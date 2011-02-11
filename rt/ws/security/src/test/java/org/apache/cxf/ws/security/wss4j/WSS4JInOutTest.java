@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Interceptor;
@@ -215,7 +216,6 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     }
     
     @Test
-    @SuppressWarnings("unchecked")
     public void testEncryption() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
@@ -281,14 +281,14 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         // There should be exactly 1 (WSS4J) HandlerResult
         //
         final java.util.List<WSHandlerResult> handlerResults = 
-            (java.util.List<WSHandlerResult>) inmsg.get(WSHandlerConstants.RECV_RESULTS);
+            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
         //
         // This should contain exactly 1 protection result
         //
-        final java.util.List<Object> protectionResults =
-            (java.util.List<Object>) handlerResults.get(0).getResults();
+        final java.util.List<WSSecurityEngineResult> protectionResults =
+            (java.util.List<WSSecurityEngineResult>) handlerResults.get(0).getResults();
         assertNotNull(protectionResults);
         assertSame(protectionResults.size(), 1);
         //
@@ -298,8 +298,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         final java.util.Map<String, Object> result =
             (java.util.Map<String, Object>) protectionResults.get(0);
         final java.util.List<WSDataRef> protectedElements =
-            (java.util.List<WSDataRef>) 
-                result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+            CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
         assertNotNull(protectedElements);
         assertSame(protectedElements.size(), 1);
         assertEquals(
@@ -312,7 +311,6 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     }
     
     @Test
-    @SuppressWarnings("unchecked")
     public void testEncryptedUsernameToken() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
@@ -387,17 +385,105 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         // There should be exactly 1 (WSS4J) HandlerResult
         //
         final java.util.List<WSHandlerResult> handlerResults = 
-            (java.util.List<WSHandlerResult>) inmsg.get(WSHandlerConstants.RECV_RESULTS);
+            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
         
         //
         // This should contain exactly 2 protection results
         //
-        final java.util.List<Object> protectionResults =
-            (java.util.List<Object>) handlerResults.get(0).getResults();
+        final java.util.List<WSSecurityEngineResult> protectionResults =
+            (java.util.List<WSSecurityEngineResult>) handlerResults.get(0).getResults();
         assertNotNull(protectionResults);
         assertSame(protectionResults.size(), 2);
+    }
+    
+    @Test
+    public void testUsernameToken() throws Exception {
+        Document doc = readDocument("wsse-request-clean.xml");
+
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
+        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
+
+        SoapMessage msg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(msg);
+        
+        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
+        SOAPPart part = saajMsg.getSOAPPart();
+        part.setContent(new DOMSource(doc));
+        saajMsg.saveChanges();
+
+        msg.setContent(SOAPMessage.class, saajMsg);
+        
+        msg.put(
+            WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN
+        );
+        msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        msg.put(WSHandlerConstants.USER, "alice");
+        msg.put("password", "alicePassword");
+
+        handler.handleMessage(msg);
+        doc = part;
+
+        assertValid("//wsse:Security", doc);
+
+        byte[] docbytes = getMessageBytes(doc);
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        dbf.setValidating(false);
+        dbf.setIgnoringComments(false);
+        dbf.setIgnoringElementContentWhitespace(true);
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setEntityResolver(new NullResolver());
+        doc = StaxUtils.read(db, reader, false);
+
+        SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        ex.setInMessage(inmsg);
+        inmsg.setContent(SOAPMessage.class, saajMsg);
+
+        //
+        // This should pass, as even though passwordType is set to digest, we are 
+        // overriding the default handler behaviour of requiring a strict password
+        // type
+        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
+        inHandler.setProperty(
+            WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN
+        );
+        inHandler.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inHandler.setProperty(WSHandlerConstants.PASSWORD_TYPE_STRICT, "false");
+        inHandler.setProperty(
+            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
+        );
+        inHandler.handleMessage(inmsg);
+        
+        inmsg = new SoapMessage(new MessageImpl());
+        ex.setInMessage(inmsg);
+        inmsg.setContent(SOAPMessage.class, saajMsg);
+        
+        //
+        // This should fail, as we are requiring a digest password type
+        //
+        inHandler = new WSS4JInInterceptor();
+        inHandler.setProperty(
+            WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN
+        );
+        inHandler.setProperty(
+            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
+        );
+        inHandler.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        try {
+            inHandler.handleMessage(inmsg);
+            fail("Expected failure on password digest");
+        } catch (org.apache.cxf.interceptor.Fault fault) {
+            // expected
+        }
     }
     
     @Test
@@ -464,7 +550,6 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         assertNull(result);
     }
     
-    
     @Test
     public void testCustomProcessorObject() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
@@ -516,7 +601,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
                 WSConstants.SIG_NS,
                 WSConstants.SIG_LN
             ),
-            new CustomProcessor()
+            CustomProcessor.class
         );
         properties.put(
             WSS4JInInterceptor.PROCESSOR_MAP,

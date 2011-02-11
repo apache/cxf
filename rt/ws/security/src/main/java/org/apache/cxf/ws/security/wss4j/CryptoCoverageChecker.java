@@ -116,14 +116,14 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         final Collection<WSDataRef> signed = new HashSet<WSDataRef>();
         final Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
         
-        List<Object> results = CastUtils.cast(
+        List<WSHandlerResult> results = CastUtils.cast(
                 (List<?>) message.get(WSHandlerConstants.RECV_RESULTS));
         
-        for (Object result : results) {
-        
-            final WSHandlerResult wshr = (WSHandlerResult) result;
-            final Vector<Object> wsSecurityEngineSignResults = new Vector<Object>();
-            final Vector<Object> wsSecurityEngineEncResults = new Vector<Object>();
+        for (final WSHandlerResult wshr : results) {
+            final List<WSSecurityEngineResult> wsSecurityEngineSignResults = 
+                new Vector<WSSecurityEngineResult>();
+            final List<WSSecurityEngineResult> wsSecurityEngineEncResults = 
+                new Vector<WSSecurityEngineResult>();
             
             WSSecurityUtil.fetchAllActionResults(wshr.getResults(),
                     WSConstants.SIGN, wsSecurityEngineSignResults);
@@ -131,8 +131,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             WSSecurityUtil.fetchAllActionResults(wshr.getResults(),
                     WSConstants.ENCR, wsSecurityEngineEncResults);
             
-            for (Object o : wsSecurityEngineSignResults) {
-                WSSecurityEngineResult wser = (WSSecurityEngineResult) o;
+            for (WSSecurityEngineResult wser : wsSecurityEngineSignResults) {
             
                 List<WSDataRef> sl = CastUtils.cast((List<?>) wser
                         .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
@@ -149,9 +148,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
                 }
             }
             
-            for (Object o : wsSecurityEngineEncResults) {
-                WSSecurityEngineResult wser = (WSSecurityEngineResult) o;
-            
+            for (WSSecurityEngineResult wser : wsSecurityEngineEncResults) {
                 List<WSDataRef> el = CastUtils.cast((List<?>) wser
                         .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
 

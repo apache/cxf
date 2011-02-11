@@ -61,17 +61,11 @@ public class KeystorePasswordCallback implements CallbackHandler {
                 //The above is an issue when doing encrypt or signing only.
                 //Perhaps using a more suitable keystore format like .jks would be better
                 pc.setPassword("password");
-                return;
             } catch (NumberFormatException nfe) {
-                //not a pfx alias, carry on to next
-            }
-
-            String pass = passwords.get(pc.getIdentifier());
-            if (pass != null) {
-                pc.setPassword(pass);
-                return;
-            } else {
-                pc.setPassword("password");
+                String pass = passwords.get(pc.getIdentifier());
+                if (pass != null) {
+                    pc.setPassword(pass);
+                }
             }
         }
     } 

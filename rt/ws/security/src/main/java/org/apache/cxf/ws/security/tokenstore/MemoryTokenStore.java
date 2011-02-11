@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.tokenstore;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -108,18 +109,19 @@ public class MemoryTokenStore implements TokenStore {
     }
 
     protected void processTokenExpiry() {
-        long time = System.currentTimeMillis();
         for (SecurityToken token : tokens.values()) {
             if (token.getState() == State.EXPIRED
                 || token.getState() == State.CANCELLED) {
                 if (autoRemove) {
                     remove(token);
                 }
-            } else if (token.getExpires() != null 
-                && token.getExpires().getTimeInMillis() < time) {
-                token.setState(SecurityToken.State.EXPIRED);
-                if (autoRemove) {
-                    remove(token);
+            } else if (token.getExpires() != null) {
+                Date current = new Date();
+                if (token.getExpires().before(current)) {
+                    token.setState(SecurityToken.State.EXPIRED);
+                    if (autoRemove) {
+                        remove(token);
+                    }
                 }
             }            
         }

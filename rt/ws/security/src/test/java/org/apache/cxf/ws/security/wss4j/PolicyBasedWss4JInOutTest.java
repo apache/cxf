@@ -47,6 +47,7 @@ import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
@@ -942,18 +943,16 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         assertNotNull(result);
     }
     
-    @SuppressWarnings("unchecked")
     private void verifyWss4jEncResults(SoapMessage inmsg) {
         //
         // There should be exactly 1 (WSS4J) HandlerResult
         //
         final List<WSHandlerResult> handlerResults = 
-            (List<WSHandlerResult>) inmsg
-                .get(WSHandlerConstants.RECV_RESULTS);
+            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
 
-        Vector<Object> protectionResults = new Vector<Object>();
+        List<WSSecurityEngineResult> protectionResults = new Vector<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(),
                 WSConstants.ENCR, protectionResults);
         assertNotNull(protectionResults);
@@ -963,8 +962,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         //
         final Map<String, Object> result = (Map<String, Object>) protectionResults
                 .get(0);
-        final List<WSDataRef> protectedElements = (List<WSDataRef>) result
-                .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> protectedElements = 
+            CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
         assertNotNull(protectedElements);
     }
     

@@ -20,11 +20,10 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,14 +62,14 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.validate.NoOpValidator;
+import org.apache.ws.security.validate.Validator;
 
 /**
  * Performs WS-Security inbound actions.
@@ -83,6 +82,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public static final String SIGNATURE_RESULT = "wss4j.signature.result";
     public static final String PRINCIPAL_RESULT = "wss4j.principal.result";
     public static final String PROCESSOR_MAP = "wss4j.processor.map";
+    public static final String VALIDATOR_MAP = "wss4j.validator.map";
 
     public static final String SECURITY_PROCESSED = WSS4JInInterceptor.class.getName() + ".DONE";
     
@@ -113,10 +113,21 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
         setProperties(properties);
-        final Map<QName, Object> map = CastUtils.cast(
-            (Map)properties.get(PROCESSOR_MAP));
-        if (map != null) {
-            secEngineOverride = createSecurityEngine(map);
+        final Map<QName, Object> processorMap = CastUtils.cast(
+            (Map<?, ?>)properties.get(PROCESSOR_MAP));
+        final Map<QName, Object> validatorMap = CastUtils.cast(
+            (Map<?, ?>)properties.get(VALIDATOR_MAP));
+        
+        if (processorMap != null) {
+            if (validatorMap != null) {
+                processorMap.putAll(validatorMap);
+            }
+            secEngineOverride = createSecurityEngine(processorMap);
+        } else if (validatorMap != null) {
+            if (processorMap != null) {
+                validatorMap.putAll(processorMap);
+            }
+            secEngineOverride = createSecurityEngine(validatorMap);
         }
     }
 
@@ -188,6 +199,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
 
         RequestData reqData = new RequestData();
+        reqData.setWssConfig(engine.getWssConfig());
         /*
          * The overall try, just to have a finally at the end to perform some
          * housekeeping.
@@ -195,7 +207,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         try {
             reqData.setMsgContext(msg);
             computeAction(msg, reqData);
-            Vector actions = new Vector();
+            List<Integer> actions = new ArrayList<Integer>();
             String action = getAction(msg, version);
 
             int doAction = WSSecurityUtil.decodeAction(action, actions);
@@ -203,6 +215,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             String actor = (String)getOption(WSHandlerConstants.ACTOR);
 
             CallbackHandler cbHandler = getCallback(reqData, doAction, utWithCallbacks);
+            
+            String passwordTypeStrict = (String)getOption(WSHandlerConstants.PASSWORD_TYPE_STRICT);
+            if (passwordTypeStrict == null) {
+                setProperty(WSHandlerConstants.PASSWORD_TYPE_STRICT, "true");
+            }
 
             /*
              * Get and check the Signature specific parameters first because
@@ -210,12 +227,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
              */
             doReceiverAction(doAction, reqData);
             
-            Vector wsResult = null;
             if (doTimeLog) {
                 t1 = System.currentTimeMillis();
             }
 
-            wsResult = engine.processSecurityHeader(
+            List<WSSecurityEngineResult> wsResult = engine.processSecurityHeader(
                 doc.getSOAPPart(), 
                 actor, 
                 cbHandler, 
@@ -232,14 +248,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     checkSignatureConfirmation(reqData, wsResult);
                 }
 
-                checkSignatures(msg, reqData, wsResult);
-                checkTimestamps(msg, reqData, wsResult);
+                storeSignature(msg, reqData, wsResult);
+                storeTimestamp(msg, reqData, wsResult);
                 checkActions(msg, reqData, wsResult, actions);
                 doResults(msg, actor, doc, wsResult, utWithCallbacks);
             } else { // no security header found
-                // Create an empty result vector to pass into the required validation
+                // Create an empty result list to pass into the required validation
                 // methods.
-                wsResult = new Vector<Object>();
+                wsResult = new ArrayList<WSSecurityEngineResult>();
                 
                 if (doc.getSOAPPart().getEnvelope().getBody().hasFault()) {
                     LOG.warning("Request does not contain Security header, " 
@@ -287,8 +303,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
-    private void checkActions(SoapMessage msg, RequestData reqData, Vector wsResult, Vector actions) 
-        throws WSSecurityException {
+    private void checkActions(
+        SoapMessage msg, 
+        RequestData reqData, 
+        List<WSSecurityEngineResult> wsResult, 
+        List<Integer> actions
+    ) throws WSSecurityException {
         /*
          * now check the security actions: do they match, in any order?
          */
@@ -297,76 +317,31 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
         }
     }
-    private void checkSignatures(SoapMessage msg, RequestData reqData, Vector wsResult) 
-        throws WSSecurityException {
-        /*
-         * Now we can check the certificate used to sign the message. In the
-         * following implementation the certificate is only trusted if
-         * either it itself or the certificate of the issuer is installed in
-         * the keystore. Note: the method verifyTrust(X509Certificate)
-         * allows custom implementations with other validation algorithms
-         * for subclasses.
-         */
-
-        // Extract the signature action result from the action vector
-        Vector signatureResults = new Vector();
+    
+    private void storeSignature(
+        SoapMessage msg, RequestData reqData, List<WSSecurityEngineResult> wsResult
+    ) throws WSSecurityException {
+        // Extract the signature action result from the action list
+        List<WSSecurityEngineResult> signatureResults = new ArrayList<WSSecurityEngineResult>();
         signatureResults = 
             WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SIGN, signatureResults);
 
+        // Store the last signature result
         if (!signatureResults.isEmpty()) {
-            for (int i = 0; i < signatureResults.size(); i++) {
-                WSSecurityEngineResult result = 
-                    (WSSecurityEngineResult) signatureResults.get(i);
-                
-                //
-                // Verify the certificate chain associated with signature verification if
-                // it exists. If it does not, then try to verify the (single) certificate
-                // used for signature verification
-                //
-                X509Certificate returnCert = (X509Certificate)result
-                    .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                X509Certificate[] returnCertChain = (X509Certificate[])result
-                .get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-                
-                if (returnCertChain != null && !verifyTrust(returnCertChain, reqData)) {
-                    LOG.warning("The certificate chain used for the signature is not trusted");
-                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-                } else if (returnCert != null && !verifyTrust(returnCert, reqData)) {
-                    LOG.warning("The certificate used for the signature is not trusted");
-                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-                }
-                msg.put(SIGNATURE_RESULT, result);
-            }
+            msg.put(SIGNATURE_RESULT, signatureResults.get(signatureResults.size() - 1));
         }
     }
     
-    protected void checkTimestamps(SoapMessage msg, RequestData reqData, Vector wsResult) 
-        throws WSSecurityException {
-        /*
-         * Perform further checks on the timestamp that was transmitted in
-         * the header. In the following implementation the timestamp is
-         * valid if it was created after (now-ttl), where ttl is set on
-         * server side, not by the client. Note: the method
-         * verifyTimestamp(Timestamp) allows custom implementations with
-         * other validation algorithms for subclasses.
-         */
-        // Extract the timestamp action result from the action vector
-        Vector timestampResults = new Vector();
+    private void storeTimestamp(
+        SoapMessage msg, RequestData reqData, List<WSSecurityEngineResult> wsResult
+    ) throws WSSecurityException {
+        // Extract the timestamp action result from the action list
+        List<WSSecurityEngineResult> timestampResults = new ArrayList<WSSecurityEngineResult>();
         timestampResults = 
             WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.TS, timestampResults);
 
         if (!timestampResults.isEmpty()) {
-            for (int i = 0; i < timestampResults.size(); i++) {
-                WSSecurityEngineResult result = 
-                    (WSSecurityEngineResult) timestampResults.get(i);
-                Timestamp timestamp = (Timestamp)result.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-
-                if (timestamp != null && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                    LOG.warning("The timestamp could not be validated");
-                    throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED);
-                }
-                msg.put(TIMESTAMP_RESULT, result);
-            }
+            msg.put(TIMESTAMP_RESULT, timestampResults.get(timestampResults.size() - 1));
         }
     }
     
@@ -381,20 +356,23 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
     }
 
-    protected void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
-        throws SOAPException, XMLStreamException, WSSecurityException {
+    protected void doResults(
+        SoapMessage msg, String actor, SOAPMessage doc, List<WSSecurityEngineResult> wsResult
+    ) throws SOAPException, XMLStreamException, WSSecurityException {
         doResults(msg, actor, doc, wsResult, false);
     }
 
-    protected void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult, 
-        boolean utWithCallbacks) throws SOAPException, XMLStreamException, WSSecurityException {
+    protected void doResults(
+        SoapMessage msg, String actor, SOAPMessage doc, List<WSSecurityEngineResult> wsResult, 
+        boolean utWithCallbacks
+    ) throws SOAPException, XMLStreamException, WSSecurityException {
         /*
          * All ok up to this point. Now construct and setup the security result
          * structure. The service may fetch this and check it.
          */
-        List<Object> results = CastUtils.cast((List)msg.get(WSHandlerConstants.RECV_RESULTS));
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
-            results = new Vector<Object>();
+            results = new ArrayList<WSHandlerResult>();
             msg.put(WSHandlerConstants.RECV_RESULTS, results);
         }
         WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
@@ -412,23 +390,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             i++;
         }
         msg.setContent(XMLStreamReader.class, reader);
-        String pwType = (String)getProperty(msg, "passwordType");
-        if ("PasswordDigest".equals(pwType)) {
-            //CXF-2150 - we need to check the UsernameTokens
-            for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
-                Integer actInt = (Integer)o.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt == WSConstants.UT) {
-                    WSUsernameTokenPrincipal princ 
-                        = (WSUsernameTokenPrincipal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                    if (!princ.isPasswordDigest()) {
-                        LOG.warning("Non-digest UsernameToken found, but digest required");
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
-                    }
-                }
-            }            
-        }
-        
-        for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
+        for (WSSecurityEngineResult o : wsResult) {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             if (p != null) {
                 msg.put(PRINCIPAL_RESULT, p);
@@ -483,7 +445,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 
                 String id = pc.getIdentifier();
                 
-                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getKeyType())) {
+                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getType())) {
                     for (SecurityToken token : store.getValidTokens()) {
                         if (id.equals(token.getSHA1())) {
                             pc.setKey(token.getSecret());
@@ -508,7 +470,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
     protected CallbackHandler getCallback(RequestData reqData, int doAction, boolean utWithCallbacks) 
         throws WSSecurityException {
-        if (!utWithCallbacks && (doAction & WSConstants.UT) != 0) {
+        if (!utWithCallbacks 
+            && ((doAction & WSConstants.UT) != 0 || (doAction & WSConstants.UT_NOPASSWORD) != 0)) {
             CallbackHandler pwdCallback = null;
             try {
                 pwdCallback = getCallback(reqData, doAction);
@@ -575,9 +538,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      *              construction); otherwise, it is taken to be the default
      *              WSSecEngine instance (currently defined in the WSHandler
      *              base class).
-     *
-     * TODO the WSHandler base class defines secEngine to be static, which
-     * is really bad, because the engine has mutable state on it.
      */
     protected WSSecurityEngine getSecurityEngine(boolean utWithCallbacks) {
         if (secEngineOverride != null) {
@@ -585,10 +545,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         
         if (!utWithCallbacks) {
-            Map<QName, Object> profiles = new HashMap<QName, Object>(3);
-            Processor processor = new UsernameTokenProcessorWithoutCallbacks();
-            profiles.put(new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN), processor);
-            profiles.put(new QName(WSConstants.WSSE11_NS, WSConstants.USERNAME_TOKEN_LN), processor);
+            Map<QName, Object> profiles = new HashMap<QName, Object>(1);
+            Validator validator = new NoOpValidator();
+            profiles.put(WSSecurityEngine.USERNAME_TOKEN, validator);
             return createSecurityEngine(profiles);
         }
         
@@ -599,9 +558,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * @return      a freshly minted WSSecurityEngine instance, using the
      *              (non-null) processor map, to be used to initialize the
      *              WSSecurityEngine instance.
-     *
-     * TODO The WSS4J APIs leave something to be desired here, but hopefully
-     * we'll clean all this up in WSS4J-2.0
      */
     protected static WSSecurityEngine
     createSecurityEngine(
@@ -612,17 +568,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         for (Map.Entry<QName, Object> entry : map.entrySet()) {
             final QName key = entry.getKey();
             Object val = entry.getValue();
-            
-            if (val instanceof String) {
-                String valStr = ((String)val).trim();
-                if ("null".equals(valStr) || valStr.length() == 0) {
-                    valStr = null;
-                }
-                config.setProcessor(key, valStr);
+            if (val instanceof Class<?>) {
+                config.setProcessor(key, (Class<?>)val);
             } else if (val instanceof Processor) {
                 config.setProcessor(key, (Processor)val);
+            } else if (val instanceof Validator) {
+                config.setValidator(key, (Validator)val);
             } else if (val == null) {
-                config.setProcessor(key, (String)val);
+                config.setProcessor(key, (Class<?>)val);
             }
         }
         final WSSecurityEngine ret = new WSSecurityEngine();

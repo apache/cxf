@@ -50,15 +50,8 @@ public class UTPasswordCallback implements CallbackHandler {
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-            String sentPassword = pc.getPassword();
             String pass = passwords.get(pc.getIdentifier());
-            if (sentPassword == null) {
-                throw new IOException("Reveived password from clienthas null value");
-            }
-            if (pass == null) {
-                throw new IOException("Unknown username sent from client");
-            }
-            if (pass.equals(sentPassword)) {
+            if (pass != null) {
                 pc.setPassword(pass);
                 return;
             }

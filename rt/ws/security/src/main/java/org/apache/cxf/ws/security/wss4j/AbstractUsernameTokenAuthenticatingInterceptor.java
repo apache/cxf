@@ -18,15 +18,12 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -38,13 +35,10 @@ import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.processor.Processor;
+import org.apache.ws.security.validate.UsernameTokenValidator;
+import org.apache.ws.security.validate.Validator;
 
 
 /**
@@ -174,83 +168,61 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
                                     String nonce,
                                     String created) throws SecurityException;
     
-    
-    /**
-     * {@inheritDoc}
-     * 
-     */
-    @Override
-    protected CallbackHandler getCallback(RequestData reqData, int doAction, boolean utNoCallbacks) 
-        throws WSSecurityException {
-        
-        // Given that a custom UT processor is used for dealing with digests 
-        // no callback handler is required when the request UT contains a digest;
-        // however a custom callback may still be needed for decrypting the encrypted UT
-        
-        if ((doAction & WSConstants.UT) != 0) {
-            CallbackHandler pwdCallback = null;
-            try {
-                pwdCallback = super.getCallback(reqData, doAction, false);
-            } catch (Exception ex) {
-                // ignore
-            }
-            return new SubjectCreatingCallbackHandler(pwdCallback);
-        }
-        
-        return super.getCallback(reqData, doAction, false);
-    }
-    
     @Override 
     protected WSSecurityEngine getSecurityEngine(boolean utNoCallbacks) {
-        if (!supportDigestPasswords) {
-            return super.getSecurityEngine(true);
-        }
-        Map<QName, Object> profiles = new HashMap<QName, Object>(3);
+        Map<QName, Object> profiles = new HashMap<QName, Object>(1);
         
-        Processor processor = new CustomUsernameTokenProcessor();
-        profiles.put(new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN), processor);
-        profiles.put(new QName(WSConstants.WSSE11_NS, WSConstants.USERNAME_TOKEN_LN), processor);
+        Validator validator = new CustomValidator();
+        profiles.put(WSSecurityEngine.USERNAME_TOKEN, validator);
         return createSecurityEngine(profiles);
     }
     
-    protected class SubjectCreatingCallbackHandler extends DelegatingCallbackHandler {
-
-        public SubjectCreatingCallbackHandler(CallbackHandler pwdHandler) {
-            super(pwdHandler);
-        }
+    protected class CustomValidator extends UsernameTokenValidator {
         
         @Override
-        protected void handleCallback(Callback c) throws IOException {
-            if (c instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback)c;
-                if (WSConstants.PASSWORD_TEXT.equals(pc.getPasswordType()) 
-                    && pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN) {
-                    AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
-                        pc.getIdentifier(), pc.getPassword(), false, null, null);
-                } 
-            }
-        }
-    }
-    
-    /**
-     * Custom UsernameTokenProcessor
-     * Unfortunately, WSS4J UsernameTokenProcessor makes it impossible to
-     * override its handleUsernameToken only. 
-     *
-     */
-    protected class CustomUsernameTokenProcessor extends UsernameTokenProcessorWithoutCallbacks {
-        
-        @Override
-        protected WSUsernameTokenPrincipal createPrincipal(String user, 
-                                                           String password,
-                                                           boolean isHashed,
-                                                           String nonce,
-                                                           String createdTime,
-                                                           String pwType) throws WSSecurityException {
+        protected void verifyCustomPassword(
+            org.apache.ws.security.message.token.UsernameToken usernameToken
+        ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
-                 user, password, isHashed, nonce, createdTime);
-            return super.createPrincipal(user, password, isHashed, nonce, createdTime, pwType);
+                usernameToken.getName(), usernameToken.getPassword(), false, null, null
+            );
         }
+        
+        @Override
+        protected void verifyPlaintextPassword(
+            org.apache.ws.security.message.token.UsernameToken usernameToken
+        ) throws WSSecurityException {
+            AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
+                usernameToken.getName(), usernameToken.getPassword(), false, null, null
+            );
+        }
+        
+        @Override
+        protected void verifyDigestPassword(
+            org.apache.ws.security.message.token.UsernameToken usernameToken
+        ) throws WSSecurityException {
+            if (!supportDigestPasswords) {
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            }
+            String user = usernameToken.getName();
+            String password = usernameToken.getPassword();
+            boolean isHashed = usernameToken.isDerivedKey();
+            String nonce = usernameToken.getNonce();
+            String createdTime = usernameToken.getCreated();
+            AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
+                user, password, isHashed, nonce, createdTime
+            );
+        }
+        
+        @Override
+        protected void verifyUnknownPassword(
+            org.apache.ws.security.message.token.UsernameToken usernameToken
+        ) throws WSSecurityException {
+            AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
+                usernameToken.getName(), null, false, null, null
+            );
+        }
+        
     }
     
 }

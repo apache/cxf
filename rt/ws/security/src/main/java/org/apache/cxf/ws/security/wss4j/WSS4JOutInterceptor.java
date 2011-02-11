@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -51,8 +52,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     
     /**
      * Property name for a map of action IDs ({@link Integer}) to action
-     * class names.  Values can be either {@link String}) or Objects
-     * implementing {@link Action}.  
+     * class names. Values can be either {@link Class}) or Objects
+-    * implementing {@link Action}.
      */
     public static final String WSS4J_ACTION_MAP = "wss4j.action.map";
     
@@ -182,7 +183,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 /*
                  * Get the action first.
                  */
-                Vector actions = new Vector();
+                List<Integer> actions = new Vector<Integer>();
                 String action = getString(WSHandlerConstants.ACTION, mc);
                 if (action == null) {
                     throw new SoapFault(new Message("NO_ACTION", LOG), version
@@ -304,19 +305,19 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 (Map<?, ?>)getProperty(mc, WSS4J_ACTION_MAP));
             if (actionMap != null) {
                 for (Map.Entry<Integer, Object> entry : actionMap.entrySet()) {
-                    String removedAction = null;
+                    Class<?> removedAction = null;
                     
                     // Be defensive here since the cast above is slightly risky
                     // with the handler config options not being strongly typed.
                     try {
-                        if (entry.getValue() instanceof String) {
+                        if (entry.getValue() instanceof Class<?>) {
                             removedAction = config.setAction(
-                                    entry.getKey().intValue(),
-                                    (String) entry.getValue());
+                                    entry.getKey().intValue(), 
+                                    (Class<?>)entry.getValue());
                         } else if (entry.getValue() instanceof Action) {
                             removedAction = config.setAction(
-                                    entry.getKey().intValue(),
-                                    (Action) entry.getValue());
+                                    entry.getKey().intValue(), 
+                                    (Action)entry.getValue());
                         } else {
                             throw new SoapFault(new Message("BAD_ACTION", LOG), version
                                     .getReceiver());
@@ -328,7 +329,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                     
                     if (doDebug) {
                         if (removedAction != null) {
-                            LOG.fine("Replaced Action: " + removedAction
+                            LOG.fine("Replaced Action: " + removedAction.getName()
                                     + " with Action: " + entry.getValue()
                                     + " for ID: " + entry.getKey());
                         } else {

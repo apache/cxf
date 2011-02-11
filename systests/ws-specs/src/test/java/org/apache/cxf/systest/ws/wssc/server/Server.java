@@ -28,7 +28,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.wssc.client.KeystorePasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSSConfig;
 
 
 public class Server extends AbstractBusTestServerBase {
@@ -86,7 +85,6 @@ public class Server extends AbstractBusTestServerBase {
     
     protected void run()  {
         try {
-            WSSConfig.getDefaultWSConfig();
             new Server("http://localhost:" + PORT + "/");
             Bus busLocal = new SpringBusFactory().createBus(
                     "org/apache/cxf/systest/ws/wssc/server/server.xml");
@@ -119,7 +117,6 @@ public class Server extends AbstractBusTestServerBase {
     }
     
     public static void main(String args[]) throws Exception {
-        WSSConfig.getDefaultWSConfig();
         new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/server/server.xml");
         new Server("http://localhost:9001/");
         System.out.println("Server ready...");

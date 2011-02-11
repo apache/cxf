@@ -26,33 +26,33 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.processor.Processor;
+import org.apache.ws.security.validate.Validator;
 
 /**
  * a custom processor that inserts itself into the results vector
  */
 public class CustomProcessor implements Processor {
     
-    @SuppressWarnings("unchecked")
-    public final void 
+    public final java.util.List<WSSecurityEngineResult> 
     handleToken(
         final org.w3c.dom.Element elem, 
         final Crypto crypto, 
         final Crypto decCrypto,
         final javax.security.auth.callback.CallbackHandler cb, 
         final WSDocInfo wsDocInfo, 
-        final java.util.Vector returnResults,
         final WSSConfig config
     ) throws WSSecurityException {
-        final java.util.Map result = 
+        final WSSecurityEngineResult result = 
             new WSSecurityEngineResult(
                 WSConstants.SIGN, 
                 (SecurityContextToken) null
             );
         result.put("foo", this);
-        returnResults.add(result);
+        return java.util.Collections.singletonList(result);
+    }
+    
+    public void setValidator(Validator validator) {
+        //
     }
 
-    public final String getId() {
-        return getClass().getName();
-    }
 }

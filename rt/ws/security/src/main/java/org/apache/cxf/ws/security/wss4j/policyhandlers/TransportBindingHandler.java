@@ -19,9 +19,11 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Vector;
+import java.util.List;
 
+import javax.xml.crypto.dsig.Reference;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
@@ -102,11 +104,13 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
     }
-    private static void addSig(Vector<byte[]> signatureValues, byte[] val) {
+    
+    private static void addSig(List<byte[]> signatureValues, byte[] val) {
         if (val != null) {
             signatureValues.add(val);
         }
     }
+    
     public void handleBinding() {
         Collection<AssertionInfo> ais;
         WSSecTimestamp timestamp = createTimestamp();
@@ -114,7 +118,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
         try {
             if (this.isRequestor()) {
-                Vector<byte[]> signatureValues = new Vector<byte[]>();
+                List<byte[]> signatureValues = new ArrayList<byte[]>();
 
                 ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
                 if (ais != null) {
@@ -213,23 +217,25 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     }
     
 
-    private byte[] doX509TokenSignature(Token token, SignedEncryptedParts signdParts,
+    private byte[] doX509TokenSignature(Token token, SignedEncryptedParts signedParts,
                                         TokenWrapper wrapper) 
         throws Exception {
         
         Document doc = saaj.getSOAPPart();
         
-        Vector<WSEncryptionPart> sigParts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
         
         if (timestampEl != null) {
-            sigParts.add(new WSEncryptionPart(timestampEl.getId()));                          
+            WSEncryptionPart timestampPart = convertToEncryptionPart(timestampEl.getElement());
+            sigParts.add(timestampPart);                          
         }
         
-        if (signdParts != null) {
-            if (signdParts.isBody()) {
-                sigParts.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody())));
+        if (signedParts != null) {
+            if (signedParts.isBody()) {
+                WSEncryptionPart bodyPart = convertToEncryptionPart(saaj.getSOAPBody());
+                sigParts.add(bodyPart);
             }
-            for (Header header : signdParts.getHeaders()) {
+            for (Header header : signedParts.getHeaders()) {
                 WSEncryptionPart wep = new WSEncryptionPart(header.getName(), 
                         header.getNamespace(),
                         "Content");
@@ -262,24 +268,27 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             */
             
             dkSig.setParts(sigParts);
-            dkSig.addReferencesToSign(sigParts, secHeader);
+            List<Reference> referenceList = dkSig.addReferencesToSign(sigParts, secHeader);
             
             //Do signature
-            dkSig.computeSignature();
-            
             dkSig.appendDKElementToHeader(secHeader);
-            dkSig.appendSigToHeader(secHeader);
+            dkSig.computeSignature(referenceList, false, null);
             
             return dkSig.getSignatureValue();
         } else {
-            WSSecSignature sig = getSignatureBuider(wrapper, token, false);
+            WSSecSignature sig = getSignatureBuilder(wrapper, token, false);
             if (sig != null) {
                 sig.prependBSTElementToHeader(secHeader);
             
-                sig.addReferencesToSign(sigParts, secHeader);
-                insertBeforeBottomUp(sig.getSignatureElement());
-            
-                sig.computeSignature();
+                List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
+                
+                if (bottomUpElement == null) {
+                    sig.computeSignature(referenceList, false, null);
+                } else {
+                    sig.computeSignature(referenceList, true, bottomUpElement);
+                }
+                bottomUpElement = sig.getSignatureElement();
+                mainSigId = sig.getId();
             
                 return sig.getSignatureValue();
             } else {
@@ -303,7 +312,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         SPConstants.IncludeTokenType inclusion = token.getInclusion();
         boolean tokenIncluded = false;
         
-        Vector<WSEncryptionPart> sigParts = new Vector<WSEncryptionPart>();
+        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
         if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS
             || ((inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
                 || inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE) 
@@ -322,19 +331,21 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
         if (timestampEl != null) {
-            sigParts.add(new WSEncryptionPart(timestampEl.getId()));                          
+            WSEncryptionPart timestampPart = convertToEncryptionPart(timestampEl.getElement());
+            sigParts.add(timestampPart);                          
         }
         
         if (signdParts != null) {
             if (signdParts.isBody()) {
-                sigParts.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody())));
+                WSEncryptionPart bodyPart = convertToEncryptionPart(saaj.getSOAPBody());
+                sigParts.add(bodyPart);
             }
             if (secTok.getX509Certificate() != null
                 || securityTok != null) {
                 //the "getX509Certificate" this is to workaround an issue in WCF
-                //In WCF, for TransportBinding, in most cases, it doesn't wan't any of
-                //the headers signed even if the policy sais so.   HOWEVER, for KeyValue
-                //IssuedTokends, it DOES want them signed
+                //In WCF, for TransportBinding, in most cases, it doesn't want any of
+                //the headers signed even if the policy says so.   HOWEVER, for KeyValue
+                //IssuedTokens, it DOES want them signed
                 for (Header header : signdParts.getHeaders()) {
                     WSEncryptionPart wep = new WSEncryptionPart(header.getName(), 
                             header.getNamespace(),
@@ -364,7 +375,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 dkSign.setExternalKey(secTok.getSecret(), secTok.getId());
             }
           
-            //    Set the algo info
+            // Set the algo info
             dkSign.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
             dkSign.setDerivedKeyLength(algorithmSuite.getSignatureDerivedKeyLength() / 8);
             if (token.getSPConstants() == SP12Constants.INSTANCE) {
@@ -375,20 +386,18 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             addDerivedKeyElement(dkSign.getdktElement());
           
             dkSign.setParts(sigParts);
-            dkSign.addReferencesToSign(sigParts, secHeader);
+            List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
           
             //Do signature
-            dkSign.computeSignature();
-          
-            dkSign.appendSigToHeader(secHeader);
+            dkSign.computeSignature(referenceList, false, null);
           
             return dkSign.getSignatureValue();
         } else {
             WSSecSignature sig = new WSSecSignature();
             if (secTok.getTokenType() == null) {
                 sig.setCustomTokenId(secTok.getId());
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
-                                            + WSConstants.SAML_ASSERTION_ID);
+                // TODO Add support for SAML2 here
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {
                 String id = secTok.getWsuId();
@@ -425,14 +434,17 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             sig.prepare(doc, crypto, secHeader);
 
             sig.setParts(sigParts);
-            sig.addReferencesToSign(sigParts, secHeader);
+            List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
 
             //Do signature
-            sig.computeSignature();
-
-            //Add elements to header
-            insertBeforeBottomUp(sig.getSignatureElement());
-
+            if (bottomUpElement == null) {
+                sig.computeSignature(referenceList, false, null);
+            } else {
+                sig.computeSignature(referenceList, true, bottomUpElement);
+            }
+            bottomUpElement = sig.getSignatureElement();
+            mainSigId = sig.getId();
+        
             return sig.getSignatureValue();
         }
     }

@@ -20,11 +20,10 @@
 package org.apache.cxf.ws.security.tokenstore;
 
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Properties;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
 import org.w3c.dom.Element;
 
@@ -34,6 +33,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.token.Reference;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 
 
 /**
@@ -106,12 +106,12 @@ public class SecurityToken {
     /**
      * Created time
      */
-    private Calendar created;
+    private Date created;
     
     /**
      * Expiration time
      */
-    private Calendar expires;
+    private Date expires;
     
     /**
      * Issuer end point address
@@ -136,7 +136,7 @@ public class SecurityToken {
     public SecurityToken() {
         
     }
-    public SecurityToken(String id, Calendar created, Calendar expires) {
+    public SecurityToken(String id, Date created, Date expires) {
         this.id = id;
         this.created = created;
         this.expires = expires;
@@ -144,8 +144,8 @@ public class SecurityToken {
     
     public SecurityToken(String id,
                  Element tokenElem,
-                 Calendar created,
-                 Calendar expires) {
+                 Date created,
+                 Date expires) {
         this.id = id;
         this.token = cloneElement(tokenElem);
         this.created = created;
@@ -178,22 +178,20 @@ public class SecurityToken {
      */
     private void processLifeTime(Element lifetimeElem) {
         try {
-            DatatypeFactory factory = DatatypeFactory.newInstance();
-            
             Element createdElem = 
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSConstants.WSU_NS,
                                                 WSConstants.CREATED_LN);
-            this.created = factory.newXMLGregorianCalendar(DOMUtils.getContent(createdElem))
-                .toGregorianCalendar();
+            DateFormat zulu = new XmlSchemaDateFormat();
+            
+            this.created = zulu.parse(DOMUtils.getContent(createdElem));
 
             Element expiresElem = 
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSConstants.WSU_NS,
                                                 WSConstants.EXPIRES_LN);
-            this.expires = factory.newXMLGregorianCalendar(DOMUtils.getContent(expiresElem))
-                .toGregorianCalendar();
-        } catch (DatatypeConfigurationException e) {
+            this.expires = zulu.parse(DOMUtils.getContent(expiresElem));
+        } catch (ParseException e) {
             //shouldn't happen
         }
     }
@@ -324,21 +322,21 @@ public class SecurityToken {
     /**
      * @return Returns the created.
      */
-    public Calendar getCreated() {
+    public Date getCreated() {
         return created;
     }
 
     /**
      * @return Returns the expires.
      */
-    public Calendar getExpires() {
+    public Date getExpires() {
         return expires;
     }
 
     /**
      * @param expires The expires to set.
      */
-    public void setExpires(Calendar expires) {
+    public void setExpires(Date expires) {
         this.expires = expires;
     }
 
@@ -350,7 +348,6 @@ public class SecurityToken {
         this.issuerAddress = issuerAddress;
     }
     
-
     /**
      * @param sha SHA1 of the encrypted key
      */
@@ -407,16 +404,18 @@ public class SecurityToken {
         }
         return null;
     }
+    
     public void setX509Certificate(X509Certificate cert, Crypto cpt) {
         x509cert = cert;
         crypto = cpt;
     }
+    
     public X509Certificate getX509Certificate() {
         return x509cert;
     }
+    
     public Crypto getCrypto() {
         return crypto;
     }
-
 
 } 

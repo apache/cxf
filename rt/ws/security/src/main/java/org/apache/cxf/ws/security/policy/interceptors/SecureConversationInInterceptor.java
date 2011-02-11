@@ -19,10 +19,9 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.transform.dom.DOMSource;
@@ -36,6 +35,7 @@ import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
@@ -86,8 +86,8 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
-import org.apache.xml.security.utils.Base64;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     static final Logger LOG = LogUtils.getL7dLogger(SecureConversationInInterceptor.class);
@@ -385,10 +385,10 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 new SecurityContextToken(SecureConversationTokenInterceptorProvider
                                               .getWSCVersion(tokenType), writer.getDocument());
             
-            Calendar created = Calendar.getInstance();
-            Calendar expires = Calendar.getInstance();
-            expires.setTimeInMillis(System.currentTimeMillis() + ttl);
-
+            Date created = new Date();
+            Date expires = new Date();
+            expires.setTime(created.getTime() + (ttl * 1000));
+            
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
             token.setTokenType(WSConstants.WSC_SCT);
@@ -457,17 +457,13 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         public void handleMessage(SoapMessage message) throws Fault {
             //Find the SC token
             boolean found = false;
-            List results = (List)message.get(WSHandlerConstants.RECV_RESULTS);
+            List<WSHandlerResult> results = 
+                CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
             if (results != null) {
-                for (int i = 0; i < results.size(); i++) {
-                    WSHandlerResult rResult =
-                            (WSHandlerResult) results.get(i);
+                for (WSHandlerResult rResult : results) {
+                    List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
     
-                    Vector wsSecEngineResults = rResult.getResults();
-    
-                    for (int j = 0; j < wsSecEngineResults.size(); j++) {
-                        WSSecurityEngineResult wser =
-                                (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                    for (WSSecurityEngineResult wser : wsSecEngineResults) {
                         Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
                         if (actInt.intValue() == WSConstants.SCT) {
                             SecurityContextToken tok
@@ -522,6 +518,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             doCancel(message, aim, tok);
 
         }
+        
         private void doCancel(SoapMessage message, AssertionInfoMap aim, SecureConversationToken itok) {
             Message m2 = message.getExchange().getOutMessage();
             

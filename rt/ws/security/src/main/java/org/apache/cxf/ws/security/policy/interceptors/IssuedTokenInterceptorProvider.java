@@ -22,11 +22,11 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Vector;
-
+import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -213,14 +213,11 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
                 if (!isRequestor(message)) {
                     boolean found = false;
-                    Vector results = (Vector)message.get(WSHandlerConstants.RECV_RESULTS);
+                    List<WSHandlerResult> results = 
+                        CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null) {
-                        for (int i = 0; i < results.size(); i++) {
-                            WSHandlerResult rResult =
-                                    (WSHandlerResult) results.get(i);
-    
-                            Vector wsSecEngineResults = rResult.getResults();
-                            SecurityToken token = findIssuedToken(wsSecEngineResults);
+                        for (WSHandlerResult rResult : results) {
+                            SecurityToken token = findIssuedToken(rResult.getResults());
                             if (token != null) {
                                 found = true;
                                 message.getExchange().put(SecurityConstants.TOKEN, token);
@@ -239,10 +236,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         
-        private SecurityToken findIssuedToken(Vector wsSecEngineResults) {
-            for (int j = 0; j < wsSecEngineResults.size(); j++) {
-                WSSecurityEngineResult wser =
-                    (WSSecurityEngineResult) wsSecEngineResults.get(j);
+        private SecurityToken findIssuedToken(
+            List<WSSecurityEngineResult> wsSecEngineResults
+        ) {
+            for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
                 if (actInt.intValue() == WSConstants.SIGN) {
                     Principal principal = 
@@ -251,13 +248,13 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         CustomTokenPrincipal customPrincipal = 
                             (CustomTokenPrincipal)principal;
                         byte[] secretKey = 
-                            (byte[])wser.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
+                            (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                         if (secretKey != null) {
                             SecurityToken token = 
                                 new SecurityToken(
                                     customPrincipal.getName(), 
-                                    (java.util.Calendar)null, 
-                                    (java.util.Calendar)null
+                                    (java.util.Date)null, 
+                                    (java.util.Date)null
                                 );
                             token.setSecret(secretKey);
                             return token;

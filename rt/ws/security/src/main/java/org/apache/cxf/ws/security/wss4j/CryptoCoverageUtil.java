@@ -82,9 +82,9 @@ public final class CryptoCoverageUtil {
                 final WSDataRef signedRef = signedRefsIt.next();
                 
                 if (isSignedEncryptionRef(encryptedRef, signedRef)) {
-                    
-                    final WSDataRef encryptedSignedRef = 
-                        new WSDataRef(signedRef.getDataref());
+
+                    final WSDataRef encryptedSignedRef = new WSDataRef();
+                    encryptedSignedRef.setWsuId(signedRef.getWsuId());
                     
                     encryptedSignedRef.setContent(false);
                     encryptedSignedRef.setName(encryptedRef.getName());

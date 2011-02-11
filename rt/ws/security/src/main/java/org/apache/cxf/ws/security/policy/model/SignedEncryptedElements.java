@@ -114,8 +114,8 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
 
         String xpathExpression;
 
-        for (Iterator iterator = xPathExpressions.iterator(); iterator.hasNext();) {
-            xpathExpression = (String)iterator.next();
+        for (Iterator<String> iterator = xPathExpressions.iterator(); iterator.hasNext();) {
+            xpathExpression = iterator.next();
             // <sp:XPath ..>
             writer.writeStartElement(prefix, SPConstants.XPATH_EXPR, namespaceURI);
             writer.writeCharacters(xpathExpression);

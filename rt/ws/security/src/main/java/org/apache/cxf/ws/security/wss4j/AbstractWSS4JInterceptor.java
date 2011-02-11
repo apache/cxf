@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
@@ -39,12 +38,10 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
 
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {
@@ -61,7 +58,6 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     private Set<String> after = new HashSet<String>();
     private String phase;
     private String id;
-    private Map<String, Crypto> cryptoTable = new ConcurrentHashMap<String, Crypto>();
     
     public AbstractWSS4JInterceptor() {
         super();
@@ -154,56 +150,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         return MessageUtils.isRequestor(message);
     }  
 
-    protected boolean decodeEnableSignatureConfirmation(RequestData reqData) throws WSSecurityException {
-
-        String value = getString(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION,
-                reqData.getMsgContext());
-
-        //we need the default to be false to not break older applications and such
-        if (value == null) {
-            return false;
-        }
-        return super.decodeEnableSignatureConfirmation(reqData);
-    }
-
-    public Crypto loadSignatureCrypto(RequestData reqData) 
-        throws WSSecurityException {
-        Crypto crypto = null;
-        /*
-         *Get crypto property file for signature. If none specified throw
-         * fault, otherwise get a crypto instance.
-         */
-        String sigPropFile = getString(WSHandlerConstants.SIG_PROP_FILE,
-                   reqData.getMsgContext());
-        String refId = null;
-        if (sigPropFile != null) {
-            crypto = cryptoTable.get(sigPropFile);
-            if (crypto == null) {
-                crypto = loadCryptoFromPropertiesFile(sigPropFile, reqData);
-                cryptoTable.put(sigPropFile, crypto);
-            }
-        } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData
-            .getMsgContext()) != null) {
-            /*
-             * If the property file is missing then 
-             * look for the Properties object 
-             */
-            refId = getString(WSHandlerConstants.SIG_PROP_REF_ID,
-                reqData.getMsgContext());
-            if (refId != null) {
-                Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if (propObj instanceof Properties) {
-                    crypto = cryptoTable.get(refId);
-                    if (crypto == null) {
-                        crypto = CryptoFactory.getInstance((Properties)propObj);
-                        cryptoTable.put(refId, crypto);
-                    }
-                }
-            }
-        } 
-        return crypto;
-    }
-    
+    @Override
     protected Crypto loadCryptoFromPropertiesFile(String propFilename, RequestData reqData) {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
@@ -233,80 +180,6 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         } finally {
             Thread.currentThread().setContextClassLoader(orig);
         }
-    }
-
-    protected Crypto loadDecryptionCrypto(RequestData reqData) 
-        throws WSSecurityException {
-        Crypto crypto = null;
-        String decPropFile = getString(WSHandlerConstants.DEC_PROP_FILE,
-                 reqData.getMsgContext());
-        String refId = null;
-        if (decPropFile != null) {
-            crypto = cryptoTable.get(decPropFile);
-            if (crypto == null) {
-                crypto = loadCryptoFromPropertiesFile(decPropFile, reqData);
-                cryptoTable.put(decPropFile, crypto);
-            }
-        } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData
-            .getMsgContext()) != null) {
-            /*
-             * If the property file is missing then 
-             * look for the Properties object 
-             */
-            refId = getString(WSHandlerConstants.DEC_PROP_REF_ID,
-                reqData.getMsgContext());
-            if (refId != null) {
-                Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if (propObj instanceof Properties) {
-                    crypto = cryptoTable.get(refId);
-                    if (crypto == null) {
-                        crypto = CryptoFactory.getInstance((Properties)propObj);
-                        cryptoTable.put(refId, crypto);
-                    }
-                }
-            }
-        } 
-        return crypto;
-    }
-    
-    protected Crypto loadEncryptionCrypto(RequestData reqData) 
-        throws WSSecurityException {
-        Crypto crypto = null;
-        /*
-        * Get encryption crypto property file. If non specified take crypto
-        * instance from signature, if that fails: throw fault
-        */
-        String encPropFile = getString(WSHandlerConstants.ENC_PROP_FILE,
-                       reqData.getMsgContext());
-        String refId = null;
-        if (encPropFile != null) {
-            crypto = cryptoTable.get(encPropFile);
-            if (crypto == null) {
-                crypto = loadCryptoFromPropertiesFile(encPropFile, reqData);
-                cryptoTable.put(encPropFile, crypto);
-            }
-        } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData
-                .getMsgContext()) != null) {
-            /*
-             * If the property file is missing then 
-             * look for the Properties object 
-             */
-            refId = getString(WSHandlerConstants.ENC_PROP_REF_ID,
-                    reqData.getMsgContext());
-            if (refId != null) {
-                Object propObj = getProperty(reqData.getMsgContext(), refId);
-                if (propObj instanceof Properties) {
-                    crypto = cryptoTable.get(refId);
-                    if (crypto == null) {
-                        crypto = CryptoFactory.getInstance((Properties)propObj);
-                        cryptoTable.put(refId, crypto);
-                    }
-                }
-            }
-        } else if (reqData.getSigCrypto() == null) {
-            return crypto;
-        }
-        return crypto;
     }
 
 }

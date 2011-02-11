@@ -34,6 +34,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -42,6 +43,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
 
 
 /**
@@ -58,7 +60,6 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
     }
     
     @org.junit.Test
-    @SuppressWarnings("unchecked")
     public void testSignatureConfirmationRequest() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
@@ -97,11 +98,9 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         // Save the signature for future confirmation
         //
-        Object sigv = msg.get(WSHandlerConstants.SEND_SIGV);
+        List<WSHandlerResult> sigv = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
-        assertTrue(sigv instanceof List);
-        assertTrue(((List<Object>)sigv).size() != 0);
-        List<Object> sigSaved = (List<Object>)sigv;
+        assertTrue(sigv.size() != 0);
         
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
@@ -135,17 +134,18 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
             (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
         assertNotNull(result);
         
-        List<Object> sigReceived = (List<Object>)inmsg.get(WSHandlerConstants.RECV_RESULTS);
+        List<WSHandlerResult> sigReceived = 
+            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(sigReceived);
         assertTrue(sigReceived.size() != 0);
         
-        testSignatureConfirmationResponse(sigSaved, sigReceived);
+        testSignatureConfirmationResponse(sigv, sigReceived);
     }
     
    
     private void testSignatureConfirmationResponse(
-        List<Object> sigSaved,
-        List<Object> sigReceived
+        List<WSHandlerResult> sigSaved,
+        List<WSHandlerResult> sigReceived
     ) throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 

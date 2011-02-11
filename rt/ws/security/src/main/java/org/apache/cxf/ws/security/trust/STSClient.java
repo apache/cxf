@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,7 +100,8 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -288,6 +288,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setKeySize(int i) {
         keySize = i;
     }
+    
     public int getKeySize() {
         return keySize;
     }
@@ -311,9 +312,9 @@ public class STSClient implements Configurable, InterceptorProvider {
     protected void setPolicyInternal(Policy newPolicy) {
         this.policy = newPolicy;
         if (algorithmSuite == null) {
-            Iterator i = policy.getAlternatives();
+            Iterator<?> i = policy.getAlternatives();
             while (i.hasNext() && algorithmSuite == null) {
-                List<PolicyComponent> p = CastUtils.cast((List)i.next());
+                List<PolicyComponent> p = CastUtils.cast((List<?>)i.next());
                 for (PolicyComponent p2 : p) {
                     if (p2 instanceof Binding) {
                         algorithmSuite = ((Binding)p2).getAlgorithmSuite();
@@ -578,10 +579,12 @@ public class STSClient implements Configurable, InterceptorProvider {
         String ns = "http://schemas.xmlsoap.org/ws/2004/08/addressing/policy";
         return new PrimitiveAssertion(new QName(ns, "UsingAddressing"));
     }
+    
     public boolean validateSecurityToken(SecurityToken tok) throws Exception {
         return validateSecurityToken(tok,
                                      namespace + "/RSTR/Status");
     }
+    
     private boolean validateSecurityToken(SecurityToken tok, String string) 
         throws Exception {
         createClient();
@@ -887,13 +890,14 @@ public class STSClient implements Configurable, InterceptorProvider {
                 secret = Base64.decode(b64Secret);
             } else if (childQname.equals(new QName(namespace, WSConstants.ENC_KEY_LN))) {
                 try {
-
-                    EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
-
-                    processor.handleToken(child, null, createCrypto(true), createHandler(), null,
-                                          new Vector(), null);
-
-                    secret = processor.getDecryptedBytes();
+                    EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
+                    WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+                    List<WSSecurityEngineResult> result =
+                        proc.handleToken(child, null, createCrypto(true), createHandler(), docInfo, null);
+                    secret = 
+                        (byte[])result.get(0).get(
+                            WSSecurityEngineResult.TAG_SECRET
+                        );
                 } catch (IOException e) {
                     throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
                 }
@@ -959,7 +963,6 @@ public class STSClient implements Configurable, InterceptorProvider {
     }
 
     private Crypto createCrypto(boolean decrypt) throws IOException {
-        WSSConfig.getDefaultWSConfig();
         Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO + (decrypt ? ".decrypt" : ""));
         if (crypto != null) {
             return crypto;

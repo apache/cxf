@@ -31,6 +31,7 @@ public final class SecurityConstants {
     public static final String USERNAME = "ws-security.username";
     public static final String PASSWORD = "ws-security.password";
     public static final String VALIDATE_TOKEN = "ws-security.validate.token";
+    public static final String USERNAME_TOKEN_VALIDATOR = "ws-security.ut.validator";
     
     public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
     

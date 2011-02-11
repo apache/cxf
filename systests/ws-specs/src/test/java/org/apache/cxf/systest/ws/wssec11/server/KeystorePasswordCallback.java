@@ -42,6 +42,7 @@ public class KeystorePasswordCallback implements CallbackHandler {
         passwords.put("alice", "password");
         passwords.put("Bob", "abcd!1234");
         passwords.put("bob", "password");
+        passwords.put("abcd", "dcba");
     }
 
     /**
@@ -56,8 +57,6 @@ public class KeystorePasswordCallback implements CallbackHandler {
             if (pass != null) {
                 pc.setPassword(pass);
                 return;
-            } else {
-                pc.setPassword("password");
             }
         }
     }

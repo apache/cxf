@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -67,8 +66,8 @@ import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.P_SHA1;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -96,6 +95,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         }
         return (Trust10)ais.iterator().next().getAssertion();
     }
+    
     static final Trust13 getTrust13(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_13);
         if (ais == null || ais.isEmpty()) {
@@ -114,6 +114,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         }
         return tokenStore;
     }
+    
     static PolicyAssertion getAddressingPolicy(AssertionInfoMap aim, boolean optional) {
         Collection<AssertionInfo> lst = aim.get(MetadataConstants.USING_ADDRESSING_2004_QNAME);
         PolicyAssertion assertion = null;
@@ -233,6 +234,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         }
         return client;
     }
+    
     static byte[] writeProofToken(String prefix, 
                                           String namespace,
                                           W3CDOMStreamWriter writer,
@@ -242,9 +244,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         byte secret[] = null; 
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
         if (clientEntropy == null) {
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            secret = new byte[keySize / 8];
-            random.nextBytes(secret);
+            secret = WSSecurityUtil.generateNonce(keySize / 8);
             
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");

@@ -21,8 +21,6 @@ package org.apache.cxf.ws.security.policy;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
-import org.apache.cxf.ws.security.policy.SPConstants.Version;
 
 public final class SP12Constants extends SPConstants {
 

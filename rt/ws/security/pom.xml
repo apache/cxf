@@ -91,20 +91,8 @@
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>1.5.11</version>
+            <version>1.6-SNAPSHOT</version>
             <exclusions>
-                <exclusion>
-                    <groupId>axis</groupId>
-                    <artifactId>axis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>opensaml</groupId>
-                    <artifactId>opensaml</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>axis</groupId>
-                    <artifactId>axis-ant</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>

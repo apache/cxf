@@ -20,11 +20,11 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
@@ -57,6 +57,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -65,6 +66,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.processor.UsernameTokenProcessor;
+import org.apache.ws.security.validate.Validator;
 
 /**
  * 
@@ -128,12 +130,16 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
                 try  {
                     final WSUsernameTokenPrincipal princ = getPrincipal(child, message);
                     if (princ != null) {
-                        Vector<WSSecurityEngineResult>v = new Vector<WSSecurityEngineResult>();
-                        v.add(0, new WSSecurityEngineResult(WSConstants.UT, princ, null, null, null));
-                        List<Object> results = CastUtils.cast((List)message
+                        List<WSSecurityEngineResult>v = new ArrayList<WSSecurityEngineResult>();
+                        int action = WSConstants.UT;
+                        if (princ.getPassword() == null) {
+                            action = WSConstants.UT_NOPASSWORD;
+                        }
+                        v.add(0, new WSSecurityEngineResult(action, princ, null, null, null));
+                        List<WSHandlerResult> results = CastUtils.cast((List<?>)message
                                                                   .get(WSHandlerConstants.RECV_RESULTS));
                         if (results == null) {
-                            results = new Vector<Object>();
+                            results = new ArrayList<WSHandlerResult>();
                             message.put(WSHandlerConstants.RECV_RESULTS, results);
                         }
                         WSHandlerResult rResult = new WSHandlerResult(null, v);
@@ -166,7 +172,15 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
             MessageUtils.getContextualBoolean(message, SecurityConstants.VALIDATE_TOKEN, true);
         if (utWithCallbacks) {
             UsernameTokenProcessor p = new UsernameTokenProcessor();
-            return p.handleUsernameToken(tokenElement, getCallback(message));
+            Object validator = 
+                message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
+            if (validator instanceof Validator) {
+                p.setValidator((Validator)validator);
+            }
+            WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+            List<WSSecurityEngineResult> results = 
+                p.handleToken(tokenElement, null, null, getCallback(message), wsDocInfo, null);
+            return (WSUsernameTokenPrincipal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         } else {
             WSUsernameTokenPrincipal principal = parseTokenAndCreatePrincipal(tokenElement);
             WSS4JTokenConverter.convertToken(message, principal);

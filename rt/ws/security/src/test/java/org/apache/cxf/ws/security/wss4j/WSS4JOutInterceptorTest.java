@@ -219,7 +219,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         }
         
         try {
-            customActions.put(new Object(), action);
+            customActions.put(new Object(), CountingUsernameTokenAction.class);
             handler.handleMessage(msg);
         } catch (SoapFault e) {
             assertEquals("An invalid action configuration was defined.", e.getMessage());

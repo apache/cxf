@@ -21,14 +21,18 @@ package org.apache.cxf.ws.security.wss4j;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -44,11 +48,15 @@ import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.WSSecHeader;
 
 public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public static final String SECURITY_PROCESSED = PolicyBasedWSS4JOutInterceptor.class.getName() + ".DONE";
     public static final PolicyBasedWSS4JOutInterceptor INSTANCE = new PolicyBasedWSS4JOutInterceptor();
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JOutInterceptor.class);
+
     
     private PolicyBasedWSS4JOutInterceptorInternal ending;
     private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();    
@@ -122,7 +130,14 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 
                 if (transport != null) {
                     WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
-                    Element el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
+                    Element el = null;
+                    try {
+                        el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
+                    } catch (WSSecurityException e) {
+                        throw new SoapFault(
+                            new Message("SECURITY_FAILED", LOG), e, message.getVersion().getSender()
+                        );
+                    }
                     try {
                         //move to end
                         saaj.getSOAPHeader().removeChild(el);
