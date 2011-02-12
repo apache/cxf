@@ -35,18 +35,8 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     
     public static final String PREFERRED_FORMAT = "source-preferred-format";
 
-    private XMLStreamDataReader xsrReader;
-    private XMLStreamDataWriter xswWriter;
-    private NodeDataWriter nodeWriter;
-    private NodeDataReader nodeReader;
-
     public SourceDataBinding() {
         super();
-        this.xsrReader = new XMLStreamDataReader();
-        this.xswWriter = new XMLStreamDataWriter();
-
-        this.nodeReader = new NodeDataReader();
-        this.nodeWriter = new NodeDataWriter();
     }
 
     public void initialize(Service service) {
@@ -57,9 +47,9 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     @SuppressWarnings("unchecked")
     public <T> DataReader<T> createReader(Class<T> cls) {
         if (cls == XMLStreamReader.class) {
-            return (DataReader<T>) xsrReader;
+            return (DataReader<T>) new XMLStreamDataReader();
         } else if (cls == Node.class) {
-            return (DataReader<T>) nodeReader;
+            return (DataReader<T>) new NodeDataReader();
         } else {
             throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
         }
@@ -72,9 +62,9 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     @SuppressWarnings("unchecked")
     public <T> DataWriter<T> createWriter(Class<T> cls) {
         if (cls == XMLStreamWriter.class) {
-            return (DataWriter<T>) xswWriter;
+            return (DataWriter<T>) new XMLStreamDataWriter();
         } else if (cls == Node.class) {
-            return (DataWriter<T>) nodeWriter;
+            return (DataWriter<T>) new NodeDataWriter();
         } else {
             throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
         }
