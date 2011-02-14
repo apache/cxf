@@ -102,6 +102,17 @@ http://cxf.apache.org/schemas/core.xsd">
 
     <jaxrs:providers>
        <ref bean="xsltProvider"/>
+    </jaxrs:providers> 
+    
+  </jaxrs:server>
+  
+  <jaxrs:server id="bookserviceWithStax"
+		        address="/thebooksWithStax/bookstore">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		  
+
+    <jaxrs:providers>
        <bean class="org.apache.cxf.systest.jaxrs.XmlStreamReaderProvider"/>
        <bean class="org.apache.cxf.systest.jaxrs.XmlStreamWriterProvider"/>
     </jaxrs:providers> 
