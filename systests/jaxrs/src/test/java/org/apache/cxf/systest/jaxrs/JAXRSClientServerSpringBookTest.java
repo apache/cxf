@@ -338,7 +338,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testReaderWriterFromJaxrsFilters() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks5/bookstore/books/convert2/123";
+            "http://localhost:" + PORT + "/the/thebooksWithStax/bookstore/books/convert2/123";
         WebClient wc = WebClient.create(endpointAddress);
         wc.type("application/xml").accept("application/xml");
         Book2 b = new Book2();
@@ -353,7 +353,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testReaderWriterFromInterceptors() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks5/bookstore/books/convert";
+            "http://localhost:" + PORT + "/the/thebooksWithStax/bookstore/books/convert";
         WebClient wc = WebClient.create(endpointAddress);
         wc.type("application/xml").accept("application/xml");
         Book2 b = new Book2();
