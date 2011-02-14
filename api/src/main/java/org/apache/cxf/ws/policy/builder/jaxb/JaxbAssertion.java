@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 
 
@@ -44,6 +45,10 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
 
     public JaxbAssertion(QName qn, boolean optional) {
         super(qn, optional);
+    }
+    
+    public JaxbAssertion(QName qn, boolean optional, boolean ignorable) {
+        super(qn, optional, ignorable);
     }
       
     @Override
@@ -64,8 +69,8 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
         return data;
     }
 
-    protected PolicyAssertion cloneMandatory() {
-        JaxbAssertion<T> a = new JaxbAssertion<T>(getName(), false);
+    protected Assertion clone(boolean optional) {
+        JaxbAssertion<T> a = new JaxbAssertion<T>(getName(), optional, ignorable);
         a.setData(data);
         return a;        
     } 

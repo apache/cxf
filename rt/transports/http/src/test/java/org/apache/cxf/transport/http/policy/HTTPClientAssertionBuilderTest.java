@@ -30,19 +30,6 @@ import org.junit.Test;
  */
 public class HTTPClientAssertionBuilderTest extends Assert {
 
-    @Test
-    public void testBuildCompatible() throws Exception {
-        HTTPClientAssertionBuilder ab = new HTTPClientAssertionBuilder();
-        JaxbAssertion<HTTPClientPolicy>  a = ab.buildAssertion();
-        HTTPClientPolicy pa = new HTTPClientPolicy();
-        a.setData(pa);
-        JaxbAssertion<HTTPClientPolicy> b = ab.buildAssertion();
-        HTTPClientPolicy pb = new HTTPClientPolicy();
-        b.setData(pb);
-        JaxbAssertion<HTTPClientPolicy> c = 
-            JaxbAssertion.cast(ab.buildCompatible(a, b), HTTPClientPolicy.class);
-        assertNotNull(c);        
-    }
     
     @Test
     public void testBuildAssertion() throws Exception {

@@ -31,7 +31,7 @@ import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderLoader;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
-import org.apache.cxf.ws.policy.builder.xml.XMLPrimitiveAssertionBuilder;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 import org.apache.cxf.ws.security.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.cxf.ws.security.policy.builders.AsymmetricBindingBuilder;
 import org.apache.cxf.ws.security.policy.builders.ContentEncryptedElementsBuilder;
@@ -145,7 +145,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             new QName(SP12Constants.SP_NS, SP12Constants.ENCRYPT_BEFORE_SIGNING),
             new QName(SP11Constants.SP_NS, SP11Constants.ENCRYPT_BEFORE_SIGNING),
         });
-        reg.register(new XMLPrimitiveAssertionBuilder(others));
+        reg.register(new PrimitiveAssertionBuilder(others));
     }
     
     public void registerProviders() {

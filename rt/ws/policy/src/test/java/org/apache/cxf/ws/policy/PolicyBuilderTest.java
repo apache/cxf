@@ -25,7 +25,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.ws.policy.builder.xml.XMLPrimitiveAssertionBuilder;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
@@ -43,7 +43,7 @@ public class PolicyBuilderTest extends Assert {
         builder = new PolicyBuilderImpl();
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         builder.setAssertionBuilderRegistry(abr);
-        AssertionBuilder ab = new XMLPrimitiveAssertionBuilder();
+        AssertionBuilder ab = new PrimitiveAssertionBuilder();
         abr.register(new QName("http://sample.org/Assertions", "A"), ab);
         abr.register(new QName("http://sample.org/Assertions", "B"), ab);
         abr.register(new QName("http://sample.org/Assertions", "C"), ab);

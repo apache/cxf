@@ -40,6 +40,7 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyContainingAssertion;
 
 /**
  * 
@@ -269,10 +270,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         if (null != pp) {
             out.addAll(fault ? pp.getInFaultInterceptors() : pp.getInInterceptors());
         }
-        Policy p = a.getPolicy();
-        if (p != null) {
-            for (PolicyAssertion a2 : getSupportedAlternatives(p)) {
-                initializeInterceptors(reg, out, a2, fault);
+        if (a instanceof PolicyContainingAssertion) {
+            Policy p = ((PolicyContainingAssertion)a).getPolicy();
+            if (p != null) {
+                for (PolicyAssertion a2 : getSupportedAlternatives(p)) {
+                    initializeInterceptors(reg, out, a2, fault);
+                }
             }
         }
     }

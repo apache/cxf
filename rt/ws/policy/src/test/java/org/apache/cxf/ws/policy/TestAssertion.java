@@ -24,7 +24,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.neethi.Constants;
-import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 
 /**
@@ -64,11 +63,6 @@ public class TestAssertion implements PolicyAssertion {
 
     public short getType() {
         return Constants.TYPE_ASSERTION;
-    }
-
-    public Policy getPolicy() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public boolean isAsserted(AssertionInfoMap aim) {

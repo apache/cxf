@@ -43,6 +43,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyContainingAssertion;
 
 /**
  * 
@@ -193,10 +194,12 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (null != pp) {
             out.addAll(usIn ? pp.getInInterceptors() : pp.getOutInterceptors());
         }
-        Policy p = a.getPolicy();
-        if (p != null) {
-            for (PolicyAssertion a2 : getSupportedAlternatives(engine, p)) {
-                initialiseInterceptors(reg, engine, out, a2, usIn);
+        if (a instanceof PolicyContainingAssertion) {
+            Policy p = ((PolicyContainingAssertion)a).getPolicy();
+            if (p != null) {
+                for (PolicyAssertion a2 : getSupportedAlternatives(engine, p)) {
+                    initialiseInterceptors(reg, engine, out, a2, usIn);
+                }
             }
         }
     }

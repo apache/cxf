@@ -24,7 +24,7 @@ import java.io.InputStream;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.ws.policy.builder.xml.XMLPrimitiveAssertionBuilder;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 import org.apache.neethi.Policy;
 import org.apache.neethi.util.PolicyComparator;
 import org.easymock.classextension.EasyMock;
@@ -77,7 +77,7 @@ public class NormalizeTest extends Assert {
         builder.setBus(bus);
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         builder.setAssertionBuilderRegistry(abr);
-        XMLPrimitiveAssertionBuilder ab = new XMLPrimitiveAssertionBuilder();
+        PrimitiveAssertionBuilder ab = new PrimitiveAssertionBuilder();
         ab.setBus(bus);
        
         abr.register(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityToken"), ab);

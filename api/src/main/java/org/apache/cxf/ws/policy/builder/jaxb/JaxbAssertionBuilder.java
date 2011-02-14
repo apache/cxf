@@ -39,6 +39,7 @@ import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.neethi.Constants;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 public class JaxbAssertionBuilder<T> implements AssertionBuilder {
 
@@ -108,7 +109,8 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder {
         QName name = new QName(element.getNamespaceURI(), element.getLocalName());
         JaxbAssertion<T> assertion = buildAssertion();
         assertion.setName(name);
-        assertion.setOptional(getOptionality(element));
+        assertion.setOptional(XMLPrimitiveAssertionBuilder.isOptional(element));
+        assertion.setIgnorable(XMLPrimitiveAssertionBuilder.isIgnorable(element));
         assertion.setData(getData(element));
         return assertion;
     }
@@ -117,19 +119,6 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder {
         return supportedTypes;
     }
 
-    @SuppressWarnings("unchecked")
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        if (a.equal(b)) {
-            JaxbAssertion<T> ja = (JaxbAssertion<T>)a;
-            JaxbAssertion<T> compatible = buildAssertion();
-            compatible.setName(a.getName());
-            compatible.setOptional(a.isOptional() && b.isOptional());
-            compatible.setData(ja.getData());
-            return compatible;
-        }
-        return null;
-    }
-    
     protected JaxbAssertion<T> buildAssertion() {
         return new JaxbAssertion<T>();
     }

@@ -30,6 +30,7 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
 
@@ -43,26 +44,6 @@ public class HTTPClientAssertionBuilder extends JaxbAssertionBuilder<HTTPClientP
 
     public HTTPClientAssertionBuilder() throws JAXBException {
         super(HTTPClientPolicy.class, PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME);     
-    }
-
-    @Override
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        if (PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME.equals(a.getName())
-            && PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME.equals(b.getName())) {
-            
-            HTTPClientPolicy compatible = PolicyUtils.intersect(
-                JaxbAssertion.cast(a, HTTPClientPolicy.class).getData(),
-                JaxbAssertion.cast(b, HTTPClientPolicy.class).getData());
-            if (null == compatible) {
-                return null;
-            }
-            JaxbAssertion<HTTPClientPolicy> ca = 
-                new JaxbAssertion<HTTPClientPolicy>(PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME, 
-                    a.isOptional() && b.isOptional());
-            ca.setData(compatible);
-            return ca;
-        }
-        return null;
     }
 
     @Override
@@ -86,7 +67,7 @@ public class HTTPClientAssertionBuilder extends JaxbAssertionBuilder<HTTPClientP
         }
         
         @Override
-        protected PolicyAssertion cloneMandatory() {
+        protected Assertion clone(boolean optional) {
             HTTPClientPolicyAssertion a = new HTTPClientPolicyAssertion();
             a.setData(getData());
             return a;        

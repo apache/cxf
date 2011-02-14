@@ -23,12 +23,14 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.extension.Registry;
+import org.apache.neethi.Assertion;
 
 /**
  * AssertionBuilderRegistry is used to manage AssertionBuilders and
  * create Assertion objects from given xml elements.
  */
-public interface AssertionBuilderRegistry extends Registry<QName, AssertionBuilder> {
+public interface AssertionBuilderRegistry 
+    extends Registry<QName, AssertionBuilder> {
     
     
     /**
@@ -44,7 +46,7 @@ public interface AssertionBuilderRegistry extends Registry<QName, AssertionBuild
      * @param element the element from which to build an Assertion.
      * @return an Assertion that is built using the specified element.
      */
-    PolicyAssertion build(Element element);
+    Assertion build(Element element);
     
     /**
      * Indicates if unknown assertions should simply be ignored.

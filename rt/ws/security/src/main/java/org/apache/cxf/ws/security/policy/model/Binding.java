@@ -20,8 +20,10 @@ package org.apache.cxf.ws.security.policy.model;
 
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyContainingAssertion;
 
-public abstract class Binding extends AbstractSecurityAssertion implements AlgorithmWrapper {
+public abstract class Binding extends AbstractSecurityAssertion 
+    implements AlgorithmWrapper, PolicyContainingAssertion  {
     protected PolicyBuilder builder;
     
     private AlgorithmSuite algorithmSuite;

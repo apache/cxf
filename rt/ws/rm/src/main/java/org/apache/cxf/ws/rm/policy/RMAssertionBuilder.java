@@ -29,6 +29,7 @@ import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
 import org.apache.cxf.ws.rm.RMConstants;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
 
@@ -44,26 +45,6 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
     }
 
     @Override
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        if (RMConstants.getRMAssertionQName().equals(a.getName())
-            && RMConstants.getRMAssertionQName().equals(b.getName())) {
-            
-            RMAssertion compatible = PolicyUtils.intersect(
-                JaxbAssertion.cast(a, RMAssertion.class).getData(),
-                JaxbAssertion.cast(b, RMAssertion.class).getData());
-            if (null == compatible) {
-                return null;
-            }
-            JaxbAssertion<RMAssertion> ca = 
-                new JaxbAssertion<RMAssertion>(RMConstants.getRMAssertionQName(), 
-                    a.isOptional() && b.isOptional());
-            ca.setData(compatible);
-            return ca;
-        }
-        return null;
-    }
-
-    @Override
     protected JaxbAssertion<RMAssertion> buildAssertion() {
         return new RMPolicyAssertion();
     }
@@ -71,6 +52,12 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
     class RMPolicyAssertion extends JaxbAssertion<RMAssertion> {
         RMPolicyAssertion() {
             super(RMConstants.getRMAssertionQName(), false);
+        }
+        RMPolicyAssertion(boolean opt) {
+            super(RMConstants.getRMAssertionQName(), opt);
+        }
+        RMPolicyAssertion(boolean opt, boolean ignore) {
+            super(RMConstants.getRMAssertionQName(), opt, ignore);
         }
 
         @Override
@@ -85,7 +72,7 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
         }
         
         @Override
-        protected PolicyAssertion cloneMandatory() {
+        protected Assertion clone(boolean b) {
             RMPolicyAssertion a = new RMPolicyAssertion();
             a.setData(getData());
             return a;        

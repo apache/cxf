@@ -23,7 +23,9 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
+import org.apache.cxf.Bus;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
+import org.apache.neethi.Assertion;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
@@ -50,7 +52,16 @@ public class AssertionBuilderRegistryImplTest extends Assert {
     
     @Test
     public void testBuildUnknownAssertion() {
-        AssertionBuilderRegistry reg = new AssertionBuilderRegistryImpl();
+        Bus bus = control.createMock(Bus.class);
+
+        PolicyBuilder builder = control.createMock(PolicyBuilder.class);
+        EasyMock.expect(bus.getExtension(PolicyBuilder.class)).andReturn(builder).anyTimes();
+
+        AssertionBuilderRegistryImpl reg = new AssertionBuilderRegistryImpl() {
+            protected void loadDynamic() {
+                //nothing
+            }
+        };
         reg.setIgnoreUnknownAssertions(false);
         Element[] elems = new Element[11];
         QName[] qnames = new QName[11];
@@ -62,6 +73,7 @@ public class AssertionBuilderRegistryImplTest extends Assert {
         }
         
         control.replay();
+        reg.setBus(bus);
         
         assertTrue(!reg.isIgnoreUnknownAssertions());
         try {
@@ -73,11 +85,13 @@ public class AssertionBuilderRegistryImplTest extends Assert {
         reg.setIgnoreUnknownAssertions(true);
         assertTrue(reg.isIgnoreUnknownAssertions());
         for (int i = 0; i < 10; i++) {
-            assertTrue(reg.build(elems[i]) instanceof XmlPrimitiveAssertion);
+            Assertion assertion = reg.build(elems[i]);
+            assertTrue("Not a PrimitiveAsertion: " + assertion.getClass().getName(), 
+                       assertion instanceof PrimitiveAssertion);
         }
         for (int i = 9; i >= 0; i--) {
-            assertTrue(reg.build(elems[i]) instanceof XmlPrimitiveAssertion);
+            assertTrue(reg.build(elems[i]) instanceof PrimitiveAssertion);
         }
-        assertTrue(reg.build(elems[10]) instanceof XmlPrimitiveAssertion);
+        assertTrue(reg.build(elems[10]) instanceof PrimitiveAssertion);
     }
 }

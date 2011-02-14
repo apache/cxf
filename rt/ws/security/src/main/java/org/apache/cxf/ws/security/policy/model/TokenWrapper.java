@@ -26,8 +26,10 @@ import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
 
-public abstract class TokenWrapper extends AbstractSecurityAssertion implements PolicyAssertion {
+public abstract class TokenWrapper extends AbstractSecurityAssertion 
+    implements PolicyAssertion, PolicyContainingAssertion {
     protected PolicyBuilder builder;
     protected Token token;
 

@@ -41,7 +41,7 @@ import org.apache.cxf.ws.policy.PolicyBuilderImpl;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.PolicyRegistryImpl;
-import org.apache.cxf.ws.policy.builder.xml.XMLPrimitiveAssertionBuilder;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
@@ -124,8 +124,9 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         abr.setIgnoreUnknownAssertions(false);
-        XMLPrimitiveAssertionBuilder ab = new XMLPrimitiveAssertionBuilder();
-        ab.setBus(bus);
+        
+        
+        PrimitiveAssertionBuilder ab = new PrimitiveAssertionBuilder();
         abr.register(new QName("http://cxf.apache.org/test/assertions", "A"), ab);
         abr.register(new QName("http://cxf.apache.org/test/assertions", "B"), ab);
         abr.register(new QName("http://cxf.apache.org/test/assertions", "C"), ab);

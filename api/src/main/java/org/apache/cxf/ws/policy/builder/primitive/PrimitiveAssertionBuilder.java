@@ -46,10 +46,10 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder {
         bus = b;
     }
     
-    public PolicyAssertion build(Element element) {  
+    public PolicyAssertion build(Element element) { 
         return new PrimitiveAssertion(element);
     }
-
+    
     public Collection<QName> getKnownElements() {
         return knownElements;
     }
@@ -57,16 +57,5 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder {
     public void setKnownElements(Collection<QName> k) {
         knownElements = k;
     }
-
-    /**
-     * If the two assertions are equal, they are also compatible. 
-     * The compatible policy is optional if both assertions are optional.
-     */
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        if (knownElements.contains(a.getName()) && a.getName().equals(b.getName())) {
-            return new PrimitiveAssertion(a.getName(), a.isOptional() && b.isOptional());
-        }
-        return  null;
-    }   
 
 }

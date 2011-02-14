@@ -36,6 +36,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.neethi.PolicyOperator;
 
 public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> {
@@ -54,12 +55,14 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     }
 
     private void putAssertionInfo(PolicyAssertion a) {
-        Policy p = a.getPolicy();
-        if (p != null) {
-            List<PolicyAssertion> pcs = new ArrayList<PolicyAssertion>();
-            getAssertions(p, pcs);
-            for (PolicyAssertion na : pcs) {
-                putAssertionInfo(na);
+        if (a instanceof PolicyContainingAssertion) {
+            Policy p = ((PolicyContainingAssertion)a).getPolicy();
+            if (p != null) {
+                List<PolicyAssertion> pcs = new ArrayList<PolicyAssertion>();
+                getAssertions(p, pcs);
+                for (PolicyAssertion na : pcs) {
+                    putAssertionInfo(na);
+                }
             }
         }
         AssertionInfo ai = new AssertionInfo(a);
@@ -86,13 +89,15 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             errors.add(a.getName());
             pass = false;
         }
-        Policy p = a.getPolicy();
-        if (p != null) {
-            Iterator it = p.getAlternatives();
-            while (it.hasNext()) {
-                List<PolicyAssertion> lst = CastUtils.cast((List<?>)it.next());
-                for (PolicyAssertion p2 : lst) {
-                    pass &= supportsAlternative(p2, errors);
+        if (a instanceof PolicyContainingAssertion) {
+            Policy p = ((PolicyContainingAssertion)a).getPolicy();
+            if (p != null) {
+                Iterator it = p.getAlternatives();
+                while (it.hasNext()) {
+                    List<PolicyAssertion> lst = CastUtils.cast((List<?>)it.next());
+                    for (PolicyAssertion p2 : lst) {
+                        pass &= supportsAlternative(p2, errors);
+                    }
                 }
             }
         }

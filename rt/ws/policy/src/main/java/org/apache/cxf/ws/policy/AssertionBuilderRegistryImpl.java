@@ -40,7 +40,8 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
-import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
+import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertionBuilder;
+import org.apache.neethi.Assertion;
 
 /**
  * 
@@ -103,7 +104,7 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
         ignoreUnknownAssertions = ignore;
     }
 
-    private synchronized void loadDynamic() {
+    protected synchronized void loadDynamic() {
         if (!dynamicLoaded && bus != null) {
             dynamicLoaded = true;
             ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
@@ -112,7 +113,7 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
             }
         }
     }
-    public PolicyAssertion build(Element element) {
+    public Assertion build(Element element) {
         loadDynamic();
         
         AssertionBuilder builder;
@@ -133,7 +134,8 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
                 if (!alreadyWarned) {
                     LOG.warning(m.toString());
                 }
-                return new XmlPrimitiveAssertion(element);
+                
+                builder = new NestedPrimitiveAssertionBuilder(bus.getExtension(PolicyBuilder.class));
             } else {
                 throw new PolicyException(m);
             }

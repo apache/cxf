@@ -24,7 +24,6 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 
 public abstract class AbstractSecurityAssertion implements PolicyAssertion {
@@ -34,7 +33,6 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
     private boolean ignorable;
     private boolean normalized;
 
-    
     public AbstractSecurityAssertion(SPConstants version) {
         constants = version;
     }
@@ -75,11 +73,6 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
 
     public PolicyComponent normalize() {
         return this;
-    }
-
-    
-    public Policy getPolicy() {
-        return null;
     }
     
     public boolean isAsserted(AssertionInfoMap aim) {

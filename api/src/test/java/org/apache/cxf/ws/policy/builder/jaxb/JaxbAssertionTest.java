@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.test.assertions.foo.FooType;
-import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.All;
 import org.apache.neethi.Constants;
 import org.apache.neethi.ExactlyOne;
@@ -80,7 +80,7 @@ public class JaxbAssertionTest extends Assert {
         assertTrue(!assertion.equal(pc));
         
         IMocksControl ctrl = EasyMock.createNiceControl();
-        XmlPrimitiveAssertion xpa = ctrl.createMock(XmlPrimitiveAssertion.class);
+        PrimitiveAssertion xpa = ctrl.createMock(PrimitiveAssertion.class);
         QName oqn = new QName("http://cxf.apache.org/test/assertions/blah", "OtherType");
         EasyMock.expect(xpa.getName()).andReturn(oqn);
         EasyMock.expect(xpa.getType()).andReturn(Constants.TYPE_ASSERTION);

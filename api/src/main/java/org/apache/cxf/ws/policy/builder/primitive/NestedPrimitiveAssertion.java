@@ -21,7 +21,6 @@ package org.apache.cxf.ws.policy.builder.primitive;
 
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -39,39 +38,55 @@ import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
-import org.apache.neethi.All;
-import org.apache.neethi.ExactlyOne;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyOperator;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
  * Implementation of an assertion that required exactly one (possibly empty) child element
  * of type Policy (as does for examples the wsam:Addressing assertion).
  * 
  */
-public class NestedPrimitiveAssertion extends PrimitiveAssertion {
+public class NestedPrimitiveAssertion 
+    extends org.apache.neethi.builders.PolicyContainingPrimitiveAssertion implements PolicyAssertion {
 
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(NestedPrimitiveAssertion.class);    
-    private Policy nested;
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(NestedPrimitiveAssertion.class);
+    
+    
     private boolean assertionRequired = true;
     private PolicyBuilder builder;
-    
-    @Deprecated
-    public NestedPrimitiveAssertion(QName name, boolean optional) {
-        this(name, optional, null, true, null);
-    }
-    
-    public NestedPrimitiveAssertion(QName name, boolean optional, PolicyBuilder b) {
-        this(name, optional, null, true, b);
-    }
-    
-    public NestedPrimitiveAssertion(QName name, boolean optional, 
-                                    Policy p, boolean assertionRequired,
+
+    public NestedPrimitiveAssertion(QName name, 
+                                    boolean optional,
                                     PolicyBuilder b) {
-        super(name, optional);
+        this(name, optional, false, null, true, b);
+    }
+    
+    public NestedPrimitiveAssertion(QName name, 
+                                    boolean optional,
+                                    boolean ignorable,
+                                    PolicyBuilder b) {
+        this(name, optional, ignorable, null, true, b);
+    }
+    
+    public NestedPrimitiveAssertion(QName name, 
+                                    boolean optional,
+                                    Policy p, 
+                                    boolean assertionRequired,
+                                    PolicyBuilder b) {
+        this(name, optional, false, p, assertionRequired, b);
+    }
+    
+    public NestedPrimitiveAssertion(QName name, 
+                                    boolean optional,
+                                    boolean ignorable, 
+                                    Policy p, 
+                                    boolean assertionRequired,
+                                    PolicyBuilder b) {
+        super(name, optional, ignorable, p);
         this.assertionRequired = assertionRequired;
-        this.nested = p;
         builder = b;
     }
 
@@ -80,12 +95,13 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
     }
     
     public NestedPrimitiveAssertion(Element elem, PolicyBuilder builder, boolean assertionRequired) {
-        super(elem);
+        super(new QName(elem.getNamespaceURI(), elem.getLocalName()),
+              XMLPrimitiveAssertionBuilder.isOptional(elem), 
+              XMLPrimitiveAssertionBuilder.isIgnorable(elem), null);
         this.builder = builder;
         this.assertionRequired = assertionRequired;
         
         // expect exactly one child element of type Policy
-       
         Element policyElem = null;
         for (Node nd = elem.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType()) {
@@ -103,40 +119,12 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
             throw new PolicyException(new Message("UNEXPECTED_CHILD_ELEMENT_EXC", BUNDLE, 
                                                   PolicyConstants.POLICY_ELEM_NAME));
         }
-        
         nested = builder.getPolicy(policyElem);  
     }
-    
-    public PolicyComponent normalize() {
-        Policy normalisedNested 
-            = (Policy)nested.normalize(builder == null ? null : builder.getPolicyRegistry(),
-                                       true);
-        
-        Policy p = new Policy();
-        ExactlyOne ea = new ExactlyOne();
-        p.addPolicyComponent(ea);
-        if (isOptional()) {
-            ea.addPolicyComponent(new All());
-        }
-        // for all alternatives in normalised nested policy
-        Iterator alternatives = normalisedNested.getAlternatives();
-        while (alternatives.hasNext()) {
-            All all = new All();
-            List<PolicyAssertion> alternative = 
-                CastUtils.cast((List)alternatives.next(), PolicyAssertion.class);
-            NestedPrimitiveAssertion a = new NestedPrimitiveAssertion(getName(), false, builder);
-            a.nested = new Policy();
-            ExactlyOne nea = new ExactlyOne();
-            a.nested.addPolicyComponent(nea);
-            All na = new All();
-            nea.addPolicyComponent(na);
-            na.addPolicyComponents(alternative);
-            all.addPolicyComponent(a);
-            ea.addPolicyComponent(all);            
-        } 
-        return p;      
-    } 
-    
+    protected Assertion clone(boolean opt, Policy n) {
+        return new NestedPrimitiveAssertion(name, opt, ignorable, n, assertionRequired, builder);
+    }
+
     @Override
     public boolean equal(PolicyComponent policyComponent) {
         
@@ -147,18 +135,8 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
         return getPolicy().equal(other.getPolicy());
     }
     
-    protected void setPolicy(Policy n) {
-        nested = n;
-    }
-    
-    @Override
-    public Policy getPolicy() {
-        return nested;
-    }
-
     @Override
     public boolean isAsserted(AssertionInfoMap aim) {
-        
         if (assertionRequired) {
             Collection<AssertionInfo> ail = aim.getAssertionInfo(name);
             for (AssertionInfo ai : ail) {

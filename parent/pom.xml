@@ -480,7 +480,7 @@
             <dependency>
                 <groupId>org.apache.neethi</groupId>
                 <artifactId>neethi</artifactId>
-                <version>2.0.4</version>
+                <version>3.0.0-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>

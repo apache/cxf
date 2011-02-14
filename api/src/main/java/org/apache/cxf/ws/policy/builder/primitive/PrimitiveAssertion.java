@@ -22,62 +22,49 @@ package org.apache.cxf.ws.policy.builder.primitive;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
-import org.apache.cxf.ws.policy.PolicyConstants;
-import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
  * 
  */
-public class PrimitiveAssertion implements PolicyAssertion {
-    
-    protected QName name;
-    protected boolean optional;
-    protected boolean ignorable;
+public class PrimitiveAssertion 
+    extends org.apache.neethi.builders.PrimitiveAssertion implements PolicyAssertion {
 
     public PrimitiveAssertion() {
-        this((QName)null);
+        super();
     }
     
     public PrimitiveAssertion(QName n) {
-        this(n, false);
+        super(n, false);
     }
     
     public PrimitiveAssertion(QName n, boolean o) {
-        name = n;
-        optional = o;
+        super(n, o);
+    }
+    public PrimitiveAssertion(QName n, boolean o, boolean i) {
+        super(n, o, i);
     }
     
     public PrimitiveAssertion(Element element) {
-        name = new QName(element.getNamespaceURI(), element.getLocalName());
-        NamedNodeMap atts = element.getAttributes();
-        if (atts != null) {
-            for (int x = 0; x < atts.getLength(); x++) {
-                Attr att = (Attr)atts.item(x);
-                QName qn = new QName(att.getNamespaceURI(), att.getLocalName());
-                if (PolicyConstants.isOptionalAttribute(qn)) {
-                    optional = Boolean.valueOf(att.getValue());                
-                }
-            }
-        }
+        super(new QName(element.getNamespaceURI(), element.getLocalName()),
+              XMLPrimitiveAssertionBuilder.isOptional(element),
+              XMLPrimitiveAssertionBuilder.isIgnorable(element));
+    }
+    
+    @Override
+    protected Assertion clone(boolean opt) {
+        return new PrimitiveAssertion(name, opt, ignorable);
     }
 
-    public String toString() {
-        return name.toString();
-    }
     public boolean equal(PolicyComponent policyComponent) {
         if (policyComponent.getType() != Constants.TYPE_ASSERTION) {
             return false;
@@ -85,60 +72,6 @@ public class PrimitiveAssertion implements PolicyAssertion {
         return getName().equals(((PolicyAssertion)policyComponent).getName());
     }
 
-    public short getType() {
-        return Constants.TYPE_ASSERTION;
-    }
-
-    public QName getName() {
-        return name;
-    }
-    
-    public void setName(QName n) {
-        name = n;
-    }
-
-    public boolean isOptional() {
-        return optional;
-    }
-
-    public void setOptional(boolean o) {
-        optional = o;        
-    }
-    public boolean isIgnorable() {
-        return ignorable;
-    }
-
-    public void setIgnorable(boolean o) {
-        ignorable = o;        
-    }
-    
-    public PolicyComponent normalize() {
-        if (isOptional()) {
-            Policy policy = new Policy();
-            ExactlyOne exactlyOne = new ExactlyOne();
-
-            All all = new All();
-            all.addPolicyComponent(cloneMandatory());
-            exactlyOne.addPolicyComponent(all);
-            exactlyOne.addPolicyComponent(new All());
-            policy.addPolicyComponent(exactlyOne);
-
-            return policy;
-        }
-
-        return cloneMandatory();
-    }
-
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-    }
-    
-    protected PolicyAssertion cloneMandatory() {
-        return new PrimitiveAssertion(name, false);
-    }
-
-    public Policy getPolicy() {
-        return null;
-    }
 
     public boolean isAsserted(AssertionInfoMap aim) {
         Collection<AssertionInfo> ail = aim.getAssertionInfo(name);
@@ -149,4 +82,5 @@ public class PrimitiveAssertion implements PolicyAssertion {
         }
         return false;
     }
+    
 }

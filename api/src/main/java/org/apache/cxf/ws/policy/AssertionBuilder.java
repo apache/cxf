@@ -55,10 +55,4 @@ public interface AssertionBuilder {
      */
     Collection<QName> getKnownElements();
 
-
-    /**
-     * Returns a new assertion that is compatible with the two specified
-     * assertions or null if no compatible assertion can be built.
-     */ 
-    PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b);
 }
