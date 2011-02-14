@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.rm;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -86,15 +85,15 @@ public class DestinationSequenceTest extends Assert {
         
         DestinationSequence seq = new DestinationSequence(id, ref, destination);
         assertEquals(id, seq.getIdentifier());
-        assertNull(seq.getLastMessageNumber());
+        assertEquals(0, seq.getLastMessageNumber());
         assertSame(ref, seq.getAcksTo());
         assertNotNull(seq.getAcknowledgment());
         assertNotNull(seq.getMonitor());   
         
         SequenceAcknowledgement ack = RMUtils.getWSRMFactory().createSequenceAcknowledgement();        
-        seq = new DestinationSequence(id, ref, BigInteger.TEN, ack);
+        seq = new DestinationSequence(id, ref, 10, ack);
         assertEquals(id, seq.getIdentifier());
-        assertEquals(BigInteger.TEN, seq.getLastMessageNumber());
+        assertEquals(10, seq.getLastMessageNumber());
         assertSame(ref, seq.getAcksTo());
         assertSame(ack, seq.getAcknowledgment());
         assertNotNull(seq.getMonitor());  
@@ -176,7 +175,7 @@ public class DestinationSequenceTest extends Assert {
         DestinationSequence seq = new DestinationSequence(id, ref, destination);
         
         seq.acknowledge(message1);
-        seq.setLastMessageNumber(BigInteger.ONE);
+        seq.setLastMessageNumber(1);
         try {
             seq.acknowledge(message2);
             fail("Expected SequenceFault not thrown.");
@@ -289,20 +288,20 @@ public class DestinationSequenceTest extends Assert {
         AcknowledgementRange r;
         for (int i = 0; i < 5; i++) {
             r = new AcknowledgementRange();
-            r.setLower(new BigInteger(Integer.toString(3 * i + 1)));
-            r.setUpper(new BigInteger(Integer.toString(3 * i + 3)));
+            r.setLower(new Long(3 * i + 1));
+            r.setUpper(new Long(3 * i + 3));
             ranges.add(r);
         }
         seq.mergeRanges();
         assertEquals(1, ranges.size());
         r = ranges.get(0);
-        assertEquals(BigInteger.ONE, r.getLower());
-        assertEquals(new BigInteger("15"), r.getUpper());
+        assertEquals(new Long(1), r.getLower());
+        assertEquals(new Long(15), r.getUpper());
         ranges.clear();
         for (int i = 0; i < 5; i++) {
             r = new AcknowledgementRange();
-            r.setLower(new BigInteger(Integer.toString(3 * i + 1)));
-            r.setUpper(new BigInteger(Integer.toString(3 * i + 2)));
+            r.setLower(new Long(3 * i + 1));
+            r.setUpper(new Long(3 * i + 2));
             ranges.add(r);
         }
         seq.mergeRanges();
@@ -311,19 +310,19 @@ public class DestinationSequenceTest extends Assert {
         for (int i = 0; i < 5; i++) {
             if (i != 2) {
                 r = new AcknowledgementRange();
-                r.setLower(new BigInteger(Integer.toString(3 * i + 1)));
-                r.setUpper(new BigInteger(Integer.toString(3 * i + 3)));
+                r.setLower(new Long(3 * i + 1));
+                r.setUpper(new Long(3 * i + 3));
                 ranges.add(r);
             }
         }
         seq.mergeRanges();
         assertEquals(2, ranges.size());
         r = ranges.get(0);
-        assertEquals(BigInteger.ONE, r.getLower());
-        assertEquals(new BigInteger("6"), r.getUpper());
+        assertEquals(new Long(1), r.getLower());
+        assertEquals(new Long(6), r.getUpper());
         r = ranges.get(1);
-        assertEquals(BigInteger.TEN, r.getLower());
-        assertEquals(new BigInteger("15"), r.getUpper());        
+        assertEquals(new Long(10), r.getLower());
+        assertEquals(new Long(15), r.getUpper());        
     }
     
     @Test
@@ -411,7 +410,7 @@ public class DestinationSequenceTest extends Assert {
         ap.setIntraMessageThreshold(0);
         AcknowledgementInterval ai = new org.apache.cxf.ws.rm.policy.ObjectFactory()
             .createRMAssertionAcknowledgementInterval();
-        ai.setMilliseconds(new BigInteger("200"));
+        ai.setMilliseconds(new Long(200));
         rma.setAcknowledgementInterval(ai);        
 
         assertTrue(!seq.sendAcknowledgement());   
@@ -450,7 +449,7 @@ public class DestinationSequenceTest extends Assert {
     public void testApplyDeliveryAssuranceAtMostOnce() throws RMException {
         setUpDestination();
         
-        BigInteger mn = BigInteger.TEN;        
+        long mn = 10;        
         SequenceAcknowledgement ack = control.createMock(SequenceAcknowledgement.class);
         List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
         AcknowledgementRange r = control.createMock(AcknowledgementRange.class);
@@ -460,7 +459,7 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(da.isSetAtMostOnce()).andReturn(true);                    
         
         control.replay();        
-        DestinationSequence ds = new DestinationSequence(id, ref, null, ack);
+        DestinationSequence ds = new DestinationSequence(id, ref, 0, ack);
         ds.setDestination(destination);
         ds.applyDeliveryAssurance(mn, null);
         control.verify();
@@ -471,8 +470,8 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(manager.getDeliveryAssurance()).andReturn(da);
         EasyMock.expect(da.isSetAtMostOnce()).andReturn(true);            
         EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
-        EasyMock.expect(r.getLower()).andReturn(new BigInteger("5"));
-        EasyMock.expect(r.getUpper()).andReturn(new BigInteger("15"));
+        EasyMock.expect(r.getLower()).andReturn(new Long(5));
+        EasyMock.expect(r.getUpper()).andReturn(new Long(15));
         control.replay();     
         try {
             ds.applyDeliveryAssurance(mn, null);
@@ -504,16 +503,16 @@ public class DestinationSequenceTest extends Assert {
         
         final AcknowledgementRange r = 
             factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setUpper(new BigInteger(Integer.toString(messages.length)));
+        r.setUpper(new Long(messages.length));
         ranges.add(r);
-        final DestinationSequence ds = new DestinationSequence(id, ref, null, ack);
+        final DestinationSequence ds = new DestinationSequence(id, ref, 0, ack);
         ds.setDestination(destination);
           
         class Acknowledger extends Thread {
             Message message;
-            BigInteger messageNr;
+            long messageNr;
             
-            Acknowledger(Message m, BigInteger mn) {
+            Acknowledger(Message m, long mn) {
                 message = m;
                 messageNr = mn;
             }
@@ -532,7 +531,7 @@ public class DestinationSequenceTest extends Assert {
         
         Thread[] threads = new Thread[messages.length];
         for (int i = messages.length - 1; i >= 0; i--) {
-            threads[i] = new Acknowledger(messages[i], new BigInteger(Integer.toString(i + 1)));
+            threads[i] = new Acknowledger(messages[i], i + 1);
             threads[i].start();
             try {
                 Thread.sleep(100);
@@ -572,7 +571,7 @@ public class DestinationSequenceTest extends Assert {
 
         control.replay();
         InactivityTimeout iat = new RMAssertion.InactivityTimeout();
-        iat.setMilliseconds(new BigInteger("200"));
+        iat.setMilliseconds(new Long(200));
         rma.setInactivityTimeout(iat); 
         
         seq.acknowledge(message);
@@ -652,10 +651,10 @@ public class DestinationSequenceTest extends Assert {
         RMStore store = control.createMock(RMStore.class);
         EasyMock.expect(manager.getStore()).andReturn(store);
         store.removeMessages(EasyMock.eq(id), 
-            CastUtils.cast(EasyMock.isA(Collection.class), BigInteger.class), EasyMock.eq(false));
+            CastUtils.cast(EasyMock.isA(Collection.class), Long.class), EasyMock.eq(false));
         EasyMock.expectLastCall();
         control.replay();
-        seq.purgeAcknowledged(BigInteger.ONE);
+        seq.purgeAcknowledged(1);
         control.verify();
     }
     
@@ -709,7 +708,7 @@ public class DestinationSequenceTest extends Assert {
         rma = policyFactory.createRMAssertion();
         BaseRetransmissionInterval bri =
             policyFactory.createRMAssertionBaseRetransmissionInterval();
-        bri.setMilliseconds(new BigInteger("3000"));
+        bri.setMilliseconds(new Long(3000));
         rma.setBaseRetransmissionInterval(bri);  
 
         EasyMock.expect(manager.getRMAssertion()).andReturn(rma).anyTimes();
@@ -735,7 +734,7 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
         SequenceType st = control.createMock(SequenceType.class);
         EasyMock.expect(rmps.getSequence()).andReturn(st);
-        BigInteger val = new BigInteger(messageNr);
+        Long val = new Long(messageNr);
         EasyMock.expect(st.getMessageNumber()).andReturn(val);
         return message;        
     }

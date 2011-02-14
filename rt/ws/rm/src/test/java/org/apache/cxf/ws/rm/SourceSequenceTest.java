@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.math.BigInteger;
 import java.util.Date;
 
 import javax.xml.datatype.Duration;
@@ -94,7 +93,7 @@ public class SourceSequenceTest extends Assert {
         assertEquals(id, seq.getIdentifier());
         assertTrue(!seq.isLastMessage());
         assertTrue(!seq.isExpired());
-        assertEquals(BigInteger.ZERO, seq.getCurrentMessageNr());
+        assertEquals(0, seq.getCurrentMessageNr());
         assertNotNull(seq.getAcknowledgement());
         assertEquals(0, seq.getAcknowledgement().getAcknowledgementRange().size());
         assertTrue(!seq.allAcknowledged());
@@ -106,7 +105,7 @@ public class SourceSequenceTest extends Assert {
         assertEquals(id, seq.getIdentifier());
         assertTrue(!seq.isLastMessage());
         assertTrue(!seq.isExpired());
-        assertEquals(BigInteger.ZERO, seq.getCurrentMessageNr());
+        assertEquals(0, seq.getCurrentMessageNr());
         assertNotNull(seq.getAcknowledgement());
         assertEquals(0, seq.getAcknowledgement().getAcknowledgementRange().size());
         assertTrue(!seq.allAcknowledged());
@@ -172,16 +171,16 @@ public class SourceSequenceTest extends Assert {
         ack = factory.createSequenceAcknowledgement();
         SequenceAcknowledgement.AcknowledgementRange r = 
             factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(new BigInteger("1"));
-        r.setUpper(new BigInteger("2"));
+        r.setLower(new Long(1));
+        r.setUpper(new Long(2));
         ack.getAcknowledgementRange().add(r);
         r = factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(new BigInteger("4"));
-        r.setUpper(new BigInteger("6"));
+        r.setLower(new Long(4));
+        r.setUpper(new Long(6));
         ack.getAcknowledgementRange().add(r);
         r = factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(new BigInteger("8"));
-        r.setUpper(new BigInteger("10"));
+        r.setLower(new Long(8));
+        r.setUpper(new Long(10));
         ack.getAcknowledgementRange().add(r);
         rq.purgeAcknowledged(seq);
         EasyMock.expectLastCall();
@@ -190,15 +189,15 @@ public class SourceSequenceTest extends Assert {
         seq.setAcknowledged(ack);
         assertSame(ack, seq.getAcknowledgement());
         assertEquals(3, ack.getAcknowledgementRange().size());
-        assertTrue(!seq.isAcknowledged(new BigInteger("3")));  
-        assertTrue(seq.isAcknowledged(new BigInteger("5")));
+        assertTrue(!seq.isAcknowledged(3));  
+        assertTrue(seq.isAcknowledged(5));
         control.verify();
     } 
 
     @Test
     public void testAllAcknowledged() throws SequenceFault, RMException {
         
-        SourceSequence seq = new SourceSequence(id, null, null, new BigInteger("4"), false);        
+        SourceSequence seq = new SourceSequence(id, null, null, 4, false);        
         setUpSource();
         seq.setSource(source);
         
@@ -208,8 +207,8 @@ public class SourceSequenceTest extends Assert {
         SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
         SequenceAcknowledgement.AcknowledgementRange r = 
             factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(BigInteger.ONE);
-        r.setUpper(new BigInteger("2"));
+        r.setLower(new Long(1));
+        r.setUpper(new Long(2));
         ack.getAcknowledgementRange().add(r);
         rq.purgeAcknowledged(seq);
         EasyMock.expectLastCall();
@@ -217,7 +216,7 @@ public class SourceSequenceTest extends Assert {
         control.replay();
         seq.setAcknowledged(ack);
         assertTrue(!seq.allAcknowledged());
-        r.setUpper(new BigInteger("4"));
+        r.setUpper(new Long(4));
         assertTrue(seq.allAcknowledged());
         control.verify();
     }
@@ -241,15 +240,15 @@ public class SourceSequenceTest extends Assert {
         
         seq = new SourceSequence(id); 
         seq.setSource(source);
-        stp.setMaxLength(BigInteger.ONE);
+        stp.setMaxLength(1);
         assertTrue(nextMessages(seq, 10));
-        assertEquals(BigInteger.ONE, seq.getCurrentMessageNr());
+        assertEquals(1, seq.getCurrentMessageNr());
         control.verify();
         
         // termination policy max length = 5
         seq = new SourceSequence(id); 
         seq.setSource(source);
-        stp.setMaxLength(new BigInteger("5"));
+        stp.setMaxLength(5);
         assertTrue(!nextMessages(seq, 2));
         control.verify();
         
@@ -257,18 +256,18 @@ public class SourceSequenceTest extends Assert {
         
         seq = new SourceSequence(id); 
         seq.setSource(source);
-        stp.setMaxLength(null);
+        stp.setMaxLength(0);
         stp.setMaxRanges(new Integer(3));
         acknowledge(seq, 1, 2, 4, 5, 6, 8, 9, 10);
         assertTrue(nextMessages(seq, 10));
-        assertEquals(BigInteger.ONE, seq.getCurrentMessageNr());
+        assertEquals(1, seq.getCurrentMessageNr());
         control.verify();
         
         // termination policy max range not exceeded
         
         seq = new SourceSequence(id); 
         seq.setSource(source);
-        stp.setMaxLength(null);
+        stp.setMaxLength(0);
         stp.setMaxRanges(new Integer(4));
         acknowledge(seq, 1, 2, 4, 5, 6, 8, 9, 10);
         assertTrue(!nextMessages(seq, 10));
@@ -303,14 +302,14 @@ public class SourceSequenceTest extends Assert {
         DestinationSequence dseq = control.createMock(DestinationSequence.class); 
         Identifier did = control.createMock(Identifier.class);
         EasyMock.expect(destination.getSequence(did)).andReturn(dseq).anyTimes();
-        EasyMock.expect(dseq.getLastMessageNumber()).andReturn(BigInteger.ONE).anyTimes();
+        EasyMock.expect(dseq.getLastMessageNumber()).andReturn(new Long(1)).anyTimes();
         EasyMock.expect(did.getValue()).andReturn("dseq").anyTimes();
         
         control.replay();
         
         seq = new SourceSequence(id, null, did);  
         seq.setSource(source);        
-        seq.nextMessageNumber(did, BigInteger.ONE, false);
+        seq.nextMessageNumber(did, 1, false);
         assertTrue(seq.isLastMessage());
         
         control.verify();
@@ -320,7 +319,7 @@ public class SourceSequenceTest extends Assert {
                                  int n) {
         int i = 0;
         while ((i < n) && !seq.isLastMessage()) {            
-            assertNotNull(seq.nextMessageNumber());
+            seq.nextMessageNumber();
             i++;
         }
         return seq.isLastMessage();
@@ -332,16 +331,14 @@ public class SourceSequenceTest extends Assert {
         while (i < messageNumbers.length) {
             SequenceAcknowledgement.AcknowledgementRange r = 
                 factory.createSequenceAcknowledgementAcknowledgementRange();
-            Integer li = new Integer(messageNumbers[i]);
-            BigInteger l = new BigInteger(li.toString());
+            Long l = new Long(messageNumbers[i]);
             r.setLower(l);
             i++;
             
             while (i < messageNumbers.length && (messageNumbers[i] - messageNumbers[i - 1]) == 1) {
                 i++;
             }
-            Integer ui = new Integer(messageNumbers[i - 1]);
-            BigInteger u = new BigInteger(ui.toString());
+            Long u = new Long(messageNumbers[i - 1]);
             r.setUpper(u);
             ack.getAcknowledgementRange().add(r);
         }

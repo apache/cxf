@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.ws.rm;
 
 import java.io.StringReader;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +58,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 
 /**
  * Tests the operation of InOrder delivery assurance for one-way messages to the server.
@@ -103,7 +101,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         Thread.sleep(100);
     }
 
-/*    @Test    
+    @Test    
     public void testAtLeastOnce() throws Exception {
         testOnewayAtLeastOnce(null);
     }
@@ -118,7 +116,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new BigInteger("2000"));
+        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -157,7 +155,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new BigInteger("2000"));
+        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -191,7 +189,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new BigInteger("2000"));
+        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -213,7 +211,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             }
         }
         
-    }*/
+    }
 
     @Test    
     public void testInOrder() throws Exception {
@@ -230,7 +228,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new BigInteger("2000"));
+        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -262,7 +260,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new BigInteger("2000"));
+        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -295,7 +293,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new BigInteger("2000"));
+        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);

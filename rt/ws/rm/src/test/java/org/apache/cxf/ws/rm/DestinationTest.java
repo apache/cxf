@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm;
 
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -143,7 +142,7 @@ public class DestinationTest extends Assert {
         EasyMock.expect(st.getIdentifier()).andReturn(id);
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         EasyMock.expect(destination.getSequence(id)).andReturn(ds);
-        BigInteger nr = BigInteger.TEN;
+        long nr = 10;
         EasyMock.expect(st.getMessageNumber()).andReturn(nr);  
         RMException ex = new RMException(new RuntimeException("already acknowledged"));
         ds.applyDeliveryAssurance(nr, message);
@@ -172,7 +171,7 @@ public class DestinationTest extends Assert {
         EasyMock.expect(rmps.getSequence()).andReturn(st);
         Identifier id = control.createMock(Identifier.class);
         EasyMock.expect(st.getIdentifier()).andReturn(id); 
-        BigInteger nr = BigInteger.TEN;
+        long nr = 10;
         EasyMock.expect(st.getMessageNumber()).andReturn(nr).times(2);
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         EasyMock.expect(destination.getSequence(id)).andReturn(ds);

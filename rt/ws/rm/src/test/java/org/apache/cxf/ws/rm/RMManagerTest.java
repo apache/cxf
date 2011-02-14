@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm;
 
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -125,7 +124,7 @@ public class RMManagerTest extends Assert {
         assertEquals(0, stp.getMaxRanges());
         assertEquals(0, stp.getMaxUnacknowledged());
         assertTrue(!stp.isTerminateOnShutdown());
-        assertEquals(BigInteger.ZERO, stp.getMaxLength());   
+        assertEquals(0, stp.getMaxLength());   
     } 
     
     @Test
@@ -579,11 +578,11 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(endpoint.getBinding()).andReturn(binding).anyTimes();
        
         EasyMock.expect(ss.isLastMessage()).andReturn(true).anyTimes();
-        EasyMock.expect(ss.getCurrentMessageNr()).andReturn(BigInteger.TEN).anyTimes();
+        EasyMock.expect(ss.getCurrentMessageNr()).andReturn(new Long(10)).anyTimes();
         if (null == m) {
             return;
         }
-        EasyMock.expect(m.getMessageNumber()).andReturn(BigInteger.TEN).times(2);
+        EasyMock.expect(m.getMessageNumber()).andReturn(new Long(10)).times(2);
         if (null == conduit) {
             EasyMock.expect(m.getTo()).andReturn("toAddress");
         }

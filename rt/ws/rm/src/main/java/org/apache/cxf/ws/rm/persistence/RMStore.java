@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm.persistence;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
 import org.apache.cxf.ws.rm.DestinationSequence;
@@ -109,5 +108,5 @@ public interface RMStore {
      * @param messageNrs the collection of message numbers
      * @param outbound true if the message is outbound
      */
-    void removeMessages(Identifier sid, Collection<BigInteger> messageNrs, boolean outbound);
+    void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound);
 }

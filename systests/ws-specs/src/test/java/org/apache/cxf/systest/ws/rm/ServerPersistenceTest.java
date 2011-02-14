@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.ws.rm;
 
-import java.math.BigInteger;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Response;
@@ -113,7 +112,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         // avoid early client resends
         greeterBus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-            .setMilliseconds(new BigInteger("60000"));
+            .setMilliseconds(new Long(60000));
         GreeterService gs = new GreeterService();
         Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);

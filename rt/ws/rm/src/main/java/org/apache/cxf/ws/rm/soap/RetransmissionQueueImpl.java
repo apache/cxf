@@ -22,7 +22,6 @@ package org.apache.cxf.ws.rm.soap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -116,7 +115,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @param seq the sequence object.
      */
     public void purgeAcknowledged(SourceSequence seq) {
-        Collection<BigInteger> purged = new ArrayList<BigInteger>();
+        Collection<Long> purged = new ArrayList<Long>();
         synchronized (this) {
             LOG.fine("Start purging resend candidates.");
             List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
@@ -126,7 +125,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
                                                                                   true);
                     SequenceType st = properties.getSequence();
-                    BigInteger m = st.getMessageNumber();
+                    long m = st.getMessageNumber().longValue();
                     if (seq.isAcknowledged(m)) {
                         sequenceCandidates.remove(i);
                         candidate.resolved();

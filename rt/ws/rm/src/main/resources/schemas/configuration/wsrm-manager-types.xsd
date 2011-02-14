@@ -113,7 +113,7 @@
     </xs:complexType>
 
     <xs:complexType name="SequenceTerminationPolicyType">    
-        <xs:attribute name="maxLength" type="xs:unsignedLong" use="optional" default="0">
+        <xs:attribute name="maxLength" type="xs:long" use="optional" default="0">
             <xs:annotation>
                 <xs:documentation>
                     The maximum length of a sequence. 
@@ -168,7 +168,7 @@
                 </xs:documentation>
             </xs:annotation>      
         </xs:attribute> 
-        <xs:attribute name="ImmediaAcksTimeout" type="xs:unsignedLong" use="optional" default="1000">
+        <xs:attribute name="ImmediaAcksTimeout" type="xs:long" use="optional" default="1000">
         <xs:annotation>
                 <xs:documentation>
                     Timeout in millisecond. If timeout for a immediateAcks, then consider there's no 

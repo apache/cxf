@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm;
 
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -139,20 +138,20 @@ public class RMOutInterceptorTest extends Assert {
         EasyMock.expect(manager.getSequence((Identifier)EasyMock.isNull(), EasyMock.same(message), 
                                         EasyMock.same(maps))).andReturn(sseq);
         EasyMock.expect(sseq.nextMessageNumber((Identifier)EasyMock.isNull(), 
-            (BigInteger)EasyMock.isNull(), EasyMock.eq(false))).andReturn(BigInteger.TEN);
+            (Long)EasyMock.eq(0L), EasyMock.eq(false))).andReturn(new Long(10));
         EasyMock.expect(sseq.isLastMessage()).andReturn(false).times(2);
         interceptor.addAcknowledgements(EasyMock.same(destination), EasyMock.same(rmpsOut), 
             (Identifier)EasyMock.isNull(), EasyMock.isA(AttributedURI.class));
         EasyMock.expectLastCall();
         Identifier sid = control.createMock(Identifier.class);
         EasyMock.expect(sseq.getIdentifier()).andReturn(sid);
-        EasyMock.expect(sseq.getCurrentMessageNr()).andReturn(BigInteger.TEN);
+        EasyMock.expect(sseq.getCurrentMessageNr()).andReturn(new Long(10));
 
         
         control.replay();
         interceptor.handle(message);
         assertSame(sid, rmpsOut.getSequence().getIdentifier());        
-        assertEquals(BigInteger.TEN, rmpsOut.getSequence().getMessageNumber());
+        assertEquals(new Long(10), rmpsOut.getSequence().getMessageNumber());
         assertNull(rmpsOut.getSequence().getLastMessage());
         control.verify();
     }

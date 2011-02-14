@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +37,7 @@ public class SourceSequence extends AbstractSequence {
 
     private Date expires;
     private Source source;
-    private BigInteger currentMessageNumber;
+    private long currentMessageNumber;
     private boolean lastMessage;
     private Identifier offeringId;
     private org.apache.cxf.ws.addressing.EndpointReferenceType target;
@@ -48,10 +47,10 @@ public class SourceSequence extends AbstractSequence {
     }
 
     public SourceSequence(Identifier i, Date e, Identifier oi) {
-        this(i, e, oi, BigInteger.ZERO, false);
+        this(i, e, oi, 0, false);
     }
 
-    public SourceSequence(Identifier i, Date e, Identifier oi, BigInteger cmn, boolean lm) {
+    public SourceSequence(Identifier i, Date e, Identifier oi, long cmn, boolean lm) {
         super(i);
         expires = e;
 
@@ -67,7 +66,7 @@ public class SourceSequence extends AbstractSequence {
      * @return the message number assigned to the most recent outgoing
      *         application message.
      */
-    public BigInteger getCurrentMessageNr() {
+    public long getCurrentMessageNr() {
         return currentMessageNumber;
     }
 
@@ -125,7 +124,7 @@ public class SourceSequence extends AbstractSequence {
 
         if (acknowledgement.getAcknowledgementRange().size() == 1) {
             AcknowledgementRange r = acknowledgement.getAcknowledgementRange().get(0);
-            return r.getLower().equals(BigInteger.ONE) && r.getUpper().equals(currentMessageNumber);
+            return r.getLower().longValue() == 1 && r.getUpper().longValue() == currentMessageNumber;
         }
         return false;
     }
@@ -193,8 +192,8 @@ public class SourceSequence extends AbstractSequence {
      * 
      * @return the next message number.
      */
-    BigInteger nextMessageNumber() {
-        return nextMessageNumber(null, null, false);
+    long nextMessageNumber() {
+        return nextMessageNumber(null, 0, false);
     }
 
     /**
@@ -206,12 +205,12 @@ public class SourceSequence extends AbstractSequence {
      * 
      * @return the next message number.
      */
-    public BigInteger nextMessageNumber(Identifier inSeqId, BigInteger inMsgNumber, boolean last) {
+    public long nextMessageNumber(Identifier inSeqId, long inMsgNumber, boolean last) {
         assert !lastMessage;
 
-        BigInteger result = null;
+        long result = 0;
         synchronized (this) {
-            currentMessageNumber = currentMessageNumber.add(BigInteger.ONE);
+            currentMessageNumber++;
             if (last) {
                 lastMessage = true;
             } else { 
@@ -250,20 +249,20 @@ public class SourceSequence extends AbstractSequence {
      * Checks if the current message should be the last message in this sequence
      * and if so sets the lastMessageNumber property.
      */
-    private void checkLastMessage(Identifier inSeqId, BigInteger inMsgNumber) {
+    private void checkLastMessage(Identifier inSeqId, long inMsgNumber) {
 
         // check if this is a response to a message that was is the last message
         // in the sequence
         // that included this sequence as an offer
 
-        if (null != inSeqId && null != inMsgNumber) {
+        if (null != inSeqId && 0 != inMsgNumber) {
             Destination destination = source.getReliableEndpoint().getDestination();
             DestinationSequence inSeq = null;
             if (null != destination) {
                 inSeq = destination.getSequence(inSeqId);
             }
 
-            if (null != inSeq && offeredBy(inSeqId) && inMsgNumber.equals(inSeq.getLastMessageNumber())) {
+            if (null != inSeq && offeredBy(inSeqId) && inMsgNumber == inSeq.getLastMessageNumber()) {
                 lastMessage = true;
             }
         }
@@ -274,8 +273,7 @@ public class SourceSequence extends AbstractSequence {
 
             assert null != stp;
 
-            if ((!stp.getMaxLength().equals(BigInteger.ZERO) && stp.getMaxLength()
-                .compareTo(currentMessageNumber) <= 0)
+            if ((stp.getMaxLength() != 0 && stp.getMaxLength() <= currentMessageNumber)
                 || (stp.getMaxRanges() > 0 && acknowledgement.getAcknowledgementRange().size() >= stp
                     .getMaxRanges())
                 || (stp.getMaxUnacknowledged() > 0 && source.getManager().getRetransmissionQueue()

@@ -31,5 +31,8 @@
         <jaxb:schemaBindings>
             <jaxb:package name="org.apache.cxf.ws.rm"/>
         </jaxb:schemaBindings>
+        <jaxb:globalBindings generateIsSetMethod="true">
+            <jaxb:javaType name="java.lang.Long" xmlType="xs:unsignedLong"/>
+        </jaxb:globalBindings>
     </jaxb:bindings>
 </jaxb:bindings>

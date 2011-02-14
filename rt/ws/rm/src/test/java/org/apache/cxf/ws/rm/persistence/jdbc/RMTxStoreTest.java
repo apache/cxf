@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +55,10 @@ public class RMTxStoreTest extends Assert {
     private static final String NON_ANON_ACKS_TO = 
         "http://localhost:9999/decoupled_endpoint";
     
+    private static final Long ZERO = new Long(0);
+    private static final Long ONE = new Long(1);
+    private static final Long TEN = new Long(10);
+    
     private static RMTxStore store;    
     private static SequenceAcknowledgement ack1;
     private static SequenceAcknowledgement ack2;
@@ -74,18 +77,19 @@ public class RMTxStoreTest extends Assert {
         ack1 = new SequenceAcknowledgement();
         SequenceAcknowledgement.AcknowledgementRange range = 
             new SequenceAcknowledgement.AcknowledgementRange();
-        range.setLower(BigInteger.ONE);
-        range.setUpper(BigInteger.ONE);
+        
+        range.setLower(ONE);
+        range.setUpper(ONE);
         ack1.getAcknowledgementRange().add(range);
         
         ack2 = new SequenceAcknowledgement();
         range = new SequenceAcknowledgement.AcknowledgementRange();
-        range.setLower(BigInteger.ONE);
-        range.setUpper(BigInteger.ONE);
+        range.setLower(ONE);
+        range.setUpper(ONE);
         ack2.getAcknowledgementRange().add(range);
         range = new SequenceAcknowledgement.AcknowledgementRange();
-        range.setLower(new BigInteger("3"));
-        range.setUpper(BigInteger.TEN);
+        range.setLower(new Long(3));
+        range.setUpper(TEN);
         ack2.getAcknowledgementRange().add(range);
     }
     
@@ -221,7 +225,7 @@ public class RMTxStoreTest extends Assert {
         RMMessage msg = control.createMock(RMMessage.class);
         Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
         sid1.setValue("sequence1");
-        EasyMock.expect(msg.getMessageNumber()).andReturn(BigInteger.ONE).times(2); 
+        EasyMock.expect(msg.getMessageNumber()).andReturn(ONE).times(2); 
         byte[] bytes = new byte[89];
         EasyMock.expect(msg.getContent()).andReturn(bytes).times(2);
         
@@ -233,7 +237,7 @@ public class RMTxStoreTest extends Assert {
         control.verify();
         
         control.reset();
-        EasyMock.expect(msg.getMessageNumber()).andReturn(BigInteger.ONE); 
+        EasyMock.expect(msg.getMessageNumber()).andReturn(ONE); 
         EasyMock.expect(msg.getContent()).andReturn(bytes);
         
         control.replay();
@@ -247,7 +251,7 @@ public class RMTxStoreTest extends Assert {
         control.verify();
         
         control.reset();
-        EasyMock.expect(msg.getMessageNumber()).andReturn(BigInteger.TEN).times(2); 
+        EasyMock.expect(msg.getMessageNumber()).andReturn(TEN).times(2); 
         EasyMock.expect(msg.getContent()).andReturn(bytes).times(2); 
         
         control.replay();
@@ -257,11 +261,11 @@ public class RMTxStoreTest extends Assert {
         store.commit();
         control.verify();
         
-        Collection<BigInteger> messageNrs = new ArrayList<BigInteger>();
-        messageNrs.add(BigInteger.ZERO);
-        messageNrs.add(BigInteger.TEN);
-        messageNrs.add(BigInteger.ONE);
-        messageNrs.add(BigInteger.TEN);
+        Collection<Long> messageNrs = new ArrayList<Long>();
+        messageNrs.add(ZERO);
+        messageNrs.add(TEN);
+        messageNrs.add(ONE);
+        messageNrs.add(TEN);
         
         store.removeMessages(sid1, messageNrs, true);
         store.removeMessages(sid1, messageNrs, false);
@@ -296,7 +300,7 @@ public class RMTxStoreTest extends Assert {
         store.abort();
         
         control.reset();
-        EasyMock.expect(seq.getLastMessageNumber()).andReturn(BigInteger.TEN);
+        EasyMock.expect(seq.getLastMessageNumber()).andReturn(TEN);
         EasyMock.expect(seq.getAcknowledgment()).andReturn(ack1);        
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         
@@ -323,7 +327,7 @@ public class RMTxStoreTest extends Assert {
         control.verify();        
         
         control.reset();
-        EasyMock.expect(seq.getCurrentMessageNr()).andReturn(BigInteger.ONE);
+        EasyMock.expect(seq.getCurrentMessageNr()).andReturn(ONE);
         EasyMock.expect(seq.isLastMessage()).andReturn(false);
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);   
         
@@ -333,7 +337,7 @@ public class RMTxStoreTest extends Assert {
         store.abort();
         
         control.reset();
-        EasyMock.expect(seq.getCurrentMessageNr()).andReturn(BigInteger.TEN);
+        EasyMock.expect(seq.getCurrentMessageNr()).andReturn(TEN);
         EasyMock.expect(seq.isLastMessage()).andReturn(true);  
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         
@@ -420,8 +424,8 @@ public class RMTxStoreTest extends Assert {
         assertEquals(0, out.size());
         
         try {
-            setupMessage(sid1, BigInteger.ONE, null, true);
-            setupMessage(sid1, BigInteger.ONE, null, false);
+            setupMessage(sid1, ONE, null, true);
+            setupMessage(sid1, ONE, null, false);
 
             out = store.getMessages(sid1, true);
             assertEquals(1, out.size());
@@ -431,8 +435,8 @@ public class RMTxStoreTest extends Assert {
             assertEquals(1, in.size());
             checkRecoveredMessages(in);
             
-            setupMessage(sid1, BigInteger.TEN, NON_ANON_ACKS_TO, true);
-            setupMessage(sid1, BigInteger.TEN, NON_ANON_ACKS_TO, false);
+            setupMessage(sid1, TEN, NON_ANON_ACKS_TO, true);
+            setupMessage(sid1, TEN, NON_ANON_ACKS_TO, false);
             
             out = store.getMessages(sid1, true);
             assertEquals(2, out.size());
@@ -442,9 +446,9 @@ public class RMTxStoreTest extends Assert {
             assertEquals(2, in.size());
             checkRecoveredMessages(in);
         } finally {
-            Collection<BigInteger> msgNrs = new ArrayList<BigInteger>();
-            msgNrs.add(BigInteger.ONE);
-            msgNrs.add(BigInteger.TEN);
+            Collection<Long> msgNrs = new ArrayList<Long>();
+            msgNrs.add(ONE);
+            msgNrs.add(TEN);
          
             store.removeMessages(sid1, msgNrs, true);
             store.removeMessages(sid1, msgNrs, false);
@@ -459,11 +463,11 @@ public class RMTxStoreTest extends Assert {
         EndpointReferenceType epr = RMUtils.createAnonymousReference2004();
         
         SequenceAcknowledgement ack = ack1;
-        BigInteger lmn = null;
+        Long lmn = ZERO;
          
         if ("sequence2".equals(s)) {
             ack = ack2;
-            lmn = BigInteger.TEN;
+            lmn = TEN;
         }
         
         EasyMock.expect(seq.getIdentifier()).andReturn(sid);
@@ -490,14 +494,14 @@ public class RMTxStoreTest extends Assert {
             
         Date expiry = null;
         Identifier osid = null;
-        BigInteger cmn = BigInteger.ONE;
+        Long cmn = ONE;
         boolean lm = false;
         
         if ("sequence2".equals(s)) {
             expiry = new Date(System.currentTimeMillis() + 3600 * 1000);
             osid = RMUtils.getWSRMFactory().createIdentifier();
             osid.setValue("offeringSequence");
-            cmn = BigInteger.TEN;
+            cmn = TEN;
             lm = true;            
         } 
         
@@ -519,7 +523,7 @@ public class RMTxStoreTest extends Assert {
         return sid;
     }
     
-    private void setupMessage(Identifier sid, BigInteger mn, String to, boolean outbound) 
+    private void setupMessage(Identifier sid, Long mn, String to, boolean outbound) 
         throws IOException, SQLException  {
         RMMessage msg = control.createMock(RMMessage.class);
         EasyMock.expect(msg.getMessageNumber()).andReturn(mn);
@@ -541,22 +545,22 @@ public class RMTxStoreTest extends Assert {
                                           || "sequence2".equals(recovered.getIdentifier().getValue()));
             assertEquals(RMConstants.getAnonymousAddress(), recovered.getAcksTo().getAddress().getValue());
             if ("sequence1".equals(recovered.getIdentifier().getValue())) {                      
-                assertNull(recovered.getLastMessageNumber());                
+                assertEquals(0, recovered.getLastMessageNumber());                
                 assertEquals(1, recovered.getAcknowledgment().getAcknowledgementRange().size());
                 SequenceAcknowledgement.AcknowledgementRange r = 
                     recovered.getAcknowledgment().getAcknowledgementRange().get(0);
-                assertEquals(BigInteger.ONE, r.getLower());
-                assertEquals(BigInteger.ONE, r.getUpper());
+                assertEquals(ONE, r.getLower());
+                assertEquals(ONE, r.getUpper());
             } else {
-                assertEquals(BigInteger.TEN, recovered.getLastMessageNumber());
+                assertEquals(10, recovered.getLastMessageNumber());
                 assertEquals(2, recovered.getAcknowledgment().getAcknowledgementRange().size());
                 SequenceAcknowledgement.AcknowledgementRange r = 
                     recovered.getAcknowledgment().getAcknowledgementRange().get(0);
-                assertEquals(BigInteger.ONE, r.getLower());
-                assertEquals(BigInteger.ONE, r.getUpper());
+                assertEquals(ONE, r.getLower());
+                assertEquals(ONE, r.getUpper());
                 r = recovered.getAcknowledgment().getAcknowledgementRange().get(1);
-                assertEquals(new BigInteger("3"), r.getLower());
-                assertEquals(BigInteger.TEN, r.getUpper());                
+                assertEquals(new Long(3), r.getLower());
+                assertEquals(TEN, r.getUpper());                
             }
         }
     }
@@ -568,12 +572,12 @@ public class RMTxStoreTest extends Assert {
                                           || "sequence2".equals(recovered.getIdentifier().getValue()));
             if ("sequence1".equals(recovered.getIdentifier().getValue())) {                      
                 assertFalse(recovered.isLastMessage());
-                assertEquals(BigInteger.ONE, recovered.getCurrentMessageNr());  
+                assertEquals(1, recovered.getCurrentMessageNr());  
                 assertNull(recovered.getExpires());
                 assertNull(recovered.getOfferingSequenceIdentifier());
             } else {
                 assertTrue(recovered.isLastMessage());
-                assertEquals(BigInteger.TEN, recovered.getCurrentMessageNr()); 
+                assertEquals(10, recovered.getCurrentMessageNr()); 
                 assertNotNull(recovered.getExpires());
                 assertEquals("offeringSequence", recovered.getOfferingSequenceIdentifier().getValue());
             }
@@ -582,15 +586,15 @@ public class RMTxStoreTest extends Assert {
     
     private void checkRecoveredMessages(Collection<RMMessage> msgs) {
         for (RMMessage msg : msgs) {
-            BigInteger mn = msg.getMessageNumber();
-            assertTrue(BigInteger.ONE.equals(mn) || BigInteger.TEN.equals(mn));
-            if (BigInteger.TEN.equals(mn)) {
+            long mn = msg.getMessageNumber();
+            assertTrue(mn == 1 || mn == 10);
+            if (mn == 10) {
                 assertEquals(NON_ANON_ACKS_TO, msg.getTo());
             } else {
                 assertNull(msg.getTo());
             }
             byte[] actual = msg.getContent();
-            assertEquals(new String("Message " + mn.longValue()), IOUtils.newStringFromBytes(actual));
+            assertEquals(new String("Message " + mn), IOUtils.newStringFromBytes(actual));
         }
     }
     

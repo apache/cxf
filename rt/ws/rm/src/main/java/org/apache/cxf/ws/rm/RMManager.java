@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -223,7 +222,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             rma.setBaseRetransmissionInterval(bri);
         }
         if (null == bri.getMilliseconds()) {
-            bri.setMilliseconds(new BigInteger(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL));
+            bri.setMilliseconds(new Long(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL));
         }
 
         rmAssertion = rma;
@@ -443,7 +442,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                 SequenceType st = RMUtils.getWSRMFactory().createSequenceType();
                 st.setIdentifier(ss.getIdentifier());
                 st.setMessageNumber(m.getMessageNumber());
-                if (ss.isLastMessage() && ss.getCurrentMessageNr().equals(m.getMessageNumber())) {
+                if (ss.isLastMessage() && ss.getCurrentMessageNr() == m.getMessageNumber()) {
                     st.setLastMessage(RMUtils.getWSRMFactory().createSequenceTypeLastMessage());
                 }
                 RMProperties rmps = new RMProperties();

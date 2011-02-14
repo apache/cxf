@@ -21,7 +21,6 @@ package org.apache.cxf.ws.rm.soap;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -67,8 +66,10 @@ import org.junit.Test;
 public class RMSoapInterceptorTest extends Assert {
 
     private static final String SEQ_IDENTIFIER = "http://Business456.com/RM/ABC";
-    private static final BigInteger MSG1_MESSAGE_NUMBER = BigInteger.ONE;
-    private static final BigInteger MSG2_MESSAGE_NUMBER = BigInteger.ONE.add(BigInteger.ONE);
+    private static final Long ONE = new Long(1);
+    private static final Long TEN = new Long(10);
+    private static final Long MSG1_MESSAGE_NUMBER = ONE;
+    private static final Long MSG2_MESSAGE_NUMBER = new Long(2);
 
     private IMocksControl control;
     
@@ -305,25 +306,25 @@ public class RMSoapInterceptorTest extends Assert {
         Identifier sid = factory.createIdentifier();
         sid.setValue("sequence1");
         s1.setIdentifier(sid);
-        s1.setMessageNumber(BigInteger.ONE);
+        s1.setMessageNumber(ONE);
         s2 = factory.createSequenceType();
         sid = factory.createIdentifier();
         sid.setValue("sequence2");
         s2.setIdentifier(sid);
-        s2.setMessageNumber(BigInteger.TEN);
+        s2.setMessageNumber(TEN);
 
         ack1 = factory.createSequenceAcknowledgement();
         SequenceAcknowledgement.AcknowledgementRange r = 
             factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(BigInteger.ONE);
-        r.setUpper(BigInteger.ONE);
+        r.setLower(ONE);
+        r.setUpper(ONE);
         ack1.getAcknowledgementRange().add(r);
         ack1.setIdentifier(s1.getIdentifier());
 
         ack2 = factory.createSequenceAcknowledgement();
         r = factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(BigInteger.ONE);
-        r.setUpper(BigInteger.TEN);
+        r.setLower(ONE);
+        r.setUpper(TEN);
         ack2.getAcknowledgementRange().add(r);
         ack2.setIdentifier(s2.getIdentifier());
 

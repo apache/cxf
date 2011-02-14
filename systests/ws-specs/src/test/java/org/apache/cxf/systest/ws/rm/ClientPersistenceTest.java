@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.ws.rm;
 
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,7 +86,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
             bus.getOutFaultInterceptors().add(logOut);
             
             bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-                .setMilliseconds(new BigInteger("60000"));
+                .setMilliseconds(new Long(60000));
             
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
@@ -171,7 +170,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
     void populateStore() throws Exception {
         
         bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-            .setMilliseconds(new BigInteger("60000"));
+            .setMilliseconds(new Long(60000));
         bus.getOutInterceptors().add(new MessageLossSimulator());
                 
         greeter.greetMeOneWay("one");

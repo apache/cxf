@@ -18,20 +18,17 @@
  */
 package org.apache.cxf.ws.rm.persistence;
 
-import java.math.BigInteger;
-
-
 public class RMMessage {
     
     private byte[] content;
-    private BigInteger messageNumber;
+    private long messageNumber;
     private String to;
     
     /**
      * Returns the message number of the message within its sequence.
      * @return the message number
      */
-    public BigInteger getMessageNumber() {
+    public long getMessageNumber() {
         return  messageNumber;
     }
     
@@ -39,7 +36,7 @@ public class RMMessage {
      * Sets the message number of the message within its sequence.
      * @param messageNumber the message number
      */
-    public void setMessageNumber(BigInteger mn) {
+    public void setMessageNumber(long mn) {
         messageNumber = mn;
     }
     

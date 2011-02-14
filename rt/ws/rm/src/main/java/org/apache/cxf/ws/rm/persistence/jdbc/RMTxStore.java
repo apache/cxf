@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -67,23 +66,23 @@ public class RMTxStore implements RMStore {
         "CREATE TABLE CXF_RM_DEST_SEQUENCES " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
         + "ACKS_TO VARCHAR(1024) NOT NULL, "
-        + "LAST_MSG_NO DECIMAL(31, 0), "
+        + "LAST_MSG_NO BIGINT, "
         + "ENDPOINT_ID VARCHAR(1024), "
         + "ACKNOWLEDGED BLOB, "
         + "PRIMARY KEY (SEQ_ID))";
     private static final String CREATE_SRC_SEQUENCES_TABLE_STMT =
         "CREATE TABLE CXF_RM_SRC_SEQUENCES " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "CUR_MSG_NO DECIMAL(31, 0) DEFAULT 1 NOT NULL, "
+        + "CUR_MSG_NO BIGINT DEFAULT 1 NOT NULL, "
         + "LAST_MSG CHAR(1), "
-        + "EXPIRY DECIMAL(31, 0), "
+        + "EXPIRY BIGINT, "
         + "OFFERING_SEQ_ID VARCHAR(256), "
         + "ENDPOINT_ID VARCHAR(1024), "            
         + "PRIMARY KEY (SEQ_ID))";
     private static final String CREATE_MESSAGES_TABLE_STMT =
         "CREATE TABLE {0} " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "MSG_NO DECIMAL(31, 0) NOT NULL, "
+        + "MSG_NO BIGINT NOT NULL, "
         + "SEND_TO VARCHAR(256), "
         + "CONTENT BLOB, "
         + "PRIMARY KEY (SEQ_ID, MSG_NO))";
@@ -297,15 +296,14 @@ public class RMTxStore implements RMStore {
                 Identifier sid = RMUtils.getWSRMFactory().createIdentifier();                
                 sid.setValue(res.getString(1));
                 EndpointReferenceType acksTo = RMUtils.createReference2004(res.getString(2));  
-                BigDecimal lm = res.getBigDecimal(3);
+                long lm = res.getLong(3);
                 InputStream is = res.getBinaryStream(4); 
                 SequenceAcknowledgement ack = null;
                 if (null != is) {
                     ack = PersistenceUtils.getInstance()
                         .deserialiseAcknowledgment(is); 
                 }
-                DestinationSequence seq = new DestinationSequence(sid, acksTo, 
-                                                                  lm == null ? null : lm.toBigInteger(), ack);
+                DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, ack);
                 seqs.add(seq);                                                 
             }
         } catch (SQLException ex) {
@@ -330,7 +328,7 @@ public class RMTxStore implements RMStore {
             while (res.next()) {
                 Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
                 sid.setValue(res.getString(1));
-                BigInteger cmn = res.getBigDecimal(2).toBigInteger();
+                long cmn = res.getLong(2);
                 boolean lm = res.getBoolean(3);
                 long lval = res.getLong(4);
                 Date expiry = 0 == lval ? null : new Date(lval);
@@ -366,7 +364,7 @@ public class RMTxStore implements RMStore {
             stmt.setString(1, sid.getValue());
             ResultSet res = stmt.executeQuery();
             while (res.next()) {
-                BigInteger mn = res.getBigDecimal(1).toBigInteger();
+                long mn = res.getLong(1);
                 String to = res.getString(2);
                 Blob blob = res.getBlob(3);
                 byte[] bytes = blob.getBytes(1, (int)blob.length());     
@@ -420,7 +418,7 @@ public class RMTxStore implements RMStore {
         }        
     }
 
-    public void removeMessages(Identifier sid, Collection<BigInteger> messageNrs, boolean outbound) {
+    public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
         try {
             beginTransaction();
             PreparedStatement stmt = outbound ? deleteOutboundMessageStmt : deleteInboundMessageStmt;
@@ -436,8 +434,8 @@ public class RMTxStore implements RMStore {
 
             stmt.setString(1, sid.getValue());
                         
-            for (BigInteger messageNr : messageNrs) {
-                stmt.setBigDecimal(2, new BigDecimal(messageNr));
+            for (Long messageNr : messageNrs) {
+                stmt.setLong(2, messageNr);
                 stmt.execute();
             }
             
@@ -480,7 +478,7 @@ public class RMTxStore implements RMStore {
     protected void storeMessage(Identifier sid, RMMessage msg, boolean outbound)         
         throws IOException, SQLException {
         String id = sid.getValue();
-        BigInteger nr = msg.getMessageNumber();
+        long nr = msg.getMessageNumber();
         String to = msg.getTo();
         LOG.log(Level.FINE, "Storing {0} message number {1} for sequence {2}, to = {3}",
             new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
@@ -526,9 +524,8 @@ public class RMTxStore implements RMStore {
         if (null == updateDestSequenceStmt) {
             updateDestSequenceStmt = connection.prepareStatement(UPDATE_DEST_SEQUENCE_STMT_STR);
         }
-        BigInteger lastMessageNr = seq.getLastMessageNumber();
-        updateDestSequenceStmt.setBigDecimal(1, lastMessageNr == null ? null
-            : new BigDecimal(lastMessageNr)); 
+        long lastMessageNr = seq.getLastMessageNumber();
+        updateDestSequenceStmt.setLong(1, lastMessageNr); 
         InputStream is = PersistenceUtils.getInstance()
             .serialiseAcknowledgment(seq.getAcknowledgment());
         updateDestSequenceStmt.setBinaryStream(2, is, is.available()); 

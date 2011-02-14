@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm.policy;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
 import org.apache.cxf.message.Message;
@@ -77,11 +76,11 @@ public final class PolicyUtils {
         
         // use maximum of inactivity timeout
         
-        BigInteger aval = null;
+        Long aval = null;
         if (null != a.getInactivityTimeout()) {
             aval = a.getInactivityTimeout().getMilliseconds();
         }
-        BigInteger bval = null;
+        Long bval = null;
         if (null != b.getInactivityTimeout()) {
             bval = b.getInactivityTimeout().getMilliseconds();            
         }
@@ -147,11 +146,11 @@ public final class PolicyUtils {
             return true;
         }
         
-        BigInteger aval = null;
+        Long aval = null;
         if (null != a.getInactivityTimeout()) {
             aval = a.getInactivityTimeout().getMilliseconds();
         }
-        BigInteger bval = null;
+        Long bval = null;
         if (null != b.getInactivityTimeout()) {
             bval = b.getInactivityTimeout().getMilliseconds();            
         }
@@ -188,7 +187,7 @@ public final class PolicyUtils {
             : null != b.getExponentialBackoff();         
     }
         
-    private static boolean equals(BigInteger aval, BigInteger bval) {
+    private static boolean equals(Long aval, Long bval) {
         if (null != aval) {
             if (null != bval) {
                 if (!aval.equals(bval)) {

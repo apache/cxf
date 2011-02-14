@@ -20,7 +20,6 @@
 
 package org.apache.cxf.ws.rm.soap;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +47,8 @@ import org.junit.Test;
  * Test resend logic.
  */
 public class RetransmissionQueueImplTest extends Assert {
+    private static final Long ONE = new Long(1);
+    private static final Long TEN = new Long(10);
 
     private IMocksControl control;
     private RMManager manager;
@@ -185,7 +186,7 @@ public class RetransmissionQueueImplTest extends Assert {
     
     @Test
     public void testPurgeAcknowledgedSome() {
-        BigInteger[] messageNumbers = {BigInteger.TEN, BigInteger.ONE};
+        Long[] messageNumbers = {TEN, ONE};
         SourceSequence sequence = setUpSequence("sequence1",
                                           messageNumbers, 
                                           new boolean[] {true, false});
@@ -214,7 +215,7 @@ public class RetransmissionQueueImplTest extends Assert {
     
     @Test
     public void testPurgeAcknowledgedNone() {
-        BigInteger[] messageNumbers = {BigInteger.TEN, BigInteger.ONE};
+        Long[] messageNumbers = {TEN, ONE};
         SourceSequence sequence = setUpSequence("sequence1",
                                            messageNumbers, 
                                            new boolean[] {false, false});
@@ -243,7 +244,7 @@ public class RetransmissionQueueImplTest extends Assert {
 
     @Test
     public void testPurgeAcknowledgedAll() {
-        BigInteger[] messageNumbers = {BigInteger.TEN, BigInteger.ONE};
+        Long[] messageNumbers = {TEN, ONE};
         SourceSequence sequence = setUpSequence("sequence1",
                                           messageNumbers,
                                           new boolean[] {true, true});
@@ -277,7 +278,7 @@ public class RetransmissionQueueImplTest extends Assert {
 
     @Test
     public void testCountUnacknowledged() {
-        BigInteger[] messageNumbers = {BigInteger.TEN, BigInteger.ONE};
+        Long[] messageNumbers = {TEN, ONE};
         SourceSequence sequence = setUpSequence("sequence1",
                                           messageNumbers, 
                                           null);
@@ -304,7 +305,7 @@ public class RetransmissionQueueImplTest extends Assert {
     
     @Test
     public void testCountUnacknowledgedUnknownSequence() {
-        BigInteger[] messageNumbers = {BigInteger.TEN, BigInteger.ONE};
+        Long[] messageNumbers = {TEN, ONE};
         SourceSequence sequence = setUpSequence("sequence1",
                                           messageNumbers, 
                                           null);
@@ -325,13 +326,12 @@ public class RetransmissionQueueImplTest extends Assert {
         return setUpMessage(sid, null);
     }
 
-    private Message setUpMessage(String sid,
-                                        BigInteger messageNumber) {
+    private Message setUpMessage(String sid, Long messageNumber) {
         return setUpMessage(sid, messageNumber, true);
     }
 
     private Message setUpMessage(String sid,
-                                        BigInteger messageNumber,
+                                        Long messageNumber,
                                         boolean storeSequence) {
         Message message =
             createMock(Message.class);
@@ -349,7 +349,7 @@ public class RetransmissionQueueImplTest extends Assert {
         RMAssertion.BaseRetransmissionInterval bri = 
             createMock(RMAssertion.BaseRetransmissionInterval.class);
         EasyMock.expect(rma.getBaseRetransmissionInterval()).andReturn(bri);
-        EasyMock.expect(bri.getMilliseconds()).andReturn(new BigInteger("5000"));
+        EasyMock.expect(bri.getMilliseconds()).andReturn(new Long(5000));
         RMAssertion.ExponentialBackoff eb = createMock(RMAssertion.ExponentialBackoff.class);
         EasyMock.expect(rma.getExponentialBackoff()).andReturn(eb);        
     }
@@ -364,7 +364,7 @@ public class RetransmissionQueueImplTest extends Assert {
     
     private SequenceType setUpSequenceType(Message message,
                                            String sid,
-                                           BigInteger messageNumber) {
+                                           Long messageNumber) {
         RMProperties rmps = createMock(RMProperties.class);
         if (message != null) {
             message.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND);
@@ -392,7 +392,7 @@ public class RetransmissionQueueImplTest extends Assert {
     }
     
     private SourceSequence setUpSequence(String sid, 
-                                   BigInteger[] messageNumbers,
+                                   Long[] messageNumbers,
                                    boolean[] isAcked) {
         SourceSequence sequence = createMock(SourceSequence.class);
         Identifier id = createMock(Identifier.class);

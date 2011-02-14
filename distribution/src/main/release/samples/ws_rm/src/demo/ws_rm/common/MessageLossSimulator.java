@@ -21,7 +21,6 @@ package demo.ws_rm.common;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,7 +106,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         @Override
         protected void onFirstWrite() throws IOException {
             if (LOG.isLoggable(Level.FINE)) {
-                BigInteger nr = RMContextUtils.retrieveRMProperties(outMessage, true)
+                Long nr = RMContextUtils.retrieveRMProperties(outMessage, true)
                     .getSequence().getMessageNumber();
                 LOG.fine("Losing message " + nr);
             }

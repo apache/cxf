@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
@@ -103,7 +102,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         
         RMProperties rmpsIn = null;
         Identifier inSeqId = null;
-        BigInteger inMessageNumber = null;
+        long inMessageNumber = 0;
         
         if (isApplicationMessage) {
             rmpsIn = (RMProperties)RMContextUtils.retrieveRMProperties(message, false);

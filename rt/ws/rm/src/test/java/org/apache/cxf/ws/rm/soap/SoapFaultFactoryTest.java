@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.rm.soap;
 
-import java.math.BigInteger;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -131,8 +129,8 @@ public class SoapFaultFactoryTest extends Assert {
         ack.setIdentifier(id);
         SequenceAcknowledgement.AcknowledgementRange range = 
             new SequenceAcknowledgement.AcknowledgementRange();
-        range.setLower(BigInteger.ONE);
-        range.setUpper(BigInteger.TEN);
+        range.setLower(new Long(1));
+        range.setUpper(new Long(10));
         ack.getAcknowledgementRange().add(range);   
         setupSequenceFault(true, RMConstants.getInvalidAcknowledgmentFaultCode(), ack);        
         control.replay();

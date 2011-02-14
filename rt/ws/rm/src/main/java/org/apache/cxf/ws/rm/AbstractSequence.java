@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.math.BigInteger;
-
 import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
 
 
@@ -67,9 +65,9 @@ public abstract class AbstractSequence {
         }
     }
     
-    public synchronized boolean isAcknowledged(BigInteger m) {
+    public synchronized boolean isAcknowledged(long m) {
         for (AcknowledgementRange r : acknowledgement.getAcknowledgementRange()) {
-            if (m.subtract(r.getLower()).signum() >= 0 && r.getUpper().subtract(m).signum() >= 0) {
+            if (m >= r.getLower().longValue() && r.getUpper().longValue() >= m) {
                 return true;
             }
         }

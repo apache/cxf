@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -49,23 +48,23 @@ public class DestinationSequence extends AbstractSequence {
 
     private Destination destination;
     private EndpointReferenceType acksTo;
-    private BigInteger lastMessageNumber;
+    private long lastMessageNumber;
     private SequenceMonitor monitor;
     private boolean acknowledgeOnNextOccasion;
     private List<DeferredAcknowledgment> deferredAcknowledgments;
     private SequenceTermination scheduledTermination;
     private String correlationID;
-    private BigInteger inProcessNumber;
-    private BigInteger highNumberCompleted = BigInteger.ZERO;
+    private long inProcessNumber;
+    private long highNumberCompleted;
     private List<Continuation> continuations = new LinkedList<Continuation>();
     
     public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d) {
-        this(i, a, null, null);
+        this(i, a, 0, null);
         destination = d;
     }
     
     public DestinationSequence(Identifier i, EndpointReferenceType a,
-                              BigInteger lmn, SequenceAcknowledgement ac) {
+                              long lmn, SequenceAcknowledgement ac) {
         super(i);
         acksTo = a;
         lastMessageNumber = lmn;
@@ -85,9 +84,9 @@ public class DestinationSequence extends AbstractSequence {
     }
     
     /**
-     * @return the message number of the last message or null if the last message had not been received.
+     * @return the message number of the last message or 0 if the last message had not been received.
      */
-    public BigInteger getLastMessageNumber() {
+    public long getLastMessageNumber() {
         return lastMessageNumber;
     }
     
@@ -107,9 +106,9 @@ public class DestinationSequence extends AbstractSequence {
     
     public void acknowledge(Message message) throws SequenceFault {
         SequenceType st = RMContextUtils.retrieveRMProperties(message, false).getSequence();
-        BigInteger messageNumber = st.getMessageNumber();
+        long messageNumber = st.getMessageNumber().longValue();
         LOG.fine("Acknowledging message: " + messageNumber);
-        if (null != lastMessageNumber && messageNumber.compareTo(lastMessageNumber) > 0) {
+        if (0 != lastMessageNumber && messageNumber > lastMessageNumber) {
             throw new SequenceFaultFactory().createLastMessageNumberExceededFault(st.getIdentifier());
         }        
         
@@ -125,14 +124,13 @@ public class DestinationSequence extends AbstractSequence {
                     done = true;
                     break;
                 } else {
-                    BigInteger diff = r.getLower().subtract(messageNumber);
-                    if (diff.signum() == 1) {
-                        if (diff.equals(BigInteger.ONE)) {
-                            r.setLower(messageNumber);
-                            done = true;
-                        }
+                    long diff = r.getLower() - messageNumber;
+                    if (diff == 1) {
+                        r.setLower(messageNumber);
+                        done = true;
+                    } else if (diff > 0) {
                         break;
-                    } else if (messageNumber.subtract(r.getUpper()).equals(BigInteger.ONE)) {
+                    } else if (messageNumber - r.getUpper().longValue() == 1) {
                         r.setUpper(messageNumber);
                         done = true;
                         break;
@@ -157,7 +155,7 @@ public class DestinationSequence extends AbstractSequence {
         long acknowledgementInterval = 0;
         AcknowledgementInterval ai = rma.getAcknowledgementInterval();
         if (null != ai) {
-            BigInteger val = ai.getMilliseconds(); 
+            Long val = ai.getMilliseconds(); 
             if (null != val) {
                 acknowledgementInterval = val.longValue();
             }
@@ -168,7 +166,7 @@ public class DestinationSequence extends AbstractSequence {
         long inactivityTimeout = 0;
         InactivityTimeout iat = rma.getInactivityTimeout();
         if (null != iat) {
-            BigInteger val = iat.getMilliseconds(); 
+            Long val = iat.getMilliseconds(); 
             if (null != val) {
                 inactivityTimeout = val.longValue();
             }
@@ -182,7 +180,7 @@ public class DestinationSequence extends AbstractSequence {
         for (int i = ranges.size() - 1; i > 0; i--) {
             AcknowledgementRange current = ranges.get(i);
             AcknowledgementRange previous = ranges.get(i - 1);
-            if (current.getLower().subtract(previous.getUpper()).equals(BigInteger.ONE)) {
+            if (current.getLower().longValue() - previous.getUpper().longValue() == 1) {
                 previous.setUpper(current.getUpper());
                 ranges.remove(i);
             }
@@ -206,7 +204,7 @@ public class DestinationSequence extends AbstractSequence {
         return monitor;
     }
     
-    void setLastMessageNumber(BigInteger lmn) {
+    void setLastMessageNumber(long lmn) {
         lastMessageNumber = lmn;
     }
       
@@ -227,7 +225,7 @@ public class DestinationSequence extends AbstractSequence {
      * @return <code>true</code> if message processing to continue, <code>false</code> if to be dropped
      * @throws Fault if message had already been acknowledged
      */
-    boolean applyDeliveryAssurance(BigInteger mn, Message message) throws RMException {
+    boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
         Continuation cont = getContinuation(message);
         DeliveryAssuranceType da = destination.getManager().getDeliveryAssurance();
         if (cont != null && da.isSetInOrder() && !cont.isNew()) {
@@ -254,22 +252,21 @@ public class DestinationSequence extends AbstractSequence {
         return message.get(Continuation.class);
     }
     
-    synchronized boolean waitInQueue(BigInteger mn, boolean canSkip,
+    synchronized boolean waitInQueue(long mn, boolean canSkip,
                                      Message message, Continuation continuation) {
         while (true) {
             
             // can process now if no other in process and this one is next
-            if (inProcessNumber == null) {
-                BigInteger diff = mn.subtract(highNumberCompleted);
-                if (BigInteger.ONE.equals(diff) || (canSkip && diff.signum() > 0)) {
+            if (inProcessNumber == 0) {
+                long diff = mn - highNumberCompleted;
+                if (diff == 1 || canSkip && diff > 0) {
                     inProcessNumber = mn;
                     return true;
                 }
             }
             
             // can abort now if same message in process or already processed
-            BigInteger compare = inProcessNumber == null ? highNumberCompleted : inProcessNumber;
-            if (compare.compareTo(mn) >= 0) {
+            if (mn == inProcessNumber || isAcknowledged(mn)) {
                 return false;
             }
             if (continuation == null) {
@@ -307,18 +304,18 @@ public class DestinationSequence extends AbstractSequence {
         notifyAll();
     }
     
-    synchronized void processingComplete(BigInteger mn) {
-        inProcessNumber = null;
+    synchronized void processingComplete(long mn) {
+        inProcessNumber = 0;
         highNumberCompleted = mn;
         wakeupAll();
     }
     
-    void purgeAcknowledged(BigInteger messageNr) {
+    void purgeAcknowledged(long messageNr) {
         RMStore store = destination.getManager().getStore();
         if (null == store) {
             return;
         }
-        Collection<BigInteger> messageNrs = new ArrayList<BigInteger>();
+        Collection<Long> messageNrs = new ArrayList<Long>();
         messageNrs.add(messageNr);
         store.removeMessages(getIdentifier(), messageNrs, false);
     }
@@ -357,7 +354,7 @@ public class DestinationSequence extends AbstractSequence {
             LOG.fine("Schedule immediate acknowledgment");
             scheduleImmediateAcknowledgement();
             destination.getManager().getTimer().schedule(
-                new ImmediateFallbackAcknowledgment(), ap.getImmediaAcksTimeout().longValue());
+                new ImmediateFallbackAcknowledgment(), ap.getImmediaAcksTimeout());
            
         }
     }

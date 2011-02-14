@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm.policy;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -59,7 +58,7 @@ public class PolicyUtilsTest extends Assert {
         assertTrue(PolicyUtils.equals(a, b));
         
         InactivityTimeout iat = new RMAssertion.InactivityTimeout();
-        iat.setMilliseconds(BigInteger.TEN);
+        iat.setMilliseconds(new Long(10));
         a.setInactivityTimeout(iat);
         assertTrue(!PolicyUtils.equals(a, b));
         b.setInactivityTimeout(iat);
@@ -79,10 +78,10 @@ public class PolicyUtilsTest extends Assert {
         assertSame(a, PolicyUtils.intersect(a, b));
         
         InactivityTimeout aiat = new RMAssertion.InactivityTimeout();
-        aiat.setMilliseconds(new BigInteger("3600000"));
+        aiat.setMilliseconds(new Long(3600000));
         a.setInactivityTimeout(aiat);
         InactivityTimeout biat = new RMAssertion.InactivityTimeout();
-        biat.setMilliseconds(new BigInteger("7200000"));
+        biat.setMilliseconds(new Long(7200000));
         b.setInactivityTimeout(biat);
         
         RMAssertion c = PolicyUtils.intersect(a, b);
@@ -92,10 +91,10 @@ public class PolicyUtilsTest extends Assert {
         assertNull(c.getExponentialBackoff());
         
         BaseRetransmissionInterval abri = new RMAssertion.BaseRetransmissionInterval();
-        abri.setMilliseconds(new BigInteger("10000"));
+        abri.setMilliseconds(new Long(10000));
         a.setBaseRetransmissionInterval(abri);
         BaseRetransmissionInterval bbri = new RMAssertion.BaseRetransmissionInterval();
-        bbri.setMilliseconds(new BigInteger("20000"));
+        bbri.setMilliseconds(new Long(20000));
         b.setBaseRetransmissionInterval(bbri);
         
         c = PolicyUtils.intersect(a, b);
@@ -105,7 +104,7 @@ public class PolicyUtilsTest extends Assert {
         assertNull(c.getExponentialBackoff());
        
         AcknowledgementInterval aai = new RMAssertion.AcknowledgementInterval();
-        aai.setMilliseconds(new BigInteger("2000"));
+        aai.setMilliseconds(new Long(2000));
         a.setAcknowledgementInterval(aai);
         
         c = PolicyUtils.intersect(a, b);
@@ -126,7 +125,7 @@ public class PolicyUtilsTest extends Assert {
     public void testGetRMAssertion() {
         RMAssertion a = new RMAssertion();
         BaseRetransmissionInterval abri = new RMAssertion.BaseRetransmissionInterval();
-        abri.setMilliseconds(new BigInteger("3000"));
+        abri.setMilliseconds(new Long(3000));
         a.setBaseRetransmissionInterval(abri);
         a.setExponentialBackoff(new RMAssertion.ExponentialBackoff());
         
@@ -148,7 +147,7 @@ public class PolicyUtilsTest extends Assert {
         control.reset();
         RMAssertion b = new RMAssertion();
         BaseRetransmissionInterval bbri = new RMAssertion.BaseRetransmissionInterval();
-        bbri.setMilliseconds(new BigInteger("2000"));
+        bbri.setMilliseconds(new Long(2000));
         b.setBaseRetransmissionInterval(bbri);
         JaxbAssertion<RMAssertion> assertion = new JaxbAssertion<RMAssertion>();
         assertion.setName(RMConstants.getRMAssertionQName());

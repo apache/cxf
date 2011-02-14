@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm.persistence;
 
 import java.io.InputStream;
-import java.math.BigInteger;
 
 import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
@@ -36,8 +35,8 @@ public class PersistenceUtilsTest extends Assert {
     public void testSerialiseDeserialiseAcknowledgement() {
         SequenceAcknowledgement ack = new SequenceAcknowledgement();
         AcknowledgementRange range = new AcknowledgementRange();
-        range.setLower(BigInteger.ONE);
-        range.setUpper(BigInteger.TEN);
+        range.setLower(new Long(1));
+        range.setUpper(new Long(10));
         ack.getAcknowledgementRange().add(range);
         PersistenceUtils utils = PersistenceUtils.getInstance();
         InputStream is = utils.serialiseAcknowledgment(ack);
