@@ -124,9 +124,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
             secEngineOverride = createSecurityEngine(processorMap);
         } else if (validatorMap != null) {
-            if (processorMap != null) {
-                validatorMap.putAll(processorMap);
-            }
             secEngineOverride = createSecurityEngine(validatorMap);
         }
     }
