@@ -39,7 +39,6 @@ public class JMSEndpointTest extends Assert {
     public void testQueueParameters() throws Exception {
         JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?foo=bar&foo2=bar2");
         assertTrue(endpoint instanceof JMSQueueEndpoint);
-        System.out.println("The Request URI is " + endpoint.getRequestURI());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
         assertEquals(endpoint.getJmsVariant(), JMSURIConstants.QUEUE);
         assertEquals(endpoint.getParameters().size(), 2);
@@ -86,6 +85,26 @@ public class JMSEndpointTest extends Assert {
         assertEquals(endpoint.getJndiConnectionFactoryName(),
                      "ConnectionFactory");
         assertEquals(endpoint.getJndiURL(), "tcp://localhost:61616");
+    }
+    
+    @Test
+    public void testReplyToNameParameters() throws Exception {
+        JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?replyToName=FOO.Tar");
+        assertTrue(endpoint instanceof JMSQueueEndpoint);
+        assertEquals("Foo.Bar", endpoint.getDestinationName());
+        assertNull(endpoint.getTopicReplyToName());
+        assertEquals("FOO.Tar", endpoint.getReplyToName());
+        try {
+            resolveEndpoint("jms:queue:Foo.Bar?replyToName=FOO.Tar&topicReplyToName=FOO.Zar");
+            fail("Expecting exception here");
+        } catch (IllegalArgumentException ex) {
+            // expect the exception
+        }
+        
+        endpoint = resolveEndpoint("jms:queue:Foo.Bar?topicReplyToName=FOO.Zar");
+        assertEquals("Foo.Bar", endpoint.getDestinationName());
+        assertNull(endpoint.getReplyToName());
+        assertEquals("FOO.Zar", endpoint.getTopicReplyToName());
     }
     
     @Test
@@ -143,13 +162,7 @@ public class JMSEndpointTest extends Assert {
         assertFalse(requestUri.contains("priority=3"));
     }
     
-    private JMSEndpoint resolveEndpoint(String uri) {
-        JMSEndpoint endpoint = null;
-        try {
-            endpoint = JMSEndpointParser.createEndpoint(uri);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return endpoint;
+    private JMSEndpoint resolveEndpoint(String uri) throws Exception {
+        return JMSEndpointParser.createEndpoint(uri);
     }
 }

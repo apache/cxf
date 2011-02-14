@@ -64,6 +64,7 @@
 		<xs:attribute name="timeToLive" type="xs:long" />
 		<xs:attribute name="priority" type="jms:priorityType" />
 		<xs:attribute name="replyToName" type="xs:string" />
+		<xs:attribute name="topicReplyToName" type="xs:string" />
 		<xs:attribute name="jndiConnectionFactoryName" type="xs:string" />
 		<xs:attribute name="jndiInitialContextFactory" type="xs:string" />
 		<xs:attribute name="jndiURL" type="xs:string" />

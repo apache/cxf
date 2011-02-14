@@ -79,6 +79,8 @@ public final class JMSEndpointParser {
         String priority = getAndRemoveParameter(parameters, JMSURIConstants.PRIORITY_PARAMETER_NAME);
         String replyToName = getAndRemoveParameter(parameters,
                                                    JMSURIConstants.REPLYTONAME_PARAMETER_NAME);
+        String topicReplyToName = getAndRemoveParameter(parameters,
+                                                   JMSURIConstants.TOPICREPLYTONAME_PARAMETER_NAME);
         String jndiConnectionFactoryName = getAndRemoveParameter(
                                                                  parameters,
                                                 JMSURIConstants.JNDICONNECTIONFACTORYNAME_PARAMETER_NAME);
@@ -96,8 +98,15 @@ public final class JMSEndpointParser {
         if (priority != null) {
             endpoint.setPriority(Integer.valueOf(priority));
         }
+        if (replyToName != null && topicReplyToName != null) {
+            throw new IllegalArgumentException(
+                "The replyToName and topicReplyToName should not be defined at the same time.");
+        }
         if (replyToName != null) {
             endpoint.setReplyToName(replyToName);
+        }
+        if (topicReplyToName != null) {
+            endpoint.setTopicReplyToName(topicReplyToName);
         }
         if (jndiConnectionFactoryName != null) {
             endpoint.setJndiConnectionFactoryName(jndiConnectionFactoryName);

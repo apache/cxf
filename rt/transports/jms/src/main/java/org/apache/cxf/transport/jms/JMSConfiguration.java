@@ -82,6 +82,7 @@ public class JMSConfiguration implements InitializingBean {
     private String replyToDestination;
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
+    private boolean replyPubSubDomain;
     private Boolean useConduitIdSelector;
     private String conduitSelectorPrefix;
     private boolean autoResolveDestination;
@@ -298,6 +299,14 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setPubSubDomain(boolean pubSubDomain) {
         this.pubSubDomain = pubSubDomain;
+    }
+    
+    public boolean isReplyPubSubDomain() {
+        return replyPubSubDomain;
+    }
+    
+    public void setReplyPubSubDomain(boolean replyPubSubDomain) {
+        this.replyPubSubDomain = replyPubSubDomain;
     }
 
     public boolean isUseJms11() {
