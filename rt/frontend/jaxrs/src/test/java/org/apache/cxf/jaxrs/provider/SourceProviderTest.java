@@ -22,14 +22,21 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.staxutils.StaxSource;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,22 +62,32 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testReadFrom() throws Exception {
-        SourceProvider p = new SourceProvider();
+        SourceProvider p = new TestSourceProvider();
         assertSame(StreamSource.class, verifyRead(p, StreamSource.class).getClass());
         assertSame(StreamSource.class, verifyRead(p, Source.class).getClass());
+        assertSame(StaxSource.class, verifyRead(p, SAXSource.class).getClass());
+        assertSame(StaxSource.class, verifyRead(p, StaxSource.class).getClass());
         assertSame(DOMSource.class, verifyRead(p, DOMSource.class).getClass());
         assertTrue(Document.class.isAssignableFrom(verifyRead(p, Document.class).getClass()));
     }
     
     @Test
+    public void testReadFromWithPreferredFormat() throws Exception {
+        SourceProvider p = new TestSourceProvider("sax");
+        assertSame(StaxSource.class, verifyRead(p, Source.class).getClass());
+    }
+    
+    @Test
     public void testWriteTo() throws Exception {
-        SourceProvider p = new SourceProvider();
+        SourceProvider p = new TestSourceProvider();
         StreamSource s = new StreamSource(new ByteArrayInputStream("<test/>".getBytes()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        p.writeTo(s, null, null, null, null, null, os);
+        p.writeTo(s, null, null, null, MediaType.APPLICATION_XML_TYPE, 
+                  new MetadataMap<String, Object>(), os);
         assertTrue(os.toString().contains("<test/>"));
         os = new ByteArrayOutputStream();
-        p.writeTo(createDomSource(), null, null, null, null, null, os);
+        p.writeTo(createDomSource(), null, null, null, MediaType.APPLICATION_XML_TYPE, 
+                  new MetadataMap<String, Object>(), os);
         assertTrue(os.toString().contains("<test/>"));
     }
     
@@ -86,5 +103,26 @@ public class SourceProviderTest extends Assert {
         DocumentBuilder builder;
         builder = factory.newDocumentBuilder();
         return new DOMSource(builder.parse(new ByteArrayInputStream("<test/>".getBytes())));
+    }
+    
+    private static class TestSourceProvider extends SourceProvider {
+        
+        private String format;
+        
+        public TestSourceProvider() {
+            
+        }
+        
+        public TestSourceProvider(String format) {
+            this.format = format;    
+        }
+
+        protected Message getCurrentMessage() {
+            Message m = new MessageImpl();
+            if (format != null) {
+                m.put("source-preferred-format", format);
+            }
+            return m;
+        };
     }
 }

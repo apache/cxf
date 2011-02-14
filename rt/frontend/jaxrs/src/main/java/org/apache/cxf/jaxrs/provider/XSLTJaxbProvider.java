@@ -42,6 +42,8 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -59,8 +61,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLFilter;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.staxutils.StaxSource;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @Produces({"application/xml", "application/*+xml", "text/xml", "text/html" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
@@ -88,16 +93,40 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     private URIResolver uriResolver;
     private String systemId;
     
+    private boolean supportJaxbOnly;
+    
+    public void setSupportJaxbOnly(boolean support) {
+        this.supportJaxbOnly = support;
+    }
+    
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        return inTemplatesAvailable(mt) && inClassCanBeHandled(type.getName())
-                   && super.isReadable(type, genericType, anns, mt);
+        // JAXB support is required
+        if (!super.isReadable(type, genericType, anns, mt)) {
+            return false;
+        }
+        // if the user has set the list of in classes and a given class 
+        // is in that list then it can only be handled by the template
+        if (inClassCanBeHandled(type.getName())) {
+            return inTemplatesAvailable(mt); 
+        } else {
+            return supportJaxbOnly;
+        }
     }
     
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        return outTemplatesAvailable(mt) && outClassCanBeHandled(type.getName()) 
-                   && super.isWriteable(type, genericType, anns, mt);
+        // JAXB support is required
+        if (!super.isReadable(type, genericType, anns, mt)) {
+            return false;
+        }
+        // if the user has set the list of out classes and a given class 
+        // is in that list then it can only be handled by the template
+        if (outClassCanBeHandled(type.getName())) {
+            return outTemplatesAvailable(mt); 
+        } else {
+            return supportJaxbOnly;
+        }
     }
     
     protected boolean inTemplatesAvailable(MediaType mt) {
@@ -114,20 +143,24 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     
     protected Templates getInTemplates(MediaType mt) {
         return inTemplates != null ? inTemplates 
-            : inMediaTemplates.get(mt.getType() + "/" + mt.getSubtype());
+            : inMediaTemplates != null ? inMediaTemplates.get(mt.getType() + "/" + mt.getSubtype()) : null;
     }
     
     protected Templates getOutTemplates(MediaType mt) {
         return outTemplates != null ? outTemplates 
-            : outMediaTemplates.get(mt.getType() + "/" + mt.getSubtype());
+            : outMediaTemplates != null ? outMediaTemplates.get(mt.getType() + "/" + mt.getSubtype()) : null;
     }
     
     @Override
     protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
         throws JAXBException {
         try {
-            XMLFilter filter = factory.newXMLFilter(
-                createTemplates(getInTemplates(mt), inParamsMap, inProperties));
+
+            Templates t = createTemplates(getInTemplates(mt), inParamsMap, inProperties);
+            if (t == null && supportJaxbOnly) {
+                return super.unmarshalFromInputStream(unmarshaller, is, mt);
+            }
+            XMLFilter filter = factory.newXMLFilter(t);
             SAXSource source = new SAXSource(filter, new InputSource(is));
             if (systemId != null) {
                 source.setSystemId(systemId);
@@ -139,9 +172,45 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
         }
     }
     
+    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, MediaType mt) 
+        throws JAXBException {
+        CachedOutputStream out = new CachedOutputStream();
+        try {
+            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+            StaxUtils.copy(new StaxSource(reader), writer);
+            writer.writeEndDocument();
+            writer.flush();
+            writer.close();
+            return unmarshalFromInputStream(unmarshaller, out.getInputStream(), mt);
+        } catch (Exception ex) {
+            throw new WebApplicationException(ex);
+        }
+    }
+    
+    @Override
+    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, MediaType mt) 
+        throws Exception {
+        CachedOutputStream out = new CachedOutputStream();
+        marshalToOutputStream(ms, obj, out, mt);
+        
+        StaxUtils.copy(new StreamSource(out.getInputStream()), writer);
+        if (getContext() == null) {
+            writer.writeEndDocument();
+            writer.flush();
+            writer.close();
+        }
+    }
+    
     @Override
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt)
         throws Exception {
+        
+        Templates t = createTemplates(getOutTemplates(mt), outParamsMap, outProperties);
+        if (t == null && supportJaxbOnly) {
+            super.marshalToOutputStream(ms, obj, os, mt);
+            return;
+        }
+        
         TransformerHandler th = factory.newTransformerHandler(
             createTemplates(getOutTemplates(mt), outParamsMap, outProperties));
         Result result = new StreamResult(os);
@@ -221,8 +290,12 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
                                       Map<String, Object> configuredParams,
                                       Map<String, String> outProps) {
         if (templates == null) {
-            LOG.severe("No template is available");
-            throw new WebApplicationException(500);
+            if (supportJaxbOnly) {
+                return null;
+            } else {
+                LOG.severe("No template is available");
+                throw new WebApplicationException(500);
+            }
         }
         
         TemplatesImpl templ =  new TemplatesImpl(templates);
