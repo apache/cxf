@@ -172,7 +172,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             && replyTo != null) {
             if (exchange.isSynchronous() || exchange.isOneWay()) {
                 replyToDestination = JMSFactory.resolveOrCreateDestination(jmsTemplate, replyTo,
-                                                                           jmsConfig.isPubSubDomain());
+                                                                           jmsConfig.isReplyPubSubDomain());
             } else {
                 if (userCID == null || !jmsConfig.isUseConduitIdSelector()) { 
                     replyToDestination = getJMSListener().getDestination();

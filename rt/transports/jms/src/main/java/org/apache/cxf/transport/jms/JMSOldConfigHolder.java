@@ -267,14 +267,14 @@ public class JMSOldConfigHolder {
                 jndiDestinationResolver.setJndiTemplate(jt);
                 jmsConfig.setDestinationResolver(jndiDestinationResolver);
                 jmsConfig.setTargetDestination(endpoint.getDestinationName());
-                jmsConfig.setReplyDestination(endpoint.getReplyToName());
+                setReplyDestination(jmsConfig, endpoint);
                 if (address != null) {
                     jmsConfig.setReplyToDestination(address.getJndiReplyToDestinationName());
                 }
             } else {
                 // Use the default dynamic destination resolver
                 jmsConfig.setTargetDestination(endpoint.getDestinationName());
-                jmsConfig.setReplyDestination(endpoint.getReplyToName());
+                setReplyDestination(jmsConfig, endpoint);
                 if (address != null) {
                     jmsConfig.setReplyToDestination(address.getJmsReplyToDestinationName());
                 }
@@ -287,6 +287,16 @@ public class JMSOldConfigHolder {
         String targetService = endpoint.getParameter(JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME);
         jmsConfig.setTargetService(targetService);
         return jmsConfig;
+    }
+    
+    private static void setReplyDestination(JMSConfiguration jmsConfig, JMSEndpoint endpoint) {
+        if (endpoint.getReplyToName() != null)  {
+            jmsConfig.setReplyDestination(endpoint.getReplyToName());
+            jmsConfig.setReplyPubSubDomain(false);
+        } else if (endpoint.getTopicReplyToName() != null) {
+            jmsConfig.setReplyDestination(endpoint.getTopicReplyToName());
+            jmsConfig.setReplyPubSubDomain(true);
+        }
     }
 
     private static void mapAddressToEndpoint(AddressType address, JMSEndpoint endpoint) {
