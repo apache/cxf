@@ -28,9 +28,11 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -455,4 +457,35 @@ public final class XMLUtils {
         trans.transform(src, res);
         return res.getNode();
     }
+    
+    public static QName convertStringToQName(String expandedQName) {
+        return convertStringToQName(expandedQName, "");
+    }
+    
+    public static QName convertStringToQName(String expandedQName, String prefix) {
+        int ind1 = expandedQName.indexOf('{');
+        if (ind1 != 0) {
+            return new QName(expandedQName);
+        }
+        
+        int ind2 = expandedQName.indexOf('}');
+        if (ind2 <= ind1 + 1 || ind2 >= expandedQName.length() - 1) {
+            return null;
+        }
+        String ns = expandedQName.substring(ind1 + 1, ind2);
+        String localName = expandedQName.substring(ind2 + 1);
+        return new QName(ns, localName, prefix);
+    }
+    
+    public static Set<QName> convertStringsToQNames(List<String> expandedQNames) {
+        Set<QName> dropElements = Collections.emptySet();
+        if (expandedQNames != null) {
+            dropElements = new LinkedHashSet<QName>(expandedQNames.size());
+            for (String val : expandedQNames) {
+                dropElements.add(XMLUtils.convertStringToQName(val));
+            }
+        }
+        return dropElements;
+    }
+    
 }

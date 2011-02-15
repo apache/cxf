@@ -70,6 +70,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
@@ -1215,21 +1216,7 @@ public final class JAXRSUtils {
     }
 
     public static QName convertStringToQName(String name) {
-        return convertStringToQName(name, "");
+        return XMLUtils.convertStringToQName(name, "");
     }
     
-    public static QName convertStringToQName(String name, String prefix) {
-        int ind1 = name.indexOf('{');
-        if (ind1 != 0) {
-            return new QName(name);
-        }
-        
-        int ind2 = name.indexOf('}');
-        if (ind2 <= ind1 + 1 || ind2 >= name.length() - 1) {
-            return null;
-        }
-        String ns = name.substring(ind1 + 1, ind2);
-        String localName = name.substring(ind2 + 1);
-        return new QName(ns, localName, prefix);
-    }
 }

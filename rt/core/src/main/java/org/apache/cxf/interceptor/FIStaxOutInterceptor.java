@@ -24,14 +24,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 
-import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -45,8 +43,7 @@ import org.apache.cxf.phase.Phase;
 public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String FI_ENABLED = "org.apache.cxf.fastinfoset.enabled";
     private static final String OUTPUT_STREAM_HOLDER = FIStaxOutInterceptor.class.getName() + ".outputstream";
-    private static final FIStaxOutEndingInterceptor ENDING = new FIStaxOutEndingInterceptor();
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(FIStaxOutInterceptor.class);
+    private static final StaxOutEndingInterceptor ENDING = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER);
 
     boolean force;
     
@@ -143,38 +140,6 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         */
         return new StAXDocumentSerializer(out);
     }
-    public static class FIStaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
-        public FIStaxOutEndingInterceptor() {
-            super(Phase.PRE_STREAM_ENDING);
-            getAfter().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
-        }
-
-        public void handleMessage(Message message) throws Fault {
-            try {
-                XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
-                if (xtw != null) {
-                    xtw.writeEndDocument();
-                    xtw.flush();
-                    xtw.close();
-                }
-                /*
-                if (xtw instanceof StAXDocumentSerializer) {
-                    ((StAXDocumentSerializer)xtw).setOutputStream(null);
-                    message.getExchange().get(Endpoint.class)
-                        .put(StAXDocumentSerializer.class.getName(), xtw);
-                }
-                */
-
-                OutputStream os = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
-                if (os != null) {
-                    message.setContent(OutputStream.class, os);
-                }
-                message.removeContent(XMLStreamWriter.class);
-            } catch (XMLStreamException e) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
-            }
-        }
-
-    }    
+        
 
 }

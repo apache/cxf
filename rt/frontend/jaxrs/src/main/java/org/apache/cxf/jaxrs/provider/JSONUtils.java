@@ -41,6 +41,7 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.transform.IgnoreNamespacesWriter;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLInputFactory;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLOutputFactory;
@@ -118,7 +119,7 @@ public final class JSONUtils {
     
     public static XMLStreamWriter createIgnoreNsWriterIfNeeded(XMLStreamWriter writer, 
                                                                boolean ignoreNamespaces) {
-        return ignoreNamespaces ? new IgnoreNsWriter(writer) : writer; 
+        return ignoreNamespaces ? new IgnoreNamespacesWriter(writer) : writer; 
     }
     
     private static String getKey(MappedNamespaceConvention convention, QName qname) throws Exception {
@@ -286,26 +287,5 @@ public final class JSONUtils {
         
     }
     
-    private static class IgnoreNsWriter extends DelegatingXMLStreamWriter {
-        
-        public IgnoreNsWriter(XMLStreamWriter writer) {
-            super(writer);
-        }
-
-        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
-            super.writeStartElement(local);
-        }
-        
-        public void writeStartElement(String uri, String local) throws XMLStreamException {
-            super.writeStartElement(local);
-        }
-        
-        public void setPrefix(String pfx, String uri) throws XMLStreamException {
-            // completed
-        }
-        
-        public void setDefaultNamespace(String uri) throws XMLStreamException {
-            // completed
-        }
-    }
+    
 }

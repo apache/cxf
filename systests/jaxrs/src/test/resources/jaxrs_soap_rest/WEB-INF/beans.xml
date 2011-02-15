@@ -55,6 +55,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </jaxrs:client>       
          
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl"/>
+  <bean id="bookstore-simple" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl">
+     <property name="ignoreJaxrsClient" value="true"/>
+  </bean>
 
   <jaxws:endpoint xmlns:s="http://books.com"
       serviceName="s:BookService"
@@ -170,6 +173,54 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <util:list id="fastinfosetType">
     <value>application/fastinfoset</value>
   </util:list>
+   
+  <jaxrs:server id="restTransform"
+		        address="/rest-transform">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.BookStore"/>
+    </jaxrs:serviceBeans>
+    
+    <jaxrs:features>
+       <ref bean="transformFeatureRest" />
+    </jaxrs:features>
+  </jaxrs:server> 
+   
+  <bean id="transformFeatureRest" class="org.apache.cxf.feature.StaxTransformFeature">
+      <property name="outTransformElements">
+        <map>
+         <entry key="Book" value="TheBook"/>
+        </map>
+      </property>
+      <property name="inTransformElements">
+        <map>
+         <entry key="{http://www.example.org/super-books}*" value="*"/>
+        </map>
+      </property>  
+  </bean> 
+  
+  <jaxws:endpoint xmlns:s="http://books.com"
+      serviceName="s:BookService"
+      endpointName="s:BookPort"
+      id="soapservice-transform"
+      implementor="#bookstore-simple"
+      address="/soap-transform/bookservice">
+      <jaxws:features>
+       <ref bean="transformFeatureSoap" />
+      </jaxws:features>
+   </jaxws:endpoint> 
+   
+   <bean id="transformFeatureSoap" class="org.apache.cxf.feature.StaxTransformFeature">
+      <property name="outTransformElements">
+        <map>
+         <entry key="{http://jaxws.jaxrs.systest.cxf.apache.org/}*" value="*"/>
+        </map>
+      </property>
+      <property name="inTransformElements">
+        <map>
+         <entry key="*" value="{http://jaxws.jaxrs.systest.cxf.apache.org/}*"/>
+        </map>
+      </property>
+   </bean>
    
 </beans>
 <!-- END SNIPPET: beans -->

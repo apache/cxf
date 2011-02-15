@@ -72,6 +72,7 @@ import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxb.JAXBBeanInfo;
 import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
@@ -1079,7 +1080,7 @@ public class WadlGenerator implements RequestHandler {
                 name = type.getAnnotation(XMLName.class);
             }
             if (name != null) {
-                QName qname = JAXRSUtils.convertStringToQName(name.value(), name.prefix());
+                QName qname = XMLUtils.convertStringToQName(name.value(), name.prefix());
                 if (qname.getPrefix().length() > 0) {
                     return qname;
                 } else {

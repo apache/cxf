@@ -46,7 +46,7 @@ import org.apache.cxf.systest.jaxrs.BookSubresourceImpl;
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
-    
+    private boolean ignoreJaxrsClient;
     @Resource
     private WebServiceContext jaxwsContext;
     @Resource
@@ -60,12 +60,18 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
         init();
     }
     
+    public void setIgnoreJaxrsClient(boolean ignore) {
+        this.ignoreJaxrsClient = ignore;
+    }
+    
     @PostConstruct
     public void verifyWebClient() {
-        if (webClient == null) {
-            throw new RuntimeException();
+        if (!ignoreJaxrsClient) {
+            if (webClient == null) {
+                throw new RuntimeException();
+            }
+            WebClient.client(webClient).accept("application/xml");
         }
-        WebClient.client(webClient).accept("application/xml");
     }
     
     public Book getBook(Long id) throws BookNotFoundFault {
@@ -100,14 +106,17 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
             }
             throw new WebApplicationException(builder.build());
         }
-        
-        if (!invocationInProcess) {
-            invocationInProcess = true;
-            return webClient.getBook(id);
+     
+        if (!ignoreJaxrsClient) {
+            if (!invocationInProcess) {
+                invocationInProcess = true;
+                return webClient.getBook(id);
+            }
+            invocationInProcess = false;
+            System.out.println(getContentType());
         }
-        invocationInProcess = false;
         
-        System.out.println(getContentType());
+        
         return books.get(id);
     }
     

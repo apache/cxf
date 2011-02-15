@@ -62,6 +62,7 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.transform.TransformUtils;
 
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml" })
@@ -207,7 +208,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         
         reader = createTransformReaderIfNeeded(reader, is);
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
-            return new JAXBCollectionWrapperReader(createNewReaderIfNeeded(reader, is));
+            return new JAXBCollectionWrapperReader(TransformUtils.createNewReaderIfNeeded(reader, is));
         } else {
             return reader;
         }

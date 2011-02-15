@@ -45,13 +45,17 @@ import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.FIStaxInInterceptor;
 import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.interceptor.transform.TransformInInterceptor;
+import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
@@ -148,6 +152,45 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                                             + "/test/services/rest2/myRestService");
         assertEquals("0", getStringFromInputStream(in));
                 
+    }
+    
+    @Test
+    public void testGetBookTransform() throws Exception {
+        
+        String address = "http://localhost:" + PORT 
+                         + "/test/services/rest-transform/bookstore/books/123";
+        WebClient client = WebClient.create(address);
+        Response r = client.get();
+        String str = getStringFromInputStream((InputStream)r.getEntity());
+        assertTrue(str.contains("TheBook"));
+    }
+    
+    @Test
+    public void testPostBookTransform() throws Exception {
+           
+        String address = "http://localhost:" + PORT 
+                         + "/test/services/rest-transform/bookstore/books";
+        
+        TransformOutInterceptor out =  new TransformOutInterceptor();
+        out.setOutTransformElements(
+            Collections.singletonMap("{http://www.example.org/books}*", 
+                                     "{http://www.example.org/super-books}*"));
+        
+        TransformInInterceptor in =  new TransformInInterceptor();
+        Map<String, String> map = new HashMap<String, String>();
+
+        // If Book2 didn't have {http://www.example.org/books}Book
+        // then we'd just do '"*" : "{http://www.example.org/books}*'
+        // but given that we have TheBook being returned, we need
+        map.put("TheBook", "{http://www.example.org/books}Book");
+        map.put("id", "{http://www.example.org/books}id");
+        in.setInTransformElements(map);
+        
+        WebClient client = WebClient.create(address);
+        WebClient.getConfig(client).getInInterceptors().add(in);
+        WebClient.getConfig(client).getOutInterceptors().add(out);
+        Book2 book = client.accept("text/xml").post(new Book2(), Book2.class);
+        assertEquals(124L, book.getId());
     }
     
     @Test
@@ -625,6 +668,35 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             new BookSoapService(wsdlUrl,
                                 new QName("http://books.com", "BookService"));
         BookStoreJaxrsJaxws store = service.getBookPort();
+        Book book = store.getBook(new Long(123));
+        assertEquals("id is wrong", book.getId(), 123);
+    }
+    
+    @Test
+    public void testGetUnqualifiedBookSoap() throws Exception {
+        String wsdlAddress =
+            "http://localhost:" + PORT + "/test/services/soap-transform/bookservice?wsdl"; 
+        URL wsdlUrl = new URL(wsdlAddress);
+        BookSoapService service = 
+            new BookSoapService(wsdlUrl,
+                                new QName("http://books.com", "BookService"));
+        BookStoreJaxrsJaxws store = service.getBookPort();
+        
+        TransformInInterceptor in =  new TransformInInterceptor();
+        Map<String, String> mapIn = new HashMap<String, String>();
+        mapIn.put("*", "{http://jaxws.jaxrs.systest.cxf.apache.org/}*");
+        in.setInTransformElements(mapIn);
+        
+        TransformOutInterceptor out =  new TransformOutInterceptor();
+        Map<String, String> mapOut = new HashMap<String, String>();
+        mapOut.put("{http://jaxws.jaxrs.systest.cxf.apache.org/}*", "getBookRequest");
+        out.setOutTransformElements(mapOut);
+        
+        
+        Client cl = ClientProxy.getClient(store);
+        cl.getInInterceptors().add(in);
+        cl.getOutInterceptors().add(out);
+        
         Book book = store.getBook(new Long(123));
         assertEquals("id is wrong", book.getId(), 123);
     }

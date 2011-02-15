@@ -44,7 +44,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String OUTPUT_STREAM_HOLDER = StaxOutInterceptor.class.getName() + ".outputstream";
     public static final String FORCE_START_DOCUMENT = "org.apache.cxf.stax.force-start-document";
-    public static final StaxOutEndingInterceptor ENDING = new StaxOutEndingInterceptor();
+    public static final StaxOutEndingInterceptor ENDING = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER);
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
     private static Map<Object, XMLOutputFactory> factories = new HashMap<Object, XMLOutputFactory>();
@@ -151,30 +151,4 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return null;
     }
     
-    public static class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
-        public StaxOutEndingInterceptor() {
-            super(Phase.PRE_STREAM_ENDING);
-            getAfter().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
-        }
-
-        public void handleMessage(Message message) throws Fault {
-            try {
-                XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
-                if (xtw != null) {
-                    xtw.writeEndDocument();
-                    xtw.flush();
-                    xtw.close();
-                }
-
-                OutputStream os = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
-                if (os != null) {
-                    message.setContent(OutputStream.class, os);
-                }
-                message.removeContent(XMLStreamWriter.class);
-            } catch (XMLStreamException e) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
-            }
-        }
-
-    }    
 }
