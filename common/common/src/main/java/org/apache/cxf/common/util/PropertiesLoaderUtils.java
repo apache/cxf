@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Replace by org.springframework.core.io.support.PropertiesLoaderUtils
@@ -57,14 +59,20 @@ public final class PropertiesLoaderUtils {
      */
     public static Properties loadAllProperties(String resourceName, ClassLoader classLoader)
         throws IOException {
-
-        
+        return loadAllProperties(resourceName, classLoader, null, null, null);
+    }        
+    public static Properties loadAllProperties(String resourceName, ClassLoader classLoader,
+                                               Logger logger, Level level, String msg)
+        throws IOException {
         Properties properties = new Properties();
         Enumeration<URL> urls = classLoader.getResources(resourceName);
 
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
-            // TODO: May need a log here, instead of the system.out
+            if (logger != null) {
+                logger.log(level, msg, url.toString());
+            }
+            
             InputStream is = null;
             try {
                 is = url.openStream();
