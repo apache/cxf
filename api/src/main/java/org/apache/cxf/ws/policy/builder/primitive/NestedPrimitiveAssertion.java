@@ -125,7 +125,6 @@ public class NestedPrimitiveAssertion
         return new NestedPrimitiveAssertion(name, opt, ignorable, n, assertionRequired, builder);
     }
 
-    @Override
     public boolean equal(PolicyComponent policyComponent) {
         
         if (!super.equal(policyComponent)) {
@@ -135,7 +134,6 @@ public class NestedPrimitiveAssertion
         return getPolicy().equal(other.getPolicy());
     }
     
-    @Override
     public boolean isAsserted(AssertionInfoMap aim) {
         if (assertionRequired) {
             Collection<AssertionInfo> ail = aim.getAssertionInfo(name);
