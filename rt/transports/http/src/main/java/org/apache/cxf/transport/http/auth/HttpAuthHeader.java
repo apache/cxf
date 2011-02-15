@@ -89,7 +89,7 @@ public final class HttpAuthHeader {
                 map.put(key, value);
             }
         } catch (IOException ex) {
-            // ignore can´t happen for StringReader
+            //ignore can't happen for StringReader
         }
         return map;
     }
