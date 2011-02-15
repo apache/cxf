@@ -22,8 +22,9 @@ package org.apache.cxf.ws.policy.builder.primitive;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Constants;
 
 public class NestedPrimitiveAssertionBuilder extends PrimitiveAssertionBuilder {
@@ -40,10 +41,8 @@ public class NestedPrimitiveAssertionBuilder extends PrimitiveAssertionBuilder {
         builder = b;
     }
         
-
-    
     @Override
-    public PolicyAssertion build(Element element) {
+    public Assertion build(Element element, AssertionBuilderFactory factory) {
         Node nd = element.getFirstChild();
         int count = 0;
         int policyCount = 0;

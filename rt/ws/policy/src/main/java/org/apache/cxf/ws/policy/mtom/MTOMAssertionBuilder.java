@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.policy.mtom;
 
-import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
@@ -28,17 +26,16 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 public class MTOMAssertionBuilder implements AssertionBuilder {
-    private static final Collection<QName> KNOWN_ELEMENTS = new ArrayList<QName>();
-    static {
-        KNOWN_ELEMENTS.add(MetadataConstants.MTOM_ASSERTION_QNAME);
-    }
+    private static final QName KNOWN_ELEMENTS[] 
+        = {MetadataConstants.MTOM_ASSERTION_QNAME};
     
-    public PolicyAssertion build(Element elem) {
+    public Assertion build(Element elem, AssertionBuilderFactory f) {
         String localName = elem.getLocalName();
         QName qn = new QName(elem.getNamespaceURI(), localName);
 
@@ -55,7 +52,7 @@ public class MTOMAssertionBuilder implements AssertionBuilder {
         return null;
     }
 
-    public Collection<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
 

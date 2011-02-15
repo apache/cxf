@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -71,13 +72,17 @@ abstract class AbstractSpringBeanMap<X, V>
         return lst;
     }
 
-    protected Collection<String> getIds(Object bean) {
+    protected Collection<X> getIds(Object bean) {
         try {
             PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(bean.getClass(), idsProperty);
             Method method = pd.getReadMethod();
-            Collection<String> c = CastUtils.cast((Collection<?>)method.invoke(bean, new Object[0]));
-
-            return c;
+            Object o = method.invoke(bean, new Object[0]);
+            if (o instanceof Collection) {
+                return CastUtils.cast((Collection<?>)method.invoke(bean, new Object[0]));
+            }
+            @SuppressWarnings("unchecked")
+            X ar[] = (X[])o;
+            return Arrays.asList(ar);
         } catch (IllegalArgumentException e) {
             throw new BeanInitializationException("Could not retrieve ids.", e);
         } catch (IllegalAccessException e) {

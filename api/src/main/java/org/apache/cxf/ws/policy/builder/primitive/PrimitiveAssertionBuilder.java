@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.policy.builder.primitive;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
@@ -28,17 +27,20 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 public class PrimitiveAssertionBuilder implements AssertionBuilder {
 
     protected Bus bus;
-    private Collection<QName> knownElements = new ArrayList<QName>();
+    private QName knownElements[] = {};
     
     public PrimitiveAssertionBuilder() {
-        knownElements = new ArrayList<QName>();
     }
     public PrimitiveAssertionBuilder(Collection<QName> els) {
+        knownElements = els.toArray(new QName[els.size()]);
+    }
+    public PrimitiveAssertionBuilder(QName els[]) {
         knownElements = els;
     }
     
@@ -46,15 +48,18 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder {
         bus = b;
     }
     
-    public PolicyAssertion build(Element element) { 
+    public Assertion build(Element element, AssertionBuilderFactory fact) { 
         return new PrimitiveAssertion(element);
     }
     
-    public Collection<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return knownElements;
     }
     
     public void setKnownElements(Collection<QName> k) {
+        knownElements = k.toArray(new QName[k.size()]);
+    }
+    public void setKnownElements(QName k[]) {
         knownElements = k;
     }
 

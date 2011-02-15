@@ -27,30 +27,13 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 	  lazy-init="true">
         <constructor-arg ref="cxf"/>
     </bean>
+    <bean class="org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder"
+      id="org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder" 
+      lazy-init="true"/>
 
     <bean class="org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider"
 	  id="org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider"
 	  lazy-init="true"/>
  
-    <bean id="org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder"
-        class="org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder"
-        lazy-init="true">
-        <property name="knownElements">
-            <set>
-                <bean class="javax.xml.namespace.QName">
-                    <constructor-arg value="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy"/>
-                    <constructor-arg value="UsingAddressing"/>
-                </bean>
-                <bean class="javax.xml.namespace.QName">
-                    <constructor-arg value="http://www.w3.org/2005/02/addressing/wsdl"/>
-                    <constructor-arg value="UsingAddressing"/>
-                </bean>
-                <bean class="javax.xml.namespace.QName">
-                    <constructor-arg value="http://www.w3.org/2006/05/addressing/wsdl"/>
-                    <constructor-arg value="UsingAddressing"/>
-                </bean>
-            </set>
-        </property>
-    </bean>
     
 </beans>

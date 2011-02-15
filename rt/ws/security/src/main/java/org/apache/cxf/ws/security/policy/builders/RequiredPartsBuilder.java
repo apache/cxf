@@ -18,24 +18,23 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.RequiredParts;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 public class RequiredPartsBuilder implements AssertionBuilder {
         
-    public PolicyAssertion build(Element element) throws IllegalArgumentException {
+    public Assertion build(Element element, AssertionBuilderFactory factory)
+        throws IllegalArgumentException {
         RequiredParts requiredParts = new RequiredParts(SP12Constants.INSTANCE);
         
         Node nd = element.getFirstChild();
@@ -49,8 +48,8 @@ public class RequiredPartsBuilder implements AssertionBuilder {
         return requiredParts;
     }
        
-    public List<QName> getKnownElements() {
-        return Collections.singletonList(SP12Constants.REQUIRED_PARTS);
+    public QName[] getKnownElements() {
+        return new QName[] {SP12Constants.REQUIRED_PARTS};
     }
 
     private void processElement(Element element, RequiredParts parent) {
@@ -64,10 +63,5 @@ public class RequiredPartsBuilder implements AssertionBuilder {
             String namespaceAttribute = element.getAttribute(SPConstants.NAMESPACE);
             parent.addHeader(new Header(nameAttribute, namespaceAttribute));
         }
-    }
-
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

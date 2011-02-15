@@ -18,18 +18,16 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.model.Trust10;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 
 public class Trust10Builder implements AssertionBuilder {
@@ -37,7 +35,7 @@ public class Trust10Builder implements AssertionBuilder {
     }
     
 
-    public PolicyAssertion build(Element element)
+    public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
 
         
@@ -71,14 +69,8 @@ public class Trust10Builder implements AssertionBuilder {
         return trust10;
     }
 
-    public List<QName> getKnownElements() {
-        return Collections.singletonList(SP11Constants.TRUST_10);
-    }
-
-
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
+    public QName[] getKnownElements() {
+        return new QName[] {SP11Constants.TRUST_10};
     }
 
 }

@@ -66,7 +66,7 @@ public class NestedPrimitiveAssertionBuilderTest extends Assert {
             + " xmlns:wsp=\"http://www.w3.org/2006/07/ws-policy\""
             + " xmlns:wsam=\"http://www.w3.org/2007/01/addressing/metadata\" />";
         
-        npab.build(getElement(data));
+        npab.build(getElement(data), null);
     }
     
     @Test
@@ -80,7 +80,7 @@ public class NestedPrimitiveAssertionBuilderTest extends Assert {
         Policy nested = control.createMock(Policy.class);
         EasyMock.expect(builder.getPolicy(EasyMock.isA(Element.class))).andReturn(nested);
         control.replay();
-        NestedPrimitiveAssertion npc = (NestedPrimitiveAssertion)npab.build(getElement(data));
+        NestedPrimitiveAssertion npc = (NestedPrimitiveAssertion)npab.build(getElement(data), null);
         assertEquals(TEST_NAME1, npc.getName());
         assertSame(nested, npc.getPolicy());
         assertTrue(npc.isOptional());
@@ -102,7 +102,7 @@ public class NestedPrimitiveAssertionBuilderTest extends Assert {
         control.replay();
         
         npab.setBus(bus);
-        NestedPrimitiveAssertion npc = (NestedPrimitiveAssertion)npab.build(getElement(data));
+        NestedPrimitiveAssertion npc = (NestedPrimitiveAssertion)npab.build(getElement(data), null);
         assertEquals(TEST_NAME1, npc.getName());
         assertSame(nested, npc.getPolicy());
         assertTrue(npc.isOptional());

@@ -18,22 +18,20 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.HttpsToken;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 
 /**
@@ -50,8 +48,8 @@ import org.apache.cxf.ws.security.policy.model.HttpsToken;
  * 
  */
 public class HttpsTokenBuilder implements AssertionBuilder {
-    private static final List<QName> KNOWN_ELEMENTS 
-        = Arrays.asList(SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN);
+    private static final QName KNOWN_ELEMENTS[] 
+        = {SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN};
 
     
     PolicyBuilder builder;
@@ -62,7 +60,7 @@ public class HttpsTokenBuilder implements AssertionBuilder {
     /**
      * {@inheritDoc}
      */
-    public PolicyAssertion build(Element element) {
+    public Assertion build(Element element, AssertionBuilderFactory factory) {
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
@@ -101,13 +99,8 @@ public class HttpsTokenBuilder implements AssertionBuilder {
     /**
      * {@inheritDoc}
      */
-    public List<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
     
-
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

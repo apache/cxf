@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
@@ -30,22 +27,23 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.RequiredElements;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 
 public class RequiredElementsBuilder implements AssertionBuilder {
-    private static final List<QName> KNOWN_ELEMENTS 
-        = Arrays.asList(SP11Constants.REQUIRED_ELEMENTS, SP12Constants.REQUIRED_ELEMENTS);
+    private static final QName KNOWN_ELEMENTS[] 
+        = {SP11Constants.REQUIRED_ELEMENTS, SP12Constants.REQUIRED_ELEMENTS};
     
-    public List<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
 
-    public PolicyAssertion build(Element element)
+    public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
 
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
@@ -89,11 +87,6 @@ public class RequiredElementsBuilder implements AssertionBuilder {
                 }
             }
         }
-    }
-
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

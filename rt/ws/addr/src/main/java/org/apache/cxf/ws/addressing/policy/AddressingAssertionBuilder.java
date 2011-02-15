@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.addressing.policy;
 
-import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
@@ -29,34 +27,34 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 /**
  * 
  */
 public class AddressingAssertionBuilder implements AssertionBuilder {
 
-    private static final Collection<QName> KNOWN_ELEMENTS = new ArrayList<QName>();
+    private static final QName[] KNOWN_ELEMENTS = {
+        MetadataConstants.ADDRESSING_ASSERTION_QNAME,
+        MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME,
+        MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME,
+        MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705,
+        MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705,
+        MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705
+    };
     private Bus bus;
     
     public AddressingAssertionBuilder(Bus b) {
         bus = b;
     }
     
-    static {
-        KNOWN_ELEMENTS.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
-        KNOWN_ELEMENTS.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
-        KNOWN_ELEMENTS.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
-        KNOWN_ELEMENTS.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705);
-        KNOWN_ELEMENTS.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-        KNOWN_ELEMENTS.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
-    }
     
-    public PolicyAssertion build(Element elem) {
+    public Assertion build(Element elem, AssertionBuilderFactory factory) {
         
         String localName = elem.getLocalName();
         QName qn = new QName(elem.getNamespaceURI(), localName);
@@ -87,7 +85,7 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
         return null;
     }
 
-    public Collection<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
     

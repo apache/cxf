@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -42,6 +41,7 @@ import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
 import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertionBuilder;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 /**
  * 
@@ -90,7 +90,7 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
     }
     
     public void register(AssertionBuilder builder) {
-        Collection<QName> names = builder.getKnownElements();
+        QName names[] = builder.getKnownElements();
         for (QName n : names) {
             super.register(n, builder);
         }
@@ -114,6 +114,9 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
         }
     }
     public Assertion build(Element element) {
+        return build(element, null);
+    }
+    public Assertion build(Element element, AssertionBuilderFactory factory) {
         loadDynamic();
         
         AssertionBuilder builder;
@@ -141,7 +144,7 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
             }
         }
 
-        return builder.build(element);
+        return builder.build(element, factory);
 
     }
 }

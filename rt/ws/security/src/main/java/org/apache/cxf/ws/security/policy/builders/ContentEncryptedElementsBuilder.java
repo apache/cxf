@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
@@ -30,17 +27,18 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 
 public class ContentEncryptedElementsBuilder implements AssertionBuilder {
-    public static final List<QName> KNOWN_ELEMENTS 
-        = Collections.singletonList(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+    public static final QName KNOWN_ELEMENTS[] 
+        = {SP12Constants.CONTENT_ENCRYPTED_ELEMENTS};
     
-    public PolicyAssertion build(Element element) {
+    public Assertion build(Element element, AssertionBuilderFactory factory) {
         
         ContentEncryptedElements contentEncryptedElements 
             = new ContentEncryptedElements(SP12Constants.INSTANCE);
@@ -59,7 +57,7 @@ public class ContentEncryptedElementsBuilder implements AssertionBuilder {
         
         return contentEncryptedElements;
     }
-    public List<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
     private void processElement(Element element, ContentEncryptedElements parent) {
@@ -84,9 +82,4 @@ public class ContentEncryptedElementsBuilder implements AssertionBuilder {
         }
     }
 
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
 }

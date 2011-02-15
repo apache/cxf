@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
@@ -34,6 +33,9 @@ import org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilder;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry;
 import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -114,21 +116,17 @@ public class PolicyExtensionsTest extends Assert {
     
     public static class TestAssertionBuilder implements AssertionBuilder {
         
-        Collection<QName> knownElements = new ArrayList<QName>();
+        QName knownElements[] = {KNOWN};
 
         public TestAssertionBuilder() {
-            knownElements.add(KNOWN);
         }
-        public PolicyAssertion build(Element arg0) {
+        public Assertion build(Element element, AssertionBuilderFactory factory) {
             return null;
         }
 
-        public Collection<QName> getKnownElements() {
+        public QName[] getKnownElements() {
             return knownElements;
         }
-        public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-            return null;
-        }       
     }
     
     public static class TestPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {

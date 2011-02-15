@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,7 +27,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -39,28 +37,27 @@ import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 
 
 public class SupportingTokensBuilder implements AssertionBuilder {
-    private static final List<QName> KNOWN_ELEMENTS 
-        = Arrays.asList(SP11Constants.SUPPORTING_TOKENS, 
-                        SP11Constants.SIGNED_SUPPORTING_TOKENS,
-                        SP11Constants.ENDORSING_SUPPORTING_TOKENS,
-                        SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+    private static final QName KNOWN_ELEMENTS[] 
+        = {SP11Constants.SUPPORTING_TOKENS, 
+           SP11Constants.SIGNED_SUPPORTING_TOKENS,
+           SP11Constants.ENDORSING_SUPPORTING_TOKENS,
+           SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS};
 
     
     PolicyBuilder builder;
     public SupportingTokensBuilder(PolicyBuilder b) {
         builder = b;
     }
-    public List<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
-
     
-    
-    public PolicyAssertion build(Element element)
+    public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
         QName name = DOMUtils.getElementQName(element);
         SupportingToken supportingToken = null;
@@ -124,12 +121,5 @@ public class SupportingTokensBuilder implements AssertionBuilder {
                 supportingToken.addToken((Token)primitive);
             }
         }
-    }
-
-
-
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

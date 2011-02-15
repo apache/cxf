@@ -17,23 +17,27 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.policy;
+package org.apache.cxf.ws.addressing.policy;
 
 
-import org.w3c.dom.Element;
+import javax.xml.namespace.QName;
 
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 
 /**
- * AssertionBuilder is an interface used to build an Assertion object from a
- * given xml element. 
- * Domain Policy authors write custom AssertionBuilders to build Assertions for 
- * domain specific assertions. 
- * Note that assertions can include nested policy expressions. To build these,
- * it may be necessary to obtain other AssertionBuilders.
- * Concrete implementations should access the AssertionBuilderRegistry as a
- * Bus extension, so the registry need not passed as an argument here.
+ * 
  */
-public interface AssertionBuilder extends org.apache.neethi.builders.AssertionBuilder<Element> {
+public class UsingAddressingAssertionBuilder extends PrimitiveAssertionBuilder {
 
+    private static final QName[] KNOWN_ELEMENTS = {
+        MetadataConstants.USING_ADDRESSING_2004_QNAME,
+        MetadataConstants.USING_ADDRESSING_2005_QNAME,
+        MetadataConstants.USING_ADDRESSING_2006_QNAME,
+    };
 
+    public UsingAddressingAssertionBuilder() {
+        super(KNOWN_ELEMENTS);
+    }
+    
+    
 }

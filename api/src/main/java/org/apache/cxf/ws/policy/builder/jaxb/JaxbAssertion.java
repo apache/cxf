@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
@@ -76,12 +75,12 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
     } 
     
     @SuppressWarnings("unchecked")
-    public static <T> JaxbAssertion<T> cast(PolicyAssertion a) {
+    public static <T> JaxbAssertion<T> cast(Assertion a) {
         return (JaxbAssertion<T>)a;
     }
     
     @SuppressWarnings("unchecked")
-    public static <T> JaxbAssertion<T> cast(PolicyAssertion a, Class<T> type) {
+    public static <T> JaxbAssertion<T> cast(Assertion a, Class<T> type) {
         return (JaxbAssertion<T>)a;
     }
 

@@ -37,7 +37,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Constants;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
@@ -105,7 +106,7 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder {
         unmarshaller = context.createUnmarshaller();
     }
     
-    public PolicyAssertion build(Element element) {
+    public Assertion build(Element element, AssertionBuilderFactory factory) {
         QName name = new QName(element.getNamespaceURI(), element.getLocalName());
         JaxbAssertion<T> assertion = buildAssertion();
         assertion.setName(name);
@@ -115,8 +116,8 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder {
         return assertion;
     }
     
-    public Collection<QName> getKnownElements() {
-        return supportedTypes;
+    public QName[] getKnownElements() {
+        return supportedTypes.toArray(new QName[supportedTypes.size()]);
     }
 
     protected JaxbAssertion<T> buildAssertion() {

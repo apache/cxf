@@ -18,16 +18,12 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -38,10 +34,12 @@ import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.policy.model.TransportToken;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 public class TransportBindingBuilder implements AssertionBuilder {
-    private static final List<QName> KNOWN_ELEMENTS 
-        = Arrays.asList(SP11Constants.TRANSPORT_BINDING, SP12Constants.TRANSPORT_BINDING);
+    private static final QName KNOWN_ELEMENTS[] 
+        = {SP11Constants.TRANSPORT_BINDING, SP12Constants.TRANSPORT_BINDING};
 
     
     PolicyBuilder builder;
@@ -49,25 +47,26 @@ public class TransportBindingBuilder implements AssertionBuilder {
         builder = b;
     }
     
-    public PolicyAssertion build(Element element)
+    public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
         
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         TransportBinding transportBinding = new TransportBinding(consts, builder);
-        processAlternative(element, transportBinding, consts);
+        processAlternative(element, transportBinding, consts, factory);
 
         return transportBinding;
     }
 
-    public List<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
 
     private void processAlternative(Element element, 
                                     TransportBinding parent,
-                                    SPConstants consts) {
+                                    SPConstants consts,
+                                    AssertionBuilderFactory factory) {
         Element polEl = DOMUtils.getFirstElement(element);
         while (polEl != null) {
             if (PolicyConstants.isPolicyElem(new QName(polEl.getNamespaceURI(),
@@ -76,14 +75,15 @@ public class TransportBindingBuilder implements AssertionBuilder {
                 while (child != null) {
                     String name = child.getLocalName();
                     if (name.equals(SPConstants.ALGO_SUITE)) {
-                        parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder().build(child));
+                        parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder()
+                            .build(child, factory));
                     } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
                         parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)
-                                                        .build(child));
+                                                        .build(child, factory));
                     } else if (name.equals(SPConstants.INCLUDE_TIMESTAMP)) {
                         parent.setIncludeTimestamp(true);
                     } else if (name.equals(SPConstants.LAYOUT)) {
-                        parent.setLayout((Layout)new LayoutBuilder().build(child));
+                        parent.setLayout((Layout)new LayoutBuilder().build(child, factory));
                     } else if (name.equals(SPConstants.PROTECT_TOKENS)) {
                         parent.setTokenProtection(true);
                     } else if (name.equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
@@ -92,11 +92,11 @@ public class TransportBindingBuilder implements AssertionBuilder {
                         if (consts.getVersion() == SPConstants.Version.SP_V11) {
                             parent.setSignedSupportingToken((SupportingToken)
                                                             new SupportingTokensBuilder(builder)
-                                                            .build(child));
+                                                            .build(child, factory));
                         } else {
                             parent.setSignedSupportingToken((SupportingToken)
                                                             new SupportingTokens12Builder(builder)
-                                                                .build(child));                        
+                                                                .build(child, factory));
                         }
                     }
                     child = DOMUtils.getNextElement(child);
@@ -107,8 +107,4 @@ public class TransportBindingBuilder implements AssertionBuilder {
         
     }
 
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

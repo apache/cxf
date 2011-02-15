@@ -28,7 +28,8 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.test.assertions.foo.FooType;
-import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.neethi.Assertion;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,8 +57,8 @@ public class JaxbAssertionBuilderTest extends Assert {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
         JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
         assertNotNull(ab);
-        assertEquals(1, ab.getKnownElements().size());
-        assertSame(qn, ab.getKnownElements().iterator().next());
+        assertEquals(1, ab.getKnownElements().length);
+        assertSame(qn, ab.getKnownElements()[0]);
     }
     
     @Test
@@ -70,7 +71,7 @@ public class JaxbAssertionBuilderTest extends Assert {
         Element elem =  DOMUtils.findAllElementsByTagNameNS((Element)doc.getDocumentElement(), 
                                                           "http://cxf.apache.org/test/assertions/foo", 
                                                           "foo").get(0);
-        PolicyAssertion a = ab.build(elem);
+        Assertion a = ab.build(elem, null);
         JaxbAssertion<FooType> jba = JaxbAssertion.cast(a, FooType.class);
         FooType foo = jba.getData();
         assertEquals("CXF", foo.getName());

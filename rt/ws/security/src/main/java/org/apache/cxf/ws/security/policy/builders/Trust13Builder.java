@@ -18,24 +18,22 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.Trust13;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 
 public class Trust13Builder implements AssertionBuilder {
 
-    public PolicyAssertion build(Element element) {
+    public Assertion build(Element element, AssertionBuilderFactory factory) {
         element = PolicyConstants.findPolicyElement(element);
 
         if (element == null) {
@@ -78,12 +76,7 @@ public class Trust13Builder implements AssertionBuilder {
 
         return trust13;
     }
-    public List<QName> getKnownElements() {
-        return Collections.singletonList(SP12Constants.TRUST_13);
+    public QName[] getKnownElements() {
+        return new QName[] {SP12Constants.TRUST_13};
     }
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,7 +27,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -38,22 +36,23 @@ import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.ProtectionToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 
 
 public class SymmetricBindingBuilder implements AssertionBuilder {
-    private static final List<QName> KNOWN_ELEMENTS 
-        = Arrays.asList(SP11Constants.SYMMETRIC_BINDING, SP12Constants.SYMMETRIC_BINDING);
+    private static final QName KNOWN_ELEMENTS[] 
+        = {SP11Constants.SYMMETRIC_BINDING, SP12Constants.SYMMETRIC_BINDING};
     
     PolicyBuilder builder;
     public SymmetricBindingBuilder(PolicyBuilder b) {
         builder = b;
     }
-    public List<QName> getKnownElements() {
+    public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
     
-    public PolicyAssertion build(Element element)
+    public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
         
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
@@ -113,9 +112,5 @@ public class SymmetricBindingBuilder implements AssertionBuilder {
                 symmetricBinding.setSignatureProtection(true);
             }
         }
-    }
-    public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }
