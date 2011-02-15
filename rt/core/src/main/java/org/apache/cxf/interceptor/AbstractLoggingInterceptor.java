@@ -31,7 +31,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -44,12 +43,9 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
  */
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractLoggingInterceptor.class);
-
     protected int limit = 100 * 1024;
     protected PrintWriter writer;
     protected boolean prettyLogging;
-    
     
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
@@ -57,6 +53,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public AbstractLoggingInterceptor(String id, String phase) {
         super(id, phase);
     }
+    
+    protected abstract Logger getLogger();
 
     public void setOutputLocation(String s) {
         if (s == null || "<logger>".equals(s)) {
@@ -71,7 +69,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                 File file = new File(uri);
                 writer = new PrintWriter(new FileWriter(file, true), true);
             } catch (Exception ex) {
-                LOG.log(Level.WARNING, "Error configuring log location " + s, ex);
+                getLogger().log(Level.WARNING, "Error configuring log location " + s, ex);
             }
         }
     }
@@ -147,8 +145,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         message = transform(message);
         if (writer != null) {
             writer.println(message);
-        } else if (LOG.isLoggable(Level.INFO)) {
-            LOG.info(message);
+        } else if (getLogger().isLoggable(Level.INFO)) {
+            getLogger().info(message);
         }
     }
     
