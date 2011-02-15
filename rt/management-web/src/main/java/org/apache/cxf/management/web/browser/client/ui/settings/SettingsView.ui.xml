@@ -34,7 +34,7 @@
                         Settings
                     </g:Label>
                     <g:Hyperlink ui:field="backHyperlink" addStyleNames="{res.css.settingsTabBackButton}">
-                        &#171; Back to browse
+                        &#171; Back to Explorer
                     </g:Hyperlink>
                 </div>
                 <div class="{res.css.settingsTabToolBar}">
