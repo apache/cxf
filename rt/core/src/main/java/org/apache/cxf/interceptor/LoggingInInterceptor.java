@@ -21,8 +21,10 @@ package org.apache.cxf.interceptor;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -34,6 +36,7 @@ import org.apache.cxf.phase.Phase;
  */
 @NoJSR250Annotations
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
+    private static final Logger LOG = LogUtils.getLogger(LoggingInInterceptor.class);
     
     public LoggingInInterceptor() {
         super(Phase.RECEIVE);
@@ -66,7 +69,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     }
     
     public void handleMessage(Message message) throws Fault {
-        if (writer != null || LOG.isLoggable(Level.INFO)) {
+        if (writer != null || getLogger().isLoggable(Level.INFO)) {
             logging(message);
         }
     }
@@ -138,5 +141,10 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             }
         }
         log(buffer.toString());
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 }

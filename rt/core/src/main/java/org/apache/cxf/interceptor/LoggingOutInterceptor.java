@@ -22,8 +22,10 @@ package org.apache.cxf.interceptor;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
@@ -35,6 +37,7 @@ import org.apache.cxf.phase.Phase;
  */
 @NoJSR250Annotations
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
+    private static final Logger LOG = LogUtils.getLogger(LoggingOutInterceptor.class);
     private static final String LOG_SETUP = LoggingOutInterceptor.class.getName() + ".log-setup";
     
     public LoggingOutInterceptor(String phase) {
@@ -60,7 +63,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         if (os == null) {
             return;
         }
-        if (LOG.isLoggable(Level.INFO) || writer != null) {
+        if (getLogger().isLoggable(Level.INFO) || writer != null) {
             // Write the output while caching it for the log message
             boolean hasLogged = message.containsKey(LOG_SETUP);
             if (!hasLogged) {
@@ -152,6 +155,12 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             message.setContent(OutputStream.class, 
                                origStream);
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
+        
     }
 
 }
