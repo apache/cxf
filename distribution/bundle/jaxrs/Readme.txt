@@ -23,7 +23,6 @@ needed for writing RESTful services based on JAX-RS/JSR-311.
 
 The following modules are not included in this bundle :
 
-cxf-common-schemas
 cxf-tools-common
 cxf-tools-validator
 cxf-tools-wsdlto-core

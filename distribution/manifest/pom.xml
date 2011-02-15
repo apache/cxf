@@ -50,11 +50,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-common-schemas</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-common</artifactId>
             <version>${project.version}</version>
         </dependency>

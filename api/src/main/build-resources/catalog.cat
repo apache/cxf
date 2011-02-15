@@ -18,7 +18,7 @@
 --
 
 
-SYSTEM "http://schemas.xmlsoap.org/wsdl/" "../../../target/schemas/schemas/wsdl/wsdl.xsd"
-SYSTEM "http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" "../../../target/schemas/schemas/wsdl/wsdl.xsd"
-SYSTEM "http://cxf.apache.org/schemas/configuration/parameterized-types.xsd" "../../../target/schemas/schemas/configuration/parameterized-types.xsd"
+SYSTEM "http://schemas.xmlsoap.org/wsdl/" "../resources/schemas/wsdl/wsdl.xsd"
+SYSTEM "http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" "../resources/schemas/wsdl/wsdl.xsd"
+SYSTEM "http://cxf.apache.org/schemas/configuration/parameterized-types.xsd" "../resources/schemas/configuration/parameterized-types.xsd"
 

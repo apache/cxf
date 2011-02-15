@@ -75,11 +75,6 @@
             <artifactId>neethi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-common-schemas</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <optional>true</optional>
@@ -88,29 +83,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-schemas</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/schemas</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.cxf</groupId>
-                                    <artifactId>cxf-common-schemas</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-xjc-plugin</artifactId>
@@ -124,40 +96,39 @@
                         </goals>
                         <configuration>
                             <extensions>
-                                <extension>org.apache.cxf:cxf-common-schemas:${project.version}</extension>
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                             </extensions>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <xsdOptions>
                                 <xsdOption>
-                                    <xsd>classpath:/schemas/wsdl/http.xsd</xsd>
-                                    <bindingFile>classpath:/schemas/wsdl/http.xjb</bindingFile>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/http.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/http.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                 </xsdOption>
                                 <xsdOption>
-                                    <xsd>classpath:/schemas/wsdl/ws-addr.xsd</xsd>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/ws-addr.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.addressing</packagename>
                                 </xsdOption>
                                 <xsdOption>
-                                    <xsd>classpath:/schemas/wsdl/addressing.xsd</xsd>
-                                    <bindingFile>classpath:/schemas/wsdl/addressing.xjb</bindingFile>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/addressing.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/addressing.xjb</bindingFile>
                                 </xsdOption>
                                 <xsdOption>
-                                    <xsd>classpath:/schemas/configuration/security.xsd</xsd>
-                                    <bindingFile>classpath:/schemas/configuration/security.xjb</bindingFile>
+                                    <xsd>${basedir}/src/main/resources/schemas/configuration/security.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/configuration/security.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <extensionArgs>
                                         <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
-                                    <xsd>classpath:/schemas/wsdl/ws-addr-wsdl.xsd</xsd>
-                                    <bindingFile>classpath:/schemas/wsdl/ws-addr-wsdl.xjb</bindingFile>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/ws-addr-wsdl.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/ws-addr-wsdl.xjb</bindingFile>
                                     <extension>true</extension>
                                 </xsdOption>
                                 <xsdOption>
-                                    <xsd>classpath:/schemas/wsdl/addressing200403.xsd</xsd>
-                                    <bindingFile>classpath:/schemas/wsdl/addressing200403.xjb</bindingFile>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/addressing200403.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/addressing200403.xjb</bindingFile>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>

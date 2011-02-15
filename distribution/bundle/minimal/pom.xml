@@ -43,12 +43,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-common-schemas</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-api</artifactId>
             <version>${project.version}</version>
         </dependency>
