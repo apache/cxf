@@ -93,7 +93,9 @@ public class ConstVisitor extends VisitorBase {
         } else if (ScopedNameVisitor.accept(getScope(), definition, schema, constTypeNode, wsdlVisitor)) {
             visitor = new ScopedNameVisitor(getScope(), definition, schema, wsdlVisitor);            
         }
-        
+        if (visitor == null) {
+            throw new RuntimeException("can't resolve type for const " + constNameNode.getText());
+        }
         visitor.visit(constTypeNode);                
         XmlSchemaType constSchemaType = visitor.getSchemaType();
         CorbaTypeImpl constCorbaType = visitor.getCorbaType();        
