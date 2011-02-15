@@ -380,5 +380,21 @@ public class IDLToWSDLTest extends ToolTestBase {
         doTestGeneratedWsdl(expected, actual);
     }
 
-    
+    public void testUndefinedTypeRef() throws Exception {
+        File input = new File(getClass().getResource("/idl/ReferUndefinedType.idl").toURI());
+        File include1Dir = new File(getClass().getResource("/idl").toURI());
+               
+        String[] args = new String[] {"-ow", "ExternalInterfaceRef.wsdl",
+                                      "-o", output.toString(),
+                                      "-I", include1Dir.toString(),
+                                      "-verbose",
+                                      input.toString()
+        };
+        try {
+            IDLToWSDL.run(args);
+            fail("should throw a RuntimeException");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().indexOf("can't resolve type for const myConst") >= 0);
+        }
+    }
 }
