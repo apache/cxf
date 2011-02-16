@@ -23,8 +23,14 @@ import java.io.InputStream;
 
 import javax.annotation.Resource;
 import javax.xml.namespace.QName;
+import javax.xml.soap.Detail;
+import javax.xml.soap.DetailEntry;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
@@ -32,6 +38,7 @@ import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -77,26 +84,50 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
         }
         
         SOAPMessage response = null;        
+        SOAPBody body = null;
         try {
-            SOAPBody body = request.getSOAPBody();
-            Node n = body.getFirstChild();
+            body = request.getSOAPBody();
+        } catch (SOAPException e) {
+            e.printStackTrace();
+            return null;
+        }
+        Node n = body.getFirstChild();
 
-            while (n.getNodeType() != Node.ELEMENT_NODE) {
-                n = n.getNextSibling();
-            }
-            if (n.getLocalName().equals(sayHi.getLocalPart())) {
+        while (n.getNodeType() != Node.ELEMENT_NODE) {
+            n = n.getNextSibling();
+        }
+        if (n.getLocalName().equals(sayHi.getLocalPart())) {
+            response = sayHiResponse;
+        } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
+            Element el = DOMUtils.getFirstElement(n);
+            String v = DOMUtils.getContent(el);
+            System.out.println(v);
+            if (v.contains("Return sayHi")) {
                 response = sayHiResponse;
-            } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
-                Element el = DOMUtils.getFirstElement(n);
-                String v = DOMUtils.getContent(el);
-                if (v.contains("Return sayHi")) {
-                    response = sayHiResponse;
-                } else {
-                    response = greetMeResponse;
+            } else if (v.contains("throwFault")) {
+                try {
+                    SOAPFactory f = SOAPFactory.newInstance(); 
+                    SOAPFault soapFault = f.createFault(); 
+                    
+                    soapFault.setFaultString("Test Fault String ****"); 
+       
+                    Detail detail = soapFault.addDetail(); 
+                    detail = soapFault.getDetail(); 
+       
+                    QName qName = new QName("http://www.Hello.org/greeter", "TestFault", "ns"); 
+                    DetailEntry de = detail.addDetailEntry(qName); 
+       
+                    qName = new QName("http://www.Hello.org/greeter", "ErrorCode", "ns"); 
+                    SOAPElement errorElement = de.addChildElement(qName); 
+                    errorElement.setTextContent("errorcode");
+                    throw new SOAPFaultException(soapFault);
+                } catch (SOAPException ex) {
+                    //ignore
                 }
+                           
+            } else {
+                response = greetMeResponse;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
         return response;
     }

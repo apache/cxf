@@ -24,6 +24,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -60,7 +61,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     
     @Test
@@ -97,6 +98,13 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
                 String reply = greeter.sayHi();
                 assertNotNull("no response received from service", reply);
                 assertEquals(response2, reply);
+            }
+
+            try {
+                greeter.greetMe("throwFault");
+                fail("Expected a fault");
+            } catch (SOAPFaultException ex) {
+                assertTrue(ex.getMessage().contains("Test Fault String"));
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
