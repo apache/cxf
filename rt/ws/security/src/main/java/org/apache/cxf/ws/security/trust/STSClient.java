@@ -423,6 +423,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         boolean wroteKeySize = false;
         
         String keyType = null;
+        String tokenType = null;
         
         if (template != null) {
             if (this.useSecondaryParameters()) {
@@ -437,6 +438,8 @@ public class STSClient implements Configurable, InterceptorProvider {
                 } else if ("KeySize".equals(tl.getLocalName())) {
                     wroteKeySize = true;
                     keySize = Integer.parseInt(DOMUtils.getContent(tl));
+                } else if ("TokenType".equals(tl.getLocalName())) {
+                    tokenType = DOMUtils.getContent(tl);
                 }
                 tl = DOMUtils.getNextElement(tl);
             }
@@ -484,6 +487,9 @@ public class STSClient implements Configurable, InterceptorProvider {
         SecurityToken token = createSecurityToken(getDocumentElement((DOMSource)obj[0]), requestorEntropy);
         if (cert != null) {
             token.setX509Certificate(cert, crypto);
+        }
+        if (tokenType != null) {
+            token.setTokenType(tokenType);
         }
         return token;
     }

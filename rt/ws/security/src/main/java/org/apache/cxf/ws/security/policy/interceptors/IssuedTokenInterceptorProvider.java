@@ -53,6 +53,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
  * 
@@ -257,6 +258,14 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                     (java.util.Date)null
                                 );
                             token.setSecret(secretKey);
+                            AssertionWrapper assertionWrapper = 
+                                (AssertionWrapper)customPrincipal.getTokenObject();
+                            if (assertionWrapper != null && assertionWrapper.getSaml1() != null) {
+                                token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                            } else if (assertionWrapper != null 
+                                && assertionWrapper.getSaml2() != null) {
+                                token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                            }
                             return token;
                         }
                     }

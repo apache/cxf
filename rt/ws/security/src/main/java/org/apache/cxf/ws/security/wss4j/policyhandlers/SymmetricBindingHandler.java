@@ -517,13 +517,19 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         }
                     } else {
                         if (encrToken instanceof IssuedToken) {
-                            encr.setCustomReferenceValue(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                             encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                            String tokenType = encrTok.getTokenType();
+                            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+                                encr.setCustomReferenceValue(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                                encr.setCustomReferenceValue(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                            } else {
+                                encr.setCustomReferenceValue(tokenType);
+                            }
                         }
                     }
 
-                    encr.prepare(saaj.getSOAPPart(),
-                                 crypto);
+                    encr.prepare(saaj.getSOAPPart(), crypto);
                    
                     if (encr.getBSTTokenId() != null) {
                         encr.prependBSTElementToHeader(secHeader);
@@ -668,13 +674,18 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     sig.setEncrKeySha1value(tok.getSHA1());
                     sig.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
                 }
-            } else if (tok.getTokenType() != null) { 
-                sig.setCustomTokenValueType(tok.getTokenType());
-                sig.setKeyIdentifierType(type);
             } else {
-                // TODO Add support for SAML2 here
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                String tokenType = tok.getTokenType();
+                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                } else {
+                    sig.setCustomTokenValueType(tokenType);
+                    sig.setKeyIdentifierType(type);
+                }
             }
             
             String sigTokId;
