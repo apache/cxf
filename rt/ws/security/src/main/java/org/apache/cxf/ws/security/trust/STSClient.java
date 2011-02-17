@@ -1012,9 +1012,11 @@ public class STSClient implements Configurable, InterceptorProvider {
         String id = null;
         if (rst != null) {
             QName elName = DOMUtils.getElementQName(rst);
-            if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))) {
+            if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))
+                && rst.hasAttributeNS(null, "AssertionID")) {
                 id = rst.getAttributeNS(null, "AssertionID");
-            } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))) {
+            } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))
+                && rst.hasAttributeNS(null, "ID")) {
                 id = rst.getAttributeNS(null, "ID");
             }
             if (id == null) {
