@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +77,25 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.query("name", name);
         Book b = wc.get(Book.class);
         assertEquals(name, b.getName());
+    }
+    
+    @Test
+    public void testGetBookWithColonMarks() throws Exception {
+        
+        // URLEncoder will turn ":" into "%3A" but ':' is actually
+        // not disallowed in the path components 
+        String endpointAddressUrlEncoded =
+            "http://localhost:" + PORT + "/bookstore/books/colon/" 
+            + URLEncoder.encode("1:2:3", "UTF-8");
+        
+        Response r = WebClient.create(endpointAddressUrlEncoded).get();
+        assertEquals(404, r.getStatus());
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/books/colon/1:2:3";
+        WebClient wc = WebClient.create(endpointAddress);
+        Book b = wc.get(Book.class);
+        assertEquals(123L, b.getId());
     }
     
     @Test
