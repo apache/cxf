@@ -26,23 +26,29 @@
 <!--    <extension class="org.apache.cxf.transport.ConduitInitiatorManagerImpl"-->
 <!--           interface="org.apache.cxf.transport.ConduitInitiatorManager"/>-->
     <extension class="org.apache.cxf.wsdl11.WSDLManagerImpl"
-           interface="org.apache.cxf.wsdl.WSDLManager"/>
+           interface="org.apache.cxf.wsdl.WSDLManager" deferred="true"/>
     <extension class="org.apache.cxf.phase.PhaseManagerImpl"
-           interface="org.apache.cxf.phase.PhaseManager"/>
+           interface="org.apache.cxf.phase.PhaseManager" deferred="true"/>
     <extension class="org.apache.cxf.workqueue.WorkQueueManagerImpl"
-       	   interface="org.apache.cxf.workqueue.WorkQueueManager"/>
+       	   interface="org.apache.cxf.workqueue.WorkQueueManager" deferred="true"/>
     <extension class="org.apache.cxf.buslifecycle.CXFBusLifeCycleManager"
-       	   interface="org.apache.cxf.buslifecycle.BusLifeCycleManager"/>   	   
+       	   interface="org.apache.cxf.buslifecycle.BusLifeCycleManager" deferred="true"/>   	   
     <extension class="org.apache.cxf.endpoint.ServerRegistryImpl"
-       	   interface="org.apache.cxf.endpoint.ServerRegistry"/>
+       	   interface="org.apache.cxf.endpoint.ServerRegistry" deferred="true"/>
     <extension class="org.apache.cxf.transport.http.QueryHandlerRegistryImpl"
-       	   interface="org.apache.cxf.transports.http.QueryHandlerRegistry"/> 
+       	   interface="org.apache.cxf.transports.http.QueryHandlerRegistry" deferred="true"/> 
     <extension class="org.apache.cxf.endpoint.EndpointResolverRegistryImpl"
-       	   interface="org.apache.cxf.endpoint.EndpointResolverRegistry"/>
+       	   interface="org.apache.cxf.endpoint.EndpointResolverRegistry" deferred="true"/>
     <extension class="org.apache.cxf.headers.HeaderManagerImpl"
-       	   interface="org.apache.cxf.headers.HeaderManager"/>
+       	   interface="org.apache.cxf.headers.HeaderManager" deferred="true"/>
     <extension class="org.apache.cxf.catalog.OASISCatalogManager"
-       	   interface="org.apache.cxf.catalog.OASISCatalogManager"/>
-    <extension class="org.apache.cxf.service.factory.FactoryBeanListenerManager"/>
+       	   interface="org.apache.cxf.catalog.OASISCatalogManager" deferred="true"/>
+    <extension class="org.apache.cxf.service.factory.FactoryBeanListenerManager" deferred="true"/>
+    <extension interface="org.apache.cxf.endpoint.ServerLifeCycleManager"
+        class="org.apache.cxf.endpoint.ServerLifeCycleManagerImpl"
+        deferred="true"/>
+    <extension interface="org.apache.cxf.endpoint.ClientLifeCycleManager"
+        class="org.apache.cxf.endpoint.ClientLifeCycleManagerImpl"
+        deferred="true"/>
            
 </extensions>

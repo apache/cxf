@@ -23,5 +23,6 @@
         <namespace>http://cxf.apache.org/bindings/corba</namespace>
         <namespace>http://schemas.apache.org/yoko/bindings/corba</namespace>
     </extension>
+    <extension class="org.apache.cxf.binding.corba.wsdl.WSDLExtensionRegister" deferred="true"/>
 
 </extensions>

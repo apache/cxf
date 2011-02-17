@@ -38,6 +38,13 @@ public class ObjectBindingFactory extends AbstractBindingFactory {
     private boolean initialized = true;
     private LocalServerListener listener;
     
+    public ObjectBindingFactory() {
+        
+    }
+    public ObjectBindingFactory(Bus b) {
+        super(b);
+    }
+    
     @PostConstruct
     public void initialize() {
         if (autoRegisterLocalEndpoint) {

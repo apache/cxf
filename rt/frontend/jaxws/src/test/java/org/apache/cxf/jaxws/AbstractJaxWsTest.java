@@ -30,8 +30,6 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-import org.apache.cxf.wsdl.WSDLManager;
-import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
@@ -81,9 +79,5 @@ public abstract class AbstractJaxWsTest extends AbstractCXFTest {
         extension.registerConduitInitiator("http://cxf.apache.org/transports/http", localTransport);
         extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration",
                                            localTransport);
-        
-        WSDLManagerImpl manager = new WSDLManagerImpl();
-        manager.setBus(bus);
-        bus.setExtension(manager, WSDLManager.class);
     }
 }

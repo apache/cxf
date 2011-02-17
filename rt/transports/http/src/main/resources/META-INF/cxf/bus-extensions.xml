@@ -25,4 +25,9 @@
         <namespace>http://schemas.xmlsoap.org/wsdl/http</namespace>
         <namespace>http://schemas.xmlsoap.org/wsdl/http/</namespace>
     </extension>
+    <extension class="org.apache.cxf.transport.http.HTTPWSDLExtensionLoader"  deferred="true"/>
+    <extension class="org.apache.cxf.transport.http.policy.HTTPClientAssertionBuilder" deferred="true"/>
+    <extension class="org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder" deferred="true"/>
+    <extension class="org.apache.cxf.transport.http.policy.NoOpPolicyInterceptorProvider" deferred="true"/>
+    
 </extensions>

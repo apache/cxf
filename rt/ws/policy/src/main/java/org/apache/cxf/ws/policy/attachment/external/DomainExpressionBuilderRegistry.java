@@ -22,12 +22,16 @@ package org.apache.cxf.ws.policy.attachment.external;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
@@ -37,13 +41,20 @@ import org.apache.cxf.ws.policy.PolicyException;
 /**
  * 
  */
+@NoJSR250Annotations(unlessNull = "bus")
 public class DomainExpressionBuilderRegistry extends RegistryImpl<QName, DomainExpressionBuilder> 
     implements BusExtension {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AssertionBuilderRegistry.class);
     
+    private boolean dynamicLoaded;
+    private Bus bus;
     public DomainExpressionBuilderRegistry() {
         super(null);
+    }
+    public DomainExpressionBuilderRegistry(Bus b) {
+        super(null);
+        setBus(b);
     }
 
     public DomainExpressionBuilderRegistry(Map<QName, DomainExpressionBuilder> builders) {
@@ -52,13 +63,34 @@ public class DomainExpressionBuilderRegistry extends RegistryImpl<QName, DomainE
     public DomainExpressionBuilderRegistry(MapProvider<QName, DomainExpressionBuilder> builders) {
         super(builders.createMap());
     }
-    
+    @Resource
+    public final void setBus(Bus b) {
+        bus = b;
+        if (b != null) {
+            b.setExtension(this, DomainExpressionBuilderRegistry.class);
+        }
+    }
+
     public Class<?> getRegistrationType() {
         return DomainExpressionBuilderRegistry.class;
     }
     
+    protected synchronized void loadDynamic() {
+        if (!dynamicLoaded && bus != null) {
+            dynamicLoaded = true;
+            ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
+            if (c != null) {
+                for (DomainExpressionBuilder b : c.getBeansOfType(DomainExpressionBuilder.class)) {
+                    for  (QName q : b.getDomainExpressionTypes()) {
+                        register(q, b);
+                    }
+                }
+            }
+        }
+    }
+
     public DomainExpression build(Element element) {
-        
+        loadDynamic();
         DomainExpressionBuilder builder;
 
         QName qname = new QName(element.getNamespaceURI(), element.getLocalName());

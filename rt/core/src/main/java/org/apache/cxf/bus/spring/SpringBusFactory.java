@@ -28,8 +28,10 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.Configurer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 
 public class SpringBusFactory extends BusFactory {
     
@@ -89,7 +91,14 @@ public class SpringBusFactory extends BusFactory {
     }    
     
     public Bus createBus(String cfgFiles[], boolean includeDefaults) {
-        try {      
+        try {
+            String userCfgFile = System.getProperty(Configurer.USER_CFG_FILE_PROPERTY_NAME);
+            String sysCfgFileUrl = System.getProperty(Configurer.USER_CFG_FILE_PROPERTY_URL);
+            Resource r = BusApplicationContext.findResource(Configurer.DEFAULT_USER_CFG_FILE);
+            if (context == null && userCfgFile == null && cfgFiles == null && sysCfgFileUrl == null 
+                && (r == null || !r.exists()) && includeDefaults) {
+                return new org.apache.cxf.bus.CXFBusFactory().createBus();
+            }
             return finishCreatingBus(createApplicationContext(cfgFiles, includeDefaults));
         } catch (BeansException ex) {
             LogUtils.log(LOG, Level.WARNING, "APP_CONTEXT_CREATION_FAILED_MSG", ex, (Object[])null);

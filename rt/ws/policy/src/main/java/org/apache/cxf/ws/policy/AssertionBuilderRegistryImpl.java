@@ -110,6 +110,9 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
             ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
             if (c != null) {
                 c.getBeansOfType(AssertionBuilderLoader.class);
+                for (AssertionBuilder b : c.getBeansOfType(AssertionBuilder.class)) {
+                    register(b);
+                }
             }
         }
     }

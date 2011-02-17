@@ -50,6 +50,10 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
     @Resource
     WebServiceContext context;
     
+    public DocLitWrappedCodeFirstServiceImpl() {
+        
+    }
+    
     public int thisShouldNotBeInTheWSDL(int i) {
         return i;
     }

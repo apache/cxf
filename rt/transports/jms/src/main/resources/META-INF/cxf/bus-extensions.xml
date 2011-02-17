@@ -23,5 +23,6 @@
         <namespace>http://cxf.apache.org/transports/jms</namespace>
         <namespace>http://cxf.apache.org/transports/jms/configuration</namespace>
     </extension>
+    <extension class="org.apache.cxf.transport.jms.wsdl11.JMSWSDLExtensionLoader" deferred="true"/>
         
 </extensions>

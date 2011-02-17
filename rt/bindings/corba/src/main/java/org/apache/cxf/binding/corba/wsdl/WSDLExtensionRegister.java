@@ -36,11 +36,24 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
     private static final String YOKO_NAMESPACE = "http://schemas.apache.org/yoko/bindings/corba";
     
     public WSDLExtensionRegister(Bus b) {
-        registerYokoCompatibleExtensors(b);
+        WSDLManager manager = b.getExtension(WSDLManager.class);
+        registerCXFExtensors(manager);
+        registerYokoCompatibleExtensors(manager);
     }
     
-    void registerYokoCompatibleExtensors(Bus bus) {
-        WSDLManager manager = bus.getExtension(WSDLManager.class);
+    void registerCXFExtensors(WSDLManager manager) {
+        createExtensor(manager, javax.wsdl.Binding.class,
+                             org.apache.cxf.binding.corba.wsdl.BindingType.class);
+        createExtensor(manager, javax.wsdl.BindingOperation.class,
+                             org.apache.cxf.binding.corba.wsdl.OperationType.class);
+        createExtensor(manager, javax.wsdl.Definition.class,
+                             org.apache.cxf.binding.corba.wsdl.TypeMappingType.class);
+        createExtensor(manager, javax.wsdl.Port.class,
+                             org.apache.cxf.binding.corba.wsdl.AddressType.class);
+        createExtensor(manager, javax.wsdl.Port.class,
+                             org.apache.cxf.binding.corba.wsdl.PolicyType.class);
+    }
+    void registerYokoCompatibleExtensors(WSDLManager manager) {
         createCompatExtensor(manager, javax.wsdl.Binding.class,
                              org.apache.cxf.binding.corba.wsdl.BindingType.class);
         createCompatExtensor(manager, javax.wsdl.BindingOperation.class,
@@ -51,6 +64,18 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
                              org.apache.cxf.binding.corba.wsdl.AddressType.class);
         createCompatExtensor(manager, javax.wsdl.Port.class,
                              org.apache.cxf.binding.corba.wsdl.PolicyType.class);
+    }
+    private void createExtensor(WSDLManager manager,
+                                Class<?> parentType,
+                                Class<? extends TExtensibilityElementImpl> elementType) {
+        try {
+            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
+                                              parentType, 
+                                              elementType);
+        } catch (JAXBException e) {
+            //ignore, won't support CORBA
+        }
+        
     }
 
     private void createCompatExtensor(WSDLManager manager,

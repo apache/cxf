@@ -26,6 +26,7 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 
 /**
  * 
@@ -48,7 +49,17 @@ public class FactoryBeanListenerManager {
     @Resource
     public final void setBus(Bus bus) {
         this.bus = bus;
+        
         this.bus.setExtension(this, FactoryBeanListenerManager.class);
+        
+        ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
+        if (loc != null) {
+            for (FactoryBeanListener f : loc.getBeansOfType(FactoryBeanListener.class)) {
+                if (!listeners.contains(f)) {
+                    listeners.add(f);
+                }
+            }
+        }
     }
     
     public List<FactoryBeanListener> getListeners() {

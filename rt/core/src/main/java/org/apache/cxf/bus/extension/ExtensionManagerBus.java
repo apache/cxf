@@ -100,10 +100,6 @@ public class ExtensionManagerBus extends CXFBusImpl {
                                   
         setState(BusState.INITIAL);
         
-        BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
-        if (null != lifeCycleManager) {
-            lifeCycleManager.initComplete();
-        }
 
         DestinationFactoryManager dfm = this.getExtension(DestinationFactoryManager.class);
         if (null == dfm) {
@@ -130,8 +126,15 @@ public class ExtensionManagerBus extends CXFBusImpl {
             ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
             ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_COMPAT});
         
+        extensionManager.activateAllByType(ResourceResolver.class);
+        
         
         this.setExtension(extensionManager, ExtensionManager.class);
+        
+        BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
+        if (null != lifeCycleManager) {
+            lifeCycleManager.initComplete();
+        }
     }
 
     public ExtensionManagerBus() {

@@ -34,6 +34,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.xml.XMLBindingFactory;
+import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -116,7 +117,10 @@ public class TestBase extends Assert {
         control = EasyMock.createNiceControl();
         
         bus = control.createMock(Bus.class);
-        EasyMock.expect(bus.getExtension(WSDLManager.class)).andStubReturn(new WSDLManagerImpl());
+        
+        WSDLManagerImpl manager = new WSDLManagerImpl();
+        XMLWSDLExtensionLoader.registerExtensors(manager);
+        EasyMock.expect(bus.getExtension(WSDLManager.class)).andStubReturn(manager);
         
         BindingFactoryManager bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);

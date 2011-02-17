@@ -41,7 +41,9 @@ public class RegistryImpl<K, T> implements Registry<K, T> {
         }
         entries = e;
     }
-    
+
+    protected void loadDynamic() {
+    }
 
     public void register(K k, T t) {
         entries.put(k, t);
@@ -52,6 +54,7 @@ public class RegistryImpl<K, T> implements Registry<K, T> {
     }
 
     public T get(K k) {
+        loadDynamic();
         return entries.get(k);
     }
 

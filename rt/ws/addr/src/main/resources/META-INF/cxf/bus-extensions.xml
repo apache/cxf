@@ -19,9 +19,12 @@
 -->
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
-    <extension class="org.apache.cxf.jaxrs.JAXRSBindingFactory" 
-      interface="org.apache.cxf.binding.BindingFactory" deferred="true">
-        <namespace>http://apache.org/cxf/binding/jaxrs</namespace>
-    </extension>
-    
+    <extension class="org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder"
+      deferred="true"/>
+    <extension class="org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder"
+      deferred="true"/>
+    <extension class="org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider"
+      deferred="true"/>
+    <extension class="org.apache.cxf.ws.addressing.AddressingWSDLExtensionLoader" deferred="true"/>
+        
 </extensions>

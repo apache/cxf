@@ -19,10 +19,6 @@
 -->
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
-    <extension class="org.apache.cxf.transport.jbi.JBITransportFactory" deferred="true">
-      <namespace>http://cxf.apache.org/transports/jbi</namespace>
-      <namespace>http://cxf.apache.org/transports/jbi/configuration</namespace>
-    </extension>
-    <extension class="org.apache.cxf.transport.jbi.wsdl11.JBIWSDLExtensionLoader"  deferred="true"/>
-        
+    <extension class="org.apache.cxf.jaxws.context.WebServiceContextResourceResolver" deferred="true"/>
+    
 </extensions>

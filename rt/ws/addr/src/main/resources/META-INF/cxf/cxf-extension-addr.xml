@@ -35,5 +35,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 	  id="org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider"
 	  lazy-init="true"/>
  
-    
+    <bean class="org.apache.cxf.ws.addressing.AddressingWSDLExtensionLoader"
+      id="org.apache.cxf.ws.addressing.AddressingWSDLExtensionLoader"
+      lazy-init="true">
+        <constructor-arg ref="cxf"/>
+    </bean>
 </beans>

@@ -94,14 +94,14 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         throws JAXBException, ClassNotFoundException {
         Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
 
-        Class<? extends TExtensibilityElementImpl> elementTypeClass = 
+        Class<? extends ExtensibilityElement> elementTypeClass = 
             ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
-                .asSubclass(TExtensibilityElementImpl.class);
+                .asSubclass(ExtensibilityElement.class);
         addExtensions(registry, parentTypeClass, elementTypeClass, namespace);
     }
     public static void addExtensions(ExtensionRegistry registry,
                                      Class<?> parentType,
-                                     Class<? extends TExtensibilityElementImpl> cls)
+                                     Class<? extends ExtensibilityElement> cls)
         throws JAXBException {
         addExtensions(registry, parentType, cls, null);
     }

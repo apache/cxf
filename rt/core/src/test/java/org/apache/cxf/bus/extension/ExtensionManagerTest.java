@@ -88,9 +88,9 @@ public class ExtensionManagerTest extends Assert {
         e.setClassname(extensionClass);       
         e.getNamespaces().add(ns);
         e.setDeferred(true);
-        manager.processExtension(e);
+        manager.addDeferred(e);
         assertNull(myService);
-        manager.activateViaNS(ns);
+        manager.activateViaNS(ns, null);
         assertNotNull(myService);
         assertEquals(1, myService.getActivationNamespaces().size());
         assertEquals(ns, myService.getActivationNamespaces().iterator().next());
@@ -98,7 +98,7 @@ public class ExtensionManagerTest extends Assert {
         // second activation should be a no-op
         
         MyService first = myService;        
-        manager.activateViaNS(ns);
+        manager.activateViaNS(ns, null);
         assertSame(first, myService);
         myService = null;
     }

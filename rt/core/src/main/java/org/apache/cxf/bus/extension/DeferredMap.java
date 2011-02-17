@@ -44,7 +44,7 @@ public class DeferredMap<V> extends ConcurrentHashMap<String, V> {
 
         if (v == null) {
             String k = (String)key;
-            em.activateViaNS(k);
+            em.activateViaNS(k, type);
 
             v = em.getExtension(k, type);
             if (v != null) {

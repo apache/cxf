@@ -82,12 +82,15 @@ public class PolicyInterceptorProviderRegistryImpl
     public Class<?> getRegistrationType() {
         return PolicyInterceptorProviderRegistry.class;
     }
-    private synchronized void loadDynamic() {
+    protected synchronized void loadDynamic() {
         if (!dynamicLoaded && bus != null) {
             dynamicLoaded = true;
             ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
             if (c != null) {
                 c.getBeansOfType(PolicyInterceptorProviderLoader.class);
+                for (PolicyInterceptorProvider b : c.getBeansOfType(PolicyInterceptorProvider.class)) {
+                    register(b);
+                }
             }
         }
     }

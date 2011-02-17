@@ -72,7 +72,7 @@ import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyIntercepto
 public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
     Bus bus;
     
-    WSSecurityPolicyLoader(Bus b) {
+    public WSSecurityPolicyLoader(Bus b) {
         bus = b;
         registerBuilders();
         try {

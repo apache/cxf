@@ -19,9 +19,7 @@
 
 package org.apache.cxf.wsdl11;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,12 +54,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.catalog.CatalogWSDLLocator;
 import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.service.model.ServiceSchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -79,8 +75,7 @@ public class WSDLManagerImpl implements WSDLManager {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLManagerImpl.class);
 
-    private static final String EXTENSIONS_RESOURCE = "META-INF/cxf/wsdl-extensions.txt";
-    private static final String EXTENSIONS_RESOURCE_XML = "META-INF/cxf/extensions.xml";
+    private static final String EXTENSIONS_RESOURCE = "META-INF/cxf/extensions.xml";
     private static final String EXTENSIONS_RESOURCE_COMPAT = "META-INF/extensions.xml";
 
     final ExtensionRegistry registry;
@@ -252,50 +247,14 @@ public class WSDLManagerImpl implements WSDLManager {
 
     private void registerInitialExtensions() throws BusException {
         registerInitialXmlExtensions(EXTENSIONS_RESOURCE_COMPAT);
-        registerInitialXmlExtensions(EXTENSIONS_RESOURCE_XML);
-        registerInitialExtensions(EXTENSIONS_RESOURCE);
-    }
-    private void registerInitialExtensions(String resource) throws BusException {
-        try {
-            for (URL url : ClassLoaderUtils.getResources(resource, this.getClass())) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
-                String line = reader.readLine();
-                while (line != null) {
-                    line = line.trim();
-                    if (!line.startsWith("#")
-                        && !StringUtils.isEmpty(line)) {
-                        try {
-                            int idx = line.indexOf('=');
-                            String parentType = line.substring(0, idx);
-                            String elementType = line.substring(idx + 1);
-                            if (LOG.isLoggable(Level.FINE)) {
-                                LOG.fine("Registering extension: " + elementType 
-                                         + " for parent: " + parentType);
-                            }
-                            JAXBExtensionHelper.addExtensions(registry, parentType, elementType);
-                        } catch (ClassNotFoundException ex) {
-                            LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);
-                        } catch (JAXBException ex) {
-                            LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);
-                        }
-                    }
-                    line = reader.readLine();
-                }
-                reader.close();
-            }
-        } catch (IOException ex) {
-            throw new BusException(ex);
-        }
+        registerInitialXmlExtensions(EXTENSIONS_RESOURCE);
     }
     private void registerInitialXmlExtensions(String resource) throws BusException {
         Properties initialExtensions = null;
         try {
             initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
                                                                         Thread.currentThread()
-                                                                              .getContextClassLoader(),
-                                                                        LOG,
-                                                                        Level.WARNING,
-                                                                        "Use of {0} is deprecated.");
+                                                                              .getContextClassLoader());
         } catch (IOException ex) {
             throw new BusException(ex);
         }

@@ -61,10 +61,18 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
     private AssertionBuilderRegistry assertionBuilderRegistry;
     private Bus bus;
    
+    public PolicyBuilderImpl() {
+    }
+    
+    public PolicyBuilderImpl(Bus theBus) {
+        bus = theBus;
+        assertionBuilderRegistry = theBus.getExtension(AssertionBuilderRegistry.class);
+    }
+
     public Class<?> getRegistrationType() {
         return PolicyBuilder.class;
     }
- 
+    
     public void setBus(Bus theBus) {
         bus = theBus;
     }

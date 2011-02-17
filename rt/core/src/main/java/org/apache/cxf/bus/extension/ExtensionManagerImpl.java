@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +48,9 @@ public class ExtensionManagerImpl implements ExtensionManager {
     public static final String ACTIVATION_NAMESPACES_SETTER_METHOD_NAME = "setActivationNamespaces";
     public static final String BUS_EXTENSION_RESOURCE_COMPAT = "META-INF/bus-extensions.xml";
     public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.xml";
+    
+    private static final String NO_NAMESPACES = "NO_NAMESPACE_BEANS";
+    
     
     private final ClassLoader loader;
     private ResourceManager resourceManager;
@@ -100,21 +104,27 @@ public class ExtensionManagerImpl implements ExtensionManager {
         }
     }
 
-    public synchronized void activateViaNS(String namespaceURI) {
+    public synchronized void activateViaNS(String namespaceURI, Class<?> type) {
         Collection<Extension> extensions = deferred.get(namespaceURI);
         if (null == extensions) {
             return;
         }
-        for (Extension e : extensions) {
-            loadAndRegister(e);
+        Iterator<Extension> it = extensions.iterator();
+        while (it.hasNext()) {
+            Extension e = it.next();
+            if (type == null || type.isAssignableFrom(e.getClassObject(loader))) {
+                loadAndRegister(e);
+                extensions.remove(e);
+            }
         }
-        extensions.clear();
-        deferred.remove(namespaceURI);
+        if (extensions.isEmpty()) {
+            deferred.remove(namespaceURI);
+        }
     }
     
     public synchronized void activateAll() {
         while (!deferred.isEmpty()) {
-            activateViaNS(deferred.keySet().iterator().next());
+            activateViaNS(deferred.keySet().iterator().next(), null);
         }
     }
     public synchronized <T> void activateAllByType(Class<T> type) {
@@ -136,28 +146,34 @@ public class ExtensionManagerImpl implements ExtensionManager {
     
     final void load(String resource) throws IOException {
         Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(resource);
+        List<Extension> all = new LinkedList<Extension>();
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             
             InputStream is = url.openStream();
-            loadFragment(is);       
+            all.addAll(new ExtensionFragmentParser().getExtensions(is));       
         }
-        
-    }
-
-    final void loadFragment(InputStream is) {
-        List<Extension> extensions = new ExtensionFragmentParser().getExtensions(is);
-        for (Extension e : extensions) {
-            processExtension(e);
+        for (Extension e : all) {
+            if (e.isDeferred()) {
+                addDeferred(e);
+            }
+        }
+        for (Extension e : all) {
+            if (!e.isDeferred()) {
+                loadAndRegister(e);
+            }
         }
     }
-
-    final void processExtension(Extension e) {
-        
-        if (!e.isDeferred()) {
-            loadAndRegister(e);
+    final void addDeferred(Extension e) {
+        Collection<String> namespaces = e.getNamespaces();
+        if (namespaces.isEmpty()) {
+            Collection<Extension> extensions = deferred.get(NO_NAMESPACES);
+            if (null == extensions) {
+                extensions = new CopyOnWriteArrayList<Extension>();
+                deferred.put(NO_NAMESPACES, extensions);
+            }
+            extensions.add(e);
         } else {
-            Collection<String> namespaces = e.getNamespaces();
             for (String ns : namespaces) {
                 Collection<Extension> extensions = deferred.get(ns);
                 if (null == extensions) {
@@ -168,7 +184,6 @@ public class ExtensionManagerImpl implements ExtensionManager {
             }
         }
     }
-    
     final void loadAndRegister(Extension e) {
         
         Class<?> cls = null;

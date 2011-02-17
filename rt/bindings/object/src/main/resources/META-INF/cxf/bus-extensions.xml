@@ -19,9 +19,8 @@
 -->
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
-    <extension class="org.apache.cxf.binding.object.ObjectBindingFactory" 
-      interface="org.apache.cxf.binding.BindingFactory" deferred="true">
-        <namespace>http://cxf.apache.org/binding/object/</namespace>
+    <extension class="org.apache.cxf.binding.object.ObjectBindingFactory" deferred="true">
+        <namespace>http://cxf.apache.org/binding/object</namespace>
     </extension>
     
 </extensions>

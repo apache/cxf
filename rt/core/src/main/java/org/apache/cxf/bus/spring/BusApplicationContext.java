@@ -191,7 +191,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         return res;
     }
     
-    protected Resource findResource(String cfgFile) {
+    public static Resource findResource(String cfgFile) {
         Resource cpr = new ClassPathResource(cfgFile);
         if (cpr.exists()) {
             return cpr;
@@ -207,7 +207,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             //ignore
         }
         //try loading it our way
-        URL url = ClassLoaderUtils.getResource(cfgFile, this.getClass());
+        URL url = ClassLoaderUtils.getResource(cfgFile, BusApplicationContext.class);
         if (url != null) {
             cpr = new UrlResource(url);
             if (cpr.exists()) {

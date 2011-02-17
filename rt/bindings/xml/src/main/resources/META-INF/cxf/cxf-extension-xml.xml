@@ -35,5 +35,10 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         </property>
         <property name="bus" ref="cxf"/>
     </bean>
+    <bean class="org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader"
+      id="org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader"
+      lazy-init="true">
+      <constructor-arg ref="cxf"/>
+    </bean>
     
 </beans>
