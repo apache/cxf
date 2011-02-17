@@ -46,6 +46,7 @@ import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.AbstractPolicyProvider;
 import org.apache.cxf.ws.policy.attachment.reference.LocalDocumentReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyReference;
 import org.springframework.core.io.Resource;
@@ -161,7 +162,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
         for (Element ae 
                 : PolicyConstants
                     .findAllPolicyElementsOfLocalName(doc, 
-                                                      PolicyConstants.POLICYATTACHMENT_ELEM_NAME)) {    
+                                                      Constants.ELEM_POLICY_ATTACHMENT)) {    
             PolicyAttachment attachment = new PolicyAttachment();
             
             for (Node nd = ae.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
@@ -169,20 +170,20 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
                     continue;
                 }
                 QName qn = new QName(nd.getNamespaceURI(), nd.getLocalName());
-                if (PolicyConstants.isAppliesToElem(qn)) {
+                if (Constants.isAppliesToElem(qn)) {
                     Collection<DomainExpression> des = readDomainExpressions((Element)nd);
                     if (des.isEmpty()) {
                         // forget about this attachment
                         continue;
                     }
                     attachment.setDomainExpressions(des);                    
-                } else if (PolicyConstants.isPolicyElem(qn)) {
+                } else if (Constants.isPolicyElement(qn)) {
                     Policy p = builder.getPolicy((Element)nd);
                     if (null != attachment.getPolicy()) {
                         p = p.merge(attachment.getPolicy());
                     }
                     attachment.setPolicy(p);
-                } else if (PolicyConstants.isPolicyRefElem(qn)) {
+                } else if (Constants.isPolicyRef(qn)) {
                     PolicyReference ref = builder.getPolicyReference((Element)nd);
                     if (null != ref) {   
                         Policy p = resolveReference(ref, doc);

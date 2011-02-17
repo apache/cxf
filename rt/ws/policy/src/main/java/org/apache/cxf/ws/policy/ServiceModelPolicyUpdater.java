@@ -92,12 +92,12 @@ public class ServiceModelPolicyUpdater {
 
     private void addPolicyRef(Extensible ext, String policyId) {
         Document doc = DOMUtils.createDocument();
-        Element el = doc.createElementNS(Constants.URI_POLICY_NS, Constants.ELEM_POLICY_REF);
+        Element el = doc.createElementNS(Constants.URI_POLICY_13_NS, Constants.ELEM_POLICY_REF);
         el.setPrefix(Constants.ATTR_WSP);
         el.setAttribute(Constants.ATTR_URI, "#" + policyId);
 
         UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-        uee.setElementType(new QName(Constants.URI_POLICY_NS, Constants.ELEM_POLICY_REF));
+        uee.setElementType(new QName(Constants.URI_POLICY_13_NS, Constants.ELEM_POLICY_REF));
         uee.setElement(el);
         uee.setRequired(true);
 
@@ -114,7 +114,7 @@ public class ServiceModelPolicyUpdater {
             policyEl.removeAttribute("xmlns:xmlns");
 
             UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-            uee.setElementType(new QName(Constants.URI_POLICY_NS, Constants.ELEM_POLICY));
+            uee.setElementType(new QName(Constants.URI_POLICY_13_NS, Constants.ELEM_POLICY));
             uee.setElement(policyEl);
 
             ei.getService().addExtensor(uee);

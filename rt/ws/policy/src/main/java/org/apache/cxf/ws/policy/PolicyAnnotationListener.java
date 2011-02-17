@@ -54,6 +54,7 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.neethi.Constants;
 
 /**
  * 
@@ -327,7 +328,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     }
     private Element addPolicy(ServiceInfo service, Policy p, Class<?> cls, String defName) {
         String uri = p.uri();
-        String ns = PolicyConstants.NAMESPACE_WS_POLICY;
+        String ns = Constants.URI_POLICY_NS;
         if (p.includeInWSDL()) {
             ExtendedURIResolver resolver = new ExtendedURIResolver();
             InputSource src = resolver.resolve(uri, "classpath:");
@@ -361,7 +362,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         }
         Document doc = DOMUtils.createDocument();
         Element el = doc.createElementNS(ns,
-                                         "wsp:" + PolicyConstants.POLICYREFERENCE_ELEM_NAME);
+                                         "wsp:" + Constants.ELEM_POLICY_REF);
         Attr att = doc.createAttribute("URI");
         att.setValue(uri);
         el.setAttributeNodeNS(att);

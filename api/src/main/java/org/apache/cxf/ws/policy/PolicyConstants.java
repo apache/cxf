@@ -19,10 +19,8 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -33,30 +31,16 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.neethi.Constants;
 
 /**
  * Encapsulation of version-specific WS-Policy constants.
  */
 public final class PolicyConstants {
     
-    public static final String NAMESPACE_WS_POLICY
-        = "http://www.w3.org/ns/ws-policy";
+    public static final String WSU_NAMESPACE_URI = Constants.URI_WSU_NS;
+    public static final String WSU_ID_ATTR_NAME = Constants.ATTR_ID;
     
-    public static final String NAMESPACE_W3_200607
-        = "http://www.w3.org/2006/07/ws-policy";
-    
-    public static final String NAMESPACE_XMLSOAP_200409
-        = "http://schemas.xmlsoap.org/ws/2004/09/policy";
-    
-    
-    public static final String POLICY_ELEM_NAME = "Policy";
-    public static final String POLICYREFERENCE_ELEM_NAME = "PolicyReference";
-    public static final String POLICYATTACHMENT_ELEM_NAME = "PolicyAttachment";
-    public static final String APPLIESTO_ELEM_NAME = "AppliesTo";
-
-    public static final String WSU_NAMESPACE_URI = 
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    public static final String WSU_ID_ATTR_NAME = "Id";
 
     public static final String POLICY_OVERRIDE 
         = "org.apache.cxf.ws.policy.override";
@@ -85,20 +69,6 @@ public final class PolicyConstants {
         = "org.apache.cxf.ws.policy.server.outfault.assertions";
     
     
-    private static final String ALL_ELEM_NAME = "All";
-    private static final String EXACTLYONE_ELEM_NAME = "ExactlyOne";
-    private static final String OPTIONAL_ATTR_NAME = "Optional"; 
-    private static final String POLICYURIS_ATTR_NAME = "PolicyURIs";
-    
-    
-    
-    private static final Set<String> SUPPORTED_NAMESPACES = new HashSet<String>();
-    static {
-        SUPPORTED_NAMESPACES.add(NAMESPACE_WS_POLICY);
-        SUPPORTED_NAMESPACES.add(NAMESPACE_W3_200607);
-        SUPPORTED_NAMESPACES.add(NAMESPACE_XMLSOAP_200409);
-    }
-    
     private PolicyConstants() {
         //utility class
     }
@@ -112,7 +82,8 @@ public final class PolicyConstants {
         return ret;
     }
     public static void findAllPolicyElementsOfLocalName(Element el, String localName, List<Element> val) {
-        if (localName.equals(el.getLocalName()) && SUPPORTED_NAMESPACES.contains(el.getNamespaceURI())) {
+        QName qn = DOMUtils.getElementQName(el);
+        if (localName.equals(qn.getLocalPart()) && Constants.isInPolicyNS(qn)) {
             val.add(el);
         }
         el = DOMUtils.getFirstElement(el);
@@ -135,50 +106,46 @@ public final class PolicyConstants {
         for (int x = 0; x < atts.getLength(); x++) {
             Attr att = (Attr)atts.item(x);
             QName qn = new QName(att.getNamespaceURI(), att.getLocalName());
-            if (isOptionalAttribute(qn)) {
+            if (Constants.isOptionalAttribute(qn)) {
                 return att;
             }
         }
         return null;
     }
 
+    
+    public static boolean isIgnorable(Element e) {
+        Attr at = findIgnorableAttribute(e);
+        if (at != null) {
+            String v = at.getValue();
+            return "true".equalsIgnoreCase(v) || "1".equals(v);
+        }
+        return false;
+    }
+    public static Attr findIgnorableAttribute(Element e) {
+        NamedNodeMap atts = e.getAttributes();
+        for (int x = 0; x < atts.getLength(); x++) {
+            Attr att = (Attr)atts.item(x);
+            QName qn = new QName(att.getNamespaceURI(), att.getLocalName());
+            if (Constants.isIgnorableAttribute(qn)) {
+                return att;
+            }
+        }
+        return null;
+    }
+    
+    
     public static Element findPolicyElement(Element parent) {
         Node nd = parent.getFirstChild();
         while (nd != null) {
-            if (POLICY_ELEM_NAME.equals(nd.getLocalName())
-                && SUPPORTED_NAMESPACES.contains(nd.getNamespaceURI())) {
-                return (Element)nd;
+            if (nd instanceof Element) {
+                QName qn = DOMUtils.getElementQName((Element)nd);
+                if (Constants.isPolicyElement(qn)) {
+                    return (Element)nd;
+                }
             }
             nd = nd.getNextSibling();
         }
         return null;
-    }
-    public static boolean isOptionalAttribute(QName qn) {
-        return OPTIONAL_ATTR_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
-    }
-    public static boolean isPolicyElem(QName qn) {
-        return POLICY_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
-    }
-    public static boolean isPolicyRefElem(QName qn) {
-        return POLICYREFERENCE_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
-    }
-    public static boolean isAppliesToElem(QName qn) {
-        return APPLIESTO_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
-    }
-    public static boolean isPolicyURIsAttr(QName qn) {
-        return POLICYURIS_ATTR_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
-    }
-    public static boolean isExactlyOne(QName qn) {
-        return EXACTLYONE_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
-    }
-    public static boolean isAll(QName qn) {
-        return ALL_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
     }
 }

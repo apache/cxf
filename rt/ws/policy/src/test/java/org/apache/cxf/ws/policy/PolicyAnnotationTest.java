@@ -42,6 +42,7 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
+import org.apache.neethi.Constants;
 
 import org.junit.Assert;
 
@@ -89,7 +90,7 @@ public class PolicyAnnotationTest extends Assert {
             ns.put("wsdl", WSDLConstants.NS_WSDL11);
             ns.put("wsu", 
                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
-            ns.put("wsp", PolicyConstants.NAMESPACE_XMLSOAP_200409);
+            ns.put("wsp", Constants.URI_POLICY_13_NS);
             XPathUtils xpu = new XPathUtils(ns);
             //org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestImplServiceServicePolicy");

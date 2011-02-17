@@ -63,6 +63,7 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
 
         IssuedToken issuedToken = new IssuedToken(consts);
         issuedToken.setOptional(PolicyConstants.isOptional(element));
+        issuedToken.setIgnorable(PolicyConstants.isIgnorable(element));
 
         String includeAttr = DOMUtils.getAttribute(element, consts.getIncludeToken());
         if (includeAttr != null) {

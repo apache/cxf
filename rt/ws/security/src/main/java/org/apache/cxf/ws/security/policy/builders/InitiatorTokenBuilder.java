@@ -60,6 +60,7 @@ public class InitiatorTokenBuilder implements AssertionBuilder<Element> {
 
         InitiatorToken initiatorToken = new InitiatorToken(consts, builder);
         initiatorToken.setOptional(PolicyConstants.isOptional(element));
+        initiatorToken.setIgnorable(PolicyConstants.isIgnorable(element));
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);

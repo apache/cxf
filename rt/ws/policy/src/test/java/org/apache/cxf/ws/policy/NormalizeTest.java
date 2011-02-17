@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.util.PolicyComparator;
 import org.easymock.classextension.EasyMock;
@@ -51,7 +52,7 @@ public class NormalizeTest extends Assert {
     
     @Test
     public void testNormalize() throws Exception {
-        Bus bus = createBus(PolicyConstants.NAMESPACE_XMLSOAP_200409);
+        Bus bus = createBus(Constants.URI_POLICY_13_NS);
         PolicyBuilderImpl builder = createBuilder(bus);
         
         int n = 26;
@@ -64,7 +65,7 @@ public class NormalizeTest extends Assert {
     
     @Test
     public void testNormalizeDefaultNs() throws Exception {
-        Bus bus = createBus(PolicyConstants.NAMESPACE_WS_POLICY);
+        Bus bus = createBus(Constants.URI_POLICY_NS);
         PolicyBuilderImpl builder = createBuilder(bus);
         
         String sample = "/samples/test1DefaultNs.xml";

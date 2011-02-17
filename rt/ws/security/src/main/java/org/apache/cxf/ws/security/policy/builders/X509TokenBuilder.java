@@ -53,6 +53,7 @@ public class X509TokenBuilder implements AssertionBuilder<Element> {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
         X509Token x509Token = new X509Token(consts);
         x509Token.setOptional(PolicyConstants.isOptional(element));
+        x509Token.setIgnorable(PolicyConstants.isIgnorable(element));
 
         Element policyElement = DOMUtils.getFirstElement(element);
 

@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -70,8 +71,8 @@ public class ReferenceResolverTest extends Assert {
         EasyMock.expect(di.getExtensors(UnknownExtensibilityElement.class)).andReturn(extensions);
         Element e = control.createMock(Element.class);
         EasyMock.expect(extension.getElement()).andReturn(e).times(2);
-        QName qn = new QName(PolicyConstants.NAMESPACE_WS_POLICY, 
-                             PolicyConstants.POLICY_ELEM_NAME);
+        QName qn = new QName(Constants.URI_POLICY_NS, 
+                             Constants.ELEM_POLICY);
         EasyMock.expect(extension.getElementType()).andReturn(qn).anyTimes();
         EasyMock.expect(e.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                          PolicyConstants.WSU_ID_ATTR_NAME))
@@ -88,12 +89,12 @@ public class ReferenceResolverTest extends Assert {
     @Test
     public void testRemoteReferenceResolverWithOlderNs() {
         
-        doTestRemoteResolver(PolicyConstants.NAMESPACE_W3_200607);
+        doTestRemoteResolver(Constants.URI_POLICY_15_DEPRECATED_NS);
     }
     
     @Test
     public void testRemoteReferenceResolverWithDefaultNs() {
-        doTestRemoteResolver(PolicyConstants.NAMESPACE_WS_POLICY);
+        doTestRemoteResolver(Constants.URI_POLICY_NS);
     }
     
     private void doTestRemoteResolver(String policyNs) {

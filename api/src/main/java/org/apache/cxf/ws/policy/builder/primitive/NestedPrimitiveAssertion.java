@@ -36,9 +36,9 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyOperator;
@@ -106,18 +106,18 @@ public class NestedPrimitiveAssertion
         for (Node nd = elem.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType()) {
                 QName qn = new QName(nd.getNamespaceURI(), nd.getLocalName());
-                if (PolicyConstants.isPolicyElem(qn)
+                if (Constants.isPolicyElement(qn)
                     && null == policyElem) {
                     policyElem = (Element)nd;
                 } else {
                     throw new PolicyException(new Message("UNEXPECTED_CHILD_ELEMENT_EXC", BUNDLE, 
-                                                          PolicyConstants.POLICY_ELEM_NAME));
+                                                          Constants.ELEM_POLICY));
                 }                
             }
         }
         if (null == policyElem) {
             throw new PolicyException(new Message("UNEXPECTED_CHILD_ELEMENT_EXC", BUNDLE, 
-                                                  PolicyConstants.POLICY_ELEM_NAME));
+                                                  Constants.ELEM_POLICY));
         }
         nested = builder.getPolicy(policyElem);  
     }

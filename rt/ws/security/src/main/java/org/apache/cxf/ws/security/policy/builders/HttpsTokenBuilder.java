@@ -67,6 +67,7 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
         
         HttpsToken httpsToken = new HttpsToken(consts);
         httpsToken.setOptional(PolicyConstants.isOptional(element));
+        httpsToken.setIgnorable(PolicyConstants.isIgnorable(element));
 
         if (consts.getVersion() == SPConstants.Version.SP_V11) {
             String attr = DOMUtils.getAttribute(element,

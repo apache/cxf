@@ -48,6 +48,7 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
 
         KeyValueToken token = new KeyValueToken(consts);
         token.setOptional(PolicyConstants.isOptional(element));
+        token.setIgnorable(PolicyConstants.isIgnorable(element));
         
         String attribute = element.getAttributeNS(element.getNamespaceURI(), SPConstants.ATTR_INCLUDE_TOKEN);
         if (StringUtils.isEmpty(attribute)) {

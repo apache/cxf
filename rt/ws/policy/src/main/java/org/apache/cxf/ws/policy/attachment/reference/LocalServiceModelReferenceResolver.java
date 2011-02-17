@@ -26,6 +26,7 @@ import javax.wsdl.extensions.UnknownExtensibilityElement;
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 
 /**
@@ -46,7 +47,7 @@ public class LocalServiceModelReferenceResolver implements ReferenceResolver {
             descriptionInfo.getExtensors(UnknownExtensibilityElement.class);
         if (extensions != null) {
             for (UnknownExtensibilityElement e : extensions) {
-                if (PolicyConstants.isPolicyElem(e.getElementType())
+                if (Constants.isPolicyElement(e.getElementType())
                     && uri.equals(e.getElement().getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                                                 PolicyConstants.WSU_ID_ATTR_NAME))) {
                     return builder.getPolicy(e.getElement());

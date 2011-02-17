@@ -84,6 +84,7 @@ import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.neethi.Constants;
 
 /**
  * A JAX-WS specific implementation of the CXF {@link org.apache.cxf.endpoint.Endpoint} interface.
@@ -274,7 +275,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 UnknownExtensibilityElement uel = new UnknownExtensibilityElement();
                 
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-                writer.writeStartElement("wsp", "PolicyReference", PolicyConstants.NAMESPACE_WS_POLICY);
+                writer.writeStartElement("wsp", "PolicyReference", Constants.URI_POLICY_NS);
                 writer.writeAttribute("URI", "#" + polRefId.toString());
                 writer.writeEndElement();
                 Element pr = writer.getDocument().getDocumentElement();
@@ -283,15 +284,15 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 bindingInfo.addExtensor(uel);
                 
                 writer = new W3CDOMStreamWriter();
-                writer.writeStartElement("wsp", "Policy", PolicyConstants.NAMESPACE_WS_POLICY);
+                writer.writeStartElement("wsp", "Policy", Constants.URI_POLICY_NS);
                 writer.writeAttribute("wsu", PolicyConstants.WSU_NAMESPACE_URI,
                                       PolicyConstants.WSU_ID_ATTR_NAME, polRefId.toString());
                 writer.writeStartElement("wsam", "Addressing", JAXWSAConstants.NS_WSAM);
                 if (!addressing.required()) {
-                    writer.writeAttribute("wsp", PolicyConstants.NAMESPACE_WS_POLICY,
+                    writer.writeAttribute("wsp", Constants.URI_POLICY_NS,
                                           "Optional", "true");
                 }
-                writer.writeStartElement("wsp", "Policy", PolicyConstants.NAMESPACE_WS_POLICY);
+                writer.writeStartElement("wsp", "Policy", Constants.URI_POLICY_NS);
                 
                 String s = getAddressingRequirement(addressing);
                 if (s != null) {

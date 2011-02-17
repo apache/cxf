@@ -31,6 +31,7 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
 
@@ -56,6 +57,7 @@ public class SecureConversationTokenBuilder implements AssertionBuilder<Element>
         
         SecureConversationToken conversationToken = new SecureConversationToken(consts);
         conversationToken.setOptional(PolicyConstants.isOptional(element));
+        conversationToken.setIgnorable(PolicyConstants.isIgnorable(element));
 
         String attribute = DOMUtils.getAttribute(element, consts.getIncludeToken());
         if (attribute == null) {
@@ -71,7 +73,7 @@ public class SecureConversationTokenBuilder implements AssertionBuilder<Element>
         Element elem = DOMUtils.getFirstElement(element);
         while (elem != null) {
             QName qn = DOMUtils.getElementQName(elem);
-            if (PolicyConstants.isPolicyElem(qn)) {
+            if (Constants.isPolicyElement(qn)) {
                 if (DOMUtils.getFirstChildWithName(elem, 
                                                    consts.getNamespace(),
                                                    SPConstants.REQUIRE_DERIVED_KEYS) != null) {

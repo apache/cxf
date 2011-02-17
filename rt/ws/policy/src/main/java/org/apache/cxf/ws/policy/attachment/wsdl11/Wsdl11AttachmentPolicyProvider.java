@@ -42,12 +42,12 @@ import org.apache.cxf.service.model.Extensible;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.AbstractPolicyProvider;
 import org.apache.cxf.ws.policy.attachment.reference.LocalServiceModelReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyReference;
 
@@ -175,10 +175,10 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider
         if (null != extensions) {
             for (UnknownExtensibilityElement e : extensions) {
                 Policy p = null;
-                if (PolicyConstants.isPolicyElem(e.getElementType())) {
+                if (Constants.isPolicyElement(e.getElementType())) {
                     p = builder.getPolicy(e.getElement());                    
 
-                } else if (PolicyConstants.isPolicyRefElem(e.getElementType())) {
+                } else if (Constants.isPolicyRef(e.getElementType())) {
                     PolicyReference ref = builder.getPolicyReference(e.getElement());
                     if (null != ref) {
                         p = resolveReference(ref, di);
@@ -195,7 +195,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider
         
         if (includeAttributes && ex.getExtensionAttributes() != null) {
             for (Map.Entry<QName, Object> ent : ex.getExtensionAttributes().entrySet()) {
-                if (PolicyConstants.isPolicyURIsAttr(ent.getKey())) {
+                if (Constants.isPolicyURIsAttr(ent.getKey())) {
                     Object attr = ent.getValue();
                     // can be of type a String, a QName, a list of Srings or a list of QNames
                     String uris = null;

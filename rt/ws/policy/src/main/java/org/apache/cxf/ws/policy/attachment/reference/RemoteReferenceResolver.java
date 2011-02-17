@@ -29,6 +29,7 @@ import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 
 /**
@@ -66,7 +67,7 @@ public class RemoteReferenceResolver implements ReferenceResolver {
             String id = uri.substring(pos + 1);
             for (Element elem : PolicyConstants
                     .findAllPolicyElementsOfLocalName(doc,
-                                                      PolicyConstants.POLICY_ELEM_NAME)) {
+                                                      Constants.ELEM_POLICY)) {
                 
                 if (id.equals(elem.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                                   PolicyConstants.WSU_ID_ATTR_NAME))) {
