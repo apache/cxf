@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.policy;
 
+import org.apache.neethi.Assertion;
+
 
 /**
  * 
@@ -26,10 +28,10 @@ package org.apache.cxf.ws.policy;
 public class AssertionInfo {
     
     private boolean asserted;
-    private final PolicyAssertion assertion;
+    private final Assertion assertion;
     private String errorMessage;
     
-    public AssertionInfo(PolicyAssertion a) {
+    public AssertionInfo(Assertion a) {
         assertion = a;
     }
     public boolean isAsserted() {
@@ -46,7 +48,7 @@ public class AssertionInfo {
         return errorMessage;
     }
     
-    public PolicyAssertion getAssertion() {
+    public Assertion getAssertion() {
         return assertion;
     }
     public String toString() {

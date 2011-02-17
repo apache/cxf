@@ -56,6 +56,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -718,7 +719,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
                         assertTrue(assertionType + " policy erroneously failed.",
-                                ai.getAssertion().isAsserted(aim));
+                                ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
                     }
                 }
             }
@@ -729,7 +730,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
                         assertFalse(assertionType + " policy erroneously asserted.",
-                                ai.getAssertion().isAsserted(aim));
+                                    ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
                     }
                 }
             }
@@ -792,7 +793,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
                         assertTrue(assertionType + " policy erroneously failed.",
-                                ai.getAssertion().isAsserted(aim));
+                                   ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
                     }
                 }
             }
@@ -803,7 +804,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
                         assertFalse(assertionType + " policy erroneously asserted.",
-                                ai.getAssertion().isAsserted(aim));
+                                    ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
                     }
                 }
             }

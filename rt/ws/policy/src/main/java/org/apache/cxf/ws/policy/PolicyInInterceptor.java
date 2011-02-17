@@ -36,6 +36,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
@@ -82,7 +83,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                     msg.getInterceptorChain().add(i);
                     LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
                 }
-                Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
+                Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
                 if (null != assertions && !assertions.isEmpty()) {
                     msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
                     msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
@@ -101,7 +102,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 
                 // insert assertions of endpoint's vocabulary into message
                 
-                Collection<PolicyAssertion> assertions = ep.getVocabulary();
+                Collection<Assertion> assertions = ep.getVocabulary();
                 if (null != assertions && !assertions.isEmpty()) {
                     msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
                     msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
@@ -142,7 +143,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             
             // insert assertions of endpoint's vocabulary into message
             
-            Collection<PolicyAssertion> assertions = ep.getVocabulary();
+            Collection<Assertion> assertions = ep.getVocabulary();
             if (null != assertions && !assertions.isEmpty()) {
                 msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
                 msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);

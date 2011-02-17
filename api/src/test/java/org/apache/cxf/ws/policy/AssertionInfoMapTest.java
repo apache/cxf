@@ -30,6 +30,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
@@ -88,11 +89,11 @@ public class AssertionInfoMapTest extends Assert {
         EasyMock.expect(c.isAsserted(aim)).andReturn(true).anyTimes();
         
         
-        List<PolicyAssertion> alt1 = new ArrayList<PolicyAssertion>();
+        List<Assertion> alt1 = new ArrayList<Assertion>();
         alt1.add(a1);
         alt1.add(b);
         
-        List<PolicyAssertion> alt2 = new ArrayList<PolicyAssertion>();
+        List<Assertion> alt2 = new ArrayList<Assertion>();
         alt2.add(a2);
         alt2.add(c);
                 

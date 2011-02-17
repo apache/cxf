@@ -41,7 +41,6 @@ import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -58,6 +57,7 @@ import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.ws.security.WSSecurityException;
@@ -115,9 +115,9 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         return tokenStore;
     }
     
-    static PolicyAssertion getAddressingPolicy(AssertionInfoMap aim, boolean optional) {
+    static Assertion getAddressingPolicy(AssertionInfoMap aim, boolean optional) {
         Collection<AssertionInfo> lst = aim.get(MetadataConstants.USING_ADDRESSING_2004_QNAME);
-        PolicyAssertion assertion = null;
+        Assertion assertion = null;
         if (null != lst && !lst.isEmpty()) {
             assertion = lst.iterator().next().getAssertion();
         }

@@ -46,9 +46,9 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.EndpointPolicy;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -287,7 +287,7 @@ public class RMEndpointTest extends Assert {
         EasyMock.expect(ae.getEndpointInfo()).andReturn(aei);
         EndpointPolicy epi = control.createMock(EndpointPolicy.class);
         EasyMock.expect(pe.getServerEndpointPolicy(aei, null)).andReturn(epi);
-        EasyMock.expect(epi.getChosenAlternative()).andReturn(new ArrayList<PolicyAssertion>());
+        EasyMock.expect(epi.getChosenAlternative()).andReturn(new ArrayList<Assertion>());
 
         pe.setServerEndpointPolicy(ei, epi);
         EasyMock.expectLastCall();
@@ -340,7 +340,7 @@ public class RMEndpointTest extends Assert {
     @Test
     public void testEffectivePolicyImpl() {
         EndpointPolicy ep = control.createMock(EndpointPolicy.class);
-        Collection<PolicyAssertion> alt = new ArrayList<PolicyAssertion>();
+        Collection<Assertion> alt = new ArrayList<Assertion>();
         EasyMock.expect(ep.getChosenAlternative()).andReturn(alt).times(2);
         PolicyInterceptorProviderRegistry reg = control.createMock(PolicyInterceptorProviderRegistry.class);
         List<Interceptor<? extends Message>> li = new ArrayList<Interceptor<? extends Message>>();

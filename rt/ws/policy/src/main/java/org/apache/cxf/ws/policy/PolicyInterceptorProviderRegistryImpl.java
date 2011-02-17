@@ -35,6 +35,7 @@ import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.neethi.Assertion;
 
 /**
  * 
@@ -94,11 +95,11 @@ public class PolicyInterceptorProviderRegistryImpl
             }
         }
     }
-    public List<Interceptor<? extends Message>> getInterceptors(Collection<PolicyAssertion> alternative, 
+    public List<Interceptor<? extends Message>> getInterceptors(Collection<? extends Assertion> alternative, 
                                              boolean out, boolean fault) {
         loadDynamic();
         List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
-        for (PolicyAssertion a : alternative) {
+        for (Assertion a : alternative) {
             if (a.isOptional()) {
                 continue;
             }

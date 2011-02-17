@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
@@ -28,6 +29,6 @@ import org.apache.neethi.Policy;
  */
 public interface AlternativeSelector {
  
-    Collection<PolicyAssertion> selectAlternative(Policy policy, PolicyEngine engine, Assertor assertor);
+    Collection<Assertion> selectAlternative(Policy policy, PolicyEngine engine, Assertor assertor);
     
 }

@@ -36,6 +36,7 @@ import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
+import org.apache.neethi.Assertion;
 
 /**
  * 
@@ -97,7 +98,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         
         // insert assertions of the chosen alternative into the message
         
-        Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
+        Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
         if (null != assertions && !assertions.isEmpty()) {
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
         }

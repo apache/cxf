@@ -31,7 +31,6 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -152,30 +151,29 @@ public class NestedPrimitiveAssertion
         if (p == null) {
             return true;
         }
-        List<PolicyComponent> pcs = 
-            CastUtils.cast(p.getPolicyComponents(), PolicyComponent.class);
+        List<PolicyComponent> pcs = p.getPolicyComponents();
         if (pcs.size() == 0) {
             return true;
         }
-        
-        if (pcs.get(0) instanceof PolicyAssertion) {
-            List<PolicyAssertion> assertions = 
-                CastUtils.cast(pcs, PolicyAssertion.class);
-            for (PolicyAssertion pa : assertions) {
-                if (!pa.isAsserted(aim)) {
+        for (PolicyComponent pc : pcs) {
+            if (pc instanceof PolicyOperator) {
+                if (!isPolicyAsserted((PolicyOperator)pc, aim)) {
                     return false;
                 }
-            }
-            return true;
-        } else {
-            List<PolicyOperator> assertions = 
-                CastUtils.cast(pcs, PolicyOperator.class);
-            for (PolicyOperator po : assertions) {
-                if (isPolicyAsserted(po, aim)) {
-                    return true;
+            } else if (pc instanceof PolicyAssertion) {
+                if (!((PolicyAssertion)pc).isAsserted(aim)) {
+                    return false;
+                }
+            } else {
+                Assertion ass = (Assertion)pc;
+                Collection<AssertionInfo> ail = aim.getAssertionInfo(ass.getName());
+                for (AssertionInfo ai : ail) {
+                    if (!ai.isAsserted() && ai.getAssertion() == ass) {
+                        return false;
+                    }
                 }
             }
-            return false;
         }
+        return true;
     }
 }

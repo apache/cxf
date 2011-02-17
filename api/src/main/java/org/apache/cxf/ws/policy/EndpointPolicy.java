@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
@@ -37,11 +38,11 @@ public interface EndpointPolicy {
     Policy getPolicy();
     EndpointPolicy updatePolicy(Policy p);
     
-    Collection<PolicyAssertion> getChosenAlternative();
+    Collection<Assertion> getChosenAlternative();
     
-    Collection<PolicyAssertion> getVocabulary();
+    Collection<Assertion> getVocabulary();
     
-    Collection<PolicyAssertion> getFaultVocabulary();
+    Collection<Assertion> getFaultVocabulary();
     
     List<Interceptor<? extends Message>> getInterceptors();
     

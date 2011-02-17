@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.extension.Registry;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.neethi.Assertion;
 
 
 /**
@@ -43,7 +44,7 @@ public interface PolicyInterceptorProviderRegistry
      */
     void register(PolicyInterceptorProvider provider);
     
-    List<Interceptor<? extends Message>> getInterceptors(Collection<PolicyAssertion> alterative, 
+    List<Interceptor<? extends Message>> getInterceptors(Collection<? extends Assertion> alterative, 
                                                          boolean out, boolean fault);
 
 }

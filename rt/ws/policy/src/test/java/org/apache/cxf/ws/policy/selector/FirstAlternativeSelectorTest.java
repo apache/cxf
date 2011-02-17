@@ -28,6 +28,7 @@ import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.TestAssertion;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
@@ -74,7 +75,7 @@ public class FirstAlternativeSelectorTest extends Assert {
         control.reset();        
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(true);
         control.replay();         
-        Collection<PolicyAssertion> chosen = selector.selectAlternative(policy, engine, assertor); 
+        Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor); 
         assertSame(1, chosen.size());
         assertSame(chosen.size(), firstAlternative.size());
         assertSame(chosen.iterator().next(), firstAlternative.iterator().next());

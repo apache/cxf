@@ -71,7 +71,6 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -98,6 +97,7 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
@@ -254,7 +254,7 @@ public abstract class AbstractBindingBuilder {
         return MessageUtils.isRequestor(message);
     }
     
-    protected void policyNotAsserted(PolicyAssertion assertion, Exception reason) {
+    protected void policyNotAsserted(Assertion assertion, Exception reason) {
         if (assertion == null) {
             return;
         }
@@ -271,7 +271,7 @@ public abstract class AbstractBindingBuilder {
         throw new PolicyException(reason);
     }
     
-    protected void policyNotAsserted(PolicyAssertion assertion, String reason) {
+    protected void policyNotAsserted(Assertion assertion, String reason) {
         if (assertion == null) {
             return;
         }
@@ -290,7 +290,7 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected void policyAsserted(PolicyAssertion assertion) {
+    protected void policyAsserted(Assertion assertion) {
         if (assertion == null) {
             return;
         }
@@ -315,10 +315,10 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected Collection<PolicyAssertion> findAndAssertPolicy(QName n) {
+    protected Collection<Assertion> findAndAssertPolicy(QName n) {
         Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
         if (ais != null && !ais.isEmpty()) {
-            List<PolicyAssertion> p = new ArrayList<PolicyAssertion>(ais.size());
+            List<Assertion> p = new ArrayList<Assertion>(ais.size());
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
                 p.add(ai.getAssertion());
@@ -415,11 +415,11 @@ public abstract class AbstractBindingBuilder {
         return timestamp;
     }
     
-    protected void assertSupportingTokens(Collection<PolicyAssertion> suppTokens) {
+    protected void assertSupportingTokens(Collection<Assertion> suppTokens) {
         if (suppTokens == null) {
             return;
         }
-        for (PolicyAssertion pa : suppTokens) {
+        for (Assertion pa : suppTokens) {
             if (pa instanceof SupportingToken) {
                 for (Token token : ((SupportingToken)pa).getTokens()) {
                     this.policyAsserted(token);
@@ -428,11 +428,11 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected Map<Token, WSSecBase> handleSupportingTokens(Collection<PolicyAssertion> tokens, 
+    protected Map<Token, WSSecBase> handleSupportingTokens(Collection<Assertion> tokens, 
                                                            boolean endorse) {
         Map<Token, WSSecBase> ret = new HashMap<Token, WSSecBase>();
         if (tokens != null) {
-            for (PolicyAssertion pa : tokens) {
+            for (Assertion pa : tokens) {
                 if (pa instanceof SupportingToken) {
                     handleSupportingTokens((SupportingToken)pa, endorse, ret);
                 }
@@ -653,7 +653,7 @@ public abstract class AbstractBindingBuilder {
         return null;
     }
     
-    public String getPassword(String userName, PolicyAssertion info, int type) {
+    public String getPassword(String userName, Assertion info, int type) {
         //Then try to get the password from the given callback handler
         Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
     
@@ -1559,40 +1559,40 @@ public abstract class AbstractBindingBuilder {
     
     protected void addSupportingTokens(List<WSEncryptionPart> sigs) {
         
-        Collection<PolicyAssertion> sgndSuppTokens = 
+        Collection<Assertion> sgndSuppTokens = 
             findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         
         Map<Token, WSSecBase> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens, false);           
         
-        Collection<PolicyAssertion> endSuppTokens = 
+        Collection<Assertion> endSuppTokens = 
             findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
 
         endSuppTokMap = this.handleSupportingTokens(endSuppTokens, true);
 
-        Collection<PolicyAssertion> sgndEndSuppTokens 
+        Collection<Assertion> sgndEndSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true);
         
-        Collection<PolicyAssertion> sgndEncryptedSuppTokens 
+        Collection<Assertion> sgndEncryptedSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         Map<Token, WSSecBase> sgndEncSuppTokMap 
             = this.handleSupportingTokens(sgndEncryptedSuppTokens, false);
         
-        Collection<PolicyAssertion> endorsingEncryptedSuppTokens 
+        Collection<Assertion> endorsingEncryptedSuppTokens 
             = findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         endEncSuppTokMap 
             = this.handleSupportingTokens(endorsingEncryptedSuppTokens, true);
 
-        Collection<PolicyAssertion> sgndEndEncSuppTokens 
+        Collection<Assertion> sgndEndEncSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         sgndEndEncSuppTokMap 
             = this.handleSupportingTokens(sgndEndEncSuppTokens, true);
 
-        Collection<PolicyAssertion> supportingToks 
+        Collection<Assertion> supportingToks 
             = findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS);
         this.handleSupportingTokens(supportingToks, false);
 
-        Collection<PolicyAssertion> encryptedSupportingToks 
+        Collection<Assertion> encryptedSupportingToks 
             = findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
         this.handleSupportingTokens(encryptedSupportingToks, false);
 

@@ -26,23 +26,23 @@ import java.util.List;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.cxf.ws.policy.Assertor;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyEngine;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
 
 /**
  * 
  */
 public class FirstAlternativeSelector implements AlternativeSelector {
     
-    public Collection<PolicyAssertion> selectAlternative(
+    public Collection<Assertion> selectAlternative(
         Policy policy, PolicyEngine engine, Assertor assertor) {
-        Iterator alternatives = policy.getAlternatives();
+        Iterator<List<PolicyComponent>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
-            List<PolicyAssertion> alternative = 
-                CastUtils.cast((List)alternatives.next(), PolicyAssertion.class);
+            List<PolicyComponent> alternative = alternatives.next();
             if (engine.supportsAlternative(alternative, assertor)) {
-                return alternative;
+                return CastUtils.cast(alternative);
             }
         }        
         return null;

@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyContainingAssertion;
@@ -47,20 +48,20 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         this(getAssertions(p));
     }
     
-    public AssertionInfoMap(Collection<PolicyAssertion> assertions) {
+    public AssertionInfoMap(Collection<? extends Assertion> assertions) {
         super(assertions.size() < 6 ? 6 : assertions.size());
-        for (PolicyAssertion a : assertions) {
+        for (Assertion a : assertions) {
             putAssertionInfo(a);
         }
     }
 
-    private void putAssertionInfo(PolicyAssertion a) {
+    private void putAssertionInfo(Assertion a) {
         if (a instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)a).getPolicy();
             if (p != null) {
-                List<PolicyAssertion> pcs = new ArrayList<PolicyAssertion>();
+                List<Assertion> pcs = new ArrayList<Assertion>();
                 getAssertions(p, pcs);
-                for (PolicyAssertion na : pcs) {
+                for (Assertion na : pcs) {
                     putAssertionInfo(na);
                 }
             }
@@ -81,16 +82,29 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
 
     }
     
-    public boolean supportsAlternative(PolicyAssertion assertion,
+    public boolean supportsAlternative(PolicyComponent assertion,
                                        List<QName> errors) {
         boolean pass = true;
-        PolicyAssertion a = (PolicyAssertion)assertion;
-        if (!a.isAsserted(this) && !a.isOptional()) {
-            errors.add(a.getName());
-            pass = false;
+        if (assertion instanceof PolicyAssertion) {
+            PolicyAssertion a = (PolicyAssertion)assertion;
+            if (!a.isAsserted(this) && !a.isOptional()) {
+                errors.add(a.getName());
+                pass = false;
+            }
+        } else if (assertion instanceof Assertion) {
+            Assertion ass = (Assertion)assertion;
+            Collection<AssertionInfo> ail = getAssertionInfo(ass.getName());
+            for (AssertionInfo ai : ail) {
+                if (ai.isAsserted() && ai.getAssertion() == ass) {
+                    return true;
+                } else if (!ass.isOptional()) {
+                    errors.add(ass.getName());
+                    pass = false;                    
+                }
+            }
         }
-        if (a instanceof PolicyContainingAssertion) {
-            Policy p = ((PolicyContainingAssertion)a).getPolicy();
+        if (assertion instanceof PolicyContainingAssertion) {
+            Policy p = ((PolicyContainingAssertion)assertion).getPolicy();
             if (p != null) {
                 Iterator it = p.getAlternatives();
                 while (it.hasNext()) {
@@ -101,12 +115,12 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
                 }
             }
         }
-        return pass || a.isOptional();
+        return pass;
     }
-    public boolean supportsAlternative(Collection<PolicyAssertion> alternative,
+    public boolean supportsAlternative(Collection<? extends PolicyComponent> alternative,
                                        List<QName> errors) {
         boolean pass = true;
-        for (PolicyAssertion a : alternative) {
+        for (PolicyComponent a : alternative) {
             pass &= supportsAlternative(a, errors);
         }
         return pass;
@@ -114,11 +128,10 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     
     public void checkEffectivePolicy(Policy policy) {
         List<QName> errors = new ArrayList<QName>();
-        Iterator alternatives = policy.getAlternatives();
-        while (alternatives.hasNext()) {      
-            List<PolicyAssertion> alternative = CastUtils.cast((List)alternatives.next(), 
-                                                               PolicyAssertion.class);
-            if (supportsAlternative(alternative, errors)) {
+        Iterator<List<PolicyComponent>> alternatives = policy.getAlternatives();
+        while (alternatives.hasNext()) {
+            List<PolicyComponent> pc = alternatives.next();
+            if (supportsAlternative(pc, errors)) {
                 return;
             }
         }
@@ -156,18 +169,17 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             }
         }
     }
-    private static Collection<PolicyAssertion> getAssertions(PolicyOperator p) {
-        Collection<PolicyAssertion> assertions = new ArrayList<PolicyAssertion>();
+    private static Collection<Assertion> getAssertions(PolicyOperator p) {
+        Collection<Assertion> assertions = new ArrayList<Assertion>();
         getAssertions(p, assertions);
         return assertions;
     }
     
-    private static void getAssertions(PolicyOperator p, Collection<PolicyAssertion> assertions) {
-        List<PolicyComponent> pcs = 
-            CastUtils.cast(p.getPolicyComponents(), PolicyComponent.class);
+    private static void getAssertions(PolicyOperator p, Collection<Assertion> assertions) {
+        List<PolicyComponent> pcs = p.getPolicyComponents();
         for (PolicyComponent pc : pcs) {
-            if (pc instanceof PolicyAssertion) {
-                assertions.add((PolicyAssertion)pc);
+            if (pc instanceof Assertion) {
+                assertions.add((Assertion)pc);
             } else {
                 getAssertions((PolicyOperator)pc, assertions);
             }

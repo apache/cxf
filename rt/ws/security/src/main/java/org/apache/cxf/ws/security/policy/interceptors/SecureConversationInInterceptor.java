@@ -57,7 +57,6 @@ import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.EndpointPolicy;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -77,6 +76,7 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.ws.security.WSConstants;
@@ -157,7 +157,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     ExactlyOne ea = new ExactlyOne();
                     p.addPolicyComponent(ea);
                     All all = new All();
-                    PolicyAssertion ass = SecureConversationTokenInterceptorProvider
+                    Assertion ass = SecureConversationTokenInterceptorProvider
                         .getAddressingPolicy(aim, false);
                     all.addPolicyComponent(ass);
                     ea.addPolicyComponent(all);
@@ -194,7 +194,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     ExactlyOne ea = new ExactlyOne();
                     p.addPolicyComponent(ea);
                     All all = new All();
-                    PolicyAssertion ass = SecureConversationTokenInterceptorProvider
+                    Assertion ass = SecureConversationTokenInterceptorProvider
                         .getAddressingPolicy(aim, false);
                     all.addPolicyComponent(ass);
                     ea.addPolicyComponent(all);
@@ -247,7 +247,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 message.getInterceptorChain().add(i);
             }
             
-            Collection<PolicyAssertion> assertions = ep.getVocabulary();
+            Collection<Assertion> assertions = ep.getVocabulary();
             if (null != assertions) {
                 message.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
             }

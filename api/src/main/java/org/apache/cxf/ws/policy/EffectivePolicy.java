@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
@@ -33,7 +34,7 @@ public interface EffectivePolicy {
     
     Policy getPolicy();
     
-    Collection<PolicyAssertion> getChosenAlternative();
+    Collection<Assertion> getChosenAlternative();
     
     List<Interceptor<? extends Message>> getInterceptors();
 }

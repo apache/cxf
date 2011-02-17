@@ -36,6 +36,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -73,8 +74,8 @@ public class EffectivePolicyImplTest extends Assert {
         assertNull(effectivePolicy.getInterceptors());
         
         Policy p = control.createMock(Policy.class);
-        PolicyAssertion a = control.createMock(PolicyAssertion.class);
-        List<PolicyAssertion> la = Collections.singletonList(a);
+        Assertion a = control.createMock(Assertion.class);
+        List<Assertion> la = Collections.singletonList(a);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         control.replay();
         effectivePolicy.setPolicy(p);
@@ -94,7 +95,7 @@ public class EffectivePolicyImplTest extends Assert {
         EndpointPolicyImpl endpointPolicy = control.createMock(EndpointPolicyImpl.class);
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(endpointPolicy.getPolicy()).andReturn(p);
-        Collection<PolicyAssertion> chosenAlternative = new ArrayList<PolicyAssertion>();
+        Collection<Assertion> chosenAlternative = new ArrayList<Assertion>();
         EasyMock.expect(endpointPolicy.getChosenAlternative()).andReturn(chosenAlternative);
         PolicyEngineImpl pe = new PolicyEngineImpl();
         effectivePolicy.initialiseInterceptors(pe, false);
@@ -259,11 +260,11 @@ public class EffectivePolicyImplTest extends Assert {
         
         control.reset();        
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
-        Collection<PolicyAssertion> alternative = new ArrayList<PolicyAssertion>();
+        Collection<Assertion> alternative = new ArrayList<Assertion>();
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor)).andReturn(alternative);
         control.replay();        
         epi.chooseAlternative(engine, assertor);
-        Collection<PolicyAssertion> choice = epi.getChosenAlternative();
+        Collection<Assertion> choice = epi.getChosenAlternative();
         assertSame(choice, alternative);   
         control.verify();
     }
@@ -272,7 +273,7 @@ public class EffectivePolicyImplTest extends Assert {
     @Test
     public void testInitialiseOutInterceptors() {
         EffectivePolicyImpl epi = new EffectivePolicyImpl();        
-        List<PolicyAssertion> alternative = new ArrayList<PolicyAssertion>();
+        List<Assertion> alternative = new ArrayList<Assertion>();
         epi.setChosenAlternative(alternative);
         
         PolicyEngineImpl engine = control.createMock(PolicyEngineImpl.class);

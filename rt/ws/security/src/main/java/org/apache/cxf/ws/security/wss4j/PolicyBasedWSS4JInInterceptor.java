@@ -53,7 +53,6 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -72,6 +71,7 @@ import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
+import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -200,7 +200,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             notAssertPolicy(aim, token, "No derived keys found.");
         }
     }
-    private void assertPolicy(AssertionInfoMap aim, PolicyAssertion token) {
+    private void assertPolicy(AssertionInfoMap aim, Assertion token) {
         Collection<AssertionInfo> ais = aim.get(token.getName());
         if (ais != null && !ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
@@ -210,7 +210,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }    
         }
     }
-    private void notAssertPolicy(AssertionInfoMap aim, PolicyAssertion token, String msg) {
+    private void notAssertPolicy(AssertionInfoMap aim, Assertion token, String msg) {
         Collection<AssertionInfo> ais = aim.get(token.getName());
         if (ais != null && !ais.isEmpty()) {
             for (AssertionInfo ai : ais) {

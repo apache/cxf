@@ -34,6 +34,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
@@ -84,8 +85,8 @@ public class EndpointPolicyImplTest extends Assert {
         assertNull(epi.getFaultInterceptors());
         
         Policy p = control.createMock(Policy.class);
-        PolicyAssertion a = control.createMock(PolicyAssertion.class);
-        List<PolicyAssertion> la = Collections.singletonList(a);
+        Assertion a = control.createMock(Assertion.class);
+        List<Assertion> la = Collections.singletonList(a);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         control.replay();
         epi.setPolicy(p);
@@ -176,11 +177,11 @@ public class EndpointPolicyImplTest extends Assert {
         
         control.reset();        
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
-        Collection<PolicyAssertion> alternative = new ArrayList<PolicyAssertion>();
+        Collection<Assertion> alternative = new ArrayList<Assertion>();
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor)).andReturn(alternative);
         control.replay();        
         epi.chooseAlternative();
-        Collection<PolicyAssertion> choice = epi.getChosenAlternative();
+        Collection<Assertion> choice = epi.getChosenAlternative();
         assertSame(choice, alternative);   
         control.verify();
     }
@@ -306,8 +307,8 @@ public class EndpointPolicyImplTest extends Assert {
         PolicyEngineImpl engine = control.createMock(PolicyEngineImpl.class);
         
         EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, engine, requestor, null);        
-        Collection<PolicyAssertion> v = new ArrayList<PolicyAssertion>();
-        Collection<PolicyAssertion> fv = new ArrayList<PolicyAssertion>();
+        Collection<Assertion> v = new ArrayList<Assertion>();
+        Collection<Assertion> fv = new ArrayList<Assertion>();
         QName aqn = new QName("http://x.y.z", "a");
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));

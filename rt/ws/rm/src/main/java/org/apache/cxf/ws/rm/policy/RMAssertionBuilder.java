@@ -25,7 +25,6 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
 import org.apache.cxf.ws.rm.RMConstants;
@@ -63,11 +62,11 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
         @Override
         public boolean equal(PolicyComponent policyComponent) {
             if (policyComponent.getType() != Constants.TYPE_ASSERTION
-                || !getName().equals(((PolicyAssertion)policyComponent).getName())) {
+                || !getName().equals(((Assertion)policyComponent).getName())) {
                 return false;
             }
             JaxbAssertion<RMAssertion> other = 
-                    JaxbAssertion.cast((PolicyAssertion)policyComponent);            
+                    JaxbAssertion.cast((Assertion)policyComponent);            
             return PolicyUtils.equals(this.getData(), other.getData());  
         }
         

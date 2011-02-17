@@ -36,6 +36,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
@@ -88,14 +89,14 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             
             // insert assertions of the chosen alternative into the message
             
-            Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
+            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
             if (null != assertions && !assertions.isEmpty()) {
                 if (LOG.isLoggable(Level.FINEST)) {
                     StringBuilder buf = new StringBuilder();
                     buf.append("Chosen alternative: ");
                     String nl = System.getProperty("line.separator");
                     buf.append(nl);
-                    for (PolicyAssertion a : assertions) {
+                    for (Assertion a : assertions) {
                         PolicyUtils.printPolicyComponent(a, buf, 1);
                     }
                     LOG.finest(buf.toString());
@@ -119,14 +120,14 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             
             // insert assertions of the chosen alternative into the message
             
-            Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
+            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
             if (null != assertions && !assertions.isEmpty()) {
                 if (LOG.isLoggable(Level.FINEST)) {
                     StringBuilder buf = new StringBuilder();
                     buf.append("Chosen alternative: ");
                     String nl = System.getProperty("line.separator");
                     buf.append(nl);
-                    for (PolicyAssertion a : assertions) {
+                    for (Assertion a : assertions) {
                         PolicyUtils.printPolicyComponent(a, buf, 1);
                     }
                     LOG.finest(buf.toString());
@@ -148,7 +149,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             
             // insert assertions of the chosen alternative into the message
                  
-            Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
+            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
             if (null != assertions && !assertions.isEmpty()) {
                 msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
                 msg.getInterceptorChain().add(PolicyVerificationOutInterceptor.INSTANCE);

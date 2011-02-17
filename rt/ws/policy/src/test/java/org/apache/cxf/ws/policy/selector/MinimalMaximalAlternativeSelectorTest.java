@@ -28,6 +28,7 @@ import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.TestAssertion;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
@@ -73,7 +74,7 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(minAlternative, assertor)).andReturn(true);
         
         control.replay();        
-        Collection<PolicyAssertion> choice = 
+        Collection<Assertion> choice = 
             selector.selectAlternative(policy, engine, assertor); 
         assertEquals(0, choice.size());
         control.verify();
@@ -103,7 +104,7 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(minAlternative, assertor)).andReturn(true);
         
         control.replay();        
-        Collection<PolicyAssertion> choice = selector.selectAlternative(policy, engine, assertor); 
+        Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor); 
         assertEquals(1, choice.size());
         assertSame(a1, choice.iterator().next());
         control.verify();
