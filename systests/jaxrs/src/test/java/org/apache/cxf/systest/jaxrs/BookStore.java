@@ -112,6 +112,15 @@ public class BookStore {
         System.out.println("PreDestroy called");
     }
     
+    @GET
+    @Path("/books/colon/{a}:{b}:{c}")
+    @Produces("application/xml")
+    public Book getBookWithColonMarks(@PathParam("a") String id1,
+                                      @PathParam("b") String id2,
+                                      @PathParam("c") String id3) throws BookNotFoundFault {
+        return doGetBook(id1 + id2 + id3);
+    }
+    
     @POST
     @Path("emptypost")
     public void emptypost() {
@@ -406,6 +415,8 @@ public class BookStore {
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
     }
+    
+    
     
     @GET
     @Path("/books/response/{bookId}/")
