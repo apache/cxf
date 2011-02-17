@@ -25,8 +25,12 @@
     <ui:with field='res'
              type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
 
-    <g:StackLayoutPanel unit='EM'>
-        <g:stack>
+   <ui:style field='style'>
+      .resetAbsolutePosition { position: relative!important; }
+   </ui:style>
+
+   <g:StackLayoutPanel unit='EM'>
+      <g:stack>
             <g:header size='3'>
                 <div>
                     <div/>
@@ -34,7 +38,7 @@
                 </div>
             </g:header>
 
-            <g:VerticalPanel width="100%">
+            <g:VerticalPanel width="100%" styleName='{style.resetAbsolutePosition}'>
                 <g:Label>Tasks</g:Label>
                 <g:Hyperlink ui:field="manageSubscriptionsHyperlink">
                     Manage endpoints
@@ -52,7 +56,7 @@
                 </div>
             </g:header>
 
-            <g:VerticalPanel width="100%">
+            <g:VerticalPanel width="100%" styleName='{style.resetAbsolutePosition}'>
                 <g:Label>Tasks</g:Label>
                 <g:Hyperlink ui:field="editCriteriaHyperlink">
                     Edit criteria
