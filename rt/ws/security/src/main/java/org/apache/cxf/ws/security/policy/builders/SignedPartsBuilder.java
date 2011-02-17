@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -31,9 +30,10 @@ import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class SignedPartsBuilder implements AssertionBuilder {
+public class SignedPartsBuilder implements AssertionBuilder<Element> {
     private static final QName KNOWN_ELEMENTS[] 
         = {SP11Constants.SIGNED_PARTS, SP12Constants.SIGNED_PARTS};
     

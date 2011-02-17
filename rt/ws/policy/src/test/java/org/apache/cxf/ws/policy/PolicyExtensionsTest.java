@@ -35,6 +35,7 @@ import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,9 +59,9 @@ public class PolicyExtensionsTest extends Assert {
 
             AssertionBuilderRegistry abr = bus.getExtension(AssertionBuilderRegistry.class);
             assertNotNull(abr);
-            AssertionBuilder ab = abr.get(KNOWN);
+            AssertionBuilder ab = abr.getBuilder(KNOWN);
             assertNotNull(ab);
-            ab = abr.get(UNKNOWN);
+            ab = abr.getBuilder(UNKNOWN);
             assertNull(ab);
 
             PolicyInterceptorProviderRegistry pipr = bus
@@ -114,7 +115,7 @@ public class PolicyExtensionsTest extends Assert {
         }
     }
     
-    public static class TestAssertionBuilder implements AssertionBuilder {
+    public static class TestAssertionBuilder implements AssertionBuilder<Element> {
         
         QName knownElements[] = {KNOWN};
 

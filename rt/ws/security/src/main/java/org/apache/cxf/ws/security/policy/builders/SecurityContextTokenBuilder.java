@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -31,9 +30,10 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class SecurityContextTokenBuilder implements AssertionBuilder {
+public class SecurityContextTokenBuilder implements AssertionBuilder<Element> {
     private static final QName KNOWN_ELEMENTS[] 
         = {SP11Constants.SECURITY_CONTEXT_TOKEN, SP12Constants.SECURITY_CONTEXT_TOKEN};
     

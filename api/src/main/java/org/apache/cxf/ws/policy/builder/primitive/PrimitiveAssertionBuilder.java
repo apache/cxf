@@ -26,11 +26,11 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
-public class PrimitiveAssertionBuilder implements AssertionBuilder {
+public class PrimitiveAssertionBuilder implements AssertionBuilder<Element> {
 
     protected Bus bus;
     private QName knownElements[] = {};

@@ -62,17 +62,20 @@ public class NestedPrimitiveAssertionTest extends Assert {
         control = EasyMock.createNiceControl();
         
         bus = control.createMock(Bus.class);
+        bus.getExtension(AssertionBuilderRegistry.class);
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        bus.getExtension(org.apache.cxf.ws.policy.PolicyEngine.class);
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         builder = new PolicyBuilderImpl();
-        builder.setBus(bus);
         builder.setAssertionBuilderRegistry(abr);
         
         NestedPrimitiveAssertionBuilder npab = new NestedPrimitiveAssertionBuilder();
         npab.setBus(bus);
         npab.setPolicyBuilder(builder);
         npab.setKnownElements(Collections.singletonList(TEST_NAME1));
-        abr.register(TEST_NAME1, npab);
+        abr.registerBuilder(TEST_NAME1, npab);
         
         PrimitiveAssertionBuilder pab = new PrimitiveAssertionBuilder();
         pab.setBus(bus);
@@ -80,10 +83,12 @@ public class NestedPrimitiveAssertionTest extends Assert {
         known.add(TEST_NAME2);
         known.add(TEST_NAME3);
         pab.setKnownElements(known);
-        abr.register(TEST_NAME2, pab);
-        abr.register(TEST_NAME3, pab); 
+        abr.registerBuilder(TEST_NAME2, pab);
+        abr.registerBuilder(TEST_NAME3, pab); 
         
         control.replay();
+        
+        builder.setBus(bus);
     }
     
     @After

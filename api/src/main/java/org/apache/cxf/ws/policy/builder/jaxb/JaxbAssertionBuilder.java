@@ -36,13 +36,13 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Constants;
+import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
-public class JaxbAssertionBuilder<T> implements AssertionBuilder {
+public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JaxbAssertionBuilder.class);
     private Unmarshaller unmarshaller;

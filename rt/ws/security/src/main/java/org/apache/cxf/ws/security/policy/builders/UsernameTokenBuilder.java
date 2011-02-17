@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -34,9 +33,10 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class UsernameTokenBuilder implements AssertionBuilder {
+public class UsernameTokenBuilder implements AssertionBuilder<Element> {
     private static final QName KNOWN_ELEMENTS[]  
         = {SP11Constants.USERNAME_TOKEN, SP12Constants.USERNAME_TOKEN};
 

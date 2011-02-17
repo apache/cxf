@@ -25,13 +25,13 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
-public class MTOMAssertionBuilder implements AssertionBuilder {
+public class MTOMAssertionBuilder implements AssertionBuilder<Element> {
     private static final QName KNOWN_ELEMENTS[] 
         = {MetadataConstants.MTOM_ASSERTION_QNAME};
     

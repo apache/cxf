@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -37,9 +36,10 @@ import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class InitiatorTokenBuilder implements AssertionBuilder {
+public class InitiatorTokenBuilder implements AssertionBuilder<Element> {
     private static final QName KNOWN_ELEMENTS[] 
         = {SP11Constants.INITIATOR_TOKEN, SP12Constants.INITIATOR_TOKEN};
     

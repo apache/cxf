@@ -80,12 +80,12 @@ public class NormalizeTest extends Assert {
         PrimitiveAssertionBuilder ab = new PrimitiveAssertionBuilder();
         ab.setBus(bus);
        
-        abr.register(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityToken"), ab);
-        abr.register(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityHeader"), ab);
-        abr.register(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "Integrity"), ab);
-        abr.register(new QName("http://sample.org/Assertions", "A"), ab);
-        abr.register(new QName("http://sample.org/Assertions", "B"), ab);
-        abr.register(new QName("http://sample.org/Assertions", "C"), ab);
+        abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityToken"), ab);
+        abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityHeader"), ab);
+        abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "Integrity"), ab);
+        abr.registerBuilder(new QName("http://sample.org/Assertions", "A"), ab);
+        abr.registerBuilder(new QName("http://sample.org/Assertions", "B"), ab);
+        abr.registerBuilder(new QName("http://sample.org/Assertions", "C"), ab);
         return builder;
     }
     

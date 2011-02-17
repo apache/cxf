@@ -24,7 +24,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -32,9 +31,10 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class WSS11Builder implements AssertionBuilder {
+public class WSS11Builder implements AssertionBuilder<Element> {
     private static final QName[] KNOWN_ELEMENTS 
         = {SP11Constants.WSS11, SP12Constants.WSS11};
 

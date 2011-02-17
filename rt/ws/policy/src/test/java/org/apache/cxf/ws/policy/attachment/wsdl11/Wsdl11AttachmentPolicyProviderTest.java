@@ -127,9 +127,9 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         
         
         PrimitiveAssertionBuilder ab = new PrimitiveAssertionBuilder();
-        abr.register(new QName("http://cxf.apache.org/test/assertions", "A"), ab);
-        abr.register(new QName("http://cxf.apache.org/test/assertions", "B"), ab);
-        abr.register(new QName("http://cxf.apache.org/test/assertions", "C"), ab);
+        abr.registerBuilder(new QName("http://cxf.apache.org/test/assertions", "A"), ab);
+        abr.registerBuilder(new QName("http://cxf.apache.org/test/assertions", "B"), ab);
+        abr.registerBuilder(new QName("http://cxf.apache.org/test/assertions", "C"), ab);
         
         PolicyBuilderImpl pb = new PolicyBuilderImpl();
         bus.getExtension(PolicyBuilder.class);

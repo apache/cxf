@@ -23,15 +23,15 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.RequiredParts;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
-public class RequiredPartsBuilder implements AssertionBuilder {
+public class RequiredPartsBuilder implements AssertionBuilder<Element> {
         
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {

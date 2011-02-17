@@ -23,14 +23,14 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class Trust10Builder implements AssertionBuilder {
+public class Trust10Builder implements AssertionBuilder<Element> {
     public Trust10Builder() {
     }
     

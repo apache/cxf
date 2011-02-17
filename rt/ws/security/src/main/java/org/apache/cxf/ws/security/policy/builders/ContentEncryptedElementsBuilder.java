@@ -26,15 +26,15 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class ContentEncryptedElementsBuilder implements AssertionBuilder {
+public class ContentEncryptedElementsBuilder implements AssertionBuilder<Element> {
     public static final QName KNOWN_ELEMENTS[] 
         = {SP12Constants.CONTENT_ENCRYPTED_ELEMENTS};
     

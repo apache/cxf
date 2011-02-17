@@ -19,34 +19,13 @@
 
 package org.apache.cxf.ws.policy;
 
-import javax.xml.namespace.QName;
-
-import org.w3c.dom.Element;
-import org.apache.cxf.extension.Registry;
-import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
 
 /**
  * AssertionBuilderRegistry is used to manage AssertionBuilders and
  * create Assertion objects from given xml elements.
  */
-public interface AssertionBuilderRegistry 
-    extends Registry<QName, AssertionBuilder> {
-    
-    
-    /**
-     * Register the builder for all qnames from the builders
-     * getKnownElements call.
-     * @param builder the builder to register 
-     */
-    void register(AssertionBuilder builder);
-    
-    /**
-     * Returns an assertion that is built using the specified xml element.
-     * 
-     * @param element the element from which to build an Assertion.
-     * @return an Assertion that is built using the specified element.
-     */
-    Assertion build(Element element);
+public interface AssertionBuilderRegistry extends AssertionBuilderFactory {
     
     /**
      * Indicates if unknown assertions should simply be ignored.
@@ -62,7 +41,7 @@ public interface AssertionBuilderRegistry
      * If set to false, the policy engine will throw an exception upon
      * encountering an assertion type for which no AssertionBuilder
      * has been registered. 
-     * @param ignoreUnknownAssertions iff unknown assertions should be ignored
+     * @param ignoreUnknownAssertions if unknown assertions should be ignored
      */
     void setIgnoreUnknownAssertions(boolean ignoreUnknownAssertions);
 }

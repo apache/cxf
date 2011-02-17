@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -36,9 +35,10 @@ import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
-public class IssuedTokenBuilder implements AssertionBuilder {
+public class IssuedTokenBuilder implements AssertionBuilder<Element> {
     private static final String WSA_NAMESPACE_SUB = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
     private static final String WSA_NAMESPACE = "http://www.w3.org/2005/08/addressing";
     

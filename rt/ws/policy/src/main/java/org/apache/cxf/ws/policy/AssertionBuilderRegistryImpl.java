@@ -19,16 +19,14 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -36,26 +34,24 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
-import org.apache.cxf.extension.RegistryImpl;
 import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertionBuilder;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.AssertionBuilderFactoryImpl;
+import org.apache.neethi.PolicyEngine;
+import org.apache.neethi.builders.AssertionBuilder;
 
 /**
  * 
  */
 @NoJSR250Annotations(unlessNull = "bus")
-public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionBuilder> implements
+public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl implements
     AssertionBuilderRegistry, BusExtension {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AssertionBuilderRegistryImpl.class);
     private static final Logger LOG 
         = LogUtils.getL7dLogger(AssertionBuilderRegistryImpl.class);
-    private static final int IGNORED_CACHE_SIZE = 10;
     private boolean ignoreUnknownAssertions = true; 
-    private List<QName> ignored = new ArrayList<QName>(IGNORED_CACHE_SIZE);
+    private Set<QName> ignored = new HashSet<QName>();
     private Bus bus;
     private boolean dynamicLoaded;
     
@@ -67,21 +63,15 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
         setBus(b);
     }
 
-    public AssertionBuilderRegistryImpl(Map<QName, AssertionBuilder> builders) {
-        super(builders);
-    }
-    public AssertionBuilderRegistryImpl(MapProvider<QName, AssertionBuilder> builders) {
-        super(builders.createMap());
-    }
-    public AssertionBuilderRegistryImpl(Bus b, MapProvider<QName, AssertionBuilder> builders) {
-        super(builders.createMap());
-        setBus(b);
-    }
     @Resource
     public final void setBus(Bus b) {
         bus = b;
         if (b != null) {
             b.setExtension(this, AssertionBuilderRegistry.class);
+            PolicyBuilder builder = b.getExtension(PolicyBuilder.class);
+            if (builder instanceof PolicyEngine) {
+                engine = (PolicyEngine)builder;
+            }
         }
     }
 
@@ -89,13 +79,6 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
         return AssertionBuilderRegistry.class;
     }
     
-    public void register(AssertionBuilder builder) {
-        QName names[] = builder.getKnownElements();
-        for (QName n : names) {
-            super.register(n, builder);
-        }
-    }
-
     public boolean isIgnoreUnknownAssertions() {
         return ignoreUnknownAssertions;
     }
@@ -111,43 +94,24 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
             if (c != null) {
                 c.getBeansOfType(AssertionBuilderLoader.class);
                 for (AssertionBuilder b : c.getBeansOfType(AssertionBuilder.class)) {
-                    register(b);
+                    registerBuilder(b);
                 }
             }
         }
     }
-    public Assertion build(Element element) {
-        return build(element, null);
-    }
-    public Assertion build(Element element, AssertionBuilderFactory factory) {
-        loadDynamic();
-        
-        AssertionBuilder builder;
-
-        QName qname = new QName(element.getNamespaceURI(), element.getLocalName());
-        builder = get(qname);
-
-        if (null == builder) {
+    protected AssertionBuilder handleNoRegisteredBuilder(QName qname) {
+        if (ignoreUnknownAssertions) {
+            boolean alreadyWarned = ignored.contains(qname);
+            if (!alreadyWarned) {
+                ignored.add(qname);
+                Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
+                LOG.warning(m.toString());
+            }
+            return new NestedPrimitiveAssertionBuilder(bus.getExtension(PolicyBuilder.class));
+        } else {
             Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
-            if (ignoreUnknownAssertions) {
-                boolean alreadyWarned = ignored.contains(qname);
-                if (alreadyWarned) {
-                    ignored.remove(qname);
-                } else if (ignored.size() == IGNORED_CACHE_SIZE) {
-                    ignored.remove(IGNORED_CACHE_SIZE - 1);
-                }
-                ignored.add(0, qname);
-                if (!alreadyWarned) {
-                    LOG.warning(m.toString());
-                }
-                
-                builder = new NestedPrimitiveAssertionBuilder(bus.getExtension(PolicyBuilder.class));
-            } else {
-                throw new PolicyException(m);
-            }
+            throw new PolicyException(m);
         }
-
-        return builder.build(element, factory);
-
     }
+    
 }

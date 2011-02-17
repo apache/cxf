@@ -90,35 +90,35 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             return;
         }
         PolicyBuilder pbuild = bus.getExtension(PolicyBuilder.class);
-        reg.register(new AlgorithmSuiteBuilder());
-        reg.register(new AsymmetricBindingBuilder(pbuild));
-        reg.register(new ContentEncryptedElementsBuilder());
-        reg.register(new EncryptedElementsBuilder());
-        reg.register(new EncryptedPartsBuilder());
-        reg.register(new HttpsTokenBuilder(pbuild));
-        reg.register(new InitiatorTokenBuilder(pbuild));
-        reg.register(new IssuedTokenBuilder(pbuild));
-        reg.register(new LayoutBuilder());
-        reg.register(new ProtectionTokenBuilder(pbuild));
-        reg.register(new RecipientTokenBuilder(pbuild));
-        reg.register(new RequiredElementsBuilder());
-        reg.register(new RequiredPartsBuilder());
-        reg.register(new SecureConversationTokenBuilder(pbuild));
-        reg.register(new SecurityContextTokenBuilder());
-        reg.register(new SignedElementsBuilder());
-        reg.register(new SignedPartsBuilder());
-        reg.register(new SupportingTokens12Builder(pbuild));
-        reg.register(new SupportingTokensBuilder(pbuild));
-        reg.register(new SymmetricBindingBuilder(pbuild));
-        reg.register(new TransportBindingBuilder(pbuild));
-        reg.register(new TransportTokenBuilder(pbuild));
-        reg.register(new Trust10Builder());
-        reg.register(new Trust13Builder());
-        reg.register(new UsernameTokenBuilder(pbuild));
-        reg.register(new KeyValueTokenBuilder());
-        reg.register(new WSS10Builder());
-        reg.register(new WSS11Builder());
-        reg.register(new X509TokenBuilder(pbuild));
+        reg.registerBuilder(new AlgorithmSuiteBuilder());
+        reg.registerBuilder(new AsymmetricBindingBuilder(pbuild));
+        reg.registerBuilder(new ContentEncryptedElementsBuilder());
+        reg.registerBuilder(new EncryptedElementsBuilder());
+        reg.registerBuilder(new EncryptedPartsBuilder());
+        reg.registerBuilder(new HttpsTokenBuilder(pbuild));
+        reg.registerBuilder(new InitiatorTokenBuilder(pbuild));
+        reg.registerBuilder(new IssuedTokenBuilder(pbuild));
+        reg.registerBuilder(new LayoutBuilder());
+        reg.registerBuilder(new ProtectionTokenBuilder(pbuild));
+        reg.registerBuilder(new RecipientTokenBuilder(pbuild));
+        reg.registerBuilder(new RequiredElementsBuilder());
+        reg.registerBuilder(new RequiredPartsBuilder());
+        reg.registerBuilder(new SecureConversationTokenBuilder(pbuild));
+        reg.registerBuilder(new SecurityContextTokenBuilder());
+        reg.registerBuilder(new SignedElementsBuilder());
+        reg.registerBuilder(new SignedPartsBuilder());
+        reg.registerBuilder(new SupportingTokens12Builder(pbuild));
+        reg.registerBuilder(new SupportingTokensBuilder(pbuild));
+        reg.registerBuilder(new SymmetricBindingBuilder(pbuild));
+        reg.registerBuilder(new TransportBindingBuilder(pbuild));
+        reg.registerBuilder(new TransportTokenBuilder(pbuild));
+        reg.registerBuilder(new Trust10Builder());
+        reg.registerBuilder(new Trust13Builder());
+        reg.registerBuilder(new UsernameTokenBuilder(pbuild));
+        reg.registerBuilder(new KeyValueTokenBuilder());
+        reg.registerBuilder(new WSS10Builder());
+        reg.registerBuilder(new WSS11Builder());
+        reg.registerBuilder(new X509TokenBuilder(pbuild));
         
         //add generic assertions for these known things to prevent warnings
         List<QName> others = Arrays.asList(new QName[] {
@@ -145,7 +145,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             new QName(SP12Constants.SP_NS, SP12Constants.ENCRYPT_BEFORE_SIGNING),
             new QName(SP11Constants.SP_NS, SP11Constants.ENCRYPT_BEFORE_SIGNING),
         });
-        reg.register(new PrimitiveAssertionBuilder(others));
+        reg.registerBuilder(new PrimitiveAssertionBuilder(others));
     }
     
     public void registerProviders() {

@@ -24,8 +24,6 @@ import java.io.InputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Element;
-
 import org.xml.sax.SAXException;
 
 import org.apache.neethi.Policy;
@@ -44,7 +42,7 @@ public interface PolicyBuilder {
      * @param element the element
      * @return the PolicyReference object constructed from the element
      */
-    PolicyReference getPolicyReference(Element element);
+    PolicyReference getPolicyReference(Object element);
     
     /**
      * Creates a Policy object from an DOM element.
@@ -52,7 +50,7 @@ public interface PolicyBuilder {
      * @param element the element
      * @return the Policy object constructed from the element
      */
-    Policy getPolicy(Element element);
+    Policy getPolicy(Object element);
     
     
     /**

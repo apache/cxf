@@ -24,7 +24,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -32,8 +31,9 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
-public class KeyValueTokenBuilder implements AssertionBuilder {
+public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
     private static final String MS_NS = "http://schemas.microsoft.com/ws/2005/07/securitypolicy";
     private static final QName KNOWN_ELEMENTS[] 
         = {SP12Constants.KEYVALUE_TOKEN, new QName(MS_NS, "RsaToken")};

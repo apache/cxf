@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -32,6 +31,7 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.HttpsToken;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 
 /**
@@ -47,7 +47,7 @@ import org.apache.neethi.AssertionBuilderFactory;
  * alternatives in the HttpsToken considering both cases whether the policy is normalized or not.
  * 
  */
-public class HttpsTokenBuilder implements AssertionBuilder {
+public class HttpsTokenBuilder implements AssertionBuilder<Element> {
     private static final QName KNOWN_ELEMENTS[] 
         = {SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN};
 

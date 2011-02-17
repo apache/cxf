@@ -30,6 +30,8 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyReference;
+import org.apache.neethi.builders.AssertionBuilder;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,9 +46,9 @@ public class PolicyBuilderTest extends Assert {
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         builder.setAssertionBuilderRegistry(abr);
         AssertionBuilder ab = new PrimitiveAssertionBuilder();
-        abr.register(new QName("http://sample.org/Assertions", "A"), ab);
-        abr.register(new QName("http://sample.org/Assertions", "B"), ab);
-        abr.register(new QName("http://sample.org/Assertions", "C"), ab);
+        abr.registerBuilder(new QName("http://sample.org/Assertions", "A"), ab);
+        abr.registerBuilder(new QName("http://sample.org/Assertions", "B"), ab);
+        abr.registerBuilder(new QName("http://sample.org/Assertions", "C"), ab);
     }
     
     @Test

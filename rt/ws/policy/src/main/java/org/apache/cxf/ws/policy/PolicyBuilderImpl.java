@@ -19,33 +19,10 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ResourceBundle;
-
-import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import org.xml.sax.SAXException;
-
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.neethi.All;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.Constants;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyOperator;
-import org.apache.neethi.PolicyReference;
-import org.apache.neethi.PolicyRegistry;
+import org.apache.neethi.PolicyEngine;
 
 
 /**
@@ -54,164 +31,42 @@ import org.apache.neethi.PolicyRegistry;
  * from DOM elements, but also from an input stream etc.
  */
 @NoJSR250Annotations
-public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
-    
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(PolicyBuilderImpl.class);
- 
-    private AssertionBuilderRegistry assertionBuilderRegistry;
+public class PolicyBuilderImpl extends PolicyEngine implements PolicyBuilder, BusExtension {
     private Bus bus;
    
     public PolicyBuilderImpl() {
     }
     
     public PolicyBuilderImpl(Bus theBus) {
-        bus = theBus;
-        assertionBuilderRegistry = theBus.getExtension(AssertionBuilderRegistry.class);
+        super(null);
+        setBus(theBus);
     }
 
     public Class<?> getRegistrationType() {
         return PolicyBuilder.class;
     }
     
-    public void setBus(Bus theBus) {
+    public void setAssertionBuilderRegistry(AssertionBuilderRegistry reg) {
+        factory = reg;
+    }
+    
+    public final void setBus(Bus theBus) {
         bus = theBus;
+        if (bus != null) {
+            AssertionBuilderRegistry reg = theBus.getExtension(AssertionBuilderRegistry.class);
+            if (reg != null) {
+                factory = reg;
+            }
+            org.apache.cxf.ws.policy.PolicyEngine e 
+                = bus.getExtension(org.apache.cxf.ws.policy.PolicyEngine.class);
+            if (e != null) {
+                this.setPolicyRegistry(e.getRegistry());
+            }
+        }
     }
     
     public Bus getBus() {
         return bus;
     }
-    
-    public void setAssertionBuilderRegistry(AssertionBuilderRegistry abr) {
-        assertionBuilderRegistry = abr;        
-    }
-    
-    public AssertionBuilderRegistry getAssertionBuilderRegistry() {
-        return assertionBuilderRegistry;        
-    }
 
-
-    /**
-     * Creates a PolicyReference object from an InputStream.
-     * 
-     * @param inputStream the input stream
-     * @return the PolicyReference constructed from the input stream
-     */
-    public PolicyReference getPolicyReference(InputStream is)
-        throws IOException, ParserConfigurationException, SAXException {
-        Element element = DOMUtils.readXml(is).getDocumentElement();
-        return getPolicyReference(element);
-    }
-    
-    /**
-     * Creates a PolicyReference object from a DOM element.
-     * 
-     * @param element the element
-     * @return the PolicyReference object constructed from the element
-     */
-    public PolicyReference getPolicyReference(Element element) {
-        if (!Constants.ELEM_POLICY_REF.equals(element.getLocalName())) {
-            throw new PolicyException(new Message("NOT_A_POLICYREF_ELEMENT_EXC", BUNDLE));
-        }
-        synchronized (element) {
-            PolicyReference reference = new PolicyReference();
-            reference.setURI(element.getAttribute("URI"));
-            return reference;
-        }
-    }
-    
-    /**
-     * Creates a Policy object from an InputStream.
-     * 
-     * @param inputStream the input stream
-     * @return the Policy object constructed from the input stream
-     */
-    public Policy getPolicy(InputStream is) 
-        throws IOException, ParserConfigurationException, SAXException {
-        Element element = DOMUtils.readXml(is).getDocumentElement();
-        return getPolicy(element);
-    }
-    
-    /**
-     * Creates a Policy object from a DOM element.
-     * 
-     * @param element the element
-     * @retun the Policy object constructed from the element
-     */
-    public Policy getPolicy(Element element) {
-        return getPolicyOperator(element);
-    }
-    
-    private Policy getPolicyOperator(Element element) {
-        return (Policy) processOperationElement(element, new Policy());
-    }
-
-    private ExactlyOne getExactlyOneOperator(Element element) {
-        return (ExactlyOne) processOperationElement(element, new ExactlyOne());
-    }
-
-    private All getAllOperator(Element element) {
-        return (All) processOperationElement(element, new All());
-    }
-
-    private PolicyOperator processOperationElement(Element operationElement, PolicyOperator operator) {
-        synchronized (operationElement) {
-    
-            if (Constants.TYPE_POLICY == operator.getType()) {
-                Policy policyOperator = (Policy)operator;
-                QName key;
-    
-                NamedNodeMap nnm = operationElement.getAttributes();
-                for (int i = 0; i < nnm.getLength(); i++) {
-                    Node n = nnm.item(i);
-                    if (Node.ATTRIBUTE_NODE == n.getNodeType()) {
-                        String namespace = n.getNamespaceURI();    
-                        if (namespace == null) {
-                            key = new QName(n.getLocalName());
-    
-                        } else if (n.getPrefix() == null) {
-                            key = new QName(namespace, n.getLocalName());
-    
-                        } else {
-                            key = new QName(namespace, n.getLocalName(), n.getPrefix());
-                        }
-                        policyOperator.addAttribute(key, n.getNodeValue());
-                    }
-                }            
-            }
-    
-            
-            Element childElement;
-            for (Node n = operationElement.getFirstChild(); n != null; n = n.getNextSibling()) {
-                if (Node.ELEMENT_NODE != n.getNodeType()) {
-                    continue;
-                }
-                childElement = (Element)n;
-                String namespaceURI = childElement.getNamespaceURI();
-                String localName = childElement.getLocalName();
-    
-                QName qn = new QName(namespaceURI, localName);
-                if (PolicyConstants.isPolicyElem(qn)) {
-                    operator.addPolicyComponent(getPolicyOperator(childElement));
-                } else if (PolicyConstants.isAll(qn)) {
-                    operator.addPolicyComponent(getAllOperator(childElement));
-                } else if (PolicyConstants.isExactlyOne(qn)) {
-                    operator.addPolicyComponent(getExactlyOneOperator(childElement));
-                } else if (PolicyConstants.isPolicyRefElem(qn)) {
-                    operator.addPolicyComponent(getPolicyReference(childElement));                
-                } else if (null != assertionBuilderRegistry) {
-                    Assertion a = assertionBuilderRegistry.build(childElement);
-                    if (null != a) {
-                        operator.addPolicyComponent(a);
-                    }
-                }
-            }
-            return operator;
-        }
-    }
-
-    public PolicyRegistry getPolicyRegistry() {
-        PolicyEngine e = bus.getExtension(PolicyEngine.class);
-        return e == null ? null : e.getRegistry();
-    }
-    
 }

@@ -26,18 +26,18 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 
 /**
  * 
  */
-public class AddressingAssertionBuilder implements AssertionBuilder {
+public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
 
     private static final QName[] KNOWN_ELEMENTS = {
         MetadataConstants.ADDRESSING_ASSERTION_QNAME,
