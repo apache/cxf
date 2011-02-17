@@ -67,6 +67,7 @@ import org.apache.cxf.tools.validator.ServiceValidator;
 import org.apache.cxf.tools.wsdlto.core.AbstractWSDLBuilder;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 public class WSDLToJavaContainer extends AbstractCXFToolContainer {
@@ -199,7 +200,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 } else {
                     serviceList = serviceBuilder.buildMockServices(definition);
                 }
-
+                //remove definition from cache so that won't fail when encounter same wsdl file
+                //name but different wsdl content(CXF-3340)
+                getBus().getExtension(WSDLManager.class).removeDefinition(definition);
             } else {
                 // TODO: wsdl2.0 support
             }
