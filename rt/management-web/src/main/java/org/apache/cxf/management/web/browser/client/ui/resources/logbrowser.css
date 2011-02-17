@@ -138,13 +138,6 @@
     border-bottom: 1px solid #7b97d0;
 }
 
-.browserTabSignOutButton {
-    padding-top: 0.3em;
-    padding-right: 0.5em;
-    position: absolute;
-    text-align: right;
-}
-
 .browserTabManageSubscriptionsButton {
     font-size: 11px;
     color: #3366CC;
@@ -221,12 +214,6 @@
     background: #FFCC66 none repeat scroll 0 0;
     padding:0.3em;
     margin-top:0.5em;
-}
-
-.settingsTabSignOutButton {
-    padding-top: 0.3em;
-    padding-right: 0.5em;
-    text-align: right;
 }
 
 .settingsTabBackButton {

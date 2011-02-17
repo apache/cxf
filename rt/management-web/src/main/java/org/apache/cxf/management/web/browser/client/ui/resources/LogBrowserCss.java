@@ -43,7 +43,6 @@ public interface LogBrowserCss extends CssResource {
     String browserTabLoadingMessage();
     String browserTabNoEntriesMessage();
     String browserTabSelectedRow();
-    String browserTabSignOutButton();
     String browserTabManageSubscriptionsButton();
     String browserTabToolBar();
     String browserTabEntryTableHeaders();
@@ -56,7 +55,6 @@ public interface LogBrowserCss extends CssResource {
     
     /* Settings tab styles */
     String settingsTabHeader();
-    String settingsTabSignOutButton();
     String settingsTabBackButton();
     String settingsTabTitle();
     String settingsTabToolBar();
