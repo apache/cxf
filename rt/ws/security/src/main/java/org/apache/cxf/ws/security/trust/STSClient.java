@@ -121,6 +121,7 @@ import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
  */
 public class STSClient implements Configurable, InterceptorProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(STSClient.class);
+    private static final String SAML2_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
     
     Bus bus;
     String name = "default.sts-client";
@@ -1002,7 +1003,17 @@ public class STSClient implements Configurable, InterceptorProvider {
     private String findID(Element rar, Element rur, Element rst) {
         String id = null;
         if (rst != null) {
-            id = this.getIDFromSTR(rst);
+            QName elName = DOMUtils.getElementQName(rst);
+            if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))
+                && rst.hasAttributeNS(null, "AssertionID")) {
+                id = rst.getAttributeNS(null, "AssertionID");
+            } else if (elName.equals(new QName(SAML2_NS, "Assertion"))
+                && rst.hasAttributeNS(null, "ID")) {
+                id = rst.getAttributeNS(null, "ID");
+            }
+            if (id == null) {
+                id = this.getIDFromSTR(rst);
+            }
         }
         if (id == null && rar != null) {
             id = this.getIDFromSTR(rar);
