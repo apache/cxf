@@ -1011,7 +1011,15 @@ public class STSClient implements Configurable, InterceptorProvider {
     private String findID(Element rar, Element rur, Element rst) {
         String id = null;
         if (rst != null) {
-            id = this.getIDFromSTR(rst);
+            QName elName = DOMUtils.getElementQName(rst);
+            if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))) {
+                id = rst.getAttributeNS(null, "AssertionID");
+            } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))) {
+                id = rst.getAttributeNS(null, "ID");
+            }
+            if (id == null) {
+                id = this.getIDFromSTR(rst);
+            }
         }
         if (id == null && rar != null) {
             id = this.getIDFromSTR(rar);
