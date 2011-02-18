@@ -52,7 +52,10 @@ public interface LogBrowserCss extends CssResource {
     String browserTabEntryDetailsSection();
     String browserTabEntryDetailsContent();
     String browserTabNavigationLink();
-    
+
+    String sidebarItem();
+    String sidebarHeader();
+
     /* Settings tab styles */
     String settingsTabHeader();
     String settingsTabBackButton();

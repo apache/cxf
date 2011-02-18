@@ -35,11 +35,11 @@
             </g:header>
 
          <g:HTMLPanel>
-                <g:Label>Tasks</g:Label>
-                <g:Hyperlink ui:field="manageSubscriptionsHyperlink">
+                <g:Label styleName='{res.css.sidebarHeader}'>Tasks</g:Label>
+                <g:Hyperlink ui:field="manageSubscriptionsHyperlink" styleName='{res.css.sidebarItem}'>
                     Manage endpoints
                 </g:Hyperlink>
-                <g:Label>Endpoints</g:Label>
+                <g:Label styleName='{res.css.sidebarHeader}'>Endpoints</g:Label>
                 <logbrowser:SubscriptionTable ui:field='exploreSubscriptionTable'
                                               styleName='{res.css.browserTabEntrySelectableTable}'/>
          </g:HTMLPanel>
@@ -53,11 +53,11 @@
             </g:header>
 
             <g:HTMLPanel>
-                <g:Label>Tasks</g:Label>
-                <g:Hyperlink ui:field="editCriteriaHyperlink">
+                <g:Label styleName='{res.css.sidebarHeader}'>Tasks</g:Label>
+                <g:Hyperlink ui:field="editCriteriaHyperlink" styleName='{res.css.sidebarItem}'>
                     Edit criteria
                 </g:Hyperlink>
-                <g:Label>Endpoints</g:Label>
+                <g:Label styleName='{res.css.sidebarHeader}'>Endpoints</g:Label>
                 <logbrowser:SubscriptionTable ui:field='filterSubscriptionTable'
                                               styleName='{res.css.browserTabEntrySelectableTable}'/>
             </g:HTMLPanel>
