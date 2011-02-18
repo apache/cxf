@@ -82,7 +82,7 @@
         <cxf.stax.impl.version>4.0.8</cxf.stax.impl.version>
         <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
         <cxf.xmlbeans.version>2.4.0</cxf.xmlbeans.version>
-        <cxf.xmlschema.version>2.0-SNAPSHOT</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.0</cxf.xmlschema.version>
         <cxf.checkstyle.extension />
 
         <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
