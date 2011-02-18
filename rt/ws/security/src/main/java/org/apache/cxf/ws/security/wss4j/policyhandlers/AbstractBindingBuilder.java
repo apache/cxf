@@ -1019,25 +1019,12 @@ public abstract class AbstractBindingBuilder {
                     Element el = (Element)list.item(x);
                     
                     if (!found.contains(el)) {
-                        // Generate an ID for the element and use this ID or else
-                        // WSS4J will only ever sign/encrypt the first matching
-                        // element with the same name and namespace as that in the
-                        // WSEncryptionPart
                         final String id = this.addWsuIdToElement(el);
                         
-                        WSEncryptionPart part = new WSEncryptionPart(
-                                id, 
-                                encryptionModifier);
+                        WSEncryptionPart part = 
+                            new WSEncryptionPart(id, encryptionModifier);
                         part.setElement(el);
                         part.setXpath(expression);
-                        
-                        /**
-                        String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
-                        
-                        if (!StringUtils.isEmpty(wsuId)) {
-                            encryptedElem.setEncId(wsuId);
-                        }
-                        **/
                         
                         result.add(part);
                     }
