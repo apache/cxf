@@ -48,12 +48,8 @@ public class WoodstoxValidationImpl implements StaxValidationManager {
         
         try {
             utils = new Stax2ValidationUtils();
-        } catch (Exception e) {
-            LOG.log(Level.INFO, "Problem initializing MSV validation", e);
-            return;
-        } catch (NoSuchMethodError nsme) {
-            LOG.log(Level.INFO, "Problem initializing MSV validation", nsme);
-            // these don't inherit from 'Exception'
+        } catch (Throwable e) {
+            LOG.log(Level.FINE, "Problem initializing MSV validation", e);
             return;
         }
         
