@@ -24,7 +24,7 @@
 	xmlns:lang="http://www.springframework.org/schema/lang"
 	xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
 http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
