@@ -48,6 +48,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     private MultivaluedMap<String, String> headers;
     private ClientState initialState;
     private boolean threadSafe; 
+    private Class serviceClass;
     
     public JAXRSClientFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -123,7 +124,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
      * Sets the resource class
      * @param cls the resource class
      */
-    public void setResourceClass(Class cls) {
+    public void setResourceClass(Class<?> cls) {
         setServiceClass(cls);
     }
     
@@ -131,8 +132,17 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
      * Sets the resource class, may be called from a Spring handler 
      * @param cls the resource class
      */
-    public void setServiceClass(Class cls) {
+    public void setServiceClass(Class<?> cls) {
+        this.serviceClass = cls;
         serviceFactory.setResourceClass(cls);
+    }
+    
+    /**
+     * Returns the service class 
+     * @param cls the service class
+     */
+    public Class<?> getServiceClass() {
+        return serviceClass;
     }
     
     /**
@@ -228,7 +238,22 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         ClassResourceInfo cri = null;
         try {
             Endpoint ep = createEndpoint();
-            cri = serviceFactory.getClassResourceInfo().get(0);
+            if (getServiceClass() != null) {
+                for (ClassResourceInfo info : serviceFactory.getClassResourceInfo()) {
+                    if (info.getServiceClass().isAssignableFrom(getServiceClass())) {
+                        cri = info;
+                        break;
+                    }
+                }
+                if (cri == null) {
+                    // can not happen in the reality
+                    throw new RuntimeException("Service class " + getServiceClass().getName()
+                                               + " is not recognized");
+                }
+            } else {
+                cri = serviceFactory.getClassResourceInfo().get(0);
+            }
+            
             boolean isRoot = cri.getURITemplate() != null;
             ClientProxyImpl proxyImpl = null;
             ClientState actualState = getActualState();

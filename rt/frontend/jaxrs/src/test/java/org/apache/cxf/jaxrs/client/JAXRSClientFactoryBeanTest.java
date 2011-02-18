@@ -20,12 +20,16 @@
 package org.apache.cxf.jaxrs.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.jaxrs.model.UserOperation;
+import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
 import org.apache.cxf.message.Message;
@@ -45,6 +49,46 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStore.class);
         assertTrue(bean.create() instanceof BookStore);
+    }
+    
+    @Test
+    public void testCreateClientWithUserResource() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        UserResource r = new UserResource();
+        r.setName(BookStore.class.getName());
+        r.setPath("/");
+        UserOperation op = new UserOperation();
+        op.setName("getDescription");
+        op.setVerb("GET");
+        r.setOperations(Collections.singletonList(op));
+        bean.setModelBeans(r);
+        assertTrue(bean.create() instanceof BookStore);
+    }
+    
+    @Test
+    public void testCreateClientWithTwoUserResources() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        UserResource r1 = new UserResource();
+        r1.setName(BookStore.class.getName());
+        r1.setPath("/store");
+        UserOperation op = new UserOperation();
+        op.setName("getDescription");
+        op.setVerb("GET");
+        r1.setOperations(Collections.singletonList(op));
+        
+        UserResource r2 = new UserResource();
+        r2.setName(Book.class.getName());
+        r2.setPath("/book");
+        UserOperation op2 = new UserOperation();
+        op2.setName("getName");
+        op2.setVerb("GET");
+        r2.setOperations(Collections.singletonList(op2));
+        
+        bean.setModelBeans(r1, r2);
+        bean.setServiceClass(Book.class);
+        assertTrue(bean.create() instanceof Book);
     }
     
     @Test
