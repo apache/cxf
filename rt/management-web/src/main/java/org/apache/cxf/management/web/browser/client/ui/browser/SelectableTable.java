@@ -129,6 +129,7 @@ public class SelectableTable<T> extends Composite {
             for (int j = 0; j < columnDefinitions.size(); j++) {
                 ColumnDefinition<T> columnDefinition = columnDefinitions.get(j);
                 table.setText(i, j, columnDefinition.getContent(entry));
+                table.getCellFormatter().addStyleName(i, j, resources.css().selectableTableRow());
             }
         }
 

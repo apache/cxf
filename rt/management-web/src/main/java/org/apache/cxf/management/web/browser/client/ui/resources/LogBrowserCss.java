@@ -56,6 +56,10 @@ public interface LogBrowserCss extends CssResource {
     String sidebarItem();
     String sidebarHeader();
 
+    String topbarLink();
+
+    String selectableTableRow();
+
     /* Settings tab styles */
     String settingsTabHeader();
     String settingsTabBackButton();

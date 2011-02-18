@@ -19,20 +19,23 @@
   -->
 
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
-<g:HTMLPanel>
-   <table>
-    <tbody>
-       <tr >
-          <td align="right">
-            <g:Hyperlink ui:field="signOutHyperlink">
-               Sign out
-            </g:Hyperlink>
-          </td>
-       </tr>
-    </tbody>
-   </table>
-</g:HTMLPanel>
+   <ui:with field='res'
+            type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
+
+   <g:HTMLPanel>
+      <table>
+         <tbody>
+            <tr>
+               <td align="right">
+                  <g:Hyperlink ui:field="signOutHyperlink" styleName='{res.css.topbarLink}'>
+                     Sign out
+                  </g:Hyperlink>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </g:HTMLPanel>
 
 </ui:UiBinder>

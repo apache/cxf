@@ -36,7 +36,7 @@
 
          <g:HTMLPanel>
                 <g:Label styleName='{res.css.sidebarHeader}'>Tasks</g:Label>
-                <g:Hyperlink ui:field="manageSubscriptionsHyperlink" styleName='{res.css.sidebarItem}'>
+                <g:Hyperlink  ui:field="manageSubscriptionsHyperlink" styleName='{res.css.sidebarItem}'>
                     Manage endpoints
                 </g:Hyperlink>
                 <g:Label styleName='{res.css.sidebarHeader}'>Endpoints</g:Label>
