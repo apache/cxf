@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.addressing.policy;
 
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -66,14 +67,17 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
         if (MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(qn)
             || MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705.equals(qn)) {
             Assertion nap = new XMLPrimitiveAssertionBuilder() {
-                public Assertion newPrimitiveAssertion(Element element) {
+                public Assertion newPrimitiveAssertion(Element element, Map<QName, String> mp) {
                     return new PrimitiveAssertion(MetadataConstants.ADDRESSING_ASSERTION_QNAME,
-                                                  isOptional(element), isIgnorable(element));        
+                                                  isOptional(element), isIgnorable(element), mp);        
                 }
-                public Assertion newPolicyContainingAssertion(Element element, Policy policy) {
+                public Assertion newPolicyContainingAssertion(Element element, 
+                                                              Map<QName, String> mp, 
+                                                              Policy policy) {
                     return new PolicyContainingPrimitiveAssertion(
                                                   MetadataConstants.ADDRESSING_ASSERTION_QNAME,
                                                   isOptional(element), isIgnorable(element),
+                                                  mp,
                                                   policy);
                 }
             } .build(elem, factory); 

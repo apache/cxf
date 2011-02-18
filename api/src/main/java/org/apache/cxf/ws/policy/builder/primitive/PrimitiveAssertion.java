@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.policy.builder.primitive;
 
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -45,6 +47,9 @@ public class PrimitiveAssertion
     }
     public PrimitiveAssertion(QName n, boolean o, boolean i) {
         super(n, o, i);
+    }
+    public PrimitiveAssertion(QName n, boolean o, boolean i, Map<QName, String> atts) {
+        super(n, o, i, atts);
     }
     
     public PrimitiveAssertion(Element element) {
