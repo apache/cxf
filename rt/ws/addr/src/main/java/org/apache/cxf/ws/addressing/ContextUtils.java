@@ -360,7 +360,7 @@ public final class ContextUtils {
      * @param inMAPs the inbound MAPs
      * @param inMessage the current message
      */
-    public static void rebaseResponse(final EndpointReferenceType reference,
+    public static void rebaseResponse(EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {
         
@@ -382,12 +382,13 @@ public final class ContextUtils {
             }
             
             try {
+                if (reference == null) {
+                    reference = ContextUtils.getNoneEndpointReference();
+                }
                 exchange.setOutMessage(partialResponse);
                 Conduit backChannel = target.getBackChannel(inMessage,
                                                             partialResponse,
-                                                            reference == null
-                                                            ? ContextUtils.getNoneEndpointReference()
-                                                            : reference);
+                                                            reference);
 
                 if (backChannel != null) {
                     // set up interceptor chains and send message
@@ -419,7 +420,8 @@ public final class ContextUtils {
                     exchange.setOutMessage(fullResponse);
                     
                     Destination destination = createDecoupledDestination(
-                        exchange, reference);
+                        exchange, 
+                        reference);
                     exchange.setDestination(destination);
                          
                     
