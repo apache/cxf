@@ -19,25 +19,18 @@
 
 package org.apache.cxf.ws.policy.builder.primitive;
 
-import java.util.Collection;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.neethi.Assertion;
-import org.apache.neethi.Constants;
-import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
  * 
  */
 public class PrimitiveAssertion 
-    extends org.apache.neethi.builders.PrimitiveAssertion implements PolicyAssertion {
+    extends org.apache.neethi.builders.PrimitiveAssertion {
 
     public PrimitiveAssertion() {
         super();
@@ -65,22 +58,4 @@ public class PrimitiveAssertion
         return new PrimitiveAssertion(name, opt, ignorable);
     }
 
-    public boolean equal(PolicyComponent policyComponent) {
-        if (policyComponent.getType() != Constants.TYPE_ASSERTION) {
-            return false;
-        }
-        return getName().equals(((PolicyAssertion)policyComponent).getName());
-    }
-
-
-    public boolean isAsserted(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ail = aim.getAssertionInfo(name);
-        for (AssertionInfo ai : ail) {
-            if (ai.isAsserted() && ai.getAssertion().equal(this)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
 }

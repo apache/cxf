@@ -95,9 +95,8 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             Assertion ass = (Assertion)assertion;
             Collection<AssertionInfo> ail = getAssertionInfo(ass.getName());
             for (AssertionInfo ai : ail) {
-                if (ai.isAsserted() && ai.getAssertion() == ass) {
-                    return true;
-                } else if (!ass.isOptional()) {
+                if (ai.getAssertion().equal(ass)
+                    && !ai.isAsserted() && !ass.isOptional()) {
                     errors.add(ass.getName());
                     pass = false;                    
                 }
@@ -106,10 +105,10 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         if (assertion instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)assertion).getPolicy();
             if (p != null) {
-                Iterator it = p.getAlternatives();
-                while (it.hasNext()) {
-                    List<PolicyAssertion> lst = CastUtils.cast((List<?>)it.next());
-                    for (PolicyAssertion p2 : lst) {
+                Iterator<List<Assertion>> alternatives = p.getAlternatives();
+                while (alternatives.hasNext()) {
+                    List<Assertion> pc = alternatives.next();
+                    for (Assertion p2 : pc) {
                         pass &= supportsAlternative(p2, errors);
                     }
                 }
@@ -128,9 +127,9 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     
     public void checkEffectivePolicy(Policy policy) {
         List<QName> errors = new ArrayList<QName>();
-        Iterator<List<PolicyComponent>> alternatives = policy.getAlternatives();
+        Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
-            List<PolicyComponent> pc = alternatives.next();
+            List<Assertion> pc = alternatives.next();
             if (supportsAlternative(pc, errors)) {
                 return;
             }
@@ -150,7 +149,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
                 }
             }
         }
-        StringBuilder error = new StringBuilder("\n");
+        StringBuilder error = new StringBuilder();
         for (String msg : msgs) {
             error.append("\n").append(msg);
         }

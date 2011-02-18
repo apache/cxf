@@ -30,8 +30,8 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 /**
  * This no-op PolicyInterceptorProvider prevents the policy enforcement
  * logic making it impossible to assert the HTTPClientPolicy upfront
- * before the HTTPConduit becomes invoved (e.g. via a WSPolicyFeature
- * applied to the <jawx:client> bean).
+ * before the HTTPConduit becomes involved (e.g. via a WSPolicyFeature
+ * applied to the <jaxws:client> bean).
  */
 @NoJSR250Annotations
 public class NoOpPolicyInterceptorProvider

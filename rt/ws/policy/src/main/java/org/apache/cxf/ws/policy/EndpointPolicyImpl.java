@@ -30,7 +30,6 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -41,7 +40,6 @@ import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyContainingAssertion;
 
 /**
@@ -175,11 +173,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     protected Collection<Assertion> getSupportedAlternatives() {
         Collection<Assertion> alternatives = new ArrayList<Assertion>();
 
-        for (Iterator<List<PolicyComponent>> it = policy.getAlternatives(); it.hasNext();) {
-            List<PolicyComponent> alternative = it.next();
+        for (Iterator<List<Assertion>> it = policy.getAlternatives(); it.hasNext();) {
+            List<Assertion> alternative = it.next();
             if (engine.supportsAlternative(alternative, assertor)) {
-                List<Assertion> asserts = CastUtils.cast(alternative);
-                alternatives.addAll(asserts);
+                alternatives.addAll(alternative);
             }
         }
         return alternatives;
@@ -256,11 +253,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
 
     Collection<Assertion> getSupportedAlternatives(Policy p) {
         Collection<Assertion> alternatives = new ArrayList<Assertion>();
-        for (Iterator<List<PolicyComponent>> it = p.getAlternatives(); it.hasNext();) {
-            List<PolicyComponent> alternative = it.next();
+        for (Iterator<List<Assertion>> it = p.getAlternatives(); it.hasNext();) {
+            List<Assertion> alternative = it.next();
             if (engine.supportsAlternative(alternative, null)) {
-                List<Assertion> asserts = CastUtils.cast(alternative);
-                alternatives.addAll(asserts);
+                alternatives.addAll(alternative);
             }
         }
         return alternatives;

@@ -79,7 +79,6 @@ public class NormalizeTest extends Assert {
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         builder.setAssertionBuilderRegistry(abr);
         PrimitiveAssertionBuilder ab = new PrimitiveAssertionBuilder();
-        ab.setBus(bus);
        
         abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityToken"), ab);
         abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityHeader"), ab);

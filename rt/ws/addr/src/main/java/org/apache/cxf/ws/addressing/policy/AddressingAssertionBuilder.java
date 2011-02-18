@@ -25,14 +25,14 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
-import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
  * 
@@ -47,10 +47,8 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
         MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705,
         MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705
     };
-    private Bus bus;
     
-    public AddressingAssertionBuilder(Bus b) {
-        bus = b;
+    public AddressingAssertionBuilder() {
     }
     
     
@@ -67,9 +65,18 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
         }
         if (MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(qn)
             || MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705.equals(qn)) {
-            PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
-            NestedPrimitiveAssertion nap = new NestedPrimitiveAssertion(elem, builder);
-            nap.setName(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
+            Assertion nap = new XMLPrimitiveAssertionBuilder() {
+                public Assertion newPrimitiveAssertion(Element element) {
+                    return new PrimitiveAssertion(MetadataConstants.ADDRESSING_ASSERTION_QNAME,
+                                                  isOptional(element), isIgnorable(element));        
+                }
+                public Assertion newPolicyContainingAssertion(Element element, Policy policy) {
+                    return new PolicyContainingPrimitiveAssertion(
+                                                  MetadataConstants.ADDRESSING_ASSERTION_QNAME,
+                                                  isOptional(element), isIgnorable(element),
+                                                  policy);
+                }
+            } .build(elem, factory); 
             return nap;
         } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)
             || MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705.equals(qn)) {

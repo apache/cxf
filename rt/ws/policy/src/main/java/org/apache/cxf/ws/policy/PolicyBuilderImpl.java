@@ -22,7 +22,6 @@ package org.apache.cxf.ws.policy;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
-import org.apache.neethi.PolicyEngine;
 
 
 /**
@@ -31,7 +30,8 @@ import org.apache.neethi.PolicyEngine;
  * from DOM elements, but also from an input stream etc.
  */
 @NoJSR250Annotations
-public class PolicyBuilderImpl extends PolicyEngine implements PolicyBuilder, BusExtension {
+public class PolicyBuilderImpl extends org.apache.neethi.PolicyBuilder 
+    implements PolicyBuilder, BusExtension {
     private Bus bus;
    
     public PolicyBuilderImpl() {
@@ -53,6 +53,7 @@ public class PolicyBuilderImpl extends PolicyEngine implements PolicyBuilder, Bu
     public final void setBus(Bus theBus) {
         bus = theBus;
         if (bus != null) {
+            theBus.setExtension(this, PolicyBuilder.class);
             AssertionBuilderRegistry reg = theBus.getExtension(AssertionBuilderRegistry.class);
             if (reg != null) {
                 factory = reg;

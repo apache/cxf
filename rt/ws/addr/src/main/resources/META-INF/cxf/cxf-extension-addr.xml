@@ -24,9 +24,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     
     <bean class="org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder"
 	  id="org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder" 
-	  lazy-init="true">
-        <constructor-arg ref="cxf"/>
-    </bean>
+	  lazy-init="true"/>
     <bean class="org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder"
       id="org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder" 
       lazy-init="true"/>

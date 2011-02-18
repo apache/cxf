@@ -27,12 +27,12 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Assert;
@@ -107,11 +107,11 @@ public class AssertionInfoMapTest extends Assert {
     public void testCheckEffectivePolicy() { 
         Policy p = new Policy();
         QName aqn = new QName("http://x.y.z", "a");
-        PolicyAssertion a = new PrimitiveAssertion(aqn);
+        Assertion a = new PrimitiveAssertion(aqn);
         QName bqn = new QName("http://x.y.z", "b");
-        PolicyAssertion b = new PrimitiveAssertion(bqn);
+        Assertion b = new PrimitiveAssertion(bqn);
         QName cqn = new QName("http://x.y.z", "c");
-        PolicyAssertion c = new PrimitiveAssertion(cqn);
+        Assertion c = new PrimitiveAssertion(cqn);
         All alt1 = new All();
         alt1.addAssertion(a);
         alt1.addAssertion(b);
@@ -146,8 +146,8 @@ public class AssertionInfoMapTest extends Assert {
     @Test
     public void testCheck() throws PolicyException {
         QName aqn = new QName("http://x.y.z", "a");
-        PolicyAssertion a = new PrimitiveAssertion(aqn);
-        Collection<PolicyAssertion> assertions = new ArrayList<PolicyAssertion>();
+        Assertion a = new PrimitiveAssertion(aqn);
+        Collection<Assertion> assertions = new ArrayList<Assertion>();
         assertions.add(a);
         AssertionInfoMap aim = new AssertionInfoMap(assertions);
         try {
@@ -164,20 +164,19 @@ public class AssertionInfoMapTest extends Assert {
     public void testAllAssertionsIn() { 
         
         Policy nested = new Policy();
-        PolicyAssertion nb = new PrimitiveAssertion(
+        Assertion nb = new PrimitiveAssertion(
             new QName("http://x.y.z", "b"));
         nested.addAssertion(nb);
         
         Policy p = new Policy();
-        PolicyAssertion a1 = new PrimitiveAssertion(
+        Assertion a1 = new PrimitiveAssertion(
                                 new QName("http://x.y.z", "a"));
-        PolicyAssertion a2 = new PrimitiveAssertion(
+        Assertion a2 = new PrimitiveAssertion(
                                  new QName("http://x.y.z", "a"));
-        PolicyAssertion b = new PrimitiveAssertion(
+        Assertion b = new PrimitiveAssertion(
                                 new QName("http://x.y.z", "b"));
-        PolicyAssertion c = new NestedPrimitiveAssertion(
-                               new QName("http://x.y.z", "c"), false, nested, true,
-                               null);
+        Assertion c = new PolicyContainingPrimitiveAssertion(
+                               new QName("http://x.y.z", "c"), false, false, nested);
         
         All alt1 = new All();
         alt1.addAssertion(a1);

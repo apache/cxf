@@ -621,7 +621,7 @@ public class PolicyEngineTest extends Assert {
         engine = new PolicyEngineImpl();
         Collection<Assertion> assertions = new ArrayList<Assertion>();
         
-        PolicyAssertion a = control.createMock(PolicyAssertion.class);
+        Assertion a = control.createMock(Assertion.class);
         EasyMock.expect(a.getType()).andReturn(Constants.TYPE_ASSERTION);
         EasyMock.expect(a.isOptional()).andReturn(true);
         

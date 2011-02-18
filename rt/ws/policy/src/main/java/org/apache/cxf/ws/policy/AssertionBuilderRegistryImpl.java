@@ -35,10 +35,10 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.extension.BusExtension;
-import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertionBuilder;
 import org.apache.neethi.AssertionBuilderFactoryImpl;
-import org.apache.neethi.PolicyEngine;
+import org.apache.neethi.PolicyBuilder;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
  * 
@@ -68,9 +68,10 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
         bus = b;
         if (b != null) {
             b.setExtension(this, AssertionBuilderRegistry.class);
-            PolicyBuilder builder = b.getExtension(PolicyBuilder.class);
-            if (builder instanceof PolicyEngine) {
-                engine = (PolicyEngine)builder;
+            org.apache.cxf.ws.policy.PolicyBuilder builder 
+                = b.getExtension(org.apache.cxf.ws.policy.PolicyBuilder.class);
+            if (builder instanceof PolicyBuilder) {
+                engine = (PolicyBuilder)builder;
             }
         }
     }
@@ -107,7 +108,7 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
                 Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
                 LOG.warning(m.toString());
             }
-            return new NestedPrimitiveAssertionBuilder(bus.getExtension(PolicyBuilder.class));
+            return new XMLPrimitiveAssertionBuilder();
         } else {
             Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
             throw new PolicyException(m);

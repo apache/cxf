@@ -25,11 +25,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.neethi.PolicyOperator;
 
 /**
@@ -154,8 +154,8 @@ public final class PolicyUtils {
             buf.append((Assertion)pc);
             buf.append(")");
             nl(buf);
-            if (pc instanceof NestedPrimitiveAssertion) {
-                PolicyComponent nested = ((NestedPrimitiveAssertion)pc).getPolicy();
+            if (pc instanceof PolicyContainingAssertion) {
+                PolicyComponent nested = ((PolicyContainingAssertion)pc).getPolicy();
                 level++;
                 printPolicyComponent(nested, buf, level);
                 level--;                
