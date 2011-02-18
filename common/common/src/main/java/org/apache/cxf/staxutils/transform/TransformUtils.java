@@ -64,7 +64,8 @@ public final class TransformUtils {
                                                                 InputStream is,
                                                                 List<String> inDropElements,
                                                                 Map<String, String> inElementsMap,
-                                                                Map<String, String> inAppendMap) {
+                                                                Map<String, String> inAppendMap,
+                                                                boolean blockOriginalReader) {
         if (inDropElements != null) {
             Set<QName> dropElements = XMLUtils.convertStringsToQNames(inDropElements);
             reader = StaxUtils.createFilteredReader(createNewReaderIfNeeded(reader, is),
@@ -72,7 +73,7 @@ public final class TransformUtils {
         }
         if (inElementsMap != null || inAppendMap != null) {
             reader = new InTransformReader(createNewReaderIfNeeded(reader, is),
-                                           inElementsMap, inAppendMap);
+                                           inElementsMap, inAppendMap, blockOriginalReader);
         }
         return reader;
     }

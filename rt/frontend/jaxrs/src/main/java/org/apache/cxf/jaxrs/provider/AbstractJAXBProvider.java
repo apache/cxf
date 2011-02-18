@@ -645,6 +645,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return TransformUtils.createTransformReaderIfNeeded(reader, is,
                                                             inDropElements,
                                                             inElementsMap,
-                                                            inAppendMap);
+                                                            inAppendMap,
+                                                            true);
     }
 }

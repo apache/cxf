@@ -38,9 +38,10 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
  */
 public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     
-    protected List<String> inDropElements;
-    protected Map<String, String> inElementsMap;
-    protected Map<String, String> inAppendMap;
+    private List<String> inDropElements;
+    private Map<String, String> inElementsMap;
+    private Map<String, String> inAppendMap;
+    private boolean blockOriginalReader = true;
     
     public TransformInInterceptor() {
         super(Phase.POST_STREAM);
@@ -63,7 +64,8 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
         return TransformUtils.createTransformReaderIfNeeded(reader, is,
                                                             inDropElements,
                                                             inElementsMap,
-                                                            inAppendMap);
+                                                            inAppendMap,
+                                                            blockOriginalReader);
     }
     
     public void setInAppendElements(Map<String, String> inElements) {
@@ -78,4 +80,7 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
         this.inElementsMap = inElements;
     }
    
+    public void setBlockOriginalReader(boolean blockOriginalReader) {
+        this.blockOriginalReader = blockOriginalReader;
+    }
 }

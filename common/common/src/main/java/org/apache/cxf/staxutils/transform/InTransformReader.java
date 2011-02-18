@@ -40,14 +40,24 @@ public class InTransformReader extends DepthXMLStreamReader {
     private QName currentQName;
     private QName previousQName;
     private int previousDepth = -1;
+    private boolean blockOriginalReader = true;
     
     public InTransformReader(XMLStreamReader reader, 
                              Map<String, String> inMap,
-                             Map<String, String> appendMap) {
+                             Map<String, String> appendMap,
+                             boolean blockOriginalReader) {
         super(reader);
         inElementsMap = new QNamesMap(inMap == null ? 0 : inMap.size());
+        this.blockOriginalReader = blockOriginalReader;
         TransformUtils.convertToQNamesMap(inMap, inElementsMap, nsMap);
         TransformUtils.convertToMapOfQNames(appendMap, inAppendMap);
+    }
+    
+    @Override
+    // If JAXB schema validation is disabled then returning 
+    // the native reader and thus bypassing this reader may work
+    public XMLStreamReader getReader() {
+        return blockOriginalReader ? this : super.getReader();
     }
     
     public int next() throws XMLStreamException {

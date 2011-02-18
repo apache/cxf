@@ -682,18 +682,34 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                                 new QName("http://books.com", "BookService"));
         BookStoreJaxrsJaxws store = service.getBookPort();
         
-        TransformInInterceptor in =  new TransformInInterceptor();
-        Map<String, String> mapIn = new HashMap<String, String>();
-        mapIn.put("*", "{http://jaxws.jaxrs.systest.cxf.apache.org/}*");
-        in.setInTransformElements(mapIn);
-        
         TransformOutInterceptor out =  new TransformOutInterceptor();
         Map<String, String> mapOut = new HashMap<String, String>();
-        mapOut.put("{http://jaxws.jaxrs.systest.cxf.apache.org/}*", "getBookRequest");
+        // Book content (id, name) is unqualified, thus the following works
+        // because JAXB will report 
+        // - {http://jaxws.jaxrs.systest.cxf.apache.org/}Book
+        // - id
+        // - name
+        // and only the qualified top-level Book tag gets matched by the following
+        // mapping
+        mapOut.put("{http://jaxws.jaxrs.systest.cxf.apache.org/}*", "*");
         out.setOutTransformElements(mapOut);
         
+        TransformInInterceptor in =  new TransformInInterceptor();
+        Map<String, String> mapIn = new HashMap<String, String>();
+        // mapIn.put("*", "{http://jaxws.jaxrs.systest.cxf.apache.org/}*");
+        // won't work for a case where a totally unqualified getBookResponse needs to be
+        // qualified such that only the top-level getBookResponse is processed because of '*'.
+        // Such a mapping would work nicely if we had say a package-info making both
+        // Book id & name qualified; otherwise we need to choose what tag we need to qualify 
+        
+        // mapIn.put("*", "{http://jaxws.jaxrs.systest.cxf.apache.org/}*");
+        // works too if the schema validation is disabled
+        
+        mapIn.put("getBookResponse", "{http://jaxws.jaxrs.systest.cxf.apache.org/}getBookResponse");
+        in.setInTransformElements(mapIn);
         
         Client cl = ClientProxy.getClient(store);
+        ((HTTPConduit)cl.getConduit()).getClient().setReceiveTimeout(10000000);
         cl.getInInterceptors().add(in);
         cl.getOutInterceptors().add(out);
         

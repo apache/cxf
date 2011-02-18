@@ -217,7 +217,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       </property>
       <property name="inTransformElements">
         <map>
-         <entry key="*" value="{http://jaxws.jaxrs.systest.cxf.apache.org/}*"/>
+         <entry key="getBook" value="{http://jaxws.jaxrs.systest.cxf.apache.org/}getBook"/>
         </map>
       </property>
    </bean>
