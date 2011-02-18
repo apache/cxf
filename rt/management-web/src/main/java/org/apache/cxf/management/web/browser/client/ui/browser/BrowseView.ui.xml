@@ -39,9 +39,7 @@
                         </g:west>
                         
                         <g:center>
-                            <g:VerticalPanel>
-                                <g:FlowPanel  styleName="{res.css.viewerSlot}" ui:field="viewerSlot"/>
-                            </g:VerticalPanel>
+                             <g:FlowPanel  styleName="{res.css.viewerSlot}" ui:field="viewerSlot"/>
                         </g:center>
 					</g:SplitLayoutPanel>
 				</g:center>

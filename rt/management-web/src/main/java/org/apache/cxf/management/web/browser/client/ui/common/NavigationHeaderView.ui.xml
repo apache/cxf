@@ -22,7 +22,7 @@
 	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
 <g:HTMLPanel>
-   <table width="100%">
+   <table>
     <tbody>
        <tr >
           <td align="right">

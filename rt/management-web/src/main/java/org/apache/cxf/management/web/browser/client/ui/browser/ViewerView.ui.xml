@@ -31,16 +31,14 @@
                 <g:north size='2.2'>
 
                     <g:HTMLPanel>
-                        <table class='{res.css.browserTabEntryTableHeaders}'>
-                            <thead style="display:none;">
-                                <tr>
-                                    <!--TODO move this values to constans-->
-                                    <th width="160px"/>
-                                    <th width="128px"/>
-                                    <th/>
-                                    <th width="350px"/>
-                                </tr>
-                            </thead>
+                        <table cellspacing="0" cellpadding="0" class='{res.css.browserTabEntryTableHeaders}'>
+                            <colgroup>
+                                 <!--TODO move this values to constans-->
+                                 <col  width="160px"/>
+                                 <col  width="128px"/>
+                                 <col />
+                                 <col width="350px"/>
+                            </colgroup>
                             <tbody>
                                 <tr>
                                     <td>
