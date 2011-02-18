@@ -42,6 +42,21 @@
         <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
     </properties>
 
+    <!-- Temporarily adding Shibboleth repo for Opensaml2 artifacts -->
+    <repositories>
+        <repository>
+            <id>shibboleth</id>
+            <name>Shibboleth Repository</name>
+            <url>http://shibboleth.internet2.edu/downloads/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
