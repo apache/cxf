@@ -24,7 +24,7 @@
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/util 
-http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+http://www.springframework.org/schema/util/spring-util.xsd">
 
   <bean id="atom" class="org.apache.cxf.jaxrs.provider.AtomPojoProvider">
     <property name="atomWriters" ref="atomWriters"/>
