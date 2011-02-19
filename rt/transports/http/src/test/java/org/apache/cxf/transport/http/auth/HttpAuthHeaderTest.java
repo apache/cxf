@@ -16,12 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http;
+package org.apache.cxf.transport.http.auth;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 
 import org.junit.Test;
 

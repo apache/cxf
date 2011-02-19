@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http;
+package org.apache.cxf.transport.http.auth;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -27,8 +27,6 @@ import java.util.Map;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
-import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
