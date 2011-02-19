@@ -32,6 +32,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -51,6 +52,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
     private static final SettingsViewUiBinder UI_BINDER = GWT.create(SettingsViewUiBinder.class);
 
     @UiField @Nonnull
+    DecoratedTabPanel tabPanel;
+
+    @UiField @Nonnull
     FlowPanel navigationHeaderSlot;
 
     @UiField @Nonnull
@@ -61,6 +65,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
     public SettingsViewImpl() {
         initWidget(UI_BINDER.createAndBindUi(this));
+        tabPanel.selectTab(0);
     }
 
     public HasWidgets getNaviagationHeaderSlot() {

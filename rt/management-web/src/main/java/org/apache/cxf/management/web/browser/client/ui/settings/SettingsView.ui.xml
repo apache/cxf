@@ -19,42 +19,71 @@
   -->
 
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
-    <ui:with field='res'
-             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
+   <ui:with field='res'
+            type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
 
-    <g:DockLayoutPanel unit='EM'>
-        <g:north size='7.2'>
-            <g:HTMLPanel>
-                <g:FlowPanel ui:field="navigationHeaderSlot"/>
+   <ui:style>
+    .content {
+       margin: 0.5em 1em;
+       padding: 3px;
+       background-color: #FC6;
+    }
 
-                <div class="{res.css.settingsTabHeader}">
-                    <g:Label addStyleNames="{res.css.settingsTabTitle}">
-                        Settings
-                    </g:Label>
-                    <g:Hyperlink ui:field="backHyperlink" addStyleNames="{res.css.settingsTabBackButton}">
-                        &#171; Back to Explorer
-                    </g:Hyperlink>
-                </div>
-                <div class="{res.css.settingsTabToolBar}">
-                    <g:Button ui:field="addSubscriptionButton">
+    .header {
+       width: auto;
+       margin-bottom: 0.5em;
+    }
+
+    .header td {
+       vertical-align: bottom;
+    }
+
+    .title {
+       font-size: 140%;
+       font-weight: bold;
+       margin-left: 0.3em;
+       margin-right: 1em;
+    }
+
+    .backLink {
+       text-decoration: underline;
+    }
+   </ui:style>
+
+
+   <g:HTMLPanel>
+      <g:FlowPanel ui:field="navigationHeaderSlot"/>
+         <div class="{style.content}">
+            <table class="{style.header}">
+               <tbody>
+                  <tr>
+                     <td>
+                        <g:Label addStyleNames="{style.title}">
+                           Settings
+                        </g:Label>
+                     </td>
+                     <td>
+                        <g:Hyperlink ui:field="backHyperlink" addStyleNames="{style.backLink}">
+                           &#171; Back to Explorer
+                        </g:Hyperlink>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <g:DecoratedTabPanel ui:field="tabPanel" addStyleDependentNames="settings">
+               <g:Tab text="Endpoints">
+                  <g:HTMLPanel>
+                     <g:Button ui:field="addSubscriptionButton">
                         Add endpoint
-                    </g:Button>
-                </div>
-            </g:HTMLPanel>
-        </g:north>
+                     </g:Button>
 
-        <g:center>
-            <g:ScrollPanel>
-                <g:HTMLPanel>
-                    <div class="{res.css.settingsTabContent}">
-                        <g:FlexTable ui:field="subscriptionsTable"
-                                     addStyleNames="{res.css.settingsTabFeedList}"/>
-                    </div>
-                </g:HTMLPanel>
-            </g:ScrollPanel>
-        </g:center>
-    </g:DockLayoutPanel>
+                     <g:FlexTable ui:field="subscriptionsTable"/>
+                  </g:HTMLPanel>
+               </g:Tab>
+            </g:DecoratedTabPanel>
+         </div>
 
+   </g:HTMLPanel>
 </ui:UiBinder>

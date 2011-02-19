@@ -1,0 +1,12 @@
+body table {
+   width:100%;
+}
+
+.gwt-DecoratedTabPanel-settings .gwt-TabPanelBottom {
+   border-color: #FFF7D7;
+   background-color: #FFF7D7;
+}
+
+.gwt-DecoratedTabPanel-settings .tabMiddleLeft, .gwt-DecoratedTabPanel-settings .tabMiddleCenter, .gwt-DecoratedTabPanel-settings .tabMiddleRight, .gwt-DecoratedTabPanel-settings .tabTopLeft, .gwt-DecoratedTabPanel-settings .tabTopCenter, .gwt-DecoratedTabPanel-settings .tabTopRight {
+   background: none repeat scroll 0 0 #FFF7D7 !important;
+}

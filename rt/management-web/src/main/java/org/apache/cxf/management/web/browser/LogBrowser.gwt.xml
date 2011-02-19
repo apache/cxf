@@ -31,6 +31,8 @@
     <script src="jstorage.config.js" />
     <script src="jstorage.min.js" />
 
+   <stylesheet src="custom.css" />
+
 	<entry-point class='org.apache.cxf.management.web.browser.client.LogBrowser' />
 
     <public path='resources' />
