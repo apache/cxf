@@ -34,7 +34,8 @@
                 <td>
 					<dp:DateBox></dp:DateBox>
 				</td>
-
+         </tr>
+         <tr>
 				<td>
 					<g:Label>To:</g:Label>
 				</td>
@@ -43,19 +44,20 @@
 				</td>
 			</tr>
             <tr>
-                <td>
+                <td valign="top">
                     <g:Label>Levels:</g:Label>
                 </td>
                 <td>
                     <g:VerticalPanel>
-                        <g:CheckBox>DEBUG</g:CheckBox>
-                        <g:CheckBox>WARN</g:CheckBox>
-                        <g:CheckBox>INFO</g:CheckBox>
-                        <g:CheckBox>ERROR</g:CheckBox>
+                        <g:CheckBox>Debug</g:CheckBox>
+                        <g:CheckBox>Warning</g:CheckBox>
+                        <g:CheckBox>Information</g:CheckBox>
+                        <g:CheckBox>Error</g:CheckBox>
                     </g:VerticalPanel>
                 </td>
             </tr>
 		</table>
+
 		<g:FlowPanel addStyleNames="{res.css.editFeedDialogButtons}">
 			<g:Button ui:field="cancelButton">
                 Cancel
