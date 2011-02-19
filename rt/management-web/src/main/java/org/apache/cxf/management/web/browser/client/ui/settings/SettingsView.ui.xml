@@ -25,36 +25,36 @@
             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
 
    <ui:style>
-    .content {
-       margin: 0.5em 1em;
-       padding: 3px;
-       background-color: #FC6;
-    }
+      .content {
+         margin: 0.5em 1em;
+         padding: 3px;
+         background-color: #FC6;
+      }
 
-    .header {
-       width: auto;
-       margin-bottom: 0.5em;
-    }
+      .header {
+         width: auto;
+         margin-bottom: 0.5em;
+      }
 
-    .header td {
-       vertical-align: bottom;
-    }
+      .header td {
+         vertical-align: bottom;
+      }
 
-    .title {
-       font-size: 140%;
-       font-weight: bold;
-       margin-left: 0.3em;
-       margin-right: 1em;
-    }
+      .title {
+         font-size: 140%;
+         font-weight: bold;
+         margin-left: 0.3em;
+         margin-right: 1em;
+      }
 
-    .backLink {
-       text-decoration: underline;
-    }
+      .backLink {
+         text-decoration: underline;
+      }
    </ui:style>
 
-
-   <g:HTMLPanel>
-      <g:FlowPanel ui:field="navigationHeaderSlot"/>
+   <g:ScrollPanel>
+      <g:HTMLPanel>
+         <g:FlowPanel ui:field="navigationHeaderSlot"/>
          <div class="{style.content}">
             <table class="{style.header}">
                <tbody>
@@ -85,5 +85,6 @@
             </g:DecoratedTabPanel>
          </div>
 
-   </g:HTMLPanel>
+      </g:HTMLPanel>
+   </g:ScrollPanel>
 </ui:UiBinder>

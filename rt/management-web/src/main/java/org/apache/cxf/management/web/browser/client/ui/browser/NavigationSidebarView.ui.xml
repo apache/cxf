@@ -22,45 +22,49 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
              xmlns:logbrowser='urn:import:org.apache.cxf.management.web.browser.client.ui.browser'>
 
-    <ui:with field='res'
-             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
+   <ui:with field='res'
+            type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
 
    <g:StackLayoutPanel unit='EM'>
       <g:stack>
-            <g:header size='3'>
-                <div>
-                    <div/>
-                    Explore
-                </div>
-            </g:header>
+         <g:header size='3'>
+            <div>
+               <div/>
+               Explore
+            </div>
+         </g:header>
 
-         <g:HTMLPanel>
-                <g:Label styleName='{res.css.sidebarHeader}'>Tasks</g:Label>
-                <g:Hyperlink  ui:field="manageSubscriptionsHyperlink" styleName='{res.css.sidebarItem}'>
-                    Manage endpoints
-                </g:Hyperlink>
-                <g:Label styleName='{res.css.sidebarHeader}'>Endpoints</g:Label>
-                <logbrowser:SubscriptionTable ui:field='exploreSubscriptionTable'
-                                              styleName='{res.css.browserTabEntrySelectableTable}'/>
-         </g:HTMLPanel>
-        </g:stack>
-        <g:stack>
-            <g:header size='3'>
-                <div>
-                    <div/>
-                    Filter
-                </div>
-            </g:header>
-
+         <g:ScrollPanel>
             <g:HTMLPanel>
-                <g:Label styleName='{res.css.sidebarHeader}'>Tasks</g:Label>
-                <g:Hyperlink ui:field="editCriteriaHyperlink" styleName='{res.css.sidebarItem}'>
-                    Edit criteria
-                </g:Hyperlink>
-                <g:Label styleName='{res.css.sidebarHeader}'>Endpoints</g:Label>
-                <logbrowser:SubscriptionTable ui:field='filterSubscriptionTable'
-                                              styleName='{res.css.browserTabEntrySelectableTable}'/>
+               <g:Label styleName='{res.css.sidebarHeader}'>Tasks</g:Label>
+               <g:Hyperlink  ui:field="manageSubscriptionsHyperlink" styleName='{res.css.sidebarItem}'>
+                  Manage endpoints
+               </g:Hyperlink>
+               <g:Label styleName='{res.css.sidebarHeader}'>Endpoints</g:Label>
+               <logbrowser:SubscriptionTable ui:field='exploreSubscriptionTable'
+                                             styleName='{res.css.browserTabEntrySelectableTable}'/>
             </g:HTMLPanel>
-        </g:stack>
-    </g:StackLayoutPanel>
+         </g:ScrollPanel>
+      </g:stack>
+      <g:stack>
+         <g:header size='3'>
+            <div>
+               <div/>
+               Filter
+            </div>
+         </g:header>
+
+         <g:ScrollPanel>
+            <g:HTMLPanel>
+               <g:Label styleName='{res.css.sidebarHeader}'>Tasks</g:Label>
+               <g:Hyperlink ui:field="editCriteriaHyperlink" styleName='{res.css.sidebarItem}'>
+                  Edit criteria
+               </g:Hyperlink>
+               <g:Label styleName='{res.css.sidebarHeader}'>Endpoints</g:Label>
+               <logbrowser:SubscriptionTable ui:field='filterSubscriptionTable'
+                                             styleName='{res.css.browserTabEntrySelectableTable}'/>
+            </g:HTMLPanel>
+         </g:ScrollPanel>
+      </g:stack>
+   </g:StackLayoutPanel>
 </ui:UiBinder>
