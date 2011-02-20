@@ -240,7 +240,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             Endpoint ep = createEndpoint();
             if (getServiceClass() != null) {
                 for (ClassResourceInfo info : serviceFactory.getClassResourceInfo()) {
-                    if (info.getServiceClass().isAssignableFrom(getServiceClass())) {
+                    if (info.getServiceClass().isAssignableFrom(getServiceClass())
+                        || getServiceClass().isAssignableFrom(info.getServiceClass())) {
                         cri = info;
                         break;
                     }
