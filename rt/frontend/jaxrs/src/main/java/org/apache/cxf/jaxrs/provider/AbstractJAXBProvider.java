@@ -207,7 +207,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             }
         }
         if (name == null && marshalAsJaxbElement) {
-            name = JAXRSUtils.convertStringToQName(cls.getSimpleName());
+            name = new QName(getPackageNamespace(cls),
+                             cls.getSimpleName());
         }
         if (name != null) {
             return new JAXBElement(name, cls, null, obj);
@@ -284,10 +285,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         if (root != null) {
             String namespace = getNamespace(root.namespace());
             if ("".equals(namespace)) {
-                String packageNs = JAXBUtils.getPackageNamespace(cls);
-                if (packageNs != null) {
-                    namespace = getNamespace(packageNs);
-                }
+                namespace = getPackageNamespace(cls);
             }
             String name = getLocalName(root.name(), cls.getSimpleName(), pluralName);
             return new QName(namespace, name);
@@ -324,6 +322,11 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             name += 's';
         }
         return name;
+    }
+    
+    private String getPackageNamespace(Class<?> cls) {
+        String packageNs = JAXBUtils.getPackageNamespace(cls);
+        return packageNs != null ? getNamespace(packageNs) : "";
     }
     
     private String getNamespace(String namespace) {
