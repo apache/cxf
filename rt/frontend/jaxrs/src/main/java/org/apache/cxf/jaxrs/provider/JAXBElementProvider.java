@@ -153,7 +153,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (JAXBElement.class.isAssignableFrom(type) 
                 || unmarshalAsJaxbElement 
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
-                response = unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(is), theType);
+                XMLStreamReader reader = getStreamReader(is, type, mt);
+                response = unmarshaller.unmarshal(
+                     TransformUtils.createNewReaderIfNeeded(reader, is), 
+                     theType);
             } else {
                 response = doUnmarshal(unmarshaller, type, is, mt);
             }

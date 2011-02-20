@@ -62,10 +62,12 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
+import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2NoRootElement;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.index.TestBean;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookNoRootElement;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.ManyTags;
@@ -303,6 +305,28 @@ public class JAXBElementProviderTest extends Assert {
         readSuperBook2(bos.toString(), false);
     }
     
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testWriteWithoutXmlRootElementWithPackageInfo() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setMarshallAsJaxbElement(true);
+        Book2NoRootElement book = new Book2NoRootElement(333);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(book, Book2NoRootElement.class, 
+                         Book2NoRootElement.class,
+                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        provider.setUnmarshallAsJaxbElement(true);
+        
+        ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
+        Book2NoRootElement book2 = 
+            (Book2NoRootElement)provider.readFrom(
+                       (Class)Book2NoRootElement.class, 
+                       Book2NoRootElement.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertEquals(book2.getId(), book.getId());
+    }
+    
     @Test
     @SuppressWarnings("unchecked")
     public void testWriteWithoutXmlRootElementObjectFactory() throws Exception {
@@ -339,6 +363,40 @@ public class JAXBElementProviderTest extends Assert {
                        (Class)SuperBook.class, SuperBook.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(124L, book.getSuperId());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadSuperBookWithJaxbElement() throws Exception {
+        final String data = "<BookNoRootElement>"
+            + "<name>superbook</name><id>111</id>" 
+            + "</BookNoRootElement>";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setUnmarshallAsJaxbElement(true);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        BookNoRootElement book = (BookNoRootElement)provider.readFrom(
+                       (Class)BookNoRootElement.class, BookNoRootElement.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertEquals(111L, book.getId());
+        assertEquals("superbook", book.getName());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadSuperBookWithJaxbElementAndTransform() throws Exception {
+        final String data = "<BookNoRootElement xmlns=\"http://books\">"
+            + "<name>superbook</name><id>111</id>" 
+            + "</BookNoRootElement>";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setUnmarshallAsJaxbElement(true);
+        provider.setInTransformElements(Collections.singletonMap(
+             "{http://books}*", ""));
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        BookNoRootElement book = (BookNoRootElement)provider.readFrom(
+                       (Class)BookNoRootElement.class, BookNoRootElement.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertEquals(111L, book.getId());
+        assertEquals("superbook", book.getName());
     }
     
     @SuppressWarnings("unchecked")
