@@ -42,6 +42,6 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
     </bean>
 
     <osgi:reference id="osgiDestinationRegistry"
-                    interface="org.apache.cxf.transport.http.org.apache.cxf.transport.http.DestinationRegistry" />
+                    interface="org.apache.cxf.transport.http.DestinationRegistry" />
 
 </beans>
