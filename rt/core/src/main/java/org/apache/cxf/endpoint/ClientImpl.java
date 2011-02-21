@@ -394,156 +394,126 @@ public class ClientImpl
                        Exchange exchange) throws Exception {
         invoke(callback, oi, params, null, exchange);
     }
-    
-    @SuppressWarnings("unchecked")
+
     public void invoke(ClientCallback callback,
                        BindingOperationInfo oi,
                        Object[] params,
                        Map<String, Object> context,
                        Exchange exchange) throws Exception {
-        Bus origBus = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus(bus);
-        try {
-            if (exchange == null) {
-                exchange = new ExchangeImpl();
-            }
-            exchange.setSynchronous(false);
-            Endpoint endpoint = getEndpoint();
-            if (context == null) {
-                context = new HashMap<String, Object>();
-                Map<String, Object> resp = new HashMap<String, Object>();
-                resp.clear();
-                Map<String, Object> reqContext = new HashMap<String, Object>(getRequestContext());
-                context.put(RESPONSE_CONTEXT, resp);
-                context.put(REQUEST_CONTEXT, reqContext);
-            }
-                        
-            Map<String, Object> reqContext = (Map<String, Object>)context.get(REQUEST_CONTEXT);
-
-            Message message = endpoint.getBinding().createMessage();
-            message.put(Message.INVOCATION_CONTEXT, context);
-
-            //setup the message context
-            setContext(reqContext, message);
-            setParameters(params, message);
-
-            if (null != reqContext) {
-                exchange.putAll(reqContext);
-            }
-            exchange.setOneWay(oi.getOutput() == null);
-            exchange.setOutMessage(message);
-            exchange.put(ClientCallback.class, callback);
-
-            setOutMessageProperties(message, oi);
-            setExchangeProperties(exchange, endpoint, oi);
-
-            // setup chain
-
-            PhaseInterceptorChain chain = setupInterceptorChain(endpoint);
-            message.setInterceptorChain(chain);
-
-            chain.setFaultObserver(outFaultObserver);
-
-            // setup conduit selector
-            prepareConduitSelector(message);
-            
-            // add additional interceptors and such
-            modifyChain(chain, message, false);
-
-            // execute chain
-            chain.doIntercept(message);
-
-        } finally {
-            BusFactory.setThreadDefaultBus(origBus);
-        }
+        doInvoke(callback, oi, params, context, exchange);
     }
 
     public Object[] invoke(BindingOperationInfo oi,
                            Object[] params,
                            Map<String, Object> context,
                            Exchange exchange) throws Exception {
+        return doInvoke(null, oi, params, context, exchange);
+    }
+
+    private Object[] doInvoke(ClientCallback callback,
+                              BindingOperationInfo oi,
+                              Object[] params,
+                              Map<String, Object> context,
+                              Exchange exchange) throws Exception {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         try {
             if (exchange == null) {
                 exchange = new ExchangeImpl();
             }
-            exchange.setSynchronous(true);
+            exchange.setSynchronous(callback == null);
             Endpoint endpoint = getEndpoint();
-
-            Map<String, Object> reqContext = null;
-            Map<String, Object> resContext = null;
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Invoke, operation info: " + oi + ", params: " + Arrays.toString(params));
             }
             Message message = endpoint.getBinding().createMessage();
-            if (null != context) {
-                reqContext = CastUtils.cast((Map)context.get(REQUEST_CONTEXT));
-                resContext = CastUtils.cast((Map)context.get(RESPONSE_CONTEXT));
-                message.put(Message.INVOCATION_CONTEXT, context);
+            
+            // Make sure INVOCATION CONTEXT, REQUEST_CONTEXT and RESPONSE_CONTEXT are present
+            // on message
+            Map<String, Object> reqContext = null;
+            Map<String, Object> resContext = null;
+            if (context == null) {
+                context = new HashMap<String, Object>();
             }
-            //setup the message context
+            reqContext = CastUtils.cast((Map)context.get(REQUEST_CONTEXT));
+            resContext = CastUtils.cast((Map)context.get(RESPONSE_CONTEXT));
+            if (reqContext == null) { 
+                reqContext = new HashMap<String, Object>(getRequestContext());
+                context.put(REQUEST_CONTEXT, reqContext);
+            }
+            if (resContext == null) {
+                resContext = new HashMap<String, Object>();
+                context.put(RESPONSE_CONTEXT, resContext);
+            }
+            
+            message.put(Message.INVOCATION_CONTEXT, context);
             setContext(reqContext, message);
-            setParameters(params, message);
-
             if (null != reqContext) {
                 exchange.putAll(reqContext);
             }
+            
+            setParameters(params, message);
 
             if (null != oi) {
                 exchange.setOneWay(oi.getOutput() == null);
             }
 
             exchange.setOutMessage(message);
-
+            exchange.put(ClientCallback.class, callback);
+            
             setOutMessageProperties(message, oi);
             setExchangeProperties(exchange, endpoint, oi);
 
-            // setup chain
-
             PhaseInterceptorChain chain = setupInterceptorChain(endpoint);
             message.setInterceptorChain(chain);
-
             chain.setFaultObserver(outFaultObserver);
-
-            // setup conduit selector
             prepareConduitSelector(message);
 
             // add additional interceptors and such
             modifyChain(chain, message, false);
             try {
-                // execute chain
                 chain.doIntercept(message);
             } catch (Fault fault) {
-                if (fault.getCause().getCause() instanceof IOException
-                        || fault.getCause() instanceof IOException) {
-                    String soap11NS = "http://schemas.xmlsoap.org/soap/envelope/";
-                    String soap12NS = "http://www.w3.org/2003/05/soap-envelope";
-                    QName faultCode = fault.getFaultCode();
-                    //for SoapFault, if it's underlying cause is IOException, 
-                    //it means something like server is down or can't create 
-                    //connection, according to soap spec we should set fault as
-                    //Server Fault
-                    if (faultCode.getNamespaceURI().equals(
-                            soap11NS)
-                            && faultCode.getLocalPart().equals("Client")) {
-                        faultCode = new QName(soap11NS, "Server");
-                        fault.setFaultCode(faultCode);
-                    }
-                    if (faultCode.getNamespaceURI().equals(
-                            soap12NS)
-                            && faultCode.getLocalPart().equals("Sender")) {
-                        faultCode = new QName(soap12NS, "Receiver");
-                        fault.setFaultCode(faultCode);
-                    }
-                }
+                enrichFault(fault);
                 throw fault;
             }
-
-            return processResult(message, exchange, oi, resContext);
-
+            
+            if (callback != null) {
+                return null;
+            } else {
+                return processResult(message, exchange, oi, resContext);
+            }
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
+        }
+    }
+
+    /**
+     * TODO This is SOAP specific code and should not be in cxf core
+     * @param fault
+     */
+    private void enrichFault(Fault fault) {
+        if (fault.getCause().getCause() instanceof IOException
+                || fault.getCause() instanceof IOException) {
+            String soap11NS = "http://schemas.xmlsoap.org/soap/envelope/";
+            String soap12NS = "http://www.w3.org/2003/05/soap-envelope";
+            QName faultCode = fault.getFaultCode();
+            //for SoapFault, if it's underlying cause is IOException, 
+            //it means something like server is down or can't create 
+            //connection, according to soap spec we should set fault as
+            //Server Fault
+            if (faultCode.getNamespaceURI().equals(
+                    soap11NS)
+                    && faultCode.getLocalPart().equals("Client")) {
+                faultCode = new QName(soap11NS, "Server");
+                fault.setFaultCode(faultCode);
+            }
+            if (faultCode.getNamespaceURI().equals(
+                    soap12NS)
+                    && faultCode.getLocalPart().equals("Sender")) {
+                faultCode = new QName(soap12NS, "Receiver");
+                fault.setFaultCode(faultCode);
+            }
         }
     }
 
