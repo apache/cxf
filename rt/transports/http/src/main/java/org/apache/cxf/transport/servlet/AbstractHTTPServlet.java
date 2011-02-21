@@ -263,8 +263,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         
         @Override
         public String getRequestURI() {
-            String query = super.getQueryString();
-            return query != null ? pathInfo + "?" + query : pathInfo; 
+            return getContextPath() + servletPath + pathInfo;
         }
         
     }
