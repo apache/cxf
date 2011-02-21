@@ -154,7 +154,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
                 XMLStreamReader reader = getStreamReader(is, type, mt);
                 response = unmarshaller.unmarshal(
-                     TransformUtils.createNewReaderIfNeeded(reader, is), 
+                     createNewReaderIfNeeded(reader, is), 
                      theType);
             } else {
                 response = doUnmarshal(unmarshaller, type, is, mt);
