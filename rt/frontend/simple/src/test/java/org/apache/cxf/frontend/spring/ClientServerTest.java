@@ -47,7 +47,7 @@ public class ClientServerTest extends AbstractSimpleFrontendSpringTest {
         assertNotNull(greeter);
         
         String result = greeter.sayHello();
-        assertEquals("We get the wrong sayHello result", result, "hello");
+        assertEquals("We get the wrong sayHello result", "hello", result);
         
         
         Client c = ClientProxy.getClient(greeter);
