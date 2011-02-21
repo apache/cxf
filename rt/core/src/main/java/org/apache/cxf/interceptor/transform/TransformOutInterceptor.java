@@ -65,6 +65,9 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     public void handleMessage(Message message) {
+        if (!isHttpVerbSupported(message)) {
+            return;
+        }
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         OutputStream out = message.getContent(OutputStream.class);
         
@@ -105,5 +108,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         this.attributesToElements = value;
     }
     
+    protected boolean isHttpVerbSupported(Message message) {
+        return  isRequestor(message) && isGET(message) ? false : true;
+    }
     
 }
