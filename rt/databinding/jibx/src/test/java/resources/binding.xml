@@ -1,0 +1,14 @@
+<binding xmlns:ns1="http://sosnoski.com/ws/library/types" name="binding" package="com.sosnoski.ws.library.types">
+  <namespace uri="http://sosnoski.com/ws/library/types" default="elements"/>
+  <mapping abstract="true" type-name="ns1:bookInformation" class="com.sosnoski.ws.library.types.BookInformation">
+    <collection field="authorList" usage="optional" create-type="java.util.ArrayList">
+      <value name="string" type="java.lang.String"/>
+    </collection>
+    <value style="element" name="title" field="title" usage="optional"/>
+    <value style="element" name="type" field="type" usage="optional"/>
+    <value style="element" name="isbn" field="isbn" usage="optional"/>
+  </mapping>
+  <mapping class="com.sosnoski.ws.library.types.BookInformation" name="bookInformation">
+    <structure map-as="ns1:bookInformation"/>
+  </mapping>
+</binding>

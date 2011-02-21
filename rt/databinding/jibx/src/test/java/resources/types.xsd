@@ -1,0 +1,14 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://sosnoski.com/ws/library/types" elementFormDefault="qualified" targetNamespace="http://sosnoski.com/ws/library/types">
+  <xs:complexType name="bookInformation">
+    <xs:annotation>
+      <xs:documentation>Schema fragment(s) for this class: <![CDATA[<pre> &lt;xs:complexType xmlns:ns="http://ws.sosnoski.com/library/types" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="BookInformation"> &lt;xs:sequence> &lt;xs:element type="xs:string" name="author" minOccurs="0" maxOccurs="unbounded"/> &lt;xs:element type="xs:string" name="title"/> &lt;/xs:sequence> &lt;xs:attribute type="xs:string" use="required" name="type"/> &lt;xs:attribute type="xs:string" use="required" name="isbn"/> &lt;/xs:complexType> ]]>/pre></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element type="xs:string" name="title" minOccurs="0"/>
+      <xs:element type="xs:string" name="type" minOccurs="0"/>
+      <xs:element type="xs:string" name="isbn" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element type="tns:bookInformation" name="bookInformation"/>
+</xs:schema>

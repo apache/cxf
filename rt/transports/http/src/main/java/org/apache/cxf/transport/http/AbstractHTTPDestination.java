@@ -214,10 +214,10 @@ public abstract class AbstractHTTPDestination
         
         DelegatingInputStream in = new DelegatingInputStream(req.getInputStream()) {
             public void cacheInput() {
-                if (!cached) {
-                    //we need to cache the values of the HttpServletRequest
+                if (!cached && inMessage.getExchange().getOutMessage() == null) {
+                    //For one-ways, we need to cache the values of the HttpServletRequest
                     //so they can be queried later for things like paths and schemes 
-                    //and such like that 
+                    //and such like that.                   
                     inMessage.put(HTTP_REQUEST, new HttpServletRequestSnapshot(req));
                 }
                 super.cacheInput();
