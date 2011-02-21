@@ -202,22 +202,26 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
             } 
             Collection<SequenceAcknowledgement> acks = rmps.getAcks();
             if (null != acks) {
-                for (SequenceAcknowledgement ack : acks) {
-                    encodeProperty(ack, 
-                                   RMConstants.getSequenceAckQName(), 
-                                   SequenceAcknowledgement.class, 
-                                   hdr,
-                                   marshaller);
+                synchronized (acks) {
+                    for (SequenceAcknowledgement ack : acks) {
+                        encodeProperty(ack, 
+                                       RMConstants.getSequenceAckQName(), 
+                                       SequenceAcknowledgement.class, 
+                                       hdr,
+                                       marshaller);
+                    }
                 }
             }
             Collection<AckRequestedType> requested = rmps.getAcksRequested();
             if (null != requested) {
-                for (AckRequestedType ar : requested) {
-                    encodeProperty(ar, 
-                                   RMConstants.getAckRequestedQName(), 
-                                   AckRequestedType.class, 
-                                   hdr,
-                                   marshaller);
+                synchronized (requested) {
+                    for (AckRequestedType ar : requested) {
+                        encodeProperty(ar, 
+                                       RMConstants.getAckRequestedQName(), 
+                                       AckRequestedType.class, 
+                                       hdr,
+                                       marshaller);
+                    }
                 }
             }
             Node node = hdr.getFirstChild();

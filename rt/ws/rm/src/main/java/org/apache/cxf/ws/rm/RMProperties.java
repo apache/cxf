@@ -40,11 +40,15 @@ public class RMProperties {
     }
     
     public void setAcks(Collection<SequenceAcknowledgement> a) {
-        acks = a;
+        synchronized (a) {
+            acks = a;
+        }
     }
     
     public void setAcksRequested(Collection<AckRequestedType> ar) {
-        acksRequested = ar;       
+        synchronized (ar) {
+            acksRequested = ar;
+        }
     }
     
     public void setSequence(SequenceType s) {
@@ -65,9 +69,11 @@ public class RMProperties {
         if (null == acks) {
             acks = new ArrayList<SequenceAcknowledgement>();
         }
-        SequenceAcknowledgement ack = seq.getAcknowledgment();
-        acks.add(ack);
-        seq.acknowledgmentSent();
+        synchronized (acks) {
+            SequenceAcknowledgement ack = seq.getAcknowledgment();
+            acks.add(ack);
+            seq.acknowledgmentSent();
+        }
     }
   
 }

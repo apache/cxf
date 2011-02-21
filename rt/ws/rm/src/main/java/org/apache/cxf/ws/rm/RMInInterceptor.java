@@ -123,13 +123,15 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();
         if (null != acks) {
-            for (SequenceAcknowledgement ack : acks) {
-                Identifier id = ack.getIdentifier();
-                SourceSequence ss = source.getSequence(id);                
-                if (null != ss) {
-                    ss.setAcknowledged(ack);
-                } else {
-                    throw (new SequenceFaultFactory()).createUnknownSequenceFault(id);
+            synchronized (acks) {
+                for (SequenceAcknowledgement ack : acks) {
+                    Identifier id = ack.getIdentifier();
+                    SourceSequence ss = source.getSequence(id);                
+                    if (null != ss) {
+                        ss.setAcknowledged(ack);
+                    } else {
+                        throw (new SequenceFaultFactory()).createUnknownSequenceFault(id);
+                    }
                 }
             }
         }
