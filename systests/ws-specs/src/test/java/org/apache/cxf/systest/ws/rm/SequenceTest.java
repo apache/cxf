@@ -1244,7 +1244,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     @Test
     public void testTerminateOnShutdown() throws Exception {
         init("org/apache/cxf/systest/ws/rm/terminate-on-shutdown.xml", true);
-        
+
         greeter.greetMeOneWay("neutrophil");
         greeter.greetMeOneWay("basophil");
         greeter.greetMeOneWay("eosinophil");
