@@ -22,6 +22,7 @@ package org.apache.cxf.transport.servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
 
 public abstract class AbstractServletController {
@@ -69,27 +70,27 @@ public abstract class AbstractServletController {
         }
         
         String hideServiceList = servletConfig.getInitParameter("hide-service-list-page");
-        if (hideServiceList != null) {
+        if (!StringUtils.isEmpty(hideServiceList)) {
             isHideServiceList = Boolean.valueOf(hideServiceList);
         }
         String isDisableAddressUpdates = servletConfig.getInitParameter("disable-address-updates");
-        if (isDisableAddressUpdates != null) {
+        if (!StringUtils.isEmpty(isDisableAddressUpdates)) {
             disableAddressUpdates = Boolean.valueOf(isDisableAddressUpdates);
         }
         String isForcedBaseAddress = servletConfig.getInitParameter("base-address");
-        if (isForcedBaseAddress != null) {
+        if (!StringUtils.isEmpty(isForcedBaseAddress)) {
             forcedBaseAddress = isForcedBaseAddress;
         }
         String serviceListTransform = servletConfig.getInitParameter("service-list-stylesheet");
-        if (serviceListTransform != null) {
+        if (!StringUtils.isEmpty(serviceListTransform)) {
             serviceListStyleSheet = serviceListTransform;
         }
         String serviceListPath = servletConfig.getInitParameter("service-list-path");
-        if (serviceListPath != null) {
+        if (!StringUtils.isEmpty(serviceListPath)) {
             serviceListRelativePath = serviceListPath;
         }
         String configTitle = servletConfig.getInitParameter("service-list-title");
-        if (configTitle != null) {
+        if (!StringUtils.isEmpty(configTitle)) {
             title = configTitle;
         }
     }
