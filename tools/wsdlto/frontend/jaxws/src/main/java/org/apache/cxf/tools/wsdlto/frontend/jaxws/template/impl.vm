@@ -94,7 +94,7 @@ public class ${implName} implements $intf.Name {
             ${method.return.writeDefaultValue(${out}, "            ", ${method.Name}, "_return")}
             return _return;
 #end
-        } catch (Exception ex) {
+        } catch (java.lang.Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
         }
