@@ -21,6 +21,7 @@ package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +39,8 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
+import org.apache.cxf.wsdl.WSDLLibrary;
+import org.apache.cxf.wsdl.http.AddressType;
 
 public abstract class AbstractServletController {
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
@@ -81,6 +84,50 @@ public abstract class AbstractServletController {
     }
     public void setTitle(String t) {
         title = t;
+    }
+    
+    protected synchronized void updateDests(HttpServletRequest request) {
+        updateDests(request, false);
+    }
+    
+    protected synchronized void updateDests(HttpServletRequest request, boolean force) {
+        
+        String base = forcedBaseAddress == null ? getBaseURL(request) : forcedBaseAddress;
+                
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null) {
+            pathInfo = "/";
+        }
+        
+        Set<String> paths = destinationRegistry.getDestinationsPaths();
+        for (String path : paths) {
+            if (!force && pathInfo != null && !pathInfo.startsWith(path)) {
+                continue;
+            }
+            AbstractHTTPDestination d2 = destinationRegistry.getDestinationForPath(path);
+            String ad = d2.getEndpointInfo().getAddress();
+            if (ad == null 
+                && d2.getAddress() != null
+                && d2.getAddress().getAddress() != null) {
+                ad = d2.getAddress().getAddress().getValue();
+                if (ad == null) {
+                    ad = "/";
+                }
+            }
+            if (ad != null 
+                && (ad.equals(path))) {
+                if (disableAddressUpdates) {
+                    request.setAttribute("org.apache.cxf.transport.endpoint.address", 
+                                         base + path);
+                } else {
+                    d2.getEndpointInfo().setAddress(base + path);
+                    if (WSDLLibrary.isAvailable() 
+                        && d2.getEndpointInfo().getExtensor(AddressType.class) != null) {
+                        d2.getEndpointInfo().getExtensor(AddressType.class).setLocation(base + path);
+                    }
+                }
+            }
+        }
     }
     
     private void init() {

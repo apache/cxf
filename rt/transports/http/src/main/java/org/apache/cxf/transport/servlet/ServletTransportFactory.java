@@ -27,19 +27,15 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
-import org.apache.cxf.wsdl.http.AddressType;
 
 public class ServletTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
    
-    private ServletController controller;
-    
     public ServletTransportFactory(Bus b) {
         super.setBus(b);
         List<String> ids = Arrays.asList(new String[] {
@@ -54,10 +50,6 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
     public ServletTransportFactory() {
     }
    
-    public void setServletController(ServletController c) {
-        controller = c;
-    }
-
     @Resource(name = "cxf")
     public void setBus(Bus b) {
         super.setBus(b);
@@ -70,20 +62,6 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
             String path = registry.getTrimmedPath(endpointInfo.getAddress());
             d = new ServletDestination(getBus(), registry, endpointInfo, path);
             registry.addDestination(path, d);
-
-            if (controller != null
-                && !StringUtils.isEmpty(controller.getLastBaseURL())) {
-                String ad = d.getEndpointInfo().getAddress();
-                if (ad != null 
-                    && (ad.equals(path)
-                    || ad.equals(controller.getLastBaseURL() + path))) {
-                    d.getEndpointInfo().setAddress(controller.getLastBaseURL() + path);
-                    if (d.getEndpointInfo().getExtensor(AddressType.class) != null) {
-                        d.getEndpointInfo().getExtensor(AddressType.class)
-                            .setLocation(controller.getLastBaseURL() + path);
-                    }
-                }
-            }
         }
         return d;
     }

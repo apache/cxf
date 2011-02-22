@@ -9,6 +9,6 @@
   ]
  },
  "attributes":{
-  "xml:base":"http://localhost:9080/atom/atom/books/entries/123"
+  "xml:base":"http://localhost:9080/atom/atomservice3/atom/books/entries/123"
  }
 }

@@ -69,7 +69,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </jaxrs:server>
   
   <jaxrs:server id="atomservice3"
-		        address="/">
+		        address="/atomservice3">
     <jaxrs:serviceBeans>
       <ref bean="atomstore3"/>
     </jaxrs:serviceBeans>

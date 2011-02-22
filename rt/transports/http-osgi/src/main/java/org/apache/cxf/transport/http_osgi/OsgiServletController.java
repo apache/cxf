@@ -19,7 +19,6 @@
 package org.apache.cxf.transport.http_osgi;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -38,7 +37,6 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.AbstractServletController;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.apache.cxf.wsdl.http.AddressType;
 
 public class OsgiServletController extends AbstractServletController {
     private static final Logger LOG = LogUtils.getL7dLogger(OsgiServletController.class);
@@ -49,25 +47,7 @@ public class OsgiServletController extends AbstractServletController {
         super(config, destinationRegistry, serviceListGenerator);
     }
 
-    private synchronized void updateDests(HttpServletRequest request) {
-        if (disableAddressUpdates) {
-            return;
-        }
-        String base = forcedBaseAddress == null ? getBaseURL(request) : forcedBaseAddress;
-
-        Set<String> paths = destinationRegistry.getDestinationsPaths();
-        for (String path : paths) {
-            AbstractHTTPDestination d2 = destinationRegistry.getDestinationForPath(path);
-            String ad = d2.getEndpointInfo().getAddress();
-            if (ad.equals(path)) {
-                d2.getEndpointInfo().setAddress(base + path);
-                if (d2.getEndpointInfo().getExtensor(AddressType.class) != null) {
-                    d2.getEndpointInfo().getExtensor(AddressType.class).setLocation(base + path);
-                }
-            }
-        }
-    }
-
+    
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         try {
             String address = request.getPathInfo() == null ? "" : request.getPathInfo();
@@ -78,7 +58,7 @@ public class OsgiServletController extends AbstractServletController {
                     || request.getRequestURI().endsWith(serviceListRelativePath + "/"))
                     || StringUtils.isEmpty(request.getPathInfo())
                     || "/".equals(request.getPathInfo())) {
-                    updateDests(request);
+                    updateDests(request, true);
                     serviceListGenerator.service(request, res);
                 } else {
                     d = destinationRegistry.checkRestfulRequest(address);

@@ -61,7 +61,6 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
             new ServletController(servletTransportFactory.getRegistry(),
                                   servletConfig,
                                   serviceListGeneratorServlet);
-        servletTransportFactory.setServletController(newController);
         if (servletConfig.getInitParameter("disable-address-updates") == null) {
             newController.setDisableAddressUpdates(disableAddressUpdates);
         }

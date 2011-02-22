@@ -50,7 +50,7 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(AtomBookServer.class));
+                   launchServer(AtomBookServer.class, true));
     }
     
     @Test
@@ -145,7 +145,7 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBooks3() throws Exception {
-        getAndCompareJson("http://localhost:" + PORT + "/atom/atom/books/entries/123.json",
+        getAndCompareJson("http://localhost:" + PORT + "/atom/atomservice3/atom/books/entries/123.json",
                         "resources/expected_atom_book_json3.txt",
                         "*/*");
     }
