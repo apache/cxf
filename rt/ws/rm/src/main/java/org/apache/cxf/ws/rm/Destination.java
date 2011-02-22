@@ -140,14 +140,13 @@ public class Destination extends AbstractEndpoint {
         if (null == ars) {
             return;
         }
-        synchronized (ars) {
-            for (AckRequestedType ar : ars) {
-                Identifier id = ar.getIdentifier();
-                DestinationSequence seq = getSequence(id);
-                if (null != seq) {
-                    ackImmediately(seq, message);
-                }
+        for (AckRequestedType ar : ars) {
+            Identifier id = ar.getIdentifier();
+            DestinationSequence seq = getSequence(id);
+            if (null == seq) {
+                continue;
             }
+            ackImmediately(seq, message);
         }
     }
     
