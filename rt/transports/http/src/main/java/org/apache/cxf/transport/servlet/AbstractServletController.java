@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -88,15 +89,15 @@ public abstract class AbstractServletController {
         }
         
         String hideServiceList = servletConfig.getInitParameter("hide-service-list-page");
-        if (hideServiceList != null) {
+        if (!StringUtils.isEmpty(hideServiceList)) {
             this.isHideServiceList = Boolean.valueOf(hideServiceList);
         }
         String isDisableAddressUpdates = servletConfig.getInitParameter("disable-address-updates");
-        if (isDisableAddressUpdates != null) {
+        if (!StringUtils.isEmpty(isDisableAddressUpdates)) {
             this.disableAddressUpdates = Boolean.valueOf(isDisableAddressUpdates);
         }
         String isForcedBaseAddress = servletConfig.getInitParameter("base-address");
-        if (isForcedBaseAddress != null) {
+        if (!StringUtils.isEmpty(isForcedBaseAddress)) {
             this.forcedBaseAddress = isForcedBaseAddress;
         }
         try {
@@ -105,7 +106,7 @@ public abstract class AbstractServletController {
             throw new RuntimeException(e.getMessage(), e);
         }
         String serviceListPath = servletConfig.getInitParameter("service-list-path");
-        if (serviceListPath != null) {
+        if (!StringUtils.isEmpty(serviceListPath)) {
             this.serviceListRelativePath = serviceListPath;
         }
     }

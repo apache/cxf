@@ -31,6 +31,14 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
     <osgix:cm-properties id="cxfOsgiProperties" persistent-id="org.apache.cxf.osgi">
         <prop key="org.apache.cxf.servlet.context">/cxf</prop>
         <prop key="org.apache.cxf.servlet.name">cxf-osgi-transport-servlet</prop>
+        <prop key="org.apache.cxf.servlet.hide-service-list-page">false</prop>
+        <prop key="org.apache.cxf.servlet.disable-address-updates">false</prop>
+        <prop key="org.apache.cxf.servlet.base-address"></prop>
+        <prop key="org.apache.cxf.servlet.service-list-path"></prop>
+        <prop key="org.apache.cxf.servlet.static-resources-list"></prop>
+        <prop key="org.apache.cxf.servlet.redirects-list"></prop>
+        <prop key="org.apache.cxf.servlet.redirect-servlet-name"></prop>
+        <prop key="org.apache.cxf.servlet.redirect-servlet-path"></prop>
     </osgix:cm-properties>
 
     <ctx:property-placeholder properties-ref="cxfOsgiProperties"/>
@@ -45,6 +53,14 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
         <osgi:service-properties>
             <entry key="alias" value="${org.apache.cxf.servlet.context}" />
             <entry key="servlet-name" value="${org.apache.cxf.servlet.name}"/>
+            <entry key="hide-service-list-page" value="${org.apache.cxf.servlet.hide-service-list-page}"/>
+            <entry key="disable-address-updates" value="${org.apache.cxf.servlet.disable-address-updates}"/>
+            <entry key="base-address" value="${org.apache.cxf.servlet.base-address}"/>
+            <entry key="service-list-path" value="${org.apache.cxf.servlet.service-list-path}"/>
+            <entry key="static-resources-list" value="${org.apache.cxf.servlet.static-resources-list}"/>
+            <entry key="redirects-list" value="${org.apache.cxf.servlet.redirects-list}"/>
+            <entry key="redirect-servlet-name" value="${org.apache.cxf.servlet.redirect-servlet-name}"/>
+            <entry key="redirect-servlet-path" value="${org.apache.cxf.servlet.redirect-servlet-path}"/>
         </osgi:service-properties>
     </osgi:service>
 
