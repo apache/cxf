@@ -87,11 +87,16 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                     setAttributes("suid", generateTimestampSUID());
                 }
                 setAttributes("expClass", expClz);
+                String exceptionSuperclass = "Exception";
                 for (JavaField jf : expClz.getFields()) {
+                    String jfClassName = jf.getClassName();
+                    if (jfClassName.substring(jfClassName.lastIndexOf(".") + 1).equals("Exception")) {
+                        exceptionSuperclass = "java.lang.Exception";
+                    }
                     setAttributes("paraName", ProcessorUtil.mangleNameToVariableName(jf.getName()));
                 }
                 
-                String exceptionSuperclass = "Exception";
+                
                 if (expClz.getName().equals(exceptionSuperclass)) {
                     exceptionSuperclass = "java.lang.Exception";
                 }
