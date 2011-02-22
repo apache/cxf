@@ -19,7 +19,6 @@
 package org.apache.cxf.transport.http_jaxws_spi;
 
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +32,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
-import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -42,7 +40,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.classextension.EasyMock.eq;
 import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.isA;
 
@@ -50,7 +47,6 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
     
     private static final String ADDRESS = "http://localhost:80/foo/bar";
     private static final String CONTEXT_PATH = "/foo";
-    private static final String PATH = "/bar";
     private IMocksControl control; 
     private Bus bus;
     private HttpContext context;
