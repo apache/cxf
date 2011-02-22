@@ -184,9 +184,10 @@ public final class JAXRSClientFactory {
      */
     public static <T> T createFromModel(String baseAddress, Class<T> cls, String modelRef, 
                                List<?> providers, String configLocation) {
-        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
+        JAXRSClientFactoryBean bean = WebClient.getBean(baseAddress, configLocation);
         bean.setProviders(providers);
         bean.setModelRef(modelRef);
+        bean.setServiceClass(cls);
         return bean.create(cls);
     }
     
@@ -201,9 +202,10 @@ public final class JAXRSClientFactory {
      */
     public static <T> T createFromModel(String baseAddress, Class<T> cls, String modelRef, 
                                         List<?> providers, boolean threadSafe) {
-        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, null);
+        JAXRSClientFactoryBean bean = WebClient.getBean(baseAddress, null);
         bean.setProviders(providers);
         bean.setModelRef(modelRef);
+        bean.setServiceClass(cls);
         if (threadSafe) {
             bean.setInitialState(new ThreadLocalClientState(baseAddress));
         }
@@ -232,9 +234,11 @@ public final class JAXRSClientFactory {
      */
     public static <T> T createFromModel(String baseAddress, Class<T> cls, List<UserResource> modelBeans,
                                List<?> providers, String configLocation) {
-        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
+        JAXRSClientFactoryBean bean = WebClient.getBean(baseAddress, configLocation);
+        
         bean.setProviders(providers);
         bean.setModelBeans(modelBeans);
+        bean.setServiceClass(cls);
         return bean.create(cls);
     }
     
