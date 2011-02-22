@@ -17,8 +17,9 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.http;
+package org.apache.cxf.frontend;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -52,75 +53,107 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
-import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.transports.http.StemMatchingQueryHandler;
+import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.http.UrlUtilities;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ResourceManagerWSDLLocator;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 
+/**
+ * 
+ */
+public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static final WSDLGetInterceptor INSTANCE = new WSDLGetInterceptor();
+    
+    public static final String AUTO_REWRITE_ADDRESS = "autoRewriteSoapAddress";
+    public static final String PUBLISHED_ENDPOINT_URL = "publishedEndpointUrl";
+    
+    private static final String WSDLS_KEY = WSDLGetInterceptor.class.getName() + ".WSDLs";
+    private static final String SCHEMAS_KEY = WSDLGetInterceptor.class.getName() + ".Schemas";
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(WSDLGetInterceptor.class);
+    
+    public WSDLGetInterceptor() {
+        super(Phase.READ);
+    }
 
-@NoJSR250Annotations
-public class WSDLQueryHandler implements StemMatchingQueryHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(WSDLQueryHandler.class, "QueryMessages");
-    private Bus bus;
-    
-    public WSDLQueryHandler() {
-    }
-    public WSDLQueryHandler(Bus b) {
-        bus = b;
-    }
-    
-    public String getResponseContentType(String baseUri, String ctx) {
-        if (baseUri.toLowerCase().contains("?wsdl")
-            || baseUri.toLowerCase().contains("?xsd=")) {
-            return "text/xml";
+    public void handleMessage(Message message) throws Fault {
+        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        String query = (String)message.get(Message.QUERY_STRING);
+        if (!"GET".equals(method) || StringUtils.isEmpty(query)) {
+            return;
         }
-        return null;
-    }
-
-    public boolean isRecognizedQuery(String baseUri, String ctx, 
-                                     EndpointInfo endpointInfo, boolean contextMatchExact) {
-        if (baseUri != null 
-            && (baseUri.contains("?") 
-                && (baseUri.toLowerCase().contains("wsdl")
-                || baseUri.toLowerCase().contains("xsd=")))) {
-            
-            int idx = baseUri.indexOf("?");
-            Map<String, String> map = UrlUtilities.parseQueryString(baseUri.substring(idx + 1));
-            if (map.containsKey("wsdl")
-                || map.containsKey("xsd")) {
-                if (contextMatchExact) {
-                    return endpointInfo.getAddress().contains(ctx);
-                } else {
-                    // contextMatchStrategy will be "stem"
-                    return endpointInfo.getAddress().
-                                contains(UrlUtilities.getStem(baseUri.substring(0, idx)));
+        String baseUri = (String)message.get(Message.REQUEST_URL);
+        String ctx = (String)message.get(Message.PATH_INFO);
+        
+        
+        //cannot have two wsdl's being written for the same endpoint at the same
+        //time as the addresses may get mixed up
+        synchronized (message.getExchange().getEndpoint()) {
+            Map<String, String> map = UrlUtilities.parseQueryString(query);
+            if (isRecognizedQuery(map, baseUri, ctx, 
+                                  message.getExchange().getEndpoint().getEndpointInfo())) {
+                
+                try {
+                    Conduit c = message.getExchange().getDestination().getBackChannel(message, null, null);
+                    Message mout = new MessageImpl();
+                    mout.setExchange(message.getExchange());
+                    message.getExchange().setOutMessage(mout);
+                    mout.put(Message.CONTENT_TYPE, "text/xml");
+                    c.prepare(mout);
+                    OutputStream os = mout.getContent(OutputStream.class);
+                    writeResponse(message,
+                                  baseUri,
+                                  map,
+                                  ctx,
+                                  message.getExchange().getEndpoint().getEndpointInfo(),
+                                  os);
+                    os.close();
+                    message.getInterceptorChain().abort();
+                } catch (IOException e) {
+                    throw new Fault(e);
+                } finally {
+                    message.getExchange().setOutMessage(null);
                 }
             }
+        }
+    }
+
+    public boolean isRecognizedQuery(Map<String, String> map,
+                                     String baseUri,
+                                     String ctx, 
+                                     EndpointInfo endpointInfo) {
+        if (map.containsKey("wsdl")
+            || map.containsKey("xsd")) {
+            return true;
         }
         return false;
     }
 
-    public void writeResponse(String baseUri, String ctxUri,
-                              EndpointInfo endpointInfo, OutputStream os) {
+    public void writeResponse(Message message,
+                              String base,
+                              Map<String, String> params,
+                              String ctxUri,
+                              EndpointInfo endpointInfo,
+                              OutputStream os) {
         try {
-            int idx = baseUri.toLowerCase().indexOf("?");
-            Map<String, String> params = UrlUtilities.parseQueryString(baseUri.substring(idx + 1));
-
-            String base;
-            
-            if (endpointInfo.getProperty("publishedEndpointUrl") != null) {
-                base = String.valueOf(endpointInfo.getProperty("publishedEndpointUrl"));
-            } else {
-                base = baseUri.substring(0, baseUri.toLowerCase().indexOf("?"));
+            Bus bus = message.getExchange().getBus();
+            Object prop = message.getContextualProperty(PUBLISHED_ENDPOINT_URL);
+            if (prop != null) {
+                base = String.valueOf(prop);
             }
 
             String wsdl = params.get("wsdl");
@@ -138,31 +171,29 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             }
             
             Map<String, Definition> mp = CastUtils.cast((Map)endpointInfo.getService()
-                                                        .getProperty(WSDLQueryHandler.class.getName()));
+                                                        .getProperty(WSDLS_KEY));
             Map<String, SchemaReference> smp = CastUtils.cast((Map)endpointInfo.getService()
-                                                        .getProperty(WSDLQueryHandler.class.getName() 
-                                                                     + ".Schemas"));
+                                                        .getProperty(SCHEMAS_KEY));
 
             if (mp == null) {
-                endpointInfo.getService().setProperty(WSDLQueryHandler.class.getName(),
+                endpointInfo.getService().setProperty(WSDLS_KEY,
                                                       new ConcurrentHashMap());
                 mp = CastUtils.cast((Map)endpointInfo.getService()
-                                    .getProperty(WSDLQueryHandler.class.getName()));
+                                    .getProperty(WSDLS_KEY));
             }
             if (smp == null) {
-                endpointInfo.getService().setProperty(WSDLQueryHandler.class.getName()
-                                                      + ".Schemas",
+                endpointInfo.getService().setProperty(SCHEMAS_KEY,
                                                       new ConcurrentHashMap());
                 smp = CastUtils.cast((Map)endpointInfo.getService()
-                                    .getProperty(WSDLQueryHandler.class.getName()
-                                                 + ".Schemas"));
+                                    .getProperty(SCHEMAS_KEY));
             }
             
             if (!mp.containsKey("")) {
-                Definition def = new ServiceWSDLBuilder(bus, endpointInfo.getService()).build();
+                Definition def = new ServiceWSDLBuilder(bus,
+                                                        endpointInfo.getService()).build();
 
                 mp.put("", def);
-                updateDefinition(def, mp, smp, base, endpointInfo);
+                updateDefinition(bus, def, mp, smp, base, endpointInfo);
             }
             
             
@@ -178,16 +209,18 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     }
                 }
                 if (def == null) {
-                    throw new WSDLQueryException(new Message("WSDL_NOT_FOUND", LOG, wsdl), null);
+                    throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("WSDL_NOT_FOUND",
+                                                                                        LOG, wsdl), null);
                 }
                 
                 synchronized (def) {
                     //writing a def is not threadsafe.  Sync on it to make sure
                     //we don't get any ConcurrentModificationExceptions
-                    if (endpointInfo.getProperty("publishedEndpointUrl") != null) {
-                        String publishingUrl = 
-                            String.valueOf(endpointInfo.getProperty("publishedEndpointUrl"));
-                        updatePublishedEndpointUrl(publishingUrl, def, endpointInfo.getName());
+                    if (endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL) != null) {
+                        String epurl = 
+                            String.valueOf(endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL));
+                        updatePublishedEndpointUrl(epurl, def, endpointInfo.getName());
+                        base = epurl;
                     }
         
                     WSDLWriter wsdlWriter = bus.getExtension(WSDLManager.class)
@@ -206,7 +239,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     }
                 }
                 if (si == null) {
-                    throw new WSDLQueryException(new Message("SCHEMA_NOT_FOUND", LOG, wsdl), null);
+                    throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("SCHEMA_NOT_FOUND", 
+                                                                                        LOG, wsdl), null);
                 }
                 
                 String uri = si.getReferencedSchema().getDocumentBaseURI();
@@ -223,7 +257,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 doc = XMLUtils.getParser().parse(src);
             }
             
-            updateDoc(doc, base, mp, smp, endpointInfo);
+            updateDoc(doc, base, mp, smp, message);
             String enc = null;
             try {
                 enc = doc.getXmlEncoding();
@@ -241,17 +275,19 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         } catch (WSDLQueryException wex) {
             throw wex;
         } catch (Exception wex) {
-            throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+            throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                                                      LOG,
-                                                     baseUri), wex);
+                                                     base), wex);
         }
     }
     
-    protected void updateDoc(Document doc, String base,
+    protected void updateDoc(Document doc, 
+                           String base,
                            Map<String, Definition> mp,
                            Map<String, SchemaReference> smp,
-                           EndpointInfo ei) {        
+                           Message message) {        
         List<Element> elementList = null;
+        Object rewriteSoapAddress = message.getContextualProperty(AUTO_REWRITE_ADDRESS);
         
         try {
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -292,31 +328,32 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+            throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                     LOG,
                     base), e);
         }
 
-        Object rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress");
-
-        if (rewriteSoapAddress != null && MessageUtils.isTrue(rewriteSoapAddress)) {
+        if (rewriteSoapAddress == null || MessageUtils.isTrue(rewriteSoapAddress)) {
             List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://schemas.xmlsoap.org/wsdl/",
                                                               "service");
             for (Element serviceEl : serviceList) {
                 String serviceName = serviceEl.getAttribute("name");
-                if (serviceName.equals(ei.getService().getName().getLocalPart())) {
+                if (serviceName.equals(message.getExchange().getService().getName().getLocalPart())) {
                     elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                       "http://schemas.xmlsoap.org/wsdl/",
                                                                       "port");
                     for (Element el : elementList) {
                         String name = el.getAttribute("name");
-                        if (name.equals(ei.getName().getLocalPart())) {
-                            Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
+                        if (name.equals(message.getExchange().getEndpoint().getEndpointInfo()
+                                            .getName().getLocalPart())) {
+                            
+                            List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el,
                                                                  "http://schemas.xmlsoap.org/wsdl/soap/",
-                                                                 "address")
-                                                                       .iterator().next();
-                            soapAddress.setAttribute("location", base);
+                                                                 "address");
+                            for (Element soapAddress : sadEls) {
+                                soapAddress.setAttribute("location", base);
+                            }
                         }
                     }
                 }
@@ -348,7 +385,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         return resolvedSchemaLocation;
     }
     
-    protected void updateDefinition(Definition def, Map<String, Definition> done,
+    protected void updateDefinition(Bus bus,
+                                    Definition def, Map<String, Definition> done,
                                   Map<String, SchemaReference> doneSchemas,
                                   String base, EndpointInfo ei) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
@@ -365,7 +403,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 try {
                     decodedStart = URLDecoder.decode(start, "utf-8");
                 } catch (UnsupportedEncodingException e) {
-                    throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                    throw new WSDLQueryException(
+                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                             LOG,
                             start), e);
                 }
@@ -378,13 +417,13 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         new URL(start);
                     } catch (MalformedURLException e) {
                         if (done.put(decodedStart, imp.getDefinition()) == null) {
-                            updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
+                            updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei);
                         }
                     }
                 } else {
                     if (done.put(decodedStart, imp.getDefinition()) == null) {
                         done.put(resolvedSchemaLocation, imp.getDefinition());
-                        updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
+                        updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei);
                     }
                 }
             }
@@ -400,7 +439,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 : CastUtils.cast((List)types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
                     Schema see = (Schema)el;
-                    updateSchemaImports(see, doneSchemas, base);
+                    updateSchemaImports(bus, see, doneSchemas, base);
                 }
             }
         }
@@ -438,9 +477,10 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         }
     }
     
-    protected void updateSchemaImports(Schema schema,
-                                           Map<String, SchemaReference> doneSchemas,
-                                           String base) {
+    protected void updateSchemaImports(Bus bus, 
+                                       Schema schema,
+                                       Map<String, SchemaReference> doneSchemas,
+                                       String base) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
         Collection<List<?>>  imports = CastUtils.cast((Collection<?>)schema.getImports().values());
         for (List<?> lst : imports) {
@@ -455,7 +495,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     try {
                         decodedStart = URLDecoder.decode(start, "utf-8");
                     } catch (UnsupportedEncodingException e) {
-                        throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                        throw new WSDLQueryException(
+                                new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                                 LOG,
                                 start), e);
                     }
@@ -468,13 +509,13 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                                 new URL(start);
                             } catch (MalformedURLException e) {
                                 if (doneSchemas.put(decodedStart, imp) == null) {
-                                    updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
+                                    updateSchemaImports(bus, imp.getReferencedSchema(), doneSchemas, base);
                                 }
                             }
                         } else {
                             if (doneSchemas.put(decodedStart, imp) == null) {
                                 doneSchemas.put(resolvedSchemaLocation, imp);
-                                updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
+                                updateSchemaImports(bus, imp.getReferencedSchema(), doneSchemas, base);
                             }
                         }
                     }
@@ -493,7 +534,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 try {
                     decodedStart = URLDecoder.decode(start, "utf-8");
                 } catch (UnsupportedEncodingException e) {
-                    throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                    throw new WSDLQueryException(
+                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                             LOG,
                             start), e);
                 }
@@ -506,7 +548,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                             new URL(start);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
-                                updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                                updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
                             }
                         }
                     }
@@ -514,7 +556,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
-                    updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                    updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
                 }
             }
         }
@@ -529,7 +571,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 try {
                     decodedStart = URLDecoder.decode(start, "utf-8");
                 } catch (UnsupportedEncodingException e) {
-                    throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                    throw new WSDLQueryException(
+                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                             LOG,
                             start), e);
                 }
@@ -542,7 +585,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                             new URL(start);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
-                                updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                                updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
                             }
                         }
                     }
@@ -550,17 +593,10 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
-                    updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                    updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
                 }
             }
         }
     }
-    
-    public boolean isRecognizedQuery(String baseUri, String ctx, EndpointInfo endpointInfo) {
-        return isRecognizedQuery(baseUri, ctx, endpointInfo, false);
-    }
 
-    public void setBus(Bus bus) {
-        this.bus = bus;
-    }
 }

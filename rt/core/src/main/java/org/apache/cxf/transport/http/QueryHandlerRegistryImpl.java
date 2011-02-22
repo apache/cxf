@@ -63,10 +63,6 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
         if (null != bus) {
             bus.setExtension(this, QueryHandlerRegistry.class);
             
-            WSDLQueryHandler wsdlQueryHandler = new WSDLQueryHandler();
-            wsdlQueryHandler.setBus(bus);
-            queryHandlers.add(wsdlQueryHandler);
-            
             ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
             if (c != null) {
                 for (QueryHandler handler : c.getBeansOfType(QueryHandler.class)) {

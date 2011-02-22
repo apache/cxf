@@ -180,6 +180,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         
         if (getInInterceptors() != null) {
             ep.getInInterceptors().addAll(getInInterceptors());
+            ep.getInInterceptors().add(WSDLGetInterceptor.INSTANCE);
         }
         if (getOutInterceptors() != null) {
             ep.getOutInterceptors().addAll(getOutInterceptors());

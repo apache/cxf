@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -161,7 +162,15 @@ public class ServerLauncher {
 
         if (inProcess) {
             Class<?> cls;
+            Map<String, String> old = new HashMap<String, String>();
             try {
+                if (null != properties) {
+                    for (Map.Entry<String, String> entry : properties.entrySet()) {
+                        old.put(entry.getKey(), System.getProperty(entry.getKey()));
+                        System.setProperty(entry.getKey(), entry.getValue());
+                    }
+                }
+                
                 cls = Class.forName(className);
                 Class<? extends AbstractTestServerBase> svcls = 
                     cls.asSubclass(AbstractTestServerBase.class);
@@ -177,6 +186,15 @@ public class ServerLauncher {
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 serverLaunchFailed = true;
+            } finally {
+                for (Map.Entry<String, String> entry : old.entrySet()) {
+                    if (entry.getValue() == null) {
+                        System.clearProperty(entry.getKey());
+                    } else {
+                        System.setProperty(entry.getKey(), entry.getValue());
+                    }
+                }
+
             }
         } else {
             List<String> cmd;

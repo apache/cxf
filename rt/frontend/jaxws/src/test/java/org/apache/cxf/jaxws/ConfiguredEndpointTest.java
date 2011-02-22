@@ -290,7 +290,7 @@ public class ConfiguredEndpointTest extends Assert {
         assertTrue("Unexpected value for property validating", 
                    Boolean.valueOf((String) ei.getProperties().get(Message.SCHEMA_VALIDATION_ENABLED)));
         List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
-        assertEquals("Unexpected number of interceptors.", 4, interceptors.size());
+        assertEquals("Unexpected number of interceptors.", 5, interceptors.size());
         assertEquals("Unexpected interceptor id.", "endpoint-in", 
                      findTestInterceptor(interceptors).getId());
         interceptors = endpoint.getOutInterceptors();

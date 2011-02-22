@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxws.spring;
 
-import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -56,7 +55,6 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.jaxws.spring.NamespaceHandler.SpringServerFactoryBean;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.transport.http.WSDLQueryHandler;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.After;
 import org.junit.Test;
@@ -262,15 +260,6 @@ public class SpringBeansTest extends Assert {
         assertTrue(bc instanceof SoapBindingConfiguration);
         sbc = (SoapBindingConfiguration) bc;
         assertEquals("rpc", sbc.getStyle());
-
-        WSDLQueryHandler handler = new WSDLQueryHandler((Bus)ctx.getBean("cxf"));
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        handler.writeResponse("http://localhost/test?wsdl", "/test",
-                              bean.create().getEndpoint().getEndpointInfo(),
-                              bout);
-        String wsdl = bout.toString();
-        assertTrue(wsdl.contains("name=\"stringArray\""));
-        assertTrue(wsdl.contains("name=\"stringArray\""));
 
         bean = (JaxWsServerFactoryBean) ctx.getBean("simple");
         assertNotNull(bean);

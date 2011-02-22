@@ -876,7 +876,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             newMO.getBindingInterceptors().add(new AttachmentInInterceptor());
             newMO.getBindingInterceptors().add(new StaxInInterceptor());
 
-            // This will not work if we one of the endpoints disables message
+            // This will not work if one of the endpoints disables message
             // processing. But, if you've disabled message processing, you
             // probably aren't going to use this feature.
             

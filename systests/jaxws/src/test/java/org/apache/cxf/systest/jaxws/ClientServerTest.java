@@ -108,7 +108,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull("cannot find test resource", url);
         defaultConfigFileName = url.toString();
 
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     @Test
     public void testCXF2419() throws Exception {

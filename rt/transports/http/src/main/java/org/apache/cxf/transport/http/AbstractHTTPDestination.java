@@ -86,6 +86,7 @@ public abstract class AbstractHTTPDestination
     public static final String HTTP_RESPONSE = "HTTP.RESPONSE";
     public static final String HTTP_CONTEXT = "HTTP.CONTEXT";
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
+    public static final String HTTP_CONTEXT_MATCH_STRATEGY = "HTTP_CONTEXT_MATCH_STRATEGY";
     
     public static final String RESPONSE_HEADERS_COPIED = "http.headers.copied";
     public static final String RESPONSE_COMMITED = "http.response.done";
@@ -229,9 +230,11 @@ public abstract class AbstractHTTPDestination
         inMessage.put(HTTP_RESPONSE, resp);
         inMessage.put(HTTP_CONTEXT, context);
         inMessage.put(HTTP_CONFIG, config);
+        inMessage.put(HTTP_CONTEXT_MATCH_STRATEGY, contextMatchStrategy);
         
         inMessage.put(Message.HTTP_REQUEST_METHOD, req.getMethod());
         inMessage.put(Message.REQUEST_URI, req.getRequestURI());
+        inMessage.put(Message.REQUEST_URL, req.getRequestURL().toString());
         String contextPath = req.getContextPath();
         if (contextPath == null) {
             contextPath = "";

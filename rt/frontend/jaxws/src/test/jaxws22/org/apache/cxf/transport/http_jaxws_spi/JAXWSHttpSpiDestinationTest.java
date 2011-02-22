@@ -33,7 +33,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
-import org.apache.cxf.transport.http.WSDLQueryHandler;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.easymock.classextension.EasyMock;
@@ -103,30 +102,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         control.verify();
     }
     
-    @Test
-    public void testWSDLQuery() throws Exception {
-        WSDLQueryHandler wqh = control.createMock(WSDLQueryHandler.class);
-        String pathInfo = null;
-        String addr = ADDRESS + "?wsdl";
-        expect(wqh.isRecognizedQuery(addr, pathInfo, endpoint, false)).andReturn(true);
-        wqh.writeResponse(eq(addr), eq(pathInfo), eq(endpoint), isA(OutputStream.class));
-        EasyMock.expectLastCall();
-        QueryHandlerRegistry qhr = control.createMock(QueryHandlerRegistry.class);
-        expect(qhr.getHandlers()).andReturn(Collections.singletonList((QueryHandler)wqh));
-        expect(bus.getExtension(QueryHandlerRegistry.class)).andReturn(qhr);
-        HttpExchange exchange = setUpExchangeForWSDLQuery(pathInfo);
-        control.replay();
 
-        JAXWSHttpSpiDestination destination = 
-            new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
-        destination.setMessageObserver(observer);
-
-        destination.doService(new HttpServletRequestAdapter(exchange),
-                              new HttpServletResponseAdapter(exchange));
-
-        control.verify();
-    }
-    
     private HttpExchange setUpExchange() throws Exception {
         HttpExchange exchange = control.createMock(HttpExchange.class);
         expect(exchange.getHttpContext()).andReturn(context).anyTimes();
@@ -146,23 +122,5 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         return exchange;
     }
     
-    private HttpExchange setUpExchangeForWSDLQuery(String pathInfo) throws Exception {
-        HttpExchange exchange = control.createMock(HttpExchange.class);
-        expect(exchange.getHttpContext()).andReturn(context).anyTimes();
-        expect(exchange.getQueryString()).andReturn("wsdl").anyTimes();
-        expect(exchange.getPathInfo()).andReturn(pathInfo);
-        expect(context.getPath()).andReturn(PATH);
-        expect(exchange.getContextPath()).andReturn(CONTEXT_PATH);
-        expect(exchange.getScheme()).andReturn("http");
-        expect(exchange.getLocalAddress()).andReturn(new InetSocketAddress("localhost", 80));
-        Map<String, List<String>> resHeaders = new HashMap<String, List<String>>();
-        expect(exchange.getResponseHeaders()).andReturn(resHeaders).anyTimes();
-        OutputStream responseBody = control.createMock(OutputStream.class);
-        responseBody.flush();
-        EasyMock.expectLastCall();
-        expect(exchange.getResponseBody()).andReturn(responseBody).anyTimes();
-        
-        return exchange;
-    }
     
 }

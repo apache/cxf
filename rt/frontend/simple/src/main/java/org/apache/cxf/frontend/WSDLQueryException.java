@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http;
+package org.apache.cxf.frontend;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;

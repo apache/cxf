@@ -39,7 +39,10 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     	<jaxws:handlers>
     		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
     	</jaxws:handlers>
-        </jaxws:endpoint>
+        <jaxws:properties>
+                <entry key="autoRewriteSoapAddress" value="false"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
 	<jaxws:server id="cxfHandlerTestServer"
 		serviceClass="org.apache.handlers.AddNumbers"
 		address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringServer">

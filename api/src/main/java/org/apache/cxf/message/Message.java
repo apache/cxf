@@ -72,6 +72,7 @@ public interface Message extends StringMap {
     
     String HTTP_REQUEST_METHOD = "org.apache.cxf.request.method";
     String REQUEST_URI = "org.apache.cxf.request.uri";
+    String REQUEST_URL = "org.apache.cxf.request.url";
     
     String PROTOCOL_HEADERS = Message.class.getName() + ".PROTOCOL_HEADERS";
     String RESPONSE_CODE = Message.class.getName() + ".RESPONSE_CODE";
