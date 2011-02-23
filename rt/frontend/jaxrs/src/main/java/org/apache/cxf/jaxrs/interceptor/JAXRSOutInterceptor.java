@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -237,7 +238,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Object entity = getEntity(responseObj);
         try {
             responseType = checkFinalContentType(responseType);
-            LOG.fine("Response content type is: " + responseType.toString());
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Response content type is: " + responseType.toString());
+            }
             message.put(Message.CONTENT_TYPE, responseType.toString());
             
             long size = writer.getSize(entity, targetType, genericType, annotations, responseType);
@@ -246,8 +249,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                          + writer.getClass().getName());
                 responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
             }
-            
-            LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
+            }
             try {
                 writer.writeTo(entity, targetType, genericType, 
                                annotations, 
