@@ -7,6 +7,11 @@ CXF is presently relying on the test web services used by Microsoft's Web Servic
 Interoperability Plug-Fest[1].  The main scenario document[2] listed in the second 
 column of the table at the top of [1] describes each test case.
 
+IMPORTANT NOTE:  since these samples rely on the external services that are provided
+by Microsoft, they may or may not run or even build reliably if the services are down 
+or have been changed.
+
+
 [1] http://mssoapinterop.org/ilab/
 [2] http://131.107.72.15/ilab/WSSecurity/WCFInteropPlugFest_Security.doc
 
