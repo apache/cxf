@@ -44,6 +44,7 @@
 
     <modules>
         <module>bundle</module>
+        <module>karaf</module>
         <module>manifest</module>
     </modules>
 
