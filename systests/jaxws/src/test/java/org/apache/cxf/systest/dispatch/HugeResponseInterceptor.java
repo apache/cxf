@@ -31,24 +31,42 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
-    private boolean isStackOverFlow;
+    private ResponseInterceptorType type;
 
-    public HugeResponseInterceptor(boolean isStackOverFlow) {
+    public HugeResponseInterceptor(ResponseInterceptorType type) {
         super(Phase.RECEIVE);
         addAfter(LoggingInInterceptor.class.getName());
-        this.isStackOverFlow = isStackOverFlow;
+        this.type = type;
     }
 
     public void handleMessage(Message message) throws Fault {
-        if (isStackOverFlow) {
+        if (type.equals(ResponseInterceptorType.overflow)) {
             throw new StackOverflowError();
-        } else {
+        } else  if (type.equals(ResponseInterceptorType.ElementLevelThreshold)) {
             InputStream is = message.getContent(InputStream.class);
             if (is != null) {
                 CachedOutputStream bos = new CachedOutputStream();
                 try {
                     is = getClass().getClassLoader().getResourceAsStream(
                         "org/apache/cxf/systest/dispatch/resources/GreetMeDocLiteralRespBreakThreshold.xml");
+                    IOUtils.copy(is, bos);
+                    bos.flush();
+                    is.close();
+                    message.setContent(InputStream.class, bos.getInputStream());
+                    bos.close();
+                    message.setContent(InputStream.class, bos.getInputStream());
+                } catch (IOException e) {
+                    throw new Fault(e);
+                }
+            }
+        } else  if (type.equals(ResponseInterceptorType.ElementCountThreshold)) {
+            InputStream is = message.getContent(InputStream.class);
+            if (is != null) {
+                CachedOutputStream bos = new CachedOutputStream();
+                try {
+                    is = getClass().getClassLoader().getResourceAsStream(
+                        "org/apache/cxf/systest/dispatch/resources/" 
+                        + "GreetMeDocLiteralRespBreakElementCountThreshold.xml");
                     IOUtils.copy(is, bos);
                     bos.flush();
                     is.close();
