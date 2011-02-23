@@ -26,7 +26,6 @@ import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -105,6 +104,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.P_SHA1;
 import org.apache.ws.security.message.token.Reference;
@@ -776,18 +776,14 @@ public class STSClient implements Configurable, InterceptorProvider {
     private X509Certificate getCert(Crypto crypto) throws Exception {
         String alias = (String)getProperty(SecurityConstants.STS_TOKEN_USERNAME);
         if (alias == null) {
-            alias = crypto.getDefaultX509Alias();
+            alias = crypto.getDefaultX509Identifier();
         }
         if (alias == null) {
-            Enumeration<String> as = crypto.getKeyStore().aliases();
-            if (as.hasMoreElements()) {
-                alias = as.nextElement();
-            }
-            if (as.hasMoreElements()) {
-                throw new Fault("No alias specified for retrieving PublicKey", LOG);
-            }
+            throw new Fault("No alias specified for retrieving PublicKey", LOG);
         }
-        return crypto.getCertificates(alias)[0];
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(alias);
+        return crypto.getX509Certificates(cryptoType)[0];
     }
 
     private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {

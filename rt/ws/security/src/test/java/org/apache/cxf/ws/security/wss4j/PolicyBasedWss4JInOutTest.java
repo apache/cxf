@@ -73,6 +73,7 @@ import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -856,7 +857,9 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         cryptoProps.load(url.openStream());
         Crypto crypto = CryptoFactory.getInstance(cryptoProps);
         String alias = cryptoProps.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
-        issuedToken.setX509Certificate(crypto.getCertificates(alias)[0], crypto);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(alias);
+        issuedToken.setX509Certificate(crypto.getX509Certificates(cryptoType)[0], crypto);
         
         msg.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
                 issuedToken.getId());

@@ -22,11 +22,9 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -502,8 +500,8 @@ public abstract class AbstractBindingBuilder {
                     Crypto crypto = secToken.getCrypto();
                     String uname = null;
                     try {
-                        uname = crypto.getKeyStore().getCertificateAlias(secToken.getX509Certificate());
-                    } catch (KeyStoreException e1) {
+                        uname = crypto.getX509Identifier(secToken.getX509Certificate());
+                    } catch (WSSecurityException e1) {
                         throw new Fault(e1);
                     }
 
@@ -1166,7 +1164,11 @@ public abstract class AbstractBindingBuilder {
                                                                 ? SecurityConstants.SIGNATURE_USERNAME
                                                                 : SecurityConstants.ENCRYPT_USERNAME);
         if (crypto != null && encrUser == null) {
-            encrUser = getDefaultCryptoAlias(crypto);
+            try {
+                encrUser = crypto.getDefaultX509Identifier();
+            } catch (WSSecurityException e1) {
+                throw new Fault(e1);
+            }
         } else if (encrUser == null || "".equals(encrUser)) {
             policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " crypto object found.");
         }
@@ -1190,26 +1192,6 @@ public abstract class AbstractBindingBuilder {
         } else {
             encrKeyBuilder.setUserInfo(encrUser);
         }
-    }
-    
-    protected String getDefaultCryptoAlias(Crypto crypto) {
-        String user = crypto.getDefaultX509Alias();
-        if (user == null) {
-            try {
-                Enumeration<String> en = crypto.getKeyStore().aliases();
-                if (en.hasMoreElements()) {
-                    user = en.nextElement();
-                }
-                if (en.hasMoreElements()) {
-                    //more than one alias in the keystore, user WILL need
-                    //to specify
-                    user = null;
-                }            
-            } catch (KeyStoreException e) {
-                //ignore
-            }
-        }
-        return user;
     }
     
     private static X509Certificate getReqSigCert(List<WSHandlerResult> results) {
@@ -1317,7 +1299,11 @@ public abstract class AbstractBindingBuilder {
         }
         String user = (String)message.getContextualProperty(userNameKey);
         if (crypto != null && StringUtils.isEmpty(user)) {
-            user = getDefaultCryptoAlias(crypto);
+            try {
+                user = crypto.getDefaultX509Identifier();
+            } catch (WSSecurityException e1) {
+                throw new Fault(e1);
+            }
         }
         if (StringUtils.isEmpty(user)) {
             policyNotAsserted(token, "No " + type + " username found.");

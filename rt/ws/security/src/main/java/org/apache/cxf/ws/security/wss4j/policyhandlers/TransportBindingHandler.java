@@ -417,7 +417,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 sig.setX509Certificate(secTok.getX509Certificate());
                 
                 crypto = secTok.getCrypto();
-                String uname = crypto.getKeyStore().getCertificateAlias(secTok.getX509Certificate());
+                String uname = crypto.getX509Identifier(secTok.getX509Certificate());
                 String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
                 if (password == null) {
                     password = "";
