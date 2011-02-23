@@ -146,6 +146,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     int ttl = 300;
     
     Object actAs;
+    String tokenType;
 
     Map<String, Object> ctx = new HashMap<String, Object>();
     
@@ -292,7 +293,11 @@ public class STSClient implements Configurable, InterceptorProvider {
     public int getKeySize() {
         return keySize;
     }
-    
+
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
+
     /**
      * Indicate whether to use the signer's public X509 certificate for the subject confirmation key info 
      * when creating a RequestsSecurityToken message. If the property is set to 'false', only the public key 
@@ -423,6 +428,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         boolean wroteKeySize = false;
         
         String keyType = null;
+        String sptt = null;
         
         if (template != null) {
             if (this.useSecondaryParameters()) {
@@ -437,6 +443,8 @@ public class STSClient implements Configurable, InterceptorProvider {
                 } else if ("KeySize".equals(tl.getLocalName())) {
                     wroteKeySize = true;
                     keySize = Integer.parseInt(DOMUtils.getContent(tl));
+                } else if ("TokenType".equals(tl.getLocalName())) {
+                    sptt = DOMUtils.getContent(tl);
                 }
                 tl = DOMUtils.getNextElement(tl);
             }
@@ -448,6 +456,9 @@ public class STSClient implements Configurable, InterceptorProvider {
 
         addRequestType(requestType, writer);
         addAppliesTo(writer, appliesTo);
+        if (sptt == null) {
+            addTokenType(writer);
+        }
         keyType = writeKeyType(writer, keyType);
 
         byte[] requestorEntropy = null;
@@ -484,6 +495,13 @@ public class STSClient implements Configurable, InterceptorProvider {
         SecurityToken token = createSecurityToken(getDocumentElement((DOMSource)obj[0]), requestorEntropy);
         if (cert != null) {
             token.setX509Certificate(cert, crypto);
+        }
+        if (token.getTokenType() == null) {
+            if (sptt != null) {
+                token.setTokenType(sptt);
+            } else if (tokenType != null) {
+                token.setTokenType(tokenType);
+            }
         }
         return token;
     }
@@ -801,7 +819,15 @@ public class STSClient implements Configurable, InterceptorProvider {
             writer.writeEndElement();
         }
     }
-    
+
+    private void addTokenType(XMLStreamWriter writer) throws XMLStreamException {
+        if (tokenType != null) {
+            writer.writeStartElement("wst", "TokenType", namespace);
+            writer.writeCharacters(tokenType);
+            writer.writeEndElement();
+        }
+    }
+
     private void addActAs(W3CDOMStreamWriter writer) throws Exception {
         if (this.actAs != null) {
             final boolean isString = this.actAs instanceof String;
@@ -847,6 +873,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         Element rpt = null;
         Element lte = null;
         Element entropy = null;
+        String tt = null;
 
         while (el != null) {
             String ln = el.getLocalName();
@@ -863,6 +890,8 @@ public class STSClient implements Configurable, InterceptorProvider {
                     rpt = el;
                 } else if ("Entropy".equals(ln)) {
                     entropy = el;
+                } else if ("TokenType".equals(ln)) {
+                    tt = DOMUtils.getContent(el);
                 }
             }
             el = DOMUtils.getNextElement(el);
@@ -876,6 +905,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         token.setAttachedReference(rar);
         token.setUnattachedReference(rur);
         token.setIssuerAddress(location);
+        token.setTokenType(tt);
 
         byte[] secret = null;
 
