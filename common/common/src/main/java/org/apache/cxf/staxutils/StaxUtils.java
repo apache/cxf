@@ -95,6 +95,7 @@ public final class StaxUtils {
     };
     
     private static int innerElementLevelThreshold = -1;
+    private static int innerElementCountThreshold = -1;
     
     static {
         int i = 20;
@@ -122,6 +123,17 @@ public final class StaxUtils {
         if (innerElementLevelThreshold <= 0) {
             innerElementLevelThreshold = -1;
         }
+        try {
+            String s =  System.getProperty("org.apache.cxf.staxutils.innerElementCountThreshold",
+                                    "-1");
+            innerElementCountThreshold = Integer.parseInt(s);
+        } catch (Throwable t) {
+            innerElementCountThreshold = -1;
+        }
+        if (innerElementCountThreshold <= 0) {
+            innerElementCountThreshold = -1;
+        }
+        
         
     }
     
@@ -938,9 +950,11 @@ public final class StaxUtils {
         throws XMLStreamException {
         Stack<Node> stack = new Stack<Node>();
         int event = reader.getEventType();
+        int elementCount = 0;
         while (reader.hasNext()) {
             switch (event) {
             case XMLStreamConstants.START_ELEMENT: {
+                elementCount++;
                 Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
                 if (reader.getPrefix() != null) {
                     e.setPrefix(reader.getPrefix());
@@ -975,6 +989,11 @@ public final class StaxUtils {
                     && stack.size() >= innerElementLevelThreshold) {
                     throw new RuntimeException("reach the innerElementLevelThreshold:" 
                                                + innerElementLevelThreshold);
+                }
+                if (isThreshold && innerElementCountThreshold != -1 
+                    && elementCount >= innerElementCountThreshold) {
+                    throw new RuntimeException("reach the innerElementCountThreshold:" 
+                                               + innerElementCountThreshold);
                 }
                 parent = e;
                 break;
