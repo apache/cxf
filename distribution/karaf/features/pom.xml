@@ -22,12 +22,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>karaf</artifactId>
+        <groupId>org.apache.cxf.karaf</groupId>
+        <artifactId>karaf-parent</artifactId>
         <version>2.4.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache.camel.karaf</groupId>
+    <groupId>org.apache.cxf.karaf</groupId>
     <artifactId>apache-cxf</artifactId>
     <packaging>pom</packaging>
     <name>CXF :: Apache Karaf :: Features</name>
