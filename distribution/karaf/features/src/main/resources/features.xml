@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ 
+      Licensed to the Apache Software Foundation (ASF) under one or more
+      contributor license agreements.  See the NOTICE file distributed with
+      this work for additional information regarding copyright ownership.
+      The ASF licenses this file to You under the Apache License, Version 2.0
+      (the "License"); you may not use this file except in compliance with
+      the License.  You may obtain a copy of the License at
+ 
+         http://www.apache.org/licenses/LICENSE-2.0
+ 
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+-->
+<features>
+  <feature name='spring' version='${cxf.spring.version}'>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/${aopalliance-bundle-version}</bundle>
+    <bundle>mvn:org.springframework/spring-asm/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-aop/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-aspects/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-core/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-beans/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-context/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-context-support/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-expression/${cxf.spring.version}</bundle>
+  </feature>
+  <feature name='jetty7' version='${pom.version}'>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/${servlet-api-2.5-version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-util/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-io/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-http/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-client/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-continuation/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-jmx/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-server/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-security/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-servlet/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-servlets/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-xml/${cxf.jetty.version}</bundle>
+    <bundle>mvn:org.eclipse.jetty/jetty-webapp/${cxf.jetty.version}</bundle>
+  </feature>
+  <feature name='jaxb' version='${pom.version}'>
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${servicemix-specs-version}</bundle>
+<bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${servicemix-specs-version}</bundle>
+<bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.0/${servicemix-specs-version}</bundle>
+<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${jaxb-bundle-version}</bundle>
+  </feature>
+  <!-- Current the abdera bundle is work as expect -->
+  <feature name='abdera' version='${pom.version}'>
+    <bundle>mvn:org.apache.abdera/abdera-core/${cxf.abdera.version}</bundle>
+    <!--bundle>mvn:org.apache.abdera/abdera-extensions-json/${cxf.abdera.version}</bundle-->
+    <bundle>mvn:org.apache.abdera/abdera-extensions-main/${cxf.abdera.version}</bundle>
+    <bundle>mvn:org.apache.abdera/abdera-i18n/${cxf.abdera.version}</bundle>
+    <bundle>mvn:org.apache.abdera/abdera-parser/${cxf.abdera.version}</bundle>
+    <bundle>mvn:commons-codec/commons-codec/${commons-codec-version}</bundle>
+    <bundle>mvn:http://download.java.net/maven/2!javax.mail/mail/${javax-mail-version}</bundle> 
+    <feature version='${pom.version}'>jaxb</feature>
+  </feature>
+  <feature name='cxf-all' version='${pom.version}'>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${geronimo-jms-spec-version}</bundle>
+    <bundle>mvn:org.springframework/spring-jms/${cxf.spring.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.asm/${asm-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.fastinfoset/${fastinfoset-version}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/${servlet-api-2.5-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/${jdom-bundle-version}</bundle>
+    <bundle>mvn:commons-codec/commons-codec/${commons-codec-version}</bundle>
+    <bundle>mvn:org.codehaus.jettison/jettison/${jettison-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${ant-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/${bcel-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/${xalan-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/${xerces-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/${xmlbeans-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/${xmlsec-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${xmlresolver-bundle-version}</bundle>
+    <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/${woodstox-core-bundle-version}</bundle>
+    <bundle>mvn:org.codehaus.woodstox/stax2-api/${stax2-api-bundle-version}</bundle>
+    <bundle>mvn:org.apache.ws.commons.schema/XmlSchema/${xmlschema-version}</bundle>
+    <bundle>mvn:commons-lang/commons-lang/${commons-lang-version}</bundle>
+    <bundle>mvn:commons-collections/commons-collections/${commons-collections-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${antlr-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.oro/${oro-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.velocity/${velocity-bundle-version}</bundle>
+    <bundle>mvn:http://download.java.net/maven/2!javax.mail/mail/${javax-mail-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.neethi/${neethi-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-${jaxws.api.version}/${servicemix-specs-version}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-annotation_1.0_spec/${gernimo-annotation-spec-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${servicemix-specs-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${saaj-impl-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.wsdl4j/${wsdl4j-bundle-version}</bundle>
+    <bundle>mvn:org.apache.ws.security/wss4j/${wss4j-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.opensaml/${opensaml-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1/${servicemix-specs-version}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-ws-metadata_2.0_spec/${geronimo-ws-metadata-spec-version}</bundle>
+    <bundle>mvn:org.apache.cxf/cxf-bundle/${pom.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-io/${commons-io-bundle-version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.abdera/${abdera-bundle-version}</bundle>
+    <feature version='${pom.version}'>spring</feature>
+    <feature version='${pom.version}'>jetty7</feature>
+    <feature version='${pom.version}'>jaxb</feature>
+  </feature>
+</features>
