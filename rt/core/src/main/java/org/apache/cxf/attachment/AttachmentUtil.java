@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -88,9 +87,7 @@ public final class AttachmentUtil {
                 URI uri = new URI(ns);
                 String host = uri.toURL().getHost();
                 cid = host;
-            } catch (URISyntaxException e) {
-                cid = ns;
-            } catch (MalformedURLException e) {
+            } catch (Exception e) {
                 cid = ns;
             }
         }
