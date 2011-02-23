@@ -27,8 +27,8 @@
         <relativePath>../../parent</relativePath>
     </parent>
 
-    <groupId>org.apache.cxf</groupId>
-    <artifactId>karaf</artifactId>
+    <groupId>org.apache.cxf.karaf</groupId>
+    <artifactId>karaf-parent</artifactId>
     <packaging>pom</packaging>
     <version>2.3.3-SNAPSHOT</version>
     <name>CXF :: Apache Karaf</name>
