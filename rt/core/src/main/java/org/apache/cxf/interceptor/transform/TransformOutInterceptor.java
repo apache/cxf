@@ -49,6 +49,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private Map<String, String> outAppendMap;
     private List<String> outDropElements;
     private boolean attributesToElements;
+    private String contextPropertyName;
     
     public TransformOutInterceptor() {
         super(Phase.PRE_STREAM);
@@ -68,6 +69,14 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (!isHttpVerbSupported(message)) {
             return;
         }
+        
+        if (contextPropertyName != null 
+            && !MessageUtils.getContextualBoolean(message.getExchange().getInMessage(),
+                                               contextPropertyName, 
+                                               false)) {
+            return;
+        }
+        
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         OutputStream out = message.getContent(OutputStream.class);
         
@@ -110,6 +119,10 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     protected boolean isHttpVerbSupported(Message message) {
         return  isRequestor(message) && isGET(message) ? false : true;
+    }
+    
+    public void setContextPropertyName(String propertyName) {
+        contextPropertyName = propertyName;
     }
     
 }

@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.transform.TransformUtils;
@@ -42,6 +43,7 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     private Map<String, String> inElementsMap;
     private Map<String, String> inAppendMap;
     private boolean blockOriginalReader = true;
+    private String contextPropertyName;
     
     public TransformInInterceptor() {
         super(Phase.POST_STREAM);
@@ -49,6 +51,10 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     public void handleMessage(Message message) {
+        if (contextPropertyName != null 
+            && !MessageUtils.getContextualBoolean(message, contextPropertyName, false)) {
+            return;
+        }
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         InputStream is = message.getContent(InputStream.class);
         
@@ -82,5 +88,9 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
    
     public void setBlockOriginalReader(boolean blockOriginalReader) {
         this.blockOriginalReader = blockOriginalReader;
+    }
+    
+    public void setContextPropertyName(String propertyName) {
+        contextPropertyName = propertyName;
     }
 }

@@ -89,7 +89,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class));
+                   launchServer(BookServerRestSoap.class, true));
     }
     
     @Test
@@ -158,7 +158,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     public void testGetBookTransform() throws Exception {
         
         String address = "http://localhost:" + PORT 
-                         + "/test/services/rest-transform/bookstore/books/123";
+                         + "/test/v1/rest-transform/bookstore/books/123";
         WebClient client = WebClient.create(address);
         Response r = client.get();
         String str = getStringFromInputStream((InputStream)r.getEntity());
@@ -169,7 +169,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     public void testPostBookTransform() throws Exception {
            
         String address = "http://localhost:" + PORT 
-                         + "/test/services/rest-transform/bookstore/books";
+                         + "/test/v1/rest-transform/bookstore/books";
         
         TransformOutInterceptor out =  new TransformOutInterceptor();
         out.setOutTransformElements(
@@ -192,6 +192,17 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         Book2 book = client.accept("text/xml").post(new Book2(), Book2.class);
         assertEquals(124L, book.getId());
     }
+    
+    @Test
+    public void testPostBookTransformV2() throws Exception {
+           
+        String address = "http://localhost:" + PORT 
+                         + "/test/v2/rest-transform/bookstore/books";
+        WebClient client = WebClient.create(address);
+        Book book = client.accept("text/xml").post(new Book(), Book.class);
+        assertEquals(124L, book.getId());
+    }
+    
     
     @Test
     public void testGetBookFastinfoset() throws Exception {
@@ -674,11 +685,11 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetUnqualifiedBookSoap() throws Exception {
+        
         String wsdlAddress =
-            "http://localhost:" + PORT + "/test/services/soap-transform/bookservice?wsdl"; 
-        URL wsdlUrl = new URL(wsdlAddress);
+            "http://localhost:" + PORT + "/test/services/soap-transform/bookservice?wsdl";
         BookSoapService service = 
-            new BookSoapService(wsdlUrl,
+            new BookSoapService(new URL(wsdlAddress), 
                                 new QName("http://books.com", "BookService"));
         BookStoreJaxrsJaxws store = service.getBookPort();
         
@@ -713,6 +724,21 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         cl.getInInterceptors().add(in);
         cl.getOutInterceptors().add(out);
         
+        Book book = store.getBook(new Long(123));
+        assertEquals("id is wrong", book.getId(), 123);
+        
+    }
+    
+    @Test
+    @Ignore
+    public void testGetBookSoapTransformDirect() throws Exception {
+        String wsdlAddress =
+            "http://localhost:" + PORT + "/test/v2/soap-transform/bookservice?wsdl"; 
+        URL wsdlUrl = new URL(wsdlAddress);
+        BookSoapService service = 
+            new BookSoapService(wsdlUrl,
+                                new QName("http://books.com", "BookService"));
+        BookStoreJaxrsJaxws store = service.getBookPort();
         Book book = store.getBook(new Long(123));
         assertEquals("id is wrong", book.getId(), 123);
     }

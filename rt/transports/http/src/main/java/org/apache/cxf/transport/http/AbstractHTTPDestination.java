@@ -94,6 +94,8 @@ public abstract class AbstractHTTPDestination
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
     public static final String CXF_CONTINUATION_MESSAGE = "cxf.continuation.message";
 
+    public static final String SERVICE_REDIRECTION = "http.service.redirection";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     private static final long serialVersionUID = 1L;
@@ -199,6 +201,8 @@ public abstract class AbstractHTTPDestination
             LOG.fine("Get the message from the request for processing");
         }
 
+        copyKnownRequestParameters(req, inMessage);
+        
         try {    
             incomingObserver.onMessage(inMessage);
         } catch (SuspendedInvocationException ex) {
@@ -207,9 +211,14 @@ public abstract class AbstractHTTPDestination
             }
             //else nothing to do, just finishing the processing
         }
+
  
     }
 
+    private void copyKnownRequestParameters(HttpServletRequest request, Message message) {
+        message.put(SERVICE_REDIRECTION, request.getParameter(SERVICE_REDIRECTION));
+    }
+    
     protected void setupMessage(Message inMessage,
                                 final ServletContext context, 
                                 final HttpServletRequest req, 

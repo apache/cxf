@@ -186,6 +186,12 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </jaxrs:server> 
    
   <bean id="transformFeatureRest" class="org.apache.cxf.feature.StaxTransformFeature">
+      <!-- 
+         apply the transformation only if the boolean property with the given name
+         is set to true on the message
+      -->   
+      <property name="contextPropertyName" value="http.service.redirection"/>
+      
       <property name="outTransformElements">
         <map>
          <entry key="Book" value="TheBook"/>
@@ -204,12 +210,15 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       id="soapservice-transform"
       implementor="#bookstore-simple"
       address="/soap-transform/bookservice">
+      
       <jaxws:features>
        <ref bean="transformFeatureSoap" />
       </jaxws:features>
+      
    </jaxws:endpoint> 
    
    <bean id="transformFeatureSoap" class="org.apache.cxf.feature.StaxTransformFeature">
+      
       <property name="outTransformElements">
         <map>
          <entry key="{http://jaxws.jaxrs.systest.cxf.apache.org/}*" value="*"/>

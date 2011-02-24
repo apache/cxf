@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 
 
@@ -55,6 +56,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     private static final String REDIRECTS_PARAMETER = "redirects-list";
     private static final String REDIRECT_SERVLET_NAME_PARAMETER = "redirect-servlet-name";
     private static final String REDIRECT_SERVLET_PATH_PARAMETER = "redirect-servlet-path";
+    private static final String REDIRECT_QUERY_CHECK_PARAMETER = "redirect-query-check";
     
     private static final Map<String, String> STATIC_CONTENT_TYPES;
     
@@ -71,6 +73,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     private List<String> redirectList; 
     private String dispatcherServletPath;
     private String dispatcherServletName;
+    private boolean redirectQueryCheck;
     
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
@@ -78,6 +81,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         staticResourcesList = parseListSequence(servletConfig.getInitParameter(STATIC_RESOURCES_PARAMETER));
         
         redirectList = parseListSequence(servletConfig.getInitParameter(REDIRECTS_PARAMETER));
+        redirectQueryCheck = Boolean.valueOf(servletConfig.getInitParameter(REDIRECT_QUERY_CHECK_PARAMETER));
         dispatcherServletName = servletConfig.getInitParameter(REDIRECT_SERVLET_NAME_PARAMETER);
         dispatcherServletPath = servletConfig.getInitParameter(REDIRECT_SERVLET_PATH_PARAMETER);
     }
@@ -164,24 +168,32 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     
     protected void handleRequest(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException {
-        
-        if (redirectList != null 
-            && matchPath(redirectList, request.getPathInfo())) {
+        if ((dispatcherServletPath != null || dispatcherServletName != null)
+            && (redirectList != null && matchPath(redirectList, request)
+                || redirectList == null)) {
+            // if no redirectList is provided then this servlet is redirecting only
             redirect(request, response, request.getPathInfo());
             return;
         }
         
         if (staticResourcesList != null 
-            && matchPath(staticResourcesList, request.getPathInfo())) {
+            && matchPath(staticResourcesList, request)) {
             serveStaticContent(request, response, request.getPathInfo());
             return;
         }
         invoke(request, response);
     }
     
-    private static boolean matchPath(List<String> values, String pathInfo) {
+    private boolean matchPath(List<String> values, HttpServletRequest request) {
+        String path = request.getPathInfo();
+        if (redirectQueryCheck) {
+            String queryString = request.getQueryString();
+            if (queryString != null && queryString.length() > 0) {
+                path += "?" + queryString; 
+            }
+        }
         for (String value : values) {
-            if (pathInfo.matches(value)) {
+            if (path.matches(value)) {
                 return true;
             }
         }
@@ -263,9 +275,20 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         
         @Override
         public String getRequestURI() {
-            return getContextPath() + servletPath + pathInfo;
+            String contextPath = getContextPath();
+            if ("/".equals(contextPath)) {
+                contextPath = "";
+            }
+            return contextPath + servletPath + pathInfo;
         }
         
+        @Override
+        public String getParameter(String name) {
+            if (AbstractHTTPDestination.SERVICE_REDIRECTION.equals(name)) {
+                return "true";
+            }
+            return super.getParameter(name);
+        }
     }
 
 }

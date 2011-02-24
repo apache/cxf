@@ -37,16 +37,72 @@
 
 	<servlet>
 		<servlet-name>CXFServlet</servlet-name>
-		<display-name>CXF Servlet</display-name>
+		<display-name>CXFServlet</display-name>
 		<servlet-class>
 			org.apache.cxf.transport.servlet.CXFServlet
 		</servlet-class>
-		<load-on-startup>1</load-on-startup>
+			<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>CXFServlet</servlet-name>
 		<url-pattern>/services/*</url-pattern>
+		<load-on-startup>1</load-on-startup>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>CXFServletV1</servlet-name>
+		<display-name>CXFServletV1</display-name>
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+		<!-- 
+		   If redirects-list is not provided and 
+		   only redirect-servlet-path or redirect-servlet-name is set then
+		   this servlet will only redirect
+		-->    
+		<init-param>
+    		<param-name>redirects-list</param-name>
+	    	<param-value>
+	    	    /rest-transform/.*
+	    	</param-value>
+	    </init-param>
+	    <init-param>
+    		<param-name>redirect-servlet-path</param-name>
+	    	<param-value>/v2</param-value>
+	    </init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CXFServletV1</servlet-name>
+		<url-pattern>/v1/*</url-pattern>
+		<load-on-startup>1</load-on-startup>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>CXFServletV2</servlet-name>
+		<display-name>CXFServletV2</display-name>
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+		<!-- 
+		     thread safe access to multiple destinations via
+		     a single CXF servlet, in this case older clients
+		     accessing CXFServlet listening on /v1 are redirected to
+		     this servlet which is also serving the new clients directly
+		     accessing /v2 
+		-->
+		<init-param>
+		      <param-name>disable-address-updates</param-name>
+		      <param-value>true</param-value>    
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CXFServletV2</servlet-name>
+		<url-pattern>/v2/*</url-pattern>
 	</servlet-mapping>
 </web-app>
 <!-- END SNIPPET: webxml -->
