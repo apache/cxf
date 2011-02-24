@@ -76,8 +76,12 @@ public class ServletDestination extends AbstractHTTPDestination {
     protected Message retrieveFromServlet3Async(HttpServletRequest req) {
         // It looks current Servlet3 implementation request doesn't pass the isAsyncStart 
         // status to the redispatched request
-        if (req.isAsyncSupported()) {
-            return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+        try {
+            if (req.isAsyncSupported()) {
+                return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+            }
+        } catch (AbstractMethodError ex) {
+            // the request may not implement the Servlet3 API
         }
         return null;
     }

@@ -376,17 +376,25 @@ public abstract class AbstractHTTPDestination
         return retrieveFromServlet3Async(req);
     }
     protected Message retrieveFromServlet3Async(HttpServletRequest req) {
-        if (req.isAsyncStarted()) {
-            return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+        try {
+            if (req.isAsyncStarted()) {
+                return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+            }
+        } catch (Throwable ex) {
+            // the request may not implement the Servlet3 API
         }
         return null;
     }
     protected void setupContinuation(Message inMessage,
                       final HttpServletRequest req, 
                       final HttpServletResponse resp) {
-        if (isServlet3 && req.isAsyncSupported()) {
-            inMessage.put(ContinuationProvider.class.getName(), 
+        try {
+            if (isServlet3 && req.isAsyncSupported()) {
+                inMessage.put(ContinuationProvider.class.getName(), 
                           new Servlet3ContinuationProvider(req, resp, inMessage));
+            }
+        } catch (Throwable ex) {
+            // the request may not implement the Servlet3 API
         }
     }
     protected String getBasePath(String contextPath) throws IOException {
