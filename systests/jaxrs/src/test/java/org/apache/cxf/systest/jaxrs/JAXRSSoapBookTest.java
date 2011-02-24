@@ -730,20 +730,6 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
-    public void testGetBookSoapTransformDirect() throws Exception {
-        String wsdlAddress =
-            "http://localhost:" + PORT + "/test/v2/soap-transform/bookservice?wsdl"; 
-        URL wsdlUrl = new URL(wsdlAddress);
-        BookSoapService service = 
-            new BookSoapService(wsdlUrl,
-                                new QName("http://books.com", "BookService"));
-        BookStoreJaxrsJaxws store = service.getBookPort();
-        Book book = store.getBook(new Long(123));
-        assertEquals("id is wrong", book.getId(), 123);
-    }
-    
-    @Test
     public void testServiceListingsAndWadl() throws Exception {
         String listings = 
             getStringFromInputStream(getHttpInputStream("http://localhost:" + PORT + "/test/services"));
