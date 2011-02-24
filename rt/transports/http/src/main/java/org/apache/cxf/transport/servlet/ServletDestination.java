@@ -80,7 +80,7 @@ public class ServletDestination extends AbstractHTTPDestination {
             if (req.isAsyncSupported()) {
                 return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
             }
-        } catch (AbstractMethodError ex) {
+        } catch (Throwable ex) {
             // the request may not implement the Servlet3 API
         }
         return null;
