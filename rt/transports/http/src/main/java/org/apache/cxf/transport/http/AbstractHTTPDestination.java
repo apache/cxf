@@ -48,6 +48,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
@@ -180,20 +181,32 @@ public abstract class AbstractHTTPDestination
                        final ServletContext context, 
                        final HttpServletRequest req, 
                        final HttpServletResponse resp) throws IOException {
-        
-        MessageImpl inMessage = new MessageImpl();
-        setupMessage(inMessage,
+        Message inMessage = retrieveFromContinuation(req);
+        if (inMessage == null) {
+            LOG.fine("Create a new message for processing");
+            inMessage = new MessageImpl();
+            setupMessage(inMessage,
                      config,
                      context,
                      req,
                      resp);
 
-        ExchangeImpl exchange = new ExchangeImpl();
-        exchange.setInMessage(inMessage);
-        exchange.setSession(new HTTPSession(req));
-        inMessage.setDestination(this);
+            ExchangeImpl exchange = new ExchangeImpl();
+            exchange.setInMessage(inMessage);
+            exchange.setSession(new HTTPSession(req));
+            ((MessageImpl)inMessage).setDestination(this);
+        } else {
+            LOG.fine("Get the message from the request for processing");
+        }
 
-        incomingObserver.onMessage(inMessage);
+        try {    
+            incomingObserver.onMessage(inMessage);
+        } catch (SuspendedInvocationException ex) {
+            if (ex.getRuntimeException() != null) {
+                throw ex.getRuntimeException();
+            }
+            //else nothing to do, just finishing the processing
+        }
  
     }
 
@@ -309,17 +322,25 @@ public abstract class AbstractHTTPDestination
         return retrieveFromServlet3Async(req);
     }
     protected Message retrieveFromServlet3Async(HttpServletRequest req) {
-        if (req.isAsyncStarted()) {
-            return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+        try {
+            if (req.isAsyncStarted()) {
+                return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+            }
+        } catch (Throwable ex) {
+            // the request may not implement the Servlet3 API
         }
         return null;
     }
-    protected void setupContinuation(Message inMessage,
-                      final HttpServletRequest req, 
-                      final HttpServletResponse resp) {
-        if (isServlet3) {
-            inMessage.put(ContinuationProvider.class.getName(), 
-                          new Servlet3ContinuationProvider(req, resp, inMessage));
+
+    protected void setupContinuation(Message inMessage, final HttpServletRequest req,
+                                     final HttpServletResponse resp) {
+        try {
+            if (isServlet3 && req.isAsyncSupported()) {
+                inMessage.put(ContinuationProvider.class.getName(),
+                              new Servlet3ContinuationProvider(req, resp, inMessage));
+            }
+        } catch (Throwable ex) {
+            // the request may not implement the Servlet3 API
         }
     }
     protected String getBasePath(String contextPath) throws IOException {

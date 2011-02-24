@@ -23,8 +23,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
@@ -58,6 +61,21 @@ public class ServletDestination extends AbstractHTTPDestination {
     protected Logger getLogger() {
         return LOG;
     }
+    
+    protected Message retrieveFromServlet3Async(HttpServletRequest req) {
+        // It looks current Servlet3 implementation request doesn't pass the isAsyncStart 
+        // status to the redispatched request
+        try {
+            if (req.isAsyncSupported()) {
+                return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+            }
+        } catch (Throwable ex) {
+            // the request may not implement the Servlet3 API
+        }
+        return null;
+    }
+         
+
 
     protected String getBasePath(String contextPath) throws IOException {
         
