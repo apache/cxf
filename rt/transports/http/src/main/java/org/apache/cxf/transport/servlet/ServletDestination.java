@@ -30,7 +30,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -70,6 +72,15 @@ public class ServletDestination extends AbstractHTTPDestination {
     protected Logger getLogger() {
         return LOG;
     }
+    
+    protected Message retrieveFromServlet3Async(HttpServletRequest req) {
+        // It looks current Servlet3 implementation request doesn't pass the isAsyncStart 
+        // status to the redispatched request
+        if (req.isAsyncSupported()) {
+            return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+        }
+        return null;
+    }
 
     public void invoke(final ServletContext context, 
                        final HttpServletRequest req, 
@@ -81,20 +92,32 @@ public class ServletDestination extends AbstractHTTPDestination {
                        final ServletContext context, 
                        final HttpServletRequest req, 
                        final HttpServletResponse resp) throws IOException {
-        
-        MessageImpl inMessage = new MessageImpl();
-        setupMessage(inMessage,
+        Message inMessage = retrieveFromContinuation(req);
+        if (inMessage == null) {
+            LOG.fine("Create a new message for processing");
+            inMessage = new MessageImpl();
+            setupMessage(inMessage,
                      config,
                      context,
                      req,
                      resp);
 
-        ExchangeImpl exchange = new ExchangeImpl();
-        exchange.setInMessage(inMessage);
-        exchange.setSession(new HTTPSession(req));
-        inMessage.setDestination(this);
+            ExchangeImpl exchange = new ExchangeImpl();
+            exchange.setInMessage(inMessage);
+            exchange.setSession(new HTTPSession(req));
+            ((MessageImpl)inMessage).setDestination(this);
+        } else {
+            LOG.fine("Get the message from the request for processing");
+        }
 
-        incomingObserver.onMessage(inMessage);
+        try {    
+            incomingObserver.onMessage(inMessage);
+        } catch (SuspendedInvocationException ex) {
+            if (ex.getRuntimeException() != null) {
+                throw ex.getRuntimeException();
+            }
+            //else nothing to do, just finishing the processing
+        }
  
     }
     protected String getBasePath(String contextPath) throws IOException {

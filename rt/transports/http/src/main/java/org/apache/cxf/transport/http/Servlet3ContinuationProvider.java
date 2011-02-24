@@ -39,6 +39,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
     HttpServletResponse resp; 
     Message inMessage;
     
+    
     public Servlet3ContinuationProvider(HttpServletRequest req,
                                         HttpServletResponse resp, 
                                         Message inMessage) {
@@ -64,7 +65,9 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         Object obj;
         
         public Servlet3Continuation() {
-            isNew = !req.isAsyncStarted();
+            // It looks current Servlet3 implementation request doesn't pass the isAsyncStart 
+            // status to the redispatched request, so we use the attribute to check the statues
+            isNew = req.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE) == null;
             if (isNew) {
                 req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                                  inMessage.getExchange().getInMessage());
@@ -83,7 +86,6 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             isNew = false;
             // Need to get the right message which is handled in the interceptor chain
             inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
-                
             isPending = true;
             return true;
         }

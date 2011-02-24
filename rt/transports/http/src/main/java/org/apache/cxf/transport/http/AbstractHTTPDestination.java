@@ -384,7 +384,7 @@ public abstract class AbstractHTTPDestination
     protected void setupContinuation(Message inMessage,
                       final HttpServletRequest req, 
                       final HttpServletResponse resp) {
-        if (isServlet3) {
+        if (isServlet3 && req.isAsyncSupported()) {
             inMessage.put(ContinuationProvider.class.getName(), 
                           new Servlet3ContinuationProvider(req, resp, inMessage));
         }
