@@ -95,6 +95,7 @@ public abstract class AbstractHTTPDestination
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
     public static final String CXF_CONTINUATION_MESSAGE = "cxf.continuation.message";
+    public static final String CXF_ASYNC_CONTEXT = "cxf.async.context";
     
     private static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
     
@@ -375,11 +376,10 @@ public abstract class AbstractHTTPDestination
         }
         return retrieveFromServlet3Async(req);
     }
+    
     protected Message retrieveFromServlet3Async(HttpServletRequest req) {
         try {
-            if (req.isAsyncStarted()) {
-                return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
-            }
+            return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
         } catch (Throwable ex) {
             // the request may not implement the Servlet3 API
         }
