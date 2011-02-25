@@ -1979,7 +1979,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             Class exClazz = exceptionClasses[i];
 
             // Ignore XFireFaults because they don't need to be declared
-            if (exClazz.equals(Exception.class) || Fault.class.isAssignableFrom(exClazz)
+            if (Fault.class.isAssignableFrom(exClazz)
                 || exClazz.equals(RuntimeException.class) || exClazz.equals(Throwable.class)) {
                 continue;
             }
