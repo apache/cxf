@@ -44,14 +44,15 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
                                     Message m) {
         req = (Request)request;
         message = m;
-        isNew = !req.isAsyncStarted();
+        isNew = req.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE) == null;
         if (isNew) {
             req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                              message.getExchange().getInMessage());
             context = req.startAsync(req, resp);
             context.addContinuationListener(this);
+            req.setAttribute(AbstractHTTPDestination.CXF_ASYNC_CONTEXT, context);
         } else {
-            context = req.getAsyncContext();
+            context = (AsyncContext)req.getAttribute(AbstractHTTPDestination.CXF_ASYNC_CONTEXT);
         }
     }
 
