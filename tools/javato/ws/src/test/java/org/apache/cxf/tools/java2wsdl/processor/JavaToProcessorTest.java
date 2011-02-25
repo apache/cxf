@@ -625,4 +625,33 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(xsd, xsd.indexOf("ref=") == -1);
         
     }
+    
+    
+    @Test
+    public void testException() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.simple.Caculator");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        File wsdlFile = new File(output, "exception.wsdl");
+        assertTrue(wsdlFile.exists());
+        // schema element
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        assertTrue(wsdlContent.indexOf("<xs:complexType name=\"Exception\">") != -1);
+        assertTrue(wsdlContent.indexOf("<xs:element name=\"Exception\" type=\"tns:Exception\"/>") != -1);
+        assertTrue(wsdlContent.indexOf("<xs:element minOccurs=\"0\" name=\"message\" type=\"xs:string\"/>") 
+                   != -1);
+        assertTrue(wsdlContent.indexOf("<xs:element minOccurs=\"0\" name=\"message\" type=\"xs:string\"/>") 
+                   != -1);
+        assertTrue(wsdlContent.indexOf("<wsdl:part name=\"Exception\" element=\"tns:Exception\">") != -1);
+        assertTrue(wsdlContent.indexOf("<wsdl:fault name=\"Exception\" message=\"tns:Exception\">") != -1);
+        assertTrue(wsdlContent.indexOf("<soap:fault name=\"Exception\" use=\"literal\"/>") != -1);
+
+    }
 }

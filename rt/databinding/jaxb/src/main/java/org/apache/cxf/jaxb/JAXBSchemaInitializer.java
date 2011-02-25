@@ -547,6 +547,16 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 }                
             }
         }
+        // Create element in xsd:sequence for Exception.class
+        if (cls.equals(Exception.class)) {
+            JAXBBeanInfo beanInfo = getBeanInfo(java.lang.String.class);
+            XmlSchemaElement exEle = new XmlSchemaElement();
+            exEle.setName("message");
+            exEle.setSchemaTypeName(getTypeName(beanInfo));
+            exEle.setMinOccurs(0);
+            seq.getItems().add(exEle);
+
+        }
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
     
