@@ -50,7 +50,7 @@ public class ServerRestricted extends AbstractBusTestServerBase {
         doPublish(baseUrl + "/XPingService", new XPingService());
         doPublish(baseUrl + "/X-NoTimestampPingService", new XNoTimestampPingService());
 //        doPublish(baseUrl + "/X-AES128PingService", new XAES128PingService());
-//        doPublish(baseUrl + "/X-AES192PingService", new XAES192PingService());
+//        doPublish(baseUrl + "/X-AES256PingService", new XAES256PingService());
 //        doPublish(baseUrl + "/X-TripleDESPingService", new XTripleDESPingService());
         doPublish(baseUrl + "/XDPingService", new XDPingService());
         doPublish(baseUrl + "/XD-ESPingService", new XDESPingService());
@@ -225,11 +225,11 @@ public class ServerRestricted extends AbstractBusTestServerBase {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
-                portName = "X-AES192_IPingService", 
+                portName = "X-AES256_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
                 wsdlLocation = 
                               "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11_restricted.wsdl")
-    public static class XAES192PingService extends PingService {
+    public static class XAES256PingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 

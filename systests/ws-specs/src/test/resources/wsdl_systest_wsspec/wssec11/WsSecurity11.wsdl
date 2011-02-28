@@ -140,9 +140,9 @@
 			<soap12:address
 				location="http://localhost/Security_WsSecurity_Service_Indigo/WsSecurity11.svc/X-AES128" />
 		</wsdl:port>
-		<wsdl:port name="X-AES192_IPingService" binding="wssec11test:X-AES192_IPingService">
+		<wsdl:port name="X-AES256_IPingService" binding="wssec11test:X-AES256_IPingService">
 			<soap12:address
-				location="http://localhost/Security_WsSecurity_Service_Indigo/WsSecurity11.svc/X-AES192" />
+				location="http://localhost/Security_WsSecurity_Service_Indigo/WsSecurity11.svc/X-AES256" />
 		</wsdl:port>
 		<wsdl:port name="X-TripleDES_IPingService" binding="wssec11test:X-TripleDES_IPingService">
 			<soap12:address

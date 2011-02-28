@@ -28,7 +28,7 @@ import org.junit.Test;
 
 /**
  * This class runs the second half of the tests, as having all in 
- * the one class causes an out of meemory problem in eclipse
+ * the one class causes an out of memory problem in eclipse
  */
 public class WSSecurity112Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
@@ -75,7 +75,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
                 "X",
                 "X-NoTimestamp",
                 "X-AES128",
-                "X-AES192",
+                "X-AES256",
                 "X-TripleDES",
                 "XD",
                 "XD-ES",

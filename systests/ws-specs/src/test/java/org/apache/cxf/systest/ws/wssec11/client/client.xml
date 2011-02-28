@@ -129,7 +129,7 @@
             <entry key="ws-security.encryption.properties" value="org/apache/cxf/systest/ws/wssec11/client/bob.properties"/> 
         </jaxws:properties>
     </jaxws:client>
-    <jaxws:client name="{http://WSSec/wssec11}X-AES192_IPingService" createdFromAPI="true">
+    <jaxws:client name="{http://WSSec/wssec11}X-AES256_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec11.client.KeystorePasswordCallback"/>
