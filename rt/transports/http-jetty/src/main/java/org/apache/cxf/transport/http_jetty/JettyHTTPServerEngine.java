@@ -37,6 +37,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.https_jetty.JettySslConnectorFactory;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -358,6 +359,14 @@ public class JettyHTTPServerEngine
                     if (h instanceof DefaultHandler) {
                         defaultHandler = (DefaultHandler) h;
                     } else {
+                        if ((h instanceof SecurityHandler) 
+                            && ((SecurityHandler)h).getHandler() == null) {
+                            //if h is SecurityHandler(such as ConstraintSecurityHandler)
+                            //then it need be on top of JettyHTTPHandler
+                            //set JettyHTTPHandler as inner handler if 
+                            //inner handler is null
+                            ((SecurityHandler)h).setHandler(handler);
+                        } 
                         handlerCollection.addHandler(h);
                     }
                 }
