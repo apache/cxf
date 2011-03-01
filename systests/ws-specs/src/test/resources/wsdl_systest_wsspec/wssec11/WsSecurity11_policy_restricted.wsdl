@@ -2453,7 +2453,7 @@
 		</wsdl:operation>
 
 	</wsdl:binding>
-	<wsdl:binding name="X-AES_IPingService" type="wssec11test:IPingService">
+	<wsdl:binding name="X-AES256_IPingService" type="wssec11test:IPingService">
 		<wsp:PolicyReference URI="#X-AES_IPingService_policy" />
 		<soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
 
