@@ -32,4 +32,7 @@ public class ThreadLocalSearchContext extends AbstractThreadLocalProxy<SearchCon
     }
 
 
+    public String getSearchExpression() {
+        return get().getSearchExpression();
+    }
 }

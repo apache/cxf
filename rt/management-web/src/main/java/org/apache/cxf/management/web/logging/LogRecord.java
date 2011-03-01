@@ -88,7 +88,9 @@ public class LogRecord {
         record.setLevel(LogLevel.fromJUL(julRecord.getLevel()));
         record.setLoggerName(julRecord.getLoggerName());
         if (julRecord.getThrown() != null) {
-            record.setThrowable(julRecord.getThrown());
+            StringWriter sw = new StringWriter();
+            julRecord.getThrown().printStackTrace(new PrintWriter(sw));
+            record.setThrowable(sw.getBuffer().toString());
         }
         if (julRecord.getParameters() != null) {
             record.setMessage(MessageFormat.format(julRecord.getMessage(), julRecord.getParameters()));
@@ -167,13 +169,6 @@ public class LogRecord {
     public void setThrowable(String throwable) {
         Validate.notNull(throwable, "throwable is null");
         this.throwable = throwable;
-    }
-
-    public void setThrowable(Throwable thr) {
-        Validate.notNull(thr, "throwable is null");
-        StringWriter sw = new StringWriter();
-        thr.printStackTrace(new PrintWriter(sw));
-        this.throwable = sw.getBuffer().toString();
     }
 
     @Override

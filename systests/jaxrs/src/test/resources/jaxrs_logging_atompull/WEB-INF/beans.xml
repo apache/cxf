@@ -150,7 +150,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 			<ref bean="feed" />
 		</jaxrs:providers>
 	</jaxrs:server>
-
+	
 	<jaxrs:server id="atomServer4" address="/atom4">
 		<jaxrs:serviceBeans>
 			<ref bean="atomPullServer4"/>
@@ -159,6 +159,17 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 			<ref bean="feed" />
 		</jaxrs:providers>
 	</jaxrs:server>
+    
+    
+    <jaxrs:server id="atomReset" address="/reset">
+		<jaxrs:serviceBeans>
+			<ref bean="atomServerReset"/>
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+
+    <bean id="atomServerReset" class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$AtomServerReset">
+        <property name="server" ref="atomPullServer2"/>
+    </bean>
     
 </beans>
 <!-- END SNIPPET: beans -->

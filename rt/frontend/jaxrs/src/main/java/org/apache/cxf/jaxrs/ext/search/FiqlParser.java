@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -292,7 +293,7 @@ public class FiqlParser<T> {
             if (!hasSubtree && AND.equals(operator)) {
                 try {
                     // Optimization: single SimpleSearchCondition for 'AND' conditions
-                    Map<String, ConditionType> map = new HashMap<String, ConditionType>();
+                    Map<String, ConditionType> map = new LinkedHashMap<String, ConditionType>();
                     beanspector.instantiate();
                     for (ASTNode<T> node : subnodes) {
                         FiqlParser<T>.Comparison comp = (Comparison)node;
@@ -348,9 +349,19 @@ public class FiqlParser<T> {
         public SearchCondition<T> build() throws FiqlParseException {
             T cond = createTemplate(name, value);
             ConditionType ct = operatorsMap.get(operator);
-            return new SimpleSearchCondition<T>(ct, cond);
+            
+            if (isPrimitive(cond)) {
+                return new SimpleSearchCondition<T>(ct, cond); 
+            } else {
+                return new SimpleSearchCondition<T>(Collections.singletonMap(name, ct), 
+                                                   cond);
+            }
         }
 
+        private boolean isPrimitive(T pojo) {
+            return pojo.getClass().getName().startsWith("java.lang");
+        }
+        
         private T createTemplate(String setter, Object val) throws FiqlParseException {
             try {
                 beanspector.instantiate().setValue(setter, val);

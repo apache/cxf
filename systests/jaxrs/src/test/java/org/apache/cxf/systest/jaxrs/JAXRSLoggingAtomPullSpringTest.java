@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,6 +30,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.xml.bind.JAXBContext;
 
@@ -42,8 +45,8 @@ import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
 import org.apache.cxf.management.web.logging.LogLevel;
 import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
 import org.apache.cxf.management.web.logging.ReadableLogStorage;
+import org.apache.cxf.management.web.logging.atom.AtomPullServer;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
-import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -58,6 +61,11 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     private int namedLogger;
     private int resourceLogger;
     private int throwables;
+    private int errorLevels;
+    private int traceLevels;
+    private int infoLevels;
+    private int debugLevels;
+    private int warningLevels;
     
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -101,9 +109,6 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         WebClient wcEntry = WebClient.create("http://localhost:" + PORT + "/atom/logs",
             Collections.singletonList(new AtomEntryProvider()))
             .accept("application/atom+xml;type=entry");
-        HTTPConduit conduit = WebClient.getConfig(wcEntry).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
         for (int i = 0; i < 8; i++) {
             Entry entry = wcEntry.path("entry/" + i).get(Entry.class);
             entry.toString();
@@ -135,38 +140,51 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     }
     
     @Test
+    public void testPagedFeedWithQuery() throws Exception {
+        WebClient wcReset = WebClient.create("http://localhost:" + PORT + "/reset");
+        wcReset.post(null);
+        
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/resource2/paged/log");
+        wc.get();
+        Thread.sleep(3000);
+        
+        String address = "http://localhost:" + PORT + "/atom2/logs"
+                         + "?_s=level==INFO,level==ERROR,level==WARN";
+        verifyPagesWithQuery(address, "next", 3, 2, "theNamedLogger");
+        verifyPagesWithQuery(address, "next", 3, 2, "theNamedLogger");    
+    }
+    
+    @Test
     public void testPagedFeedWithReadWriteStorage() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/resource3/storage");
-        HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
         wc.path("/log").get();
         Thread.sleep(3000);
         
         verifyStoragePages("http://localhost:" 
-                           + PORT + "/atom3/logs", "next", "Resource3", "theStorageLogger");
+                           + PORT + "/atom3/logs", "next", "Resource3", "theStorageLogger", false);
         List<org.apache.cxf.management.web.logging.LogRecord> list = Storage.getRecords();
         assertEquals(4, list.size());
         verifyStoragePages("http://localhost:" 
-                           + PORT + "/atom3/logs", "next", "Resource3", "theStorageLogger");
+                           + PORT + "/atom3/logs", "next", "Resource3", "theStorageLogger", false);
         verifyStoragePages("http://localhost:" + PORT + "/atom3/logs/2", "previous", "Resource3", 
-                           "theStorageLogger");
+                           "theStorageLogger", false);
     }
     
     @Test
     public void testPagedFeedWithReadOnlyStorage() throws Exception {
         verifyStoragePages("http://localhost:" 
-                           + PORT + "/atom4/logs", "next", "Resource4", "readOnlyStorageLogger");
+                           + PORT + "/atom4/logs", "next", "Resource4", "readOnlyStorageLogger", true);
         verifyStoragePages("http://localhost:" + PORT + "/atom4/logs/2", "previous", "Resource4", 
-                           "readOnlyStorageLogger");
+                           "readOnlyStorageLogger", true);
     }
     
     private void verifyStoragePages(String startAddress, String rel, 
-                                    String resourceName, String nLogger) 
+                                    String resourceName, String nLogger,
+                                    boolean readOnly) 
         throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         String href1 = fillPagedEntries(entries, startAddress, 4, rel, true);
-        assertNull(fillPagedEntries(entries, href1, 4, rel, false));
+        fillPagedEntries(entries, href1, 4, rel, "next".equals(rel) && readOnly ? true : false);
         assertEquals(8, entries.size());
         
         resetCounters();
@@ -190,7 +208,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         String href1 = fillPagedEntries(entries, startAddress, 
                                         firstValue, rel, true);
         String href2 = fillPagedEntries(entries, href1, 3, rel, true);
-        assertNull(fillPagedEntries(entries, href2, lastValue, rel, false));
+        fillPagedEntries(entries, href2, lastValue, rel, false);
         assertEquals(8, entries.size());
         
         resetCounters();
@@ -198,6 +216,26 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
             updateCounters(readLogRecord(e.getContent()), "Resource2", nLogger);
         }
         verifyCounters();
+    }
+    
+    private void verifyPagesWithQuery(String startAddress, String rel, 
+                             int firstValue, int lastValue, String nLogger) 
+        throws Exception {
+        List<Entry> entries = new ArrayList<Entry>();
+        String hrefRel = fillPagedEntries(entries, startAddress, 
+                                        firstValue, rel, true);
+        hrefRel = fillPagedEntries(entries, hrefRel, lastValue, rel, false);
+        assertEquals(firstValue + lastValue, entries.size());
+        
+        resetCounters();
+        for (Entry e : entries) {
+            updateCounters(readLogRecord(e.getContent()), "Resource2", nLogger);
+        }
+        assertEquals(3, errorLevels);
+        assertEquals(1, infoLevels);
+        assertEquals(0, debugLevels);
+        assertEquals(0, traceLevels);
+        assertEquals(1, warningLevels);
     }
     
     private String fillPagedEntries(List<Entry> entries, String href, int expected, 
@@ -211,6 +249,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
             assertNotNull(link);
             return link.getHref().toString();
         } else {
+            assertNull(link);
             return null;
         }
     }
@@ -218,6 +257,8 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     private Feed getFeed(String address) {
         WebClient wc = WebClient.create(address,
                                          Collections.singletonList(new AtomFeedProvider()));
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        
         Feed feed = wc.accept("application/atom+xml").get(Feed.class);
         feed.toString();
         return feed;
@@ -265,6 +306,23 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
 
     }
     
+    @Path("/")
+    public static class AtomServerReset {
+        
+        private AtomPullServer server;
+        
+        public void setServer(AtomPullServer s) {
+            this.server = s;
+        }
+        
+        
+        @POST
+        public void reset() {
+            server.reset();
+        }
+
+    }
+    
     @Ignore
     public static class ExternalStorage implements ReadableLogStorage {
 
@@ -294,7 +352,9 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
             lr.setLoggerName(loggerName);
             lr.setLevel(LogLevel.fromJUL(level));
             if (t != null) {
-                lr.setThrowable(t);
+                StringWriter sw = new StringWriter();
+                t.printStackTrace(new PrintWriter(sw));
+                lr.setThrowable(sw.getBuffer().toString());
             }
             records.add(lr);
         }
@@ -359,25 +419,36 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     
     
     private static void doLog(Logger l1, Logger l2) {
+        
+        // 3 severe, 1 warning, 1 info and 3 debug messages 
+        
+        // 1
         l1.severe("severe message");
+        // 2
         l1.warning("warning message");
+        // 3
         l1.info("info message");
         LogRecord r = new LogRecord(Level.FINE, "fine message");
         if ("Resource4".equals(l1.getName())) {
             r.setLoggerName(l1.getName());
         }
         r.setThrown(new IllegalArgumentException("tadaam"));
+        // 4
         l1.log(r);
         r = new LogRecord(Level.FINER, "finer message with {0} and {1}");
         r.setParameters(new Object[] {
             "param1", "param2"
         });
         r.setLoggerName("faky-logger");
+        // 5
         l1.log(r);
+        // 6
         l1.finest("finest message");
 
         // for LOG2 only 'warning' and above messages should be logged
+        // 7
         l2.severe("severe message");
+        // 8
         l2.severe("severe message2");
         l2.info("info message - should not pass!");
         l2.finer("finer message - should not pass!");
@@ -407,6 +478,19 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         if (record.getThrowable().length() > 0) {
             throwables++;
         }
+        
+        LogLevel level = record.getLevel();
+        if (level == LogLevel.ERROR) {
+            errorLevels++;
+        } else if (level == LogLevel.DEBUG) {
+            debugLevels++;
+        } else if (level == LogLevel.TRACE) {
+            traceLevels++;    
+        } else if (level == LogLevel.INFO) {
+            infoLevels++;
+        } else {
+            warningLevels++;    
+        }
     }
     
     private void resetCounters() {
@@ -414,6 +498,12 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         namedLogger = 0;
         resourceLogger = 0;
         throwables = 0;
+        
+        errorLevels = 0;
+        infoLevels = 0;
+        debugLevels = 0;
+        traceLevels = 0;
+        warningLevels = 0;
     }
     
     private void verifyCounters() {
@@ -421,5 +511,11 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         assertEquals(4, resourceLogger);
         assertEquals(2, namedLogger);
         assertEquals(1, fakyLogger);
+        
+        assertEquals(3, errorLevels);
+        assertEquals(1, infoLevels);
+        assertEquals(2, debugLevels);
+        assertEquals(1, traceLevels);
+        assertEquals(1, warningLevels);
     }
 }

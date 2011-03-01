@@ -37,7 +37,7 @@ public class SearchContextImpl implements SearchContext {
     public <T> SearchCondition<T> getCondition(Class<T> cls) {
         FiqlParser<T> parser = getParser(cls);
         
-        String expression = getExpression();
+        String expression = getSearchExpression();
         if (expression != null) {
             try {
                 return parser.parse(expression);
@@ -50,7 +50,7 @@ public class SearchContextImpl implements SearchContext {
         
     }
 
-    private String getExpression() {
+    public String getSearchExpression() {
         String queryStr = (String)message.get(Message.QUERY_STRING);
         if (queryStr != null 
             && (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY))) {

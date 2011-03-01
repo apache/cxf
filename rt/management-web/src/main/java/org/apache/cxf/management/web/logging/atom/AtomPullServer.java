@@ -36,6 +36,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.abdera.model.Entry;
@@ -47,6 +48,7 @@ import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.management.web.logging.LogLevel;
 import org.apache.cxf.management.web.logging.LogRecord;
 import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
@@ -60,12 +62,12 @@ public class AtomPullServer extends AbstractAtomBean {
     private List<LogRecord> records = new LinkedList<LogRecord>();
     private WeakHashMap<Integer, Feed> feeds = new WeakHashMap<Integer, Feed>();
     private ReadableLogStorage storage;
-    private int pageSize = 40;
-    private int maxInMemorySize = 500;
+    private int pageSize = 20;
+    private int maxInMemorySize = 1000;
     private boolean useArchivedFeeds;
-    private int recordsSize;
+    private volatile int recordsSize;
     private volatile boolean alreadyClosed;
-    private SearchCondition<LogRecord> condition;
+    private SearchCondition<LogRecord> readableStorageCondition;
         
     @Context
     private MessageContext context;
@@ -112,7 +114,7 @@ public class AtomPullServer extends AbstractAtomBean {
                 r.setLevel(LogLevel.valueOf(l.getLevel()));
                 list.add(new SearchConditionImpl(r));
             }
-            condition = new OrSearchCondition<LogRecord>(list);
+            readableStorageCondition = new OrSearchCondition<LogRecord>(list);
         }
         initBusProperty();
     }
@@ -142,7 +144,7 @@ public class AtomPullServer extends AbstractAtomBean {
     
     @GET
     @Produces("application/atom+xml")
-    public Feed getXmlFeed(@PathParam("id") int page) {
+    public Feed getXmlFeed() {
         return getXmlFeedWithPage(1);
     }
     
@@ -162,16 +164,18 @@ public class AtomPullServer extends AbstractAtomBean {
         }
         
         Feed feed = null;
+        SearchCondition<LogRecord> condition = getCurrentCondition();
         synchronized (records) {
-            List<LogRecord> list = getSubList(page);
+            List<LogRecord> list = new LinkedList<LogRecord>();
+            int lastPage = fillSubList(list, page, condition);
             Collections.sort(list, new LogRecordComparator());
             feed = (Feed)new CustomFeedConverter(page).convert(list).get(0);
-            setFeedPageProperties(feed, page);
+            setFeedPageProperties(feed, page, lastPage);
         }
         // if at the moment we've converted n < pageSize number of records only and
         // persist a Feed keyed by a page then another reader requesting the same page 
         // may miss latest records which might've been added since the original request
-        if (feed.getEntries().size() == pageSize) {
+        if (condition == null && feed.getEntries().size() == pageSize) {
             synchronized (feeds) {
                 feeds.put(page, feed);
             }
@@ -183,7 +187,8 @@ public class AtomPullServer extends AbstractAtomBean {
     @Produces({"text/html", "application/xhtml+xml" })
     @Path("alternate/{id}")
     public String getAlternateFeed(@PathParam("id") int page) {
-        List<LogRecord> list = getSubList(page);
+        List<LogRecord> list = new LinkedList<LogRecord>();
+        fillSubList(list, page, getCurrentCondition());
         Collections.sort(list, new LogRecordComparator());
         return convertEntriesToHtml(list);
         
@@ -193,7 +198,7 @@ public class AtomPullServer extends AbstractAtomBean {
     @Path("entry/{id}")
     @Produces("application/atom+xml;type=entry")
     public Entry getEntry(@PathParam("id") int index) {
-        List<LogRecord> list = getLogRecords(index);
+        List<LogRecord> list = getLogRecords(index, getCurrentCondition());
         return (Entry)new CustomEntryConverter(index).convert(list).get(0);
     }
     
@@ -201,7 +206,7 @@ public class AtomPullServer extends AbstractAtomBean {
     @Path("entry/alternate/{id}")
     @Produces({"text/html", "application/xhtml+xml" })
     public String getAlternateEntry(@PathParam("id") int index) {
-        List<LogRecord> logRecords = getLogRecords(index);
+        List<LogRecord> logRecords = getLogRecords(index, getCurrentCondition());
         return convertEntryToHtml(logRecords.get(0));
     }
     
@@ -212,12 +217,12 @@ public class AtomPullServer extends AbstractAtomBean {
         return recordsSize;
     }
     
-    private List<LogRecord> getLogRecords(int index) {
+    private List<LogRecord> getLogRecords(int index, SearchCondition<LogRecord> theSearch) {
         List<LogRecord> list = new LinkedList<LogRecord>();
         if (storage != null) {
             int storageSize = storage.getSize();
             if (recordsSize == -1 || index < storageSize) {
-                storage.load(list, condition, index, 1);
+                storage.load(list, theSearch, index, 1);
             } else if (index < recordsSize) {
                 list.add(records.get(index - storageSize));   
             }
@@ -231,17 +236,16 @@ public class AtomPullServer extends AbstractAtomBean {
     }
     
     
-    protected List<LogRecord> getSubList(int page) {
+    protected int fillSubList(List<LogRecord> list, int page, SearchCondition<LogRecord> theSearch) {
         
         if (recordsSize == -1) {
             // let the external storage load the records it knows about
-            List<LogRecord> list = new LinkedList<LogRecord>();
-            storage.load(list, condition, page == 1 ? 0 : (page - 1) * pageSize, pageSize);
-            return list;
+            storage.load(list, theSearch, page == 1 ? 0 : (page - 1) * pageSize, pageSize);
+            return page;
         }
         
         if (recordsSize == 0) {
-            return records;
+            return 1;
         }
         
         int fromIndex = 0;
@@ -267,58 +271,93 @@ public class AtomPullServer extends AbstractAtomBean {
         }
 
         // if we have the storage then try to load from it
+        boolean loaded = false;
         if (storage != null) {
             if (fromIndex < storage.getSize()) {
                 int storageSize = storage.getSize();
                 int maxQuantityToLoad = toIndex > storageSize ? toIndex - storageSize : toIndex - fromIndex;
-                List<LogRecord> list = new LinkedList<LogRecord>();
-                storage.load(list, condition, fromIndex, maxQuantityToLoad);
+                storage.load(list, theSearch, fromIndex, maxQuantityToLoad);
+                loaded = true;
+                
                 int totalQuantity = toIndex - fromIndex;
                 if (list.size() < totalQuantity) {
                     int remaining = totalQuantity - list.size();
                     if (remaining > records.size()) {
                         remaining = records.size();
                     }
-                    list.addAll(records.subList(0, remaining));
+                    fromIndex = 0;
+                    toIndex = remaining;
+                    loaded = false;
                 }
-                return list;
             } else {
                 fromIndex -= storage.getSize();
                 toIndex -= storage.getSize();
             }
         } 
-        return records.subList(fromIndex, toIndex);
+        if (!loaded) {
+            list.addAll(filterRecords(records.subList(fromIndex, toIndex), theSearch));
+        }
         
+        if (theSearch != null && list.size() < pageSize && page * pageSize < recordsSize) {
+            return fillSubList(list, page + 1, theSearch);    
+        } else {
+            return page;
+        }
     }
     
-    protected void setFeedPageProperties(Feed feed, int page) {
+    private List<LogRecord> filterRecords(List<LogRecord> list, SearchCondition<LogRecord> theSearch) {
+        return theSearch == null ? list : theSearch.findAll(list);
+    }
+    
+    private SearchCondition<LogRecord> getCurrentCondition() {
+        SearchCondition<LogRecord> current = context.getContext(SearchContext.class)
+            .getCondition(LogRecord.class);
+        if (current == null) {
+            return readableStorageCondition;
+        } else {
+            return current;
+        }
+    }
+    
+    private String getSearchExpression() {
+        return context.getContext(SearchContext.class).getSearchExpression();
+    }
+    
+    protected void setFeedPageProperties(Feed feed, int page, int lastPage) {
         String self = context.getUriInfo().getAbsolutePath().toString();
         feed.addLink(self, "self");
+        
+        int feedSize = feed.getEntries().size();
+        String searchExpression = getSearchExpression();
         
         String uri = context.getUriInfo().getBaseUriBuilder().path("logs").build().toString();
         feed.addLink(uri + "/alternate/" + page, "alternate");
         if (!useArchivedFeeds) {
             if (recordsSize != -1) {
                 if (page > 2) {
-                    feed.addLink(uri, "first");
+                    feed.addLink(createLinkUri(uri, searchExpression), "first");
                 }
                 
-                if (page * pageSize < recordsSize) {
-                    feed.addLink(uri + "/" + (page + 1), "next");
+                if (searchExpression == null && lastPage * pageSize < recordsSize
+                    || searchExpression != null && feedSize == pageSize) {
+                    feed.addLink(createLinkUri(uri + "/" + (lastPage + 1), searchExpression), "next");
                 }
                 
-                if (page * (pageSize + 1) < recordsSize) {
+                if (searchExpression == null && page * (pageSize + 1) < recordsSize) {
                     feed.addLink(uri + "/" + (recordsSize / pageSize + 1), "last");
                 }
-            } else if (feed.getEntries().size() == pageSize) {
-                feed.addLink(uri + "/" + (page + 1), "next");
+            } else if (feedSize == pageSize) {
+                feed.addLink(createLinkUri(uri + "/" + (page + 1), searchExpression), "next");
             }
-            if (page > 1) {
+            if (searchExpression == null && page > 1) {
                 uri = page > 2 ? uri + "/" + (page - 1) : uri;
-                feed.addLink(uri, "previous");
+                feed.addLink(createLinkUri(uri, searchExpression), "previous");
             }
         } else {
-            feed.addLink(self, "current");
+            throw new WebApplicationException(Response.serverError()
+                                              .entity("Archived feeds are not supported yet")
+                                              .build());
+            // feed.addLink(self, "current");
             // TODO : add prev-archive and next-archive; next-archive should not be set if it will point to
             // current
             // and xmlns:fh="http://purl.org/syndication/history/1.0":archive extension but only if
@@ -327,6 +366,9 @@ public class AtomPullServer extends AbstractAtomBean {
         
     }
     
+    private String createLinkUri(String uri, String search) {
+        return search == null ? uri : uri + "?_s=" + search; 
+    }
     
     public void publish(LogRecord record) {
         if (alreadyClosed) {
@@ -369,6 +411,12 @@ public class AtomPullServer extends AbstractAtomBean {
         if (storage instanceof ReadWriteLogStorage) {
             ((ReadWriteLogStorage)storage).save(records);
         }
+    }
+    
+    public synchronized void reset() {
+        records.clear();
+        recordsSize = 0;
+        feeds.clear();
     }
     
     // TODO : this all can be done later on in a simple xslt template

@@ -18,6 +18,24 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+/**
+ * Represents the current search expression
+ */
 public interface SearchContext {
+    
+    /**
+     * Returns the typed search condition representing the search expression
+     * 
+     * @param cls the type of the bean(s) the new search condition will 
+     *        attempt to match
+     * @return the search condition
+     */
     <T> SearchCondition<T> getCondition(Class<T> cls);
+    
+    
+    /**
+     * Returns the actual query expression
+     * @return the expression
+     */
+    String getSearchExpression();
 }

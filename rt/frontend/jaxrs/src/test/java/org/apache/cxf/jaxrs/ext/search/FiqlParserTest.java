@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.datatype.DatatypeFactory;
 
@@ -164,6 +165,16 @@ public class FiqlParserTest extends Assert {
     @Test
     public void testParseComplex1() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
+        assertEquals(ConditionType.AND, filter.getConditionType());
+        
+        List<SearchCondition<Condition>> conditions = filter.getSearchConditions();
+        assertEquals(2, conditions.size());
+        PrimitiveStatement st1 = conditions.get(0).getStatement();
+        assertEquals(ConditionType.EQUALS, st1.getCondition());
+        
+        PrimitiveStatement st2 = conditions.get(1).getStatement();
+        assertEquals(ConditionType.GREATER_THAN, st2.getCondition());
+        
         assertTrue(filter.isMet(new Condition("amichalec", 12, new Date())));
         assertTrue(filter.isMet(new Condition("ami", 12, new Date())));
         assertFalse(filter.isMet(new Condition("ami", 8, null)));
@@ -182,6 +193,17 @@ public class FiqlParserTest extends Assert {
     @Test
     public void testParseComplex2() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
+        assertEquals(ConditionType.OR, filter.getConditionType());
+        
+        List<SearchCondition<Condition>> conditions = filter.getSearchConditions();
+        assertEquals(2, conditions.size());
+        
+        PrimitiveStatement st1 = conditions.get(0).getStatement();
+        assertEquals(ConditionType.EQUALS, st1.getCondition());
+        
+        PrimitiveStatement st2 = conditions.get(1).getStatement();
+        assertEquals(ConditionType.GREATER_THAN, st2.getCondition());
+        
         assertTrue(filter.isMet(new Condition("ami", 0, new Date())));
         assertTrue(filter.isMet(new Condition("foo", 20, null)));
         assertFalse(filter.isMet(new Condition("foo", 0, null)));

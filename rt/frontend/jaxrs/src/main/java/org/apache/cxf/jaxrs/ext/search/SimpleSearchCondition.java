@@ -21,8 +21,8 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -235,7 +235,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      */
     private Map<String, Object> getGettersAndValues() {
         
-        Map<String, Object> getters2values = new HashMap<String, Object>();
+        Map<String, Object> getters2values = new LinkedHashMap<String, Object>();
         Beanspector<T> beanspector = new Beanspector<T>(condition);
         for (String getter : beanspector.getGettersNames()) {
             Object value = getValue(beanspector, getter, condition);

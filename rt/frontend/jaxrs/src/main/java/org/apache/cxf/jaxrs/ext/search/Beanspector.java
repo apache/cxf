@@ -22,8 +22,8 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,8 +34,8 @@ class Beanspector<T> {
 
     private Class<T> tclass;
     private T tobj;
-    private Map<String, Method> getters = new HashMap<String, Method>();
-    private Map<String, Method> setters = new HashMap<String, Method>();
+    private Map<String, Method> getters = new LinkedHashMap<String, Method>();
+    private Map<String, Method> setters = new LinkedHashMap<String, Method>();
 
     public Beanspector(Class<T> tclass) {
         if (tclass == null) {
