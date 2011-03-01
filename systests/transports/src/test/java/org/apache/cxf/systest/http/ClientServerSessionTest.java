@@ -67,7 +67,8 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
 
             if (headers == null) {
                 headers = new HashMap<String, List<String>>();
-                bp.getRequestContext().put("javax.xml.ws.http.request.headers", headers);
+                bp.getRequestContext()
+                    .put("javax.xml.ws.http.request.headers", headers);
             }
 
             List<String> cookies = Arrays.asList(new String[] {"a=a", "b=b"});

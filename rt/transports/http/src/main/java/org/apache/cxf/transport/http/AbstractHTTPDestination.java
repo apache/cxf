@@ -31,10 +31,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -147,7 +147,8 @@ public abstract class AbstractHTTPDestination
      * @param message the current message
      */
     protected void setHeaders(Message message) {
-        Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
+        Map<String, List<String>> requestHeaders 
+            = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         copyRequestHeaders(message, requestHeaders);
         message.put(Message.PROTOCOL_HEADERS, requestHeaders);
 
@@ -187,7 +188,7 @@ public abstract class AbstractHTTPDestination
         Map<String, List<String>> responseHeaders =
             CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
         if (responseHeaders == null) {
-            responseHeaders = new HashMap<String, List<String>>();
+            responseHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             message.put(Message.PROTOCOL_HEADERS, responseHeaders);         
         }
         setPolicies(responseHeaders);
@@ -227,7 +228,9 @@ public abstract class AbstractHTTPDestination
                 values.add(val);
             }
         }
-        headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
+        if (!headers.containsKey(Message.CONTENT_TYPE)) {
+            headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
+        }
     }
 
     /**

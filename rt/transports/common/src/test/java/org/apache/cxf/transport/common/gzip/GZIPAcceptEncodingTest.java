@@ -23,9 +23,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
@@ -128,7 +128,8 @@ public class GZIPAcceptEncodingTest extends Assert {
     }
 
     private void setAcceptEncoding(String enc) {
-        Map<String, List<String>> protocolHeaders = new HashMap<String, List<String>>();
+        Map<String, List<String>> protocolHeaders 
+            = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         protocolHeaders.put(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.ACCEPT_ENCODING), Collections
             .singletonList(enc));
         inMessage.put(Message.PROTOCOL_HEADERS, protocolHeaders);

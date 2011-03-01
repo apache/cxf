@@ -21,10 +21,10 @@ package org.apache.cxf.transport.common.gzip;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -300,7 +300,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
             .get(Message.PROTOCOL_HEADERS));
         if (protocolHeaders == null) {
-            protocolHeaders = new HashMap<String, List<String>>();
+            protocolHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             message.put(Message.PROTOCOL_HEADERS, protocolHeaders);
         }
         List<String> header = CastUtils.cast((List<?>)protocolHeaders.get(name));

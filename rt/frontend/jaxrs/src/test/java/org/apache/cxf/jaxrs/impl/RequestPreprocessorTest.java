@@ -20,9 +20,9 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -132,7 +132,7 @@ public class RequestPreprocessorTest extends Assert {
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
         m.put(Message.HTTP_REQUEST_METHOD, method);
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         if (methodHeader != null) {
             headers.put("X-HTTP-Method-Override", Collections.singletonList(methodHeader));   
         }

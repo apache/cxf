@@ -37,10 +37,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
@@ -890,9 +890,11 @@ public class HTTPConduit
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
         if (null == headers) {
-            headers = new LinkedHashMap<String, List<String>>();
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         } else if (headers instanceof HashMap) {
-            headers = new LinkedHashMap<String, List<String>>(headers);
+            Map<String, List<String>> h2 = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            h2.putAll(headers);
+            headers = h2;
         }
         message.put(Message.PROTOCOL_HEADERS, headers);
         return headers;
@@ -2281,7 +2283,7 @@ public class HTTPConduit
             inMessage.setExchange(exchange);
             Map<String, List<String>> origHeaders = connection.getHeaderFields();
             Map<String, List<String>> headers = 
-                new HashMap<String, List<String>>();
+                new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             for (String key : connection.getHeaderFields().keySet()) {
                 if (key != null) {
                     headers.put(HttpHeaderHelper.getHeaderKey(key), 
