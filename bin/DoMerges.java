@@ -233,7 +233,7 @@ public class DoMerges {
         }
         if (!records.isEmpty()) {
             StringBuilder ver = new StringBuilder();
-            for (String s : blocks) {
+            for (String s : records) {
                 if (ver.length() > 0) {
                     ver.append(',');
                 }
