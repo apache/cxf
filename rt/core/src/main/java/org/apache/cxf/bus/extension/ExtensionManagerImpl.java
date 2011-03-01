@@ -145,7 +145,7 @@ public class ExtensionManagerImpl implements ExtensionManager {
     }
     
     final void load(String resource) throws IOException {
-        Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(resource);
+        Enumeration<URL> urls = loader.getResources(resource);
         List<Extension> all = new LinkedList<Extension>();
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
