@@ -46,7 +46,7 @@ import org.apache.hello_world_soap_http.types.TestNillableResponse;
 public class GreeterImpl implements Greeter {
 
     public String greetMe(String me) {
-        return null;
+        return "Hello " + me;
     }
 
     public String greetMeLater(long delay) {
