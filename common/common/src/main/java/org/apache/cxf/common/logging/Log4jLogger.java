@@ -51,15 +51,13 @@ public class Log4jLogger extends AbstractDelegatingLogger {
 
     private final org.apache.log4j.Logger log;
 
-    static {
-        JDKBugHacks.doHacks();
-        
+    static {        
         //older versions of log4j don't have TRACE, use debug
         org.apache.log4j.Level t = org.apache.log4j.Level.DEBUG;
         try {
             Field f = org.apache.log4j.Level.class.getField("TRACE");
             t = (org.apache.log4j.Level)f.get(null);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             //ignore, assume old version of log4j
         }
         TRACE = t;

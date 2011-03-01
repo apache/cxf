@@ -44,59 +44,83 @@ final class JDKBugHacks {
     }
     
     public static void doHacks() {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
-            //set to the topmost non-null so things that grab the context classloader
-            //won't get our classloader.
-            ClassLoader ncl = orig;
-            while (ncl.getParent() != null) {
-                ncl = ncl.getParent();
-            }
-            Thread.currentThread().setContextClassLoader(ncl);
-            
+            ClassLoader orig = Thread.currentThread().getContextClassLoader();
             try {
-                //Trigger a call to sun.awt.AppContext.getAppContext()
-                ImageIO.getCacheDirectory();
-            } catch (Throwable t) {
-                //ignore
+                // Use the system classloader as the victim for all this
+                // ClassLoader pinning we're about to do.
+                Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+                
+                try {
+                    //Trigger a call to sun.awt.AppContext.getAppContext()
+                    ImageIO.getCacheDirectory();
+                } catch (Throwable t) {
+                    //ignore
+                }
+                try {
+                    // Several components end up opening JarURLConnections without first
+                    // disabling caching. This effectively locks the file.
+                    // JAXB does this and thus affects us pretty badly.
+                    // Doesn't matter that this JAR doesn't exist - just as long as
+                    // the URL is well-formed
+                    URL url = new URL("jar:file://dummy.jar!/");
+                    URLConnection uConn = url.openConnection();
+                    uConn.setDefaultUseCaches(false);
+                } catch (Throwable e) {
+                    //ignore
+                }
+                try {
+                    //DocumentBuilderFactory seems to SOMETIMES pin the classloader
+                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                    factory.newDocumentBuilder();
+                } catch (Throwable e) {
+                    //ignore
+                }
+                // Several components end up calling:
+                // sun.misc.GC.requestLatency(long)
+                //
+                // Those libraries / components known to trigger memory leaks due to
+                // eventual calls to requestLatency(long) are:
+                // - javax.management.remote.rmi.RMIConnectorServer.start()
+                try {
+                    Class<?> clazz = Class.forName("sun.misc.GC");
+                    Method method = clazz.getDeclaredMethod("requestLatency",
+                            new Class[] {Long.TYPE});
+                    method.invoke(null, Long.valueOf(3600000));
+                } catch (Throwable e) {
+                    //ignore
+                }
+                
+                // Calling getPolicy retains a static reference to the context 
+                // class loader.
+                try {
+                    // Policy.getPolicy();
+                    Class<?> policyClass = Class
+                        .forName("javax.security.auth.Policy");
+                    Method method = policyClass.getMethod("getPolicy");
+                    method.invoke(null);
+                } catch (Throwable e) {
+                    // ignore
+                }
+                try {
+                    // Initializing javax.security.auth.login.Configuration retains a static reference 
+                    // to the context class loader.
+                    Class.forName("javax.security.auth.login.Configuration", true, 
+                                  ClassLoader.getSystemClassLoader());
+                } catch (Throwable e) {
+                    // Ignore
+                }
+                // Creating a MessageDigest during web application startup
+                // initializes the Java Cryptography Architecture. Under certain
+                // conditions this starts a Token poller thread with TCCL equal
+                // to the web application class loader.
+                java.security.Security.getProviders();
+            } finally {
+                Thread.currentThread().setContextClassLoader(orig);
             }
-            try {
-                // Several components end up opening JarURLConnections without first
-                // disabling caching. This effectively locks the file.
-                // JAXB does this and thus affects us pretty badly.
-                // Doesn't matter that this JAR doesn't exist - just as long as
-                // the URL is well-formed
-                URL url = new URL("jar:file://dummy.jar!/");
-                URLConnection uConn = url.openConnection();
-                uConn.setDefaultUseCaches(false);
-            } catch (Throwable e) {
-                //ignore
-            }
-            try {
-                //DocumentBuilderFactory seems to SOMETIMES pin the classloader
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.newDocumentBuilder();
-            } catch (Throwable e) {
-                //ignore
-            }
-            // Several components end up calling:
-            // sun.misc.GC.requestLatency(long)
-            //
-            // Those libraries / components known to trigger memory leaks due to
-            // eventual calls to requestLatency(long) are:
-            // - javax.management.remote.rmi.RMIConnectorServer.start()
-            try {
-                Class<?> clazz = Class.forName("sun.misc.GC");
-                Method method = clazz.getDeclaredMethod("requestLatency",
-                        new Class[] {Long.TYPE});
-                method.invoke(null, Long.valueOf(3600000));
-            } catch (Throwable e) {
-                //ignore
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(orig);
+        } catch (Throwable t) {
+            //ignore
         }
-        
     }
 
 }
