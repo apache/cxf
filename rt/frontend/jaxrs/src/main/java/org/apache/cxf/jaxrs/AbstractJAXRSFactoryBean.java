@@ -139,7 +139,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
         //default to http transport
         if (transportId == null) {
-            transportId = "http://schemas.xmlsoap.org/wsdl/soap/http";
+            transportId = "http://cxf.apache.org/transports/http";
         }
 
         setTransportId(transportId);
