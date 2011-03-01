@@ -27,9 +27,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -206,9 +206,12 @@ public class Headers {
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
         if (null == headers) {
-            headers = new LinkedHashMap<String, List<String>>();
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         } else if (headers instanceof HashMap) {
-            headers = new LinkedHashMap<String, List<String>>(headers);
+            Map<String, List<String>> headers2 
+                = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            headers2.putAll(headers);
+            headers = headers2;
         }
         message.put(Message.PROTOCOL_HEADERS, headers);
         return headers;
@@ -333,7 +336,9 @@ public class Headers {
                 values.add(val);
             }
         }
-        headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
+        if (!headers.containsKey(Message.CONTENT_TYPE)) {
+            headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
+        }
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "Request Headers: " + headers.toString());
         }

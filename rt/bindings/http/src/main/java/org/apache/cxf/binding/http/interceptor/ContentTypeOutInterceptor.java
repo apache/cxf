@@ -19,9 +19,9 @@
 package org.apache.cxf.binding.http.interceptor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -42,7 +42,7 @@ public class ContentTypeOutInterceptor extends AbstractPhaseInterceptor<Message>
     public void handleMessage(Message message) throws Fault {
         Map<String, List<String>> headers = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null) {
-            headers = new HashMap<String, List<String>>();
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         String ct = (String)message.getExchange().get(Endpoint.class).get(HttpHeaderHelper.CONTENT_TYPE);

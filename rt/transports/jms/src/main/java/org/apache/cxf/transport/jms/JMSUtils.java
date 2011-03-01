@@ -26,9 +26,9 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -158,7 +158,7 @@ public final class JMSUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map)inMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (headers == null) {
-            headers = new HashMap<String, List<String>>();
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
         headers.put(JMSSpecConstants.JMS_MESSAGE_TYPE, Collections.singletonList(messageType));
@@ -193,7 +193,8 @@ public final class JMSUtils {
                 }
             }
 
-            Map<String, List<String>> protHeaders = new HashMap<String, List<String>>();
+            Map<String, List<String>> protHeaders
+                = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             List<JMSPropertyType> props = messageProperties.getProperty();
             Enumeration enm = message.getPropertyNames();
             while (enm.hasMoreElements()) {
@@ -265,7 +266,7 @@ public final class JMSUtils {
                 Map<String, List<String>> headers = CastUtils.cast((Map)inMessage
                     .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
                 if (headers == null) {
-                    headers = new HashMap<String, List<String>>();
+                    headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
                     inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
                 }
                 try {
@@ -404,7 +405,7 @@ public final class JMSUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (null == headers) {
-            headers = new HashMap<String, List<String>>();
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
 
@@ -439,7 +440,7 @@ public final class JMSUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (null == headers) {
-            headers = new HashMap<String, List<String>>();
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
         return contentType;

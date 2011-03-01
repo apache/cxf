@@ -22,9 +22,9 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -63,7 +63,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
         if (null == headers) {
-            headers = new HashMap<String, List<String>>();
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         return headers;

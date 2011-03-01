@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
@@ -109,7 +110,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
         if (message.getVersion() instanceof Soap11) {
             Map<String, List<String>> reqHeaders = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
             if (reqHeaders == null) {
-                reqHeaders = new HashMap<String, List<String>>();
+                reqHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             }
             
             if (reqHeaders.size() == 0) {

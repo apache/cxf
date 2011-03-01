@@ -88,7 +88,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         try {
             processor.execute();
         } catch (WSDLRuntimeException wrex) {
-            assertEquals("BINDING_MISSING_TYPE", wrex.getMessage());
+            assertTrue(wrex.getMessage().contains("Could not find portType for binding"));
         }
     }
 

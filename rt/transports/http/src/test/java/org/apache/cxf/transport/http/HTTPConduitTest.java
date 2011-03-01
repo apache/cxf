@@ -23,9 +23,9 @@ package org.apache.cxf.transport.http;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
@@ -60,7 +60,7 @@ public class HTTPConduitTest extends Assert {
      */
     private Message getNewMessage() {
         Message message = new MessageImpl();
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         List<String> contentTypes = new ArrayList<String>();
         contentTypes.add("text/xml");
         contentTypes.add("charset=utf8");

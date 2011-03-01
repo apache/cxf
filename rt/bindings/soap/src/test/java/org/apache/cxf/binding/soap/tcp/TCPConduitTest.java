@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 //import javax.xml.stream.XMLStreamException;
 //import javax.xml.stream.XMLStreamReader;
@@ -119,7 +119,7 @@ public class TCPConduitTest {
     private Message getNewMessage() {
         Message message = new MessageImpl();
         message = new SoapMessage(message);
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         List<String> contentTypes = new ArrayList<String>();
         contentTypes.add("text/xml");
         contentTypes.add("charset=utf8");

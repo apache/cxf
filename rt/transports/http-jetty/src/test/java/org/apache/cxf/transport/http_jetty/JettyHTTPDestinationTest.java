@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
@@ -775,7 +776,7 @@ public class JettyHTTPDestinationTest extends Assert {
         outMsg.putAll(inMessage);
         outMsg.setExchange(new ExchangeImpl());
         outMsg.put(Message.PROTOCOL_HEADERS,
-                   new HashMap<String, List<String>>());
+                   new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER));
         return outMsg;
     }
     

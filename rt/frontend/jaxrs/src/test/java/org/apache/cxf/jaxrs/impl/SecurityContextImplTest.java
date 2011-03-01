@@ -19,9 +19,9 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -34,7 +34,8 @@ public class SecurityContextImplTest extends Assert {
     @Test
     public void testAuthenticationScheme() {
         Message m = new MessageImpl();
-        Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
+        Map<String, List<String>> requestHeaders 
+            = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         List<String> values = new ArrayList<String>();
         values.add("Digest realm=\"custom\"");
         requestHeaders.put("Authorization", values);
