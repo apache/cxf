@@ -171,6 +171,7 @@ public class DoMerges {
         p.waitFor();
 
         List<String> blocks = new ArrayList<String>();
+        List<String> records = new ArrayList<String>();
 
         int count = 1;
         for (String ver : verList) {
@@ -190,8 +191,9 @@ public class DoMerges {
             char c = auto ? 'M' : 0;
             while (c != 'M'
                    && c != 'B'
-                   && c != 'I') {
-                System.out.print("[M]erge, [B]lock, or [I]gnore? ");
+                   && c != 'I'
+                   && c != 'R') {
+                System.out.print("[M]erge, [B]lock, or [I]gnore, [R]ecord only? ");
                 int i = System.in.read();
                 c = Character.toUpperCase((char)i);
             }
@@ -221,10 +223,41 @@ public class DoMerges {
             case 'B':
                 blocks.add(ver);
                 break;
+            case 'R':
+                records.add(ver);
+                break;
             case 'I':
                 System.out.println("Ignoring");
                 break;
             }
+        }
+        if (!records.isEmpty()) {
+            StringBuilder ver = new StringBuilder();
+            for (String s : blocks) {
+                if (ver.length() > 0) {
+                    ver.append(',');
+                }
+                ver.append(s);
+            }
+            System.out.println("Recording " + ver);
+            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svnmerge.py", "merge", "--record-only", "-r", ver.toString()}));
+            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            line = reader.readLine();
+            while (line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            if (p.waitFor() != 0) {
+                System.out.println("ERROR!");
+                reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                line = reader.readLine();
+                while (line != null) {
+                    System.out.println(line);
+                    line = reader.readLine();
+                }
+                System.exit(1);
+            }
+            doCommit();
         }
 
         if (!blocks.isEmpty()) {
