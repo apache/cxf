@@ -63,6 +63,8 @@ public final class LogUtils {
     }
 
     static {
+        JDKBugHacks.doHacks();
+        
         try {
             String cname = System.getProperty(KEY);
             if (StringUtils.isEmpty(cname)) {
