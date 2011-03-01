@@ -58,7 +58,8 @@ public class ExtensionManagerBus extends CXFBusImpl {
     private static final String BUS_ID_PROPERTY_NAME = "org.apache.cxf.bus.id";
     private final ExtensionManagerImpl extensionManager;
     
-    public ExtensionManagerBus(Map<Class, Object> e, Map<String, Object> properties) {
+    public ExtensionManagerBus(Map<Class, Object> e, Map<String, Object> properties,
+          ClassLoader extensionClassLoader) {
         super(e);
 
         if (null == properties) {
@@ -93,7 +94,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
         extensions.put(ResourceManager.class, resourceManager);
 
         extensionManager = new ExtensionManagerImpl(new String[0],
-                                                    Thread.currentThread().getContextClassLoader(),
+                                                    extensionClassLoader,
                                                     extensions,
                                                     resourceManager, 
                                                     this);
@@ -133,9 +134,13 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
         this.setExtension(extensionManager, ExtensionManager.class);
     }
+    
+    public ExtensionManagerBus(Map<Class, Object> e, Map<String, Object> properties) {
+       this(e, properties, Thread.currentThread().getContextClassLoader());
+    }
 
     public ExtensionManagerBus() {
-        this(null, null);
+        this(null, null, Thread.currentThread().getContextClassLoader());
     }
     protected synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
         ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
