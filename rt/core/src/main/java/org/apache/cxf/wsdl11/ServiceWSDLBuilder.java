@@ -394,6 +394,9 @@ public class ServiceWSDLBuilder {
                 }
             }
             binding.setQName(bindingInfo.getName());
+            if (!bindingInfo.getName().getNamespaceURI().equals(definition.getTargetNamespace())) {
+                addNamespace(bindingInfo.getName().getNamespaceURI());
+            }
             buildBindingOperation(definition, binding, bindingInfo.getOperations());
             addExtensibilityElements(binding, getWSDL11Extensors(bindingInfo));
             definition.addBinding(binding);
