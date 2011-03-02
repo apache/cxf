@@ -253,8 +253,7 @@ public class WSDLManagerImpl implements WSDLManager {
         Properties initialExtensions = null;
         try {
             initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
-                                                                        Thread.currentThread()
-                                                                              .getContextClassLoader());
+                  this.getClass().getClassLoader());
         } catch (IOException ex) {
             throw new BusException(ex);
         }
