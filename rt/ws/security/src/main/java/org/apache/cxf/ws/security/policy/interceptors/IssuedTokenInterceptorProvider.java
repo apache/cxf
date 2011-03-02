@@ -19,7 +19,7 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -48,11 +48,11 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
@@ -242,32 +242,23 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         ) {
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.SIGN) {
-                    Principal principal = 
-                        (Principal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                    if (principal instanceof CustomTokenPrincipal) {
-                        CustomTokenPrincipal customPrincipal = 
-                            (CustomTokenPrincipal)principal;
-                        byte[] secretKey = 
-                            (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                        if (secretKey != null) {
-                            SecurityToken token = 
-                                new SecurityToken(
-                                    customPrincipal.getName(), 
-                                    (java.util.Date)null, 
-                                    (java.util.Date)null
-                                );
-                            token.setSecret(secretKey);
-                            AssertionWrapper assertionWrapper = 
-                                (AssertionWrapper)customPrincipal.getTokenObject();
-                            if (assertionWrapper != null && assertionWrapper.getSaml1() != null) {
-                                token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                            } else if (assertionWrapper != null 
-                                && assertionWrapper.getSaml2() != null) {
-                                token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-                            }
-                            return token;
+                if (actInt.intValue() == WSConstants.ST_SIGNED) {
+                    AssertionWrapper assertionWrapper = 
+                        (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                    SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
+                    if (subjectKeyInfo != null) {
+                        SecurityToken token = new SecurityToken(assertionWrapper.getId());
+                        token.setSecret(subjectKeyInfo.getSecret());
+                        X509Certificate[] certs = subjectKeyInfo.getCerts();
+                        if (certs != null && certs.length > 0) {
+                            token.setX509Certificate(certs[0], null);
                         }
+                        if (assertionWrapper.getSaml1() != null) {
+                            token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                        } else if (assertionWrapper.getSaml2() != null) {
+                            token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                        }
+                        return token;
                     }
                 }
             }

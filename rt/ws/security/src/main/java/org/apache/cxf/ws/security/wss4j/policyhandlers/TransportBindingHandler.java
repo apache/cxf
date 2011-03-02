@@ -36,6 +36,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
@@ -46,6 +47,7 @@ import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
+import org.apache.cxf.ws.security.policy.model.TransportToken;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -118,6 +120,30 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
         try {
             if (this.isRequestor()) {
+                TransportToken transportTokenWrapper = tbinding.getTransportToken();
+                if (transportTokenWrapper != null) {
+                    Token transportToken = transportTokenWrapper.getToken();
+                    if (transportToken instanceof IssuedToken) {
+                        SecurityToken secToken = getSecurityToken();
+                        if (secToken == null) {
+                            policyNotAsserted(transportToken, "No transport token id");
+                            return;
+                        } else {
+                            policyAsserted(transportToken);
+                        }
+                        
+                        IncludeTokenType inclusion = transportToken.getInclusion();
+                        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == inclusion
+                            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == inclusion
+                            || (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                                == inclusion)) {
+                            
+                            Element el = secToken.getToken();
+                            addEncyptedKeyElement(cloneElement(el));
+                        } 
+                    }
+                }
+                
                 List<byte[]> signatureValues = new ArrayList<byte[]>();
 
                 ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);

@@ -60,12 +60,15 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.Header;
+import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.RequiredElements;
 import org.apache.cxf.ws.security.policy.model.RequiredParts;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.TransportBinding;
+import org.apache.cxf.ws.security.policy.model.TransportToken;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.policy.model.X509Token;
@@ -262,6 +265,31 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
             assertPolicy(aim, SP12Constants.SUPPORTING_TOKENS);
         }
+        
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                TransportBinding binding = (TransportBinding)ai.getAssertion();
+                TransportToken token = binding.getTransportToken();
+                if (token != null && token.getToken() instanceof IssuedToken) {
+                    action = addToAction(action, "Signature", true);
+                    Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+                    Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+                    if (s != null) {
+                        message.put("decryptionPropRefId", "RefId-" + s.toString());
+                        message.put("RefId-" + s.toString(), getProps(s, message));
+                        if (e == null) {
+                            e = s;
+                        }
+                    }
+                    if (e != null) {
+                        message.put("SignaturePropRefId", "RefId-" + e.toString());
+                        message.put("RefId-" + e.toString(), getProps(e, message));
+                    }
+                }
+            }
+        }
+        
         return action;
     }
     private String checkSymetricBinding(AssertionInfoMap aim, 
@@ -692,10 +720,19 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (ais == null) {                       
             return true;
         }
-        assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
+        
+        for (AssertionInfo ai : ais) {
+            TransportBinding binding = (TransportBinding)ai.getAssertion();
+            ai.setAsserted(true);
+            if (binding.getTransportToken() != null) {
+                assertPolicy(aim, binding.getTransportToken());
+                assertPolicy(aim, binding.getTransportToken().getToken());
+            }
+        }
+        
         assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
         assertPolicy(aim, SP12Constants.SIGNED_PARTS);
-        return !assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
+        return true;
     }
 
 }

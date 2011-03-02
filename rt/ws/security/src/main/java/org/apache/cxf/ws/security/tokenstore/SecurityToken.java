@@ -136,6 +136,11 @@ public class SecurityToken {
     public SecurityToken() {
         
     }
+    
+    public SecurityToken(String id) {
+        this.id = id;
+    }
+
     public SecurityToken(String id, Date created, Date expires) {
         this.id = id;
         this.created = created;
