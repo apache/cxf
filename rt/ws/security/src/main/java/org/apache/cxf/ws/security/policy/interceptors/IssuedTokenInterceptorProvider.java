@@ -96,9 +96,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sts-client");
         }
         
-        // Transpose ActAs info from original request to the STS client.
-        client.setActAs(message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS));
-        
         return client;
     }
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -134,6 +131,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         }
                         synchronized (client) {
                             try {
+                                // Transpose ActAs info from original request to the STS client.
+                                client.setActAs(
+                                    message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS));
+
                                 client.setTrust(getTrust10(aim));
                                 client.setTrust(getTrust13(aim));
                                 client.setTemplate(itok.getRstTemplate());

@@ -595,7 +595,12 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     private PrimitiveAssertion getAddressingAssertion() {
         String ns = "http://schemas.xmlsoap.org/ws/2004/08/addressing/policy";
-        return new PrimitiveAssertion(new QName(ns, "UsingAddressing"));
+        String local = "UsingAddressing";
+        if ("http://www.w3.org/2005/08/addressing".equals(addressingNamespace)) {
+            ns = "http://www.w3.org/2007/02/addressing/metadata";
+            local = "Addressing";
+        }
+        return new PrimitiveAssertion(new QName(ns, local), true);
     }
     
     public boolean validateSecurityToken(SecurityToken tok) throws Exception {
@@ -615,37 +620,17 @@ public class STSClient implements Configurable, InterceptorProvider {
         ExactlyOne one = new ExactlyOne();
         validatePolicy.addPolicyComponent(one);
         All all = new All();
-        PolicyBuilder pbuilder = bus.getExtension(PolicyBuilder.class);
-        SymmetricBinding binding = new SymmetricBinding(pbuilder);
-        all.addAssertion(binding);
         one.addPolicyComponent(all);
         all.addAssertion(getAddressingAssertion());
-        ProtectionToken ptoken = new ProtectionToken(pbuilder);
-        binding.setProtectionToken(ptoken);
-        binding.setIncludeTimestamp(true);
-        binding.setEntireHeadersAndBodySignatures(true);
-        binding.setTokenProtection(false);
-        AlgorithmSuite suite = new AlgorithmSuite();
-        binding.setAlgorithmSuite(suite);
-        SecureConversationToken sct = new SecureConversationToken();
-        sct.setOptional(true);
-        ptoken.setToken(sct);
-        
-        SignedEncryptedParts parts = new SignedEncryptedParts(true);
-        parts.setBody(true);
-        parts.addHeader(new Header("To", addressingNamespace));
-        parts.addHeader(new Header("From", addressingNamespace));
-        parts.addHeader(new Header("FaultTo", addressingNamespace));
-        parts.addHeader(new Header("ReplyTo", addressingNamespace));
-        parts.addHeader(new Header("Action", addressingNamespace));
-        parts.addHeader(new Header("MessageID", addressingNamespace));
-        parts.addHeader(new Header("RelatesTo", addressingNamespace));
-        all.addPolicyComponent(parts);
-        
+
+        client.getRequestContext().clear();
         client.getRequestContext().putAll(ctx);
-        client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, validatePolicy);
         client.getRequestContext().put(SecurityConstants.TOKEN, tok);
         BindingOperationInfo boi = findOperation("/RST/Validate");
+        if (boi == null) {
+            boi = findOperation("/RST/Issue");
+            client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, validatePolicy);
+        }
         
         client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, 
                                        namespace + "/RST/Validate");
@@ -658,18 +643,35 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeCharacters(namespace + "/Validate");
         writer.writeEndElement();
 
+        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeCharacters(namespace + "/RSTR/Status");
+        writer.writeEndElement();
+
         writer.writeStartElement("wst", "ValidateTarget", namespace);
-        Element el = tok.getUnattachedReference();
-        if (el == null) {
-            el = tok.getAttachedReference();
-        }
+
+        Element el = tok.getToken();
         StaxUtils.copy(el, writer);
 
         writer.writeEndElement();
         writer.writeEndElement();
 
-        client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
-        
+        Object o[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        el = getDocumentElement((DOMSource)o[0]);
+        if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
+            el = DOMUtils.getFirstElement(el);
+        }
+        if (!"RequestSecurityTokenResponse".equals(el.getLocalName())) {
+            throw new Fault("Unexpected element " + el.getLocalName(), LOG);
+        }
+        el = DOMUtils.getFirstElement(el);
+        while (el != null) {
+            if ("Status".equals(el.getLocalName())) {
+                Element e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Code");
+                String s = DOMUtils.getContent(e2);
+                return s.endsWith("/status/valid");
+            }
+            el = DOMUtils.getNextElement(el);
+        }
         return false;
     }
 
