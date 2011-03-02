@@ -28,7 +28,7 @@
 	<xs:element name="priority" type="soapjms:priorityType" />
 	<xs:element name="timeToLive" type="soapjms:timeToLiveType" />
 	<xs:element name="replyToName" type="soapjms:replyToNameType" />
-
+    <xs:element name="topicReplyToName" type="soapjms:topicReplyToNameType" />
 
 	<!-- JMS specification for wsdl-->
 	<xs:complexType name="jndiConnectionFactoryNameType">
@@ -85,6 +85,13 @@
 	</xs:complexType>
 
 	<xs:complexType name="replyToNameType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<xs:complexType name="topicReplyToNameType">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
 			</xs:extension>
