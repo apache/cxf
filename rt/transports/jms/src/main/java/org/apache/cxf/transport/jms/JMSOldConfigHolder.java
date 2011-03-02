@@ -47,6 +47,7 @@ import org.apache.cxf.transport.jms.wsdl.JndiURLType;
 import org.apache.cxf.transport.jms.wsdl.PriorityType;
 import org.apache.cxf.transport.jms.wsdl.ReplyToNameType;
 import org.apache.cxf.transport.jms.wsdl.TimeToLiveType;
+import org.apache.cxf.transport.jms.wsdl.TopicReplyToNameType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
@@ -403,6 +404,13 @@ public class JMSOldConfigHolder {
             ReplyToNameType replyToNameType = getWSDLExtensor(ei, ReplyToNameType.class);
             if (replyToNameType != null) {
                 endpoint.setReplyToName(replyToNameType.getValue());
+            }
+        }
+        
+        if (!endpoint.isSetTopicReplyToName()) {
+            TopicReplyToNameType topicReplyToNameType = getWSDLExtensor(ei, TopicReplyToNameType.class);
+            if (topicReplyToNameType != null) {
+                endpoint.setTopicReplyToName(topicReplyToNameType.getValue());
             }
         }
     }
