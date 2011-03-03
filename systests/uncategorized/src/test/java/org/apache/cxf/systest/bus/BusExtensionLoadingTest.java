@@ -49,7 +49,7 @@ public class BusExtensionLoadingTest extends Assert {
     public void testBusConstructionWithoutTCCL() throws Exception {
         ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(null);
+            Thread.currentThread().setContextClassLoader(new TestClassLoader());
             BusFactory factory = new CXFBusFactory() {
                 public Bus createBus(Map<Class, Object> e, Map<String, Object> properties) {
                     return new ExtensionManagerBus(e, properties, this.getClass().getClassLoader());
@@ -101,25 +101,34 @@ public class BusExtensionLoadingTest extends Assert {
         @Override
         public Class<?> loadClass(final String className) throws ClassNotFoundException {
             if (className.contains("cxf")) {
-                throw new ClassNotFoundException("TestClassLoader does not load CXF classes");
+                throw new ClassNotFoundException("TestClassLoader does not load CXF classes: " +  className);
             } else {
                 return super.loadClass(className);
             }
         }
-
+        
         @Override
         public URL getResource(final String name) {
-            return null;
+            if (name.contains("cxf") || name.contains("bus")) {
+                return null;
+            }
+            return super.getResource(name);
         }
 
         @Override
         public Enumeration<URL> getResources(final String name) throws IOException {
-            return Collections.enumeration(new ArrayList<URL>());
+            if (name.contains("cxf") || name.contains("bus")) {
+                return Collections.enumeration(new ArrayList<URL>());
+            }
+            return super.getResources(name);
         }
 
         @Override
         public InputStream getResourceAsStream(final String name) {
-            return null;
+            if (name.contains("cxf") || name.contains("bus")) {
+                return null;
+            }
+            return super.getResourceAsStream(name);
         }
     }
 }
