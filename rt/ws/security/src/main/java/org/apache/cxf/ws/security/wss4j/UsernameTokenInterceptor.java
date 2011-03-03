@@ -191,7 +191,7 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
     protected WSUsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement) 
         throws WSSecurityException {
         org.apache.ws.security.message.token.UsernameToken ut = 
-            new org.apache.ws.security.message.token.UsernameToken(tokenElement, false);
+            new org.apache.ws.security.message.token.UsernameToken(tokenElement);
         
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
         principal.setNonce(ut.getNonce());
