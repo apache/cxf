@@ -25,13 +25,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean class="org.apache.cxf.binding.jbi.JBIBindingFactory" 
 	  id="org.apache.cxf.binding.jbi.JBIBindingFactory" 
 	  lazy-init="true">
-      <property name="bus" ref="cxf"/>
-      <property name="activationNamespaces">
-            <set>
-              <value>http://cxf.apache.org/bindings/jbi</value>
-              <value>http://java.sun.com/xml/ns/jbi/binding/service+engine</value>
-            </set>
-        </property>
+      <constructor-arg ref="cxf"/>
     </bean>
 
 </beans>

@@ -27,10 +27,5 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 	  id="org.apache.cxf.transport.local.LocalTransportFactory"
 	  lazy-init="true">
         <property name="bus" ref="cxf"/>
-        <property name="transportIds">
-            <list>
-                <value>http://cxf.apache.org/transports/local</value>
-            </list>
-        </property>
     </bean>
 </beans>

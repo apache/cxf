@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.binding.xml;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javax.xml.namespace.QName;
 
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultInInterceptor;
@@ -42,6 +46,17 @@ import org.apache.cxf.service.model.ServiceInfo;
 
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class XMLBindingFactory extends AbstractBindingFactory {
+    public static final Collection<String> DEFAULT_NAMESPACES 
+        = Arrays.asList(
+            "http://cxf.apache.org/bindings/xformat",
+            "http://www.w3.org/2004/08/wsdl/http",
+            "http://schemas.xmlsoap.org/wsdl/http/");
+    
+    public XMLBindingFactory() {
+    }
+    public XMLBindingFactory(Bus b) {
+        super(b, DEFAULT_NAMESPACES);
+    }
     
     public Binding createBinding(BindingInfo binding) {
         XMLBinding xb = new XMLBinding(binding);

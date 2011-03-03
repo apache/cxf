@@ -26,14 +26,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean class="org.apache.cxf.binding.xml.XMLBindingFactory"
 	  id="org.apache.cxf.binding.xml.XMLBindingFactory"
 	  lazy-init="true">
-        <property name="activationNamespaces">
-            <set>
-                <value>http://cxf.apache.org/bindings/xformat</value>
-                <value>http://www.w3.org/2004/08/wsdl/http</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-            </set>
-        </property>
-        <property name="bus" ref="cxf"/>
+        <constructor-arg ref="cxf"/>
     </bean>
     <bean class="org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader"
       id="org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader"

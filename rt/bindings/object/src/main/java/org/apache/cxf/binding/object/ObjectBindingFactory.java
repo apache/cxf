@@ -18,22 +18,30 @@
  */
 package org.apache.cxf.binding.object;
 
+import java.util.Arrays;
+
+import java.util.Collection;
+
 import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class ObjectBindingFactory extends AbstractBindingFactory {
     public static final String BINDING_ID = "http://cxf.apache.org/binding/object";
     public static final String RUN_NON_LOGICAL  = "objectBinding.stopAfterLogical";
     
+    public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(BINDING_ID);
+                                                                              
     private boolean autoRegisterLocalEndpoint;
     private boolean initialized = true;
     private LocalServerListener listener;
@@ -42,17 +50,25 @@ public class ObjectBindingFactory extends AbstractBindingFactory {
         
     }
     public ObjectBindingFactory(Bus b) {
-        super(b);
+        super(b, DEFAULT_NAMESPACES);
+        initialize();
     }
     
     @PostConstruct
-    public void initialize() {
+    public final void initialize() {
         if (autoRegisterLocalEndpoint) {
             Bus bus = getBus();
             ServerLifeCycleManager manager = bus.getExtension(ServerLifeCycleManager.class);
             if (manager != null) {
                 listener = new LocalServerListener(bus, this);
                 manager.registerListener(listener);
+            }
+        } else if (listener != null) {
+            Bus bus = getBus();
+            ServerLifeCycleManager manager = bus.getExtension(ServerLifeCycleManager.class);
+            if (manager != null) {
+                manager.unRegisterListener(listener);
+                listener = null;
             }
         }
         initialized = true;

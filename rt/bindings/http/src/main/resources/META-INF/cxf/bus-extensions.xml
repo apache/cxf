@@ -20,8 +20,6 @@
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
     <extension class="org.apache.cxf.binding.http.HttpBindingFactory" 
-      interface="org.apache.cxf.binding.BindingFactory" deferred="true">
-        <namespace>http://apache.org/cxf/binding/http</namespace>
-    </extension>
+      interface="org.apache.cxf.binding.BindingFactory" deferred="true"/>
     
 </extensions>

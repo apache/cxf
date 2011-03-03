@@ -26,12 +26,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
 	<bean class="org.apache.cxf.binding.object.ObjectBindingFactory"
 	      id="org.apache.cxf.binding.object.ObjectBindingFactory"
-		lazy-init="true" depends-on="org.apache.cxf.endpoint.ServerLifeCycleManager" >
-		<property name="bus" ref="cxf"/>
-		<property name="activationNamespaces">
-			<set>
-				<value>http://cxf.apache.org/binding/object</value>
-			</set>
-		</property>
+		lazy-init="true">
+		<constructor-arg ref="cxf"/>
 	</bean>
 </beans>

@@ -19,7 +19,5 @@
 -->
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
-    <extension class="org.apache.cxf.transport.local.LocalTransportFactory"  deferred="true">
-        <namespace>http://cxf.apache.org/transports/local</namespace>
-    </extension>
+    <extension class="org.apache.cxf.transport.local.LocalTransportFactory"  deferred="true"/>
 </extensions>

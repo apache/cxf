@@ -18,11 +18,6 @@
   under the License.
 -->
 <extensions xmlns="http://cxf.apache.org/bus/extension">
-
-    <extension class="org.apache.cxf.binding.corba.CorbaBindingFactory" deferred="true">
-        <namespace>http://cxf.apache.org/bindings/corba</namespace>
-        <namespace>http://schemas.apache.org/yoko/bindings/corba</namespace>
-    </extension>
+    <extension class="org.apache.cxf.binding.corba.CorbaBindingFactory" deferred="true"/>
     <extension class="org.apache.cxf.binding.corba.wsdl.WSDLExtensionRegister" deferred="true"/>
-
 </extensions>

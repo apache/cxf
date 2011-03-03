@@ -18,8 +18,12 @@
  */
 package org.apache.cxf.binding.jbi;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.jbi.interceptor.JBIFaultInInterceptor;
@@ -27,6 +31,7 @@ import org.apache.cxf.binding.jbi.interceptor.JBIFaultOutInterceptor;
 import org.apache.cxf.binding.jbi.interceptor.JBIOperationInInterceptor;
 import org.apache.cxf.binding.jbi.interceptor.JBIWrapperInInterceptor;
 import org.apache.cxf.binding.jbi.interceptor.JBIWrapperOutInterceptor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
@@ -36,8 +41,18 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class JBIBindingFactory extends AbstractBindingFactory {
+    public static final Collection<String> DEFAULT_NAMESPACES 
+        = Arrays.asList("http://cxf.apache.org/bindings/jbi",
+                        "http://java.sun.com/xml/ns/jbi/binding/service+engine");
 
+    public JBIBindingFactory() {
+    }
+    public JBIBindingFactory(Bus b) {
+        super(b, DEFAULT_NAMESPACES);
+    }
+    
     public Binding createBinding(BindingInfo binding) {
         JBIBindingInfo bindingInfo = (JBIBindingInfo) binding;
         JBIBinding jb = new JBIBinding(bindingInfo);

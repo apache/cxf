@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.http_jetty;
 
 import java.io.IOException;
+
 import java.security.GeneralSecurityException;
 
 import javax.annotation.PostConstruct;
@@ -26,17 +27,22 @@ import javax.annotation.Resource;
 import javax.imageio.IIOException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
 
     public JettyHTTPTransportFactory() {
         super();
+    }
+    public JettyHTTPTransportFactory(Bus b) {
+        super(b);
     }
     
     @Resource 
@@ -45,7 +51,7 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
     }
     
     @PostConstruct
-    public void finalizeConfig() {
+    public final void finalizeConfig() {
         if (null == bus) {
             return;
         }

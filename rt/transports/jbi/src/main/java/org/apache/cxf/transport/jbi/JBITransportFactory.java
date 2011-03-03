@@ -19,9 +19,11 @@
 package org.apache.cxf.transport.jbi;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -48,6 +50,9 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
     DestinationFactory {
 
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/jbi";
+    public static final List<String> DEFAULT_NAMESPACES 
+        = Arrays.asList(TRANSPORT_ID,
+                        "http://cxf.apache.org/transports/jbi/configuration");
 
     private static final Logger LOG = LogUtils.getL7dLogger(JBITransportFactory.class);
 
@@ -57,7 +62,11 @@ public class JBITransportFactory extends AbstractTransportFactory implements Con
     private final Map<String, JBIDestination> destinationMap =  new HashMap<String, JBIDestination>();
 
 
-    private Collection<String> activationNamespaces;
+    private Collection<String> activationNamespaces = DEFAULT_NAMESPACES;
+    
+    public JBITransportFactory() {
+        super(DEFAULT_NAMESPACES);
+    }
 
     @Resource(name = "cxf")
     public void setBus(Bus b) {

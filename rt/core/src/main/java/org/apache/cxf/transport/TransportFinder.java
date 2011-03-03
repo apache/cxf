@@ -52,9 +52,9 @@ public class TransportFinder<T> {
         if (locator == null) {
             return null;
         }
-        T factory = loadDefaultNamespace(namespace);
+        T factory = loadActivationNamespaces(namespace);
         if (factory == null) {
-            factory = loadActivationNamespaces(namespace);
+            factory = loadDefaultNamespace(namespace);
         }
         if (factory == null) {
             factory = loadNoDefaultNamespace(namespace);

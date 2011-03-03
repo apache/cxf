@@ -23,7 +23,6 @@ import java.net.URL;
 import junit.framework.Assert;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.transport.DestinationFactory;
@@ -66,24 +65,21 @@ public class JettyHTTPServerEngineFactoryTest
      * configuration.
      */
     @Test
-    public void testMakeSureTransportFactoryHasEngineFactory() {
+    public void testMakeSureTransportFactoryHasEngineFactory() throws Exception {
         bus = BusFactory.getDefaultBus(true);
         
         assertNotNull("Cannot get bus", bus);
         
-        try {
-            // Make sure we got the Transport Factory.
-            DestinationFactoryManager destFM = 
-                bus.getExtension(DestinationFactoryManager.class);
-            assertNotNull("Cannot get DestinationFactoryManager", destFM);
-            DestinationFactory destF = 
-                destFM.getDestinationFactory(
-                        "http://cxf.apache.org/transports/http");
-            assertNotNull("No DestinationFactory", destF);
-            assertTrue(JettyHTTPTransportFactory.class.isInstance(destF));
-        } catch (BusException e) {
-            fail("Asserting Transport Factory" + e);
-        }
+        // Make sure we got the Transport Factory.
+        DestinationFactoryManager destFM = 
+            bus.getExtension(DestinationFactoryManager.class);
+        assertNotNull("Cannot get DestinationFactoryManager", destFM);
+        DestinationFactory destF = 
+            destFM.getDestinationFactory(
+                    "http://cxf.apache.org/transports/http");
+        assertNotNull("No DestinationFactory", destF);
+        assertTrue(JettyHTTPTransportFactory.class.isInstance(destF));
+
         // And the JettyHTTPServerEngineFactory should be there.
         JettyHTTPServerEngineFactory factory =
             bus.getExtension(JettyHTTPServerEngineFactory.class);

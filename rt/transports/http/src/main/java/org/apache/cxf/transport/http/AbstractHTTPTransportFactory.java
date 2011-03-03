@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.http;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -47,6 +49,15 @@ public abstract class AbstractHTTPTransportFactory
     extends AbstractTransportFactory 
     implements WSDLEndpointFactory {
 
+    public static final List<String> DEFAULT_NAMESPACES 
+        = Arrays.asList(
+            "http://cxf.apache.org/transports/http",
+            "http://cxf.apache.org/transports/http/configuration",
+            "http://schemas.xmlsoap.org/wsdl/http",
+            "http://schemas.xmlsoap.org/wsdl/http/"
+        );
+        
+    
     /**
      * This constant holds the prefixes served by this factory.
      */
@@ -61,8 +72,16 @@ public abstract class AbstractHTTPTransportFactory
     public AbstractHTTPTransportFactory() {
         this(new DestinationRegistryImpl());
     }
-    
+    public AbstractHTTPTransportFactory(Bus b) {
+        this(b, new DestinationRegistryImpl());
+    }
+    public AbstractHTTPTransportFactory(Bus b, DestinationRegistry registry) {
+        super(DEFAULT_NAMESPACES, b);
+        this.registry = registry;
+    }
+
     public AbstractHTTPTransportFactory(DestinationRegistry registry) {
+        super(DEFAULT_NAMESPACES);
         this.registry = registry;
     }
 

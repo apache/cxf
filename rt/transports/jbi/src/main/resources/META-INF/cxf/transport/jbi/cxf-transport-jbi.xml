@@ -27,11 +27,5 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 	  id="org.apache.cxf.transport.jbi.JBITransportFactory" 
 	  lazy-init="true">
         <property name="bus" ref="cxf"/>
-        <property name="transportIds">
-            <list>
-              <value>http://cxf.apache.org/transports/jbi</value>
-              <value>http://cxf.apache.org/transports/jbi/configuration</value>
-            </list>
-        </property>
     </bean>
 </beans>

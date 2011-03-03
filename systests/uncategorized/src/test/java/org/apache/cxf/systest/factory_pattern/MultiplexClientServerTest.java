@@ -76,8 +76,10 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
             props.put("org.apache.activemq.default.directory.prefix", 
                       System.getProperty("org.apache.activemq.default.directory.prefix"));
         }
-        props.put("java.util.logging.config.file", 
+        if (System.getProperty("java.util.logging.config.file") != null) {
+            props.put("java.util.logging.config.file", 
                   System.getProperty("java.util.logging.config.file"));
+        }
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null, true));
         

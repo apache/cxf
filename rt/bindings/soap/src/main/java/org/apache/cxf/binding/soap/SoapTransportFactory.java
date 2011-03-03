@@ -67,7 +67,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     
     public static final String TRANSPORT_ID = "http://schemas.xmlsoap.org/soap/";
     
-    private static final List<String> TRANSPORT_IDS = Arrays.asList(
+    public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
             "http://schemas.xmlsoap.org/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap12/",
@@ -78,7 +78,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             "http://schemas.xmlsoap.org/soap/http");
     
     public SoapTransportFactory() {
-        super(TRANSPORT_IDS, null);
+        super(DEFAULT_NAMESPACES, null);
     }
     
     public Set<String> getUriPrefixes() {

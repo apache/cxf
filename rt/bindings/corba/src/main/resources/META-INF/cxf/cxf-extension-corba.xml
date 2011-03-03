@@ -25,20 +25,8 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <bean id="org.apache.cxf.binding.corba.CorbaBindingFactory"
-	class="org.apache.cxf.binding.corba.CorbaBindingFactory" lazy-init="true">
-        <property name="bus" ref="cxf"/>
-        <property name="activationNamespaces">
-            <set>
-                <value>http://cxf.apache.org/bindings/corba</value>
-                <value>http://schemas.apache.org/yoko/bindings/corba</value>
-            </set>
-        </property>
-        <property name="transportIds">
-            <list>
-				<value>http://cxf.apache.org/bindings/corba</value>
-	        	<value>http://schemas.apache.org/yoko/bindings/corba</value>
-            </list>
-        </property>
+	   class="org.apache.cxf.binding.corba.CorbaBindingFactory" lazy-init="true">
+        <constructor-arg ref="cxf"/>
     </bean>
     
     <bean class="org.apache.cxf.binding.corba.wsdl.WSDLExtensionRegister" lazy-init="true">

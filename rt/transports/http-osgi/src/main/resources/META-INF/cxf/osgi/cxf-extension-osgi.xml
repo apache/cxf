@@ -31,14 +31,6 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
         <constructor-arg ref="osgiDestinationRegistry"/>
 
         <property name="bus" ref="cxf"/>
-        <property name="transportIds">
-            <list>
-                <value>http://cxf.apache.org/transports/http</value>
-                <value>http://cxf.apache.org/transports/http/configuration</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-            </list>
-        </property>
     </bean>
 
     <osgi:reference id="osgiDestinationRegistry"

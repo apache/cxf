@@ -20,10 +20,13 @@ package org.apache.cxf.binding.http;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.http.interceptor.ContentTypeOutInterceptor;
@@ -52,9 +55,16 @@ import org.apache.cxf.service.model.ServiceInfo;
 public class HttpBindingFactory extends AbstractBindingFactory {
 
     public static final String HTTP_BINDING_ID = "http://apache.org/cxf/binding/http";
+    public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(HTTP_BINDING_ID);
+                                                                              
     private List<ResourceStrategy> strategies = new ArrayList<ResourceStrategy>();
 
     public HttpBindingFactory() {
+        strategies.add(new JRAStrategy());
+        strategies.add(new ConventionStrategy());
+    }
+    public HttpBindingFactory(Bus bus) {
+        super(bus, DEFAULT_NAMESPACES);
         strategies.add(new JRAStrategy());
         strategies.add(new ConventionStrategy());
     }

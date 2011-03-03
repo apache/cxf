@@ -28,13 +28,5 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean class="org.apache.cxf.transport.servlet.ServletTransportFactory"
 	  id="org.apache.cxf.transport.servlet.ServletTransportFactory">
         <property name="bus" ref="cxf"/>
-        <property name="transportIds">
-            <list>
-                <value>http://cxf.apache.org/transports/http</value>                
-                <value>http://cxf.apache.org/transports/http/configuration</value>                
-                <value>http://schemas.xmlsoap.org/wsdl/http</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-            </list>
-        </property>
     </bean>
 </beans>

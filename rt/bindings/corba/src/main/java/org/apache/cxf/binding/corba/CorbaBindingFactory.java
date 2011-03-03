@@ -20,12 +20,16 @@
 package org.apache.cxf.binding.corba;
 
 import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamFaultInInterceptor;
@@ -33,6 +37,7 @@ import org.apache.cxf.binding.corba.interceptors.CorbaStreamFaultOutInterceptor;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamInInterceptor;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamOutInterceptor;
 import org.apache.cxf.binding.corba.utils.OrbConfig;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
 import org.apache.cxf.service.model.BindingInfo;
@@ -45,14 +50,29 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class CorbaBindingFactory extends AbstractBindingFactory
     implements ConduitInitiator, DestinationFactory {
+
+    public static final Collection<String> DEFAULT_NAMESPACES 
+        = Arrays.asList(
+            "http://cxf.apache.org/bindings/corba",
+            "http://schemas.apache.org/yoko/bindings/corba"
+        );
+
     
-    protected List<String> transportIds;
+    protected List<String> transportIds = new ArrayList<String>(DEFAULT_NAMESPACES);
     protected OrbConfig orbConfig = new OrbConfig();
 
+    public CorbaBindingFactory(Bus b) {
+        super(b, DEFAULT_NAMESPACES);
+        registerWithDestinationManager();
+        registerWithConduitManager();
+    }
+
+    
     @PostConstruct
-    void registerWithDestinationManager() {
+    final void registerWithDestinationManager() {
         if (null == bus) {
             return;
         }
@@ -66,7 +86,7 @@ public class CorbaBindingFactory extends AbstractBindingFactory
     }
 
     @PostConstruct
-    void registerWithConduitManager() {
+    final void registerWithConduitManager() {
         if (null == bus) {
             return;
         }
@@ -119,7 +139,6 @@ public class CorbaBindingFactory extends AbstractBindingFactory
         return transportIds;
     }
 
-    @Resource(name = "transportIds")
     public void setTransportIds(List<String> ids) {
         transportIds = ids;
     }

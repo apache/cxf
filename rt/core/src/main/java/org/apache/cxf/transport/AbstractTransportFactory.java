@@ -35,6 +35,9 @@ public abstract class AbstractTransportFactory {
     
     public AbstractTransportFactory() {
     }
+    public AbstractTransportFactory(List<String> ids) {
+        transportIds = ids;
+    }
     public AbstractTransportFactory(List<String> ids, Bus b) {
         transportIds = ids;
         bus = b;

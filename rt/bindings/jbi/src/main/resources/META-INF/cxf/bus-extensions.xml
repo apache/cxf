@@ -19,9 +19,6 @@
 -->
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
-    <extension class="org.apache.cxf.binding.jbi.JBIBindingFactory" deferred="true">
-        <namespace>http://cxf.apache.org/bindings/jbi</namespace>
-        <namespace>http://java.sun.com/xml/ns/jbi/binding/service+engine</namespace>
-    </extension>
+    <extension class="org.apache.cxf.binding.jbi.JBIBindingFactory" deferred="true"/>
     
 </extensions>

@@ -21,7 +21,9 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -40,25 +42,26 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 public class JMSTransportFactory extends AbstractTransportFactory implements ConduitInitiator,
     DestinationFactory {
 
+    public static final List<String> DEFAULT_NAMESPACES 
+        = Arrays.asList(
+            "http://cxf.apache.org/transports/jms",
+            "http://cxf.apache.org/transports/jms/configuration"
+        );
+
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
     static {
         URI_PREFIXES.add("jms://");
         URI_PREFIXES.add("jms:");
     }
 
-    private Bus bus;
 
     public JMSTransportFactory() {
-        
+        super(DEFAULT_NAMESPACES);
     }
     
     @Resource(name = "cxf")
-    public void setBus(Bus b) {
-        bus = b;
-    }
-
-    public Bus getBus() {
-        return bus;
+    public void setBus(Bus bus) {
+        super.setBus(bus);
     }
 
     public Conduit getConduit(EndpointInfo endpointInfo) throws IOException {

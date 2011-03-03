@@ -28,15 +28,12 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean class="org.apache.cxf.transport.http_jetty.JettyHTTPTransportFactory"
 	  id="org.apache.cxf.transport.http_jetty.JettyHTTPTransportFactory"
     	lazy-init="true">
-        <property name="bus" ref="cxf"/>
-        <property name="transportIds">
-            <list>
-                <value>http://cxf.apache.org/transports/http</value>
-                <value>http://cxf.apache.org/transports/http/configuration</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-            </list>
-        </property>
+        <constructor-arg ref="cxf"/>
+    </bean>
+    <bean class="org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory"
+        id="org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory"
+        lazy-init="true">
+        <constructor-arg ref="cxf"/>
     </bean>
 
 </beans>

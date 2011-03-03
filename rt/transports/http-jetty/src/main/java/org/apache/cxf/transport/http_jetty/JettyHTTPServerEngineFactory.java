@@ -91,6 +91,9 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     public JettyHTTPServerEngineFactory() {
         // Empty
     }    
+    public JettyHTTPServerEngineFactory(Bus b) {
+        setBus(b);
+    }    
     public JettyHTTPServerEngineFactory(Bus b,
                                         Map<String, TLSServerParameters> tls,
                                         Map<String, ThreadingParameters> threading) {
