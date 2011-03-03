@@ -1,0 +1,4 @@
+org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder::true
+org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder::true
+org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider::true
+org.apache.cxf.ws.addressing.AddressingWSDLExtensionLoader::true

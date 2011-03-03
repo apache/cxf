@@ -19,7 +19,10 @@
 
 package org.apache.cxf.bus.extension;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +42,7 @@ public class ExtensionFragmentParser {
     private static final String INTERFACE_ATTR_NAME = "interface";
     private static final String DEFERRED_ATTR_NAME = "deferred";
     
-    List<Extension> getExtensions(InputStream is) {
+    List<Extension> getExtensionsFromXML(InputStream is) {
         Document document = null;
         try {
             document = StaxUtils.read(is);
@@ -49,7 +52,44 @@ public class ExtensionFragmentParser {
         
         return deserialiseExtensions(document);
     }
-    
+    List<Extension> getExtensionsFromText(InputStream is) throws IOException {
+        List<Extension> extensions = new ArrayList<Extension>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        String line = reader.readLine();
+        while (line != null) {
+            line = line.trim();
+            if (line.length() > 0 && line.charAt(0) != '#') {
+                Extension ext = new Extension();
+                int idx = line.indexOf(':');
+                if (idx != -1) {
+                    ext.setClassname(line.substring(0, idx));
+                    line = line.substring(idx + 1);
+                } else {
+                    ext.setClassname(line);
+                    line = null;
+                }
+                if (line != null) {
+                    idx = line.indexOf(':');
+                    if (idx != -1) {
+                        ext.setInterfaceName(line.substring(0, idx));
+                        line = line.substring(idx + 1);
+                    } else {
+                        ext.setInterfaceName(line);
+                        line = null;
+                    }
+                }
+                if (line != null) {
+                    ext.setDeferred(Boolean.parseBoolean(line));
+                }
+                if (ext.getClassname() != null) {
+                    extensions.add(ext);
+                }
+            }
+            
+            line = reader.readLine();
+        }
+        return extensions;
+    }
     
     List<Extension> deserialiseExtensions(Document document) {
         List<Extension> extensions = new ArrayList<Extension>();

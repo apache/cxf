@@ -1,0 +1,4 @@
+org.apache.cxf.transport.jms.JMSTransportFactory::true
+org.apache.cxf.transport.jms.wsdl11.JMSWSDLExtensionLoader::true
+
+

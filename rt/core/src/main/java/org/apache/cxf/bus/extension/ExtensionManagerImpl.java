@@ -46,8 +46,8 @@ public class ExtensionManagerImpl implements ExtensionManager {
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";
     public static final String ACTIVATION_NAMESPACES_PROPERTY_NAME = "activationNamespaces";
     public static final String ACTIVATION_NAMESPACES_SETTER_METHOD_NAME = "setActivationNamespaces";
-    public static final String BUS_EXTENSION_RESOURCE_COMPAT = "META-INF/bus-extensions.xml";
-    public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.xml";
+    public static final String BUS_EXTENSION_RESOURCE_XML = "META-INF/cxf/bus-extensions.xml";
+    public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.txt";
     
     private static final String NO_NAMESPACES = "NO_NAMESPACE_BEANS";
     
@@ -62,7 +62,7 @@ public class ExtensionManagerImpl implements ExtensionManager {
 
     public ExtensionManagerImpl(ClassLoader cl, Map<Class, Object> initialExtensions, 
                                 ResourceManager rm, Bus b) {
-        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_COMPAT},
+        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_XML},
                  cl, initialExtensions, rm, b);
     }
     public ExtensionManagerImpl(String resource, 
@@ -151,7 +151,11 @@ public class ExtensionManagerImpl implements ExtensionManager {
             URL url = urls.nextElement();
             
             InputStream is = url.openStream();
-            all.addAll(new ExtensionFragmentParser().getExtensions(is));       
+            if (resource.endsWith("xml")) {
+                all.addAll(new ExtensionFragmentParser().getExtensionsFromXML(is));
+            } else {
+                all.addAll(new ExtensionFragmentParser().getExtensionsFromText(is));
+            }
         }
         for (Extension e : all) {
             if (e.isDeferred()) {

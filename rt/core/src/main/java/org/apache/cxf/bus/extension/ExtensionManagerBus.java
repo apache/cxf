@@ -125,7 +125,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
         }
         extensionManager.load(new String[] {
             ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
-            ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_COMPAT});
+            ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_XML});
         
         extensionManager.activateAllByType(ResourceResolver.class);
         

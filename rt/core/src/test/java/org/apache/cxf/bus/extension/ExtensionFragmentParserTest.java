@@ -31,7 +31,7 @@ public class ExtensionFragmentParserTest extends Assert {
     @Test
     public void testGetExtensions() {
         InputStream is = ExtensionFragmentParserTest.class.getResourceAsStream("extension1.xml");
-        List<Extension> extensions = new ExtensionFragmentParser().getExtensions(is);
+        List<Extension> extensions = new ExtensionFragmentParser().getExtensionsFromXML(is);
         assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
         
         Extension e = extensions.get(0);
