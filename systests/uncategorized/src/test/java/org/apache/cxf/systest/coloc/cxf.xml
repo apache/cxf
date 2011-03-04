@@ -22,8 +22,11 @@
        xmlns:http="http://cxf.apache.org/transports/http/configuration"
        xmlns:jms="http://cxf.apache.org/transports/jms"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:cxf="http://cxf.apache.org/core"
+       
        xsi:schemaLocation="
        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
 http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
@@ -69,14 +72,12 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean id="faultOutbound" class="org.apache.cxf.systest.coloc.ThrowFaultInterceptor"/>
 
     <!-- Adding interceptors to the bus will add it to all services/endpoints-->
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-        <property name="outInterceptors">
-            <list>
+    <cxf:bus>
+        <cxf:outInterceptors>
                 <ref bean="colocOutbound"/>
                 <ref bean="faultOutbound"/>
-            </list>
-        </property>
-    </bean>
+        </cxf:outInterceptors>
+    </cxf:bus>
 
     <!-- Avoid upfront Conduit creation, as client-side transport resources
          are not required in the coloc case -->

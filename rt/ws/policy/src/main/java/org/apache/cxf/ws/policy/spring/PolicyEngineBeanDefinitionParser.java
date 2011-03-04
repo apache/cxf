@@ -21,7 +21,9 @@ package org.apache.cxf.ws.policy.spring;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyEngineImpl;
@@ -33,7 +35,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 
 public class PolicyEngineBeanDefinitionParser extends AbstractBeanDefinitionParser {
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        bean.addConstructorArgReference(PolicyEngine.class.getName());
+        super.addBusWiringAttribute(bean, BusWiringType.CONSTRUCTOR);
         super.doParse(element, ctx, bean);
     }
     
@@ -61,8 +63,8 @@ public class PolicyEngineBeanDefinitionParser extends AbstractBeanDefinitionPars
         
         private PolicyEngineImpl engine;
         
-        public PolicyEngineConfig(PolicyEngine e) {
-            engine = (PolicyEngineImpl)e;
+        public PolicyEngineConfig(Bus bus) {
+            engine = (PolicyEngineImpl)bus.getExtension(PolicyEngine.class);
         }
         
         public boolean getEnabled() {

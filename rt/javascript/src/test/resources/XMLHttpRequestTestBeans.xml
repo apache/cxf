@@ -32,11 +32,6 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-xml.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-local.xml" />
 
 	<httpj:engine-factory bus="cxf">
 		<httpj:engine port="8808">

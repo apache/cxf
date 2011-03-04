@@ -25,8 +25,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapDispatchPort" createdFromAPI="true">
          <jaxws:features>

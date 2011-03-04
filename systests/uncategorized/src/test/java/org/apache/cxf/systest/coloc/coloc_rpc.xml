@@ -22,20 +22,21 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
        xmlns:coloc="http://cxf.apache.org/binding/coloc"
+              xmlns:cxf="http://cxf.apache.org/core"
+       
        xsi:schemaLocation="
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+   
     <bean id="faultOutbound" class="org.apache.cxf.systest.coloc.ThrowFaultInterceptor"/>
 
     <!-- Adding interceptors to the bus will add it to all services/endpoints-->
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-        <property name="outInterceptors">
-            <list>
-                <ref bean="faultOutbound"/>
-            </list>
-        </property>
-    </bean>
+    <cxf:bus>
+        <cxf:outInterceptors>
+            <ref bean="faultOutbound"/>
+        </cxf:outInterceptors>
+    </cxf:bus>
 
     <jaxws:client name="{http://apache.org/headers/rpc_lit}SoapPort"
                   createdFromAPI="true">

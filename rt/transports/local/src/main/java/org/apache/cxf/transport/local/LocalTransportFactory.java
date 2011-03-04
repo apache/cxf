@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
@@ -43,6 +44,7 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class LocalTransportFactory extends AbstractTransportFactory
     implements DestinationFactory, ConduitInitiator {
    
@@ -68,9 +70,12 @@ public class LocalTransportFactory extends AbstractTransportFactory
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;
     private Set<String> uriPrefixes = new HashSet<String>(URI_PREFIXES);
-    
+
     public LocalTransportFactory() {
-        super(DEFAULT_NAMESPACES);
+        this(null);
+    }
+    public LocalTransportFactory(Bus b) {
+        super(DEFAULT_NAMESPACES, b);
         
         messageFilterProperties = new HashSet<String>();
         messageIncludeProperties = new HashSet<String>();

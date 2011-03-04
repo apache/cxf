@@ -22,8 +22,6 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
-  
     <!-- Endpoint Level Interceptors-->
     <!-- Inserted From JaxWsEndpointImpl, EndpointImpl-->
     <bean id="wrapperClassIn" class="org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor"/>

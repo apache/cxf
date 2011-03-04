@@ -21,6 +21,7 @@ package org.apache.cxf.bus.spring;
 
 
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.resource.ResourceManager;
 import org.springframework.beans.BeansException;
@@ -74,6 +75,10 @@ public class Jsr250BeanPostProcessor
                     m = (ResourceManager)context.getBean(ResourceManager.class.getName());
                 } catch (NoSuchBeanDefinitionException t) {
                     //ignore - no resource manager
+                }
+                if (resourceManager == null && m == null) {
+                    Bus b = (Bus)context.getBean("cxf");
+                    m = b.getExtension(ResourceManager.class);
                 }
                 if (resourceManager == null && m != null) {
                     resourceManager = m;

@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.corba.CorbaBindingFactory;
 
 public class OrbConfigurer  {
@@ -59,6 +61,13 @@ public class OrbConfigurer  {
         return factory;
     }
 
+    @Resource
+    public void setBus(Bus b) {
+        if (factory == null) {
+            factory = b.getExtension(CorbaBindingFactory.class);
+        }
+    }
+    
     @PostConstruct
     public void register() {
         if (factory != null) {

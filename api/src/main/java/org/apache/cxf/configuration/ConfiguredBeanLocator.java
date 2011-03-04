@@ -43,13 +43,6 @@ public interface ConfiguredBeanLocator {
      */
     <T> Collection<? extends T> getBeansOfType(Class<T> type);
 
-    /**
-     * Returns the bean of the given type and name.  Causes it to be loaded.
-     * @param name
-     * @param type
-     * @return the bean of the given name and type
-     */
-    <T> T getBeanOfType(String name, Class<T> type);
     
     /**
      * Iterates through the beans of the given type, calling the listener

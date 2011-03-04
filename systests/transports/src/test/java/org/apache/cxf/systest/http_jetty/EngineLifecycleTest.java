@@ -92,9 +92,6 @@ public class EngineLifecycleTest extends Assert {
         applicationContext = new GenericApplicationContext();
         readBeans(new ClassPathResource("/org/apache/cxf/systest/http_jetty/cxf.xml"));
         readBeans(new ClassPathResource("META-INF/cxf/cxf.xml"));
-        readBeans(new ClassPathResource("META-INF/cxf/cxf-extension-soap.xml"));
-        readBeans(new ClassPathResource("META-INF/cxf/cxf-extension-http.xml"));
-        readBeans(new ClassPathResource("META-INF/cxf/cxf-extension-http-jetty.xml"));
         readBeans(new ClassPathResource("jetty-engine.xml", getClass()));
         if (includeService) {
             readBeans(new ClassPathResource("server-lifecycle-beans.xml", getClass()));

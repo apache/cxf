@@ -80,6 +80,10 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     public SoapTransportFactory() {
         super(DEFAULT_NAMESPACES, null);
     }
+
+    public SoapTransportFactory(Bus b) {
+        super(DEFAULT_NAMESPACES, b);
+    }
     
     public Set<String> getUriPrefixes() {
         return Collections.singleton("soap.tcp");

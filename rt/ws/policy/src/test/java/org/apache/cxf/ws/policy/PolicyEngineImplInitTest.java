@@ -41,15 +41,13 @@ import static org.junit.Assert.assertNotNull;
 @ContextConfiguration
 public class PolicyEngineImplInitTest {
 
-    @Resource
-    PolicyEngineImpl pe;
 
     @Resource
     Bus bus;
 
     @Before
     public void setUp() throws Exception {
-        assertNotNull(pe);
+        assertNotNull(bus);
     }
     
     @After

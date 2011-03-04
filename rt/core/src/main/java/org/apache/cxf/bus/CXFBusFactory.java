@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
-import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 
 public class CXFBusFactory extends BusFactory {
     
@@ -38,18 +37,11 @@ public class CXFBusFactory extends BusFactory {
     }
     
     public Bus createBus(Map<Class, Object> e, Map<String, Object> properties) {
-        Bus bus = new ExtensionManagerBus(e, properties);
+        ExtensionManagerBus bus = new ExtensionManagerBus(e, properties);
         possiblySetDefaultBus(bus);
         initializeBus(bus);
+        bus.initialize();
         return bus;
     }
  
-    
-    protected void initializeBus(Bus bus) {
-        super.initializeBus(bus);
-        BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
-        if (null != lifeCycleManager) {
-            lifeCycleManager.initComplete();
-        }
-    }
 }

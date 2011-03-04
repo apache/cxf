@@ -50,7 +50,7 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
     
     private Unmarshaller unmarshaller;
     
-    EndpointReferenceDomainExpressionBuilder() {
+    public EndpointReferenceDomainExpressionBuilder() {
 
     }  
     

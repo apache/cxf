@@ -1085,6 +1085,13 @@ public abstract class AbstractBindingBuilder {
                 if (url == null) {
                     url = ClassLoaderUtils.getResource((String)o, this.getClass());
                 }
+                if (url == null) {
+                    try {
+                        url = new URL((String)o);
+                    } catch (Exception ex) {
+                        //ignore
+                    }
+                }
                 if (url != null) {
                     InputStream ins = url.openStream();
                     properties = new Properties();

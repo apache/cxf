@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 
 
 public class Extension {
@@ -33,6 +34,14 @@ public class Extension {
     private String interfaceName;
     private boolean deferred;
     private Collection<String> namespaces = new ArrayList<String>();
+    private Object obj;
+    
+    public String getName() {
+        return StringUtils.isEmpty(interfaceName) ? className : interfaceName;
+    }
+    public Object getLoadedObject() {
+        return obj;
+    }
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
@@ -95,14 +104,14 @@ public class Extension {
     }
     
     Object load(ClassLoader cl, Bus b) {
-        Object obj = null;
         try {
             Class<?> cls = getClassObject(cl);
             try {
                 //if there is a Bus constructor, use it.
                 if (b != null) {
                     Constructor con = cls.getConstructor(Bus.class);
-                    return con.newInstance(b);
+                    obj = con.newInstance(b);
+                    return obj;
                 }
             } catch (Exception ex) {
                 //ignore

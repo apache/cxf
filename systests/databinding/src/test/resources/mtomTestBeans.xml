@@ -23,9 +23,6 @@ http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
 
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />

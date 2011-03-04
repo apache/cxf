@@ -48,10 +48,6 @@ public class ApplicationContextTest extends Assert {
     
     private static final String S1 = 
         ApplicationContextTest.class.getResource("/META-INF/cxf/cxf.xml").toString();
-    private static final String S2 = 
-        ApplicationContextTest.class.getResource("/META-INF/cxf/cxf-extension-http.xml").toString();
-    private static final String S3 = 
-        ApplicationContextTest.class.getResource("/META-INF/cxf/cxf-extension-http-jetty.xml").toString();
     
     @BeforeClass
     public static void classUp() {
@@ -70,7 +66,7 @@ public class ApplicationContextTest extends Assert {
             .getResource("/org/apache/cxf/transport/http_jetty/spring/invalid-beans.xml").toString();
     
         try {
-            new TestApplicationContext(new String[] {S1, S2, S3, s4});
+            new TestApplicationContext(new String[] {S1, s4});
             fail("Expected XmlBeanDefinitionStoreException not thrown.");
         } catch (XmlBeanDefinitionStoreException ex) {
             assertTrue(ex.getCause() instanceof SAXParseException);
@@ -83,7 +79,7 @@ public class ApplicationContextTest extends Assert {
             .getResource("/org/apache/cxf/transport/http_jetty/spring/beans.xml").toString();
         
         TestApplicationContext ctx = new TestApplicationContext(
-            new String[] {S1, S2, S3, s4});
+            new String[] {S1, s4});
         
         //ctx.refresh();
         checkContext(ctx);
@@ -94,7 +90,7 @@ public class ApplicationContextTest extends Assert {
             .getResource("/org/apache/cxf/transport/http_jetty/spring/beans-props.xml").toString();
         
         TestApplicationContext ctx = new TestApplicationContext(
-            new String[] {S1, S2, S3, s4});
+            new String[] {S1, s4});
         checkContext(ctx);
     }
     private void checkContext(TestApplicationContext ctx) throws Exception {

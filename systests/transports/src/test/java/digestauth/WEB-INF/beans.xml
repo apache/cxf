@@ -36,7 +36,6 @@
               http://cxf.apache.org/schemas/jaxws.xsd">
               
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
-  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
   <http:destination name="{http://apache.org/hello_world}Mortimer.http-destination">

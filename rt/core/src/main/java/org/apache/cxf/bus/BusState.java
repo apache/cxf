@@ -19,5 +19,5 @@
 package org.apache.cxf.bus;
 
 public enum BusState {
-    INITIAL, RUNNING, SHUTDOWN;
+    INITIAL, RUNNING, SHUTTING_DOWN, SHUTDOWN;
 }

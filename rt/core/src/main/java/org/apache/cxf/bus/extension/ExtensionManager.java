@@ -24,7 +24,6 @@ public interface ExtensionManager {
     
     <T> void activateAllByType(Class<T> type);
     
-    void activateViaNS(String namespace, Class<?> type);
-    
     <T> T getExtension(String ns, Class<T> type);
+    
 }

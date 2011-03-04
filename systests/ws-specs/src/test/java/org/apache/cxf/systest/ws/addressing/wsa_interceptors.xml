@@ -21,8 +21,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:cxf="http://cxf.apache.org/core"
        xsi:schemaLocation="
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator">
@@ -34,36 +36,28 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
 
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-        <property name="inInterceptors">
-            <list>
+    <cxf:bus>
+        <cxf:inInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="loggingIn"/>
-            </list>
-        </property>
-        <property name="inFaultInterceptors">
-            <list>
+        </cxf:inInterceptors>
+        <cxf:inFaultInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="loggingIn"/>
-            </list>
-        </property>
-        <property name="outInterceptors">
-            <list>
+        </cxf:inFaultInterceptors>
+        <cxf:outInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="loggingOut"/>
-            </list>
-        </property>
-        <property name="outFaultInterceptors">
-            <list>
+        </cxf:outInterceptors>
+        <cxf:outFaultInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="loggingOut"/>
-            </list>
-        </property>
-    </bean>
+        </cxf:outFaultInterceptors>
+    </cxf:bus>
 
     <!--jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" 
                   createdFromAPI="true">

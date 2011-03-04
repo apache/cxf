@@ -26,7 +26,6 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 	<context:annotation-config />
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
 
 	<bean class="org.apache.cxf.jaxws.spring.ClientHolderBean" id="greeters"
 		autowire="default">
@@ -48,6 +47,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 		<property name="transportIds">
 			<list>
 				<value>http://cxf.apache.org/transports/local</value>
+                <value>http://cxf.apache.org/transports/http</value>
 				<value>http://schemas.xmlsoap.org/soap/http</value>
 				<value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
 			</list>

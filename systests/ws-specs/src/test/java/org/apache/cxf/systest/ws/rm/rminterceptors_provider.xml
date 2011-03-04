@@ -19,8 +19,11 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://cxf.apache.org/core"
        xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+">
 
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
@@ -37,44 +40,36 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
 
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-        <property name="inInterceptors">
-            <list>
+    <cxf:bus>
+        <cxf:inInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalIn"/>
                 <ref bean="rmCodec"/>
                 <ref bean="rmDelivery"/>
                 <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-            </list>
-        </property>
-        <property name="inFaultInterceptors">
-            <list>
+        </cxf:inInterceptors>
+        <cxf:inFaultInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalIn"/>
                 <ref bean="rmCodec"/>
                 <ref bean="rmDelivery"/>
                 <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-            </list>
-        </property>
-        <property name="outInterceptors">
-            <list>
+        </cxf:inFaultInterceptors>
+        <cxf:outInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalOut"/>
                 <ref bean="rmCodec"/>
                 <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-            </list>
-        </property>
-        <property name="outFaultInterceptors">
-            <list>
+        </cxf:outInterceptors>
+        <cxf:outFaultInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalOut"/>
                 <ref bean="rmCodec"/>
                 <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-            </list>
-        </property>
-    </bean>
+        </cxf:outFaultInterceptors>
+    </cxf:bus>
 </beans>

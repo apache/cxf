@@ -49,10 +49,10 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
     Set<String> loaded = new CopyOnWriteArraySet<String>();
     Bus bus;
      
-    public BindingFactoryManagerImpl() throws BusException {
+    public BindingFactoryManagerImpl() {
         bindingFactories = new ConcurrentHashMap<String, BindingFactory>();
     }
-    public BindingFactoryManagerImpl(Bus b) throws BusException {
+    public BindingFactoryManagerImpl(Bus b) {
         bindingFactories = new ConcurrentHashMap<String, BindingFactory>();
         setBus(b);
     }
@@ -107,9 +107,9 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
         BindingFactory factory = bindingFactories.get(namespace);
         if (null == factory) {
             if (!failed.contains(namespace)) {
-                factory = loadDefaultNamespace(namespace);
+                factory = loadActivationNamespace(namespace);
                 if (factory == null) {
-                    factory = loadActivationNamespace(namespace);
+                    factory = loadDefaultNamespace(namespace);
                 }
                 if (factory == null) {
                     factory = loadAll(namespace);

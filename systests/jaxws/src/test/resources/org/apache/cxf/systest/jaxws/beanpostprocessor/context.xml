@@ -6,9 +6,6 @@
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-local.xml" />
 	
 <!-- This test is not run with a servlet container. It tests non-servlet publication. -->
 <bean id="servicebean" class="org.apache.cxf.systest.jaxws.beanpostprocessor.WebServiceRUs"/>

@@ -23,25 +23,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.resource.ObjectTypeResolver;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
 
-public class ExtensionManagerImpl implements ExtensionManager {
+public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLocator {
 
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";
     public static final String ACTIVATION_NAMESPACES_PROPERTY_NAME = "activationNamespaces";
@@ -49,15 +47,10 @@ public class ExtensionManagerImpl implements ExtensionManager {
     public static final String BUS_EXTENSION_RESOURCE_XML = "META-INF/cxf/bus-extensions.xml";
     public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.txt";
     
-    private static final String NO_NAMESPACES = "NO_NAMESPACE_BEANS";
-    
-    
     private final ClassLoader loader;
     private ResourceManager resourceManager;
-    private Map<String, Collection<Extension>> deferred;
+    private Map<String, Extension> all = new LinkedHashMap<String, Extension>();
     private final Map<Class, Object> activated;
-    private final Map<String, Collection<Object>> namespaced = 
-        new ConcurrentHashMap<String, Collection<Object>>();
     private final Bus bus;
 
     public ExtensionManagerImpl(ClassLoader cl, Map<Class, Object> initialExtensions, 
@@ -88,7 +81,6 @@ public class ExtensionManagerImpl implements ExtensionManager {
         resourceManager.addResourceResolver(extensionManagerResolver);
         resourceManager.addResourceResolver(new ObjectTypeResolver(this));
 
-        deferred = new ConcurrentHashMap<String, Collection<Extension>>();
         load(resources);
     }
     public final void load(String resources[]) {
@@ -103,93 +95,58 @@ public class ExtensionManagerImpl implements ExtensionManager {
             throw new ExtensionException(ex);
         }
     }
-
-    public synchronized void activateViaNS(String namespaceURI, Class<?> type) {
-        Collection<Extension> extensions = deferred.get(namespaceURI);
-        if (null == extensions) {
-            return;
-        }
-        Iterator<Extension> it = extensions.iterator();
-        while (it.hasNext()) {
-            Extension e = it.next();
-            if (type == null || type.isAssignableFrom(e.getClassObject(loader))) {
-                loadAndRegister(e);
-                extensions.remove(e);
-            }
-        }
-        if (extensions.isEmpty()) {
-            deferred.remove(namespaceURI);
-        }
+    public void add(Extension ex) {
+        all.put(ex.getName(), ex);
     }
     
-    public synchronized void activateAll() {
-        while (!deferred.isEmpty()) {
-            activateViaNS(deferred.keySet().iterator().next(), null);
+    public synchronized void initialize() {
+        for (Extension e : all.values()) {
+            if (!e.isDeferred() && e.getLoadedObject() == null) {
+                loadAndRegister(e);
+            }
+        }        
+    }
+
+    public synchronized void removeBeansOfNames(List<String> names) {
+        for (String s : names) {
+            all.remove(s);
         }
+    }
+    public synchronized void activateAll() {
+        for (Extension e : all.values()) {
+            if (e.getLoadedObject() == null) {
+                loadAndRegister(e);
+            }
+        }        
     }
     public synchronized <T> void activateAllByType(Class<T> type) {
-        for (Map.Entry<String, Collection<Extension>> e : deferred.entrySet()) {
-            if (!e.getValue().isEmpty()) {
-                List<Extension> removes = new ArrayList<Extension>(e.getValue().size());
-                Iterator<Extension> it = e.getValue().iterator();
-                while (it.hasNext()) {
-                    Extension ex = it.next();
-                    if (type.isAssignableFrom(ex.getClassObject(loader))) {
-                        loadAndRegister(ex);
-                        removes.add(ex);
-                    }
-                }
-                e.getValue().removeAll(removes);
+        for (Extension e : all.values()) {
+            if (e.getLoadedObject() == null
+                && type.isAssignableFrom(e.getClassObject(loader))) {
+                loadAndRegister(e);
             }
-        }
+        }        
     }
-    
+
     final void load(String resource) throws IOException {
         Enumeration<URL> urls = loader.getResources(resource);
-        List<Extension> all = new LinkedList<Extension>();
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             
             InputStream is = url.openStream();
+            List<Extension> exts;
             if (resource.endsWith("xml")) {
-                all.addAll(new ExtensionFragmentParser().getExtensionsFromXML(is));
+                exts = new ExtensionFragmentParser().getExtensionsFromXML(is);
             } else {
-                all.addAll(new ExtensionFragmentParser().getExtensionsFromText(is));
+                exts = new ExtensionFragmentParser().getExtensionsFromText(is);
             }
-        }
-        for (Extension e : all) {
-            if (e.isDeferred()) {
-                addDeferred(e);
-            }
-        }
-        for (Extension e : all) {
-            if (!e.isDeferred()) {
-                loadAndRegister(e);
+            for (Extension e : exts) {
+                all.put(e.getName(), e);
             }
         }
     }
-    final void addDeferred(Extension e) {
-        Collection<String> namespaces = e.getNamespaces();
-        if (namespaces.isEmpty()) {
-            Collection<Extension> extensions = deferred.get(NO_NAMESPACES);
-            if (null == extensions) {
-                extensions = new CopyOnWriteArrayList<Extension>();
-                deferred.put(NO_NAMESPACES, extensions);
-            }
-            extensions.add(e);
-        } else {
-            for (String ns : namespaces) {
-                Collection<Extension> extensions = deferred.get(ns);
-                if (null == extensions) {
-                    extensions = new CopyOnWriteArrayList<Extension>();
-                    deferred.put(ns, extensions);
-                }
-                extensions.add(e);
-            }
-        }
-    }
+
     final void loadAndRegister(Extension e) {
-        
         Class<?> cls = null;
         if (null != e.getInterfaceName() && !"".equals(e.getInterfaceName())) {
             cls = e.loadInterface(loader);
@@ -237,27 +194,16 @@ public class ExtensionManagerImpl implements ExtensionManager {
             }   
             activated.put(cls, obj);
         }
-        for (String ns : e.getNamespaces()) {
-            Collection<Object> intf2Obj = namespaced.get(ns);
-            if (intf2Obj == null) {
-                intf2Obj = new CopyOnWriteArrayList<Object>();
-                if (!namespaced.containsKey(ns)) {
-                    namespaced.put(ns, intf2Obj);
-                }
-            }
-            intf2Obj.add(obj);
-        }
     }
 
-    public <T> T getExtension(String ns, Class<T> type) {
-        
-        Collection<Object> nsExts = namespaced.get(ns);
-        if (nsExts != null) {
-            for (Object o : nsExts) {
-                if (type.isAssignableFrom(o.getClass())) {
-                    return type.cast(o);
-                }
+    public synchronized <T> T getExtension(String name, Class<T> type) {
+        Extension e = all.get(name);
+        if (e != null
+            && type.isAssignableFrom(e.getClassObject(loader))) {
+            if (e.getLoadedObject() == null) {
+                loadAndRegister(e);
             }
+            return type.cast(e.getLoadedObject());
         }
         return null;
     }
@@ -285,5 +231,54 @@ public class ExtensionManagerImpl implements ExtensionManager {
             clazz = clazz.getSuperclass();
         }        
     }
-
+    public List<String> getBeanNamesOfType(Class<?> type) {
+        List<String> ret = new LinkedList<String>();
+        for (Extension ex : all.values()) {
+            if (type.isAssignableFrom(ex.getClassObject(loader))) {
+                ret.add(ex.getName());
+            }            
+        }
+        return ret;
+    }
+    public synchronized <T> Collection<? extends T> getBeansOfType(Class<T> type) {
+        List<T> ret = new LinkedList<T>();
+        for (Extension ex : all.values()) {
+            if (type.isAssignableFrom(ex.getClassObject(loader))) {
+                if (ex.getLoadedObject() == null) {
+                    loadAndRegister(ex);
+                }
+                ret.add(type.cast(ex.getLoadedObject()));
+            }            
+        }
+        return ret;
+    }
+    public synchronized <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
+        boolean loaded = false;
+        for (Extension ex : all.values()) {
+            Class<?> cls = ex.getClassObject(loader);
+            if (ex.getLoadedObject() == null 
+                && type.isAssignableFrom(cls)
+                && listener.loadBean(ex.getName(), cls.asSubclass(type))) {
+                loadAndRegister(ex);
+                if (listener.beanLoaded(ex.getName(), type.cast(ex.getLoadedObject()))) {
+                    return true;
+                }
+                loaded = true;
+            }            
+        }
+        return loaded;
+    }
+    public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value) {
+        Extension ex = all.get(beanName);
+        return ex != null && ex.getNamespaces() != null
+            && ex.getNamespaces().contains(value);
+    }
+    public void destroyBeans() {
+        for (Extension ex : all.values()) {
+            if (ex.getLoadedObject() != null) {
+                ResourceInjector injector = new ResourceInjector(resourceManager);
+                injector.destroy(ex.getLoadedObject());
+            }
+        }        
+    }
 }

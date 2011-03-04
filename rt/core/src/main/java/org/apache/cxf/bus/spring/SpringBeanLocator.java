@@ -24,10 +24,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.helpers.CastUtils;
 import org.springframework.beans.Mergeable;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -40,31 +45,46 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class SpringBeanLocator implements ConfiguredBeanLocator {
     ApplicationContext context;
-    public SpringBeanLocator(ApplicationContext ctx) {
+    ConfiguredBeanLocator orig;
+    public SpringBeanLocator(ApplicationContext ctx, Bus bus) {
         context = ctx;
+        orig = bus.getExtension(ConfiguredBeanLocator.class);
+        if (orig instanceof ExtensionManagerImpl) {
+            List<String> names = new ArrayList<String>();
+            for (String s : ctx.getBeanDefinitionNames()) {
+                names.add(s);
+                for (String s2 : ctx.getAliases(s)) {
+                    names.add(s2);
+                }
+            }
+            
+            ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
+        }
     }
 
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
-        return Arrays.asList(context.getBeanNamesForType(type, false, true));
-    }
-
-    /** {@inheritDoc}*/
-    public <T> T getBeanOfType(String name, Class<T> type) {
-        return type.cast(context.getBean(name, type));
+        Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
+                                                                                         false,
+                                                                                         true)));
+        s.addAll(orig.getBeanNamesOfType(type));
+        return new ArrayList<String>(s);
     }
 
     /** {@inheritDoc}*/
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        return CastUtils.cast(context.getBeansOfType(type, false, true).values());
+        Map<String, T> mp = context.getBeansOfType(type, false, true);
+        List<T> lst = new LinkedList<T>(mp.values());
+        lst.addAll(orig.getBeansOfType(type));
+        return lst;
     }
 
     public <T> boolean loadBeansOfType(Class<T> type,
                                        BeanLoaderListener<T> listener) {
-        List<String> list = new ArrayList<String>(Arrays.asList(context.getBeanNamesForType(type, 
-                                                                                            false, 
-                                                                                            true)));
+        List<String> list = Arrays.asList(context.getBeanNamesForType(type, false, true));
+            
         Collections.reverse(list);
+        boolean loaded = false;
         for (String s : list) {
             Class<?> beanType = context.getType(s);
             Class<? extends T> t = beanType.asSubclass(type);
@@ -73,50 +93,53 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                 if (listener.beanLoaded(s, type.cast(o))) {
                     return true;
                 }
+                loaded = true;
             }
         }
-        return false;
+        return loaded || orig.loadBeansOfType(type, listener);
     }
 
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String searchValue) {
-        ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
-        BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(beanName);
-        if (!ctxt.getBeanFactory().isSingleton(beanName) || def.isAbstract()) {
-            return false;
-        }
-        Collection<?> ids = null;
-        PropertyValue pv = def.getPropertyValues().getPropertyValue(propertyName);
-        
-        if (pv != null) {
-            Object value = pv.getValue();
-            if (!(value instanceof Collection)) {
-                throw new RuntimeException("The property " + propertyName + " must be a collection!");
+        if (context.containsBean(beanName)) {
+            ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
+            BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(beanName);
+            if (!ctxt.getBeanFactory().isSingleton(beanName) || def.isAbstract()) {
+                return false;
             }
-
-            if (value instanceof Mergeable) {
-                if (!((Mergeable)value).isMergeEnabled()) {
-                    ids = (Collection<?>)value;
+            Collection<?> ids = null;
+            PropertyValue pv = def.getPropertyValues().getPropertyValue(propertyName);
+            
+            if (pv != null) {
+                Object value = pv.getValue();
+                if (!(value instanceof Collection)) {
+                    throw new RuntimeException("The property " + propertyName + " must be a collection!");
                 }
-            } else {
-                ids = (Collection<?>)value;
-            }
-        } 
-        
-        if (ids != null) {
-            for (Iterator itr = ids.iterator(); itr.hasNext();) {
-                Object o = itr.next();
-                if (o instanceof TypedStringValue) {
-                    if (searchValue.equals(((TypedStringValue) o).getValue())) {
-                        return true;
+    
+                if (value instanceof Mergeable) {
+                    if (!((Mergeable)value).isMergeEnabled()) {
+                        ids = (Collection<?>)value;
                     }
                 } else {
-                    if (searchValue.equals((String)o)) {
-                        return true;
+                    ids = (Collection<?>)value;
+                }
+            } 
+            
+            if (ids != null) {
+                for (Iterator itr = ids.iterator(); itr.hasNext();) {
+                    Object o = itr.next();
+                    if (o instanceof TypedStringValue) {
+                        if (searchValue.equals(((TypedStringValue) o).getValue())) {
+                            return true;
+                        }
+                    } else {
+                        if (searchValue.equals((String)o)) {
+                            return true;
+                        }
                     }
                 }
             }
         }
-        return false;
+        return orig.hasConfiguredPropertyValue(beanName, propertyName, searchValue);
     }
 
 }

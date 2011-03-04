@@ -19,10 +19,10 @@
 
 package org.apache.cxf.bus.spring;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -35,11 +35,26 @@ import org.springframework.context.support.AbstractApplicationContext;
 /**
  * 
  */
-@NoJSR250Annotations
-public class BusApplicationListener implements ApplicationListener, ApplicationContextAware {
+public class SpringBus extends ExtensionManagerBus 
+    implements ApplicationContextAware, ApplicationListener {
+
     AbstractApplicationContext ctx;
+
     
     /** {@inheritDoc}*/
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        ctx = (AbstractApplicationContext)applicationContext;
+        ctx.addApplicationListener(this);
+        ApplicationContext ac = applicationContext.getParent();
+        while (ac != null) {
+            if (ac instanceof AbstractApplicationContext) {
+                ((AbstractApplicationContext)ac).addApplicationListener(this);
+            }
+            ac = ac.getParent();
+        }
+        setExtension(new ConfigurerImpl(applicationContext), Configurer.class);
+    }
+
     public void onApplicationEvent(ApplicationEvent event) {
         if (ctx == null) {
             return;
@@ -56,33 +71,16 @@ public class BusApplicationListener implements ApplicationListener, ApplicationC
         
         if (doIt) {
             if (event instanceof ContextRefreshedEvent) {
-                Bus bus = (Bus)ctx.getBean("cxf");
-                ((CXFBusImpl)bus).initialize();
-                BusLifeCycleManager lcm = (BusLifeCycleManager)
-                    ctx.getBean("org.apache.cxf.buslifecycle.BusLifeCycleManager",
-                            BusLifeCycleManager.class);
-                lcm.initComplete();
+                initialize();
             } else if (event instanceof ContextClosedEvent) {
-                BusLifeCycleManager lcm = (BusLifeCycleManager)
-                    ctx.getBean("org.apache.cxf.buslifecycle.BusLifeCycleManager",
-                        BusLifeCycleManager.class);
-                lcm.postShutdown();
+                getExtension(BusLifeCycleManager.class).postShutdown();
             }
         }
     }
-
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        if (applicationContext instanceof AbstractApplicationContext) {
-            ctx = (AbstractApplicationContext)applicationContext;
-            ctx.addApplicationListener(this);
-            ApplicationContext ac = applicationContext.getParent();
-            while (ac != null) {
-                if (ac instanceof AbstractApplicationContext) {
-                    ((AbstractApplicationContext)ac).addApplicationListener(this);
-                }
-                ac = ac.getParent();
-            }
-        }        
+    
+    public void destroyBeans() {
+        ctx.close();
+        super.destroyBeans();
     }
 
 }

@@ -29,10 +29,12 @@
   xmlns:sec="http://cxf.apache.org/configuration/security"
   xmlns:http="http://cxf.apache.org/transports/http/configuration"
   xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+  xmlns:cxf="http://cxf.apache.org/core"
   xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
   xsi:schemaLocation="
   		   http://cxf.apache.org/configuration/security
   		      http://cxf.apache.org/schemas/configuration/security.xsd
+	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
            http://cxf.apache.org/transports/http/configuration
               http://cxf.apache.org/schemas/configuration/http-conf.xsd
            http://cxf.apache.org/transports/http-jetty/configuration
@@ -71,12 +73,10 @@
 	  </httpj:engine>
    </httpj:engine-factory>
   
-   <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-        <property name="inInterceptors">
-            <list>
+   <cxf:bus>
+        <cxf:inInterceptors>
                 <bean class="org.apache.cxf.systest.http.PushBack401"/>
-            </list>
-        </property>
-   </bean> 
+        </cxf:inInterceptors>
+    </cxf:bus>
 
 </beans>

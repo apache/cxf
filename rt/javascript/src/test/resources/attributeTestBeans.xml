@@ -26,9 +26,6 @@ under the License.
 						http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 	<!-- CXF -->
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-local.xml" />
 
    <bean id="attribute-test-proxy-factory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean" >
     <property name="serviceClass" value="org.apache.cxf.javascript.fortest.AttributeTestService"/>

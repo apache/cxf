@@ -70,6 +70,4 @@
 	  </httpj:engine>
    </httpj:engine-factory>  
   
-  <!-- We need a bean named "cxf", or SpringBusFactory barfs -->
-  <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
 </beans>

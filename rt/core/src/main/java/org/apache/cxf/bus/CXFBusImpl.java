@@ -121,9 +121,6 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
                 public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
                     return null;
                 }
-                public <T> T getBeanOfType(String name, Class<T> type) {
-                    return null;
-                }
                 public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
                     return false;
                 }
@@ -169,7 +166,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         initializeFeatures();
     }
 
-    private void initializeFeatures() {
+    protected void initializeFeatures() {
         if (features != null) {
             for (AbstractFeature f : features) {
                 f.initialize(this);
@@ -181,11 +178,22 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         shutdown(true);
     }
 
+    protected void destroyBeans() {
+        
+    }
+    
     public void shutdown(boolean wait) {
+        if (state == BusState.SHUTTING_DOWN) {
+            return;
+        }
         BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
         if (null != lifeCycleManager) {
             lifeCycleManager.preShutdown();
         }
+        synchronized (this) {
+            state = BusState.SHUTTING_DOWN;
+        }
+        destroyBeans();
         synchronized (this) {
             state = BusState.SHUTDOWN;
             notifyAll();

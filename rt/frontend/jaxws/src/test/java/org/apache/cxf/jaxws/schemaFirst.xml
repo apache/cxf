@@ -25,12 +25,12 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
-  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
     
   <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
       <property name="transportIds">
           <list>
               <value>http://cxf.apache.org/transports/local</value>
+              <value>http://cxf.apache.org/transports/http</value>
               <value>http://schemas.xmlsoap.org/soap/http</value>
               <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
           </list>

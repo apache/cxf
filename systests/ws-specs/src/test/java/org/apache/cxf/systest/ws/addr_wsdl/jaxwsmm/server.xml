@@ -28,12 +28,6 @@
 	">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-xml.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-addr.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-policy.xml" />
 
 	<jaxws:endpoint
 		id="asyncMessagingProvider"

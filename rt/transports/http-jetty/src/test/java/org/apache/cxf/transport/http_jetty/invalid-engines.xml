@@ -46,6 +46,5 @@
 	    </httpj:connector> 
 	  </httpj:engine>
    </httpj:engine-factory>  
-   <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-   </bean> 
+
 </beans>

@@ -27,15 +27,13 @@ http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/
 http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
 
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
-  <import resource="classpath:META-INF/cxf/cxf-extension-xml.xml"/>
-  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
 
   <bean class="org.apache.cxf.transport.local.LocalTransportFactory" 
-    lazy-init="false"
-    depends-on="org.apache.cxf.binding.soap.SoapTransportFactory">
+    lazy-init="false">
       <property name="transportIds">
           <list>
               <value>http://cxf.apache.org/transports/local</value>
+              <value>http://cxf.apache.org/transports/http</value>
               <value>http://schemas.xmlsoap.org/soap/http</value>
               <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
               <value>http://schemas.xmlsoap.org/wsdl/http/</value>

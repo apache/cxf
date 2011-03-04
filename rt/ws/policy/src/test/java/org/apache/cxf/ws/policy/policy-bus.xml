@@ -26,16 +26,11 @@
 http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema/transports/http.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+    
     <bean class="org.apache.cxf.ws.policy.PolicyExtensionsTest$TestAssertionBuilder"/>
     <bean class="org.apache.cxf.ws.policy.PolicyExtensionsTest$TestPolicyInterceptorProvider"/>
 
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
-    <bean id="org.apache.cxf.buslifecycle.BusLifeCycleManager" class="org.apache.cxf.buslifecycle.CXFBusLifeCycleManager">
-        <property name="bus" ref="cxf"/>
-    </bean>
-    <bean class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>
-    <bean class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
-    <import resource="../../../../../META-INF/cxf/cxf-extension-policy.xml"/>  
     
     <!-- use bean ids if you want to load multiple external attachment providers -->
     

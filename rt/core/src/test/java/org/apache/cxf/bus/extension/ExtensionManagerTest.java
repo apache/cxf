@@ -34,7 +34,6 @@ public class ExtensionManagerTest extends Assert {
 
     private static final String EXTENSIONMANAGER_TEST_RESOURECE_NAME = "extensionManagerTest";
     private ExtensionManagerImpl manager;
-    private MyService myService;
     private Map<Class, Object> extensions;
     
     @Before
@@ -47,7 +46,6 @@ public class ExtensionManagerTest extends Assert {
         
         manager = new ExtensionManagerImpl("test-extension.xml", 
             Thread.currentThread().getContextClassLoader(), extensions, rm, null); 
-        myService = null;
     }
     
     @Test
@@ -76,36 +74,6 @@ public class ExtensionManagerTest extends Assert {
          
     }
     
-    @Test
-    public void testActivateViaNS() {
-        verifyActivateViaNS(MyResourceService.class.getName(), "http://cxf.apache.org/resource");
-        verifyActivateViaNS(MySetterService.class.getName(), "http://cxf.apache.org/setter");
-    }
-    
-    public void verifyActivateViaNS(String extensionClass, String ns) {        
-        
-        Extension e = new Extension();
-        e.setClassname(extensionClass);       
-        e.getNamespaces().add(ns);
-        e.setDeferred(true);
-        manager.addDeferred(e);
-        assertNull(myService);
-        manager.activateViaNS(ns, null);
-        assertNotNull(myService);
-        assertEquals(1, myService.getActivationNamespaces().size());
-        assertEquals(ns, myService.getActivationNamespaces().iterator().next());
-        
-        // second activation should be a no-op
-        
-        MyService first = myService;        
-        manager.activateViaNS(ns, null);
-        assertSame(first, myService);
-        myService = null;
-    }
-    
-    public void setMyService(MyService m) {
-        myService = m;
-    }
 
     
 }

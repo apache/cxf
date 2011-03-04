@@ -59,6 +59,5 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <value>test</value>
             </list>
         </property>
-        <property name="factory" ref="org.apache.cxf.binding.corba.CorbaBindingFactory"/>
     </bean>
 </beans>

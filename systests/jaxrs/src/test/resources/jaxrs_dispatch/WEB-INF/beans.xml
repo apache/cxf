@@ -40,7 +40,6 @@ http://cxf.apache.org/core
 http://cxf.apache.org/schemas/core.xsd">
 
   <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
   <bean class="org.apache.cxf.systest.jaxrs.BookStoreDispatch" id="serviceBean"/>
