@@ -60,15 +60,8 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 
 
 /**
- * Bean to help easily create Server endpoints for JAX-RS. Example:
- * <pre>
- * JAXRSServerFactoryBean sf = JAXRSServerFactoryBean();
- * sf.setResourceClasses(Book.class);
- * sf.setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
- * sf.setAddress("http://localhost:9080/");
- * sf.create();
- * </pre>
- * This will start a server for you and register it with the ServerManager.
+ * Abstract bean holding functionality common for creating 
+ * JAX-RS Server and Client objects.
  */
 public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     

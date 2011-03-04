@@ -56,7 +56,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.service.invoker.AbstractInvoker;
 
 public class JAXRSInvoker extends AbstractInvoker {
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServiceFactoryBean.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSInvoker.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInvoker.class);
     private static final String SERVICE_LOADER_AS_CONTEXT = "org.apache.cxf.serviceloader-context";
     private static final String SERVICE_OBJECT_SCOPE = "org.apache.cxf.service.scope";
@@ -211,10 +211,10 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 exchange.put(OperationResourceInfo.class, subOri);
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
-                // work out request parameters for the sub-resouce class. Here we
-                // presume Inputstream has not been consumed yet by the root resource class.
-                //I.e., only one place either in the root resource or sub-resouce class can
-                //have a parameter that read from entitybody.
+                // work out request parameters for the sub-resource class. Here we
+                // presume InputStream has not been consumed yet by the root resource class.
+                //I.e., only one place either in the root resource or sub-resource class can
+                //have a parameter that read from entity body.
                 List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
                 msg.setContent(List.class, newParams);
 
