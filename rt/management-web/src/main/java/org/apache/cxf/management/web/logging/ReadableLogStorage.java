@@ -33,13 +33,13 @@ public interface ReadableLogStorage {
      * Read the records and load them into a provided list
      * @param list the list saved records should be added to
      * @param condition the condition loaded records must meet, can be null 
-     * @param loadFrom the initial index of the storage to have records loaded from
-     * @param int maxNumberOfRecords the max number of records to load from the storage
+     * @param pageNumber the initial page to have records loaded from
+     * @param int pageSize the max number of records to load from the storage
      */
     void load(List<LogRecord> list, 
               SearchCondition<LogRecord> condition,
-              int loadFrom, 
-              int maxNumberOfRecords);
+              int pageNumber, 
+              int pageSize);
     
     
     /**
