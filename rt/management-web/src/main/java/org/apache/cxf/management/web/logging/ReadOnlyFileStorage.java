@@ -72,18 +72,21 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     private ConcurrentHashMap<Integer, PageInfo> pagesMap
         = new ConcurrentHashMap<Integer, PageInfo>();
     
-    
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public int getSize() {
         return -1;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void load(List<LogRecord> list, 
                      SearchCondition<LogRecord> condition, 
                      int pageNumber,
                      int pageSize) {
-        FileInfo logFileInfo = getLogFileInfo(pageNumber, true);
+        FileInfo logFileInfo = getLogFileInfo(pageNumber);
         if (logFileInfo == null) {
             return;
         }
@@ -107,9 +110,12 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
             }
         }
         savePagePosition(pageNumber, logFileInfo);
-
     }
 
+    /**
+     * If no more records is available in the current file then try to get 
+     * the next one with an optional scanning 
+     **/
     private FileInfo getNextLogFileInfo(FileInfo logFileInfo, boolean firstTry) {
         for (Iterator<FileInfo> it = logFiles.iterator(); it.hasNext();) {
             FileInfo fileInfo = it.next();
@@ -124,8 +130,11 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
         return null;
     }
-    
-    private FileInfo getLogFileInfo(int pageNumber, boolean firstTry) {
+
+    /**
+     * Gets the file corresponding to the current page
+     */
+    private FileInfo getLogFileInfo(int pageNumber) {
         PageInfo pageInfo = pagesMap.get(pageNumber);
         if (pageInfo != null) {
             FileInfo fileInfo = pageInfo.getFileInfo();
@@ -139,7 +148,6 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
         if (pageNumber == 1 
             && logDirectory != null 
-            && firstTry 
             && logFiles.size() == 0
             && scanLogDirectory()) {
             FileInfo fileInfo = logFiles.get(0);
@@ -149,7 +157,9 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         return null;
     }
     
-    
+    /**
+     * Save the position of the next page 
+     */
     private void savePagePosition(int pageNumber, FileInfo fileInfo) {
         try {
             long pos = fileInfo.getFile().getFilePointer();
@@ -261,18 +271,42 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
     }
     
+    /**
+     * Log column separator such as '|'
+     * @param columnSep the separator
+     */
     public void setColumnSep(String columnSep) {
         this.columnSep = columnSep;
     }
 
-    public void setNumberOfColums(String number) {
+    /**
+     * Sets the number of columns per record 
+     * @param number the number of columns per record
+     */
+    public void setNumberOfColumns(String number) {
         this.numberOfColumns = Integer.parseInt(number);
     }
 
+    /**
+     * Identifies the columns which this reader should use
+     * when creating a LogRecord. Example, given a 7-columns
+     * record a user may only need the information from 1, 2, 
+     * and the last column. Regular expressions are not suitable.
+     * 
+     * @param columnsMap the map, the key is the column number (starting from 1)
+     *        and the value is the name of the property such as 'message'.
+     *        The following properties are supported at the moment: 
+     *        'date', 'level' 'category', 'thread', 'message'.
+     */
     public void setColumnsMap(Map<Integer, String> columnsMap) {
         this.columnsMap = columnsMap;
     }
 
+    /**
+     * A list of log files, the oldest files are expected to be in the top
+     * of the list
+     * @param locations the locations
+     */
     public void setLogLocations(List<String> locations) {
         logFiles = new LinkedList<FileInfo>();
         for (int i = 0; i < locations.size(); i++) {
@@ -325,6 +359,11 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         return realPath;
     }
     
+    /**
+     * Sets the log location. 
+     * @param location the location, if it is a directory then 
+     *        the on-demand scanning will be enabled
+     */
     public void setLogLocation(String location) {
         String realPath = getRealLocation(location);
         File file = new File(realPath);
@@ -335,6 +374,9 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
     }
     
+    /**
+     * Skip the records at the top of the file which have no column separators 
+     */
     private void skipIgnorableRecords(FileInfo fInfo, boolean first) throws IOException {
         long nextPos = fInfo.getFile().getFilePointer();
         String line = fInfo.getFile().readLine();
@@ -348,15 +390,40 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
         
     }
-    
+    //CHECKSTYLE:OFF
+    /**
+     * The format for parsing the log date
+     * <p>
+     * Please see <a href="http://download.oracle.com/javase/1.5.0/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>
+     * </p>
+     */
+    //CHECKSTYLE:ON
     public void setRecordDateFormat(String format) {
         recordDateFormat = new SimpleDateFormat(format);
     }
     
+    /**
+     * Optional map for converting the levels.
+     * This map is not required if the log records have levels
+     * with one of the following values: 
+     * 'WARN', 'ERROR', 'DEBUG', 'TRACE', 'INFO', 'FATAL'.  
+     * @param map the map of levels
+     */
     public void setLevelsMap(Map<String, String> map) {
         this.levelsMap = map;
     }
     
+    /**
+     * Optional comparator which can be used for sorting the 
+     * new log files found after the latest scan iteration.
+     * 
+     * If scanning is enabled then by default the file names are compared
+     * using either the embedded date (provided the fileNameDatePattern is set)
+     * or the last segment in the file name which is expected to be a number.
+     * The files with the oldest dates or bigger indexes will be positioned first. 
+     *  
+     * @param comp the comparator
+     */
     public void setFileNameComparator(Comparator<String> comp) {
         this.fileNameComparator = comp;
     }
@@ -371,6 +438,11 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
     }
 
+    /**
+     * Indicates if the file modified date needs to be used for
+     * creating a LogRecord date - in case the actual log record
+     * contains no year/month/hour information.
+     */
     public void setUseFileModifiedDate(boolean useFileModifiedDate) {
         this.useFileModifiedDate = useFileModifiedDate;
     }
@@ -405,10 +477,19 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
     }
     
+    /**
+     * Sets the regular expression for capturing the date from the file name
+     * If set then it must contain a single capturing group only.
+     * @param fileNameDatePattern
+     */
     public void setFileNameDatePattern(String fileNameDatePattern) {
         this.fileNameDatePattern = Pattern.compile(fileNameDatePattern);
     }
 
+    /**
+     * Optional pattern for parsing the file date
+     * @param fileNameDateFormat
+     */
     public void setFileNameDateFormat(String fileNameDateFormat) {
         this.fileNameDateFormat = fileNameDateFormat;
     }

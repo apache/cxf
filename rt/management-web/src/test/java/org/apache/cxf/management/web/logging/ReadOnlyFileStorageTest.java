@@ -36,7 +36,7 @@ public class ReadOnlyFileStorageTest extends Assert {
     public void setUp() throws Exception {
         storage = new ReadOnlyFileStorage();
        
-        storage.setNumberOfColums("7");
+        storage.setNumberOfColumns("7");
         storage.setColumnSep("|");
               
         Map<Integer, String> columnsMap = new HashMap<Integer, String>(); 
