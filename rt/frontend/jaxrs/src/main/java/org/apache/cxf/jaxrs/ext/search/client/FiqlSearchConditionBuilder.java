@@ -46,18 +46,16 @@ import org.apache.cxf.jaxrs.ext.search.FiqlParser;
  * PartialCondition c = b.query();
  * c.is("price").lessThan(100).and().or(
  *      c.is("title").equalTo("The lord*"), 
- *      c.is("author").equalTo("R.R.Tolkien").build();
+ *      c.is("author").equalTo("R.R.Tolkien")).build();
  * // gives "price=lt=100.0;(title==The lord*,author==R.R.Tolkien)"
  * </pre>
  */
 public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
 
-    @Override
     public String build() {
         return "";
     }
 
-    @Override
     public PartialCondition query() {
         return new Builder();
     }
@@ -76,7 +74,6 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
             this.parent = parent;
         }
 
-        @Override
         public String build() {
             return buildPartial(null);
             // if (parent != null) {
@@ -95,163 +92,136 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
             }
         }
 
-        @Override
         public CompleteCondition after(Date date) {
             result += FiqlParser.GT + toString(date);
             return this;
         }
 
-        @Override
         public CompleteCondition before(Date date) {
             result += FiqlParser.LT + toString(date);
             return this;
         }
 
-        @Override
         public CompleteCondition equalTo(String literalOrPattern) {
             result += FiqlParser.EQ + literalOrPattern;
             return this;
         }
 
-        @Override
         public CompleteCondition equalTo(double number) {
             result += FiqlParser.EQ + number;
             return this;
         }
 
-        @Override
         public CompleteCondition equalTo(Date date) {
             result += FiqlParser.EQ + toString(date);
             return this;
         }
 
-        @Override
         public CompleteCondition greaterOrEqualTo(double number) {
             result += FiqlParser.GE + number;
             return this;
         }
 
-        @Override
         public CompleteCondition greaterThan(double number) {
             result += FiqlParser.GT + number;
             return this;
         }
 
-        @Override
         public CompleteCondition lessOrEqualTo(double number) {
             result += FiqlParser.LE + number;
             return this;
         }
 
-        @Override
         public CompleteCondition lessThan(double number) {
             result += FiqlParser.LT + number;
             return this;
         }
 
-        @Override
         public CompleteCondition lexicalAfter(String literal) {
             result += FiqlParser.GT + literal;
             return this;
         }
 
-        @Override
         public CompleteCondition lexicalBefore(String literal) {
             result += FiqlParser.LT + literal;
             return this;
         }
 
-        @Override
         public CompleteCondition lexicalNotAfter(String literal) {
             result += FiqlParser.LE + literal;
             return this;
         }
 
-        @Override
         public CompleteCondition lexicalNotBefore(String literal) {
             result += FiqlParser.GE + literal;
             return this;
         }
 
-        @Override
         public CompleteCondition notAfter(Date date) {
             result += FiqlParser.LE + toString(date);
             return this;
         }
 
-        @Override
         public CompleteCondition notBefore(Date date) {
             result += FiqlParser.GE + toString(date);
             return this;
         }
 
-        @Override
         public CompleteCondition notEqualTo(String literalOrPattern) {
             result += FiqlParser.NEQ + literalOrPattern;
             return this;
         }
 
-        @Override
         public CompleteCondition notEqualTo(double number) {
             result += FiqlParser.NEQ + number;
             return this;
         }
 
-        @Override
         public CompleteCondition notEqualTo(Date date) {
             result += FiqlParser.NEQ + toString(date);
             return this;
         }
 
-        @Override
         public CompleteCondition after(Duration distanceFromNow) {
             result += FiqlParser.GT + distanceFromNow;
             return this;
         }
 
-        @Override
         public CompleteCondition before(Duration distanceFromNow) {
             result += FiqlParser.LT + distanceFromNow;
             return this;
         }
 
-        @Override
         public CompleteCondition equalTo(Duration distanceFromNow) {
             result += FiqlParser.EQ + distanceFromNow;
             return this;
         }
 
-        @Override
         public CompleteCondition notAfter(Duration distanceFromNow) {
             result += FiqlParser.LE + distanceFromNow;
             return this;
         }
 
-        @Override
         public CompleteCondition notBefore(Duration distanceFromNow) {
             result += FiqlParser.GE + distanceFromNow;
             return this;
         }
 
-        @Override
         public CompleteCondition notEqualTo(Duration distanceFromNow) {
             result += FiqlParser.NEQ + distanceFromNow;
             return this;
         }
 
-        @Override
         public PartialCondition and() {
             result += FiqlParser.AND;
             return this;
         }
 
-        @Override
         public PartialCondition or() {
             result += FiqlParser.OR;
             return this;
         }
 
-        @Override
         public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
             result += "(" + ((Builder)c1).buildPartial(this) + FiqlParser.AND
                       + ((Builder)c2).buildPartial(this);
@@ -262,7 +232,6 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
             return this;
         }
 
-        @Override
         public CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
             result += "(" + ((Builder)c1).buildPartial(this) + FiqlParser.OR
                       + ((Builder)c2).buildPartial(this);
@@ -273,7 +242,6 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
             return this;
         }
 
-        @Override
         public Property is(String property) {
             Builder b = new Builder(this);
             b.result = property;
