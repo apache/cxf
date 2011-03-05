@@ -63,7 +63,7 @@ public class NavigationSidebarViewImpl extends Composite implements NavigationSi
 
                 // Remove selection from subscription list in filter section
                 filterSubscriptionTable.deselect();
-                presenter.onSubcriptionItemClicked(row);
+                presenter.onExploreSubcriptionItemClicked(row);
             }
         });
 
@@ -74,7 +74,7 @@ public class NavigationSidebarViewImpl extends Composite implements NavigationSi
 
                 // Remove selection from subscription list in explore section
                 exploreSubscriptionTable.deselect();
-                presenter.onSubcriptionItemClicked(row);
+                presenter.onFilterSubcriptionItemClicked(row);
             }
         });
     }

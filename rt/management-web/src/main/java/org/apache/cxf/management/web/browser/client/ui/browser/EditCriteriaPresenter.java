@@ -19,13 +19,19 @@
 
 package org.apache.cxf.management.web.browser.client.ui.browser;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
 import org.apache.cxf.management.web.browser.client.EventBus;
+import org.apache.cxf.management.web.browser.client.event.ChangedFilterOptionsEvent;
+import org.apache.cxf.management.web.browser.client.service.browser.FilterOptions;
+import org.apache.cxf.management.web.browser.client.service.browser.FilterOptions.Level;
 import org.apache.cxf.management.web.browser.client.ui.BasePresenter;
 import org.apache.cxf.management.web.browser.client.ui.BindStrategy;
 
@@ -43,5 +49,34 @@ public class EditCriteriaPresenter extends BasePresenter implements EditCriteria
 
         this.view = view;
         this.view.setPresenter(this);
+    }
+
+    public void onSaveButtonClicked() {
+        Date from = view.getFromValue().getValue();
+        Date to = view.getToValue().getValue();
+
+        List<Level> acceptedLevels = new ArrayList<FilterOptions.Level>();
+
+        if (view.getDebugValue().getValue()) {
+            acceptedLevels.add(Level.DEBUG);
+        }
+        if (view.getInfoValue().getValue()) {
+            acceptedLevels.add(Level.INFO);
+        }
+        if (view.getWarnValue().getValue()) {
+            acceptedLevels.add(Level.WARN);
+        }
+        if (view.getErrorValue().getValue()) {
+            acceptedLevels.add(Level.ERROR);
+        }
+
+        FilterOptions filterOptions;
+        if (from == null && to == null && acceptedLevels.isEmpty()) {
+            filterOptions = FilterOptions.EMPTY;
+        } else {
+            filterOptions = new FilterOptions(from, to, acceptedLevels);
+        }
+
+        eventBus.fireEvent(new ChangedFilterOptionsEvent(filterOptions));
     }
 }

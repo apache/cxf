@@ -19,50 +19,93 @@
 
 package org.apache.cxf.management.web.browser.client.ui.browser;
 
+import java.util.Date;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.apache.cxf.management.web.browser.client.ui.AbstractDialog;
 import org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserConstans;
 
 @Singleton
 public class EditCriteriaViewImpl extends AbstractDialog implements EditCriteriaView {
+    @UiTemplate("EditCriteriaView.ui.xml")
+    interface EditCriteriaViewUiBinder extends UiBinder<Widget, EditCriteriaViewImpl> { }
 
-    @Nonnull
-    private Form form;
+    private static final EditCriteriaViewUiBinder UI_BINDER = GWT.create(EditCriteriaViewUiBinder.class);
+
+    @UiField @Nonnull DateBox fromDateBox;
+    @UiField @Nonnull DateBox toDateBox;
+    @UiField @Nonnull CheckBox debugCheckBox;
+    @UiField @Nonnull CheckBox warnCheckBox;
+    @UiField @Nonnull CheckBox infoCheckBox;
+    @UiField @Nonnull CheckBox errorCheckBox;
+
+    @Nonnull private Presenter presenter;
 
     @Inject
     public EditCriteriaViewImpl(@Nonnull final LogBrowserConstans constans) {
-        this.form = new Form();
-
-        init(constans.editCriteriaDialogTitle(), form);
+        init(constans.editCriteriaDialogTitle(), UI_BINDER.createAndBindUi(this));
     }
 
+    @UiHandler("cancelButton")
+    void onCancelButtonClicked(@Nonnull final ClickEvent event) {
+        hide();
+    }
+
+    @UiHandler("saveButton")
+    void onSaveButtonClicked(@Nonnull final ClickEvent event) {
+        presenter.onSaveButtonClicked();
+        hide();
+    }
+
+    @Nonnull
+    public HasValue<Date> getFromValue() {
+        return fromDateBox;
+    }
+
+    @Nonnull
+    public HasValue<Date> getToValue() {
+        return toDateBox;
+    }
+
+    @Nonnull
+    public HasValue<Boolean> getDebugValue() {
+        return debugCheckBox;
+    }
+
+    @Nonnull
+    public HasValue<Boolean> getInfoValue() {
+        return infoCheckBox;
+    }
+
+    @Nonnull
+    public HasValue<Boolean> getWarnValue() {
+        return warnCheckBox;
+    }
+
+    @Nonnull
+    public HasValue<Boolean> getErrorValue() {
+        return errorCheckBox;
+    }
+
+    @Nullable
     public Widget asWidget() {
         return null;
     }
 
     public void setPresenter(Presenter presenter) {
-        //TODO implement
-    }
-
-    //TODO remove this internal class - information about how to render view should in BindStrategy 
-    protected static class Form extends Composite {
-
-        @UiTemplate("EditCriteriaView.ui.xml")
-        interface FormViewUiBinder extends UiBinder<Widget, Form> { }
-
-        private static final FormViewUiBinder UI_BINDER = GWT.create(FormViewUiBinder.class);
-
-        public Form() {
-            initWidget(UI_BINDER.createAndBindUi(this));
-        }
+        this.presenter = presenter;
     }
 }

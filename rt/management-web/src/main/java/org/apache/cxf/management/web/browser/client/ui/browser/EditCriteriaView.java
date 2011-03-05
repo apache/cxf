@@ -19,13 +19,28 @@
 
 package org.apache.cxf.management.web.browser.client.ui.browser;
 
+import java.util.Date;
+
+import com.google.gwt.user.client.ui.HasValue;
 import org.apache.cxf.management.web.browser.client.ui.View;
 
 public interface EditCriteriaView extends View {
     
     public interface Presenter {
-
+        void onSaveButtonClicked();
     }
+
+    HasValue<Date> getFromValue();
+
+    HasValue<Date> getToValue();
+
+    HasValue<Boolean> getDebugValue();
+
+    HasValue<Boolean> getInfoValue();
+
+    HasValue<Boolean> getWarnValue();
+
+    HasValue<Boolean> getErrorValue();
 
     void setPresenter(Presenter presenter);
 }

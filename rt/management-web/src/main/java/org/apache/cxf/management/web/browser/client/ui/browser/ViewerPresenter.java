@@ -133,6 +133,7 @@ public class ViewerPresenter extends BasePresenter implements ViewerView.Present
             resources.css().browserTabLoadingMessage());
     }
 
+    //TODO Rename this method. Name should emphasize that it gets and sets feed
     private void getFeed(@Nonnull final String url) {
         setLoadingMessage();
         proxy.getFeed(url, new FeedProxyImpl.Callback() {

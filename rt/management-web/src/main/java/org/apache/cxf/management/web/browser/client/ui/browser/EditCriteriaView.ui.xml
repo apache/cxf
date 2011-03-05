@@ -32,7 +32,7 @@
 					<g:Label>From:</g:Label>
 				</td>
                 <td>
-					<dp:DateBox></dp:DateBox>
+					<dp:DateBox ui:field="fromDateBox"/>
 				</td>
          </tr>
          <tr>
@@ -40,7 +40,7 @@
 					<g:Label>To:</g:Label>
 				</td>
                 <td>
-					<dp:DateBox></dp:DateBox>
+					<dp:DateBox ui:field="toDateBox"/>
 				</td>
 			</tr>
             <tr>
@@ -49,10 +49,10 @@
                 </td>
                 <td>
                     <g:VerticalPanel>
-                        <g:CheckBox>Debug</g:CheckBox>
-                        <g:CheckBox>Warning</g:CheckBox>
-                        <g:CheckBox>Information</g:CheckBox>
-                        <g:CheckBox>Error</g:CheckBox>
+                        <g:CheckBox ui:field="debugCheckBox">Debug</g:CheckBox>
+                        <g:CheckBox ui:field="warnCheckBox">Warning</g:CheckBox>
+                        <g:CheckBox ui:field="infoCheckBox">Information</g:CheckBox>
+                        <g:CheckBox ui:field="errorCheckBox">Error</g:CheckBox>
                     </g:VerticalPanel>
                 </td>
             </tr>

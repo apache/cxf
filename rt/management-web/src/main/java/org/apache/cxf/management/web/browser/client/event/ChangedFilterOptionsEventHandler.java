@@ -17,26 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.management.web.browser.client.ui.browser;
+package org.apache.cxf.management.web.browser.client.event;
 
-import java.util.List;
+import com.google.gwt.event.shared.EventHandler;
 
-import org.apache.cxf.management.web.browser.client.service.settings.Subscription;
-import org.apache.cxf.management.web.browser.client.ui.View;
-
-public interface NavigationSidebarView extends View {
-
-    public interface Presenter {
-        void onExploreSubcriptionItemClicked(int row);
-
-        void onFilterSubcriptionItemClicked(int row);
-
-        void onManageSubscriptionsButtonClicked();
-
-        void onEditCriteriaHyperinkClicked();
-    }
-
-    void setSubscriptions(List<Subscription> subscriptions);
-    
-    void setPresenter(Presenter presenter);
+public interface ChangedFilterOptionsEventHandler extends EventHandler {
+    void onChangedFilterOptions(ChangedFilterOptionsEvent event);
 }

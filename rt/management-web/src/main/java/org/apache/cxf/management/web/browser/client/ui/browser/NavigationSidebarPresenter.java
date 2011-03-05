@@ -21,17 +21,21 @@ package org.apache.cxf.management.web.browser.client.ui.browser;
 
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
 import org.apache.cxf.management.web.browser.client.EventBus;
+import org.apache.cxf.management.web.browser.client.event.ChangedFilterOptionsEvent;
+import org.apache.cxf.management.web.browser.client.event.ChangedFilterOptionsEventHandler;
 import org.apache.cxf.management.web.browser.client.event.ChangedSubscriptionsEvent;
 import org.apache.cxf.management.web.browser.client.event.ChangedSubscriptionsEventHandler;
 import org.apache.cxf.management.web.browser.client.event.GoToEditCriteriaEvent;
 import org.apache.cxf.management.web.browser.client.event.GoToSettingsEvent;
 import org.apache.cxf.management.web.browser.client.event.SelectedSubscriptionEvent;
+import org.apache.cxf.management.web.browser.client.service.browser.FilterOptions;
+import org.apache.cxf.management.web.browser.client.service.browser.FilterOptions.Level;
 import org.apache.cxf.management.web.browser.client.service.settings.SettingsFacade;
 import org.apache.cxf.management.web.browser.client.service.settings.Subscription;
 import org.apache.cxf.management.web.browser.client.ui.BasePresenter;
@@ -39,14 +43,13 @@ import org.apache.cxf.management.web.browser.client.ui.BindStrategy;
 
 @Singleton
 public class NavigationSidebarPresenter extends BasePresenter implements NavigationSidebarView.Presenter {
+    @Nonnull private final NavigationSidebarView view;
+    @Nonnull private final SettingsFacade settingsManager;
 
-    @Nonnull
-    private final NavigationSidebarView view;
+    @Nonnull private FilterOptions filterOptions = FilterOptions.EMPTY;
 
-    @Nonnull
-    private final SettingsFacade settingsManager;
-
-    private List<Subscription> subscriptions;
+    @Nullable private Subscription selectedSubscription;
+    @Nonnull private List<Subscription> subscriptions;
 
     @Inject
     public NavigationSidebarPresenter(@Nonnull final EventBus eventBus,
@@ -65,10 +68,48 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
         updateSubscriptions();
     }
 
-    public void onSubcriptionItemClicked(final int row) {
+    public void onExploreSubcriptionItemClicked(int row) {
         assert row >= 0 && row < subscriptions.size();
-        Subscription selectedSubscription = subscriptions.get(row);
+        selectedSubscription = subscriptions.get(row);
         eventBus.fireEvent(new SelectedSubscriptionEvent(selectedSubscription.getUrl()));
+    }
+
+    public void onFilterSubcriptionItemClicked(int row) {
+        assert row >= 0 && row < subscriptions.size();
+        selectedSubscription = subscriptions.get(row);
+        selectSubscriptionWithFilterOptions();
+    }
+
+    private void selectSubscriptionWithFilterOptions() {
+        assert selectedSubscription != null;
+
+        StringBuilder url = new StringBuilder(selectedSubscription.getUrl());
+
+        if (filterOptions != FilterOptions.EMPTY) {
+            url.append("?_s=");
+
+            if (filterOptions.getFrom() != null) {
+                url.append("date=ge=");
+                url.append(filterOptions.getFrom().getTime());
+                url.append(";");
+            }
+
+            if (filterOptions.getTo() != null) {
+                url.append("date=lt=");
+                url.append(filterOptions.getTo().getTime());
+                url.append(";");
+            }
+
+            if (!filterOptions.getLevels().isEmpty()) {
+                for (Level level : filterOptions.getLevels()) {
+                    url.append("level==");
+                    url.append(level);
+                    url.append(";");
+                }
+            }
+        }
+
+        eventBus.fireEvent(new SelectedSubscriptionEvent(url.toString()));
     }
 
     public void onManageSubscriptionsButtonClicked() {
@@ -92,5 +133,12 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
             }
         });
 
+        eventBus.addHandler(ChangedFilterOptionsEvent.TYPE, new ChangedFilterOptionsEventHandler() {
+
+            public void onChangedFilterOptions(ChangedFilterOptionsEvent event) {
+                filterOptions = event.getFilterOptions();
+                selectSubscriptionWithFilterOptions();
+            }
+        });
     }
 }
