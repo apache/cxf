@@ -534,7 +534,6 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
  
     protected class FileInfoComparator implements Comparator<FileInfo> {
 
-        @Override
         public int compare(FileInfo info1, FileInfo info2) {
             String name1 = info1.getFileName();
             String name2 = info2.getFileName();
