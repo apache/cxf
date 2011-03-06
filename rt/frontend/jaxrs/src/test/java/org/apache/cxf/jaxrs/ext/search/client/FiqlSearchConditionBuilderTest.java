@@ -35,7 +35,7 @@ import org.junit.Test;
 
 public class FiqlSearchConditionBuilderTest {
     private static FiqlSearchConditionBuilder b = new FiqlSearchConditionBuilder();
-    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
 
     @Test
     public void testEmptyBuild() {
@@ -56,7 +56,7 @@ public class FiqlSearchConditionBuilderTest {
 
     @Test
     public void testEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-01 12:34");
+        Date d = df.parse("2011-03-01 12:34 +0100");
         String ret = b.query().is("foo").equalTo(d).build();
         assertEquals("foo==2011-03-01T12:34:00.000+01:00", ret);
     }
@@ -82,7 +82,7 @@ public class FiqlSearchConditionBuilderTest {
 
     @Test
     public void testNotEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-01 12:34");
+        Date d = df.parse("2011-03-01 12:34 +0100");
         String ret = b.query().is("foo").notEqualTo(d).build();
         assertEquals("foo!=2011-03-01T12:34:00.000+01:00", ret);
     }
@@ -144,28 +144,28 @@ public class FiqlSearchConditionBuilderTest {
 
     @Test
     public void testGreaterThanDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33");
+        Date d = df.parse("2011-03-02 22:33 +0100");
         String ret = b.query().is("foo").after(d).build();
         assertEquals("foo=gt=2011-03-02T22:33:00.000+01:00", ret);
     }
 
     @Test
     public void testLessThanDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33");
+        Date d = df.parse("2011-03-02 22:33 +0100");
         String ret = b.query().is("foo").before(d).build();
         assertEquals("foo=lt=2011-03-02T22:33:00.000+01:00", ret);
     }
 
     @Test
     public void testLessOrEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33");
+        Date d = df.parse("2011-03-02 22:33 +0100");
         String ret = b.query().is("foo").notAfter(d).build();
         assertEquals("foo=le=2011-03-02T22:33:00.000+01:00", ret);
     }
 
     @Test
     public void testGreaterOrEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33");
+        Date d = df.parse("2011-03-02 22:33 +0100");
         String ret = b.query().is("foo").notBefore(d).build();
         assertEquals("foo=ge=2011-03-02T22:33:00.000+01:00", ret);
     }
