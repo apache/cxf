@@ -24,6 +24,7 @@ import java.util.concurrent.Executor;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -275,4 +276,11 @@ public interface Client extends InterceptorProvider, MessageObserver {
      * @param executor
      */
     void setExecutor(Executor executor);
+    
+    
+    /**
+     * Retrieves the Bus that was used to create the Client
+     * @return the Bus
+     */
+    Bus getBus();
 }

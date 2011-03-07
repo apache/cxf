@@ -166,6 +166,10 @@ public class ClientImpl
         }
         notifyLifecycleManager();
     }
+    
+    public Bus getBus() {
+        return bus;
+    }
 
     public void destroy() {
         ClientLifeCycleManager mgr = bus.getExtension(ClientLifeCycleManager.class);

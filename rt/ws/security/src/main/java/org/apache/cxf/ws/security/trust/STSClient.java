@@ -265,6 +265,9 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setWsdlLocation(String wsdl) {
         wsdlLocation = wsdl;
     }
+    public String getWsdlLocation() {
+        return wsdlLocation;
+    }
 
     public void setServiceName(String qn) {
         serviceName = QName.valueOf(qn);
@@ -277,9 +280,15 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setServiceQName(QName qn) {
         serviceName = qn;
     }
+    public QName getServiceQName() {
+        return serviceName;
+    }
 
     public void setEndpointQName(QName qn) {
         endpointName = qn;
+    }
+    public QName getEndpointQName() {
+        return endpointName;
     }
     
     public void setActAs(Object actAs) {
