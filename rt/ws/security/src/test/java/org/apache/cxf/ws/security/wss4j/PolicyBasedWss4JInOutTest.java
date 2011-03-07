@@ -904,6 +904,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                 "META-INF/cxf/insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
                 TestPwdCallback.class.getName());
+        inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
         
         return inHandler;
     }

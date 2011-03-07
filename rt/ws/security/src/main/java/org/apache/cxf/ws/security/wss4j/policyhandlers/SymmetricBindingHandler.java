@@ -413,6 +413,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 SecurityTokenReference tokenRef = new SecurityTokenReference(saaj.getSOAPPart());
                 if (encrTok.getSHA1() != null) {
                     tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
+                    tokenRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 }
                 dkEncr.setExternalKey(encrTok.getSecret(), tokenRef.getElement());
             } else {
@@ -590,6 +591,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             SecurityTokenReference tokenRef = new SecurityTokenReference(doc);
             if (tok.getSHA1() != null) {
                 tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
+                tokenRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
         } else {
