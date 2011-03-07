@@ -332,7 +332,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     
     
     /**
-     * It make make sense to map logFile.getChannel() to memory for large files
+     * It may make sense to map logFile.getChannel() to memory for large files
      * >= 1MB
      */
     private void processNewLogFile(File file) throws IOException {
