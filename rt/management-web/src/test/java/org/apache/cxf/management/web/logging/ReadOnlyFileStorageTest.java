@@ -48,8 +48,10 @@ public class ReadOnlyFileStorageTest extends Assert {
        
         storage.setRecordDateFormat(ReadOnlyFileStorage.DATE_ONLY_FORMAT 
                                    + " " + "kk:mm:ss,SSS");
+        storage.setFileNameDatePattern("(\\d\\d\\d\\d-\\d\\d-\\d\\d)-.+");
+        
         storage.setUseFileModifiedDate(true);
-       
+        
        
     }
     
@@ -61,7 +63,7 @@ public class ReadOnlyFileStorageTest extends Assert {
     @Test
     public void testReadRecords() throws Exception {
         
-        storage.setLogLocation(getClass().getResource("logs/karaf.log.1").toURI().getPath());
+        storage.setLogLocation(getClass().getResource("logs/2011-01-22-karaf.log").toURI().getPath());
         List<LogRecord> recordsFirstPage1 = readPage(1, 10, 10);
         
         readPage(2, 10, 10);
@@ -81,7 +83,7 @@ public class ReadOnlyFileStorageTest extends Assert {
     @Test
     public void testReadRecordsWithMultiLines() throws Exception {
         
-        storage.setLogLocation(getClass().getResource("logs/karaf.log").toURI().getPath());
+        storage.setLogLocation(getClass().getResource("logs/2011-01-23-karaf.log").toURI().getPath());
         List<LogRecord> recordsFirstPage1 = readPage(1, 10, 10);
         
         List<LogRecord> recordsLastPage1 = readPage(2, 10, 10);
@@ -104,8 +106,8 @@ public class ReadOnlyFileStorageTest extends Assert {
     public void testReadRecordsWithMultipleFiles() throws Exception {
         
         List<String> locations = new ArrayList<String>();
-        locations.add(getClass().getResource("logs/karaf.log.1").toURI().getPath());
-        locations.add(getClass().getResource("logs/karaf.log").toURI().getPath());
+        locations.add(getClass().getResource("logs/2011-01-22-karaf.log").toURI().getPath());
+        locations.add(getClass().getResource("logs/2011-01-23-karaf.log").toURI().getPath());
         storage.setLogLocations(locations);
         List<LogRecord> recordsFirstPage1 = readPage(1, 10, 10);
         readPage(2, 10, 10);
@@ -115,6 +117,34 @@ public class ReadOnlyFileStorageTest extends Assert {
         List<LogRecord> recordsLastPage1 = readPage(6, 10, 2);
         
         LogRecord recordWithExceptionInMessage = recordsPage4.get(4);
+        assertEquals(LogLevel.ERROR, recordWithExceptionInMessage.getLevel());
+        assertTrue(recordWithExceptionInMessage.getMessage()
+                   .contains("mvn:org.apache.cxf/cxf-bundle/"));
+        assertTrue(recordWithExceptionInMessage.getMessage()
+                   .contains("Caused by: org.osgi.framework.BundleException"));
+        
+        List<LogRecord> recordsFirstPage2 = readPage(1, 10, 10);
+        compareRecords(recordsFirstPage1, recordsFirstPage2);
+        
+        List<LogRecord> recordsLastPage2 = readPage(6, 10, 2);
+        compareRecords(recordsLastPage1, recordsLastPage2);
+    }
+    
+    @Test
+    public void testReadRecordsWithMultipleFiles2() throws Exception {
+        
+        List<String> locations = new ArrayList<String>();
+        locations.add(getClass().getResource("logs/2011-01-23-karaf.log").toURI().getPath());
+        locations.add(getClass().getResource("logs/2011-01-22-karaf.log").toURI().getPath());
+        storage.setLogLocations(locations);
+        List<LogRecord> recordsFirstPage1 = readPage(1, 10, 10);
+        readPage(2, 10, 10);
+        readPage(3, 10, 10);
+        readPage(4, 10, 10);
+        readPage(5, 10, 10);
+        List<LogRecord> recordsLastPage1 = readPage(6, 10, 2);
+        
+        LogRecord recordWithExceptionInMessage = recordsFirstPage1.get(2);
         assertEquals(LogLevel.ERROR, recordWithExceptionInMessage.getLevel());
         assertTrue(recordWithExceptionInMessage.getMessage()
                    .contains("mvn:org.apache.cxf/cxf-bundle/"));

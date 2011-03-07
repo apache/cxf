@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ import java.util.regex.Pattern;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
 /**
- * Facilitates reading the log entries from the existing log files
+ * Facilitates reading the log entries from the existing log files.
  */
 public class ReadOnlyFileStorage implements ReadableLogStorage {
     
@@ -48,7 +47,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     public static final String CATEGORY_PROPERTY = "category";
     public static final String THREAD_PROPERTY = "thread";
     
-    public static final String DATE_ONLY_FORMAT = "yyyy_MM_dd";
+    public static final String DATE_ONLY_FORMAT = "yyyy-MM-dd";
         
     private static final String LINE_SEP = System.getProperty("line.separator"); 
     
@@ -117,12 +116,14 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
      * the next one with an optional scanning 
      **/
     private FileInfo getNextLogFileInfo(FileInfo logFileInfo, boolean firstTry) {
-        for (Iterator<FileInfo> it = logFiles.iterator(); it.hasNext();) {
-            FileInfo fileInfo = it.next();
-            if (fileInfo == logFileInfo && it.hasNext()) {
-                return it.next(); 
-            } else {
-                break;
+        for (int i = 0; i < logFiles.size(); i++) {
+            FileInfo fileInfo = logFiles.get(i);
+            if (fileInfo == logFileInfo) {
+                if (i + 1 < logFiles.size()) {    
+                    return logFiles.get(i + 1); 
+                } else {
+                    break;
+                }
             }
         }
         if (firstTry && logDirectory != null && scanLogDirectory()) {
@@ -132,7 +133,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     }
 
     /**
-     * Gets the file corresponding to the current page
+     * Gets the file corresponding to the current page.
      */
     private FileInfo getLogFileInfo(int pageNumber) {
         PageInfo pageInfo = pagesMap.get(pageNumber);
@@ -146,12 +147,12 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
             }
             return pageInfo.getFileInfo();
         }
-        if (pageNumber == 1 
-            && logDirectory != null 
-            && logFiles.size() == 0
+        int oldSize = logFiles.size();
+        if (logDirectory != null 
             && scanLogDirectory()) {
-            FileInfo fileInfo = logFiles.get(0);
-            savePagePosition(0, fileInfo);
+            FileInfo fileInfo = logFiles.get(oldSize);
+            // savePagePosition increases the number by 1
+            savePagePosition(pageNumber - 1, fileInfo);
             return fileInfo;
         }
         return null;
@@ -163,7 +164,15 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     private void savePagePosition(int pageNumber, FileInfo fileInfo) {
         try {
             long pos = fileInfo.getFile().getFilePointer();
-            pagesMap.put(pageNumber + 1, new PageInfo(fileInfo, pos));
+            if (pos < fileInfo.getFile().length()) {
+                pagesMap.put(pageNumber + 1, new PageInfo(fileInfo, pos));
+            } else {
+                FileInfo nextFileInfo = getNextLogFileInfo(fileInfo, false);
+                if (nextFileInfo != null) {
+                    pagesMap.put(pageNumber + 1, 
+                                 new PageInfo(nextFileInfo, nextFileInfo.getFile().getFilePointer()));
+                }
+            }
         } catch (IOException ex) {
             // ignore
         }
@@ -321,28 +330,36 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
     }
     
+    
+    /**
+     * It make make sense to map logFile.getChannel() to memory for large files
+     * >= 1MB
+     */
     private void processNewLogFile(File file) throws IOException {
         RandomAccessFile logFile = new RandomAccessFile(file, "r");
         
         String fileModifiedDate = null;
         if (useFileModifiedDate) {
-            String dateFormat = fileNameDateFormat == null ? DATE_ONLY_FORMAT : fileNameDateFormat;
-            
             if (fileNameDatePattern != null) {
                 Matcher m = fileNameDatePattern.matcher(file.getName());
-                if (m.find()) {
-                    fileModifiedDate = m.group();
+                if (m.matches() && m.groupCount() > 0) {
+                    fileModifiedDate = m.group(1);
                 }
             }
             if (fileModifiedDate == null) {
                 Date fileDate = new Date(file.lastModified());
-                fileModifiedDate = new SimpleDateFormat(dateFormat).format(fileDate);
+                fileModifiedDate = getLogDateFormat().format(fileDate);
             }
         }
         
         FileInfo fileInfo = new FileInfo(logFile, file.getName(), fileModifiedDate);
         skipIgnorableRecords(fileInfo, logFiles.size() == 0);
         logFiles.add(fileInfo);
+    }
+    
+    private SimpleDateFormat getLogDateFormat() {
+        String format = fileNameDateFormat == null ? DATE_ONLY_FORMAT : fileNameDateFormat;
+        return new SimpleDateFormat(format);
     }
     
     private String getRealLocation(String location) {
@@ -450,10 +467,10 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     private boolean scanLogDirectory() {
         int oldSize = logFiles.size();
         for (File file : logDirectory.listFiles()) {
-            // just in case
-            if (file.isDirectory()) {
-                // continue
+            if (file.isDirectory() || file.isHidden()) {
+                continue;
             }
+            
             boolean isNew = true;
             for (FileInfo fInfo : logFiles) {
                 if (fInfo.getFileName().equalsIgnoreCase(file.getName())) {
@@ -535,6 +552,18 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     protected class FileInfoComparator implements Comparator<FileInfo> {
 
         public int compare(FileInfo info1, FileInfo info2) {
+            
+            if (useFileModifiedDate && fileNameDatePattern != null) {
+                SimpleDateFormat dateFormat = getLogDateFormat();
+                try {
+                    Date date1 = dateFormat.parse(info1.getFileModified());
+                    Date date2 = dateFormat.parse(info2.getFileModified());
+                    return date1.compareTo(date2);
+                } catch (Exception ex) {
+                    // continue
+                }
+            }
+            
             String name1 = info1.getFileName();
             String name2 = info2.getFileName();
             if (fileNameComparator != null) {
