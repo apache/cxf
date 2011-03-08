@@ -1,0 +1,5 @@
+# Comment
+ # Comment2
+org.apache.cxf.foo.FooImpl:org.apache.cxf.foo.Foo
+java.lang.Boolean::true
+java.lang.Long::true

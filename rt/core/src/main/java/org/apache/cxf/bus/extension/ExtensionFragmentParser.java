@@ -52,43 +52,52 @@ public class ExtensionFragmentParser {
         
         return deserialiseExtensions(document);
     }
+    
+    /**
+     * Reads extension definitions from a Text file and instantiates them
+     * The text file has the following syntax
+     * classname:interfacename:deferred(true|false)
+     * 
+     * @param is stream to read the extension from
+     * @return list of Extensions
+     * @throws IOException
+     */
     List<Extension> getExtensionsFromText(InputStream is) throws IOException {
         List<Extension> extensions = new ArrayList<Extension>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         String line = reader.readLine();
         while (line != null) {
-            line = line.trim();
-            if (line.length() > 0 && line.charAt(0) != '#') {
-                Extension ext = new Extension();
-                int idx = line.indexOf(':');
-                if (idx != -1) {
-                    ext.setClassname(line.substring(0, idx));
-                    line = line.substring(idx + 1);
-                } else {
-                    ext.setClassname(line);
-                    line = null;
-                }
-                if (line != null) {
-                    idx = line.indexOf(':');
-                    if (idx != -1) {
-                        ext.setInterfaceName(line.substring(0, idx));
-                        line = line.substring(idx + 1);
-                    } else {
-                        ext.setInterfaceName(line);
-                        line = null;
-                    }
-                }
-                if (line != null) {
-                    ext.setDeferred(Boolean.parseBoolean(line));
-                }
-                if (ext.getClassname() != null) {
-                    extensions.add(ext);
-                }
+            final Extension extension = getExtensionFromTextLine(line);
+            if (extension != null) {
+                extensions.add(extension);
             }
-            
             line = reader.readLine();
         }
         return extensions;
+    }
+
+    private Extension getExtensionFromTextLine(String line) {
+        line = line.trim();
+        if (line.length() == 0 || line.charAt(0) == '#') {
+            return null;
+        }
+        final Extension ext = new Extension();
+        String[] parts = line.split(":");
+        ext.setClassname(parts[0]);
+        if (ext.getClassname() == null) {
+            return null;
+        }
+        if (parts.length >= 2) {
+            String interfaceName = parts[1];
+            if (interfaceName != null && interfaceName.isEmpty()) {
+                interfaceName = null;
+            }
+            ext.setInterfaceName(interfaceName);
+        }
+        if (parts.length >= 3) {
+            ext.setDeferred(Boolean.parseBoolean(parts[2]));
+        }
+        return ext;
     }
     
     List<Extension> deserialiseExtensions(Document document) {
