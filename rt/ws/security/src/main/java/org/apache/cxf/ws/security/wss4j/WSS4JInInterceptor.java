@@ -39,6 +39,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -211,7 +213,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             String actor = (String)getOption(WSHandlerConstants.ACTOR);
 
-            CallbackHandler cbHandler = getCallback(reqData, doAction, utWithCallbacks);
+            reqData.setCallbackHandler(getCallback(reqData, doAction, utWithCallbacks));
             
             String passwordTypeStrict = (String)getOption(WSHandlerConstants.PASSWORD_TYPE_STRICT);
             if (passwordTypeStrict == null) {
@@ -227,13 +229,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (doTimeLog) {
                 t1 = System.currentTimeMillis();
             }
+            Element elem = WSSecurityUtil.getSecurityHeader(doc.getSOAPPart(), actor);
 
             List<WSSecurityEngineResult> wsResult = engine.processSecurityHeader(
-                doc.getSOAPPart(), 
-                actor, 
-                cbHandler, 
-                reqData.getSigCrypto(), 
-                reqData.getDecCrypto()
+                elem, reqData
             );
 
             if (doTimeLog) {

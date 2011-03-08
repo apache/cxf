@@ -62,6 +62,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.WSSecUsernameToken;
@@ -165,21 +166,29 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         }
     }
 
-    protected WSUsernameTokenPrincipal getPrincipal(Element tokenElement, SoapMessage message)
+    protected WSUsernameTokenPrincipal getPrincipal(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
         
         boolean utWithCallbacks = 
             MessageUtils.getContextualBoolean(message, SecurityConstants.VALIDATE_TOKEN, true);
         if (utWithCallbacks) {
             UsernameTokenProcessor p = new UsernameTokenProcessor();
-            Object validator = 
-                message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
-            if (validator instanceof Validator) {
-                p.setValidator((Validator)validator);
-            }
             WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+            RequestData data = new RequestData() {
+                public CallbackHandler getCallbackHandler() {
+                    return getCallback(message);
+                }
+                public Validator getValidator(QName qName) throws WSSecurityException {
+                    Object validator = 
+                        message.getContextualProperty(SecurityConstants.USERNAME_TOKEN_VALIDATOR);
+                    if (validator == null) {
+                        return super.getValidator(qName);
+                    }
+                    return (Validator)validator;
+                }
+            };
             List<WSSecurityEngineResult> results = 
-                p.handleToken(tokenElement, null, null, getCallback(message), wsDocInfo, null);
+                p.handleToken(tokenElement, data, wsDocInfo);
             return (WSUsernameTokenPrincipal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         } else {
             WSUsernameTokenPrincipal principal = parseTokenAndCreatePrincipal(tokenElement);

@@ -20,10 +20,9 @@ package org.apache.cxf.ws.security.wss4j;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.validate.Validator;
@@ -36,11 +35,8 @@ public class CustomProcessor implements Processor {
     public final java.util.List<WSSecurityEngineResult> 
     handleToken(
         final org.w3c.dom.Element elem, 
-        final Crypto crypto, 
-        final Crypto decCrypto,
-        final javax.security.auth.callback.CallbackHandler cb, 
-        final WSDocInfo wsDocInfo, 
-        final WSSConfig config
+        final RequestData data, 
+        final WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         final WSSecurityEngineResult result = 
             new WSSecurityEngineResult(

@@ -95,6 +95,9 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try { 
+                if (args.length == 0) {
+                    args = new String[] {TEMPDIR};
+                }
                 Server s = new Server(args[0]); 
                 s.start();
             } catch (Exception ex) {

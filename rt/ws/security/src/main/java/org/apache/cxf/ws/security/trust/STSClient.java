@@ -107,6 +107,7 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.P_SHA1;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
@@ -929,8 +930,11 @@ public class STSClient implements Configurable, InterceptorProvider {
                 try {
                     EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                     WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+                    RequestData data = new RequestData();
+                    data.setDecCrypto(createCrypto(true));
+                    data.setCallbackHandler(createHandler());
                     List<WSSecurityEngineResult> result =
-                        proc.handleToken(child, null, createCrypto(true), createHandler(), docInfo, null);
+                        proc.handleToken(child, data, docInfo);
                     secret = 
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET

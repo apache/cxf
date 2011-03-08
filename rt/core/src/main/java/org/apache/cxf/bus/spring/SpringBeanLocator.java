@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
@@ -46,15 +46,27 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringBeanLocator implements ConfiguredBeanLocator {
     ApplicationContext context;
     ConfiguredBeanLocator orig;
+    Set<String> passThroughs = new HashSet<String>();
+    
     public SpringBeanLocator(ApplicationContext ctx, Bus bus) {
         context = ctx;
         orig = bus.getExtension(ConfiguredBeanLocator.class);
         if (orig instanceof ExtensionManagerImpl) {
             List<String> names = new ArrayList<String>();
             for (String s : ctx.getBeanDefinitionNames()) {
-                names.add(s);
-                for (String s2 : ctx.getAliases(s)) {
-                    names.add(s2);
+                ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
+                BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(s);
+                String cn =  def.getBeanClassName();
+                if (OldSpringSupport.class.getName().equals(cn)) {
+                    passThroughs.add(s);
+                    for (String s2 : ctx.getAliases(s)) {
+                        passThroughs.add(s2);
+                    }
+                } else {
+                    names.add(s);
+                    for (String s2 : ctx.getAliases(s)) {
+                        names.add(s2);
+                    }
                 }
             }
             
@@ -67,22 +79,31 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
                                                                                          false,
                                                                                          true)));
+        s.removeAll(passThroughs);
         s.addAll(orig.getBeanNamesOfType(type));
         return new ArrayList<String>(s);
     }
 
     /** {@inheritDoc}*/
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        Map<String, T> mp = context.getBeansOfType(type, false, true);
-        List<T> lst = new LinkedList<T>(mp.values());
+        Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
+                                                                                            false,
+                                                                                            true)));
+        s.removeAll(passThroughs);
+        List<T> lst = new LinkedList<T>();
+        for (String n : s) {
+            lst.add(context.getBean(n, type));
+        }
         lst.addAll(orig.getBeansOfType(type));
         return lst;
     }
 
     public <T> boolean loadBeansOfType(Class<T> type,
                                        BeanLoaderListener<T> listener) {
-        List<String> list = Arrays.asList(context.getBeanNamesForType(type, false, true));
-            
+        List<String> list = new ArrayList<String>(Arrays.asList(context.getBeanNamesForType(type,
+                                                                                            false,
+                                                                                            true)));
+        list.removeAll(passThroughs);
         Collections.reverse(list);
         boolean loaded = false;
         for (String s : list) {
@@ -100,7 +121,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
 
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String searchValue) {
-        if (context.containsBean(beanName)) {
+        if (context.containsBean(beanName) && !passThroughs.contains(beanName)) {
             ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
             BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(beanName);
             if (!ctxt.getBeanFactory().isSingleton(beanName) || def.isAbstract()) {

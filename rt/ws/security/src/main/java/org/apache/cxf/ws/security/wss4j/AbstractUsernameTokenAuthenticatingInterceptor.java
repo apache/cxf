@@ -37,6 +37,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.validate.UsernameTokenValidator;
 import org.apache.ws.security.validate.Validator;
 
@@ -181,7 +182,8 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyCustomPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken
+            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
                 usernameToken.getName(), usernameToken.getPassword(), false, null, null
@@ -190,7 +192,8 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyPlaintextPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken
+            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
                 usernameToken.getName(), usernameToken.getPassword(), false, null, null
@@ -199,7 +202,8 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyDigestPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken
+            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            RequestData data
         ) throws WSSecurityException {
             if (!supportDigestPasswords) {
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
@@ -216,7 +220,8 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyUnknownPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken
+            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
                 usernameToken.getName(), null, false, null, null

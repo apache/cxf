@@ -41,6 +41,9 @@ public class SpringBus extends ExtensionManagerBus
     AbstractApplicationContext ctx;
 
     
+    public SpringBus() {
+    }
+    
     /** {@inheritDoc}*/
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         ctx = (AbstractApplicationContext)applicationContext;

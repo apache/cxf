@@ -61,7 +61,7 @@ public abstract class AbstractPolicyProvider implements PolicyProvider {
             PolicyEngine pe = (PolicyEngine)bus.getExtension(PolicyEngine.class);
             if (pe != null) {
                 setRegistry(pe.getRegistry());
-                ((PolicyEngineImpl)pe).getPolicyProviders().add(this);
+                ((PolicyEngineImpl)pe).addPolicyProvider(this);
             }
         }
     }

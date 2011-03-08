@@ -30,11 +30,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
       <http:client DecoupledEndpoint="http://localhost:${testutil.ports.decoupled}/decoupled_endpoint"/>
     </http:conduit>
 
-    <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
-        <property name="bus" ref="cxf"/>
-        <property name="enabled" value="true"/>
-    </bean>
-
     <bean class="org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider">
         <constructor-arg ref="cxf"/>
         <property name="location" value="${temp.location}/rm-external.xml"/>
