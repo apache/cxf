@@ -97,6 +97,13 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
             }
         }
     }
+    
+    protected void doStart() throws Exception {
+        // setup the create SSLContext on the SSLContextFactory
+        getSslContextFactory().setSslContext(createSSLContext());
+        super.doStart();
+    }
+    
     protected SSLContext createSSLContext() throws Exception  {
         String proto = getProtocol() == null
             ? "TLS"
