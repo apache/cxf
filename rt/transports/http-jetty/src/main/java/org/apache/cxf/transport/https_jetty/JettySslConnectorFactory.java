@@ -75,8 +75,8 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
         con.setSecureRandom(tlsServerParameters.getSecureRandom());
         con.setClientAuthentication(
                 tlsServerParameters.getClientAuthentication());
-        con.setProtocol(tlsServerParameters.getSecureSocketProtocol());
-        con.setProvider(tlsServerParameters.getJsseProvider());
+        con.getSslContextFactory().setProtocol(tlsServerParameters.getSecureSocketProtocol());
+        con.getSslContextFactory().setProvider(tlsServerParameters.getJsseProvider());
         con.setCipherSuites(tlsServerParameters.getCipherSuites());
         con.setCipherSuitesFilter(tlsServerParameters.getCipherSuitesFilter());
     }

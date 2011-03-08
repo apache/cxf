@@ -87,13 +87,13 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
      * configures an HTTP Destination.
      */
     protected void setClientAuthentication(ClientAuthentication clientAuth) {
-        setWantClientAuth(true);
+        getSslContextFactory().setWantClientAuth(true);
         if (clientAuth != null) {
             if (clientAuth.isSetWant()) {
-                setWantClientAuth(clientAuth.isWant());
+                getSslContextFactory().setWantClientAuth(clientAuth.isWant());
             }
             if (clientAuth.isSetRequired()) {
-                setNeedClientAuth(clientAuth.isRequired());
+                getSslContextFactory().setNeedClientAuth(clientAuth.isRequired());
             }
         }
     }
@@ -105,13 +105,13 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     }
     
     protected SSLContext createSSLContext() throws Exception  {
-        String proto = getProtocol() == null
+        String proto = getSslContextFactory().getProtocol() == null
             ? "TLS"
-                : getProtocol();
+                : getSslContextFactory().getProtocol();
  
-        SSLContext context = getProvider() == null
+        SSLContext context = getSslContextFactory().getProvider() == null
             ? SSLContext.getInstance(proto)
-                : SSLContext.getInstance(proto, getProvider());
+                : SSLContext.getInstance(proto, getSslContextFactory().getProvider());
             
         context.init(keyManagers, trustManagers, secureRandom);
 
@@ -122,7 +122,7 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
                     cipherSuitesFilter,
                     LOG, true);
         
-        setExcludeCipherSuites(cs);
+        getSslContextFactory().setExcludeCipherSuites(cs);
         
         return context;
     }
