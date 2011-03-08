@@ -89,7 +89,7 @@ public class ExtensionFragmentParser {
         }
         if (parts.length >= 2) {
             String interfaceName = parts[1];
-            if (interfaceName != null && interfaceName.isEmpty()) {
+            if (interfaceName != null && "".equals(interfaceName)) {
                 interfaceName = null;
             }
             ext.setInterfaceName(interfaceName);
