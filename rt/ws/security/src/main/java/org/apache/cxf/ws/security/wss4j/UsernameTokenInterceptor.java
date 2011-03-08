@@ -59,6 +59,7 @@ import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
@@ -187,6 +188,7 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
                     return (Validator)validator;
                 }
             };
+            data.setWssConfig(WSSConfig.getNewInstance());
             List<WSSecurityEngineResult> results = 
                 p.handleToken(tokenElement, data, wsDocInfo);
             return (WSUsernameTokenPrincipal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
