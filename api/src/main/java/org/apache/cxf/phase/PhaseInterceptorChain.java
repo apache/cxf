@@ -292,7 +292,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
                         if (ex2 == null) {
                             ex2 = ex;
                         }
-
+                        
                         FaultListener flogger = (FaultListener)
                                 message.getContextualProperty(FaultListener.class.getName());
                         boolean useDefaultLogging = true;
@@ -302,12 +302,12 @@ public class PhaseInterceptorChain implements InterceptorChain {
                         if (useDefaultLogging) {
                             doDefaultLogging(message, ex2, description);
                         }
-
-    
                         
                         boolean isOneWay = false;
                         if (message.getExchange() != null) {
-                            message.getExchange().put(Exception.class, ex2);
+                            if (message.getContent(Exception.class) != null) {
+                                message.getExchange().put(Exception.class, ex2);
+                            }
                             isOneWay = message.getExchange().isOneWay();
                         }
                         
