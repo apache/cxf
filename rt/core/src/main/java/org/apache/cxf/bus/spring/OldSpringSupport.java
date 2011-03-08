@@ -35,13 +35,16 @@ public final class OldSpringSupport implements FactoryBean, BeanNameAware {
     Bus bus;
     Class<?> cls;
     String id;
+    
+    public OldSpringSupport(String imp) {
+        logWarning(imp);
+    }
+    
     public OldSpringSupport(Bus b, Class<?> c) {
-        //utility class
         cls = c;
         bus = b;
     }
     public OldSpringSupport(Bus b, Class<?> c, String imp) {
-        //utility class
         cls = c;
         bus = b;
         logWarning(imp);

@@ -25,10 +25,6 @@
 		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 ">
 
-	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
-
 	<!--
 		Define a cxf endpoint based on client stub generated from a wsdl. It
 		is important to provide serviceName and endpointName so the wsdl is

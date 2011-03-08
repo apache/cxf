@@ -367,7 +367,7 @@
                         <!-- copy additional jars. These are jars we want included, but don't 
                                      really don't want them on the classpath in the normal case -->
                         <id>add-jars</id>
-                        <phase>package</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
@@ -424,7 +424,7 @@
                                 <artifactItem>
                                     <groupId>junit</groupId>
                                     <artifactId>junit</artifactId>
-                                    <version>4.4</version>
+                                    <version>4.8.1</version>
                                     <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
@@ -487,16 +487,22 @@
                             <tasks>
                                 <mkdir dir="${basedir}/target" />
                                 <pathconvert property="cp" refid="maven.runtime.classpath" />
-                                <condition property="output.cp" value="set CXF_CLASSPATH=${cp}">
+                                <path id="samples.libs">
+                                    <fileset dir="${basedir}/target/sample-libs">
+                                        <include name="**/*.jar"/>
+                                    </fileset>
+                                </path>
+                                <pathconvert property="samples.libs.cp" refid="samples.libs" />
+                                <condition property="output.cp" value="set CXF_CLASSPATH=${cp}:${samples.libs.cp}">
                                     <os family="windows" />
                                 </condition>
                                 <condition property="output.ext" value=".bat">
                                     <os family="windows" />
                                 </condition>
-                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}" />
+                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}:${samples.libs.cp}" />
                                 <property name="output.ext" value="" />
                                 <echo file="${basedir}/target/srcbuild_env${output.ext}" message="${output.cp}" />
-                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}" />
+                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}:${samples.libs.cp}" />
                                 <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}" />
                                 <copy file="${basedir}/src/main/assembly/jbi.xml" tofile="${basedir}/target/jbi.xml" overwrite="yes">
                                     <filterset>
