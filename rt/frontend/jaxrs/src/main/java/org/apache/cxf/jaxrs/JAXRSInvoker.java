@@ -274,7 +274,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         return cri.getResourceProvider().getInstance(exchange.getInMessage());
     }
     
-    public Object getActualServiceObject(Exchange exchange, Object rootInstance) {
+    protected Object getActualServiceObject(Exchange exchange, Object rootInstance) {
         
         Object last = exchange.get(LAST_SERVICE_OBJECT);
         return last !=  null ? last : rootInstance;

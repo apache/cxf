@@ -166,8 +166,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
 
-    // TODO: deprecate?  default invoker can be changed by subclassing
-    // JAXRSServiceFactoryBean
     protected Invoker createInvoker() {
         return serviceFactory.createInvoker();
     }
