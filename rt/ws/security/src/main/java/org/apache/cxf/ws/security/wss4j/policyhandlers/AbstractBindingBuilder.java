@@ -1280,10 +1280,53 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected WSSecSignature getSignatureBuilder(TokenWrapper wrapper, Token token, boolean endorse) {
+    protected WSSecSignature getSignatureBuilder(
+        TokenWrapper wrapper, Token token, boolean endorse
+    ) {
+        return getSignatureBuilder(wrapper, token, false, endorse);
+    }
+    
+    protected WSSecSignature getSignatureBuilder(
+        TokenWrapper wrapper, Token token, boolean attached, boolean endorse
+    ) {
         WSSecSignature sig = new WSSecSignature();
-        checkForX509PkiPath(sig, token);        
-        setKeyIdentifierType(sig, wrapper, token);
+        checkForX509PkiPath(sig, token);
+        if (token instanceof IssuedToken) {
+            policyAsserted(token);
+            policyAsserted(wrapper);
+            SecurityToken securityToken = getSecurityToken();
+            String tokenType = securityToken.getTokenType();
+            
+            int type = attached ? WSConstants.CUSTOM_SYMM_SIGNING 
+                : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
+            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+            } else {
+                sig.setCustomTokenValueType(tokenType);
+                sig.setKeyIdentifierType(type);
+            }
+            
+            String sigTokId;
+            if (attached) {
+                sigTokId = securityToken.getWsuId();
+                if (sigTokId == null) {
+                    sigTokId = securityToken.getId();                    
+                }
+                if (sigTokId.startsWith("#")) {
+                    sigTokId = sigTokId.substring(1);
+                }
+            } else {
+                sigTokId = securityToken.getId();
+            }
+            
+            sig.setCustomTokenId(sigTokId);
+        } else {
+            setKeyIdentifierType(sig, wrapper, token);
+        }
         
         boolean encryptCrypto = false;
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;

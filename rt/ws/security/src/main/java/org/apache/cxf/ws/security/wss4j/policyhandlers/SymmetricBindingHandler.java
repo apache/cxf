@@ -606,8 +606,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         dkSign.setDerivedKeyLength(sbinding.getAlgorithmSuite().getSignatureDerivedKeyLength() / 8);
         if (tok.getSHA1() != null) {
             //Set the value type of the reference
-            dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                + WSConstants.ENC_KEY_VALUE_TYPE);
+            dkSign.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         } else {
             dkSign.setCustomValueType(tok.getTokenType());
         }

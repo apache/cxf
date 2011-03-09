@@ -726,10 +726,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             } else if (prots == Protections.ENCRYPT_SIGN) {
                 ai.setNotAsserted("Not signed before encrypted");                                    
             }
-            assertPolicy(aim, abinding.getInitiatorToken());
-            assertPolicy(aim, abinding.getRecipientToken());
-            assertPolicy(aim, abinding.getInitiatorToken().getToken(), derived);
-            assertPolicy(aim, abinding.getRecipientToken().getToken(), derived);
+            if (abinding.getInitiatorToken() != null) {
+                assertPolicy(aim, abinding.getInitiatorToken());
+                assertPolicy(aim, abinding.getInitiatorToken().getToken(), derived);
+            }
+            if (abinding.getRecipientToken() != null) {
+                assertPolicy(aim, abinding.getRecipientToken());
+                assertPolicy(aim, abinding.getRecipientToken().getToken(), derived);
+            }
         }
         return true;
     }

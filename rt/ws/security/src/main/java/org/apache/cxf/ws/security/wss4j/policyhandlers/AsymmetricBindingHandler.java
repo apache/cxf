@@ -38,11 +38,14 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
+import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.RecipientToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -95,6 +98,33 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
     private void doSignBeforeEncrypt() {
         try {
+            TokenWrapper initiatorWrapper = abinding.getInitiatorToken();
+            boolean attached = false;
+            if (initiatorWrapper != null) {
+                Token initiatorToken = initiatorWrapper.getToken();
+                if (initiatorToken instanceof IssuedToken) {
+                    SecurityToken secToken = getSecurityToken();
+                    if (secToken == null) {
+                        policyNotAsserted(initiatorToken, "No intiator token id");
+                        return;
+                    } else {
+                        policyAsserted(initiatorToken);
+                        
+                        IncludeTokenType inclusion = initiatorToken.getInclusion();
+                        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == inclusion
+                            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == inclusion
+                            || (isRequestor() 
+                                && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                                    == inclusion)) {
+                            
+                            Element el = secToken.getToken();
+                            this.addEncyptedKeyElement(cloneElement(el));
+                            attached = true;
+                        } 
+                    }
+                }
+            }
+            
             List<WSEncryptionPart> sigs = new ArrayList<WSEncryptionPart>();
             if (isRequestor()) {
                 //Add timestamp
@@ -105,7 +135,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
 
                 addSupportingTokens(sigs);
-                doSignature(sigs);
+                doSignature(sigs, attached);
                 doEndorse();
             } else {
                 //confirm sig
@@ -119,7 +149,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
 
                 addSignatureConfirmation(sigs);
-                doSignature(sigs);
+                doSignature(sigs, attached);
             }
 
             List<WSEncryptionPart> enc = getEncryptedParts();
@@ -157,6 +187,34 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             wrapper = abinding.getInitiatorToken();
         }
         encryptionToken = wrapper.getToken();
+        
+        TokenWrapper initiatorWrapper = abinding.getInitiatorToken();
+        boolean attached = false;
+        if (initiatorWrapper != null) {
+            Token initiatorToken = initiatorWrapper.getToken();
+            if (initiatorToken instanceof IssuedToken) {
+                SecurityToken secToken = getSecurityToken();
+                if (secToken == null) {
+                    policyNotAsserted(initiatorToken, "No intiator token id");
+                    return;
+                } else {
+                    policyAsserted(initiatorToken);
+                    
+                    IncludeTokenType inclusion = initiatorToken.getInclusion();
+                    if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == inclusion
+                        || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == inclusion
+                        || (isRequestor() 
+                            && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                                == inclusion)) {
+                        
+                        Element el = secToken.getToken();
+                        this.addEncyptedKeyElement(cloneElement(el));
+                        attached = true;
+                    } 
+                }
+            }
+        }
+        
         List<WSEncryptionPart> encrParts = null;
         List<WSEncryptionPart> sigParts = null;
         try {
@@ -194,7 +252,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     && abinding.getInitiatorToken() != null) 
                 || (!isRequestor() && abinding.getRecipientToken() != null)) {
                 try {
-                    doSignature(sigParts);
+                    doSignature(sigParts, attached);
                 } catch (WSSecurityException e) {
                     //REVISIT - exception
                     e.printStackTrace();
@@ -287,11 +345,21 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt();
                     
-                    setKeyIdentifierType(encr, recToken, encrToken);
-                    
                     encr.setDocument(saaj.getSOAPPart());
                     Crypto crypto = getEncryptionCrypto(recToken);
-                    setEncryptionUser(encr, recToken, false, crypto);
+                    
+                    SecurityToken securityToken = getSecurityToken();
+                    setKeyIdentifierType(encr, recToken, encrToken);
+                    //
+                    // Using a stored cert is only suitable for the Issued Token case, where
+                    // we're extracting the cert from a SAML Assertion on the provider side
+                    //
+                    if (!isRequestor() && securityToken != null 
+                        && securityToken.getX509Certificate() != null) {
+                        encr.setUseThisCert(securityToken.getX509Certificate());
+                    } else {
+                        setEncryptionUser(encr, recToken, false, crypto);
+                    }
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
                     encr.setKeyEncAlgo(algorithmSuite.getAsymmetricKeyWrap());
                     
@@ -338,7 +406,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
     }
     
-    private void doSignature(List<WSEncryptionPart> sigParts) throws WSSecurityException, SOAPException {
+    private void doSignature(List<WSEncryptionPart> sigParts, boolean attached) 
+        throws WSSecurityException, SOAPException {
         Token sigToken = null;
         TokenWrapper wrapper = null;
         if (isRequestor()) {
@@ -399,7 +468,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 e.printStackTrace();
             }
         } else {
-            WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, false);
+            WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
                       
             // This action must occur before sig.prependBSTElementToHeader
             if (abinding.isTokenProtection()
