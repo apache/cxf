@@ -31,7 +31,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamConstants;
@@ -40,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -239,7 +239,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 t2 = System.currentTimeMillis();
             }
 
-            if (wsResult != null) { // security header found
+            if (wsResult != null && !wsResult.isEmpty()) { // security header found
                 if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
                     checkSignatureConfirmation(reqData, wsResult);
                 }
@@ -247,12 +247,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 storeSignature(msg, reqData, wsResult);
                 storeTimestamp(msg, reqData, wsResult);
                 checkActions(msg, reqData, wsResult, actions);
-                doResults(msg, actor, doc, wsResult, utWithCallbacks);
+                doResults(
+                    msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult, utWithCallbacks
+                );
             } else { // no security header found
                 // Create an empty result list to pass into the required validation
                 // methods.
                 wsResult = new ArrayList<WSSecurityEngineResult>();
-                
                 if (doc.getSOAPPart().getEnvelope().getBody().hasFault()) {
                     LOG.warning("Request does not contain Security header, " 
                                 + "but it's a fault.");
@@ -266,12 +267,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     // the unasserted assertions will provide confirmation that
                     // security was not sufficient.
                     // checkActions(msg, reqData, wsResult, actions);
-                    doResults(msg, actor, doc, wsResult);
+                    doResults(msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult);
                 } else {
                     checkActions(msg, reqData, wsResult, actions);
-                    doResults(msg, actor, doc, wsResult);
+                    doResults(msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult);
                 }
             }
+            advanceBody(msg, doc.getSOAPBody());
 
             if (doTimeLog) {
                 t3 = System.currentTimeMillis();
@@ -353,13 +355,21 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
 
     protected void doResults(
-        SoapMessage msg, String actor, SOAPMessage doc, List<WSSecurityEngineResult> wsResult
+        SoapMessage msg, 
+        String actor, 
+        Element soapHeader,
+        Element soapBody,
+        List<WSSecurityEngineResult> wsResult
     ) throws SOAPException, XMLStreamException, WSSecurityException {
-        doResults(msg, actor, doc, wsResult, false);
+        doResults(msg, actor, soapHeader, soapBody, wsResult, false);
     }
 
     protected void doResults(
-        SoapMessage msg, String actor, SOAPMessage doc, List<WSSecurityEngineResult> wsResult, 
+        SoapMessage msg, 
+        String actor,
+        Element soapHeader,
+        Element soapBody,
+        List<WSSecurityEngineResult> wsResult, 
         boolean utWithCallbacks
     ) throws SOAPException, XMLStreamException, WSSecurityException {
         /*
@@ -374,18 +384,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
         results.add(0, rResult);
 
-        SOAPBody body = doc.getSOAPBody();
-
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new DOMSource(body));
-        // advance just past body
-        int evt = reader.next();
-        int i = 0;
-        while (reader.hasNext() && i < 1
-               && (evt != XMLStreamConstants.END_ELEMENT || evt != XMLStreamConstants.START_ELEMENT)) {
-            reader.next();
-            i++;
-        }
-        msg.setContent(XMLStreamReader.class, reader);
         for (WSSecurityEngineResult o : wsResult) {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             if (p != null) {
@@ -402,6 +400,20 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
+    protected void advanceBody(
+        SoapMessage msg, Node body
+    ) throws SOAPException, XMLStreamException, WSSecurityException {
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new DOMSource(body));
+        // advance just past body
+        int evt = reader.next();
+        int i = 0;
+        while (reader.hasNext() && i < 1
+               && (evt != XMLStreamConstants.END_ELEMENT || evt != XMLStreamConstants.START_ELEMENT)) {
+            reader.next();
+            i++;
+        }
+        msg.setContent(XMLStreamReader.class, reader);
+    }
     
     protected SecurityContext createSecurityContext(final Principal p) {
         return new SecurityContext() {

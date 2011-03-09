@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -109,8 +107,8 @@ public final class CryptoCoverageUtil {
      * Checks that the references provided refer to the
      * signed/encrypted SOAP body element.
      * 
-     * @param message
-     *            the soap message containing the signature/encryption and content
+     * @param soapBody
+     *            the SOAP body element
      * @param refs
      *            the refs to the data extracted from the signature/encryption
      * @param type
@@ -124,21 +122,12 @@ public final class CryptoCoverageUtil {
      *             covered by the signature/encryption.
      */
     public static void checkBodyCoverage(
-        SOAPMessage message,
+        Element soapBody,
         final Collection<WSDataRef> refs,
         CoverageType type,
-        CoverageScope scope) throws WSSecurityException {
-        
-        final Element body;
-        
-        try {
-            body = message.getSOAPBody();
-        } catch (SOAPException e1) {
-            // Can't get the SAAJ parts out of the document.
-            throw new WSSecurityException(WSSecurityException.FAILURE);
-        }
-        
-        if (!CryptoCoverageUtil.matchElement(refs, type, scope, body)) {
+        CoverageScope scope
+    ) throws WSSecurityException {
+        if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody)) {
             throw new WSSecurityException("The " + getCoverageTypeString(type)
                     + " does not cover the required elements (soap:Body).");
         }
@@ -151,8 +140,8 @@ public final class CryptoCoverageUtil {
      * namespace.  If {@code name} is null, all headers from {@code namespace}
      * are inspected for coverage.
      * 
-     * @param message
-     *            the soap message containing the signature/encryption and content
+     * @param soapHeader
+     *            the SOAP header element
      * @param refs
      *            the refs to the data extracted from the signature/encryption
      * @param namespaces
@@ -170,7 +159,7 @@ public final class CryptoCoverageUtil {
      *             covered by the signature/encryption.
      */
     public static void checkHeaderCoverage(
-            SOAPMessage message,
+            Element soapHeader,
             final Collection<WSDataRef> refs,
             String namespace,
             String name,
@@ -178,20 +167,10 @@ public final class CryptoCoverageUtil {
             CoverageScope scope) throws WSSecurityException {
         
         final List<Element> elements;
-        final Element parent;
-        
-        try {
-            parent = message.getSOAPHeader();
-        } catch (SOAPException e1) {
-            // Can't get the SAAJ parts out of the document.
-            throw new WSSecurityException(WSSecurityException.FAILURE);
-        }
-        
         if (name == null) {
-            elements = DOMUtils.getChildrenWithNamespace(parent, namespace);
+            elements = DOMUtils.getChildrenWithNamespace(soapHeader, namespace);
         } else {
-            elements = DOMUtils.getChildrenWithName(
-                    parent, namespace, name);
+            elements = DOMUtils.getChildrenWithName(soapHeader, namespace, name);
         }
         
         for (Element el : elements) {
@@ -208,8 +187,8 @@ public final class CryptoCoverageUtil {
      * signed/encrypted elements as defined by the XPath expression in {@code
      * xPath}.
      * 
-     * @param message
-     *            the soap message containing the signature/encryption and content
+     * @param soapEnvelope
+     *            the SOAP Envelope element
      * @param refs
      *            the refs to the data extracted from the signature/encryption
      * @param namespaces
@@ -227,14 +206,14 @@ public final class CryptoCoverageUtil {
      *             covered by the signature/encryption.
      */
     public static void checkCoverage(
-            SOAPMessage message,
+            Element soapEnvelope,
             final Collection<WSDataRef> refs,
             Map<String, String> namespaces,
             String xPath,
             CoverageType type,
             CoverageScope scope) throws WSSecurityException {
         
-        CryptoCoverageUtil.checkCoverage(message, refs, namespaces, Arrays
+        CryptoCoverageUtil.checkCoverage(soapEnvelope, refs, namespaces, Arrays
                 .asList(xPath), type, scope);
     }
     
@@ -243,8 +222,8 @@ public final class CryptoCoverageUtil {
      * signed/encrypted elements as defined by the XPath expressions in {@code
      * xPaths}.
      * 
-     * @param message
-     *            the soap message containing the signature/encryption and content
+     * @param soapEnvelope
+     *            the SOAP Envelope element
      * @param refs
      *            the refs to the data extracted from the signature/encryption
      * @param namespaces
@@ -262,7 +241,7 @@ public final class CryptoCoverageUtil {
      *             covered by the signature/encryption.
      */
     public static void checkCoverage(
-            SOAPMessage message,
+            Element soapEnvelope,
             final Collection<WSDataRef> refs,
             Map<String, String> namespaces,
             Collection<String> xPaths,
@@ -285,13 +264,10 @@ public final class CryptoCoverageUtil {
             try {
                 list = (NodeList)xpath.evaluate(
                         xpathString, 
-                        message.getSOAPPart().getEnvelope(),
+                        soapEnvelope,
                         XPathConstants.NODESET);
             } catch (XPathExpressionException e) {
                 // The xpath's are not valid in the config.
-                throw new WSSecurityException(WSSecurityException.FAILURE);
-            } catch (SOAPException e) {
-                // Can't get the SAAJ parts out of the document.
                 throw new WSSecurityException(WSSecurityException.FAILURE);
             }
             

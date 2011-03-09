@@ -31,14 +31,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
@@ -351,7 +351,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                    QName name, 
                                    Collection<WSDataRef> refs,
                                    SoapMessage msg,
-                                   SOAPMessage doc,
+                                   Element soapEnvelope,
                                    CoverageType type,
                                    CoverageScope scope) throws SOAPException {
         Collection<AssertionInfo> ais = aim.get(name);
@@ -373,7 +373,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 if (xpaths != null) {
                     for (String xPath : xpaths) {
                         try {
-                            CryptoCoverageUtil.checkCoverage(doc, refs,
+                            CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
                                     namespaces, xPath, type, scope);
                         } catch (WSSecurityException e) {
                             ai.setNotAsserted("No " + type 
@@ -390,7 +390,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                               QName name, 
                               Collection<WSDataRef> signed,
                               SoapMessage msg,
-                              SOAPMessage doc,
+                              Element soapHeader,
+                              Element soapBody,
                               CoverageType type) throws SOAPException {
         Collection<AssertionInfo> ais = aim.get(name);
         if (ais != null) {
@@ -401,9 +402,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 if (p.isBody()) {
                     try {
                         if (CoverageType.SIGNED.equals(type)) {
-                            CryptoCoverageUtil.checkBodyCoverage(doc, signed, type, CoverageScope.ELEMENT);
+                            CryptoCoverageUtil.checkBodyCoverage(
+                                soapBody, signed, type, CoverageScope.ELEMENT
+                            );
                         } else {
-                            CryptoCoverageUtil.checkBodyCoverage(doc, signed, type, CoverageScope.CONTENT);
+                            CryptoCoverageUtil.checkBodyCoverage(
+                                soapBody, signed, type, CoverageScope.CONTENT
+                            );
                         }
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted(msg.getVersion().getBody() + " not " + type);
@@ -412,7 +417,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 
                 for (Header h : p.getHeaders()) {
                     try {
-                        CryptoCoverageUtil.checkHeaderCoverage(doc, signed, h
+                        CryptoCoverageUtil.checkHeaderCoverage(soapHeader, signed, h
                                 .getNamespace(), h.getName(), type,
                                 CoverageScope.ELEMENT);
                     } catch (WSSecurityException e) {
@@ -493,11 +498,15 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return prots;
     }
     
-    protected void doResults(SoapMessage msg, String actor, 
-                             SOAPMessage doc, List<WSSecurityEngineResult> results, 
-                             boolean utWithCallbacks) 
-        throws SOAPException, XMLStreamException, WSSecurityException {
-        
+    @Override
+    protected void doResults(
+        SoapMessage msg, 
+        String actor,
+        Element soapHeader,
+        Element soapBody,
+        List<WSSecurityEngineResult> results, 
+        boolean utWithCallbacks
+    ) throws SOAPException, XMLStreamException, WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         Collection<WSDataRef> signed = new HashSet<WSDataRef>();
         Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
@@ -576,19 +585,22 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
         
-        assertTokens(aim, SP12Constants.SIGNED_PARTS, signed, msg, doc, CoverageType.SIGNED);
-        assertTokens(aim, SP12Constants.ENCRYPTED_PARTS, encrypted, msg, doc, CoverageType.ENCRYPTED);
-        assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, msg, doc,
+        assertTokens(aim, SP12Constants.SIGNED_PARTS, signed, msg, soapHeader, soapBody, CoverageType.SIGNED);
+        assertTokens(
+            aim, SP12Constants.ENCRYPTED_PARTS, encrypted, msg, soapHeader, soapBody, CoverageType.ENCRYPTED
+        );
+        Element soapEnvelope = soapHeader.getOwnerDocument().getDocumentElement();
+        assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, msg, soapEnvelope,
                 CoverageType.SIGNED, CoverageScope.ELEMENT);
-        assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, doc,
+        assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
                 CoverageType.ENCRYPTED, CoverageScope.ELEMENT);
-        assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg, doc,
+        assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
                 CoverageType.ENCRYPTED, CoverageScope.CONTENT);
         
-        assertHeadersExists(aim, msg, doc);
-
-        assertAsymetricBinding(aim, msg, doc, prots, hasDerivedKeys);
-        assertSymetricBinding(aim, msg, doc, prots, hasDerivedKeys);
+        assertHeadersExists(aim, msg, soapHeader);
+        
+        assertAsymetricBinding(aim, msg, prots, hasDerivedKeys);
+        assertSymetricBinding(aim, msg, prots, hasDerivedKeys);
         assertTransportBinding(aim);
         
         
@@ -604,19 +616,19 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         }
         
-        super.doResults(msg, actor, doc, results, utWithCallbacks);
+        super.doResults(msg, actor, soapHeader, soapBody, results, utWithCallbacks);
     }
-    private void assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, SOAPMessage doc) 
+    private void assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 
         throws SOAPException {
         
-        SOAPHeader header = doc.getSOAPHeader();
         Collection<AssertionInfo> ais = aim.get(SP12Constants.REQUIRED_PARTS);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 RequiredParts rp = (RequiredParts)ai.getAssertion();
                 ai.setAsserted(true);
                 for (Header h : rp.getHeaders()) {
-                    if (header == null || DOMUtils.getFirstChildWithName(header, h.getQName()) == null) {
+                    if (header == null 
+                        || DOMUtils.getFirstChildWithName((Element)header, h.getQName()) == null) {
                         ai.setNotAsserted("No header element of name " + h.getQName() + " found.");
                     }
                 }
@@ -653,7 +665,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
 
     private boolean assertSymetricBinding(AssertionInfoMap aim, 
                                            SoapMessage message,
-                                           SOAPMessage doc,
                                            Protections prots,
                                            Boolean derived) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
@@ -694,7 +705,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
     private boolean assertAsymetricBinding(AssertionInfoMap aim, 
                                            SoapMessage message,
-                                           SOAPMessage doc,
                                            Protections prots,
                                            Boolean derived) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);

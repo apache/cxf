@@ -28,7 +28,10 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -45,7 +48,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.WSSecurityUtil;
-
 
 /**
  * Utility to enable the checking of WS-Security signature/encryption
@@ -178,14 +180,23 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             }
                     
             try {
+                SOAPMessage saajDoc = message.getContent(SOAPMessage.class);
+                Element documentElement = null;
+                if (saajDoc != null && saajDoc.getSOAPPart() != null) {
+                    documentElement = saajDoc.getSOAPPart().getEnvelope();
+                }
                 CryptoCoverageUtil.checkCoverage(
-                        message.getContent(SOAPMessage.class),
+                        documentElement,
                         refsToCheck,
                         this.prefixMap, 
                         xPathExpression.getXPath(),
                         xPathExpression.getType(),
                         xPathExpression.getScope());
             } catch (WSSecurityException e) {
+                throw new SoapFault("No " + xPathExpression.getType()
+                        + " element found matching XPath "
+                        + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
+            } catch (SOAPException e) {
                 throw new SoapFault("No " + xPathExpression.getType()
                         + " element found matching XPath "
                         + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
