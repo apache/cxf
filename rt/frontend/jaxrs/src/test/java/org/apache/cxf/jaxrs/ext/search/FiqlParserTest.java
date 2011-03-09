@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
 public class FiqlParserTest extends Assert {
     private FiqlParser<Condition> parser = new FiqlParser<Condition>(Condition.class);
 
@@ -78,12 +77,12 @@ public class FiqlParserTest extends Assert {
     public void testRedundantBrackets() throws FiqlParseException {
         parser.parse("name==a;((((level==10))))");
     }
-    
+
     @Test
     public void testAndOfOrs() throws FiqlParseException {
         parser.parse("(name==a,name==b);(level=gt=0,level=lt=10)");
     }
-    
+
     @Test
     public void testOrOfAnds() throws FiqlParseException {
         parser.parse("(name==a;name==b),(level=gt=0;level=lt=10)");
@@ -166,21 +165,22 @@ public class FiqlParserTest extends Assert {
     public void testParseComplex1() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         assertEquals(ConditionType.AND, filter.getConditionType());
-        
+
         List<SearchCondition<Condition>> conditions = filter.getSearchConditions();
         assertEquals(2, conditions.size());
         PrimitiveStatement st1 = conditions.get(0).getStatement();
-        assertEquals(ConditionType.EQUALS, st1.getCondition());
-        
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertEquals(ConditionType.GREATER_THAN, st2.getCondition());
-        
+        assertTrue((ConditionType.EQUALS.equals(st1.getCondition()) 
+            && ConditionType.GREATER_THAN.equals(st2.getCondition())) 
+            || (ConditionType.EQUALS.equals(st2.getCondition()) 
+                && ConditionType.GREATER_THAN.equals(st1.getCondition())));
+
         assertTrue(filter.isMet(new Condition("amichalec", 12, new Date())));
         assertTrue(filter.isMet(new Condition("ami", 12, new Date())));
         assertFalse(filter.isMet(new Condition("ami", 8, null)));
         assertFalse(filter.isMet(new Condition("am", 20, null)));
     }
-    
+
     @SuppressWarnings("deprecation")
     @Test
     public void testSQL1() throws FiqlParseException {
@@ -194,16 +194,17 @@ public class FiqlParserTest extends Assert {
     public void testParseComplex2() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         assertEquals(ConditionType.OR, filter.getConditionType());
-        
+
         List<SearchCondition<Condition>> conditions = filter.getSearchConditions();
         assertEquals(2, conditions.size());
-        
+
         PrimitiveStatement st1 = conditions.get(0).getStatement();
-        assertEquals(ConditionType.EQUALS, st1.getCondition());
-        
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertEquals(ConditionType.GREATER_THAN, st2.getCondition());
-        
+        assertTrue((ConditionType.EQUALS.equals(st1.getCondition()) 
+            && ConditionType.GREATER_THAN.equals(st2.getCondition())) 
+            || (ConditionType.EQUALS.equals(st2.getCondition()) 
+                && ConditionType.GREATER_THAN.equals(st1.getCondition())));
+
         assertTrue(filter.isMet(new Condition("ami", 0, new Date())));
         assertTrue(filter.isMet(new Condition("foo", 20, null)));
         assertFalse(filter.isMet(new Condition("foo", 0, null)));
@@ -217,7 +218,7 @@ public class FiqlParserTest extends Assert {
         assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') OR (level > '10')".equals(sql)
                    || "SELECT * FROM table WHERE (level > '10') OR (name LIKE 'ami%')".equals(sql));
     }
-    
+
     @Test
     public void testParseComplex3() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
@@ -233,22 +234,22 @@ public class FiqlParserTest extends Assert {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         String sql = filter.toSQL("table");
         assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "
-                   + "OR (level > '10'))").equals(sql)
+                    + "OR (level > '10'))").equals(sql)
                    || ("SELECT * FROM table WHERE (name LIKE 'foo%') AND "
-                   + "((level > '10') OR (name NOT LIKE '%bar'))").equals(sql));
+                       + "((level > '10') OR (name NOT LIKE '%bar'))").equals(sql));
     }
-    
+
     @SuppressWarnings("deprecation")
     @Test
     public void testSQL4() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
         String sql = filter.toSQL("table");
         assertTrue(("SELECT * FROM table WHERE ((name = 'test') OR (level = '18'))"
-                   + " AND ((name = 'test1') OR (level <> '19'))").equals(sql)
+                    + " AND ((name = 'test1') OR (level <> '19'))").equals(sql)
                    || ("SELECT * FROM table WHERE ((name = 'test1') OR (level <> '19'))"
-                   + " AND ((name = 'test') OR (level = '18'))").equals(sql));
+                       + " AND ((name = 'test') OR (level = '18'))").equals(sql));
     }
-    
+
     @SuppressWarnings("deprecation")
     @Test
     public void testSQL5() throws FiqlParseException {
@@ -256,7 +257,7 @@ public class FiqlParserTest extends Assert {
         String sql = filter.toSQL("table");
         assertTrue("SELECT * FROM table WHERE name = 'test'".equals(sql));
     }
-    
+
     @Test
     public void testParseComplex4() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;name!=*bar,level=gt=10");
@@ -265,7 +266,7 @@ public class FiqlParserTest extends Assert {
         assertTrue(filter.isMet(new Condition("foobar", 20, null)));
         assertFalse(filter.isMet(new Condition("fooxxxbar", 0, null)));
     }
-    
+
     @Ignore
     static class Condition {
         private String name;
@@ -289,11 +290,11 @@ public class FiqlParserTest extends Assert {
             this.name = name;
         }
 
-        public Integer getLevel() {
+        public int getLevel() {
             return level;
         }
 
-        public void setLevel(Integer level) {
+        public void setLevel(int level) {
             this.level = level;
         }
 

@@ -333,11 +333,6 @@ public class SimpleSearchConditionTest {
         assertFalse(ssc.isMet("foobarbaz"));
     }
     
-    @Test(expected = IllegalArgumentException.class)
-    public void testPrimitivePropertyOfCondition() {
-        new SimpleSearchCondition<PrimitiveProp>(ConditionType.EQUALS, new PrimitiveProp(123));
-    }
-
     static class SingleAttr {
         private String foo;
 
@@ -372,23 +367,5 @@ public class SimpleSearchConditionTest {
         public String getBar() {
             return bar;
         }
-    }
-    
-    static class PrimitiveProp {
-        private Integer foo;
-
-        public PrimitiveProp(Integer foo) {
-            super();
-            this.foo = foo;
-        }
-        
-        //primitives getter will be detected
-        public int getFoo() {
-            return foo;
-        }
-
-        public void setFoo(int foo) {
-            this.foo = foo;
-        }        
-    }
+    }    
 }

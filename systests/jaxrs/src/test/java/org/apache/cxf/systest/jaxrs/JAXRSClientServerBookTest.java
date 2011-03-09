@@ -679,26 +679,23 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "application/xml", 200);
     }
     
-// Enable these tests when SimpleSearchCondition flaw (
-// regarding primitive type of properties of type T) is sloved     
+    @Test
+    public void testSearchBook123() throws Exception {
+        getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/search"
+                               + "?_s=name==CXF*;id=ge=123;id=lt=124",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
     
-//    @Test
-//    public void testSearchBook123() throws Exception {
-//        getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/search"
-//                               + "?_s=name==CXF*;id=ge=123;id=lt=124",
-//                               "resources/expected_get_book123.txt",
-//                               "application/xml", 200);
-//    }
-//    
-//    @Test
-//    public void testSearchBook123WithWebClient() throws Exception {
-//        String address = "http://localhost:" + PORT + "/bookstore/books/search";
-//                          
-//        WebClient client = WebClient.create(address);
-//        Book b = client.query("_s", "name==CXF*;id=ge=123;id=lt=124").get(Book.class);
-//        assertEquals(b.getId(), 123L);
-//        
-//    }
+    @Test
+    public void testSearchBook123WithWebClient() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/search";
+                          
+        WebClient client = WebClient.create(address);
+        Book b = client.query("_s", "name==CXF*;id=ge=123;id=lt=124").get(Book.class);
+        assertEquals(b.getId(), 123L);
+        
+    }
     
     @Test
     public void testGetBook123CGLIB() throws Exception {

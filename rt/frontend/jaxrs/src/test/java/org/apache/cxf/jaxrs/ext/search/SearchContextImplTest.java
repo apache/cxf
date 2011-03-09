@@ -21,11 +21,11 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SearchContextImplTest extends Assert {
@@ -67,48 +67,4 @@ public class SearchContextImplTest extends Assert {
         assertEquals(1, found.size());
         assertEquals(new Book("CXF Rocks", 125L), found.get(0));
     }
-    
-    @Ignore
-    public static class Book {
-        private String name;
-        private long id;
-        
-        public Book() {
-        }
-        
-        public Book(String name, long id) {
-            this.name = name;
-            this.id = id;
-        }
-        
-        public void setName(String n) {
-            name = n;
-        }
-
-        public String getName() {
-            return name;
-        }
-        
-        public void setId(Long i) {
-            id = i;
-        }
-        public Long getId() {
-            return id;
-        }
-        
-        public int hashCode() { 
-            return name.hashCode() * 37 + new Long(id).hashCode();
-        }
-        
-        public boolean equals(Object o) {
-            if (!(o instanceof Book)) {
-                return false;
-            }
-            Book other = (Book)o;
-            
-            return other.name.equals(name) && other.id == id;
-            
-        }
-    }
-
 }

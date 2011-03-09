@@ -21,8 +21,8 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +32,7 @@ import java.util.Set;
  * {@link #isMet(Object)} description.
  * 
  * @param <T> type of search condition.
+ * 
  */
 public class SimpleSearchCondition<T> implements SearchCondition<T> {
 
@@ -46,9 +47,9 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     }
     private ConditionType joiningType = ConditionType.AND;
     private T condition;
-
+    
     private List<SearchCondition<T>> scts;
-
+    
     /**
      * Creates search condition with same operator (equality, inequality) applied in all comparison; see
      * {@link #isMet(Object)} for details of comparison.
@@ -68,7 +69,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
         this.condition = condition;
         scts = createConditions(null, cType);
-
+                
     }
 
     /**
@@ -86,7 +87,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         if (condition == null) {
             throw new IllegalArgumentException("condition is null");
         }
-        if (isPrimitive(condition)) {
+        if (isBuiltIn(condition)) {
             throw new IllegalArgumentException("mapped operators strategy is "
                                                + "not supported for primitive type "
                                                + condition.getClass().getName());
@@ -125,17 +126,15 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
-    private List<SearchCondition<T>> createConditions(Map<String, ConditionType> getters2operators,
+    private List<SearchCondition<T>> createConditions(Map<String, ConditionType> getters2operators, 
                                                       ConditionType sharedType) {
-        if (isPrimitive(condition)) {
-            return Collections.singletonList((SearchCondition<T>)new PrimitiveSearchCondition<T>(null,
-                                                                                                 condition,
-                                                                                                 sharedType,
-                                                                                                 condition));
+        if (isBuiltIn(condition)) {
+            return Collections.singletonList(
+                (SearchCondition<T>)new PrimitiveSearchCondition<T>(null, condition, sharedType, condition));
         } else {
             List<SearchCondition<T>> list = new ArrayList<SearchCondition<T>>();
             Map<String, Object> get2val = getGettersAndValues();
-
+            
             for (String getter : get2val.keySet()) {
                 ConditionType ct = getters2operators == null ? sharedType : getters2operators.get(getter);
                 if (ct == null) {
@@ -146,7 +145,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                     continue;
                 }
                 list.add(new PrimitiveSearchCondition<T>(getter, rval, ct, condition));
-
+                
             }
             if (list.isEmpty()) {
                 throw new IllegalStateException("This search condition is empty and can not be used");
@@ -154,7 +153,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             return list;
         }
     }
-
+    
     /**
      * Compares given object against template condition object.
      * <p>
@@ -166,8 +165,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * For other types the comparison of given object against template object is done using its
      * <b>getters</b>; Value returned by {@linkplain #isMet(Object)} operation is <b>conjunction ('and'
      * operator)</b> of comparisons of each getter accessible in object of type T. Getters of template object
-     * that return null or throw exception are not used in comparison. If type T contains getters that return
-     * primitive not-nullable types (as int, float etc) exception will be thrown. Finally, if all getters
+     * that return null or throw exception are not used in comparison. Finally, if all getters
      * return nulls (are excluded) it is interpreted as no filter (match every pojo).
      * <p>
      * If {@link #SimpleSearchCondition(ConditionType, Object) constructor with shared operator} was used,
@@ -193,7 +191,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * 
      * class Entity {
      *   public String getName() {...
-     *   public Integer getLevel() {...
+     *   public int getLevel() {...
      *   public String getMessage() {...
      * }
      * 
@@ -238,25 +236,14 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * @return template (condition) object getters mapped to their non-null values
      */
     private Map<String, Object> getGettersAndValues() {
-        Map<String, Object> getters2values = new LinkedHashMap<String, Object>();
+        
+        Map<String, Object> getters2values = new HashMap<String, Object>();
         Beanspector<T> beanspector = new Beanspector<T>(condition);
         for (String getter : beanspector.getGettersNames()) {
-            try {
-                if (beanspector.getAccessorType(getter).isPrimitive()) {
-                    String beanType = beanspector.getBean().getClass().getCanonicalName();
-                    throw new IllegalArgumentException("Type '" + beanType + "' has property '" + getter
-                                                       + "' of primitive type and "
-                                                       + "cannot be used as a condition");
-                }
-            } catch (IllegalArgumentException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new IllegalArgumentException(e);
-            }
             Object value = getValue(beanspector, getter, condition);
             getters2values.put(getter, value);
         }
-        // we do not need compare class objects
+        //we do not need compare class objects
         getters2values.keySet().remove("class");
         return getters2values;
     }
@@ -269,9 +256,10 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
-    private boolean isPrimitive(T pojo) {
+    private boolean isBuiltIn(T pojo) {
         return pojo.getClass().getName().startsWith("java.lang");
     }
+
 
     public List<T> findAll(Collection<T> pojos) {
         List<T> result = new ArrayList<T>();
@@ -286,7 +274,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     public String toSQL(String table, String... columns) {
         return SearchUtils.toSQL(this, table, columns);
     }
-
+    
     public PrimitiveStatement getStatement() {
         if (scts.size() == 1) {
             return scts.get(0).getStatement();
@@ -298,5 +286,6 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     public void accept(SearchConditionVisitor<T> visitor) {
         visitor.visit(this);
     }
-
+    
+    
 }
