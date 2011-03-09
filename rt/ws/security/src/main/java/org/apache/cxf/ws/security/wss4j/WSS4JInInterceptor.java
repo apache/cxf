@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -93,7 +95,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                                                                  null,
                                                                  WSS4JInInterceptor.class.getName()
                                                                      + "-Time");
-    private SAAJInInterceptor saajIn = new SAAJInInterceptor();
     private boolean ignoreActions;
 
     /**
@@ -130,16 +131,22 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
+    @Override
+    public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>>
+    getAdditionalInterceptors() {
+        List<PhaseInterceptor<? extends org.apache.cxf.message.Message>> extras 
+            = new ArrayList<PhaseInterceptor<? extends org.apache.cxf.message.Message>>(1);
+        extras.add(SAAJInInterceptor.SAAJPreInInterceptor.INSTANCE);
+        return extras;
+    }
+
+    
     public void setIgnoreActions(boolean i) {
         ignoreActions = i;
     }
     private SOAPMessage getSOAPMessage(SoapMessage msg) {
-        SOAPMessage doc = msg.getContent(SOAPMessage.class);
-        if (doc == null) {
-            saajIn.handleMessage(msg);
-            doc = msg.getContent(SOAPMessage.class);
-        }
-        return doc;
+        SAAJInInterceptor.INSTANCE.handleMessage(msg);
+        return msg.getContent(SOAPMessage.class);
     }
     
     @Override

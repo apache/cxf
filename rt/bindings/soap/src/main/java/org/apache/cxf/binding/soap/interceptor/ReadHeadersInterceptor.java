@@ -103,6 +103,22 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         bus = b;
     }
 
+    public static SoapVersion readVersion(XMLStreamReader xmlReader, SoapMessage message) {
+        String ns = xmlReader.getNamespaceURI();
+        if (ns == null || "".equals(ns)) {
+            throw new SoapFault(new Message("NO_NAMESPACE", LOG, xmlReader.getLocalName()),
+                                Soap11.getInstance().getVersionMismatch());
+        }
+        
+        SoapVersion soapVersion = SoapVersionFactory.getInstance().getSoapVersion(ns);
+        if (soapVersion == null) {
+            throw new SoapFault(new Message("INVALID_VERSION", LOG, ns, xmlReader.getLocalName()),
+                                    Soap11.getInstance().getVersionMismatch());
+        }
+        message.setVersion(soapVersion);
+        return soapVersion;
+    }
+    
     public void handleMessage(SoapMessage message) {
         if (isGET(message)) {
             LOG.fine("ReadHeadersInterceptor skipped in HTTP GET method");
@@ -119,31 +135,30 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         }
 
         try {
-            if (xmlReader.nextTag() == XMLStreamConstants.START_ELEMENT) {
-                String ns = xmlReader.getNamespaceURI();
-                if (ns == null || "".equals(ns)) {
-                    throw new SoapFault(new Message("NO_NAMESPACE", LOG, xmlReader.getLocalName()),
-                                        Soap11.getInstance().getVersionMismatch());
-                }
+            if (xmlReader.getEventType() == XMLStreamConstants.START_ELEMENT 
+                || xmlReader.nextTag() == XMLStreamConstants.START_ELEMENT) {
                 
-                SoapVersion soapVersion = SoapVersionFactory.getInstance().getSoapVersion(ns);
-                if (soapVersion == null) {
-                    throw new SoapFault(new Message("INVALID_VERSION", LOG, ns, xmlReader.getLocalName()),
-                                            Soap11.getInstance().getVersionMismatch());
-                }
+                SoapVersion soapVersion = readVersion(xmlReader, message);
                 if (soapVersion == Soap12.getInstance()
                     && version == Soap11.getInstance()) {
-                    throw new SoapFault(new Message("INVALID_11_VERSION", LOG, ns, xmlReader.getLocalName()),
+                    throw new SoapFault(new Message("INVALID_11_VERSION", LOG, 
+                                                    Soap12.getInstance().getNamespace(),
+                                                    xmlReader.getLocalName()),
                                         Soap11.getInstance().getVersionMismatch());                    
                 }
-                message.setVersion(soapVersion);
 
                 XMLStreamReader filteredReader = new PartialXMLStreamReader(xmlReader, message.getVersion()
                     .getBody());
 
-                Document doc = StaxUtils.read(filteredReader);
-
-                message.setContent(Node.class, doc);
+                Node nd = message.getContent(Node.class);
+                Document doc = null;
+                if (nd instanceof Document && ((Document)nd).getDocumentElement() == null) {
+                    doc = (Document)nd;
+                    StaxUtils.readDocElements(doc, doc, filteredReader, false, false);
+                } else {
+                    doc = StaxUtils.read(filteredReader);
+                    message.setContent(Node.class, doc);
+                }
 
                 // Find header
                 // TODO - we could stream read the "known" headers and just DOM read the 

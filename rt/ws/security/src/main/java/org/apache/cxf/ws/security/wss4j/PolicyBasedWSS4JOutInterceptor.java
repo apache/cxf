@@ -199,5 +199,10 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         public void handleFault(SoapMessage message) {
             //nothing
         }
+
+        public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> 
+        getAdditionalInterceptors() {
+            return null;
+        }
     }
 }

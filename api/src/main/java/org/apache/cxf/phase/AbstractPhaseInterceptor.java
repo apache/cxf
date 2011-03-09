@@ -168,6 +168,10 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     public final Set<String> getBefore() {
         return before;
     }
+    
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        return null;
+    }
 
     public final String getId() {
         return id;

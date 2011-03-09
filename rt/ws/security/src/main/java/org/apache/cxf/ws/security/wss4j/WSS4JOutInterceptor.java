@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +138,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         public WSS4JOutInterceptorInternal() {
             super();
         }
-
+        
         public void handleMessage(SoapMessage mc) throws Fault {
             
             boolean doDebug = LOG.isLoggable(Level.FINE);
@@ -339,6 +340,11 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                     }
                 }
             }
+        }
+
+        public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> 
+        getAdditionalInterceptors() {
+            return null;
         }
     }
 }

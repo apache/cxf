@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -72,6 +73,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }
 
     public void postHandleMessage(SoapMessage message) throws Fault {
+    }
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        return null;
     }
 
     public String getPhase() {

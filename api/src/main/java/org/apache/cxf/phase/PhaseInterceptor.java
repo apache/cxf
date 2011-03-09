@@ -19,6 +19,7 @@
 
 package org.apache.cxf.phase;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.apache.cxf.interceptor.Interceptor;
@@ -64,5 +65,12 @@ public interface PhaseInterceptor<T extends Message> extends Interceptor<T> {
      * @return the phase
      */
     String getPhase();
+    
+    /**
+     * Returns a collection of Interceptors that should be added to the chain 
+     * whenever this interceptor is added.   May return null.
+     * @return the collection of interceptors
+     */
+    Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors();
 
 }

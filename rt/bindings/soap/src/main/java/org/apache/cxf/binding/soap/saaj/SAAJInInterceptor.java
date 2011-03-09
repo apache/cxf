@@ -21,8 +21,10 @@ package org.apache.cxf.binding.soap.saaj;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.xml.namespace.QName;
@@ -35,6 +37,7 @@ import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
@@ -50,6 +53,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.Soap11FaultInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultInInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -61,7 +65,9 @@ import org.apache.cxf.headers.HeaderProcessor;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
@@ -71,50 +77,117 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
  */
 @NoJSR250Annotations
 public class SAAJInInterceptor extends AbstractSoapInterceptor {
+    public static final SAAJInInterceptor INSTANCE = new SAAJInInterceptor();
+    
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJInInterceptor.class);
-    
-    private MessageFactory factory11;
-    private MessageFactory factory12;
-    
-    
+    private static final String BODY_FILLED_IN = SAAJInInterceptor.class.getName() + ".BODY_DONE";
+
+    private SAAJPreInInterceptor preInterceptor = SAAJPreInInterceptor.INSTANCE;
+    private List<PhaseInterceptor<? extends Message>> extras 
+        = new ArrayList<PhaseInterceptor<? extends Message>>(1);
     public SAAJInInterceptor() {
         super(Phase.PRE_PROTOCOL);
+        extras.add(preInterceptor);
     }
     public SAAJInInterceptor(String phase) {
         super(phase);
     }
     
-    private synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
-        if (message.getVersion() instanceof Soap11) {
-            if (factory11 == null) { 
-                factory11 = MessageFactory.newInstance();
-            } 
-            return factory11;
-        }
-        if (factory12 == null) {
-            factory12 = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-        }
-        return factory12;
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        return extras;
     }
+
+    /**
+     * This class sets up the Document in the Message so that the ReadHeadersInterceptor
+     * can read directly into the SAAJ document instead of creating a new DOM
+     * that we would need to copy into the SAAJ later.
+     */
+    public static class SAAJPreInInterceptor extends AbstractSoapInterceptor {
+        public static final SAAJPreInInterceptor INSTANCE = new SAAJPreInInterceptor();
+        
+        private MessageFactory factory11;
+        private MessageFactory factory12;
+        
+        public SAAJPreInInterceptor() {
+            super(Phase.READ);
+            addBefore(ReadHeadersInterceptor.class.getName());
+        }
+        public void handleMessage(SoapMessage message) throws Fault {
+            if (isGET(message)) {
+                return;
+            }
+            if (isRequestor(message) && message.getExchange().getInMessage() == null) {
+                //already processed
+                return;
+            }
+            try {
+                XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
+                if (xmlReader == null) {
+                    return;
+                }
+                if (xmlReader.nextTag() == XMLStreamConstants.START_ELEMENT) {
+                    ReadHeadersInterceptor.readVersion(xmlReader, message);
+                }
+                MessageFactory factory = getFactory(message);
+                SOAPMessage soapMessage = factory.createMessage();
+                message.setContent(SOAPMessage.class, soapMessage);
+                
+                SOAPPart part = soapMessage.getSOAPPart();
+                message.setContent(Document.class, part);
+                message.put(BODY_FILLED_IN, Boolean.FALSE);
+
+            } catch (RuntimeException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new SoapFault("XML_STREAM_EXC", BUNDLE, e, message.getVersion().getSender());
+            }
+        }
+        public synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
+            if (message.getVersion() instanceof Soap11) {
+                if (factory11 == null) { 
+                    factory11 = MessageFactory.newInstance();
+                } 
+                return factory11;
+            }
+            if (factory12 == null) {
+                factory12 = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+            }
+            return factory12;
+        }
+    }
+    
+    
     
     public void handleMessage(SoapMessage message) throws Fault {
         if (isGET(message)) {
             return;
         }
+        Boolean bodySet = (Boolean)message.get(BODY_FILLED_IN);
+        if (bodySet != null && bodySet == Boolean.TRUE) {
+            return;
+        }
+        message.put(BODY_FILLED_IN, Boolean.TRUE);
 
         try {
-            MessageFactory factory = getFactory(message);
-            SOAPMessage soapMessage = factory.createMessage();
-            message.setContent(SOAPMessage.class, soapMessage);
-            
+            SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
+            if (soapMessage == null) {
+                MessageFactory factory = preInterceptor.getFactory(message);
+                soapMessage = factory.createMessage();
+                message.setContent(SOAPMessage.class, soapMessage);
+            }
+            XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
+            if (xmlReader == null) {
+                return;
+            }
             SOAPPart part = soapMessage.getSOAPPart();
-            
             Document node = (Document) message.getContent(Node.class);
-            if (node == null) {
-                // replicate 2.1 behavior.
-                part.setContent(new DOMSource(null));
-            } else {
-                StaxUtils.copy(node, new W3CDOMStreamWriter(part));
+            if (node != part) {
+                if (node == null) {
+                    // replicate 2.1 behavior.
+                    part.setContent(new DOMSource(null));
+                } else {
+                    StaxUtils.copy(node, new W3CDOMStreamWriter(part));
+                }
             }
             message.setContent(Node.class, soapMessage.getSOAPPart());
 
@@ -148,7 +221,6 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 soapMessage.getSOAPPart().getEnvelope().addHeader();
             }
             
-            XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
 
             if (hasFault(message, xmlReader)) {
                 SOAPFault soapFault = 

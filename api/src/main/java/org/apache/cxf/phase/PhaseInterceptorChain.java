@@ -191,7 +191,8 @@ public class PhaseInterceptorChain implements InterceptorChain {
     }
     
     public void add(Interceptor i, boolean force) {
-        PhaseInterceptor pi = (PhaseInterceptor)i;
+        @SuppressWarnings("unchecked")
+        PhaseInterceptor<? extends Message> pi = (PhaseInterceptor)i;
 
         String phaseName = pi.getPhase();        
         Integer phase = nameMap.get(phaseName);
@@ -206,6 +207,13 @@ public class PhaseInterceptorChain implements InterceptorChain {
             }
 
             insertInterceptor(phase, pi, force);
+        }
+        Collection<PhaseInterceptor<? extends Message>> extras 
+            = pi.getAdditionalInterceptors();
+        if (extras != null) {
+            for (PhaseInterceptor<? extends Message> p : extras) {
+                add(p, force);
+            }
         }
     }
 
@@ -481,7 +489,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
     }
     
-    private void insertInterceptor(int phase, PhaseInterceptor interc, boolean force) {
+    private void insertInterceptor(int phase, PhaseInterceptor<? extends Message> interc, boolean force) {
         InterceptorHolder ih = new InterceptorHolder(interc, phase);
         if (heads[phase] == null) {
             // no interceptors yet in this phase
@@ -523,10 +531,10 @@ public class PhaseInterceptorChain implements InterceptorChain {
         } else { // this phase already has interceptors attached
         
             // list of interceptors that the new interceptor should precede
-            Set beforeList = interc.getBefore();
+            Set<String> beforeList = interc.getBefore();
 
             // list of interceptors that the new interceptor should be after
-            Set afterList = interc.getAfter();
+            Set<String> afterList = interc.getAfter();
             
             // firstBefore will hold the first interceptor of a given phase
             // that the interceptor to be added must precede
@@ -548,7 +556,8 @@ public class PhaseInterceptorChain implements InterceptorChain {
                             || cmp.getAfter().contains(id))) {
                         firstBefore = ih2;
                     } 
-                    if (cmpId != null && afterList.contains(cmpId)) {
+                    if (cmp.getBefore().contains(id) 
+                        || (cmpId != null && afterList.contains(cmpId))) {
                         lastAfter = ih2;
                     }
                     if (!force && cmpId.equals(id)) {
@@ -576,6 +585,16 @@ public class PhaseInterceptorChain implements InterceptorChain {
                 //System.out.println("         " + interc.getId());
             }
             hasAfters[phase] |= !afterList.isEmpty();
+            
+            if (firstBefore == null
+                && lastAfter == null
+                && !beforeList.isEmpty()
+                && afterList.isEmpty()) {
+                //if this interceptor has stuff it MUST be before,
+                //but nothing it must be after, just
+                //stick it at the beginning
+                firstBefore = heads[phase];
+            }
             
             if (firstBefore == null) {
                 //just add new interceptor at the end
