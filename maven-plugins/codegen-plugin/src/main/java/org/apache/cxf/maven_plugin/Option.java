@@ -134,6 +134,12 @@ public class Option {
      * Enables validating the WSDL before generating the code. 
      */
     Boolean validateWsdl;
+    
+    
+    /**
+     * Enables or disables generation of the type classes. Default value is true.
+     */
+    Boolean generateTypes;
 
     /**
      * Enables generation of fault Exception's SUID based on hash of classname.
@@ -314,6 +320,14 @@ public class Option {
     public void setValidateWsdl(boolean validateWsdl) {
         this.validateWsdl = validateWsdl;
     }
+    
+    public boolean isGenerateTypes() {
+        return generateTypes == null ? true : generateTypes;
+    }
+    
+    public void setGenerateTypes(boolean generateTypes) {
+        this.generateTypes = generateTypes;
+    }
 
     public boolean isUseFQCNForFaultSerialVersionUID() {
         return useFQCNForFaultSerialVersionUID == null ? false : useFQCNForFaultSerialVersionUID;
@@ -398,6 +412,7 @@ public class Option {
         destination.setPackagenames(getPackagenames());
         destination.setServiceName(getServiceName());
         destination.setValidateWsdl(isValidateWsdl());
+        destination.setGenerateTypes(isGenerateTypes());
         destination.setUseFQCNForFaultSerialVersionUID(isUseFQCNForFaultSerialVersionUID());
         destination.setMarkGenerated(isMarkGenerated());
         destination.setAllowElementRefs(isAllowElementRefs());
@@ -417,6 +432,7 @@ public class Option {
     public void merge(Option defaultOptions) {
         wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
         extendedSoapHeaders = setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
+        generateTypes = setIfNull(generateTypes, defaultOptions.generateTypes);
         validateWsdl = setIfNull(validateWsdl, defaultOptions.validateWsdl);
         useFQCNForFaultSerialVersionUID = setIfNull(useFQCNForFaultSerialVersionUID,
             defaultOptions.useFQCNForFaultSerialVersionUID);

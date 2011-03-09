@@ -45,6 +45,7 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
+
 import org.junit.Test;
 
 public class CodeGenTest extends AbstractCodeGenTest {
@@ -1331,6 +1332,14 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue(m[0].getParameterAnnotations()[1][0] instanceof WebParam);
         WebParam wp = (WebParam)m[0].getParameterAnnotations()[1][0];
         assertTrue(wp.header());
+    }
+    
+    @Test
+    public void testCXFNotType() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CXF_GENERATE_TYPES, "false");
+        processor.setContext(env);
+        processor.execute();
     }
 
     @Test

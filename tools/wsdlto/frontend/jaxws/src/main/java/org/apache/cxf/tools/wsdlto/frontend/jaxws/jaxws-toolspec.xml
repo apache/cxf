@@ -235,6 +235,16 @@ Examples:
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
+            
+            <option id="generatetypes" maxOccurs="1">
+                <annotation>Enables the processing of generating the type class from schema. The default is true.
+                </annotation>
+                <switch>gt</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>(true, false)</annotation>
+                    <valueenum>true|false</valueenum>
+                </associatedArgument>
+            </option>
 
             <option id="defaultns" maxOccurs="1">
                 <annotation>
