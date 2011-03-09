@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.PrimitiveSearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -80,6 +84,7 @@ public class ReadOnlyFileStorageTest extends Assert {
         assertTrue(lastRecord.getMessage().contains("Pax Web available at"));
     }
     
+        
     @Test
     public void testReadRecordsWithMultiLines() throws Exception {
         
@@ -113,6 +118,7 @@ public class ReadOnlyFileStorageTest extends Assert {
         readPage(2, 10, 10);
         readPage(3, 10, 10);
         List<LogRecord> recordsPage4 = readPage(4, 10, 10);
+        readPage(4, 10, 10);
         readPage(5, 10, 10);
         List<LogRecord> recordsLastPage1 = readPage(6, 10, 2);
         
@@ -128,6 +134,23 @@ public class ReadOnlyFileStorageTest extends Assert {
         
         List<LogRecord> recordsLastPage2 = readPage(6, 10, 2);
         compareRecords(recordsLastPage1, recordsLastPage2);
+    }
+    
+    @Test
+    public void testReadRecordsWithMultipleFilesAndSearch() throws Exception {
+        
+        List<String> locations = new ArrayList<String>();
+        locations.add(getClass().getResource("logs/2011-01-22-karaf.log").toURI().getPath());
+        locations.add(getClass().getResource("logs/2011-01-23-karaf.log").toURI().getPath());
+        storage.setLogLocations(locations);
+        SearchCondition<LogRecord> sc = 
+            new PrimitiveSearchCondition<LogRecord>("message",
+                "*FeaturesServiceImpl.java:323*",
+                ConditionType.EQUALS,
+                new LogRecord()); 
+        List<LogRecord> recordsFirstPage1 = readPage(1, sc, 2, 1);
+        List<LogRecord> recordsFirstPage2 = readPage(1, sc, 2, 1);
+        compareRecords(recordsFirstPage1, recordsFirstPage2);
     }
     
     @Test
@@ -195,8 +218,14 @@ public class ReadOnlyFileStorageTest extends Assert {
     }
     
     private List<LogRecord> readPage(int page, int pageSize, int expected) {
+        return readPage(page, null, pageSize, expected);
+        
+    }
+    
+    private List<LogRecord> readPage(int page, SearchCondition<LogRecord> sc,
+                                     int pageSize, int expected) {
         List<LogRecord> records = new ArrayList<LogRecord>();
-        storage.load(records, null, page, pageSize);
+        storage.load(records, sc, page, pageSize);
         assertEquals(expected, records.size());
         return records;
         

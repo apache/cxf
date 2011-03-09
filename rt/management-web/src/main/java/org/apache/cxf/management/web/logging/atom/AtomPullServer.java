@@ -36,7 +36,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.abdera.model.Entry;
@@ -64,7 +63,6 @@ public class AtomPullServer extends AbstractAtomBean {
     private ReadableLogStorage storage;
     private int pageSize = 20;
     private int maxInMemorySize = 1000;
-    private boolean useArchivedFeeds;
     private volatile int recordsSize;
     private volatile boolean alreadyClosed;
     private SearchCondition<LogRecord> readableStorageCondition;
@@ -114,7 +112,7 @@ public class AtomPullServer extends AbstractAtomBean {
                 r.setLevel(LogLevel.valueOf(l.getLevel()));
                 list.add(new SearchConditionImpl(r));
             }
-            readableStorageCondition = new OrSearchCondition<LogRecord>(list);
+            readableStorageCondition = list.size() == 0 ? null : new OrSearchCondition<LogRecord>(list);
         }
         initBusProperty();
     }
@@ -237,66 +235,32 @@ public class AtomPullServer extends AbstractAtomBean {
     
     
     protected int fillSubList(List<LogRecord> list, int page, SearchCondition<LogRecord> theSearch) {
+        int oldListSize = list.size();
         
-        if (recordsSize == -1) {
-            // let the external storage load the records it knows about
-            storage.load(list, theSearch, page == 1 ? 0 : (page - 1) * pageSize, pageSize);
+        if (storage != null) {
+            page = storage.load(list, theSearch, page, pageSize);
+        }
+        
+        if (recordsSize == -1 || recordsSize == 0 || list.size() == pageSize) {
             return page;
         }
         
-        if (recordsSize == 0) {
-            return 1;
+        int fromIndex = page == 1 ? list.size() 
+                                  : (page - 1) * pageSize + list.size();
+        if (fromIndex > recordsSize) {
+            // this should not happen really
+            page = 1;
+            fromIndex = 0;
         }
+        int toIndex = page * pageSize;
+        if (toIndex > recordsSize) {
+            toIndex = recordsSize;
+        }
+        int offset = storage != null ? pageSize - (list.size() - oldListSize) : 0;
+        fromIndex -= offset;
+        toIndex -= offset;
+        list.addAll(filterRecords(records.subList(fromIndex, toIndex), theSearch));
         
-        int fromIndex = 0;
-        int toIndex = 0;
-        // see http://tools.ietf.org/html/draft-nottingham-atompub-feed-history-07
-        if (!useArchivedFeeds) {
-            fromIndex = page == 1 ? 0 : (page - 1) * pageSize;
-            if (fromIndex > recordsSize) {
-                // this should not happen really
-                page = 1;
-                fromIndex = 0;
-            }
-            toIndex = page == 1 ? pageSize : fromIndex + pageSize;
-            if (toIndex > recordsSize) {
-                toIndex = recordsSize;
-            }
-        } else {
-            fromIndex = recordsSize - pageSize * page;
-            if (fromIndex < 0) {
-                fromIndex = 0;
-            }
-            toIndex = pageSize < recordsSize ? recordsSize : pageSize;
-        }
-
-        // if we have the storage then try to load from it
-        boolean loaded = false;
-        if (storage != null) {
-            if (fromIndex < storage.getSize()) {
-                int storageSize = storage.getSize();
-                int maxQuantityToLoad = toIndex > storageSize ? toIndex - storageSize : toIndex - fromIndex;
-                storage.load(list, theSearch, fromIndex, maxQuantityToLoad);
-                loaded = true;
-                
-                int totalQuantity = toIndex - fromIndex;
-                if (list.size() < totalQuantity) {
-                    int remaining = totalQuantity - list.size();
-                    if (remaining > records.size()) {
-                        remaining = records.size();
-                    }
-                    fromIndex = 0;
-                    toIndex = remaining;
-                    loaded = false;
-                }
-            } else {
-                fromIndex -= storage.getSize();
-                toIndex -= storage.getSize();
-            }
-        } 
-        if (!loaded) {
-            list.addAll(filterRecords(records.subList(fromIndex, toIndex), theSearch));
-        }
         
         if (theSearch != null && list.size() < pageSize && page * pageSize < recordsSize) {
             return fillSubList(list, page + 1, theSearch);    
@@ -332,38 +296,26 @@ public class AtomPullServer extends AbstractAtomBean {
         
         String uri = context.getUriInfo().getBaseUriBuilder().path("logs").build().toString();
         feed.addLink(uri + "/alternate/" + page, "alternate");
-        if (!useArchivedFeeds) {
-            if (recordsSize != -1) {
-                if (page > 2) {
-                    feed.addLink(createLinkUri(uri, searchExpression), "first");
-                }
-                
-                if (searchExpression == null && lastPage * pageSize < recordsSize
-                    || searchExpression != null && feedSize == pageSize) {
-                    feed.addLink(createLinkUri(uri + "/" + (lastPage + 1), searchExpression), "next");
-                }
-                
-                if (searchExpression == null && page * (pageSize + 1) < recordsSize) {
-                    feed.addLink(uri + "/" + (recordsSize / pageSize + 1), "last");
-                }
-            } else if (feedSize == pageSize) {
-                feed.addLink(createLinkUri(uri + "/" + (page + 1), searchExpression), "next");
+        if (recordsSize != -1) {
+            if (page > 2) {
+                feed.addLink(createLinkUri(uri, searchExpression), "first");
             }
-            if (searchExpression == null && page > 1) {
-                uri = page > 2 ? uri + "/" + (page - 1) : uri;
-                feed.addLink(createLinkUri(uri, searchExpression), "previous");
+            
+            if (searchExpression == null && lastPage * pageSize < recordsSize
+                || searchExpression != null && feedSize == pageSize) {
+                feed.addLink(createLinkUri(uri + "/" + (lastPage + 1), searchExpression), "next");
             }
-        } else {
-            throw new WebApplicationException(Response.serverError()
-                                              .entity("Archived feeds are not supported yet")
-                                              .build());
-            // feed.addLink(self, "current");
-            // TODO : add prev-archive and next-archive; next-archive should not be set if it will point to
-            // current
-            // and xmlns:fh="http://purl.org/syndication/history/1.0":archive extension but only if
-            // it is not current
+            
+            if (searchExpression == null && page * (pageSize + 1) < recordsSize) {
+                feed.addLink(uri + "/" + (recordsSize / pageSize + 1), "last");
+            }
+        } else if (feedSize == pageSize) {
+            feed.addLink(createLinkUri(uri + "/" + (lastPage + 1), searchExpression), "next");
         }
-        
+        if (page > 1) {
+            uri = page > 2 ? uri + "/" + (page - 1) : uri;
+            feed.addLink(createLinkUri(uri, searchExpression), "previous");
+        }
     }
     
     private String createLinkUri(String uri, String search) {

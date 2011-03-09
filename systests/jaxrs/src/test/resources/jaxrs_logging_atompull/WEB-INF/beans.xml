@@ -85,8 +85,27 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</property>	
 	</bean>      
 
+    <bean id = "atomPullServer5" class="org.apache.cxf.management.web.logging.atom.AtomPullServer" 
+	      init-method="init">
+		  <property name="pageSize" value="1"/>
+		  <property name="storage">
+			<ref bean="storage3" />
+		</property>	
+	</bean>
+
    	<bean id="storage" class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Storage"/> 
-   	<bean id="storage2" class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$ExternalStorage"/> 
+   	<bean id="storage2" class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$ExternalStorage"/>
+   	<bean id="storage3" class="org.apache.cxf.management.web.logging.ReadOnlyFileStorage">
+   	    <property name="logLocation" value="{systemtests.jaxrs.logs.folder}/log.txt"/>
+   	    <property name="numberOfColumns" value="2"/>
+   	    <property name="columnsMap">
+   	       <map>
+   	         <entry key="1" value="level"/>
+   	         <entry key="2" value="message"/>
+   	       </map>
+   	    </property>
+   	</bean>
+   	 
 
 	<bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider">
 	    <property name="formattedOutput" value="true"/>
@@ -159,6 +178,14 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:providers>
 	</jaxrs:server>
     
+    <jaxrs:server id="atomServer5" address="/atom5">
+		<jaxrs:serviceBeans>
+			<ref bean="atomPullServer5"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+		</jaxrs:providers>
+	</jaxrs:server>
     
     <jaxrs:server id="atomReset" address="/reset">
 		<jaxrs:serviceBeans>

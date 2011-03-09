@@ -35,16 +35,19 @@ public interface ReadableLogStorage {
      * @param condition the condition loaded records must meet, can be null 
      * @param pageNumber the initial page to have records loaded from
      * @param int pageSize the max number of records to load from the storage
+     * 
+     * @return the current page number; it may be different from the starting page if
+     *         certain records within the given page range did not match the search condition.
      */
-    void load(List<LogRecord> list, 
-              SearchCondition<LogRecord> condition,
-              int pageNumber, 
-              int pageSize);
+    int load(List<LogRecord> list, 
+             SearchCondition<LogRecord> condition,
+             int pageNumber, 
+             int pageSize);
     
     
     /**
      * Get the size of storage (in records)
-     * @param the size, -1 if not known, for ex, when reading from an open file containing log entries
+     * @return the size, -1 if not known, for ex, when reading from an open file containing log entries
      */
     int getSize();
     

@@ -30,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,8 +49,9 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     public static final String DATE_ONLY_FORMAT = "yyyy-MM-dd";
         
     private static final String LINE_SEP = System.getProperty("line.separator"); 
+    private static final String DEFAULT_COLUMN_SEP = "|";
     
-    private String columnSep;
+    private String columnSep = DEFAULT_COLUMN_SEP;
     private int numberOfColumns;
     private boolean startsFromSeparator;
     private boolean endsWithSeparator;
@@ -65,11 +65,9 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     private Comparator<String> fileNameComparator;
     
     private Map<Integer, String> columnsMap;
-    private List<FileInfo> logFiles 
-        = Collections.synchronizedList(new LinkedList<FileInfo>());  
+    private List<FileInfo> logFiles = new LinkedList<FileInfo>();  
     private Map<String, String> levelsMap;
-    private ConcurrentHashMap<Integer, PageInfo> pagesMap
-        = new ConcurrentHashMap<Integer, PageInfo>();
+    private Map<Integer, PageInfo> pagesMap = new HashMap<Integer, PageInfo>();
     
     /**
      * {@inheritDoc}
@@ -81,16 +79,22 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     /**
      * {@inheritDoc}
      */
-    public void load(List<LogRecord> list, 
+    // Synchronization can not be avoided at the moment as
+    // the file position is continuously changed.
+    // Realistically, the log files will probably be viewed
+    // by the admin so it's not a problem. However the memory mapping can
+    // help in making it more flexible
+    public synchronized int load(List<LogRecord> list, 
                      SearchCondition<LogRecord> condition, 
                      int pageNumber,
                      int pageSize) {
         FileInfo logFileInfo = getLogFileInfo(pageNumber);
         if (logFileInfo == null) {
-            return;
+            return pageNumber;
         }
         
-        int count = 0;
+        int recordCount = 0;
+        int currentIndex = 0;
         while (true) {
             LogRecord record = readRecord(logFileInfo);
             if (record == null) {
@@ -98,17 +102,23 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
                 if (logFileInfo != null) {
                     continue;
                 } else {
-                    return;
+                    return pageNumber;
                 }
             }
             if (condition == null || condition.isMet(record)) {
                 list.add(record);
-                if (++count == pageSize) {
+                if (++recordCount == pageSize) {
+                    saveNextPagePosition(pageNumber + 1, logFileInfo);
                     break;
                 }
             }
+            if (++currentIndex == pageSize) {
+                pageNumber++;
+                recordCount = 0;
+                currentIndex = 0;
+            }
         }
-        savePagePosition(pageNumber, logFileInfo);
+        return pageNumber;
     }
 
     /**
@@ -120,7 +130,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
             FileInfo fileInfo = logFiles.get(i);
             if (fileInfo == logFileInfo) {
                 if (i + 1 < logFiles.size()) {    
-                    return logFiles.get(i + 1); 
+                    return setFilePosition(logFiles.get(i + 1), logFiles.get(i + 1).getStartPosition());
                 } else {
                     break;
                 }
@@ -132,27 +142,29 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         return null;
     }
 
+    private FileInfo setFilePosition(FileInfo fileInfo, long pos) {
+        try {
+            fileInfo.getFile().seek(pos);
+            return fileInfo;
+        } catch (IOException ex) {
+            System.err.println("Problem setting a page position in " + fileInfo.getFileName());
+            return null;
+        }
+    }
+    
     /**
      * Gets the file corresponding to the current page.
      */
     private FileInfo getLogFileInfo(int pageNumber) {
         PageInfo pageInfo = pagesMap.get(pageNumber);
         if (pageInfo != null) {
-            FileInfo fileInfo = pageInfo.getFileInfo();
-            try {
-                fileInfo.getFile().seek(pageInfo.getPosition());
-            } catch (IOException ex) {
-                System.err.println("Problem setting a page position in " + fileInfo.getFileName());
-                return null;
-            }
-            return pageInfo.getFileInfo();
+            return setFilePosition(pageInfo.getFileInfo(), pageInfo.getPosition());
         }
         int oldSize = logFiles.size();
         if (logDirectory != null 
             && scanLogDirectory()) {
             FileInfo fileInfo = logFiles.get(oldSize);
-            // savePagePosition increases the number by 1
-            savePagePosition(pageNumber - 1, fileInfo);
+            saveNextPagePosition(pageNumber, fileInfo);
             return fileInfo;
         }
         return null;
@@ -161,15 +173,15 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     /**
      * Save the position of the next page 
      */
-    private void savePagePosition(int pageNumber, FileInfo fileInfo) {
+    private void saveNextPagePosition(int pageNumber, FileInfo fileInfo) {
         try {
             long pos = fileInfo.getFile().getFilePointer();
             if (pos < fileInfo.getFile().length()) {
-                pagesMap.put(pageNumber + 1, new PageInfo(fileInfo, pos));
+                pagesMap.put(pageNumber, new PageInfo(fileInfo, pos));
             } else {
                 FileInfo nextFileInfo = getNextLogFileInfo(fileInfo, false);
                 if (nextFileInfo != null) {
-                    pagesMap.put(pageNumber + 1, 
+                    pagesMap.put(pageNumber, 
                                  new PageInfo(nextFileInfo, nextFileInfo.getFile().getFilePointer()));
                 }
             }
@@ -341,20 +353,31 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         String fileModifiedDate = null;
         if (useFileModifiedDate) {
             if (fileNameDatePattern != null) {
-                Matcher m = fileNameDatePattern.matcher(file.getName());
-                if (m.matches() && m.groupCount() > 0) {
-                    fileModifiedDate = m.group(1);
-                }
+                fileModifiedDate = getDateFromFileName(file.getName());
             }
             if (fileModifiedDate == null) {
                 Date fileDate = new Date(file.lastModified());
                 fileModifiedDate = getLogDateFormat().format(fileDate);
             }
         }
-        
-        FileInfo fileInfo = new FileInfo(logFile, file.getName(), fileModifiedDate);
-        skipIgnorableRecords(fileInfo, logFiles.size() == 0);
+        skipIgnorableRecords(logFile);
+        FileInfo fileInfo = new FileInfo(logFile, 
+                                         file.getName(), 
+                                         fileModifiedDate,
+                                         logFile.getFilePointer());
+        if (logFiles.size() == 0) {
+            pagesMap.put(1, new PageInfo(fileInfo, fileInfo.getStartPosition()));
+        }
         logFiles.add(fileInfo);
+    }
+    
+    private String getDateFromFileName(String name) {
+        Matcher m = fileNameDatePattern.matcher(name);
+        if (m.matches() && m.groupCount() > 0) {
+            return m.group(1);
+        } else {
+            return null;
+        }
     }
     
     private SimpleDateFormat getLogDateFormat() {
@@ -367,8 +390,12 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         int indexClose = location.indexOf("}");
         String realPath = null;
         if (indexOpen == 0 && indexClose != -1) {
-            realPath = location.substring(1, indexClose)
-                       + location.substring(indexClose + 1);
+            String property = location.substring(1, indexClose);
+            String resolvedPath = System.getProperty(property);
+            if (resolvedPath == null) {
+                throw new IllegalArgumentException("System property " + property + " can not be resolved");
+            }
+            realPath = resolvedPath + location.substring(indexClose + 1);
             
         } else {
             realPath = location;
@@ -394,16 +421,16 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     /**
      * Skip the records at the top of the file which have no column separators 
      */
-    private void skipIgnorableRecords(FileInfo fInfo, boolean first) throws IOException {
-        long nextPos = fInfo.getFile().getFilePointer();
-        String line = fInfo.getFile().readLine();
+    private void skipIgnorableRecords(RandomAccessFile file) throws IOException {
+        long nextPos = file.getFilePointer();
+        if (nextPos == file.length()) {
+            return;
+        }
+        String line = file.readLine();
         if (line.contains(columnSep)) {
-            fInfo.getFile().seek(nextPos);
-            if (first) {
-                pagesMap.put(1, new PageInfo(fInfo, nextPos));
-            }
+            file.seek(nextPos);
         } else {
-            skipIgnorableRecords(fInfo, first);
+            skipIgnorableRecords(file);
         }
         
     }
@@ -467,7 +494,9 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     private boolean scanLogDirectory() {
         int oldSize = logFiles.size();
         for (File file : logDirectory.listFiles()) {
-            if (file.isDirectory() || file.isHidden()) {
+            if (file.isDirectory() || file.isHidden()
+                || fileNameDatePattern != null 
+                   && getDateFromFileName(file.getName()) == null) {
                 continue;
             }
             
@@ -531,11 +560,13 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         private RandomAccessFile file;
         private String fileModified;
         private String fileName;
+        private long startPosition;
         
-        public FileInfo(RandomAccessFile file, String fileName, String fileModified) {
+        public FileInfo(RandomAccessFile file, String fileName, String fileModified, long startPos) {
             this.file = file;
             this.fileModified = fileModified;
             this.fileName = fileName;
+            this.startPosition = startPos;
         }
         
         public RandomAccessFile getFile() {
@@ -546,6 +577,9 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         }
         public String getFileName() {
             return fileName;
+        }
+        public long getStartPosition() {
+            return startPosition;
         }
     }
  

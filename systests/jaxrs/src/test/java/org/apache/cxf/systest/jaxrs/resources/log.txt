@@ -1,0 +1,2 @@
+INFO | Info message
+DEBUG | Debug Message
