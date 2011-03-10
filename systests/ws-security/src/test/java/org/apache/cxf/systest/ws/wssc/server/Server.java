@@ -131,7 +131,7 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService", 
                 portName = "SecureConversation_MutualCertificate10SignEncrypt_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class SCMCSEIPingService extends PingServiceImpl {
     }
 
@@ -139,42 +139,42 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService", 
                 portName = "AC_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class ACIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "ADC_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class ADCIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "ADC-ES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class ADCESIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_A_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class AIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_AD_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class ADIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_AD-ES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class ADESIPingService extends PingServiceImpl {
     }
 
@@ -183,42 +183,42 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService", 
                 portName = "UXC_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class UXCIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "UXDC_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class UXDCIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "UXDC-SEES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class UXDCSEESIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_UX_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class UXIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_UXD_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class UXDIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_UXD-SEES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class UXDSEESIPingService extends PingServiceImpl {
     }
 
@@ -226,35 +226,35 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService", 
                 portName = "XC_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XCIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "XDC_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XDCIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "XDC_IPingService1", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XDC1IPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "XDC-ES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XDCESIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "XDC-SEES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XDCSEESIPingService extends PingServiceImpl {
     }
     
@@ -262,35 +262,35 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService", 
                 portName = "_X_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_X10_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class X10IPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_XD_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XDIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_XD-SEES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XDSEESIPingService extends PingServiceImpl {
     }
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "_XD-ES_IPingService", 
                 endpointInterface = "wssec.wssc.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl")
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl")
     public static class XDESIPingService extends PingServiceImpl {
     }
 }

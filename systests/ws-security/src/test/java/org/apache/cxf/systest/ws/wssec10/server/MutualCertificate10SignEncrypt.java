@@ -23,7 +23,7 @@ package org.apache.cxf.systest.ws.wssec10.server;
     serviceName = "PingService", 
     portName = "MutualCertificate10SignEncrypt_IPingService", 
     endpointInterface = "wssec.wssec10.IPingService",
-    wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec10/WsSecurity10.wsdl"
+    wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10.wsdl"
 )                  
 public class MutualCertificate10SignEncrypt extends PingServiceBase {
     // complete

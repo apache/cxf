@@ -95,7 +95,7 @@
        address="http://localhost:${testutil.ports.AuthorizedServer}/UserName" 
        serviceName="interop:PingService"
        endpointName="interop:UserName_IPingService"
-       wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec10/WsSecurity10_12_restricted_hashed.wsdl"
+       wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10_12_restricted_hashed.wsdl"
        implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
         
        <jaxws:inInterceptors>
@@ -109,7 +109,7 @@
        address="http://localhost:${testutil.ports.AuthorizedServer}/HashedUserName" 
        serviceName="interop:PingService"
        endpointName="interop:UserName_IPingService_hashed"
-       wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec10/WsSecurity10_12_restricted_hashed.wsdl"
+       wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10_12_restricted_hashed.wsdl"
        implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
         
        <jaxws:inInterceptors>

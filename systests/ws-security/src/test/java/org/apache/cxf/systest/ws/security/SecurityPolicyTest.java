@@ -385,7 +385,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortHttp",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImpl extends AbstractDoubleItImpl {
     }
     
@@ -393,7 +393,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortHttps",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplHttps extends AbstractDoubleItImpl {
     }
     
@@ -401,7 +401,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortEncryptThenSign",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplEncryptThenSign extends AbstractDoubleItImpl {
     }
     
@@ -409,7 +409,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortSignThenEncrypt",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplSignThenEncrypt extends AbstractDoubleItImpl {
     }
     
@@ -417,7 +417,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortSign",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplSign extends AbstractDoubleItImpl {
     }
     
@@ -425,7 +425,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortXPath",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplXPath extends AbstractDoubleItImpl {
     }
     
@@ -433,14 +433,14 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortSignedOnly",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplSignOnly extends AbstractDoubleItImpl {
     }
     
     @WebServiceProvider(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
                         portName = "DoubleItPortSignThenEncrypt",
                         serviceName = "DoubleItService", 
-                        wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl") 
+                        wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl") 
     @ServiceMode(value = Mode.PAYLOAD)
     public static class DoubleItProvider implements Provider<Source> {
 
@@ -475,7 +475,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortCXF3041",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplCXF3041 extends AbstractDoubleItImpl {
     }
     
@@ -483,7 +483,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 portName = "DoubleItPortCXF3042",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
-                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+                wsdlLocation = "classpath:/wsdl_systest_wssec/DoubleIt.wsdl")
     public static class DoubleItImplCXF3042 extends AbstractDoubleItImpl {
     }
     

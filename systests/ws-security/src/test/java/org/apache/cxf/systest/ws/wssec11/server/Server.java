@@ -91,7 +91,7 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "A_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class APingService extends PingService {
     }
     
@@ -99,7 +99,7 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "A-NoTimestamp_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class ANoTimestampPingService extends PingService {
     }
 
@@ -107,21 +107,21 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "AD_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class ADPingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "A-ES_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class AESPingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "AD-ES_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class ADESPingService extends PingService {
     }
 
@@ -129,14 +129,14 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "UX_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class UXPingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "UX-NoTimestamp_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class UXNoTimestampPingService extends PingService {
     }
 
@@ -144,7 +144,7 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "UXD_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class UXDPingService extends PingService {
     }
 
@@ -152,14 +152,14 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "UX-SEES_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class UXSEESPingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "UXD-SEES_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class UXDSEESPingService extends PingService {
     }
 
@@ -169,14 +169,14 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "X_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XPingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "X-NoTimestamp_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XNoTimestampPingService extends PingService {
     }
 
@@ -184,7 +184,7 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "XD_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XDPingService extends PingService {
     }
 
@@ -192,35 +192,35 @@ public class Server extends AbstractBusTestServerBase {
                 serviceName = "PingService11", 
                 portName = "XD-ES_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XDESPingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "XD-SEES_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XDSEESPingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "X-AES128_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XAES128PingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "X-AES256_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XAES256PingService extends PingService {
     }
     @WebService(targetNamespace = "http://WSSec/wssec11", 
                 serviceName = "PingService11", 
                 portName = "X-TripleDES_IPingService", 
                 endpointInterface = "wssec.wssec11.IPingService",
-                wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl")        
+                wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")        
     public static class XTripleDESPingService extends PingService {
     }
 

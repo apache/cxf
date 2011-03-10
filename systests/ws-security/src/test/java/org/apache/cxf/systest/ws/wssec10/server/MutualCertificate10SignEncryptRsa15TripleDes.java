@@ -21,10 +21,10 @@ package org.apache.cxf.systest.ws.wssec10.server;
 @javax.jws.WebService(
     targetNamespace = "http://WSSec/wssec10", 
     serviceName = "PingService", 
-    portName = "MutualCertificate10SignEncrypt_IPingService", 
+    portName = "MutualCertificate10SignEncryptRsa15TripleDes_IPingService", 
     endpointInterface = "wssec.wssec10.IPingService",
-    wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec10/WsSecurity10_restricted.wsdl"
+    wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10.wsdl"
 )                  
-public class MutualCertificate10SignEncryptRestricted extends PingServiceBase {
+public class MutualCertificate10SignEncryptRsa15TripleDes extends PingServiceBase {
     // complete
 }
