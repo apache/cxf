@@ -30,6 +30,14 @@
     <name>Apache CXF Databinding System Tests</name>
     <version>2.4.0-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
+
+
+    <properties>
+        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
+        <hello.world.binding.file>hello_world.xml</hello.world.binding.file>
+        <doc.lit.bare.binding.file>doc_lit_bare.xml</doc.lit.bare.binding.file>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -141,12 +149,12 @@
                 <version>${cxf.jibx.version}</version>
                 <configuration>
                     <directory>${basedir}/target/generated/src/test/java/jibx_bindings</directory>
-                    <load>true</load>
-                    <validate>true</validate>
+                    <!--load>true</load-->
+                    <!--validate>true</validate-->
                     <!--verify>true</verify-->
                     <includes>
-                        <include>hello_world.xml</include>
-                        <include>doc_lit_bare.xml</include>
+                        <include>${hello.world.binding.file}</include>
+                        <include>${doc.lit.bare.binding.file}</include>
                     </includes>
                 </configuration>
                 <executions>
@@ -160,6 +168,20 @@
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>fastinstall</id>
+            <properties>
+                <hello.world.binding.file>none</hello.world.binding.file>
+                <doc.lit.bare.binding.file>none</doc.lit.bare.binding.file>
+            </properties>
+        </profile>
+        <profile>
+            <id>setup.eclipse</id>
+            <properties>
+                <hello.world.binding.file>none</hello.world.binding.file>
+                <doc.lit.bare.binding.file>none</doc.lit.bare.binding.file>
+            </properties>
+        </profile>
         <profile>
             <id>ibmjdk</id>
             <activation>
@@ -345,8 +367,5 @@
             <artifactId>jibx-tools</artifactId>
         </dependency>
     </dependencies>
-    <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
-    </properties>
 
 </project>
