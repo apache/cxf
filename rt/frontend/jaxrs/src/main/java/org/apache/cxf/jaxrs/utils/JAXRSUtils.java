@@ -187,6 +187,11 @@ public final class JAXRSUtils {
                                      Message message) {
         ClassResourceInfo cri = ori.getClassResourceInfo();
         InjectionUtils.injectContextMethods(requestObject, cri, message);
+        
+        if (cri.isSingleton() 
+            && (!cri.getParameterMethods().isEmpty() || !cri.getParameterFields().isEmpty())) {
+            LOG.fine("Injecting request parameters into singleton resource is not thread-safe");
+        }
         // Param methods
         MultivaluedMap<String, String> values = 
             (MultivaluedMap<String, String>)message.get(URITemplate.TEMPLATE_PARAMETERS);
@@ -198,9 +203,7 @@ public final class JAXRSUtils {
                                                 message,
                                                 values,
                                                 ori);
-            if (o != null) { 
-                InjectionUtils.injectThroughMethod(requestObject, m, o);
-            }
+            InjectionUtils.injectThroughMethod(requestObject, m, o);
         }
         // Param fields
         for (Field f : cri.getParameterFields()) {
@@ -211,9 +214,7 @@ public final class JAXRSUtils {
                                                 message,
                                                 values,
                                                 ori);
-            if (o != null) { 
-                InjectionUtils.injectFieldValue(f, requestObject, o);
-            }
+            InjectionUtils.injectFieldValue(f, requestObject, o);
         }
         
     }
