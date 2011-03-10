@@ -441,20 +441,19 @@ public class WSDL2JavaMojo extends AbstractMojo {
         URL url = getClass().getResource(getClass().getSimpleName() + ".class");
         
         try {
-            URI uri = url.toURI();
-            if ("jar".equals(uri.getScheme())) {
-                String s = uri.getSchemeSpecificPart();
+            if ("jar".equals(url.getProtocol())) {
+                String s = url.getPath();
                 if (s.contains("!")) {
                     s = s.substring(0, s.indexOf('!'));
-                    uri = new URI(s);
+                    url = new URL(s);
                 }
             }
+            URI uri = new URI(url.getProtocol(), null, url.getPath(), null, null);
             if (uri.getSchemeSpecificPart().endsWith(".class")) {
                 String s = uri.toString();
                 s = s.substring(0, s.length() - 6 - getClass().getName().length());
                 uri = new URI(s);
             }
-            
             File file = new File(uri);
             if (file.exists()) {
                 artifactsPath.add(file.toURI());
@@ -626,9 +625,11 @@ public class WSDL2JavaMojo extends AbstractMojo {
         }
 
         cmd.createArg().setLine(additionalJvmArgs);
-
+        
+        File file = null;
         try {
-            File file = FileUtils.createTempFile("cxf-codegen", ".jar");
+            //file = new File("/tmp/test.jar"); 
+            file = FileUtils.createTempFile("cxf-codegen", ".jar");
 
             JarArchiver jar = new JarArchiver();
             jar.setDestFile(file.getAbsoluteFile());
@@ -636,7 +637,11 @@ public class WSDL2JavaMojo extends AbstractMojo {
             Manifest manifest = new Manifest();
             Attribute attr = new Attribute();
             attr.setName("Class-Path");
-            attr.setValue(StringUtils.join(classPath.iterator(), " "));
+            StringBuilder b = new StringBuilder(8000);
+            for (URI cp : classPath) {
+                b.append(cp.toURL().toExternalForm()).append(' ');
+            }
+            attr.setValue(b.toString());
             manifest.getMainSection().addConfiguredAttribute(attr);
             
             attr = new Attribute();
@@ -688,6 +693,9 @@ public class WSDL2JavaMojo extends AbstractMojo {
             throw new MojoExecutionException(msg.toString());
         }
 
+        if (file != null) {
+            file.delete();
+        }
         if (StringUtils.isNotEmpty(err.getOutput()) && err.getOutput().contains("WSDL2Java Error")) {
             StringBuffer msg = new StringBuffer();
             msg.append(err.getOutput());
