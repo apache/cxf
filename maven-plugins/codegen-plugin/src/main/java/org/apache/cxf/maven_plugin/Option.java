@@ -137,9 +137,9 @@ public class Option {
     
     
     /**
-     * Enables or disables generation of the type classes. Default value is true.
+     * Enables or disables generation of the type classes. Default value is false.
      */
-    Boolean generateTypes;
+    Boolean noTypes;
 
     /**
      * Enables generation of fault Exception's SUID based on hash of classname.
@@ -321,12 +321,12 @@ public class Option {
         this.validateWsdl = validateWsdl;
     }
     
-    public boolean isGenerateTypes() {
-        return generateTypes == null ? true : generateTypes;
+    public boolean isNoTypes() {
+        return noTypes == null ? false : noTypes;
     }
     
-    public void setGenerateTypes(boolean generateTypes) {
-        this.generateTypes = generateTypes;
+    public void setNoTypes(boolean noTypes) {
+        this.noTypes = noTypes;
     }
 
     public boolean isUseFQCNForFaultSerialVersionUID() {
@@ -412,7 +412,7 @@ public class Option {
         destination.setPackagenames(getPackagenames());
         destination.setServiceName(getServiceName());
         destination.setValidateWsdl(isValidateWsdl());
-        destination.setGenerateTypes(isGenerateTypes());
+        destination.setNoTypes(isNoTypes());
         destination.setUseFQCNForFaultSerialVersionUID(isUseFQCNForFaultSerialVersionUID());
         destination.setMarkGenerated(isMarkGenerated());
         destination.setAllowElementRefs(isAllowElementRefs());
@@ -432,7 +432,7 @@ public class Option {
     public void merge(Option defaultOptions) {
         wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
         extendedSoapHeaders = setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
-        generateTypes = setIfNull(generateTypes, defaultOptions.generateTypes);
+        noTypes = setIfNull(noTypes, defaultOptions.noTypes);
         validateWsdl = setIfNull(validateWsdl, defaultOptions.validateWsdl);
         useFQCNForFaultSerialVersionUID = setIfNull(useFQCNForFaultSerialVersionUID,
             defaultOptions.useFQCNForFaultSerialVersionUID);

@@ -238,7 +238,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
         }
         
-        if (!context.getBooleanValue(ToolConstants.CXF_GENERATE_TYPES, "true")) {
+        if (context.optionSet(ToolConstants.CFG_NO_TYPES)) {
             context.remove(ToolConstants.CFG_TYPES);
             context.remove(ToolConstants.CFG_ALL);
             context.remove(ToolConstants.CFG_COMPILE);
@@ -580,7 +580,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             || context.optionSet(ToolConstants.CFG_GEN_FAULT)) {
             return true;
         }
-        if (!context.getBooleanValue(ToolConstants.CXF_GENERATE_TYPES, "true")) {
+        if (context.optionSet(ToolConstants.CFG_NO_TYPES)) {
             return true;
         }
         return false;
