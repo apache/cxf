@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -399,7 +400,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
         Bus bus = null;
         try {
-            String cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
+            Set<String> cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
             if ("once".equals(fork) || "true".equals(fork)) {
                 forkOnce(cp, effectiveWsdlOptions);
@@ -432,7 +433,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         System.gc();
     }
     
-    private void addPluginArtifact(List<String> artifactsPath) {
+    private void addPluginArtifact(Set<String> artifactsPath) {
         //for Maven 2.x, the actual artifact isn't in the list....  need to try and find it
         URL url = getClass().getResource(getClass().getSimpleName() + ".class");
         
@@ -461,7 +462,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
     }
 
-    private void forkOnce(String classPath, List<WsdlOption> effectiveWsdlOptions) 
+    private void forkOnce(Set<String> classPath, List<WsdlOption> effectiveWsdlOptions) 
         throws MojoExecutionException {
         List<WsdlOption> toDo = new LinkedList<WsdlOption>();
         List<List<String>> wargs = new LinkedList<List<String>>();
@@ -486,7 +487,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             return;
         }
         
-        List<String> artifactsPath = new ArrayList<String>(pluginArtifacts.size());
+        Set<String> artifactsPath = new LinkedHashSet<String>();
         for (Artifact a : pluginArtifacts) {
             File file = a.getFile();
             if (file == null) {
@@ -497,12 +498,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
             artifactsPath.add(file.getPath());
         }
         addPluginArtifact(artifactsPath);
+        artifactsPath.addAll(classPath);
         
-        classPath = StringUtils.join(artifactsPath.iterator(), File.pathSeparator) 
-            + File.pathSeparator + classPath;
+        String cp = StringUtils.join(artifactsPath.iterator(), File.pathSeparator);
         
         String args[] = createForkOnceArgs(wargs);
-        runForked(classPath, ForkOnceWSDL2Java.class, args);
+        runForked(cp, ForkOnceWSDL2Java.class, args);
         
         for (WsdlOption wsdlOption : toDo) {
             File dirs[] = wsdlOption.getDeleteDirs();
@@ -543,7 +544,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
     private Bus callWsdl2Java(WsdlOption wsdlOption, 
                               Bus bus,
-                              String classPath) throws MojoExecutionException {
+                              Set<String> classPath) throws MojoExecutionException {
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
         URI basedir = project.getBasedir().toURI();
@@ -561,7 +562,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         getLog().debug("Calling wsdl2java with args: " + Arrays.toString(args));
         
         if (!"false".equals(fork)) {
-            List<String> artifactsPath = new ArrayList<String>(pluginArtifacts.size());
+            Set<String> artifactsPath = new LinkedHashSet<String>();
             for (Artifact a : pluginArtifacts) {
                 File file = a.getFile();
                 if (file == null) {
@@ -572,10 +573,10 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 artifactsPath.add(file.getPath());
             }
             addPluginArtifact(artifactsPath);
-            classPath = StringUtils.join(artifactsPath.iterator(), File.pathSeparator) 
-                + File.pathSeparator + classPath;
+            artifactsPath.addAll(classPath);
+            String cp = StringUtils.join(artifactsPath.iterator(), File.pathSeparator);
             
-            runForked(classPath, WSDLToJava.class, args);
+            runForked(cp, WSDLToJava.class, args);
 
         } else {
             if (bus == null) {

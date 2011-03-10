@@ -25,8 +25,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.maven.artifact.Artifact;
@@ -55,12 +57,12 @@ public class ClassLoaderSwitcher {
      * @param useCompileClasspath
      * @param classesDir
      */
-    public String switchClassLoader(MavenProject project,
-                                     boolean useCompileClasspath,
-                                     File classesDir) {
+    public Set<String> switchClassLoader(MavenProject project,
+                                         boolean useCompileClasspath,
+                                         File classesDir) {
         List<URL> urlList = new ArrayList<URL>();
         StringBuilder buf = new StringBuilder();
-
+        Set<String> ret = new LinkedHashSet<String>();
         
         try {
             urlList.add(classesDir.toURI().toURL());
@@ -72,9 +74,11 @@ public class ClassLoaderSwitcher {
         }
 
         buf.append(classesDir.getAbsolutePath());
+        ret.add(classesDir.getAbsolutePath());
         buf.append(File.pathSeparatorChar);
         if (!useCompileClasspath) {
             buf.append(project.getBuild().getOutputDirectory());
+            ret.add(project.getBuild().getOutputDirectory());
             buf.append(File.pathSeparatorChar);
         }
         List<?> artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
@@ -83,6 +87,7 @@ public class ClassLoaderSwitcher {
                 if (a.getFile() != null && a.getFile().exists()) {
                     urlList.add(a.getFile().toURI().toURL());
                     buf.append(a.getFile().getAbsolutePath());
+                    ret.add(a.getFile().getAbsolutePath());
                     buf.append(File.pathSeparatorChar);
                     // System.out.println("     " +
                     // a.getFile().getAbsolutePath());
@@ -105,7 +110,7 @@ public class ClassLoaderSwitcher {
 
         Thread.currentThread().setContextClassLoader(loader);
         System.setProperty("java.class.path", newCp);
-        return newCp;
+        return ret;
     }
 
     /**
