@@ -112,10 +112,46 @@
                                         <extraarg>xmlbeans</extraarg>
                                     </extraargs>
                                 </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/jibx/hello_world.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>jibx</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/jibx/doc_lit_bare.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>jibx</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jibx</groupId>
+                <artifactId>maven-jibx-plugin</artifactId>
+                <version>${cxf.jibx.version}</version>
+                <configuration>
+                    <directory>${basedir}/target/generated/src/test/java/jibx_bindings</directory>
+                    <load>true</load>
+                    <validate>true</validate>
+                    <!--verify>true</verify-->
+                    <includes>
+                        <include>hello_world.xml</include>
+                        <include>doc_lit_bare.xml</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-bind</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -188,6 +224,11 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jibx</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -286,6 +327,22 @@
        	    <scope>test</scope>
        	</dependency>
 
+        <dependency>
+            <groupId>org.jibx</groupId>
+            <artifactId>jibx-bind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
+            <artifactId>jibx-run</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
+            <artifactId>jibx-schema</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
+            <artifactId>jibx-tools</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>

@@ -19,5 +19,5 @@ under the License.
 -->
 
 <plugin name="jibx" version="" provider="cxf.apache.org" xmlns="http://cxf.apache.org/tools/plugin">
-    <databinding name="jibx" package="org.apache.cxf.jibx.tools" profile="JiBXToolingDataBinding"/>
+    <databinding name="jibx" package="org.apache.cxf.jibx.tools" profile="JibxToolingDataBinding"/>
 </plugin>

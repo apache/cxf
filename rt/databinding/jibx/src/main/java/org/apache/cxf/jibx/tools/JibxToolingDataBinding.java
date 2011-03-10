@@ -47,6 +47,7 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
+import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.jibx.binding.Compile;
 import org.jibx.binding.Utility;
@@ -92,7 +93,7 @@ public class JibxToolingDataBinding implements DataBindingProfile {
             codegen.setProblemHandler(handler);
 
             // Setting the source (or the output) directory
-            String sourcePath = (String)context.get(ToolConstants.CFG_SOURCEDIR);
+            String sourcePath = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
             if (sourcePath == null) {
                 sourcePath = (new File(".")).getAbsolutePath();
             }
@@ -101,6 +102,17 @@ public class JibxToolingDataBinding implements DataBindingProfile {
                 generatePath.mkdir();
             }
             codegen.setGeneratePath(generatePath);
+            String wsdlUrl = URIParserUtil.getAbsoluteURI((String)context.get(ToolConstants.CFG_WSDLURL));
+            if (wsdlUrl.contains("/")) {
+                wsdlUrl = wsdlUrl.substring(wsdlUrl.lastIndexOf('/'));
+            }
+            if (wsdlUrl.toLowerCase().endsWith(".wsdl")) {
+                wsdlUrl = wsdlUrl.substring(0, wsdlUrl.length() - 5);
+            }
+            wsdlUrl += ".xml";
+            File jibxDir = new File(generatePath, "jibx_bindings/");
+            jibxDir.mkdirs();
+            codegen.setBindingName("jibx_bindings/" +  wsdlUrl);
 
             String classPath = (String)context.get(ToolConstants.CFG_CLASSDIR);
             if (classPath == null) {
@@ -168,11 +180,15 @@ public class JibxToolingDataBinding implements DataBindingProfile {
     }
 
     public void initialize(ToolContext context) throws ToolException {
+        context.put(ToolConstants.RUNTIME_DATABINDING_CLASS,
+                    "org.apache.cxf.jibx.JibxDataBinding.class");
+        
         String wsdlUrl = (String)context.get(ToolConstants.CFG_WSDLURL);
         initializeJiBXCodeGenerator(wsdlUrl);
     }
 
     private void initializeJiBXCodeGenerator(String wsdlUrl) {
+
         try {
             loadWsdl(wsdlUrl, this.schemaMap, this.resolvers);
         } catch (WSDLException e) {
@@ -213,13 +229,20 @@ public class JibxToolingDataBinding implements DataBindingProfile {
     }
 
     @SuppressWarnings("unchecked")
-    private static SchemasetCustom defaultSchemasetCustom(Map<String, Element> schemaMap) {
+    private SchemasetCustom defaultSchemasetCustom(Map<String, Element> smap) {
         SchemasetCustom customRoot = new SchemasetCustom((SchemasetCustom)null);
-        Set<String> schemaIds = schemaMap.keySet();
+        Set<String> schemaIds = smap.keySet();
         for (String schemaId : schemaIds) {
             SchemaCustom schemaCustom = new SchemaCustom(customRoot);
             schemaCustom.setName(schemaId);
+            schemaCustom.setForceTypes(Boolean.TRUE);
             customRoot.getChildren().add(schemaCustom);
+        }
+        for (ISchemaResolver r : resolvers) {
+            SchemaCustom schemaCustom = new SchemaCustom(customRoot);
+            schemaCustom.setName(r.getName());
+            schemaCustom.setForceTypes(Boolean.TRUE);
+            customRoot.getChildren().add(schemaCustom);                    
         }
         return customRoot;
     }
@@ -229,7 +252,6 @@ public class JibxToolingDataBinding implements DataBindingProfile {
         for (Object child : children) {
             SchemaCustom schemaCustom = (SchemaCustom)child;
             schemaCustom.setForceTypes(Boolean.TRUE);
-            // TODO setForceType recursively ??
         }
     }
 
@@ -346,6 +368,7 @@ public class JibxToolingDataBinding implements DataBindingProfile {
          */
         public void generate() throws JiBXException, IOException {
             CodeGen codegen = new CodeGen(customRoot, schemaRoot, generatePath);
+            
             codegen.generate(verbose, usingNamespace, nonamespacePackage, bindingName, fileset, includePaths,
                              modelFile, problemHandler);
             setPostGenerateInfo(codegen);

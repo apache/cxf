@@ -26,9 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.ws.WebFault;
-
-import org.w3c.dom.Node;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -44,6 +43,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 public class WebFaultOutInterceptor extends FaultOutInterceptor {
 
@@ -104,15 +104,16 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
             Service service = message.getExchange().get(Service.class);
 
             try {
-                DataWriter<Node> writer = service.getDataBinding().createWriter(Node.class);
+                DataWriter<XMLStreamWriter> writer 
+                    = service.getDataBinding().createWriter(XMLStreamWriter.class);
     
                 OperationInfo op = message.getExchange().get(BindingOperationInfo.class).getOperationInfo();
                 QName faultName = getFaultName(fault, cause.getClass(), op);
                 MessagePartInfo part = getFaultMessagePart(faultName, op);
                 if (f.hasDetails()) {
-                    writer.write(faultInfo, part, f.getDetail());
+                    writer.write(faultInfo, part, new W3CDOMStreamWriter(f.getDetail()));
                 } else {
-                    writer.write(faultInfo, part, f.getOrCreateDetail());
+                    writer.write(faultInfo, part, new W3CDOMStreamWriter(f.getOrCreateDetail()));
                     if (!f.getDetail().hasChildNodes()) {
                         f.setDetail(null);
                     }
