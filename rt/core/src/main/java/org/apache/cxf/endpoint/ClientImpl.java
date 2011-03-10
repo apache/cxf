@@ -642,6 +642,7 @@ public class ClientImpl
             message.getExchange().put(Endpoint.class, endpoint);
         }
         message = endpoint.getBinding().createMessage(message);
+        message.getExchange().setInMessage(message);
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
         PhaseManager pm = bus.getExtension(PhaseManager.class);

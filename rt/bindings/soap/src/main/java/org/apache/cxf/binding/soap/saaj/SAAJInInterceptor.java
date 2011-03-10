@@ -133,7 +133,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 message.setContent(SOAPMessage.class, soapMessage);
                 
                 SOAPPart part = soapMessage.getSOAPPart();
-                message.setContent(Document.class, part);
+                message.setContent(Node.class, part);
                 message.put(BODY_FILLED_IN, Boolean.FALSE);
 
             } catch (RuntimeException ex) {

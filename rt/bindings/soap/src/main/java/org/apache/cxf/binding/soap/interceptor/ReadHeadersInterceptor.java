@@ -152,7 +152,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
 
                 Node nd = message.getContent(Node.class);
                 Document doc = null;
-                if (nd instanceof Document && ((Document)nd).getDocumentElement() == null) {
+                if (nd instanceof Document) {
                     doc = (Document)nd;
                     StaxUtils.readDocElements(doc, doc, filteredReader, false, false);
                 } else {
