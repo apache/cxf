@@ -50,6 +50,7 @@ import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.namespace.QName;
@@ -107,6 +108,66 @@ public class JAXBElementProviderTest extends Assert {
         assertNotNull(bookContext);
         JAXBContext superBookContext = provider.getJAXBContext(SuperBook.class, SuperBook.class);
         assertSame(bookContext, superBookContext);
+    }
+    
+    @Test
+    public void testExtraClassWithoutSingleContext() throws Exception {
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setExtraClass(new Class[]{SuperBook.class});
+        provider.init(Collections.singletonList(cri));
+        JAXBContext bookContext = provider.getJAXBContext(Book.class, Book.class);
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream(); 
+        bookContext.createMarshaller().marshal(new SuperBook("name", 1L, 2L), os);
+        SuperBook book = (SuperBook)bookContext.createUnmarshaller()
+                             .unmarshal(new ByteArrayInputStream(os.toByteArray()));
+        assertEquals(2L, book.getSuperId());        
+    }
+    
+    @Test
+    public void testExtraClassWithGenerics() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setExtraClass(new Class[]{XmlObject.class});
+        testXmlList(provider);
+    }
+    
+    @Test
+    public void testExtraClassWithGenericsAndSingleContext() throws Exception {
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(XmlListResource.class, XmlListResource.class, true, true);
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setExtraClass(new Class[]{XmlObject.class});
+        provider.init(Collections.singletonList(cri));
+        testXmlList(provider);
+        
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void testXmlList(JAXBElementProvider provider) throws Exception {
+        
+        List<XmlObject> list = new ArrayList<XmlObject>();
+        for (int i = 0; i < 10; i++) {
+            MyObject o = new MyObject();
+            o.setName("name #" + i);
+            list.add(new XmlObject(o));
+        }
+        XmlList<XmlObject> xmlList = new XmlList<XmlObject>(list);
+        
+        JAXBContext context = provider.getJAXBContext(XmlList.class, XmlList.class);
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream(); 
+        context.createMarshaller().marshal(xmlList, os);
+        XmlList<XmlObject> list2 = (XmlList<XmlObject>)context.createUnmarshaller()
+            .unmarshal(new ByteArrayInputStream(os.toByteArray()));
+        
+        List<XmlObject> actualList = list2.getList();
+        assertEquals(10, actualList.size());
+        for (int i = 0; i < 10; i++) {
+            XmlObject object = actualList.get(i);
+            assertEquals("name #" + i, object.getAttribute().getName());
+        }
     }
     
     @Test
@@ -1141,6 +1202,71 @@ public class JAXBElementProviderTest extends Assert {
         
         @GET
         public SuperBook getSuperBook() {
+            return null;
+        }
+    }
+    
+    @XmlRootElement(name = "list")
+    public static class XmlList<A> {
+        private List<A> list;
+
+        public XmlList() {
+            // no-op
+        }
+
+        public XmlList(List<A> l) {
+            list = l;
+        }
+
+        public List<A> getList() {
+            return list;
+        }
+
+        public void setList(List<A> l) {
+            list = l;
+        }
+    }
+
+    @XmlType
+    public static class XmlObject {
+        private MyObject attribute;
+
+        public XmlObject() {
+            // no-op
+        }
+
+        public XmlObject(MyObject a) {
+            attribute = a;
+        }
+
+        @XmlElement(name = "attribute")
+        public MyObject getAttribute() {
+            return attribute;
+        }
+
+        public void setAttribute(MyObject a) {
+            attribute = a;
+        }
+    }
+
+    public static class MyObject {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String n) {
+            name = n;
+        }
+    }
+
+    
+    @Path("/test")
+    public class XmlListResource {
+        @GET
+        @Path("/jaxb")
+        public XmlList<XmlObject> testJaxb() {
             return null;
         }
     }

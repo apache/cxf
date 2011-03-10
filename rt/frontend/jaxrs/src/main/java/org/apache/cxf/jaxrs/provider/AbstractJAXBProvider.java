@@ -375,7 +375,16 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
             if (context == null) {
-                context = JAXBContext.newInstance(new Class[]{type}, cProperties);
+                Class[] classes = null;
+                if (extraClass != null) {
+                    classes = new Class[extraClass.length + 1];
+                    classes[0] = type;
+                    System.arraycopy(extraClass, 0, classes, 1, extraClass.length);
+                } else {
+                    classes = new Class[] {type};    
+                }
+                
+                context = JAXBContext.newInstance(classes, cProperties);
                 classContexts.put(type, context);
             }
             return context;
