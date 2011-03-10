@@ -39,6 +39,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
@@ -155,7 +156,10 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }  
 
     @Override
-    protected Crypto loadCryptoFromPropertiesFile(String propFilename, RequestData reqData) {
+    protected Crypto loadCryptoFromPropertiesFile(
+        String propFilename, 
+        RequestData reqData
+    ) throws WSSecurityException {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
             try {

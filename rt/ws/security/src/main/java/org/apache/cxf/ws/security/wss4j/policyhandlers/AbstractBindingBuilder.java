@@ -432,8 +432,10 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected Map<Token, WSSecBase> handleSupportingTokens(Collection<Assertion> tokens, 
-                                                           boolean endorse) {
+    protected Map<Token, WSSecBase> handleSupportingTokens(
+        Collection<Assertion> tokens, 
+        boolean endorse
+    ) throws WSSecurityException {
         Map<Token, WSSecBase> ret = new HashMap<Token, WSSecBase>();
         if (tokens != null) {
             for (Assertion pa : tokens) {
@@ -445,13 +447,18 @@ public abstract class AbstractBindingBuilder {
         return ret;
     }
     
-    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens, boolean endorse) {
+    protected Map<Token, WSSecBase> handleSupportingTokens(
+        SupportingToken suppTokens,
+        boolean endorse
+    ) throws WSSecurityException {
         return handleSupportingTokens(suppTokens, endorse, new HashMap<Token, WSSecBase>());
     }
     
-    protected Map<Token, WSSecBase> handleSupportingTokens(SupportingToken suppTokens, 
-                                                           boolean endorse,
-                                                           Map<Token, WSSecBase> ret) {
+    protected Map<Token, WSSecBase> handleSupportingTokens(
+        SupportingToken suppTokens, 
+        boolean endorse,
+        Map<Token, WSSecBase> ret
+    ) throws WSSecurityException {
         if (suppTokens == null) {
             return ret;
         }
@@ -1054,19 +1061,23 @@ public abstract class AbstractBindingBuilder {
         return encrKey;
     }
 
-    public Crypto getSignatureCrypto(TokenWrapper wrapper) {
+    public Crypto getSignatureCrypto(TokenWrapper wrapper) throws WSSecurityException {
         return getCrypto(wrapper, SecurityConstants.SIGNATURE_CRYPTO,
                          SecurityConstants.SIGNATURE_PROPERTIES);
     }
 
 
-    public Crypto getEncryptionCrypto(TokenWrapper wrapper) {
+    public Crypto getEncryptionCrypto(TokenWrapper wrapper) throws WSSecurityException {
         return getCrypto(wrapper, 
                          SecurityConstants.ENCRYPT_CRYPTO,
                          SecurityConstants.ENCRYPT_PROPERTIES);
     }
     
-    public Crypto getCrypto(TokenWrapper wrapper, String cryptoKey, String propKey) {
+    public Crypto getCrypto(
+        TokenWrapper wrapper, 
+        String cryptoKey, 
+        String propKey
+    ) throws WSSecurityException {
         Crypto crypto = (Crypto)message.getContextualProperty(cryptoKey);
         if (crypto != null) {
             return crypto;
@@ -1288,13 +1299,13 @@ public abstract class AbstractBindingBuilder {
     
     protected WSSecSignature getSignatureBuilder(
         TokenWrapper wrapper, Token token, boolean endorse
-    ) {
+    ) throws WSSecurityException {
         return getSignatureBuilder(wrapper, token, false, endorse);
     }
     
     protected WSSecSignature getSignatureBuilder(
         TokenWrapper wrapper, Token token, boolean attached, boolean endorse
-    ) {
+    ) throws WSSecurityException {
         WSSecSignature sig = new WSSecSignature(wssConfig);
         checkForX509PkiPath(sig, token);
         if (token instanceof IssuedToken) {
@@ -1587,7 +1598,7 @@ public abstract class AbstractBindingBuilder {
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS));
     }
     
-    protected void addSupportingTokens(List<WSEncryptionPart> sigs) {
+    protected void addSupportingTokens(List<WSEncryptionPart> sigs) throws WSSecurityException {
         
         Collection<Assertion> sgndSuppTokens = 
             findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
