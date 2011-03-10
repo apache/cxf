@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -430,6 +431,35 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
         System.gc();
     }
+    
+    private void addPluginArtifact(List<String> artifactsPath) {
+        //for Maven 2.x, the actual artifact isn't in the list....  need to try and find it
+        URL url = getClass().getResource(getClass().getSimpleName() + ".class");
+        
+        try {
+            URI uri = url.toURI();
+            if ("jar".equals(uri.getScheme())) {
+                String s = uri.getSchemeSpecificPart();
+                if (s.contains("!")) {
+                    s = s.substring(0, s.indexOf('!'));
+                    uri = new URI(s);
+                }
+            }
+            if (uri.getSchemeSpecificPart().endsWith(".class")) {
+                String s = uri.toString();
+                s = s.substring(0, s.length() - 6 - getClass().getName().length());
+                uri = new URI(s);
+            }
+            
+            File file = new File(uri);
+            if (file.exists()) {
+                artifactsPath.add(file.getPath());
+            }
+        } catch (Exception ex) {
+            //ex.printStackTrace();
+        }
+
+    }
 
     private void forkOnce(String classPath, List<WsdlOption> effectiveWsdlOptions) 
         throws MojoExecutionException {
@@ -466,6 +496,8 @@ public class WSDL2JavaMojo extends AbstractMojo {
             }
             artifactsPath.add(file.getPath());
         }
+        addPluginArtifact(artifactsPath);
+        
         classPath = StringUtils.join(artifactsPath.iterator(), File.pathSeparator) 
             + File.pathSeparator + classPath;
         
@@ -539,6 +571,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 }
                 artifactsPath.add(file.getPath());
             }
+            addPluginArtifact(artifactsPath);
             classPath = StringUtils.join(artifactsPath.iterator(), File.pathSeparator) 
                 + File.pathSeparator + classPath;
             
