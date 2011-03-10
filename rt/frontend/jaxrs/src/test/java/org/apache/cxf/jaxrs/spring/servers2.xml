@@ -35,7 +35,8 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
       </property>
   </bean>
   
-  <jaxrs:server id="server1" address="http://localhost:8080/simpleWithAddress10"
+  <jaxrs:server id="server1" 
+     address="http://localhost:9090/simpleWithAddress10"
      beanNames="bookstore3 bookstore4">
     <jaxrs:serviceFactories>
        <ref bean="sfactory1"/>

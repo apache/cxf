@@ -39,9 +39,10 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
   <jaxrs:server xmlns:s="http://books.com" serviceName="s:BookService" 
         id="simple" 
         serviceClass="org.apache.cxf.jaxrs.resources.BookStore"         
-        address="http://localhost:8080/rs"/>
+        address="http://localhost:9090/rs"/>
   
-  <jaxrs:server id="inlineServiceBeans" address="http://localhost:8080/simpleWithAddress10">
+  <jaxrs:server id="inlineServiceBeans" 
+                address="http://localhost:9090/simpleWithAddress10">
     <jaxrs:serviceBeans>
       <bean class="org.apache.cxf.jaxrs.resources.BookStore"/>
       <bean class="org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly"/>      
@@ -50,7 +51,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
   
   <jaxrs:server id="inlineProvider"
     serviceClass="org.apache.cxf.jaxrs.resources.BookStore"
-    address="http://localhost:8080/simpleWithAddress"
+    address="http://localhost:9090/simpleWithAddress"
     bus="cxf" staticSubresourceResolution="false">
     <jaxrs:providers>
         <ref bean="feed"/>
@@ -75,7 +76,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
   
   <jaxrs:server id="moduleServer"
     modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
-    address="http://localhost:8080/simpleWithAddress"
+    address="http://localhost:9090/simpleWithAddress"
     bus="cxf"/>
   
 </beans>
