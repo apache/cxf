@@ -43,7 +43,13 @@ public class TrustException extends UncheckedException {
     public TrustException(Message msg, Throwable t) {
         super(msg, t);
     }
-
+    /**
+     * @param msg
+     * @param t
+     */
+    public TrustException(Logger log, String msg, Object ... params) {
+        super(log, msg, params);
+    }
     /**
      * @param cause
      */

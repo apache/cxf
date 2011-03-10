@@ -52,15 +52,14 @@ public class STSTokenValidator implements Validator {
             STSClient c = STSUtils.getClient(m);
             synchronized (c) {
                 System.setProperty("noprint", "true");
-                if (c.validateSecurityToken(token)) {
-                    return credential;
-                } 
-                System.clearProperty("noprint");
+                c.validateSecurityToken(token);
+                return credential;
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e);
         }
-        throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
     }
 
 }

@@ -28,6 +28,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -613,14 +614,21 @@ public class STSClient implements Configurable, InterceptorProvider {
         return new PrimitiveAssertion(new QName(ns, local), true);
     }
     
-    public boolean validateSecurityToken(SecurityToken tok) throws Exception {
+    public List<SecurityToken> validateSecurityToken(SecurityToken tok) throws Exception {
         return validateSecurityToken(tok,
                                      namespace + "/RSTR/Status");
     }
     
-    private boolean validateSecurityToken(SecurityToken tok, String string) 
+    private List<SecurityToken> validateSecurityToken(SecurityToken tok, String tokentype) 
         throws Exception {
         createClient();
+        
+        if (tokentype == null) {
+            tokentype = tokenType;
+        }
+        if (tokentype == null) {
+            tokentype = namespace + "/RSTR/Status";
+        }
 
         if (addressingNamespace == null) {
             addressingNamespace = "http://www.w3.org/2005/08/addressing";
@@ -654,7 +662,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeEndElement();
 
         writer.writeStartElement("wst", "TokenType", namespace);
-        writer.writeCharacters(namespace + "/RSTR/Status");
+        writer.writeCharacters(tokentype);
         writer.writeEndElement();
 
         writer.writeStartElement("wst", "ValidateTarget", namespace);
@@ -674,15 +682,32 @@ public class STSClient implements Configurable, InterceptorProvider {
             throw new Fault("Unexpected element " + el.getLocalName(), LOG);
         }
         el = DOMUtils.getFirstElement(el);
+        String reason = null;
+        boolean valid = false;
+        List<SecurityToken> tokens = new LinkedList<SecurityToken>();
         while (el != null) {
             if ("Status".equals(el.getLocalName())) {
                 Element e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Code");
                 String s = DOMUtils.getContent(e2);
-                return s.endsWith("/status/valid");
+                valid =  s.endsWith("/status/valid");
+                
+                e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Reason");
+                if (e2 != null) {
+                    reason = DOMUtils.getContent(e2);
+                }
+            } else if ("RequestedSecurityToken".equals(el.getLocalName())) {
+                //TODO: get the token out of it.  Need to find an STS that actually
+                //suports this first to test it
             }
             el = DOMUtils.getNextElement(el);
         }
-        return false;
+        if (!valid) {
+            throw new TrustException(LOG, "VALIDATION_FAILED", reason);
+        }
+        if (tokens.isEmpty()) {
+            tokens.add(tok);
+        }
+        return tokens;
     }
 
     public void cancelSecurityToken(SecurityToken token) throws Exception {
