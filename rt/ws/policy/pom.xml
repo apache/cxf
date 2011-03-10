@@ -154,6 +154,7 @@
                         <id>generate-test-sources</id>
                         <phase>generate-test-sources</phase>
                         <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>

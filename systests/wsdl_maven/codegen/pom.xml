@@ -50,6 +50,7 @@
                             <goal>wsdl2java</goal>
                         </goals>
                         <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
                             </defaultOptions>

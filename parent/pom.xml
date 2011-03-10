@@ -41,6 +41,7 @@
         <cxf.server.launcher.vmargs>-ea</cxf.server.launcher.vmargs>
         <cxf.compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
+        <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
 
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>

@@ -156,6 +156,7 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
                             <sourceRoot>target/generated/src/main/java</sourceRoot>
                             <wsdlRoot>src/main/resources/wsdl</wsdlRoot>
                             <wsdlOptions>

@@ -55,10 +55,13 @@ public class ClassLoaderSwitcher {
      * @param useCompileClasspath
      * @param classesDir
      */
-    public void switchClassLoader(MavenProject project, boolean useCompileClasspath, File classesDir) {
+    public String switchClassLoader(MavenProject project,
+                                     boolean useCompileClasspath,
+                                     File classesDir) {
         List<URL> urlList = new ArrayList<URL>();
         StringBuilder buf = new StringBuilder();
 
+        
         try {
             urlList.add(classesDir.toURI().toURL());
             if (!useCompileClasspath) {
@@ -102,6 +105,7 @@ public class ClassLoaderSwitcher {
 
         Thread.currentThread().setContextClassLoader(loader);
         System.setProperty("java.class.path", newCp);
+        return newCp;
     }
 
     /**
