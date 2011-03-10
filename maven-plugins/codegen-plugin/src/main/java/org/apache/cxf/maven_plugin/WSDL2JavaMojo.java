@@ -51,6 +51,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectUtils;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.codehaus.plexus.archiver.jar.Manifest;
+import org.codehaus.plexus.archiver.jar.Manifest.Attribute;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -400,7 +403,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
         Bus bus = null;
         try {
-            Set<String> cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
+            Set<URI> cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
             if ("once".equals(fork) || "true".equals(fork)) {
                 forkOnce(cp, effectiveWsdlOptions);
@@ -433,7 +436,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         System.gc();
     }
     
-    private void addPluginArtifact(Set<String> artifactsPath) {
+    private void addPluginArtifact(Set<URI> artifactsPath) {
         //for Maven 2.x, the actual artifact isn't in the list....  need to try and find it
         URL url = getClass().getResource(getClass().getSimpleName() + ".class");
         
@@ -454,7 +457,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             
             File file = new File(uri);
             if (file.exists()) {
-                artifactsPath.add(file.getPath());
+                artifactsPath.add(file.toURI());
             }
         } catch (Exception ex) {
             //ex.printStackTrace();
@@ -462,7 +465,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
     }
 
-    private void forkOnce(Set<String> classPath, List<WsdlOption> effectiveWsdlOptions) 
+    private void forkOnce(Set<URI> classPath, List<WsdlOption> effectiveWsdlOptions) 
         throws MojoExecutionException {
         List<WsdlOption> toDo = new LinkedList<WsdlOption>();
         List<List<String>> wargs = new LinkedList<List<String>>();
@@ -487,7 +490,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             return;
         }
         
-        Set<String> artifactsPath = new LinkedHashSet<String>();
+        Set<URI> artifactsPath = new LinkedHashSet<URI>();
         for (Artifact a : pluginArtifacts) {
             File file = a.getFile();
             if (file == null) {
@@ -495,15 +498,13 @@ public class WSDL2JavaMojo extends AbstractMojo {
                                                  + a.getGroupId() + ":" + a.getArtifactId()
                                                  + ":" + a.getVersion());
             }
-            artifactsPath.add(file.getPath());
+            artifactsPath.add(file.toURI());
         }
         addPluginArtifact(artifactsPath);
         artifactsPath.addAll(classPath);
         
-        String cp = StringUtils.join(artifactsPath.iterator(), File.pathSeparator);
-        
         String args[] = createForkOnceArgs(wargs);
-        runForked(cp, ForkOnceWSDL2Java.class, args);
+        runForked(artifactsPath, ForkOnceWSDL2Java.class, args);
         
         for (WsdlOption wsdlOption : toDo) {
             File dirs[] = wsdlOption.getDeleteDirs();
@@ -544,7 +545,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
     private Bus callWsdl2Java(WsdlOption wsdlOption, 
                               Bus bus,
-                              Set<String> classPath) throws MojoExecutionException {
+                              Set<URI> classPath) throws MojoExecutionException {
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
         URI basedir = project.getBasedir().toURI();
@@ -562,7 +563,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         getLog().debug("Calling wsdl2java with args: " + Arrays.toString(args));
         
         if (!"false".equals(fork)) {
-            Set<String> artifactsPath = new LinkedHashSet<String>();
+            Set<URI> artifactsPath = new LinkedHashSet<URI>();
             for (Artifact a : pluginArtifacts) {
                 File file = a.getFile();
                 if (file == null) {
@@ -570,13 +571,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
                                                      + a.getGroupId() + ":" + a.getArtifactId()
                                                      + ":" + a.getVersion());
                 }
-                artifactsPath.add(file.getPath());
+                artifactsPath.add(file.toURI());
             }
             addPluginArtifact(artifactsPath);
             artifactsPath.addAll(classPath);
-            String cp = StringUtils.join(artifactsPath.iterator(), File.pathSeparator);
             
-            runForked(cp, WSDLToJava.class, args);
+            runForked(artifactsPath, WSDLToJava.class, args);
 
         } else {
             if (bus == null) {
@@ -612,7 +612,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         return javaExe;
     }
 
-    private void runForked(String classPath, Class cls, String[] args) throws MojoExecutionException {
+    private void runForked(Set<URI> classPath, Class cls, String[] args) throws MojoExecutionException {
         getLog().info("Running wsdl2java in fork mode...");
 
         Commandline cmd = new Commandline();
@@ -624,11 +624,38 @@ public class WSDL2JavaMojo extends AbstractMojo {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);
         }
-        cmd.createArg().setValue("-cp");
-        cmd.createArg().setValue(classPath);
+
         cmd.createArg().setLine(additionalJvmArgs);
-        cmd.createArg().setValue(cls.getName());
+
+        try {
+            File file = FileUtils.createTempFile("cxf-codegen", ".jar");
+
+            JarArchiver jar = new JarArchiver();
+            jar.setDestFile(file.getAbsoluteFile());
+            
+            Manifest manifest = new Manifest();
+            Attribute attr = new Attribute();
+            attr.setName("Class-Path");
+            attr.setValue(StringUtils.join(classPath.iterator(), " "));
+            manifest.getMainSection().addConfiguredAttribute(attr);
+            
+            attr = new Attribute();
+            attr.setName("Main-Class");
+            attr.setValue(cls.getName());
+            manifest.getMainSection().addConfiguredAttribute(attr);
+
+            jar.addConfiguredManifest(manifest);
+            jar.createArchive();
+            
+            cmd.createArg().setValue("-jar");
+            cmd.createArg().setValue(file.getAbsolutePath());
+
+            
+        } catch (Exception e1) {
+            throw new MojoExecutionException("Could not create runtime jar", e1);
+        }
         cmd.addArguments(args);
+        
 
         CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
         CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();

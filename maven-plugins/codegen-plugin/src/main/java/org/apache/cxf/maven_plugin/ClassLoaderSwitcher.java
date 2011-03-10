@@ -21,6 +21,7 @@ package org.apache.cxf.maven_plugin;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -57,12 +58,12 @@ public class ClassLoaderSwitcher {
      * @param useCompileClasspath
      * @param classesDir
      */
-    public Set<String> switchClassLoader(MavenProject project,
+    public Set<URI> switchClassLoader(MavenProject project,
                                          boolean useCompileClasspath,
                                          File classesDir) {
         List<URL> urlList = new ArrayList<URL>();
         StringBuilder buf = new StringBuilder();
-        Set<String> ret = new LinkedHashSet<String>();
+        Set<URI> ret = new LinkedHashSet<URI>();
         
         try {
             urlList.add(classesDir.toURI().toURL());
@@ -74,11 +75,11 @@ public class ClassLoaderSwitcher {
         }
 
         buf.append(classesDir.getAbsolutePath());
-        ret.add(classesDir.getAbsolutePath());
+        ret.add(classesDir.toURI());
         buf.append(File.pathSeparatorChar);
         if (!useCompileClasspath) {
             buf.append(project.getBuild().getOutputDirectory());
-            ret.add(project.getBuild().getOutputDirectory());
+            ret.add(new File(project.getBuild().getOutputDirectory()).toURI());
             buf.append(File.pathSeparatorChar);
         }
         List<?> artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
@@ -87,7 +88,7 @@ public class ClassLoaderSwitcher {
                 if (a.getFile() != null && a.getFile().exists()) {
                     urlList.add(a.getFile().toURI().toURL());
                     buf.append(a.getFile().getAbsolutePath());
-                    ret.add(a.getFile().getAbsolutePath());
+                    ret.add(a.getFile().toURI());
                     buf.append(File.pathSeparatorChar);
                     // System.out.println("     " +
                     // a.getFile().getAbsolutePath());
