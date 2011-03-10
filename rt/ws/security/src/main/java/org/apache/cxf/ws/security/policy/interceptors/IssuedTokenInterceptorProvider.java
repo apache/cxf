@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -45,6 +44,7 @@ import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
@@ -86,18 +86,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         }
         return tokenStore;
     }
-    static STSClient getClient(Message message) {
-        STSClient client = (STSClient)message
-            .getContextualProperty(SecurityConstants.STS_CLIENT);
-        if (client == null) {
-            client = new STSClient(message.getExchange().get(Bus.class));
-            Endpoint ep = message.getExchange().get(Endpoint.class);
-            client.setEndpointName(ep.getEndpointInfo().getName().toString() + ".sts-client");
-            client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sts-client");
-        }
-        
-        return client;
-    }
+
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public IssuedTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
@@ -121,7 +110,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         }
                     }
                     if (tok == null) {
-                        STSClient client = getClient(message);
+                        STSClient client = STSUtils.getClient(message);
                         AddressingProperties maps =
                             (AddressingProperties)message
                                 .get("javax.xml.ws.addressing.context.outbound");

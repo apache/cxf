@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Element;
 
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
@@ -222,17 +221,6 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                 ctx.put(s, v);
             }
         }
-    }
-    static STSClient getClient(Message message) {
-        STSClient client = (STSClient)message
-            .getContextualProperty(SecurityConstants.STS_CLIENT);
-        if (client == null) {
-            client = new STSClient(message.getExchange().get(Bus.class));
-            Endpoint ep = message.getExchange().get(Endpoint.class);
-            client.setEndpointName(ep.getEndpointInfo().getName().toString() + ".sct-client");
-            client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sct-client");
-        }
-        return client;
     }
     
     static byte[] writeProofToken(String prefix, 

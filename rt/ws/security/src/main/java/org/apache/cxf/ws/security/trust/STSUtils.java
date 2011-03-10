@@ -30,6 +30,7 @@ import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.BindingInfo;
@@ -42,6 +43,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.neethi.Policy;
 
 /**
@@ -78,6 +80,17 @@ public final class STSUtils {
         return TOKEN_TYPE_SCT_05_12;
     }
     
+    public static STSClient getClient(Message message) {
+        STSClient client = (STSClient)message
+            .getContextualProperty(SecurityConstants.STS_CLIENT);
+        if (client == null) {
+            client = new STSClient(message.getExchange().get(Bus.class));
+            Endpoint ep = message.getExchange().get(Endpoint.class);
+            client.setEndpointName(ep.getEndpointInfo().getName().toString() + ".sct-client");
+            client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sct-client");
+        }
+        return client;
+    }
     
     public static Endpoint createSTSEndpoint(Bus bus, 
                                              String namespace,

@@ -54,6 +54,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.message.WSSecDKSign;
@@ -69,12 +70,13 @@ import org.apache.ws.security.message.WSSecUsernameToken;
 public class TransportBindingHandler extends AbstractBindingBuilder {
     TransportBinding tbinding;
     
-    public TransportBindingHandler(TransportBinding binding,
+    public TransportBindingHandler(WSSConfig config,
+                                   TransportBinding binding,
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
                                     SoapMessage message) {
-        super(binding, saaj, secHeader, aim, message);
+        super(config, binding, saaj, secHeader, aim, message);
         this.tbinding = binding;
     }
     
@@ -277,7 +279,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
             encrKey.appendToHeader(secHeader);
             
-            WSSecDKSign dkSig = new WSSecDKSign();
+            WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
             
             dkSig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
             dkSig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
@@ -385,7 +387,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
         if (token.isDerivedKeys()) {
             //Do Signature with derived keys
-            WSSecDKSign dkSign = new WSSecDKSign();
+            WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
           
             //Setting the AttachedReference or the UnattachedReference according to the flag
             Element ref;
@@ -419,7 +421,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
           
             return dkSign.getSignatureValue();
         } else {
-            WSSecSignature sig = new WSSecSignature();
+            WSSecSignature sig = new WSSecSignature(wssConfig);
             if (secTok.getTokenType() == null) {
                 sig.setCustomTokenId(secTok.getId());
                 // TODO Add support for SAML2 here

@@ -32,6 +32,10 @@ public final class SecurityConstants {
     public static final String PASSWORD = "ws-security.password";
     public static final String VALIDATE_TOKEN = "ws-security.validate.token";
     public static final String USERNAME_TOKEN_VALIDATOR = "ws-security.ut.validator";
+    public static final String SAML1_TOKEN_VALIDATOR = "ws-security.saml1.validator";
+    public static final String SAML2_TOKEN_VALIDATOR = "ws-security.saml2.validator";
+    public static final String TIMESTAMP_TOKEN_VALIDATOR = "ws-security.timestamp.validator";
+    public static final String SIGNATURE_TOKEN_VALIDATOR = "ws-security.signature.validator";
     
     public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
     
@@ -43,6 +47,7 @@ public final class SecurityConstants {
     
     public static final String SIGNATURE_CRYPTO = "ws-security.signature.crypto";
     public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
+    
 
     public static final String TOKEN = "ws-security.token";
     public static final String TOKEN_ID = "ws-security.token.id";
@@ -85,7 +90,9 @@ public final class SecurityConstants {
             ENCRYPT_USERNAME, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
             TOKEN, TOKEN_ID, STS_CLIENT, STS_TOKEN_PROPERTIES, STS_TOKEN_CRYPTO,
             STS_TOKEN_DO_CANCEL, TIMESTAMP_TTL, ALWAYS_ENCRYPT_UT,
-            STS_TOKEN_ACT_AS, STS_TOKEN_USERNAME, STS_TOKEN_USE_CERT_FOR_KEYINFO
+            STS_TOKEN_ACT_AS, STS_TOKEN_USERNAME, STS_TOKEN_USE_CERT_FOR_KEYINFO,
+            SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
+            SIGNATURE_TOKEN_VALIDATOR
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

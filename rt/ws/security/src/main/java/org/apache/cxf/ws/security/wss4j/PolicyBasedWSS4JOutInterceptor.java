@@ -48,6 +48,7 @@ import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.WSSecHeader;
 
@@ -146,15 +147,19 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         //ignore
                     }
                     
-                    
+                    WSSConfig config = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
+                    if (config == null) {
+                        config = WSSConfig.getNewInstance();
+                    }
+
                     if (transport instanceof TransportBinding) {
-                        new TransportBindingHandler((TransportBinding)transport, saaj,
+                        new TransportBindingHandler(config, (TransportBinding)transport, saaj,
                                                     secHeader, aim, message).handleBinding();
                     } else if (transport instanceof SymmetricBinding) {
-                        new SymmetricBindingHandler((SymmetricBinding)transport, saaj,
+                        new SymmetricBindingHandler(config, (SymmetricBinding)transport, saaj,
                                                      secHeader, aim, message).handleBinding();
                     } else {
-                        new AsymmetricBindingHandler((AsymmetricBinding)transport, saaj,
+                        new AsymmetricBindingHandler(config, (AsymmetricBinding)transport, saaj,
                                                      secHeader, aim, message).handleBinding();
                     }
                     

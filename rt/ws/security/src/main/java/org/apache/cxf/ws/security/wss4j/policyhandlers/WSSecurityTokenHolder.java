@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.WSSecBase;
 
 /**
@@ -28,8 +29,8 @@ import org.apache.ws.security.message.WSSecBase;
 public class WSSecurityTokenHolder extends WSSecBase {
     SecurityToken token;
     
-    public WSSecurityTokenHolder(SecurityToken t) {
-        super();
+    public WSSecurityTokenHolder(WSSConfig config, SecurityToken t) {
+        super(config);
         token = t;
     }
     

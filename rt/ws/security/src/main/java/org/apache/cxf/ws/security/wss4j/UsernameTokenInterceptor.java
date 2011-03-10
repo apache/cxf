@@ -304,11 +304,15 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
     }
     protected WSSecUsernameToken addUsernameToken(SoapMessage message, UsernameToken token) {
         String userName = (String)message.getContextualProperty(SecurityConstants.USERNAME);
-        
+        WSSConfig wssConfig = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+
         if (!StringUtils.isEmpty(userName)) {
             // If NoPassword property is set we don't need to set the password
             if (token.isNoPassword()) {
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
                 return utBuilder;
@@ -321,7 +325,7 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
             
             if (!StringUtils.isEmpty(password)) {
                 //If the password is available then build the token
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
                 if (token.isHashPassword()) {
                     utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);  
                 } else {

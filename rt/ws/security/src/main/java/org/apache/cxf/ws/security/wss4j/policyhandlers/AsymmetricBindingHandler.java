@@ -48,6 +48,7 @@ import org.apache.cxf.ws.security.policy.model.TokenWrapper;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -75,12 +76,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     private String encryptedKeyId;
     private byte[] encryptedKeyValue;
     
-    public AsymmetricBindingHandler(AsymmetricBinding binding,
+    public AsymmetricBindingHandler(WSSConfig config,
+                                    AsymmetricBinding binding,
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
                                     SoapMessage message) {
-        super(binding, saaj, secHeader, aim, message);
+        super(config, binding, saaj, secHeader, aim, message);
         this.abinding = binding;
         protectionOrder = binding.getProtectionOrder();
     }
@@ -320,7 +322,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             if (encrToken.isDerivedKeys()) {
                 try {
-                    WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+                    WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
                     
                     if (encrKey == null) {
                         setupEncryptedKey(recToken, encrToken);
@@ -343,7 +345,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             } else {
                 try {
-                    WSSecEncrypt encr = new WSSecEncrypt();
+                    WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
                     
                     encr.setDocument(saaj.getSOAPPart());
                     Crypto crypto = getEncryptionCrypto(recToken);
@@ -362,7 +364,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
                     encr.setKeyEncAlgo(algorithmSuite.getAsymmetricKeyWrap());
-                    
                     encr.prepare(saaj.getSOAPPart(), crypto);
                     
                     if (encr.getBSTTokenId() != null) {
@@ -425,7 +426,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             // Set up the encrypted key to use
             setupEncryptedKey(wrapper, sigToken);
             
-            WSSecDKSign dkSign = new WSSecDKSign();
+            WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
             dkSign.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
 
             // Set the algo info

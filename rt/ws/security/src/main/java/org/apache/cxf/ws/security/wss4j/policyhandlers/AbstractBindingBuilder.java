@@ -99,6 +99,7 @@ import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
@@ -129,6 +130,7 @@ public abstract class AbstractBindingBuilder {
     protected SPConstants.ProtectionOrder protectionOrder = 
         SPConstants.ProtectionOrder.SignBeforeEncrypting;
     
+    protected final WSSConfig wssConfig;
     protected SOAPMessage saaj;
     protected WSSecHeader secHeader;
     protected AssertionInfoMap aim;
@@ -152,11 +154,14 @@ public abstract class AbstractBindingBuilder {
     Element bottomUpElement;
     Element topDownElement;
     
-    public AbstractBindingBuilder(Binding binding,
+    public AbstractBindingBuilder(
+                           WSSConfig config,
+                           Binding binding,
                            SOAPMessage saaj,
                            WSSecHeader secHeader,
                            AssertionInfoMap aim,
                            SoapMessage message) {
+        this.wssConfig = config;
         this.binding = binding;
         this.aim = aim;
         this.secHeader = secHeader;
@@ -369,7 +374,8 @@ public abstract class AbstractBindingBuilder {
             if (ttl <= 0) {
                 ttl = 300;
             }
-            timestampEl = new WSSecTimestamp();
+            timestampEl = new WSSecTimestamp(wssConfig);
+            timestampEl.setWsConfig(wssConfig);
             timestampEl.setTimeToLive(ttl);
             timestampEl.prepare(saaj.getSOAPPart());
             for (AssertionInfo ai : ais) {
@@ -482,9 +488,9 @@ public abstract class AbstractBindingBuilder {
         
                 if (secToken.getX509Certificate() == null) {   
                     //Add the extracted token
-                    ret.put(token, new WSSecurityTokenHolder(secToken));
+                    ret.put(token, new WSSecurityTokenHolder(wssConfig, secToken));
                 } else {
-                    WSSecSignature sig = new WSSecSignature();                    
+                    WSSecSignature sig = new WSSecSignature(wssConfig);                    
                     sig.setX509Certificate(secToken.getX509Certificate());
                     sig.setCustomTokenId(secToken.getId());
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
@@ -618,7 +624,7 @@ public abstract class AbstractBindingBuilder {
         if (!StringUtils.isEmpty(userName)) {
             // If NoPassword property is set we don't need to set the password
             if (token.isNoPassword()) {
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
                 info.setAsserted(true);
@@ -632,7 +638,7 @@ public abstract class AbstractBindingBuilder {
             
             if (!StringUtils.isEmpty(password)) {
                 //If the password is available then build the token
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
                 if (token.isHashPassword()) {
                     utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);  
                 } else {
@@ -1035,7 +1041,7 @@ public abstract class AbstractBindingBuilder {
     
     protected WSSecEncryptedKey getEncryptedKeyBuilder(TokenWrapper wrapper, 
                                                        Token token) throws WSSecurityException {
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(wssConfig);
         Crypto crypto = getEncryptionCrypto(wrapper);
         message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         setKeyIdentifierType(encrKey, wrapper, token);
@@ -1289,7 +1295,7 @@ public abstract class AbstractBindingBuilder {
     protected WSSecSignature getSignatureBuilder(
         TokenWrapper wrapper, Token token, boolean attached, boolean endorse
     ) {
-        WSSecSignature sig = new WSSecSignature();
+        WSSecSignature sig = new WSSecSignature(wssConfig);
         checkForX509PkiPath(sig, token);
         if (token instanceof IssuedToken) {
             policyAsserted(token);
@@ -1368,7 +1374,7 @@ public abstract class AbstractBindingBuilder {
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         sig.setDigestAlgo(binding.getAlgorithmSuite().getDigest());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
-        
+        sig.setWsConfig(wssConfig);
         try {
             sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
         } catch (WSSecurityException e) {
@@ -1435,7 +1441,7 @@ public abstract class AbstractBindingBuilder {
         throws WSSecurityException, ConversationException {
         
         Document doc = saaj.getSOAPPart();
-        WSSecDKSign dkSign = new WSSecDKSign();  
+        WSSecDKSign dkSign = new WSSecDKSign(wssConfig);  
         
         //Check whether it is security policy 1.2 and use the secure conversation accordingly
         if (SP12Constants.INSTANCE == policyToken.getSPConstants()) {
@@ -1518,7 +1524,7 @@ public abstract class AbstractBindingBuilder {
         throws WSSecurityException, ConversationException {
         
         Document doc = saaj.getSOAPPart();
-        WSSecSignature sig = new WSSecSignature();
+        WSSecSignature sig = new WSSecSignature(wssConfig);
         // If a EncryptedKeyToken is used, set the correct value type to
         // be used in the wsse:Reference in ds:KeyInfo
         if (policyToken instanceof X509Token) {
@@ -1676,7 +1682,7 @@ public abstract class AbstractBindingBuilder {
         }
         
         // prepare a SignatureConfirmation token
-        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
+        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(wssConfig);
         if (signatureActions.size() > 0) {
             for (WSSecurityEngineResult wsr : signatureActions) {
                 byte[] sigVal = (byte[]) wsr.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);

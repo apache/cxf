@@ -38,6 +38,7 @@ import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.WSConstants;
 
 class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
@@ -98,7 +99,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             return;
         }
         
-        STSClient client = SecureConversationTokenInterceptorProvider.getClient(message);
+        STSClient client = STSUtils.getClient(message);
         AddressingProperties maps =
             (AddressingProperties)message
                 .get("javax.xml.ws.addressing.context.outbound");
@@ -138,7 +139,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
     private SecurityToken issueToken(SoapMessage message,
                                      AssertionInfoMap aim,
                                      SecureConversationToken itok) {
-        STSClient client = SecureConversationTokenInterceptorProvider.getClient(message);
+        STSClient client = STSUtils.getClient(message);
         AddressingProperties maps =
             (AddressingProperties)message
                 .get("javax.xml.ws.addressing.context.outbound");

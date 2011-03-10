@@ -176,6 +176,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         boolean utWithCallbacks = 
             MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
         
+        RequestData reqData = new CXFRequestData();
+
         WSSConfig config = (WSSConfig)msg.getContextualProperty(WSSConfig.class.getName()); 
         WSSecurityEngine engine;
         if (config != null) {
@@ -183,7 +185,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             engine.setWssConfig(config);
         } else {
             engine = getSecurityEngine(utWithCallbacks);
+            if (engine == null) {
+                engine = new WSSecurityEngine();
+            }
+            config = engine.getWssConfig();
         }
+        reqData.setWssConfig(config);
         
         SOAPMessage doc = getSOAPMessage(msg);
         
@@ -204,8 +211,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             t0 = System.currentTimeMillis();
         }
 
-        RequestData reqData = new RequestData();
-        reqData.setWssConfig(engine.getWssConfig());
         /*
          * The overall try, just to have a finally at the end to perform some
          * housekeeping.
@@ -566,7 +571,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             return createSecurityEngine(profiles);
         }
         
-        return secEngine;
+        return null;
     }
 
     /**
@@ -624,4 +629,43 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return fault;
     }
     
+    
+    static class CXFRequestData extends RequestData {
+        public CXFRequestData() {
+        }
+
+        public Validator getValidator(QName qName) throws WSSecurityException {
+            String key = null;
+            if (WSSecurityEngine.SAML_TOKEN.equals(qName)) {
+                key = SecurityConstants.SAML1_TOKEN_VALIDATOR;
+            } else if (WSSecurityEngine.SAML2_TOKEN.equals(qName)) {
+                key = SecurityConstants.SAML2_TOKEN_VALIDATOR;
+            } else if (WSSecurityEngine.USERNAME_TOKEN.equals(qName)) {
+                key = SecurityConstants.USERNAME_TOKEN_VALIDATOR;
+            } else if (WSSecurityEngine.SIGNATURE.equals(qName)) {
+                key = SecurityConstants.SIGNATURE_TOKEN_VALIDATOR;
+            } else if (WSSecurityEngine.TIMESTAMP.equals(qName)) {
+                key = SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR;
+            } 
+            if (key != null) {
+                Object o = ((SoapMessage)this.getMsgContext()).getContextualProperty(key);
+                try {
+                    if (o instanceof Validator) {
+                        return (Validator)o;
+                    } else if (o instanceof Class) {
+                        return (Validator)((Class)o).newInstance();
+                    } else if (o instanceof String) {
+                        return (Validator)ClassLoaderUtils.loadClass(o.toString(),
+                                                                     WSS4JInInterceptor.class)
+                                                                     .newInstance();
+                    }
+                } catch (RuntimeException t) {
+                    throw t;
+                } catch (Throwable t) {
+                    throw new WSSecurityException(t.getMessage(), t);
+                }
+            }
+            return super.getValidator(qName);
+        }
+    };
 }

@@ -49,6 +49,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -75,12 +76,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     SymmetricBinding sbinding;
     TokenStore tokenStore;
     
-    public SymmetricBindingHandler(SymmetricBinding binding,
+    public SymmetricBindingHandler(WSSConfig config, 
+                                   SymmetricBinding binding,
                                     SOAPMessage saaj,
                                     WSSecHeader secHeader,
                                     AssertionInfoMap aim,
                                     SoapMessage message) {
-        super(binding, saaj, secHeader, aim, message);
+        super(config, binding, saaj, secHeader, aim, message);
         this.sbinding = binding;
         tokenStore = getTokenStore();
         protectionOrder = binding.getProtectionOrder();
@@ -392,7 +394,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                           List<WSEncryptionPart> encrParts,
                                           boolean atEnd) {
         try {
-            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
             if (recToken.getToken().getSPConstants() == SP12Constants.INSTANCE) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_12);
             }
@@ -478,7 +480,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                            attached, encrParts, atEnd);
             } else {
                 try {
-                    WSSecEncrypt encr = new WSSecEncrypt();
+                    WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
                     String encrTokId = encrTok.getId();
                     if (attached) {
                         encrTokId = encrTok.getWsuId();
@@ -558,7 +560,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                SecurityToken tok,
                                boolean included) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
-        WSSecDKSign dkSign = new WSSecDKSign();
+        WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
         if (policyTokenWrapper.getToken().getSPConstants() == SP12Constants.INSTANCE) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
         }
@@ -659,7 +661,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         if (policyToken.isDerivedKeys()) {
             return doSignatureDK(sigs, policyTokenWrapper, policyToken, tok, included);
         } else {
-            WSSecSignature sig = new WSSecSignature();
+            WSSecSignature sig = new WSSecSignature(wssConfig);
+            sig.setWsConfig(wssConfig);
             // If a EncryptedKeyToken is used, set the correct value type to
             // be used in the wsse:Reference in ds:KeyInfo
             int type = included ? WSConstants.CUSTOM_SYMM_SIGNING 
