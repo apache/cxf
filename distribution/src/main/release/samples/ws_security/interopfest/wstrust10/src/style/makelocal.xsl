@@ -9,8 +9,8 @@
     xmlns:wsa="http://www.w3.org/2005/08/addressing">
     <xsl:output method="xml"/>
 
-    <xsl:param name="target.host">131.107.72.15</xsl:param>
-    <xsl:param name="wsdl.host">131.107.72.15</xsl:param>
+    <xsl:param name="target.host">131.107.153.205</xsl:param>
+    <xsl:param name="wsdl.host">131.107.153.205</xsl:param>
 
     <xsl:template match="wsdl:import">
         <xsl:copy>

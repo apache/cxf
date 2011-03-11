@@ -18,13 +18,11 @@
 -->
 <project name="wssec11" default="download">
     <property name="build.dir" location="target"/>
-    <property name="wsdl.host" value="131.107.72.15"/>
+    <property name="wsdl.host" value="131.107.153.205"/>
     <property name="target.host" value="${wsdl.host}"/>
    
     <target name="download.internal" if="needsToDownload">
-        <mkdir dir="${build.dir}/generated/src/main/resources/certs"/>
         <mkdir dir="${build.dir}/wsdl"/>
-        <get src="http://131.107.72.15/ilab/Certs/Certs.zip" dest="${build.dir}/Certs.zip"/>
         <get src="http://${wsdl.host}/Security_Federation_FederatedService_Indigo/Symmetric.svc?wsdl" dest="${build.dir}/wsdl/WsTrustSym.wsdl"/>
         <get src="http://${wsdl.host}/Security_Federation_FederatedService_Indigo/Symmetric.svc?wsdl=wsdl0" dest="${build.dir}/wsdl/WsTrustSym_policy.wsdl"/>
 
@@ -36,6 +34,10 @@
 
 
         <antcall target="transform"/>
+
+        <!--get src="http://131.107.72.15/ilab/Certs/Certs.zip" dest="${build.dir}/Certs.zip"/-->
+        <copy file="../Certs.zip" todir="${build.dir}"/>
+        <mkdir dir="${build.dir}/generated/src/main/resources/certs"/>
         <unzip src="${build.dir}/Certs.zip" dest="${build.dir}/generated/src/main/resources/certs"/>
     </target>
 

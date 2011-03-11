@@ -24,7 +24,8 @@
     <target name="download.internal" if="needsToDownload">
         <mkdir dir="${build.dir}/generated/src/main/resources/certs"/>
         <mkdir dir="${build.dir}/wsdl"/>
-        <get src="http://131.107.72.15/ilab/Certs/Certs.zip" dest="${build.dir}/Certs.zip"/>
+        <!--get src="http://131.107.72.15/ilab/Certs/Certs.zip" dest="${build.dir}/Certs.zip"/-->
+        <copy file="../Certs.zip" todir="${build.dir}"/>
         <get src="${baseLocation}?wsdl" dest="${build.dir}/wsdl/WSSecureConversation.wsdl"/>
         <get src="${baseLocation}?wsdl=wsdl0" dest="${build.dir}/wsdl/WSSecureConversation_policy.wsdl"/>
         <get src="${baseLocation}?xsd=xsd0" dest="${build.dir}/wsdl/WSSecureConversation_0.xsd"/>
