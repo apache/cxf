@@ -110,9 +110,13 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         if (headers != null) {
             buffer.getHeader().append(headers);
         }
-        String uri = (String)message.get(Message.REQUEST_URI);
+        String uri = (String)message.get(Message.REQUEST_URL);
         if (uri != null) {
             buffer.getAddress().append(uri);
+            String query = (String)message.get(Message.QUERY_STRING);
+            if (query != null) {
+                buffer.getAddress().append("?").append(query);
+            }
         }
             
         InputStream is = message.getContent(InputStream.class);
