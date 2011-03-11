@@ -28,7 +28,6 @@ import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
@@ -45,6 +44,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -250,9 +250,9 @@ public class LogicalMessageImpl implements LogicalMessage {
     private SOAPMessage initSOAPMessage(InputStream is) throws SOAPException, IOException {
         SOAPMessage msg = null;
         if (is != null) {
-            msg = MessageFactory.newInstance().createMessage(null, is);
+            msg = SAAJFactoryResolver.createMessageFactory(null).createMessage(null, is);
         } else {
-            msg = MessageFactory.newInstance().createMessage();
+            msg = SAAJFactoryResolver.createMessageFactory(null).createMessage();
         }
         msg.setProperty(SOAPMessage.WRITE_XML_DECLARATION, "true");
         msg.getSOAPPart().getEnvelope().addNamespaceDeclaration(WSDLConstants.NP_SCHEMA_XSD,

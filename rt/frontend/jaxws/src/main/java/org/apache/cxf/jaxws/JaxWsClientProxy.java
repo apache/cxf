@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
@@ -48,6 +47,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
@@ -199,7 +199,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                     .equals(((SoapFault)ex).getFaultCode().getNamespaceURI())) {
                 //change to 1.1
                 try {
-                    soapFault = SOAPFactory.newInstance().createFault();
+                    soapFault = SAAJFactoryResolver.createSOAPFactory(null).createFault();
                 } catch (Throwable t) {
                     //ignore
                 }
