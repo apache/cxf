@@ -66,25 +66,30 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
             Fault f = (Fault)message.getContent(Exception.class);
     
             SoapFault fault = SoapFault.createFault(f, message.getVersion());       
-            
+
             try {
                 Map<String, String> namespaces = fault.getNamespaces();
                 for (Map.Entry<String, String> e : namespaces.entrySet()) {
                     writer.writeNamespace(e.getKey(), e.getValue());
                 }
-    
+
                 String ns = message.getVersion().getNamespace();
-                String defaultPrefix = StaxUtils.getUniquePrefix(writer, ns, true);
-    
-                writer.writeStartElement(defaultPrefix, "Fault", ns);
-    
+                String defaultPrefix = writer.getPrefix(ns);
+                if (defaultPrefix == null) {
+                    defaultPrefix = StaxUtils.getUniquePrefix(writer, ns, false);
+                    writer.writeStartElement(defaultPrefix, "Fault", ns);
+                    writer.writeNamespace(defaultPrefix, ns);
+                } else {
+                    writer.writeStartElement(defaultPrefix, "Fault", ns);
+                }
+
                 writer.writeStartElement(defaultPrefix, "Code", ns);
                 writer.writeStartElement(defaultPrefix, "Value", ns);
            
                 writer.writeCharacters(fault.getCodeString(getFaultCodePrefix(writer, fault.getFaultCode()), 
                                                            defaultPrefix));
                 writer.writeEndElement();
-                
+
                 if (fault.getSubCode() != null) {
                     writer.writeStartElement(defaultPrefix, "Subcode", ns);
                     writer.writeStartElement(defaultPrefix, "Value", ns);
@@ -95,7 +100,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                     writer.writeEndElement();
                 }
                 writer.writeEndElement();
-    
+
                 writer.writeStartElement(defaultPrefix, "Reason", ns);
                 writer.writeStartElement(defaultPrefix, "Text", ns);
                 writer.writeAttribute("xml", "http://www.w3.org/XML/1998/namespace", "lang", getLangCode());
@@ -106,27 +111,27 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 }
                 writer.writeEndElement();
                 writer.writeEndElement();
-    
+
                 if (fault.hasDetails()) {
                     Element detail = fault.getDetail();
                     writer.writeStartElement(defaultPrefix, "Detail", ns);
-    
+
                     Node node = detail.getFirstChild();
                     while (node != null) {
                         StaxUtils.writeNode(node, writer, true);
                         node = node.getNextSibling();
                     }
-    
+
                     // Details
                     writer.writeEndElement();
                 }
-    
+
                 if (fault.getRole() != null) {
                     writer.writeStartElement(defaultPrefix, "Role", ns);
                     writer.writeCharacters(fault.getRole());
                     writer.writeEndElement();
                 }
-    
+
                 // Fault
                 writer.writeEndElement();
             } catch (Exception xe) {
@@ -134,7 +139,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 throw f;
             }
         }
-        
+
         private String getLangCode() {        
             String code = LOG.getResourceBundle().getLocale().getLanguage();
             if (StringUtils.isEmpty(code)) {
