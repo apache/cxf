@@ -141,7 +141,7 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testAcknowledgeBasic() throws SequenceFault {
         Timer timer = control.createMock(Timer.class);
-        setUpDestination(timer);
+        setUpDestination(timer, null);
         Message message1 = setUpMessage("1");
         Message message2 = setUpMessage("2");
         control.replay();
@@ -168,7 +168,7 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testAcknowledgeLastMessageNumberExceeded() throws SequenceFault {  
         Timer timer = control.createMock(Timer.class);
-        setUpDestination(timer);
+        setUpDestination(timer, null);
         Message message1 = setUpMessage("1");
         Message message2 = setUpMessage("2");
         control.replay();
@@ -190,7 +190,7 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testAcknowledgeAppendRange() throws SequenceFault {
         Timer timer = control.createMock(Timer.class);
-        setUpDestination(timer);
+        setUpDestination(timer, null);
         Message[] messages = new Message [] {
             setUpMessage("1"),
             setUpMessage("2"),
@@ -220,7 +220,7 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testAcknowledgeInsertRange() throws SequenceFault {
         Timer timer = control.createMock(Timer.class);
-        setUpDestination(timer);
+        setUpDestination(timer, null);
         Message[] messages = new Message [] {
             setUpMessage("1"),
             setUpMessage("2"),
@@ -255,7 +255,7 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testAcknowledgePrependRange() throws SequenceFault { 
         Timer timer = control.createMock(Timer.class);
-        setUpDestination(timer);
+        setUpDestination(timer, null);
         Message[] messages = new Message [] {
             setUpMessage("4"),
             setUpMessage("5"),
@@ -329,7 +329,7 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testMonitor() throws SequenceFault {
         Timer timer = control.createMock(Timer.class);
-        setUpDestination(timer);
+        setUpDestination(timer, null);
         Message[] messages = new Message[15];
         for (int i = 0; i < messages.length; i++) {
             messages[i] = setUpMessage(Integer.toString(i + 1));
@@ -372,7 +372,7 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testAcknowledgeImmediate() throws SequenceFault {
         Timer timer = control.createMock(Timer.class);
-        setUpDestination(timer);
+        setUpDestination(timer, null);
         Message message = setUpMessage("1");
         control.replay();
         
@@ -391,11 +391,10 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testAcknowledgeDeferred() throws SequenceFault, RMException {
         Timer timer = new Timer();
-        setUpDestination(timer);
+        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        setUpDestination(timer, rme);
         
         DestinationSequence seq = new DestinationSequence(id, ref, destination);
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme).anyTimes();
         Proxy proxy = control.createMock(Proxy.class);
         EasyMock.expect(rme.getProxy()).andReturn(proxy).anyTimes();        
         proxy.acknowledge(seq);
@@ -552,12 +551,17 @@ public class DestinationSequenceTest extends Assert {
         assertTrue("timed out waiting for messages to be processed in order", !timedOut);
         
         control.verify();
+        
+
+
     }
     
     @Test
     public void testScheduleSequenceTermination() throws SequenceFault {
         Timer timer = new Timer();
-        setUpDestination(timer);
+        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        EasyMock.expect(rme.getProxy()).andReturn(control.createMock(Proxy.class)).anyTimes();
+        setUpDestination(timer, rme);
         
         DestinationSequence seq = new DestinationSequence(id, ref, destination);
         destination.removeSequence(seq);
@@ -565,8 +569,6 @@ public class DestinationSequenceTest extends Assert {
         
         Message message = setUpMessage("1");
         
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme);
         long arrival = System.currentTimeMillis();
         EasyMock.expect(rme.getLastApplicationMessage()).andReturn(arrival);
 
@@ -622,7 +624,7 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expectLastCall();
         control.replay();
         st.run();
-        control.verify();
+        control.verify();        
     }
     
     @Test
@@ -673,6 +675,7 @@ public class DestinationSequenceTest extends Assert {
         seq.cancelDeferredAcknowledgments();
         t.cancel();
         control.verify();
+
     }
     
     @Test
@@ -691,10 +694,10 @@ public class DestinationSequenceTest extends Assert {
     }
     
     private void setUpDestination() {
-        setUpDestination(null);
+        setUpDestination(null, null);
     }
     
-    private void setUpDestination(Timer timer) {
+    private void setUpDestination(Timer timer, RMEndpoint endpoint) {
         
         manager = control.createMock(RMManager.class);
 
@@ -718,6 +721,10 @@ public class DestinationSequenceTest extends Assert {
         
         destination = control.createMock(Destination.class);
         EasyMock.expect(destination.getManager()).andReturn(manager).anyTimes();
+        if (endpoint == null) {
+            endpoint = EasyMock.createMock(RMEndpoint.class);
+        }
+        EasyMock.expect(destination.getReliableEndpoint()).andReturn(endpoint).anyTimes();
         
         if (null != timer) {
             EasyMock.expect(manager.getTimer()).andReturn(timer).anyTimes();
