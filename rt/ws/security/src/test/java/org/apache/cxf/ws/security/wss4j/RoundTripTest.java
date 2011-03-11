@@ -55,15 +55,15 @@ public class RoundTripTest extends AbstractSecurityTest {
         service.getOutInterceptors().add(new LoggingOutInterceptor());
 
         wsIn = new WSS4JInInterceptor();
-        wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
-        wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "META-INF/cxf/insecurity.properties");
+        wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 
         service.getInInterceptors().add(wsIn);
 
         wsOut = new WSS4JOutInterceptor();
-        wsOut.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        wsOut.setProperty(WSHandlerConstants.ENC_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        wsOut.setProperty(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        wsOut.setProperty(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         wsOut.setProperty(WSHandlerConstants.USER, "myalias");
         wsOut.setProperty("password", "myAliasPassword");
         wsOut.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());

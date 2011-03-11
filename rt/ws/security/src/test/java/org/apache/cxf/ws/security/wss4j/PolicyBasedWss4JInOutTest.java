@@ -853,7 +853,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
             new SecurityToken(assertionId, issuedAssertion, null);
         
         Properties cryptoProps = new Properties();
-        URL url = ClassLoader.getSystemResource("META-INF/cxf/outsecurity.properties");
+        URL url = ClassLoader.getSystemResource("outsecurity.properties");
         cryptoProps.load(url.openStream());
         Crypto crypto = CryptoFactory.getInstance(cryptoProps);
         String alias = cryptoProps.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
@@ -899,9 +899,9 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         }
         inHandler.setProperty(WSHandlerConstants.ACTION, action);
         inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, 
-                "META-INF/cxf/insecurity.properties");
+                "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
-                "META-INF/cxf/insecurity.properties");
+                "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
                 TestPwdCallback.class.getName());
         inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
@@ -918,8 +918,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     private SoapMessage getOutSoapMessageForDom(Document doc, AssertionInfoMap aim)
         throws SOAPException {
         SoapMessage msg = this.getSoapMessageForDom(doc, aim);
-        msg.put(SecurityConstants.SIGNATURE_PROPERTIES, "META-INF/cxf/outsecurity.properties");
-        msg.put(SecurityConstants.ENCRYPT_PROPERTIES, "META-INF/cxf/outsecurity.properties");
+        msg.put(SecurityConstants.SIGNATURE_PROPERTIES, "outsecurity.properties");
+        msg.put(SecurityConstants.ENCRYPT_PROPERTIES, "outsecurity.properties");
         msg.put(SecurityConstants.CALLBACK_HANDLER, TestPwdCallback.class.getName());
         msg.put(SecurityConstants.SIGNATURE_USERNAME, "myalias");
         msg.put(SecurityConstants.ENCRYPT_USERNAME, "myalias");

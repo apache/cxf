@@ -79,7 +79,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         msg.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
         //
@@ -122,7 +122,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
+        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
 
         inHandler.handleMessage(inmsg);

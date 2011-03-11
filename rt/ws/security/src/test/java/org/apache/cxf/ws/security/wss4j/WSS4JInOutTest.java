@@ -59,6 +59,7 @@ import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.junit.Test;
 
 
@@ -86,202 +87,84 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         assertTrue(output.contains("MustUnderstandInterceptor, SAAJInInterceptor, WSS4JInInterceptor"));
     }
     
+    
     @Test
     public void testSignature() throws Exception {
-        Document doc = readDocument("wsse-request-clean.xml");
-
-        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
-        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
+        Map<String, String> outProperties = new HashMap<String, String>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(WSHandlerConstants.USER, "myalias");
+        outProperties.put("password", "myAliasPassword");
         
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
-        msg.put("password", "myAliasPassword");
-
-        handler.handleMessage(msg);
-
-        doc = part;
+        Map<String, String> inProperties = new HashMap<String, String>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
         
-        assertValid("//wsse:Security", doc);
-        assertValid("//wsse:Security/ds:Signature", doc);
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/ds:Signature");
 
-        byte[] docbytes = getMessageBytes(doc);
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
-
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
-
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
-
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
-
-        inHandler.handleMessage(inmsg);
-        
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNotNull(result);
-        X509Certificate certificate = (X509Certificate)result
-            .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        List<WSHandlerResult> handlerResults = 
+            makeInvocation(outProperties, xpaths, inProperties);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+         
+        X509Certificate certificate = 
+            (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertNotNull(certificate);
     }
     
     @Test
     public void testDirectReferenceSignature() throws Exception {
-        Document doc = readDocument("wsse-request-clean.xml");
-
-        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
-        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
+        Map<String, String> outProperties = new HashMap<String, String>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(WSHandlerConstants.USER, "myalias");
+        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        outProperties.put("password", "myAliasPassword");
         
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
-        msg.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        msg.put("password", "myAliasPassword");
-
-        handler.handleMessage(msg);
-
-        doc = part;
+        Map<String, String> inProperties = new HashMap<String, String>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
         
-        assertValid("//wsse:Security", doc);
-        // Check to see that the binary security token was inserted in the header
-        assertValid("//wsse:Security/wsse:BinarySecurityToken", doc);
-        assertValid("//wsse:Security/ds:Signature", doc);
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/wsse:BinarySecurityToken");
+        xpaths.add("//wsse:Security/ds:Signature");
 
-        byte[] docbytes = getMessageBytes(doc);
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
-
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
-
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
-
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
-
-        inHandler.handleMessage(inmsg);
-        
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNotNull(result);
-        X509Certificate certificate = (X509Certificate)result
-            .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        List<WSHandlerResult> handlerResults = 
+            makeInvocation(outProperties, xpaths, inProperties);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+         
+        X509Certificate certificate = 
+            (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertNotNull(certificate);
     }
     
     @Test
     public void testEncryption() throws Exception {
-        Document doc = readDocument("wsse-request-clean.xml");
-
-        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
-        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
+        Map<String, String> outProperties = new HashMap<String, String>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
+        outProperties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
+        outProperties.put(WSHandlerConstants.USER, "myalias");
+        outProperties.put("password", "myAliasPassword");
         
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-        
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        msg.put(WSHandlerConstants.ENC_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
-        msg.put("password", "myAliasPassword");
-
-        handler.handleMessage(msg);
-        doc = part;
-
-        assertValid("//wsse:Security", doc);
-        assertValid("//s:Body/xenc:EncryptedData", doc);
-
-        byte[] docbytes = getMessageBytes(doc);
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
-
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
-
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
-
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE, "META-INF/cxf/insecurity.properties");
-        inHandler.setProperty(
+        Map<String, String> inProperties = new HashMap<String, String>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
+        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(
             WSHandlerConstants.PW_CALLBACK_CLASS, 
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//s:Body/xenc:EncryptedData");
 
-        inHandler.handleMessage(inmsg);
-        //
-        // Check that the EncryptedData is no longer there
-        //
-        assertInvalid("//s:Body/xenc:EncryptedData", saajMsg.getSOAPPart());
-        //
-        // There should be exactly 1 (WSS4J) HandlerResult
-        //
-        final java.util.List<WSHandlerResult> handlerResults = 
-            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
+        List<WSHandlerResult> handlerResults = 
+            makeInvocation(outProperties, xpaths, inProperties);
+
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
         //
@@ -312,80 +195,37 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     
     @Test
     public void testEncryptedUsernameToken() throws Exception {
-        Document doc = readDocument("wsse-request-clean.xml");
-
-        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
-        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-        
-        msg.put(
-            WSHandlerConstants.ACTION, 
+        Map<String, String> outProperties = new HashMap<String, String>();
+        outProperties.put(
+            WSHandlerConstants.ACTION,
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
         );
-        msg.put(WSHandlerConstants.ENC_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "alice");
-        msg.put("password", "alicePassword");
-        msg.put(WSHandlerConstants.ENCRYPTION_USER, "myalias");
-        msg.put(
+        outProperties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
+        outProperties.put(WSHandlerConstants.USER, "alice");
+        outProperties.put("password", "alicePassword");
+        outProperties.put(WSHandlerConstants.ENCRYPTION_USER, "myalias");
+        outProperties.put(
             WSHandlerConstants.ENCRYPTION_PARTS, 
             "{Content}{" + WSConstants.WSSE_NS + "}UsernameToken"
         );
-
-        handler.handleMessage(msg);
-        doc = part;
-
-        assertValid("//wsse:Security", doc);
-
-        byte[] docbytes = getMessageBytes(doc);
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
-
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
-
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
-
-        inHandler.setProperty(
+        
+        Map<String, String> inProperties = new HashMap<String, String>();
+        inProperties.put(
             WSHandlerConstants.ACTION, 
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
         );
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE, "META-INF/cxf/insecurity.properties");
-        inHandler.setProperty(
+        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(
             WSHandlerConstants.PW_CALLBACK_CLASS, 
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
 
-        inHandler.handleMessage(inmsg);
-        //
-        // Check that the EncryptedData is no longer there
-        //
-        assertInvalid("//s:Body/xenc:EncryptedData", saajMsg.getSOAPPart());
-        //
-        // There should be exactly 1 (WSS4J) HandlerResult
-        //
-        final java.util.List<WSHandlerResult> handlerResults = 
-            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
+        List<WSHandlerResult> handlerResults = 
+            makeInvocation(outProperties, xpaths, inProperties);
+
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
         
@@ -400,87 +240,38 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     
     @Test
     public void testUsernameToken() throws Exception {
-        Document doc = readDocument("wsse-request-clean.xml");
-
-        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
-        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
+        Map<String, String> outProperties = new HashMap<String, String>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        outProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProperties.put(WSHandlerConstants.USER, "alice");
+        outProperties.put("password", "alicePassword");
         
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-        
-        msg.put(
-            WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN
+        Map<String, String> inProperties = new HashMap<String, String>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(WSHandlerConstants.PASSWORD_TYPE_STRICT, "false");
+        inProperties.put(
+            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
-        msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-        msg.put(WSHandlerConstants.USER, "alice");
-        msg.put("password", "alicePassword");
-
-        handler.handleMessage(msg);
-        doc = part;
-
-        assertValid("//wsse:Security", doc);
-
-        byte[] docbytes = getMessageBytes(doc);
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
-
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
 
         //
         // This should pass, as even though passwordType is set to digest, we are 
         // overriding the default handler behaviour of requiring a strict password
         // type
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
-        inHandler.setProperty(
-            WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN
-        );
-        inHandler.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        inHandler.setProperty(WSHandlerConstants.PASSWORD_TYPE_STRICT, "false");
-        inHandler.setProperty(
-            WSHandlerConstants.PW_CALLBACK_CLASS, 
-            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
-        );
-        inHandler.handleMessage(inmsg);
-        
-        inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
+        //
+        makeInvocation(outProperties, xpaths, inProperties);
         
         //
         // This should fail, as we are requiring a digest password type
         //
-        inHandler = new WSS4JInInterceptor();
-        inHandler.setProperty(
-            WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN
-        );
-        inHandler.setProperty(
-            WSHandlerConstants.PW_CALLBACK_CLASS, 
-            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
-        );
-        inHandler.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(WSHandlerConstants.PASSWORD_TYPE_STRICT, "true");
         try {
-            inHandler.handleMessage(inmsg);
-            fail("Expected failure on password digest");
+            makeInvocation(outProperties, xpaths, inProperties);
+            fail("Failure expected on the wrong password type");
         } catch (org.apache.cxf.interceptor.Fault fault) {
             // expected
         }
@@ -505,7 +296,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saajMsg);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
@@ -569,7 +360,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saajMsg);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
@@ -628,67 +419,31 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     
     @Test
     public void testPKIPath() throws Exception {
-        Document doc = readDocument("wsse-request-clean.xml");
-
-        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
-        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
+        Map<String, String> outProperties = new HashMap<String, String>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        outProperties.put(WSHandlerConstants.USER, "alice");
+        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
+        outProperties.put(
+            WSHandlerConstants.PW_CALLBACK_CLASS, KeystorePasswordCallback.class.getName()
+        );
+        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        outProperties.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
         
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/alice.properties");
-        msg.put(WSHandlerConstants.USER, "alice");
-        msg.put(WSHandlerConstants.PW_CALLBACK_CLASS, KeystorePasswordCallback.class.getName());
-        msg.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        msg.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
-
-        handler.handleMessage(msg);
-
-        doc = part;
+        Map<String, String> inProperties = new HashMap<String, String>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "cxfca.properties");
         
-        assertValid("//wsse:Security", doc);
-        assertValid("//wsse:Security/ds:Signature", doc);
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/ds:Signature");
 
-        byte[] docbytes = getMessageBytes(doc);
-
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
-
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
-
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
-
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/cxfca.properties");
-
-        inHandler.handleMessage(inmsg);
-        
-        WSSecurityEngineResult result = 
-            (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
-        assertNotNull(result);
-        X509Certificate[] certificates = (X509Certificate[])result
-            .get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+        List<WSHandlerResult> handlerResults = 
+            makeInvocation(outProperties, xpaths, inProperties);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
+         
+        X509Certificate[] certificates = 
+            (X509Certificate[]) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
         assertNotNull(certificates);
         assertEquals(certificates.length, 2);
     }
@@ -721,6 +476,69 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         return ret;
     }
     
+    private List<WSHandlerResult> makeInvocation(
+        Map<String, String> outProperties,
+        List<String> xpaths,
+        Map<String, String> inProperties
+    ) throws Exception {
+        Document doc = readDocument("wsse-request-clean.xml");
+
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
+        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
+
+        SoapMessage msg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(msg);
+
+        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
+        SOAPPart part = saajMsg.getSOAPPart();
+        part.setContent(new DOMSource(doc));
+        saajMsg.saveChanges();
+
+        msg.setContent(SOAPMessage.class, saajMsg);
+
+        for (String key : outProperties.keySet()) {
+            msg.put(key, outProperties.get(key));
+        }
+
+        handler.handleMessage(msg);
+
+        doc = part;
+
+        for (String xpath : xpaths) {
+            assertValid(xpath, doc);
+        }
+
+        byte[] docbytes = getMessageBytes(doc);
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        dbf.setValidating(false);
+        dbf.setIgnoringComments(false);
+        dbf.setIgnoringElementContentWhitespace(true);
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setEntityResolver(new NullResolver());
+        doc = StaxUtils.read(db, reader, false);
+
+        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
+
+        SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        ex.setInMessage(inmsg);
+        inmsg.setContent(SOAPMessage.class, saajMsg);
+
+        for (String key : inProperties.keySet()) {
+            inHandler.setProperty(key, inProperties.get(key));
+        }
+
+        inHandler.handleMessage(inmsg);
+
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
+        return handlerResults;
+    }
     
     // FOR DEBUGGING ONLY
     /*private*/ static String serialize(Document doc) {

@@ -95,7 +95,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE, "META-INF/cxf/insecurity.properties");
+        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 
         try {

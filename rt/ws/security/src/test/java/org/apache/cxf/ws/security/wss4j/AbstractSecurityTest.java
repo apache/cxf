@@ -55,6 +55,8 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         addNamespace("s", Soap11.getInstance().getNamespace());
         addNamespace("xenc", WSConstants.ENC_NS);
         addNamespace("wsu", WSConstants.WSU_NS);
+        addNamespace("saml1", WSConstants.SAML_NS);
+        addNamespace("saml2", WSConstants.SAML2_NS);
     }
 
     /**

@@ -63,8 +63,8 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
 
         wsIn = new SimpleSubjectCreatingInterceptor();
         wsIn.setSupportDigestPasswords(digest);
-        wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
-        wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "META-INF/cxf/insecurity.properties");
+        wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
         
         service.getInInterceptors().add(wsIn);
@@ -75,8 +75,8 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
         
         
         wsOut = new WSS4JOutInterceptor();
-        wsOut.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        wsOut.setProperty(WSHandlerConstants.ENC_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        wsOut.setProperty(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        wsOut.setProperty(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         wsOut.setProperty(WSHandlerConstants.USER, "myalias");
         if (digest) {
             wsOut.setProperty("password", "myAliasPassword");

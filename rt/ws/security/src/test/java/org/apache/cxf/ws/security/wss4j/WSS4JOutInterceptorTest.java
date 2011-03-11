@@ -60,7 +60,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saaj);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "username");
         msg.put("password", "myAliasPassword");
         msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
@@ -88,7 +88,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saaj);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "username");
         msg.put("password", "myAliasPassword");
         msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
@@ -116,8 +116,8 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saaj);
         
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
-        msg.put(WSHandlerConstants.ENC_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
@@ -142,7 +142,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saaj);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myAlias");
         msg.put("password", "myAliasPassword");
 
@@ -167,7 +167,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.setContent(SOAPMessage.class, saaj);
         
         ohandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
-        ohandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        ohandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
@@ -196,7 +196,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         customActions.put(WSConstants.UT, action);
                 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/outsecurity.properties");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "username");
         msg.put("password", "myAliasPassword");
         msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);

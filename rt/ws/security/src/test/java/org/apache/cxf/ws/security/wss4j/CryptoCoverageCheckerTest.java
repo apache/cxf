@@ -229,9 +229,9 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
         
         inHandler.setProperty(WSHandlerConstants.ACTION, action);
         inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, 
-                "META-INF/cxf/insecurity.properties");
+                "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
-                "META-INF/cxf/insecurity.properties");
+                "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
                 TestPwdCallback.class.getName());
         inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
