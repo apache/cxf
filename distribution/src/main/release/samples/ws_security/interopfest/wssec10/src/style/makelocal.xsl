@@ -8,16 +8,16 @@
     <xsl:template match="xs:import">
         <xsl:copy>
             <xsl:choose>
-                <xsl:when test="@schemaLocation='http://131.107.72.15/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd0'">
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd0'">
                     <xsl:attribute name="schemaLocation">WsSecurity10_0.xsd</xsl:attribute>
                 </xsl:when>
-                <xsl:when test="@schemaLocation='http://131.107.72.15/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd1'">
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd1'">
                     <xsl:attribute name="schemaLocation">WsSecurity10_1.xsd</xsl:attribute>
                 </xsl:when>
-                <xsl:when test="@schemaLocation='http://131.107.72.15/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd2'">
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd2'">
                     <xsl:attribute name="schemaLocation">WsSecurity10_2.xsd</xsl:attribute>
                 </xsl:when>
-                <xsl:when test="@schemaLocation='http://131.107.72.15/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd3'">
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?xsd=xsd3'">
                     <xsl:attribute name="schemaLocation">WsSecurity10_3.xsd</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
@@ -31,7 +31,7 @@
     <xsl:template match="wsdl:import">
         <xsl:copy>
             <xsl:choose>
-                <xsl:when test="@location='http://131.107.72.15/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?wsdl'">
+                <xsl:when test="@location='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity10.svc?wsdl'">
                     <xsl:attribute name="location">WsSecurity10.wsdl</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
@@ -47,7 +47,7 @@
         <xsl:copy>
             <xsl:choose>
                 <xsl:when test="@location='https://kirillgdev04/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/UserNameOverTransport'">
-                    <xsl:attribute name="location">https://131.107.72.15/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/UserNameOverTransport</xsl:attribute>
+                    <xsl:attribute name="location">https://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/UserNameOverTransport</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates select="@*"/>

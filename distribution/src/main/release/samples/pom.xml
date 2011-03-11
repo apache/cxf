@@ -90,11 +90,11 @@
         wsdl's and certs and such
         -->
 	
-        <!--<module>ws_security/interopfest/wssc</module>
+        <module>ws_security/interopfest/wssc</module>
         <module>ws_security/interopfest/wstrust10</module>
         <module>ws_security/interopfest/wssec10</module>
-        <module>ws_security/interopfest/wssec11</module>-->
-        <!--module>ws_security/interopfest/wstrust13</module-->
+        <module>ws_security/interopfest/wssec11</module>
+        <module>ws_security/interopfest/wstrust13</module>
     </modules>
     <dependencyManagement>
         <dependencies>

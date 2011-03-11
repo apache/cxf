@@ -34,8 +34,8 @@
         <cxf.version>${project.version}</cxf.version>
         <test.method>ALL</test.method>
 
-        <wsdl.host>131.107.72.15</wsdl.host>
-        <target.host>131.107.72.15</target.host>
+        <wsdl.host>131.107.153.205</wsdl.host>
+        <target.host>131.107.153.205</target.host>
     </properties>
     <build>
         <resources>

@@ -30,7 +30,6 @@ import interop.client.KeystorePasswordCallback;
 
 public class Server {
     protected Server(String baseUrl) throws Exception {
-        WSSConfig.getDefaultWSConfig();
         new SpringBusFactory().createBus("etc/server.xml");
         
         //"SecureConversation_UserNameOverTransport_IPingService",
