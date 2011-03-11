@@ -90,7 +90,7 @@ public abstract class AbstractServletController {
         updateDests(request, false);
     }
     
-    protected synchronized void updateDests(HttpServletRequest request, boolean force) {
+    protected void updateDests(HttpServletRequest request, boolean force) {
         
         String base = forcedBaseAddress == null ? getBaseURL(request) : forcedBaseAddress;
                 
