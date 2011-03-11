@@ -306,8 +306,8 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     
     private String sanitize(String in) {
         StringBuilder str = new StringBuilder(in.length());
-        for (int x = 0; x < str.length(); x++) {
-            char ch = str.charAt(x);
+        for (int x = 0; x < in.length(); x++) {
+            char ch = in.charAt(x);
             switch (ch) {
             case ':':
             case '/':
