@@ -63,7 +63,7 @@ public final class ToolConstants {
     public static final String CFG_EXTRA_SOAPHEADER = "exsoapheader";
     public static final String CFG_DEFAULT_NS = "defaultns";
     public static final String CFG_DEFAULT_EX = "defaultex";
-    public static final String CXF_GENERATE_TYPES = "generatetypes";
+    public static final String CFG_NO_TYPES = "notypes";
     public static final String CFG_XJC_ARGS = "xjc";
     public static final String CFG_CATALOG = "catalog";
     public static final String CFG_DEFAULT_VALUES = "defaultValues";

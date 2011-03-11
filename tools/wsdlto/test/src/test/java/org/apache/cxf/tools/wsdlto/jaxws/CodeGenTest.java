@@ -1337,9 +1337,16 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testCXFNotType() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
-        env.put(ToolConstants.CXF_GENERATE_TYPES, "false");
+        env.put(ToolConstants.CFG_USE_FQCN_FAULT_SERIAL_VERSION_UID, Boolean.TRUE);
         processor.setContext(env);
         processor.execute();
+        
+        File sayHiResponseFile =
+            new File(output, "org/apache/cxf/w2j/hello_world_soap_http/types/SayHiResponse");
+        assertFalse(sayHiResponseFile.exists());
+        File greetMeResponseFile =
+            new File(output, "org/apache/cxf/w2j/hello_world_soap_http/types/GreetMeResponse");
+        assertFalse(greetMeResponseFile.exists());
     }
 
     @Test
