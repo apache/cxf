@@ -297,6 +297,7 @@ public class JettyHTTPServerEngine
      * @param handler notified on incoming HTTP requests
      */
     public synchronized void addServant(URL url, JettyHTTPHandler handler) {
+        SecurityHandler securityHandler = null;
         if (server == null) {
             DefaultHandler defaultHandler = null;
             // create a new jetty server instance if there is no server there            
@@ -351,7 +352,6 @@ public class JettyHTTPServerEngine
              * one to start, or it is now one containing only the single handler
              * that was there to begin with.
              */
-
             if (handlers != null && handlers.size() > 0) {
                 for (Handler h : handlers) {
                     // Filtering out the jetty default handler 
@@ -366,8 +366,10 @@ public class JettyHTTPServerEngine
                             //set JettyHTTPHandler as inner handler if 
                             //inner handler is null
                             ((SecurityHandler)h).setHandler(handler);
-                        } 
-                        handlerCollection.addHandler(h);
+                            securityHandler = (SecurityHandler)h;
+                        } else {
+                            handlerCollection.addHandler(h);
+                        }
                     }
                 }
             }
@@ -415,11 +417,21 @@ public class JettyHTTPServerEngine
                 sessionManager.setIdManager(idManager);
             }
             SessionHandler sessionHandler = new SessionHandler(sessionManager);
-            sessionHandler.setHandler(handler);
+            if (securityHandler != null) {
+                //use the securityHander which already wrap the jetty http handler
+                sessionHandler.setHandler(securityHandler);
+            } else {
+                sessionHandler.setHandler(handler);
+            }
             context.setHandler(sessionHandler);
         } else {
             // otherwise, just the one.
-            context.setHandler(handler);
+            if (securityHandler != null) {
+                //use the securityHander which already wrap the jetty http handler
+                context.setHandler(securityHandler);
+            } else {
+                context.setHandler(handler);
+            }
         }
         contexts.addHandler(context);
         
