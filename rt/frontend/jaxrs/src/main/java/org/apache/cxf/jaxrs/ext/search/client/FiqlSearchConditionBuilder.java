@@ -19,12 +19,14 @@
 package org.apache.cxf.jaxrs.ext.search.client;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import javax.xml.datatype.Duration;
 
 import org.apache.cxf.jaxrs.ext.search.FiqlParser;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 /**
  * Builds client-side search condition that passed to backend can be consumed by {@link FiqlParser}.
@@ -52,26 +54,41 @@ import org.apache.cxf.jaxrs.ext.search.FiqlParser;
  */
 public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
 
+    private Map<String, String> properties;
+    
+    public FiqlSearchConditionBuilder() {
+        this (Collections.<String, String>emptyMap());    
+    }
+    
+    public FiqlSearchConditionBuilder(Map<String, String> properties) {
+        this.properties = properties;    
+    }
+    
     public String build() {
         return "";
     }
 
     public PartialCondition query() {
-        return new Builder();
+        return new Builder(properties);
     }
 
     private static class Builder implements SearchConditionBuilder.Property,
         SearchConditionBuilder.CompleteCondition, SearchConditionBuilder.PartialCondition {
         private String result = "";
         private Builder parent;
-        private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        private DateFormat df;
+        private boolean timeZoneSupported;
 
-        public Builder() {
+        public Builder(Map<String, String> properties) {
             parent = null;
+            df = SearchUtils.getDateFormat(properties, FiqlParser.DEFAULT_DATE_FORMAT);
+            timeZoneSupported = SearchUtils.isTimeZoneSupported(properties, Boolean.TRUE);
         }
 
         public Builder(Builder parent) {
             this.parent = parent;
+            df = parent.getDateFormat();
+            timeZoneSupported = parent.isTimeZoneSupported();
         }
 
         public String build() {
@@ -83,6 +100,14 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
             // }
         }
 
+        private DateFormat getDateFormat() {
+            return df;
+        }
+
+        private boolean isTimeZoneSupported() {
+            return timeZoneSupported;
+        }
+        
         // builds from parent but not further then exclude builder
         private String buildPartial(Builder exclude) {
             if (parent != null && !parent.equals(exclude)) {
@@ -250,9 +275,13 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
 
         private String toString(Date date) {
             String s = df.format(date);
-            // zone in XML is "+01:00" in Java is "+0100"; adding semicolon
-            int len = s.length();
-            return s.substring(0, len - 2) + ":" + s.substring(len - 2, len);
+            if (timeZoneSupported) {
+                // zone in XML is "+01:00" in Java is "+0100"; adding semicolon
+                int len = s.length();
+                return s.substring(0, len - 2) + ":" + s.substring(len - 2, len);
+            } else {
+                return s;
+            }
         }
     }
 

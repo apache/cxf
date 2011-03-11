@@ -63,7 +63,7 @@ public class LogRecord {
     }
     
     public LogRecord(LogRecord copy) {
-        this.eventTimestamp = copy.getEventTimestamp();
+        this.eventTimestamp = copy.getDate();
         this.level = copy.getLevel();
         this.message = copy.getMessage();
         this.loggerName = copy.getLoggerName();
@@ -84,7 +84,7 @@ public class LogRecord {
     public static LogRecord fromJUL(java.util.logging.LogRecord julRecord) {
         Validate.notNull(julRecord, "julRecord is null");
         LogRecord record = new LogRecord();
-        record.setEventTimestamp(new Date(julRecord.getMillis()));
+        record.setDate(new Date(julRecord.getMillis()));
         record.setLevel(LogLevel.fromJUL(julRecord.getLevel()));
         record.setLoggerName(julRecord.getLoggerName());
         if (julRecord.getThrown() != null) {
@@ -106,13 +106,13 @@ public class LogRecord {
     }
     
     @XmlElement(namespace = "http://cxf.apache.org/log")
-    public Date getEventTimestamp() {
+    public Date getDate() {
         return eventTimestamp;
     }
 
-    public void setEventTimestamp(Date eventTimestamp) {
-        Validate.notNull(eventTimestamp, "eventTimestamp is null");
-        this.eventTimestamp = eventTimestamp;
+    public void setDate(Date date) {
+        Validate.notNull(date, "eventTimestamp is null");
+        this.eventTimestamp = date;
     }
 
     @XmlElement(namespace = "http://cxf.apache.org/log")

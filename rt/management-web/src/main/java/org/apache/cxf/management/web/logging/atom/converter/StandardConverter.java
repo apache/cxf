@@ -218,7 +218,7 @@ public class StandardConverter implements Converter {
         // forget about single line "addExtension().setText()" since
         // javac failure "org.apache.abdera.model.Element cannot be dereferenced"
         Element e = erec.addExtension(qn("eventTimestamp"));
-        e.setText(toAtomDateFormat(record.getEventTimestamp()));
+        e.setText(toAtomDateFormat(record.getDate()));
         e = erec.addExtension(qn("level"));
         e.setText(record.getLevel().toString());
         e = erec.addExtension(qn("loggerName"));
@@ -348,7 +348,7 @@ public class StandardConverter implements Converter {
                 entry.setSummary(records.get(0).getLoggerName() + " : " + records.get(0).getMessage());
             }
             if (records.size() > 0) {
-                entry.setUpdated(toAtomDateFormat(records.get(0).getEventTimestamp()));
+                entry.setUpdated(toAtomDateFormat(records.get(0).getDate()));
             }
         }
     }

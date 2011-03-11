@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -71,7 +74,11 @@ public class SearchContextImpl implements SearchContext {
         // we can use this method as a parser factory, ex
         // we can get parsers capable of parsing XQuery and other languages
         // depending on the properties set by a user
-        
-        return new FiqlParser<T>(cls); 
+        Map<String, String> props = new LinkedHashMap<String, String>(2);
+        props.put(SearchUtils.DATE_FORMAT_PROPERTY, 
+                  (String)message.getContextualProperty(SearchUtils.DATE_FORMAT_PROPERTY));
+        props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, 
+                  (String)message.getContextualProperty(SearchUtils.TIMEZONE_SUPPORT_PROPERTY));
+        return new FiqlParser<T>(cls, props); 
     }
 }

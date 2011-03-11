@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.ext.search;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -55,20 +54,30 @@ public class FiqlParser<T> {
     public static final String LE = "=le=";
     public static final String EQ = "==";
     public static final String NEQ = "!=";
+    
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private static Map<String, ConditionType> operatorsMap;
+    private static final Pattern COMPARATORS_PATTERN; 
+    private static final Map<String, ConditionType> OPERATORS_MAP;
+
     static {
-        operatorsMap = new HashMap<String, ConditionType>();
-        operatorsMap.put(GT, ConditionType.GREATER_THAN);
-        operatorsMap.put(GE, ConditionType.GREATER_OR_EQUALS);
-        operatorsMap.put(LT, ConditionType.LESS_THAN);
-        operatorsMap.put(LE, ConditionType.LESS_OR_EQUALS);
-        operatorsMap.put(EQ, ConditionType.EQUALS);
-        operatorsMap.put(NEQ, ConditionType.NOT_EQUALS);
+        // operatorsMap
+        OPERATORS_MAP = new HashMap<String, ConditionType>();
+        OPERATORS_MAP.put(GT, ConditionType.GREATER_THAN);
+        OPERATORS_MAP.put(GE, ConditionType.GREATER_OR_EQUALS);
+        OPERATORS_MAP.put(LT, ConditionType.LESS_THAN);
+        OPERATORS_MAP.put(LE, ConditionType.LESS_OR_EQUALS);
+        OPERATORS_MAP.put(EQ, ConditionType.EQUALS);
+        OPERATORS_MAP.put(NEQ, ConditionType.NOT_EQUALS);
+        
+        // pattern
+        String comparators = GT + "|" + GE + "|" + LT + "|" + LE + "|" + EQ + "|" + NEQ;
+        String s1 = "[\\p{ASCII}]+(" + comparators + ")";
+        COMPARATORS_PATTERN = Pattern.compile(s1);
     }
 
     private Beanspector<T> beanspector;
-
+    private Map<String, String> properties;
     /**
      * Creates FIQL parser.
      * 
@@ -76,7 +85,19 @@ public class FiqlParser<T> {
      *            accessible no-arg constructor and complementary setters to these used in FIQL expressions.
      */
     public FiqlParser(Class<T> tclass) {
+        this(tclass, Collections.<String, String>emptyMap());
+    }
+    
+    /**
+     * Creates FIQL parser.
+     * 
+     * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
+     *            accessible no-arg constructor and complementary setters to these used in FIQL expressions.
+     * @param contextProperties            
+     */
+    public FiqlParser(Class<T> tclass, Map<String, String> contextProperties) {
         beanspector = new Beanspector<T>(tclass);
+        properties = contextProperties;
     }
 
     /**
@@ -186,10 +207,7 @@ public class FiqlParser<T> {
     }
 
     private Comparison parseComparison(String expr) throws FiqlParseException {
-        String comparators = GT + "|" + GE + "|" + LT + "|" + LE + "|" + EQ + "|" + NEQ;
-        String s1 = "[\\p{ASCII}]+(" + comparators + ")";
-        Pattern p = Pattern.compile(s1);
-        Matcher m = p.matcher(expr);
+        Matcher m = COMPARATORS_PATTERN.matcher(expr);
         if (m.find()) {
             String name = expr.substring(0, m.start(1));
             String operator = m.group(1);
@@ -213,17 +231,17 @@ public class FiqlParser<T> {
             throw new FiqlParseException(e);
         }
         if (Date.class.isAssignableFrom(valueType)) {
-            DateFormat df;
             try {
-                df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                // zone in XML is "+01:00" in Java is "+0100"; stripping semicolon
-                int idx = value.lastIndexOf(':');
-                if (idx != -1) {
-                    String v = value.substring(0, idx) + value.substring(idx + 1);
-                    castedValue = df.parse(v);
-                } else {
-                    castedValue = df.parse(value);
+                DateFormat df = SearchUtils.getDateFormat(properties, DEFAULT_DATE_FORMAT);
+                String dateValue = value;
+                if (SearchUtils.isTimeZoneSupported(properties, Boolean.TRUE)) {
+                    // zone in XML is "+01:00" in Java is "+0100"; stripping semicolon
+                    int idx = value.lastIndexOf(':');
+                    if (idx != -1) {
+                        dateValue = value.substring(0, idx) + value.substring(idx + 1);
+                    }
                 }
+                castedValue = df.parse(dateValue);
             } catch (ParseException e) {
                 // is that duration?
                 try {
@@ -297,7 +315,7 @@ public class FiqlParser<T> {
                     beanspector.instantiate();
                     for (ASTNode<T> node : subnodes) {
                         FiqlParser<T>.Comparison comp = (Comparison)node;
-                        map.put(comp.getName(), operatorsMap.get(comp.getOperator()));
+                        map.put(comp.getName(), OPERATORS_MAP.get(comp.getOperator()));
                         beanspector.setValue(comp.getName(), comp.getValue());
                     }
                     return new SimpleSearchCondition<T>(map, beanspector.getBean());
@@ -348,7 +366,7 @@ public class FiqlParser<T> {
 
         public SearchCondition<T> build() throws FiqlParseException {
             T cond = createTemplate(name, value);
-            ConditionType ct = operatorsMap.get(operator);
+            ConditionType ct = OPERATORS_MAP.get(operator);
             
             if (isPrimitive(cond)) {
                 return new SimpleSearchCondition<T>(ct, cond); 

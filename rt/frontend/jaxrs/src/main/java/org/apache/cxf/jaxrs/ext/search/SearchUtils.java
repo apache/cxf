@@ -18,12 +18,28 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.text.SimpleDateFormat;
+import java.util.Map;
+
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 
 public final class SearchUtils {
     
+    public static final String DATE_FORMAT_PROPERTY = "search.date-format";
+    public static final String TIMEZONE_SUPPORT_PROPERTY = "search.timezone.support";
+    
     private SearchUtils() {
         
+    }
+    
+    public static SimpleDateFormat getDateFormat(Map<String, String> properties, String defaultFormat) {
+        String dfProperty = properties.get(DATE_FORMAT_PROPERTY);
+        return new SimpleDateFormat(dfProperty == null ? defaultFormat : dfProperty);    
+    }
+    
+    public static boolean isTimeZoneSupported(Map<String, String> properties, Boolean defaultValue) {
+        String tzProperty = properties.get(SearchUtils.TIMEZONE_SUPPORT_PROPERTY);
+        return tzProperty == null ? defaultValue : Boolean.valueOf(tzProperty);    
     }
     
     public static <T> String toSQL(SearchCondition<T> sc, String table, String... columns) {

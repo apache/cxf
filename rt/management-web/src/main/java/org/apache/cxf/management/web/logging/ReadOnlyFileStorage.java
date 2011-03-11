@@ -239,7 +239,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
                 String fileModifiedDate = logFileInfo.getFileModified();
                 logDate = fileModifiedDate != null ? fileModifiedDate + " " + logDate : logDate;
                 Date date = recordDateFormat.parse(logDate);
-                record.setEventTimestamp(date);
+                record.setDate(date);
             } catch (Exception ex) {
                 // ignore
             }

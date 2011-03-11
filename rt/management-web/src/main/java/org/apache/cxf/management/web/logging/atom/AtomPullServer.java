@@ -394,7 +394,7 @@ public class AtomPullServer extends AbstractAtomBean {
         sb.append("<tr><th>Date</th><th>Level</th><th>Logger</th><th>Message</th></tr>");
         for (LogRecord lr : list) {
             sb.append("<tr>");
-            sb.append("<td>" + df.format(lr.getEventTimestamp()) + "</td>");
+            sb.append("<td>" + df.format(lr.getDate()) + "</td>");
             sb.append("<td>" + lr.getLevel().toString() + "</td>");
             sb.append("<td>" + lr.getLoggerName() + "</td>");
             String message = null;
@@ -476,7 +476,7 @@ public class AtomPullServer extends AbstractAtomBean {
     private static class LogRecordComparator implements Comparator<LogRecord> {
 
         public int compare(LogRecord r1, LogRecord r2) {
-            return r1.getEventTimestamp().compareTo(r2.getEventTimestamp()) * -1;
+            return r1.getDate().compareTo(r2.getDate()) * -1;
         }
         
     }

@@ -22,7 +22,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeFactory;
 
@@ -142,15 +144,30 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testParseDate() throws FiqlParseException, ParseException {
+    public void testParseDateWithDefaultFormat() throws FiqlParseException, ParseException {
         SearchCondition<Condition> filter = parser.parse("time=le=2010-03-11T18:00:00.000+00:00");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        DateFormat df = new SimpleDateFormat(FiqlParser.DEFAULT_DATE_FORMAT);
         assertTrue(filter.isMet(new Condition("whatever", 15, df.parse("2010-03-11T18:00:00.000+0000"))));
         assertTrue(filter.isMet(new Condition(null, null, df.parse("2010-03-10T22:22:00.000+0000"))));
         assertFalse(filter.isMet(new Condition("blah", null, df.parse("2010-03-12T00:00:00.000+0000"))));
         assertFalse(filter.isMet(new Condition(null, 123, df.parse("2010-03-12T00:00:00.000+0000"))));
     }
 
+    @Test
+    public void testParseDateWithCustomFormat() throws FiqlParseException, ParseException {
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
+        props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
+        parser = new FiqlParser<Condition>(Condition.class, props);
+        
+        SearchCondition<Condition> filter = parser.parse("time=le=2010-03-11T18:00:00");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        assertTrue(filter.isMet(new Condition("whatever", 15, df.parse("2010-03-11T18:00:00"))));
+        assertTrue(filter.isMet(new Condition(null, null, df.parse("2010-03-10T22:22:00"))));
+        assertFalse(filter.isMet(new Condition("blah", null, df.parse("2010-03-12T00:00:00"))));
+        assertFalse(filter.isMet(new Condition(null, 123, df.parse("2010-03-12T00:00:00"))));
+    }
+    
     @Test
     public void testParseDateDuration() throws Exception {
         SearchCondition<Condition> filter = parser.parse("time=gt=-PT1M");

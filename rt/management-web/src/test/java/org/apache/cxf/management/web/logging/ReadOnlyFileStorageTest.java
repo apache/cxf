@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -154,6 +156,58 @@ public class ReadOnlyFileStorageTest extends Assert {
     }
     
     @Test
+    public void testReadRecordsWithMultipleFilesAndSearchDates() throws Exception {
+        
+        List<String> locations = new ArrayList<String>();
+        locations.add(getClass().getResource("logs/2011-01-22-karaf.log").toURI().getPath());
+        locations.add(getClass().getResource("logs/2011-01-23-karaf.log").toURI().getPath());
+        storage.setLogLocations(locations);
+        
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss SSS");
+        props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
+        FiqlParser<LogRecord> parser = new FiqlParser<LogRecord>(LogRecord.class, props);
+        
+        SearchCondition<LogRecord> sc = parser.parse("date==2011-01-22T11:49:17 184");
+        
+        List<LogRecord> recordsFirstPage1 = readPage(1, sc, 2, 1);
+        List<LogRecord> recordsFirstPage2 = readPage(1, sc, 2, 1);
+        compareRecords(recordsFirstPage1, recordsFirstPage2);
+        
+        LogRecord record = recordsFirstPage1.get(0);
+        assertEquals("Initializing Timer", record.getMessage());
+    }
+    
+    @Test
+    public void testReadRecordsWithMultipleFilesAndSearchDates2() throws Exception {
+        
+        List<String> locations = new ArrayList<String>();
+        locations.add(getClass().getResource("logs/2011-01-22-karaf.log").toURI().getPath());
+        locations.add(getClass().getResource("logs/2011-01-23-karaf.log").toURI().getPath());
+        storage.setLogLocations(locations);
+        
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd");
+        props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
+        FiqlParser<LogRecord> parser = new FiqlParser<LogRecord>(LogRecord.class, props);
+        
+        SearchCondition<LogRecord> sc = parser.parse("date=lt=2011-01-23");
+        
+        List<LogRecord> recordsFirstPage1 = readPage(1, sc, 32, 32);
+        readPage(2, sc, 32, 0);
+        List<LogRecord> recordsFirstPage2 = readPage(1, sc, 32, 32);
+                
+        compareRecords(recordsFirstPage1, recordsFirstPage2);
+        
+        LogRecord firstRecord = recordsFirstPage1.get(0);
+        assertEquals("Starting JMX OSGi agent", firstRecord.getMessage());
+        LogRecord lastRecord = recordsFirstPage1.get(31);
+        assertTrue(lastRecord.getMessage().contains("Pax Web available at"));
+        
+        readPage(2, sc, 32, 0);
+    }
+    
+    @Test
     public void testReadRecordsWithMultipleFiles2() throws Exception {
         
         List<String> locations = new ArrayList<String>();
@@ -212,7 +266,7 @@ public class ReadOnlyFileStorageTest extends Assert {
             LogRecord r1 = records1.get(i);
             LogRecord r2 = records2.get(i);
             assertEquals(r1.getLevel(), r2.getLevel());
-            assertEquals(r1.getEventTimestamp(), r2.getEventTimestamp());
+            assertEquals(r1.getDate(), r2.getDate());
             assertEquals(r1.getMessage(), r2.getMessage());
         }    
     }

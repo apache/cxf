@@ -22,6 +22,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -30,6 +32,7 @@ import javax.xml.datatype.Duration;
 
 import static junit.framework.Assert.assertEquals;
 
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.client.SearchConditionBuilder.PartialCondition;
 
 import org.junit.AfterClass;
@@ -76,6 +79,21 @@ public class FiqlSearchConditionBuilderTest {
         Date d = df.parse("2011-03-01 12:34 +0000");
         String ret = b.query().is("foo").equalTo(d).build();
         assertEquals("foo==2011-03-01T12:34:00.000+00:00", ret);
+    }
+    
+    @Test
+    public void testEqualToDateWithCustomFormat() throws ParseException {
+        
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
+        props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
+        
+        Date d = df.parse("2011-03-01 12:34 +0000");
+        
+        FiqlSearchConditionBuilder bCustom = new FiqlSearchConditionBuilder(props);
+        
+        String ret = bCustom.query().is("foo").equalTo(d).build();
+        assertEquals("foo==2011-03-01T12:34:00", ret);
     }
 
     @Test
