@@ -29,7 +29,6 @@ import java.util.ResourceBundle;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeader;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
@@ -41,6 +40,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -82,14 +82,17 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
     public synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
         if (message.getVersion() instanceof Soap11) {
             if (factory11 == null) { 
-                factory11 = MessageFactory.newInstance();
+                factory11 = SAAJFactoryResolver.createMessageFactory(message.getVersion());
             } 
             return factory11;
         }
-        if (factory12 == null) {
-            factory12 = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+        if (message.getVersion() instanceof Soap12) {
+            if (factory12 == null) {
+                factory12 = SAAJFactoryResolver.createMessageFactory(message.getVersion());
+            }
+            return factory12;
         }
-        return factory12;
+        return SAAJFactoryResolver.createMessageFactory(null);
     }
     public void handleMessage(SoapMessage message) throws Fault {
         SOAPMessage saaj = message.getContent(SOAPMessage.class);

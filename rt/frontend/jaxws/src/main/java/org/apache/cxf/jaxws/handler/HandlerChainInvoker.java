@@ -26,9 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
@@ -45,6 +43,8 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
@@ -434,11 +434,11 @@ public class HandlerChainInvoker {
         try {
             SOAPMessage soapMessage = null;
 
-            if (!(msg instanceof SoapMessage) || ((SoapMessage)msg).getVersion().getVersion() <= 1.11d) {
-                soapMessage = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL).createMessage();
-            } else {
-                soapMessage = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
+            SoapVersion version = null;
+            if (msg instanceof SoapMessage) {
+                version = ((SoapMessage)msg).getVersion();
             }
+            soapMessage = SAAJFactoryResolver.createMessageFactory(version).createMessage();
             msg.setContent(SOAPMessage.class, soapMessage);
 
             SOAPBody body = soapMessage.getSOAPBody();

@@ -24,7 +24,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.ws.WebServiceException;
@@ -34,6 +33,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
+import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxws.binding.AbstractBindingImpl;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
@@ -95,11 +95,7 @@ public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding 
         if (this.soapBinding instanceof SoapBindingInfo) {
             SoapBindingInfo bindingInfo = (SoapBindingInfo) this.soapBinding;
             try {
-                if (bindingInfo.getSoapVersion() instanceof Soap11) {
-                    return MessageFactory.newInstance();
-                } else if (bindingInfo.getSoapVersion() instanceof Soap12) {
-                    return MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-                }
+                return SAAJFactoryResolver.createMessageFactory(bindingInfo.getSoapVersion());
             } catch (SOAPException e) {
                 throw new WebServiceException(BUNDLE.getString("SAAJ_FACTORY_ERR"), e);
             }
@@ -111,11 +107,7 @@ public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding 
         if (this.soapBinding instanceof SoapBindingInfo) {
             SoapBindingInfo bindingInfo = (SoapBindingInfo) this.soapBinding;
             try {
-                if (bindingInfo.getSoapVersion() instanceof Soap11) {
-                    return SOAPFactory.newInstance();
-                } else if (bindingInfo.getSoapVersion() instanceof Soap12) {
-                    return SOAPFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-                }
+                return SAAJFactoryResolver.createSOAPFactory(bindingInfo.getSoapVersion());
             } catch (SOAPException e) {
                 throw new WebServiceException(BUNDLE.getString("SAAJ_FACTORY_ERR"), e);
             }
