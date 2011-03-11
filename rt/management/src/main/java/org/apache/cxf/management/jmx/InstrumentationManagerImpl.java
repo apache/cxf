@@ -305,16 +305,23 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     }
     
     private String sanitize(String in) {
-        String result = null;
-        if (in != null) {
-            result = in.replace(':', '_');
-            result = result.replace('/', '_');
-            result = result.replace('\\', '_');
-            result = result.replace('?', '_');
-            result = result.replace('=', '_');
-            result = result.replace(',', '_');
+        StringBuilder str = new StringBuilder(in.length());
+        for (int x = 0; x < str.length(); x++) {
+            char ch = str.charAt(x);
+            switch (ch) {
+            case ':':
+            case '/':
+            case '\\':
+            case '?':
+            case '=':
+            case ',':
+                str.append('_');
+                break;
+            default:
+                str.append(ch);
+            }
         }
-        return result;
+        return str.toString();
     }
 }
 
