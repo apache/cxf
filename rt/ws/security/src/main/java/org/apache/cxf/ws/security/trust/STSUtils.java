@@ -80,14 +80,19 @@ public final class STSUtils {
         return TOKEN_TYPE_SCT_05_12;
     }
     
-    public static STSClient getClient(Message message) {
+    public static STSClient getClient(Message message, String type) {
+        if (type == null) {
+            type = "";
+        } else {
+            type = "." + type + "-client";
+        }
         STSClient client = (STSClient)message
             .getContextualProperty(SecurityConstants.STS_CLIENT);
         if (client == null) {
             client = new STSClient(message.getExchange().get(Bus.class));
             Endpoint ep = message.getExchange().get(Endpoint.class);
-            client.setEndpointName(ep.getEndpointInfo().getName().toString() + ".sct-client");
-            client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sct-client");
+            client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
+            client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
         }
         return client;
     }

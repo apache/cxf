@@ -110,7 +110,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         }
                     }
                     if (tok == null) {
-                        STSClient client = STSUtils.getClient(message);
+                        STSClient client = STSUtils.getClient(message, "sts");
                         AddressingProperties maps =
                             (AddressingProperties)message
                                 .get("javax.xml.ws.addressing.context.outbound");

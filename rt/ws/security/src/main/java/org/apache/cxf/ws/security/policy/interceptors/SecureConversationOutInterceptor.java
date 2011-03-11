@@ -99,7 +99,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             return;
         }
         
-        STSClient client = STSUtils.getClient(message);
+        STSClient client = STSUtils.getClient(message, "sct");
         AddressingProperties maps =
             (AddressingProperties)message
                 .get("javax.xml.ws.addressing.context.outbound");
@@ -139,7 +139,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
     private SecurityToken issueToken(SoapMessage message,
                                      AssertionInfoMap aim,
                                      SecureConversationToken itok) {
-        STSClient client = STSUtils.getClient(message);
+        STSClient client = STSUtils.getClient(message, "sct");
         AddressingProperties maps =
             (AddressingProperties)message
                 .get("javax.xml.ws.addressing.context.outbound");

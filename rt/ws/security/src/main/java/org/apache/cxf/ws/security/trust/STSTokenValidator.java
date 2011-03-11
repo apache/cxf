@@ -49,7 +49,7 @@ public class STSTokenValidator implements Validator {
         try {
             token.setToken(credential.getAssertion().getElement());
             
-            STSClient c = STSUtils.getClient(m);
+            STSClient c = STSUtils.getClient(m, "sts");
             synchronized (c) {
                 System.setProperty("noprint", "true");
                 c.validateSecurityToken(token);

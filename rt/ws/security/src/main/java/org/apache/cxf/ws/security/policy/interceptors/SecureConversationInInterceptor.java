@@ -531,7 +531,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 }
             }
 
-            STSClient client = STSUtils.getClient(m2);
+            STSClient client = STSUtils.getClient(m2, "sct");
             AddressingProperties maps =
                 (AddressingProperties)message
                     .get("javax.xml.ws.addressing.context.inbound");
