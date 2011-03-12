@@ -52,12 +52,12 @@ under the License.
             <httpj:tlsServerParameters>
                <sec:keyManagers keyPassword="password">
                    <sec:keyStore type="JKS" password="password" 
-                        file="src/test/java/org/apache/cxf/systest/ws/security/Bethal.jks"/>
-                        </sec:keyManagers>
-                        <sec:trustManagers>
-                        <sec:keyStore type="JKS" password="password"
-                       file="src/test/java/org/apache/cxf/systest/ws/security/Truststore.jks"/>
-                        </sec:trustManagers>
+                        resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+               </sec:keyManagers>
+               <sec:trustManagers>
+                   <sec:keyStore type="JKS" password="password"
+                        resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+               </sec:trustManagers>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
@@ -68,13 +68,13 @@ under the License.
     <http:conduit name="{http://cxf.apache.org/policytest/DoubleIt}DoubleItPortHttps.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                   <sec:keyStore type="JKS" password="password" 
-                        file="src/test/java/org/apache/cxf/systest/ws/security/Morpit.jks"/>
-                   </sec:keyManagers>
-                <sec:trustManagers>
-                   <sec:keyStore type="JKS" password="password"
-                       file="src/test/java/org/apache/cxf/systest/ws/security/Truststore.jks"/>
-                </sec:trustManagers>
+                <sec:keyStore type="JKS" password="password" 
+                     resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore type="JKS" password="password"
+                     resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+            </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
 
