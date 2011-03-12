@@ -21,25 +21,20 @@ package org.apache.cxf.management.web.browser.client.service.settings;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.apache.cxf.management.web.browser.client.EventBus;
-import org.apache.cxf.management.web.browser.client.event.GoToBrowserEvent;
-import org.apache.cxf.management.web.browser.client.event.RemoteStorageAccessDeniedEvent;
+import org.apache.cxf.management.web.browser.client.event.ChangedSubscriptionsEvent;
 
+//TODO Remove StorageStrategy feature
 @Singleton
 public class SettingsFacade {
 
     @Nonnull
     private final RemoteStorageProxy remoteStorage;
-
-    @Nonnull
-    private final LocalStorage localStorage;
 
     @Nonnull
     private final EventBus eventBus;
@@ -53,35 +48,22 @@ public class SettingsFacade {
     private boolean initialized;
 
     public enum StorageStrategy {
-        LOCAL_AND_REMOTE,
         REMOTE
     }    
 
     @Inject
     public SettingsFacade(@Nonnull final RemoteStorageProxy remoteStorage,
-                          @Nonnull final LocalStorage localStorage,
                           @Nonnull final EventBus eventBus,
                           @Nonnull final IdentifierGenerator identifierGenerator) {
         this.remoteStorage = remoteStorage;
-        this.localStorage = localStorage;
         this.eventBus = eventBus;
         this.identifierGenerator = identifierGenerator;
     }
 
-    public boolean isSettingsAlreadyInLocalStorage() {
-        return localStorage.isAvailable() && localStorage.retrieveSettings() != null;
-    }    
-
-    public void initialize(@Nonnull final StorageStrategy strategy, @Nonnull final Credentials credentials) {
+    public void initialize(@Nonnull final StorageStrategy strategy) {
         storageLayer = createStorageLayers(strategy);
-        storageLayer.initialize(credentials);
+        storageLayer.initialize();
         initialized = true;
-    }
-
-    public void clearMemoryAndLocalStorage() {
-        assert storageLayer != null;
-        storageLayer.clear();
-        initialized = false;
     }
 
     public void addSubscription(@Nonnull final String name, @Nonnull final String url) {
@@ -133,9 +115,6 @@ public class SettingsFacade {
     @Nonnull
     private StorageLayer createStorageLayers(@Nonnull final StorageStrategy storageStrategy) {
         switch(storageStrategy) {
-        case LOCAL_AND_REMOTE:
-            return new RemoteStorageLayer(remoteStorage,
-                new LocalStorageLayer(localStorage, new MemoryStorageLayer()));
         case REMOTE:
             return new RemoteStorageLayer(remoteStorage, new MemoryStorageLayer());
         default:
@@ -145,7 +124,7 @@ public class SettingsFacade {
 
     private interface StorageLayer {
 
-        boolean initialize(Credentials credentials);
+        boolean initialize();
 
         Settings getSettings();
 
@@ -161,9 +140,8 @@ public class SettingsFacade {
         @Nonnull
         private Settings settings;
 
-        public boolean initialize(@Nonnull final Credentials credentials) {
+        public boolean initialize() {
             this.settings = new Settings();
-            this.settings.setCredentials(credentials);
             return false;
         }
 
@@ -184,54 +162,6 @@ public class SettingsFacade {
         }
     }
 
-    private static class LocalStorageLayer implements StorageLayer {
-
-        @Nonnull
-        private final MemoryStorageLayer parent; // TODO change to StorageLayer interface
-
-        @Nonnull
-        private final LocalStorage localStorage;
-
-        public LocalStorageLayer(@Nonnull final LocalStorage localStorage,
-                                 @Nonnull final MemoryStorageLayer parent) {
-            this.parent = parent;
-            this.localStorage = localStorage;
-        }
-
-        public boolean initialize(@Nonnull final Credentials credentials) {
-            boolean isSuccess = parent.initialize(credentials);
-            
-            assert !isSuccess;
-
-            Settings settings = localStorage.retrieveSettings();
-            if (settings != null) {
-                parent.update(settings);
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        @Nonnull
-        public Settings getSettings() {
-            return parent.getSettings();
-        }
-
-        public void update(@Nonnull final Settings settings) {
-            parent.update(settings);
-            localStorage.saveSettings(settings);
-        }
-
-        public void update() {
-            update(parent.getSettings());
-        }
-
-        public void clear() {
-            parent.clear();
-            localStorage.clear();
-        }
-    }
-
     private class RemoteStorageLayer implements StorageLayer {
 
         @Nonnull
@@ -246,27 +176,19 @@ public class SettingsFacade {
             this.remoteStorage = remoteStorage;
         }
 
-        public boolean initialize(@Nonnull final Credentials credentials) {
-            assert credentials != null;
-
-            boolean isSuccess = parent.initialize(credentials);
+        public boolean initialize() {
+            boolean isSuccess = parent.initialize();
             
             if (!isSuccess) {
-                remoteStorage.saveSettings(credentials, new RemoteStorageProxyImpl.Callback() {
-
-                    @Override
-                    public void onAccessDenied() {
-                        eventBus.fireEvent(new RemoteStorageAccessDeniedEvent());
-                    }
+                remoteStorage.saveSettings(new RemoteStorageProxyImpl.Callback() {
 
                     @Override
                     public void onSuccess(@Nullable final Settings retrievedSettings) {
                         Settings settings = retrievedSettings != null ? retrievedSettings : new Settings();
-                        settings.setCredentials(credentials);
 
                         parent.update(settings);
 
-                        eventBus.fireEvent(new GoToBrowserEvent());
+                        eventBus.fireEvent(new ChangedSubscriptionsEvent());
                     }
                 });
             }
@@ -284,8 +206,7 @@ public class SettingsFacade {
 
             parent.update(settings);
 
-            remoteStorage.retrieveSettings(settings.getCredentials(), settings,
-                new RemoteStorageProxyImpl.NoActionCallback());
+            remoteStorage.retrieveSettings(settings, new RemoteStorageProxyImpl.NoActionCallback());
         }
         
         public void update() {

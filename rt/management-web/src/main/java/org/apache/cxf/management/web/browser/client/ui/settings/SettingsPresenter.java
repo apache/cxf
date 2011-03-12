@@ -33,7 +33,6 @@ import com.google.inject.name.Named;
 import org.apache.cxf.management.web.browser.client.EventBus;
 import org.apache.cxf.management.web.browser.client.event.ChangedSubscriptionsEvent;
 import org.apache.cxf.management.web.browser.client.event.GoToBrowserEvent;
-import org.apache.cxf.management.web.browser.client.event.SignOutEvent;
 import org.apache.cxf.management.web.browser.client.service.settings.SettingsFacade;
 import org.apache.cxf.management.web.browser.client.service.settings.Subscription;
 import org.apache.cxf.management.web.browser.client.ui.BasePresenter;
@@ -126,10 +125,6 @@ public class SettingsPresenter extends BasePresenter
 
     public void onBackHyperlinkClicked() {
         eventBus.fireEvent(new GoToBrowserEvent());
-    }
-
-    public void onSingOutHyperlinkClicked() {
-        eventBus.fireEvent(new SignOutEvent());
     }
 
     private void updateSubscriptions() {

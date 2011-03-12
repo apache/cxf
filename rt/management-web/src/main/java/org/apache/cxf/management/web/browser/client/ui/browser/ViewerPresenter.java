@@ -139,11 +139,6 @@ public class ViewerPresenter extends BasePresenter implements ViewerView.Present
         proxy.getFeed(url, new FeedProxyImpl.Callback() {
 
             @Override
-            public void onAccessDenied() {
-                setFeed(Feed.EMPTY);
-            }
-
-            @Override
             public void onSuccess(@Nonnull final Feed newFeed) {
                 setFeed(newFeed);
             }

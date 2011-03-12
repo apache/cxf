@@ -25,7 +25,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import org.apache.cxf.management.web.browser.client.EventBus;
-import org.apache.cxf.management.web.browser.client.event.SignOutEvent;
+import org.apache.cxf.management.web.browser.client.event.GoToSettingsEvent;
 import org.apache.cxf.management.web.browser.client.ui.BasePresenter;
 import org.apache.cxf.management.web.browser.client.ui.BindStrategy;
 
@@ -44,7 +44,7 @@ public class NavigationHeaderPresenter extends BasePresenter implements Navigati
         this.view.setPresenter(this);
     }
 
-    public void onSignOutButtonClicked() {
-        eventBus.fireEvent(new SignOutEvent());
+    public void onSettingsButtonClicked() {
+        eventBus.fireEvent(new GoToSettingsEvent());
     }
 }

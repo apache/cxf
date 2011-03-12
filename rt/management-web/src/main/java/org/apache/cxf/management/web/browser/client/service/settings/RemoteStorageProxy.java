@@ -23,7 +23,7 @@ import com.google.gwt.http.client.RequestCallback;
 
 public interface RemoteStorageProxy {
     
-    void saveSettings(Credentials credentials, RequestCallback callback);
+    void saveSettings(RequestCallback callback);
 
-    void retrieveSettings(Credentials credentials, Settings settings, RequestCallback callback);
+    void retrieveSettings(Settings settings, RequestCallback callback);
 }

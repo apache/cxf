@@ -24,7 +24,7 @@ import org.apache.cxf.management.web.browser.client.ui.View;
 public interface NavigationHeaderView extends View {
     
     public interface Presenter {
-        void onSignOutButtonClicked();
+        void onSettingsButtonClicked();
     }
 
     void setPresenter(Presenter presenter);

@@ -24,15 +24,11 @@ import com.google.inject.name.Names;
 
 import org.apache.cxf.management.web.browser.client.service.settings.IdentifierGenerator;
 import org.apache.cxf.management.web.browser.client.service.settings.IdentifierGeneratorImpl;
-import org.apache.cxf.management.web.browser.client.service.settings.LocalStorage;
-import org.apache.cxf.management.web.browser.client.service.settings.LocalStorageImpl;
 import org.apache.cxf.management.web.browser.client.service.settings.RemoteStorageProxy;
 import org.apache.cxf.management.web.browser.client.service.settings.RemoteStorageProxyImpl;
 import org.apache.cxf.management.web.browser.client.ui.BindStrategy;
 import org.apache.cxf.management.web.browser.client.ui.DialogBindStrategyImpl;
 import org.apache.cxf.management.web.browser.client.ui.WidgetBindStrategyImpl;
-import org.apache.cxf.management.web.browser.client.ui.accesscontroler.AccessControlView;
-import org.apache.cxf.management.web.browser.client.ui.accesscontroler.AccessControlViewImpl;
 import org.apache.cxf.management.web.browser.client.ui.browser.BrowseView;
 import org.apache.cxf.management.web.browser.client.ui.browser.BrowseViewImpl;
 import org.apache.cxf.management.web.browser.client.ui.browser.EditCriteriaView;
@@ -54,7 +50,6 @@ public class Module extends AbstractGinModule {
     protected void configure() {
         bind(EventBus.class).to(DefaultEventBus.class);
         bind(IdentifierGenerator.class).to(IdentifierGeneratorImpl.class);
-        bind(AccessControlView.class).to(AccessControlViewImpl.class);
         bind(SettingsView.class).to(SettingsViewImpl.class);
         bind(SubscriptionDialog.class).to(SubscriptionDialogImpl.class);
         bind(BrowseView.class).to(BrowseViewImpl.class);
@@ -63,13 +58,8 @@ public class Module extends AbstractGinModule {
         bind(EditCriteriaView.class).to(EditCriteriaViewImpl.class);
         bind(ViewerView.class).to(ViewerViewImpl.class);
         bind(RemoteStorageProxy.class).to(RemoteStorageProxyImpl.class);
-        bind(LocalStorage.class).to(LocalStorageImpl.class);
 
         //TODO move it to view class:
-
-        bind(BindStrategy.class)
-                .annotatedWith(Names.named("BindStrategyForAccessControl"))
-                .to(WidgetBindStrategyImpl.class);
 
         bind(BindStrategy.class)
                 .annotatedWith(Names.named("BindStrategyForBrowser"))

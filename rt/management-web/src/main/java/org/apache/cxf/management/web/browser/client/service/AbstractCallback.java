@@ -25,15 +25,13 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 
+//TODO Remove - this class is useless
 public abstract class AbstractCallback<T> implements RequestCallback {
     private static final int OK = 200;
-    private static final int UNAUTHORIZED = 401;
 
     public void onResponseReceived(@Nonnull final Request request, @Nonnull final Response response) {
         if (OK == response.getStatusCode()) {
             onSuccess(parse(response));
-        } else if (UNAUTHORIZED == response.getStatusCode()) {
-            onAccessDenied();
         } else {
             
             // TODO add custom exception
@@ -46,8 +44,6 @@ public abstract class AbstractCallback<T> implements RequestCallback {
         // TODO add custom exception
         throw new RuntimeException(ex);
     }
-
-    public abstract void onAccessDenied();
 
     public abstract void onSuccess(T obj);
 

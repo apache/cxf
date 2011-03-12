@@ -25,24 +25,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class Settings {
-
-    @Nullable
-    private Credentials credentials;
-
     @Nullable
     private Set<Subscription> subscriptions;
-
-    @Nonnull
-    public Credentials getCredentials() {
-        if (credentials == null) {
-            credentials = Credentials.EMPTY;
-        }
-        return credentials;
-    }
-
-    public void setCredentials(@Nonnull final Credentials credentials) {
-        this.credentials = credentials;
-    }
 
     @Nonnull
     public Set<Subscription> getSubscriptions() {

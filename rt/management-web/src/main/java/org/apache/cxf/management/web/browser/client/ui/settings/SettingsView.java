@@ -37,8 +37,6 @@ public interface SettingsView extends View {
         void onRemoveSubscriptionButtonClicked(Subscription subscription);
 
         void onBackHyperlinkClicked();
-
-        void onSingOutHyperlinkClicked();
     }
 
     HasWidgets getNaviagationHeaderSlot();

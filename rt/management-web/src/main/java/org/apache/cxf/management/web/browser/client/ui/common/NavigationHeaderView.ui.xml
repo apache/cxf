@@ -29,8 +29,8 @@
          <tbody>
             <tr>
                <td align="right">
-                  <g:Hyperlink ui:field="signOutHyperlink" styleName='{res.css.topbarLink}'>
-                     Sign out
+                  <g:Hyperlink ui:field="settingsHyperlink" styleName='{res.css.topbarLink}'>
+                     Settings
                   </g:Hyperlink>
                </td>
             </tr>

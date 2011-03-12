@@ -44,10 +44,10 @@ public class NavigationHeaderViewImpl extends Composite implements NavigationHea
         initWidget(UI_BINDER.createAndBindUi(this));
     }
 
-    @UiHandler("signOutHyperlink")
+    @UiHandler("settingsHyperlink")
     void onSignOutHyperlinkClicked(@Nonnull final ClickEvent event) {
         assert presenter != null;
-        presenter.onSignOutButtonClicked();
+        presenter.onSettingsButtonClicked();
     }
 
     public void setPresenter(@Nonnull final Presenter presenter) {

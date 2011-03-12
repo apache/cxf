@@ -64,23 +64,29 @@ public class BootstrapStorage {
     }
 
     @GET
-    @Path("/settings/{username}")
+    @Path("/settings")
     @Produces("application/json")
-    @AuthenticationRequired
-    public Settings getSettings(@PathParam("username") final String username) {
+    public Settings getSettings() {
+
+        //TODO Remove username everywhere
+        String username = "admin";
+
         Validate.notNull(username, "username is null");
         Validate.notEmpty(username, "username is empty");
-        
+
         LOGGER.fine(String.format("Retrieve settings, user='%s'", username));
-        
+
         return storage.getSettings(username);
     }
 
     @PUT
-    @Path("/settings/{username}")
+    @Path("/settings")
     @Consumes("application/json")
-    @AuthenticationRequired
-    public Response setSettings(@PathParam("username") final String username, final Settings settings) {
+    public Response setSettings(final Settings settings) {
+
+        //TODO Remove username everywhere
+        String username = "admin";
+
         Validate.notNull(username, "username is null");
         Validate.notEmpty(username, "username is empty");
         Validate.notNull(settings, "settings is null");

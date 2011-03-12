@@ -86,43 +86,6 @@ a {
   margin-top: 15px;
 }
 
-/* Access controler styles */
-
-.accessControlTab {
-    margin:50px auto;
-    width:25em;
-}
-
-.accessControlTab p > label {
-    width:7em;
-    float:left;
-    text-align:right;
-    margin-right:1em;
-    display:block;
-}
-
-.accessControlTab fieldset {
-    border:3px solid #BBCDF3;
-}
-
-.accessControlTab legend {
-    padding:2px 6px;
-    font-weight:bolder;
-}
-
-.accessControlTabErrorMessage {
-    color:red;
-    margin-left: 8em;
-}
-
-.accessControlTabRememberMeCheckbox {
-    margin-left:8em;
-}
-
-.accessControlTabSignInButton button {
-    margin-left: 8em;
-}
-
 /* Browser tab styles */
 
 @sprite .browserTabLoadingMessage {

@@ -28,8 +28,6 @@
 
     <script src="uuid.min.js" />
     <script src="json2.min.js" />
-    <script src="jstorage.config.js" />
-    <script src="jstorage.min.js" />
 
    <stylesheet src="custom.css" />
 

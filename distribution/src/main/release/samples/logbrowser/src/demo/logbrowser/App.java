@@ -28,7 +28,6 @@ import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
 
 import org.apache.cxf.management.web.browser.bootstrapping.BootstrapStorage;
-import org.apache.cxf.management.web.browser.bootstrapping.SimpleAuthenticationFilter;
 import org.apache.cxf.management.web.browser.bootstrapping.SimpleXMLSettingsStorage;
 import org.apache.cxf.management.web.logging.atom.AtomPullServer;
 
@@ -41,11 +40,6 @@ public class App extends Application {
 
         // The log browser
         classes.add(new BootstrapStorage(new SimpleXMLSettingsStorage()));
-        classes.add(new SimpleAuthenticationFilter(new HashMap<String, String>() {
-            {
-                put("admin", "admin");
-            }
-        }));
         classes.add(new BootstrapStorage.StaticFileProvider());
         classes.add(new BootstrapStorage.SettingsProvider());
 

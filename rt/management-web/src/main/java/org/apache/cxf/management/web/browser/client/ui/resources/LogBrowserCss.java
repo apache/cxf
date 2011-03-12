@@ -33,12 +33,6 @@ public interface LogBrowserCss extends CssResource {
     String errorDialogButtons();
     String errorDialogErrorType();
 
-    /* Access control tab styles */
-    String accessControlTab();
-    String accessControlTabErrorMessage();
-    String accessControlTabRememberMeCheckbox();
-    String accessControlTabSignInButton();
-
     /* Browser tab styles*/
     String browserTabLoadingMessage();
     String browserTabNoEntriesMessage();
