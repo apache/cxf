@@ -23,6 +23,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -48,7 +49,9 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
 
     @Nonnull private FilterOptions filterOptions = FilterOptions.EMPTY;
 
-    @Nullable private Subscription selectedSubscription;
+    @Nullable private Subscription selectedSubscriptionInExplorer;
+    @Nullable private Subscription selectedSubscriptionInFilter;
+
     @Nonnull private List<Subscription> subscriptions;
 
     @Inject
@@ -70,33 +73,41 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
 
     public void onExploreSubcriptionItemClicked(int row) {
         assert row >= 0 && row < subscriptions.size();
-        selectedSubscription = subscriptions.get(row);
-        eventBus.fireEvent(new SelectedSubscriptionEvent(selectedSubscription.getUrl()));
+
+        selectedSubscriptionInExplorer = subscriptions.get(row);
+        selectedSubscriptionInFilter = null;
+
+        eventBus.fireEvent(new SelectedSubscriptionEvent(selectedSubscriptionInExplorer.getUrl()));
     }
 
     public void onFilterSubcriptionItemClicked(int row) {
         assert row >= 0 && row < subscriptions.size();
-        selectedSubscription = subscriptions.get(row);
+
+        selectedSubscriptionInFilter = subscriptions.get(row);
+        selectedSubscriptionInExplorer = null;
+
         selectSubscriptionWithFilterOptions();
     }
 
     private void selectSubscriptionWithFilterOptions() {
-        assert selectedSubscription != null;
+        assert selectedSubscriptionInFilter != null;
 
-        StringBuilder url = new StringBuilder(selectedSubscription.getUrl());
+        StringBuilder url = new StringBuilder(selectedSubscriptionInFilter.getUrl());
 
         if (filterOptions != FilterOptions.EMPTY) {
             url.append("?_s=");
 
+            DateTimeFormat dateTimeFormater = DateTimeFormat.getFormat("yyyy-MM-dd");
+
             if (filterOptions.getFrom() != null) {
                 url.append("date=ge=");
-                url.append(filterOptions.getFrom().getTime());
+                url.append(dateTimeFormater.format(filterOptions.getFrom()));
                 url.append(";");
             }
 
             if (filterOptions.getTo() != null) {
                 url.append("date=lt=");
-                url.append(filterOptions.getTo().getTime());
+                url.append(dateTimeFormater.format(filterOptions.getTo()));
                 url.append(";");
             }
 
@@ -104,9 +115,11 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
                 for (Level level : filterOptions.getLevels()) {
                     url.append("level==");
                     url.append(level);
-                    url.append(";");
+                    url.append(",");
                 }
             }
+
+            url.deleteCharAt(url.length() - 1);
         }
 
         eventBus.fireEvent(new SelectedSubscriptionEvent(url.toString()));
@@ -137,7 +150,9 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
 
             public void onChangedFilterOptions(ChangedFilterOptionsEvent event) {
                 filterOptions = event.getFilterOptions();
-                selectSubscriptionWithFilterOptions();
+                if (selectedSubscriptionInFilter != null) {
+                    selectSubscriptionWithFilterOptions();
+                }
             }
         });
     }
