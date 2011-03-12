@@ -7,7 +7,6 @@ Run application:
     mvn clean gwt:run -Pdev
 2) Open new browser's window and go to: 
     http://127.0.0.1:8888/logbrowser/LogBrowser.html?gwt.codesvr=127.0.0.1:9997
-3) Use "admin", as login and password, to sign in.
 
 Configure settings:
 
