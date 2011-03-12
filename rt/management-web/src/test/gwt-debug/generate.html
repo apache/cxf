@@ -1,0 +1,67 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements. See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership. The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Generate log entry</title>
+    <style type="text/css">
+        label {
+        width: 5em;
+        float: left;
+        text-align: right;
+        margin-right: 0.5em;
+        display: block
+        }
+        .submit input {
+        margin-left: 8em;
+        }
+    </style>
+</head>
+<body>
+<form action="generate.do" method="get">
+    <p>
+        <label for="level">Level:</label>
+        <select id="level" name="level">
+            <option value="debug">DEBUG</option>
+            <option value="info">INFO</option>
+            <option value="warning">WARNING</option>
+            <option value="error">ERROR</option>
+        </select>
+    </p>
+
+    <p>
+        <label for="copies">Copies:</label>
+        <input id="copies" name="copies" type="text" size="2" value="1"/>
+    </p>
+
+    <p>
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="10" cols="80"></textarea>
+    </p>
+
+    <p>
+        <label for="exceptionMessage">Exception message:</label>
+        <textarea id="exceptionMessage" name="exceptionMessage" rows="10" cols="80"></textarea>
+    </p>
+
+    <p class="submit"><input type="submit" value="Generate"/></p>
+</form>
+</body>
+</html>

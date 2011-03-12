@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <welcome-file-list>
+        <welcome-file>logbrowser/LogBrowser.html</welcome-file>
+    </welcome-file-list>
+
+	<servlet>
+		<servlet-name>Generate</servlet-name>
+		<display-name>Generate log entry</display-name>
+		<servlet-class>
+			org.apache.cxf.management.web.logging.Generate
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+    <servlet>
+        <servlet-name>MockApp</servlet-name>
+        <display-name>MockApp</display-name>
+        <servlet-class>
+            org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
+        </servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>
+                org.apache.cxf.management.web.logging.MockApp
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>jaxrs.inInterceptors</param-name>
+            <param-value>
+                org.apache.cxf.interceptor.LoggingInInterceptor
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>jaxrs.outInterceptors</param-name>
+            <param-value>
+                org.apache.cxf.interceptor.LoggingOutInterceptor
+            </param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+	<servlet-mapping>
+		<servlet-name>Generate</servlet-name>
+		<url-pattern>/generate.do</url-pattern>
+	</servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>MockApp</servlet-name>
+        <url-pattern>/log/*</url-pattern>
+    </servlet-mapping>
+</web-app>
