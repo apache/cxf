@@ -18,10 +18,5 @@
   under the License.
 -->
 <extensions xmlns="http://cxf.apache.org/bus/extension">
-
-    <extension class="org.apache.cxf.jaxrs.JAXRSBindingFactory" 
-      interface="org.apache.cxf.binding.BindingFactory" deferred="true">
-        <namespace>http://apache.org/cxf/binding/jaxrs</namespace>
-    </extension>
-    
+ <!-- Nothing needed now.  Leave file for 2.2.x for compatibility -->
 </extensions>
