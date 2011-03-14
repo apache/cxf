@@ -21,8 +21,10 @@ package org.apache.cxf.management.jmx;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +34,7 @@ import javax.annotation.Resource;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.JMException;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerDelegate;
 import javax.management.MBeanServerFactory;
 
 import javax.management.NotCompliantMBeanException;
@@ -59,6 +62,8 @@ import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
 public class InstrumentationManagerImpl extends JMXConnectorPolicyType 
     implements InstrumentationManager, BusLifeCycleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(InstrumentationManagerImpl.class);
+
+    private static Map<String, String>mbeanServerIDMap = new HashMap<String, String>();
 
     private Bus bus;
     private MBServerConnectorFactory mcf;    
@@ -119,10 +124,20 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                 if (usePlatformMBeanServer) {
                     mbs = ManagementFactory.getPlatformMBeanServer();
                 } else {
-                    List<MBeanServer> servers = CastUtils
-                        .cast(MBeanServerFactory.findMBeanServer(mbeanServerName));
-                    if (servers.size() <= 1) {
+                    String mbeanServerID = mbeanServerIDMap.get(mbeanServerName);
+                    List<MBeanServer> servers = null;
+                    if (mbeanServerID != null) {
+                        servers = CastUtils.cast(MBeanServerFactory.findMBeanServer(mbeanServerID));
+                    }
+                    if (servers == null || servers.size() == 0) {
                         mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
+                        try {
+                            mbeanServerID = (String) mbs.getAttribute(MBeanServerDelegate.DELEGATE_NAME,
+                                                                     "MBeanServerId");
+                            mbeanServerIDMap.put(mbeanServerName, mbeanServerID);
+                        } catch (JMException e) {
+                            // ignore
+                        }
                     } else {
                         mbs = (MBeanServer)servers.get(0);
                     }
