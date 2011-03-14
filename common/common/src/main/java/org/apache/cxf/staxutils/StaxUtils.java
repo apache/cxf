@@ -956,7 +956,7 @@ public final class StaxUtils {
             case XMLStreamConstants.START_ELEMENT: {
                 elementCount++;
                 Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
-                if (reader.getPrefix() != null) {
+                if (!StringUtils.isEmpty(reader.getPrefix())) {
                     e.setPrefix(reader.getPrefix());
                 }       
                 e = (Element)parent.appendChild(e);
