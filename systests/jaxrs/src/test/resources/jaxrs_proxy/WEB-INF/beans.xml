@@ -39,6 +39,8 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
+  <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
   
   <bean id="bookstoreInterface" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>
@@ -93,6 +95,18 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
        
   </jaxrs:server>
 
+
+  <jaxrs:server id="requestScopeEndpoint" address="/request">
+     <jaxrs:serviceFactories>
+		<bean class="org.apache.cxf.systest.jaxrs.RequestScopeResourceFactory">
+             <property name="beanId" value="requestScopeBean"/>
+        </bean>
+     </jaxrs:serviceFactories>
+  </jaxrs:server>
+
+  <bean id="requestScopeBean" class="org.apache.cxf.systest.jaxrs.BookStore" scope="request">
+      <aop:scoped-proxy />
+  </bean>
 
   <bean id="sfactory1" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">  
       <property name="beanId" value="bookstore"/>

@@ -33,6 +33,11 @@
 		</listener-class>
 	</listener>
 
+    <!-- makes request-scoped beans work -->
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+
 	<servlet>
 		<servlet-name>CXFServlet</servlet-name>
 		<display-name>CXF Servlet</display-name>

@@ -26,7 +26,9 @@ import java.net.URLConnection;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,7 +38,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerProxySpring.class));
+                   launchServer(BookServerProxySpring.class, true));
     }
     
     @Test
@@ -139,6 +141,17 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in)); 
     }
 
+    @Test
+    public void testGetBookWithRequestScope() {
+        // the BookStore method which will handle this request depends on the injected HttpHeaders
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/test/request/bookstore/booksecho2");
+        wc.type("text/plain").accept("text/plain");
+        wc.header("CustomHeader", "custom-header");
+        String value = wc.post("CXF", String.class);
+        assertEquals("CXF", value);
+        assertEquals("custom-header", wc.getResponse().getMetadata().getFirst("CustomHeader"));
+    }
+    
     private String getStringFromInputStream(InputStream in) throws Exception {        
         CachedOutputStream bos = new CachedOutputStream();
         IOUtils.copy(in, bos);
