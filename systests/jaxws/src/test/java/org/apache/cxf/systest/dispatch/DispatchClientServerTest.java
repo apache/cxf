@@ -22,6 +22,8 @@ package org.apache.cxf.systest.dispatch;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -41,11 +43,13 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.xml.sax.InputSource;
@@ -89,8 +93,16 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             String address = "http://localhost:"
                 + TestUtil.getPortNumber(DispatchClientServerTest.class)
                 + "/SOAPDispatchService/SoapDispatchPort";
-            Endpoint.publish(address, implementor);
-
+            Endpoint ep = Endpoint.create(SOAPBinding.SOAP11HTTP_BINDING, implementor);
+            
+            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, String> nsMap = new HashMap<String, String>();
+            nsMap.put("gmns", "http://apache.org/hello_world_soap_http/types");
+            properties.put("soap.env.ns.map", nsMap);
+            properties.put("disable.outputstream.optimization", "true");
+            
+            ep.setProperties(properties);
+            ep.publish(address);
         }
 
         public static void main(String[] args) {
@@ -327,6 +339,12 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         assertEquals("Response should be : Hello TestSOAPInputMessage", expected, domResMsg.getNode()
             .getFirstChild().getTextContent().trim());
+        
+        Element el = (Element)domResMsg.getNode().getFirstChild();
+        System.out.println(DOMUtils.getElementQName(el));
+        assertEquals("gmns", el.lookupPrefix("http://apache.org/hello_world_soap_http/types"));
+        assertEquals("http://apache.org/hello_world_soap_http/types", 
+                     el.lookupNamespaceURI("gmns"));
 
         // Test invoke oneway
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq1.xml");
