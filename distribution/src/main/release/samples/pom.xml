@@ -28,6 +28,7 @@
     <properties>
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
