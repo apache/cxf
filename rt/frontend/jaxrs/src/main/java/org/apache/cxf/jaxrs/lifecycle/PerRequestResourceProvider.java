@@ -30,6 +30,10 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 
+/**
+ * The default per-request resource provider which creates 
+ * a new resource instance per every request
+ */
 public class PerRequestResourceProvider implements ResourceProvider {
     private Constructor<?> c;
     private Method postConstructMethod;
@@ -45,15 +49,20 @@ public class PerRequestResourceProvider implements ResourceProvider {
         preDestroyMethod = ResourceUtils.findPreDestroyMethod(clazz);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSingleton() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object getInstance(Message m) {  
         return createInstance(m);
     }
     
-        
     protected Object createInstance(Message m) {
         
         Object[] values = ResourceUtils.createConstructorArguments(c, m);
@@ -77,10 +86,16 @@ public class PerRequestResourceProvider implements ResourceProvider {
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void releaseInstance(Message m, Object o) {
         InjectionUtils.invokeLifeCycleMethod(o, preDestroyMethod);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Class<?> getResourceClass() {
         return c.getDeclaringClass();
     }

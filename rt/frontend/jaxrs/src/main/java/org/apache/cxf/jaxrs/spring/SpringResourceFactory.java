@@ -31,6 +31,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+/**
+ * The ResourceProvider implementation which delegates to 
+ * ApplicationContext to manage the life-cycle of the resource
+ */
 public class SpringResourceFactory implements ResourceProvider, ApplicationContextAware {
 
     private Constructor<?> c;
@@ -63,6 +67,9 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
         isSingleton = ac.isSingleton(beanId);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Object getInstance(Message m) {
         Object[] values = ResourceUtils.createConstructorArguments(c, m);
         Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
@@ -72,10 +79,16 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
         return instance;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSingleton() {
         return isSingleton; 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void releaseInstance(Message m, Object o) {
         if (!isSingleton) {
             InjectionUtils.invokeLifeCycleMethod(o, preDestroyMethod);
@@ -99,6 +112,9 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
         return c;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Class<?> getResourceClass() {
         return c.getDeclaringClass();
     }
