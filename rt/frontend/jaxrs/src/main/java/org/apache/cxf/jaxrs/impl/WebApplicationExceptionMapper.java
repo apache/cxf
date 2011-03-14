@@ -37,6 +37,8 @@ public class WebApplicationExceptionMapper
     private static final Logger LOG = LogUtils.getL7dLogger(WebApplicationExceptionMapper.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WebApplicationExceptionMapper.class);
     
+    private boolean printStackTrace;
+    
     public Response toResponse(WebApplicationException ex) {
         if (LOG.isLoggable(Level.WARNING)) {
             String message = ex.getCause() == null ? ex.getMessage() : ex.getCause().getMessage();
@@ -65,7 +67,17 @@ public class WebApplicationExceptionMapper
             }
             r = Response.status(500).type(MediaType.TEXT_PLAIN).entity(message).build();
         }
+        
+        if (printStackTrace) {
+            ex.printStackTrace();
+        }
+        
         return r;
     }
 
+    public void setPrintStackTrace(boolean printStackTrace) {
+        this.printStackTrace = printStackTrace;
+    }
+
+    
 }
