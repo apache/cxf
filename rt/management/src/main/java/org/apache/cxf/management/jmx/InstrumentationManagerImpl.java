@@ -36,6 +36,7 @@ import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerDelegate;
 import javax.management.MBeanServerFactory;
+import javax.management.MalformedObjectNameException;
 
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectInstance;
@@ -132,7 +133,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                     if (servers == null || servers.size() == 0) {
                         mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
                         try {
-                            mbeanServerID = (String) mbs.getAttribute(MBeanServerDelegate.DELEGATE_NAME,
+                            mbeanServerID = (String) mbs.getAttribute(getDelegateName(),
                                                                      "MBeanServerId");
                             mbeanServerIDMap.put(mbeanServerName, mbeanServerID);
                         } catch (JMException e) {
@@ -168,6 +169,21 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                     LOG.log(Level.SEVERE, "REGISTER_FAILURE_MSG", new Object[]{bus, jmex});
                 }
             }
+        }
+    }
+    
+    private ObjectName getDelegateName() throws JMException {
+        try {
+            return (ObjectName)MBeanServerDelegate.class.getField("DELEGATE_NAME").get(null);
+        } catch (Throwable t) {
+            //ignore, likely on Java5
+        }
+        try {
+            return new ObjectName("JMImplementation:type=MBeanServerDelegate");
+        } catch (MalformedObjectNameException e) {
+            JMException jme = new JMException(e.getMessage());
+            jme.initCause(e);
+            throw jme;
         }
     }
 
