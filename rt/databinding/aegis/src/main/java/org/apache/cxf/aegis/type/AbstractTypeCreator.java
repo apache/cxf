@@ -120,6 +120,8 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             result = createCollectionType(info);
         } else if (isEnum(javaClass)) {
             result = createEnumType(info);
+        } else if (javaClass.equals(byte[].class)) {
+            result = getTypeMapping().getType(javaClass);
         } else {
             AegisType type = getTypeMapping().getType(info.getType());
             if (type == null) {

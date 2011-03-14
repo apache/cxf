@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.aegis;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +65,18 @@ public class AegisJaxWsImpl implements AegisJaxWs {
     
     public java.util.List<String> echoBigList(java.util.List<String> l) {
         return l;
+    }
+
+    public byte[] export(List<Integer> integers) {
+        StringBuilder b = new StringBuilder(integers.size() * 3);
+        for (Integer i : integers) {
+            b.append(i.toString());
+        }
+        try {
+            return b.toString().getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

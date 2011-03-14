@@ -136,4 +136,19 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
         File f = FileUtils.getDefaultTempDir();
         Assert.assertEquals(0, f.listFiles().length);
     }
+    
+    @Test 
+    //CXF-3376
+    public void testByteArray() throws Exception {
+        int size = 50;
+        List<Integer> ints = new ArrayList<Integer>(size);
+        for (int x = 0; x < size; x++) {
+            ints.add(x);
+        }        
+        setupForTest(false);
+        byte[] bytes = client.export(ints);
+        Assert.assertNotNull(bytes);
+        Assert.assertTrue(bytes.length > 50);
+        
+    }
 }
