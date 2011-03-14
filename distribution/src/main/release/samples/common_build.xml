@@ -127,7 +127,7 @@
         <mkdir dir="${build.classes.dir}"/>
         <mkdir dir="${build.src.dir}"/>
 
-        <javac destdir="${build.classes.dir}" debug="true" fork="true">
+        <javac destdir="${build.classes.dir}" debug="true" fork="true" encoding="utf-8">
             <compilerarg line="-J${cxf.endorsed.flag}"/>
             <src path="${src.dir}"/>
             <src path="${build.src.dir}"/>
