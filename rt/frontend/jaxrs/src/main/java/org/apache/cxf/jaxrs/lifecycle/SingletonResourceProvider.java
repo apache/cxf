@@ -24,6 +24,10 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 
+/**
+ * The default singleton resource provider which returns 
+ * the same resource instance per every request
+ */
 public class SingletonResourceProvider implements ResourceProvider {
     private Object resourceInstance;
     
@@ -39,18 +43,30 @@ public class SingletonResourceProvider implements ResourceProvider {
         this(o, false);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSingleton() {
         return true;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Object getInstance(Message m) {
         return resourceInstance;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void releaseInstance(Message m, Object o) {
-        // TODO Auto-generated method stub
+        // complete
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Class<?> getResourceClass() {
         return ClassHelper.getRealClass(resourceInstance);
     }

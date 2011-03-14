@@ -22,13 +22,33 @@ package org.apache.cxf.jaxrs.lifecycle;
 import org.apache.cxf.message.Message;
 
 /**
- * ResourceProviders are used to specify the lifecycle 
- * (per-request or singleton primarily) of root resources.
+ * ResourceProvider controls the life-cycle of the JAX-RS root resources.
  */
 public interface ResourceProvider {
 
+    /**
+     * Returns the resource instance which will handle the current request 
+     * @param m the current request message
+     * @return resource instance
+     */
     Object getInstance(Message m);
+    
+    /**
+     * Releases the resource instance if needed
+     * @param m the current request message
+     * @param o resource instance
+     */
     void releaseInstance(Message m, Object o);
+    
+    /**
+     * Returns the Class of the resource
+     * @return
+     */
     Class<?> getResourceClass();
+    
+    /**
+     * Indicates if the managed resource is a singleton
+     * @return
+     */
     boolean isSingleton();
 }
