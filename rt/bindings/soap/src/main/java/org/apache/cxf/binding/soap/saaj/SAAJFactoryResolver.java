@@ -46,7 +46,7 @@ public final class SAAJFactoryResolver {
         MessageFactory messageFactory;
         String messageFactoryClassName = System.getProperty(MESSAGE_FACTORY_KEY);
         if (messageFactoryClassName != null) {
-            messageFactory = newInstanceCxfMessageFactory(messageFactoryClassName,
+            messageFactory = newInstanceCxfSAAJFactory(messageFactoryClassName,
                                                           MessageFactory.class);
         } else if (version instanceof Soap11) {
             try {
@@ -55,7 +55,11 @@ public final class SAAJFactoryResolver {
                 messageFactory = MessageFactory.newInstance();
             }
         } else if (version instanceof Soap12) {
-            messageFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+            try {
+                messageFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+            } catch (Throwable t) {
+                messageFactory = MessageFactory.newInstance();
+            }
         } else {
             messageFactory = MessageFactory.newInstance();
         }
@@ -66,7 +70,7 @@ public final class SAAJFactoryResolver {
         SOAPFactory soapFactory;
         String soapFactoryClassName = System.getProperty(SOAP_FACTORY_KEY);
         if (soapFactoryClassName != null) {
-            soapFactory = newInstanceCxfMessageFactory(soapFactoryClassName,
+            soapFactory = newInstanceCxfSAAJFactory(soapFactoryClassName,
                                                        SOAPFactory.class);
         } else if (version instanceof Soap11) {
             try {
@@ -75,14 +79,18 @@ public final class SAAJFactoryResolver {
                 soapFactory = SOAPFactory.newInstance();
             }
         } else if (version instanceof Soap12) {
-            soapFactory = SOAPFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+            try {
+                soapFactory = SOAPFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+            } catch (Throwable t) {
+                soapFactory = SOAPFactory.newInstance();
+            }
         } else {
             soapFactory = SOAPFactory.newInstance();
         }
         return soapFactory;
     }
 
-    private static <T> T newInstanceCxfMessageFactory(String factoryName, Class<T> cls)
+    private static <T> T newInstanceCxfSAAJFactory(String factoryName, Class<T> cls)
         throws SOAPException {
         try {
             Class<?> klass = Class.forName(factoryName);
