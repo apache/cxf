@@ -68,7 +68,6 @@ public class BusRegistrationTest extends Assert {
         serverIM = serverBus.getExtension(InstrumentationManager.class);
         assertTrue("Instrumentation Manager should not be null", serverIM != null);
         Thread t = new Thread(new Runnable() {
-            @Override
             public void run() {
                 clientBus = factory.createBus("no-connector-spring.xml");
                 clientIM = clientBus.getExtension(InstrumentationManager.class);
