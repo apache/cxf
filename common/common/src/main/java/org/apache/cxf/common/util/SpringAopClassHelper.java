@@ -19,8 +19,10 @@
 
 package org.apache.cxf.common.util;
 
+import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.BeanCreationException;
 
 /**
  * 
@@ -56,12 +58,22 @@ class SpringAopClassHelper extends ClassHelper {
         if (AopUtils.isAopProxy(o)) {
             Advised advised = (Advised)o;
             try {
-                Object target = advised.getTargetSource().getTarget();
+                TargetSource targetSource = advised.getTargetSource();
+                
+                Object target = null;
+                
+                try {
+                    target = targetSource.getTarget();
+                } catch (BeanCreationException ex) {
+                    // some scopes such as 'request' may not 
+                    // be active on the current thread yet
+                    return getRealClassFromClassInternal(targetSource.getTargetClass());
+                }
                 
                 if (target == null) {
                     Class targetClass = AopUtils.getTargetClass(o);
                     if (targetClass != null) {
-                        return targetClass;
+                        return getRealClassFromClassInternal(targetClass);
                     }
                 } else {
                     return getRealClassInternal(target); 

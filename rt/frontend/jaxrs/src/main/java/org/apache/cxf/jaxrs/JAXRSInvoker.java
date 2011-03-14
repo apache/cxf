@@ -120,13 +120,14 @@ public class JAXRSInvoker extends AbstractInvoker {
             pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
                     
             if (cri.isRoot()) {
-                JAXRSUtils.handleSetters(ori, resourceObject,
+                Object realResourceObject = ClassHelper.getRealObject(resourceObject);
+                JAXRSUtils.handleSetters(ori, realResourceObject,
                                          exchange.getInMessage());
     
-                InjectionUtils.injectContextFields(resourceObject,
+                InjectionUtils.injectContextFields(realResourceObject,
                                                    ori.getClassResourceInfo(),
                                                    exchange.getInMessage());
-                InjectionUtils.injectResourceFields(resourceObject,
+                InjectionUtils.injectResourceFields(realResourceObject,
                                                 ori.getClassResourceInfo(),
                                                 exchange.getInMessage());
             }
