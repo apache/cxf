@@ -21,36 +21,31 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/${aopalliance-bundle-version}</bundle>
     <bundle>mvn:org.springframework/spring-asm/${cxf.spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-aop/${cxf.spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-aspects/${cxf.spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-core/${cxf.spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-beans/${cxf.spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-context/${cxf.spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-context-support/${cxf.spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-expression/${cxf.spring.version}</bundle>
   </feature>
-  <feature name='jetty7' version='${pom.version}'>
+  <feature name='jetty7' version='${cxf.jetty.version}'>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/${servlet-api-2.5-version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-util/${cxf.jetty.version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-io/${cxf.jetty.version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-http/${cxf.jetty.version}</bundle>
-    <bundle>mvn:org.eclipse.jetty/jetty-client/${cxf.jetty.version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-continuation/${cxf.jetty.version}</bundle>
-    <bundle>mvn:org.eclipse.jetty/jetty-jmx/${cxf.jetty.version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-server/${cxf.jetty.version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-security/${cxf.jetty.version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-servlet/${cxf.jetty.version}</bundle>
-    <bundle>mvn:org.eclipse.jetty/jetty-servlets/${cxf.jetty.version}</bundle>
     <bundle>mvn:org.eclipse.jetty/jetty-xml/${cxf.jetty.version}</bundle>
-    <bundle>mvn:org.eclipse.jetty/jetty-webapp/${cxf.jetty.version}</bundle>
   </feature>
-  <feature name='jaxb' version='${pom.version}'>
+  <feature name='jaxb' version='${jaxb-bundle-version}'>
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${servicemix-specs-version}</bundle>
 <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${servicemix-specs-version}</bundle>
 <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.0/${servicemix-specs-version}</bundle>
 <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${jaxb-bundle-version}</bundle>
   </feature>
-  <!-- Current the abdera bundle is work as expect -->
-  <feature name='abdera' version='${pom.version}'>
+  <!-- Current the abdera bundle is not working as we expect -->
+  <feature name='abdera' version='${cxf.abdera.version}'>
     <bundle>mvn:org.apache.abdera/abdera-core/${cxf.abdera.version}</bundle>
     <!--bundle>mvn:org.apache.abdera/abdera-extensions-json/${cxf.abdera.version}</bundle-->
     <bundle>mvn:org.apache.abdera/abdera-extensions-main/${cxf.abdera.version}</bundle>
@@ -58,7 +53,7 @@
     <bundle>mvn:org.apache.abdera/abdera-parser/${cxf.abdera.version}</bundle>
     <bundle>mvn:commons-codec/commons-codec/${commons-codec-version}</bundle>
     <bundle>mvn:http://download.java.net/maven/2!javax.mail/mail/${javax-mail-version}</bundle> 
-    <feature version='${pom.version}'>jaxb</feature>
+    <feature version='${jaxb-bundle-version}'>jaxb</feature>
   </feature>
   <feature name='cxf-all' version='${pom.version}'>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${geronimo-jms-spec-version}</bundle>
@@ -98,8 +93,8 @@
     <bundle>mvn:org.apache.cxf/cxf-bundle/${pom.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-io/${commons-io-bundle-version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.abdera/${abdera-bundle-version}</bundle>
-    <feature version='${pom.version}'>spring</feature>
-    <feature version='${pom.version}'>jetty7</feature>
-    <feature version='${pom.version}'>jaxb</feature>
+    <feature version='${cxf.spring.version}'>spring</feature>
+    <feature version='${cxf.jetty.version}'>jetty7</feature>
+    <feature version='${jaxb-bundle-version}'>jaxb</feature>
   </feature>
 </features>
