@@ -102,7 +102,7 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
 
             boolean isFirstAttribute = true;
 
-            if (filterOptions.getPhrase() != null && !filterOptions.getPhrase().isEmpty()) {
+            if (filterOptions.getPhrase() != null && !"".equals(filterOptions.getPhrase())) {
                 url.append("message==*");
                 url.append(filterOptions.getPhrase());
                 url.append("*;");
