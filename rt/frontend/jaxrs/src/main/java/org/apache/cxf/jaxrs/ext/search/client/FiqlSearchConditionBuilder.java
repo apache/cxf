@@ -68,18 +68,15 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         return "";
     }
 
-    @Override
     public Property is(String property) {
         return new Builder(properties).is(property);
     }
 
-    @Override
     public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, 
                                  CompleteCondition... cn) {
         return new Builder(properties).and(c1, c2, cn);
     }
 
-    @Override
     public CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
         return new Builder(properties).or(c1, c2, cn);
     }
