@@ -1,0 +1,51 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.cxf.jaxrs.ext.search.client;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class SearchConditionBuilderTest {
+
+    @Test
+    public void testDefault() throws Exception {
+        assertTrue(SearchConditionBuilder.instance() instanceof FiqlSearchConditionBuilder);
+    }
+
+    @Test
+    public void testFiqlImpl() throws Exception {
+        assertTrue(SearchConditionBuilder.instance("fiql") instanceof FiqlSearchConditionBuilder);
+    }
+
+    @Test
+    public void testCaseInsensitive() throws Exception {
+        assertTrue(SearchConditionBuilder.instance("fiQL") instanceof FiqlSearchConditionBuilder);
+    }
+
+    @Test
+    public void testDefaultFallback() throws Exception {
+        assertTrue(SearchConditionBuilder.instance("unknown language") instanceof FiqlSearchConditionBuilder);
+    }
+
+    @Test
+    public void testNullLang() throws Exception {
+        assertTrue(SearchConditionBuilder.instance(null) instanceof FiqlSearchConditionBuilder);
+    }
+}

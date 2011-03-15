@@ -33,7 +33,6 @@ import javax.xml.datatype.Duration;
 import static junit.framework.Assert.assertEquals;
 
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
-import org.apache.cxf.jaxrs.ext.search.client.SearchConditionBuilder.PartialCondition;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -59,25 +58,25 @@ public class FiqlSearchConditionBuilderTest {
     
     @Test
     public void testEmptyBuild() {
-        assertEquals("", b.build());
+        assertEquals("", b.query());
     }
 
     @Test
     public void testEqualToString() {
-        String ret = b.query().is("foo").equalTo("literalOrPattern*").build();
+        String ret = b.is("foo").equalTo("literalOrPattern*").query();
         assertEquals("foo==literalOrPattern*", ret);
     }
 
     @Test
     public void testEqualToNumber() {
-        String ret = b.query().is("foo").equalTo(123.5).build();
+        String ret = b.is("foo").equalTo(123.5).query();
         assertEquals("foo==123.5", ret);
     }
 
     @Test
     public void testEqualToDate() throws ParseException {
         Date d = df.parse("2011-03-01 12:34 +0000");
-        String ret = b.query().is("foo").equalTo(d).build();
+        String ret = b.is("foo").equalTo(d).query();
         assertEquals("foo==2011-03-01T12:34:00.000+00:00", ret);
     }
     
@@ -92,190 +91,186 @@ public class FiqlSearchConditionBuilderTest {
         
         FiqlSearchConditionBuilder bCustom = new FiqlSearchConditionBuilder(props);
         
-        String ret = bCustom.query().is("foo").equalTo(d).build();
+        String ret = bCustom.is("foo").equalTo(d).query();
         assertEquals("foo==2011-03-01T12:34:00", ret);
     }
 
     @Test
     public void testEqualToDuration() throws ParseException, DatatypeConfigurationException {
         Duration d = DatatypeFactory.newInstance().newDuration(false, 0, 0, 1, 12, 0, 0); 
-        String ret = b.query().is("foo").equalTo(d).build();
+        String ret = b.is("foo").equalTo(d).query();
         assertEquals("foo==-P0Y0M1DT12H0M0S", ret);
     }
 
     @Test
     public void testNotEqualToString() {
-        String ret = b.query().is("foo").notEqualTo("literalOrPattern*").build();
+        String ret = b.is("foo").notEqualTo("literalOrPattern*").query();
         assertEquals("foo!=literalOrPattern*", ret);
     }
 
     @Test
     public void testNotEqualToNumber() {
-        String ret = b.query().is("foo").notEqualTo(123.5).build();
+        String ret = b.is("foo").notEqualTo(123.5).query();
         assertEquals("foo!=123.5", ret);
     }
 
     @Test
     public void testNotEqualToDate() throws ParseException {
         Date d = df.parse("2011-03-01 12:34 +0000");
-        String ret = b.query().is("foo").notEqualTo(d).build();
+        String ret = b.is("foo").notEqualTo(d).query();
         assertEquals("foo!=2011-03-01T12:34:00.000+00:00", ret);
     }
 
     @Test
     public void testNotEqualToDuration() throws ParseException, DatatypeConfigurationException {
         Duration d = DatatypeFactory.newInstance().newDuration(false, 0, 0, 1, 12, 0, 0); 
-        String ret = b.query().is("foo").notEqualTo(d).build();
+        String ret = b.is("foo").notEqualTo(d).query();
         assertEquals("foo!=-P0Y0M1DT12H0M0S", ret);
     }
 
     @Test
     public void testGreaterThanString() {
-        String ret = b.query().is("foo").lexicalAfter("abc").build();
+        String ret = b.is("foo").lexicalAfter("abc").query();
         assertEquals("foo=gt=abc", ret);
     }
 
     @Test
     public void testLessThanString() {
-        String ret = b.query().is("foo").lexicalBefore("abc").build();
+        String ret = b.is("foo").lexicalBefore("abc").query();
         assertEquals("foo=lt=abc", ret);
     }
 
     @Test
     public void testLessOrEqualToString() {
-        String ret = b.query().is("foo").lexicalNotAfter("abc").build();
+        String ret = b.is("foo").lexicalNotAfter("abc").query();
         assertEquals("foo=le=abc", ret);
     }
 
     @Test
     public void testGreaterOrEqualToString() {
-        String ret = b.query().is("foo").lexicalNotBefore("abc").build();
+        String ret = b.is("foo").lexicalNotBefore("abc").query();
         assertEquals("foo=ge=abc", ret);
     }
     
     @Test
     public void testGreaterThanNumber() {
-        String ret = b.query().is("foo").greaterThan(25).build();
+        String ret = b.is("foo").greaterThan(25).query();
         assertEquals("foo=gt=25.0", ret);
     }
 
     @Test
     public void testLessThanNumber() {
-        String ret = b.query().is("foo").lessThan(25.333).build();
+        String ret = b.is("foo").lessThan(25.333).query();
         assertEquals("foo=lt=25.333", ret);
     }
 
     @Test
     public void testLessOrEqualToNumber() {
-        String ret = b.query().is("foo").lessOrEqualTo(0).build();
+        String ret = b.is("foo").lessOrEqualTo(0).query();
         assertEquals("foo=le=0.0", ret);
     }
 
     @Test
     public void testGreaterOrEqualToNumber() {
-        String ret = b.query().is("foo").greaterOrEqualTo(-5).build();
+        String ret = b.is("foo").greaterOrEqualTo(-5).query();
         assertEquals("foo=ge=-5.0", ret);
     }
 
     @Test
     public void testGreaterThanDate() throws ParseException {
         Date d = df.parse("2011-03-02 22:33 +0000");
-        String ret = b.query().is("foo").after(d).build();
+        String ret = b.is("foo").after(d).query();
         assertEquals("foo=gt=2011-03-02T22:33:00.000+00:00", ret);
     }
 
     @Test
     public void testLessThanDate() throws ParseException {
         Date d = df.parse("2011-03-02 22:33 +0000");
-        String ret = b.query().is("foo").before(d).build();
+        String ret = b.is("foo").before(d).query();
         assertEquals("foo=lt=2011-03-02T22:33:00.000+00:00", ret);
     }
 
     @Test
     public void testLessOrEqualToDate() throws ParseException {
         Date d = df.parse("2011-03-02 22:33 +0000");
-        String ret = b.query().is("foo").notAfter(d).build();
+        String ret = b.is("foo").notAfter(d).query();
         assertEquals("foo=le=2011-03-02T22:33:00.000+00:00", ret);
     }
 
     @Test
     public void testGreaterOrEqualToDate() throws ParseException {
         Date d = df.parse("2011-03-02 22:33 +0000");
-        String ret = b.query().is("foo").notBefore(d).build();
+        String ret = b.is("foo").notBefore(d).query();
         assertEquals("foo=ge=2011-03-02T22:33:00.000+00:00", ret);
     }
 
     @Test
     public void testGreaterThanDuration() throws DatatypeConfigurationException {
         Duration d = DatatypeFactory.newInstance().newDuration(false, 0, 0, 1, 12, 0, 0); 
-        String ret = b.query().is("foo").after(d).build();
+        String ret = b.is("foo").after(d).query();
         assertEquals("foo=gt=-P0Y0M1DT12H0M0S", ret);
     }
 
     @Test
     public void testLessThanDuration() throws DatatypeConfigurationException {
         Duration d = DatatypeFactory.newInstance().newDuration(false, 0, 0, 1, 12, 0, 0); 
-        String ret = b.query().is("foo").before(d).build();
+        String ret = b.is("foo").before(d).query();
         assertEquals("foo=lt=-P0Y0M1DT12H0M0S", ret);
     }
 
     @Test
     public void testLessOrEqualToDuration() throws DatatypeConfigurationException {
         Duration d = DatatypeFactory.newInstance().newDuration(false, 0, 0, 1, 12, 0, 0); 
-        String ret = b.query().is("foo").notAfter(d).build();
+        String ret = b.is("foo").notAfter(d).query();
         assertEquals("foo=le=-P0Y0M1DT12H0M0S", ret);
     }
 
     @Test
     public void testGreaterOrEqualToDuration() throws DatatypeConfigurationException {
         Duration d = DatatypeFactory.newInstance().newDuration(false, 0, 0, 1, 12, 0, 0); 
-        String ret = b.query().is("foo").notBefore(d).build();
+        String ret = b.is("foo").notBefore(d).query();
         assertEquals("foo=ge=-P0Y0M1DT12H0M0S", ret);
     }
     
     @Test
     public void testOrSimple() {
-        String ret = b.query().is("foo").greaterThan(20).or().is("foo").lessThan(10).build();
+        String ret = b.is("foo").greaterThan(20).or().is("foo").lessThan(10).query();
         assertEquals("foo=gt=20.0,foo=lt=10.0", ret);
     }    
     
     @Test
     public void testAndSimple() {
-        String ret = b.query().is("foo").greaterThan(20).and().is("bar").equalTo("plonk").build();
+        String ret = b.is("foo").greaterThan(20).and().is("bar").equalTo("plonk").query();
         assertEquals("foo=gt=20.0;bar==plonk", ret);
     }
     
     @Test
     public void testOrComplex() {
-        PartialCondition c = b.query();
-        String ret = c.or(c.is("foo").equalTo("aaa"), c.is("bar").equalTo("bbb")).build();
+        String ret = b.or(b.is("foo").equalTo("aaa"), b.is("bar").equalTo("bbb")).query();
         assertEquals("(foo==aaa,bar==bbb)", ret);
     }    
 
     @Test
     public void testAndComplex() {
-        PartialCondition c = b.query();
-        String ret = c.and(c.is("foo").equalTo("aaa"), c.is("bar").equalTo("bbb")).build();
+        String ret = b.and(b.is("foo").equalTo("aaa"), b.is("bar").equalTo("bbb")).query();
         assertEquals("(foo==aaa;bar==bbb)", ret);
     }    
 
     @Test
     public void testComplex1() {
-        PartialCondition c = b.query();
-        String ret = c.is("foo").equalTo(123.4).or().and(
-            c.is("bar").equalTo("asadf*"), 
-            c.is("baz").lessThan(20)).build();
+        String ret = b.is("foo").equalTo(123.4).or().and(
+            b.is("bar").equalTo("asadf*"), 
+            b.is("baz").lessThan(20)).query();
         assertEquals("foo==123.4,(bar==asadf*;baz=lt=20.0)", ret);
     }
 
     @Test
     public void testComplex2() {
-        PartialCondition c = b.query();
-        String ret = c.is("foo").equalTo(123.4).or().is("foo").equalTo("null").and().or(
-            c.is("bar").equalTo("asadf*"), 
-            c.is("baz").lessThan(20).and().or(
-                c.is("sub1").equalTo(0),
-                c.is("sub2").equalTo(0))).build();
+        String ret = b.is("foo").equalTo(123.4).or().is("foo").equalTo("null").and().or(
+            b.is("bar").equalTo("asadf*"), 
+            b.is("baz").lessThan(20).and().or(
+                b.is("sub1").equalTo(0),
+                b.is("sub2").equalTo(0))).query();
         
         assertEquals("foo==123.4,foo==null;(bar==asadf*,baz=lt=20.0;(sub1==0.0,sub2==0.0))", ret);
     }

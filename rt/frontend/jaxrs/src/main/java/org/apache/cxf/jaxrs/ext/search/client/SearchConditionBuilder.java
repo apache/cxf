@@ -18,116 +18,54 @@
  */
 package org.apache.cxf.jaxrs.ext.search.client;
 
-import java.util.Date;
-
-import javax.xml.datatype.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Builds client-side search condition string using `fluent interface' style. It helps build create part of
- * URL that will be parsed by server-side counterpart e.g. FiqlSearchConditionBuilder has FiqlParser.
+ * Builder of client-side search condition string using `fluent interface' style. It helps build create part
+ * of URL that will be parsed by server-side counterpart. It is factory of different implementations e.g. for
+ * {@link FiqlSearchConditionBuilder}, that has {@link org.apache.cxf.jaxrs.ext.search.FiqlParser FiqlParser}
+ * on server-side, one can use <tt>SearchConditionBuilder.instance("FIQL")</tt>.
+ * <p>
+ * See {@link FiqlSearchConditionBuilder} for examples of usage.
  */
-public interface SearchConditionBuilder {
+public abstract class SearchConditionBuilder implements PartialCondition {
 
-    /** Creates unconstrained query (no conditions) */
-    PartialCondition query();
-
-    /** Finalize condition construction and build search condition. */
-    String build();
-
-    public interface Property {
-        /** Is textual property equal to given literal or matching given pattern? */
-        CompleteCondition equalTo(String literalOrPattern);
-
-        /** Is numeric property equal to given number? */
-        CompleteCondition equalTo(double number);
-
-        /** Is date property same as given date? */
-        CompleteCondition equalTo(Date date);
-
-        /** Is date property same as date distant from now by given period of time? */
-        CompleteCondition equalTo(Duration distanceFromNow);
-
-        /** Is textual property different than given literal or not matching given pattern? */
-        CompleteCondition notEqualTo(String literalOrPattern);
-
-        /** Is numeric property different than given number? */
-        CompleteCondition notEqualTo(double number);
-
-        /** Is date property different than given date? */
-        CompleteCondition notEqualTo(Date date);
-
-        /** Is date property different than date distant from now by given period of time? */
-        CompleteCondition notEqualTo(Duration distanceFromNow);
-
-        /** Is numeric property greater than given number? */
-        CompleteCondition greaterThan(double number);
-
-        /** Is numeric property less than given number? */
-        CompleteCondition lessThan(double number);
-
-        /** Is numeric property greater or equal to given number? */
-        CompleteCondition greaterOrEqualTo(double number);
-
-        /** Is numeric property less or equal to given number? */
-        CompleteCondition lessOrEqualTo(double number);
-
-        /** Is date property after (greater than) given date? */
-        CompleteCondition after(Date date);
-
-        /** Is date property before (less than) given date? */
-        CompleteCondition before(Date date);
-
-        /** Is date property not before (greater or equal to) given date? */
-        CompleteCondition notBefore(Date date);
-
-        /** Is date property not after (less or equal to) given date? */
-        CompleteCondition notAfter(Date date);
-
-        /** Is date property after (greater than) date distant from now by given period of time? */
-        CompleteCondition after(Duration distanceFromNow);
-
-        /** Is date property before (less than) date distant from now by given period of time? */
-        CompleteCondition before(Duration distanceFromNow);
-
-        /** Is date property not after (less or equal to) date distant from now by given period of time? */
-        CompleteCondition notAfter(Duration distanceFromNow);
-
-        /** Is date property not before (greater or equal to) date distant from now by given 
-         * period of time? */
-        CompleteCondition notBefore(Duration distanceFromNow);
-
-        /** Is textual property lexically after (greater than) given literal? */
-        CompleteCondition lexicalAfter(String literal);
-
-        /** Is textual property lexically before (less than) given literal? */
-        CompleteCondition lexicalBefore(String literal);
-
-        /** Is textual property lexically not before (greater or equal to) given literal? */
-        CompleteCondition lexicalNotBefore(String literal);
-
-        /** Is textual property lexically not after (less or equal to) given literal? */
-        CompleteCondition lexicalNotAfter(String literal);
+    private static Map<String, SearchConditionBuilder> lang2impl;
+    private static SearchConditionBuilder defaultImpl;
+    static {
+        defaultImpl = new FiqlSearchConditionBuilder();
+        lang2impl = new HashMap<String, SearchConditionBuilder>();
+        lang2impl.put("fiql", defaultImpl);
     }
-    
-    public interface PartialCondition {
-        /** Get property of inspected entity type */
-        Property is(String property);
 
-        /** Conjunct multiple expressions */
-        CompleteCondition and(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn);
-
-        /** Disjunct multiple expressions */
-        CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn);
+    /**
+     * Creates instance of builder.
+     * 
+     * @return default implementation of builder.
+     */
+    public static SearchConditionBuilder instance() {
+        return instance("FIQL");
     }
-    
-    public interface CompleteCondition /*extends PartialCondition*/ {
-        /** Conjunct current expression with another */
-        PartialCondition and();
 
-        /** Disjunct current expression with another */
-        PartialCondition or();
-
-        /** Finalize condition construction and build search condition. */
-        String build();
+    /**
+     * Creates instance of builder for specific language.
+     * 
+     * @param language alias of language, case insensitive. If alias is unknown, default FIQL implementation
+     *            is returned.
+     * @return implementation of expected or default builder.
+     */
+    public static SearchConditionBuilder instance(String language) {
+        SearchConditionBuilder impl = null;
+        if (language != null) {
+            impl = lang2impl.get(language.toLowerCase());
+        }
+        if (impl == null) {
+            impl = new FiqlSearchConditionBuilder();
+        }
+        return impl;
     }
+
+    /** Finalize condition construction and build search condition query. */
+    public abstract String query();
 }

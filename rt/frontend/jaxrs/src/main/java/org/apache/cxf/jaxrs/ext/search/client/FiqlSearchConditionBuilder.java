@@ -34,10 +34,10 @@ import org.apache.cxf.jaxrs.ext.search.SearchUtils;
  * Examples:
  * 
  * <pre>
- * FiqlSearchConditionBuilder b = new FiqlSearchConditionBuilder();
- * b.query().is(&quot;price&quot;).equalTo(123.5).build();
+ * SearchConditionBuilder b = SearchConditionBuilder.instance("fiql");
+ * b.is(&quot;price&quot;).equalTo(123.5).query();
  * // gives &quot;price==123.5&quot;
- * b.query().is(&quot;price&quot;).greaterThan(30).and().is(&quot;price&quot;).lessThan(50).build();
+ * b.is(&quot;price&quot;).greaterThan(30).and().is(&quot;price&quot;).lessThan(50).query();
  * // gives &quot;price=gt=30.0;price=lt=50.0&quot;
  * </pre>
  * 
@@ -45,35 +45,46 @@ import org.apache.cxf.jaxrs.ext.search.SearchUtils;
  * like the following example:
  * 
  * <pre>
- * PartialCondition c = b.query();
- * c.is("price").lessThan(100).and().or(
- *      c.is("title").equalTo("The lord*"), 
- *      c.is("author").equalTo("R.R.Tolkien")).build();
- * // gives "price=lt=100.0;(title==The lord*,author==R.R.Tolkien)"
+ * SearchConditionBuilder b = SearchConditionBuilder.instance("fiql");
+ * b.is(&quot;price&quot;).lessThan(100).and().or(
+ *     b.is(&quot;title&quot;).equalTo(&quot;The lord*&quot;),
+ *     b.is(&quot;author&quot;).equalTo(&quot;R.R.Tolkien&quot;)).query();
+ * // gives &quot;price=lt=100.0;(title==The lord*,author==R.R.Tolkien)&quot;
  * </pre>
  */
-public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
+public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
 
     private Map<String, String> properties;
-    
+
     public FiqlSearchConditionBuilder() {
-        this (Collections.<String, String>emptyMap());    
+        this(Collections.<String, String> emptyMap());
     }
-    
+
     public FiqlSearchConditionBuilder(Map<String, String> properties) {
-        this.properties = properties;    
+        this.properties = properties;
     }
-    
-    public String build() {
+
+    public String query() {
         return "";
     }
 
-    public PartialCondition query() {
-        return new Builder(properties);
+    @Override
+    public Property is(String property) {
+        return new Builder(properties).is(property);
     }
 
-    private static class Builder implements SearchConditionBuilder.Property,
-        SearchConditionBuilder.CompleteCondition, SearchConditionBuilder.PartialCondition {
+    @Override
+    public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, 
+                                 CompleteCondition... cn) {
+        return new Builder(properties).and(c1, c2, cn);
+    }
+
+    @Override
+    public CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
+        return new Builder(properties).or(c1, c2, cn);
+    }
+
+    private static class Builder implements Property, CompleteCondition, PartialCondition {
         private String result = "";
         private Builder parent;
         private DateFormat df;
@@ -91,13 +102,8 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
             timeZoneSupported = parent.isTimeZoneSupported();
         }
 
-        public String build() {
+        public String query() {
             return buildPartial(null);
-            // if (parent != null) {
-            // return parent.build() + result;
-            // } else {
-            // return result;
-            // }
         }
 
         private DateFormat getDateFormat() {
@@ -107,7 +113,7 @@ public class FiqlSearchConditionBuilder implements SearchConditionBuilder {
         private boolean isTimeZoneSupported() {
             return timeZoneSupported;
         }
-        
+
         // builds from parent but not further then exclude builder
         private String buildPartial(Builder exclude) {
             if (parent != null && !parent.equals(exclude)) {
