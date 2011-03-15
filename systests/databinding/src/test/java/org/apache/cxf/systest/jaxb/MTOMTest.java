@@ -132,9 +132,6 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
         ObjectWithHashMapData data = port.getHashMapData(count);
         for (int y = 1;  y < count; y++) {
             byte bytes[] = data.getKeyData().get(Integer.toHexString(y));
-            if (bytes.length != y) {
-                System.out.println(new String(bytes));
-            }
             assertEquals(y, bytes.length);
         }
     }
