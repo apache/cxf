@@ -111,7 +111,7 @@ public class OsgiServletTest extends Assert {
         observer = control.createMock(MessageObserver.class);
         extensor = control.createMock(AddressType.class);
         endpoint = new EndpointInfo();
-        endpoint.setAddress(ADDRESS);
+        endpoint.setAddress(PATH);
         endpoint.setName(QNAME);
         ServiceInfo service = new ServiceInfo();
         service.setInterface(new InterfaceInfo(service, QNAME));
@@ -200,14 +200,16 @@ public class OsgiServletTest extends Assert {
     @Test
     public void testInvokeRestful() throws Exception {
         setUpRequest(URI, null, -1);
-        paths.add(ADDRESS);
+        EasyMock.expect(request.getContextPath()).andReturn("");
+        EasyMock.expect(request.getServletPath()).andReturn("/cxf");
+        paths.add(PATH);
         // TODO How can the registry first return null then destination for the same path?
-        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(null);
-        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(destination);
+        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(null);
+        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(destination);
         EasyMock.expect(registry.checkRestfulRequest(EasyMock.isA(String.class))).andReturn(destination);
         EasyMock.expect(destination.getMessageObserver()).andReturn(observer);
         endpoint.addExtensor(extensor);
-        extensor.setLocation(EasyMock.eq(ROOT + "/cxf/Soap" + ADDRESS));
+        extensor.setLocation(EasyMock.eq(ROOT + URI));
         EasyMock.expectLastCall();
 
         control.replay();
@@ -229,7 +231,7 @@ public class OsgiServletTest extends Assert {
 
         EasyMock.expect(request.getPathInfo()).andReturn(path != null 
                                                 ? path
-                                                : ADDRESS).anyTimes();
+                                                : PATH).anyTimes();
         if (path != null) {
             EasyMock.expect(registry.getDestinationForPath(path)).andReturn(destination);
         }
