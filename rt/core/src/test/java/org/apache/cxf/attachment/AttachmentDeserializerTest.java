@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.activation.DataSource;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -455,6 +456,43 @@ public class AttachmentDeserializerTest extends Assert {
             throw new IOException("Should not be 0");
         }
         return bout.toString();
+    }
+    
+    @Test
+    public void testCXF3383() throws Exception {
+        String contentType = "multipart/related; type=\"application/xop+xml\";"
+            + " boundary=\"uuid:7a555f51-c9bb-4bd4-9929-706899e2f793\"; start=" 
+            + "\"<root.message@cxf.apache.org>\"; start-info=\"text/xml\"";
+        
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, contentType);
+        message.setContent(InputStream.class, getClass().getResourceAsStream("cxf3383.data"));
+        message.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, System
+                .getProperty("java.io.tmpdir"));
+        message.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, String
+                .valueOf(AttachmentDeserializer.THRESHOLD));
+
+
+        AttachmentDeserializer ad 
+            = new AttachmentDeserializer(message, 
+                                         Collections.singletonList("multipart/related"));
+        
+        ad.initializeAttachments();
+        
+        
+        for (int x = 1; x < 50; x++) {
+            String cid = "1882f79d-e20a-4b36-a222-7a75518cf395-" + x + "@cxf.apache.org";
+            DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
+            byte bts[] = new byte[1024];
+            
+            InputStream ins = ds.getInputStream();
+            int count = ins.read(bts, 0, bts.length);
+            int sz = ins.read(bts, count, bts.length - count);
+            while (sz != -1) {
+                sz = ins.read(bts, count, bts.length - count);
+            }
+            assertEquals(x + 1, count);
+        }
     }
 
 }
