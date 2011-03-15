@@ -56,7 +56,7 @@ public interface AegisJaxWs {
     java.util.List<String> getStringList();
     
     @WebMethod
-    java.util.List<String> echoBigList(java.util.List<String> l);
+    java.util.List<String> echoBigList(@WebParam(name = "foo") java.util.List<String> l);
     
     @WebMethod
     byte[] export(java.util.List<java.lang.Integer> integers);

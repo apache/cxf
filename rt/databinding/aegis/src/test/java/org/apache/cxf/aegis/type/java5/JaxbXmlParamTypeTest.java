@@ -18,14 +18,11 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-import java.lang.reflect.Method;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
-import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeCreator;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
@@ -41,27 +38,14 @@ public class JaxbXmlParamTypeTest extends AbstractAegisTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        tm = new DefaultTypeMapping();
+        tm = new DefaultTypeMapping(null, 
+                                    DefaultTypeMapping.createDefaultTypeMapping(false, false));
         creator = new Java5TypeCreator();
         creator.setNextCreator(new DefaultTypeCreator());
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
     }
 
-    @Test
-    public void testType() throws Exception {
-        Method m = CustomTypeService.class.getMethod("doFoo", new Class[] {String.class});
-
-        AegisType type = creator.createType(m, 0);
-        tm.register(type);
-        assertTrue(type instanceof org.apache.cxf.aegis.type.basic.BeanType);
-        assertEquals(new QName("urn:xfire:foo", "custom"), type.getSchemaType());
-
-        type = creator.createType(m, -1);
-        tm.register(type);
-        assertTrue(type instanceof org.apache.cxf.aegis.type.basic.BeanType);
-        assertEquals(new QName("urn:xfire:foo", "custom"), type.getSchemaType());
-    }
 
     @Test
     public void testMapServiceWSDL() throws Exception {

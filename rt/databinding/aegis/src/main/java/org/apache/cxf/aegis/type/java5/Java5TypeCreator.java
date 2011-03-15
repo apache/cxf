@@ -24,6 +24,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -74,14 +75,13 @@ public class Java5TypeCreator extends AbstractTypeCreator {
 
             Class paramTypeClass = annotationReader.getParamType(m, index);
             info.setAegisTypeClass(castToAegisTypeClass(paramTypeClass));
-
-            String paramName = annotationReader.getParamName(m, index);
+            String paramName = annotationReader.getParamTypeName(m, index);
             if (paramName != null) {
                 info.setTypeName(createQName(m.getParameterTypes()[index],
-                        paramName,
-                        annotationReader.getParamNamespace(m, index)));
+                                             genericType,
+                                             paramName,
+                                             annotationReader.getParamNamespace(m, index)));
             }
-
             return info;
         } else {
             Type genericReturnType = m.getGenericReturnType();
@@ -99,14 +99,14 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             }
 
             info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getReturnType(m)));
-
-            String returnName = annotationReader.getReturnName(m);
+            String returnName = annotationReader.getReturnTypeName(m);
             if (returnName != null) {
                 info.setTypeName(createQName(m.getReturnType(),
-                        returnName,
-                        annotationReader.getReturnNamespace(m)));
+                                             genericReturnType,
+                                             returnName,
+                                             annotationReader.getReturnNamespace(m)));
+                
             }
-
             return info;
         }
     }
@@ -243,14 +243,24 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     public QName createQName(Class typeClass) {
         String name = annotationReader.getName(typeClass);
         String ns = annotationReader.getNamespace(typeClass);
-        return createQName(typeClass, name, ns);
+        return createQName(typeClass, null, name, ns);
     }
 
-    private QName createQName(Class typeClass, String name, String ns) {
+    private QName createQName(Class typeClass, Type type, String name, String ns) {
+        if (typeClass.isArray()) {
+            typeClass = typeClass.getComponentType();
+        }
+        if (List.class.isAssignableFrom(typeClass)
+            && type instanceof ParameterizedType) {
+            type = ((ParameterizedType)type).getActualTypeArguments()[0];
+            if (type instanceof Class) {
+                typeClass = (Class)type;
+            }
+        }
+        
         if (name == null || name.length() == 0) {
             name = ServiceUtils.makeServiceNameFromClassName(typeClass);
         }
-        
         //check from aegis type annotation
         if (ns == null || ns.length() == 0) {
             ns = annotationReader.getNamespace(typeClass);

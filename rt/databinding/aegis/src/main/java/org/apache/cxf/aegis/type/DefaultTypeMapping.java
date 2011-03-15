@@ -99,7 +99,7 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     public DefaultTypeMapping(String identifierURI) {
-        this.identifierURI = identifierURI;
+        this.identifierURI = identifierURI == null ? DEFAULT_MAPPING_URI : identifierURI;
         class2Type = Collections.synchronizedMap(new HashMap<Type, AegisType>());
         class2xml = Collections.synchronizedMap(new HashMap<Type, QName>());
         xml2Type = Collections.synchronizedMap(new HashMap<QName, AegisType>());

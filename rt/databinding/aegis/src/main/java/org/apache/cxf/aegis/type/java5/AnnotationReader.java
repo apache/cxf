@@ -140,22 +140,20 @@ public class AnnotationReader {
     }
 
     @SuppressWarnings("unchecked")
-    public String getParamName(Method method, int index) {
+    public String getParamTypeName(Method method, int index) {
         return (String) getAnnotationValue("name",
                 method,
                 index,
                 AegisType.class,
-                XmlParamType.class,
-                WEB_PARAM);
+                XmlParamType.class);
     }
 
     @SuppressWarnings("unchecked")
-    public String getReturnName(AnnotatedElement element) {
+    public String getReturnTypeName(AnnotatedElement element) {
         return (String) getAnnotationValue("name",
                 element,
                 "",
-                XmlReturnType.class,
-                WEB_RESULT);
+                XmlReturnType.class);
     }
 
     @SuppressWarnings("unchecked")
