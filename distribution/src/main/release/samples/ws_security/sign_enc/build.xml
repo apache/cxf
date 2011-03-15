@@ -53,11 +53,11 @@
 		<mkdir dir="${build.classes.dir}/demo/wssec/client/keystore"/>
 
         <copy todir="${build.classes.dir}/demo/wssec/client/etc">
-            <fileset dir="${basedir}/etc" includes="Client*.properties" />
+            <fileset dir="${basedir}/src/main/resources/etc" includes="Client*.properties" />
         </copy>
 
         <copy todir="${build.classes.dir}/demo/wssec/client/keystore">
-            <fileset dir="${basedir}/keystore" includes="client*.jks" />
+            <fileset dir="${basedir}/src/main/resources/keystore" includes="client*.jks" />
         </copy>
     </target>
 
@@ -66,11 +66,11 @@
 		<mkdir dir="${build.classes.dir}/demo/wssec/server/keystore"/>
 
         <copy todir="${build.classes.dir}/demo/wssec/server/etc">
-            <fileset dir="${basedir}/etc" includes="Server*.properties" />
+            <fileset dir="${basedir}/src/main/resources/etc" includes="Server*.properties" />
         </copy>
 
         <copy todir="${build.classes.dir}/demo/wssec/server/keystore">
-            <fileset dir="${basedir}/keystore" includes="server*.jks" />
+            <fileset dir="${basedir}/src/main/resources/keystore" includes="server*.jks" />
         </copy>
     </target>
 
