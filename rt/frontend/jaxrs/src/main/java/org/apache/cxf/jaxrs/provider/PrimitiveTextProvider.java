@@ -50,6 +50,7 @@ public class PrimitiveTextProvider
         
         return InjectionUtils.handleParameter(
                     IOUtils.readStringFromStream(is), 
+                    false,
                     type,
                     ParameterType.REQUEST_BODY, null);
         

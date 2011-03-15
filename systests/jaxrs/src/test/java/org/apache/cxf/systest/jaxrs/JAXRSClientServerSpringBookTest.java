@@ -55,7 +55,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class, true));
+                   launchServer(BookServerSpring.class));
     }
     
     @Test
@@ -74,6 +74,28 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             "http://localhost:" + PORT + "/the/thebooks/bookstore/bookinfo?"
                                + "param1=12&param2=3"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
+    }
+    
+    @Test
+    public void testGetBookWithEncodedSemicolon() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks/bookstore/semicolon%3B"; 
+        WebClient client = WebClient.create(endpointAddress);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        Book book = client.get(Book.class);
+        assertEquals(333L, book.getId());
+        assertEquals(";", book.getName());
+    }
+    
+    @Test
+    public void testGetBookWithEncodedSemicolonAndMatrixParam() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks/bookstore/semicolon2%3B;a=b"; 
+        WebClient client = WebClient.create(endpointAddress);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        Book book = client.get(Book.class);
+        assertEquals(333L, book.getId());
+        assertEquals(";b", book.getName());
     }
     
     @Test
