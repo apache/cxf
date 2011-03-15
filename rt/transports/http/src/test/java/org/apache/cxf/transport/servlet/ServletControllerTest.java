@@ -117,6 +117,10 @@ public class ServletControllerTest extends Assert {
             new StringBuffer("http://localhost:8080/services/bar")).times(2);
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar").anyTimes();
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/services");
         EasyMock.replay(req);
         String url = new ServletController().getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
@@ -130,6 +134,10 @@ public class ServletControllerTest extends Assert {
             new StringBuffer("http://localhost:8080/services/bar;a=b")).times(2);
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar").anyTimes();
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/services");
         EasyMock.replay(req);
         String url = new ServletController().getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
@@ -143,6 +151,10 @@ public class ServletControllerTest extends Assert {
             new StringBuffer("http://localhost:8080/services/bar;a=b;c=d;e=f")).times(2);        
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar").anyTimes();
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/services");
         EasyMock.replay(req);
         String url = new ServletController().getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
@@ -156,6 +168,10 @@ public class ServletControllerTest extends Assert {
             new StringBuffer("http://localhost:8080/services/bar;a=b;c=d;e=f")).times(2);        
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar;a=b;c=d").anyTimes();
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/services");
         EasyMock.replay(req);
         String url = new ServletController().getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
@@ -169,6 +185,10 @@ public class ServletControllerTest extends Assert {
             new StringBuffer("http://localhost:8080/services/bar;a=b;c=d;e=f")).times(2);        
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar;a=b").anyTimes();
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/services");
         EasyMock.replay(req);
         String url = new ServletController().getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
@@ -182,6 +202,10 @@ public class ServletControllerTest extends Assert {
             new StringBuffer("http://localhost:8080/services/bar;a=b;c=d;e=f;")).times(2);        
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar;a=b").anyTimes();
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/services");
         EasyMock.replay(req);
         String url = new ServletController().getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
