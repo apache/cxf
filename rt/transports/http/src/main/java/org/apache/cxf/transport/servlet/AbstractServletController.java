@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
@@ -165,34 +164,19 @@ public abstract class AbstractServletController {
         String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
         //fix for CXF-898
         if (!"/".equals(pathInfo) || reqPrefix.endsWith("/")) {
-            // needs to be done given that pathInfo is decoded
-            // TODO : it's unlikely servlet path will contain encoded values so we're most 
-            // likely safe however we need to ensure if it happens then this code works properly too
-            reqPrefix = UrlUtils.pathDecode(reqPrefix);
-            // pathInfo drops matrix parameters attached to a last path segment
-            int offset = 0;
-            int index = getMatrixParameterIndex(reqPrefix, pathInfo);
-            if (index >= pathInfo.length()) {
-                offset = reqPrefix.length() - index;
+            String basePath = request.getContextPath() + request.getServletPath();
+            int index;
+            if (basePath.length() == 0) {
+                index = reqPrefix.indexOf(request.getRequestURI());
+            } else {
+                index = reqPrefix.indexOf(basePath);
             }
-            reqPrefix = reqPrefix.substring(0, reqPrefix.length() - pathInfo.length() - offset);
+            reqPrefix = reqPrefix.substring(0, index + basePath.length());
         }
         return reqPrefix;
     }
     
-    private int getMatrixParameterIndex(String reqPrefix, String pathInfo) {
-        int index = reqPrefix.lastIndexOf(';');
-        int lastIndex = -1;
-        while (index >= pathInfo.length()) {
-            lastIndex = index;
-            reqPrefix = reqPrefix.substring(0, index);
-            if (reqPrefix.endsWith(pathInfo)) {
-                break;
-            }
-            index = reqPrefix.lastIndexOf(';');
-        }
-        return lastIndex;
-    }
+    
     
     public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,
                                   AbstractHTTPDestination d) throws ServletException {
