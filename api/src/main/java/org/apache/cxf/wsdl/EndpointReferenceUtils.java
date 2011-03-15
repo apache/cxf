@@ -631,7 +631,7 @@ public final class EndpointReferenceUtils {
     }
     
     
-    private static Schema createSchema(ServiceInfo serviceInfo, Bus b) {
+    private static synchronized Schema createSchema(ServiceInfo serviceInfo, Bus b) {
         if (b == null) {
             b = BusFactory.getThreadDefaultBus(false);
         }
@@ -644,6 +644,7 @@ public final class EndpointReferenceUtils {
             try {
                 for (SchemaInfo si : serviceInfo.getSchemas()) {
                     Element el = si.getElement();
+                    unsetReadonly(el);
                     String baseURI = null;
                     try {
                         baseURI = el.getBaseURI();
@@ -706,12 +707,29 @@ public final class EndpointReferenceUtils {
                     String s = XMLUtils.toString(schemaInfo.getElement(), 4);
                     LOG.log(Level.INFO, "Schema for: " + schemaInfo.getNamespaceURI() + "\n" + s);
                 }
+            } finally { 
+                for (Source src : schemaSourcesMap2.values()) {
+                    if (src instanceof DOMSource) {
+                        Node nd = ((DOMSource)src).getNode();
+                        unsetReadonly(nd);
+                    }
+                }
             }
             serviceInfo.setProperty(Schema.class.getName(), schema);
         }
         return schema;
     }
     
+    private static void unsetReadonly(Node nd) {
+        try {
+            //work around a bug in the version of Xerces that is in the JDK
+            //that only allows the Element to be used to create a schema once.
+            nd.getClass().getMethod("setReadOnly", Boolean.TYPE, Boolean.TYPE).invoke(nd, false, true);
+        } catch (Throwable ex) {
+            //ignore
+        }
+    }
+
     public static Schema getSchema(ServiceInfo serviceInfo) {
         return getSchema(serviceInfo, null);
     }
