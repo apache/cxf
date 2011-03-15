@@ -55,11 +55,6 @@ public class UTPasswordCallback implements CallbackHandler {
                 return;
             }
         }
-
-        //
-        // Password not found
-        //
-        throw new IOException();
     }
 
     /**

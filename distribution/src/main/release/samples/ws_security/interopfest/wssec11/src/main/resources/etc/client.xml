@@ -45,30 +45,35 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}A-NoTimestamp_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
+            <entry key="futureTimeToLive" value="60"/> 
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}AD_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}A-ES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}AD-ES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
 
@@ -77,6 +82,7 @@
             <entry key="ws-security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}UX-NoTimestamp_IPingService" createdFromAPI="true">
@@ -84,6 +90,7 @@
             <entry key="ws-security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}UXD_IPingService" createdFromAPI="true">
@@ -91,13 +98,15 @@
             <entry key="ws-security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>    
     <jaxws:client name="{http://InteropBaseAddress/interop}UX-SEES_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
-            <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>    
     <jaxws:client name="{http://InteropBaseAddress/interop}UXD-SEES_IPingService" createdFromAPI="true">
@@ -105,6 +114,7 @@
             <entry key="ws-security.username" value="abcd"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>    
     
@@ -113,6 +123,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}X-NoTimestamp_IPingService" createdFromAPI="true">
@@ -120,6 +131,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}X-AES128_IPingService" createdFromAPI="true">
@@ -127,6 +139,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}X-AES192_IPingService" createdFromAPI="true">
@@ -134,6 +147,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}X-TripleDES_IPingService" createdFromAPI="true">
@@ -141,6 +155,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}XD_IPingService" createdFromAPI="true">
@@ -148,6 +163,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
         <jaxws:client name="{http://InteropBaseAddress/interop}XD-ES_IPingService" createdFromAPI="true">
@@ -155,6 +171,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://InteropBaseAddress/interop}XD-SEES_IPingService" createdFromAPI="true">
@@ -162,6 +179,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
+            <entry key="futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>        
 </beans>
