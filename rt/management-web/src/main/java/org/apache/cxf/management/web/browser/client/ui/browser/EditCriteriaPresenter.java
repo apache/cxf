@@ -52,6 +52,7 @@ public class EditCriteriaPresenter extends BasePresenter implements EditCriteria
     }
 
     public void onSaveButtonClicked() {
+        String phrase = view.getPhraseValue().getValue();
         Date from = view.getFromValue().getValue();
         Date to = view.getToValue().getValue();
 
@@ -74,7 +75,7 @@ public class EditCriteriaPresenter extends BasePresenter implements EditCriteria
         if (from == null && to == null && acceptedLevels.isEmpty()) {
             filterOptions = FilterOptions.EMPTY;
         } else {
-            filterOptions = new FilterOptions(from, to, acceptedLevels);
+            filterOptions = new FilterOptions(phrase, from, to, acceptedLevels);
         }
 
         eventBus.fireEvent(new ChangedFilterOptionsEvent(filterOptions));

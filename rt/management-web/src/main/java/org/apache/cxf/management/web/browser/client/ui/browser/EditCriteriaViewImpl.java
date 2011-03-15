@@ -31,6 +31,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.inject.Inject;
@@ -45,6 +46,7 @@ public class EditCriteriaViewImpl extends AbstractDialog implements EditCriteria
 
     private static final EditCriteriaViewUiBinder UI_BINDER = GWT.create(EditCriteriaViewUiBinder.class);
 
+    @UiField @Nonnull TextBox phraseTextBox;
     @UiField @Nonnull DateBox fromDateBox;
     @UiField @Nonnull DateBox toDateBox;
     @UiField @Nonnull CheckBox debugCheckBox;
@@ -68,6 +70,10 @@ public class EditCriteriaViewImpl extends AbstractDialog implements EditCriteria
     void onSaveButtonClicked(@Nonnull final ClickEvent event) {
         presenter.onSaveButtonClicked();
         hide();
+    }
+
+    public HasValue<String> getPhraseValue() {
+        return phraseTextBox;
     }
 
     @Nonnull

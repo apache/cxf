@@ -33,6 +33,7 @@ public class FilterOptions {
 
     public static final FilterOptions EMPTY = new FilterOptions();
 
+    @Nullable private String phrase;
     @Nullable private Date from;
     @Nullable private Date to;
     @Nonnull private List<Level> levels;
@@ -41,10 +42,17 @@ public class FilterOptions {
         this.levels = new ArrayList<Level>();
     }
 
-    public FilterOptions(@Nullable Date from, @Nullable Date to, @Nonnull List<Level> levels) {
+    public FilterOptions(@Nullable String phrase, @Nullable Date from,
+                         @Nullable Date to, @Nonnull List<Level> levels) {
+        this.phrase = phrase;
         this.from = from;
         this.to = to;
         this.levels = levels;
+    }
+
+    @Nullable
+    public String getPhrase() {
+        return phrase;
     }
 
     @Nullable

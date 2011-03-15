@@ -29,9 +29,17 @@
 		<table cellspacing="6">
 			<tr>
 				<td>
+					<g:Label>Phrase:</g:Label>
+				</td>
+             <td>
+                <g:TextBox ui:field="phraseTextBox" addStyleDependentNames="clear"/>
+				</td>
+         </tr>
+			<tr>
+				<td>
 					<g:Label>From:</g:Label>
 				</td>
-                <td>
+             <td>
 					<dp:DateBox ui:field="fromDateBox"/>
 				</td>
          </tr>
@@ -39,7 +47,7 @@
 				<td>
 					<g:Label>To:</g:Label>
 				</td>
-                <td>
+             <td>
 					<dp:DateBox ui:field="toDateBox"/>
 				</td>
 			</tr>

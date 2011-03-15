@@ -10,3 +10,7 @@ body table {
 .gwt-DecoratedTabPanel-settings .tabMiddleLeft, .gwt-DecoratedTabPanel-settings .tabMiddleCenter, .gwt-DecoratedTabPanel-settings .tabMiddleRight, .gwt-DecoratedTabPanel-settings .tabTopLeft, .gwt-DecoratedTabPanel-settings .tabTopCenter, .gwt-DecoratedTabPanel-settings .tabTopRight {
    background: none repeat scroll 0 0 #FFF7D7 !important;
 }
+
+.gwt-TextBox-clear {
+   padding: 1px 0px;
+}

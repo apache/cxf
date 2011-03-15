@@ -30,6 +30,8 @@ public interface EditCriteriaView extends View {
         void onSaveButtonClicked();
     }
 
+    HasValue<String> getPhraseValue();
+
     HasValue<Date> getFromValue();
 
     HasValue<Date> getToValue();

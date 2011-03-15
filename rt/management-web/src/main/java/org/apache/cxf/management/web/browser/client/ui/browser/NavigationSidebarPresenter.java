@@ -23,6 +23,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -97,32 +98,59 @@ public class NavigationSidebarPresenter extends BasePresenter implements Navigat
         if (filterOptions != FilterOptions.EMPTY) {
             url.append("?_s=");
 
-            DateTimeFormat dateTimeFormater = DateTimeFormat.getFormat("yyyy-MM-dd");
+            DateTimeFormat dateTimeFormatter = DateTimeFormat.getFormat("yyyy-MM-dd");
+
+            boolean isFirstAttribute = true;
+
+            if (filterOptions.getPhrase() != null && !filterOptions.getPhrase().isEmpty()) {
+                url.append("phrase==*");
+                url.append(filterOptions.getPhrase());
+                url.append("*;");
+                isFirstAttribute = false;
+            }
 
             if (filterOptions.getFrom() != null) {
                 url.append("date=ge=");
-                url.append(dateTimeFormater.format(filterOptions.getFrom()));
+                url.append(dateTimeFormatter.format(filterOptions.getFrom()));
                 url.append(";");
+                isFirstAttribute = false;
             }
 
             if (filterOptions.getTo() != null) {
                 url.append("date=lt=");
-                url.append(dateTimeFormater.format(filterOptions.getTo()));
+                url.append(dateTimeFormatter.format(filterOptions.getTo()));
                 url.append(";");
+                isFirstAttribute = false;
             }
 
             if (!filterOptions.getLevels().isEmpty()) {
+
+                // Add parenthesis only if not first attribute
+                if (!isFirstAttribute) {
+                    url.append("(");
+                }
+
                 for (Level level : filterOptions.getLevels()) {
                     url.append("level==");
                     url.append(level);
                     url.append(",");
                 }
-            }
 
-            url.deleteCharAt(url.length() - 1);
+                // Remove last ';' or ',' from URL
+                url.deleteCharAt(url.length() - 1);
+
+                // Add parenthesis only if not first attribute
+                if (!isFirstAttribute) {
+                    url.append(")");
+                }
+            } else {
+
+                // Remove last ';' or ',' from URL
+                url.deleteCharAt(url.length() - 1);
+            }
         }
 
-        eventBus.fireEvent(new SelectedSubscriptionEvent(url.toString()));
+        eventBus.fireEvent(new SelectedSubscriptionEvent(URL.encode(url.toString())));
     }
 
     public void onManageSubscriptionsButtonClicked() {
