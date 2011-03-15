@@ -305,7 +305,8 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                 @MatrixParam("p2") String mp2,
                                 @MatrixParam("p3") String mp3,
                                 @MatrixParam("p4") String mp4,
-                                @MatrixParam("p4") List<String> mp4List) {
+                                @MatrixParam("p4") List<String> mp4List,
+                                @MatrixParam("p5") String mp5) {
         // complete
     }
     

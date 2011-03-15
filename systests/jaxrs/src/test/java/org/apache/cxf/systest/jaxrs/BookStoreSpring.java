@@ -88,6 +88,21 @@ public class BookStoreSpring {
     }
     
     @GET
+    @Path("/semicolon{id}")
+    @Produces("application/xml")
+    public Book getBookWithSemicoln(@PathParam("id") String name) {
+        return new Book(name, 333L);
+    }
+    
+    @GET
+    @Path("/semicolon2{id}")
+    @Produces("application/xml")
+    public Book getBookWithSemicolnAndMatrixParam(@PathParam("id") String name,
+                                                  @MatrixParam("a") String matrixParam) {
+        return new Book(name + matrixParam, 333L);
+    }
+    
+    @GET
     @Path("/bookinfo")
     public Book getBookByUriInfo() throws Exception {
         MultivaluedMap<String, String> params = ui.getQueryParameters();

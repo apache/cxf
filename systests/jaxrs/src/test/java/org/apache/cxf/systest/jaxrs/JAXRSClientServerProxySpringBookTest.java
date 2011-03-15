@@ -38,7 +38,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerProxySpring.class, true));
+                   launchServer(BookServerProxySpring.class));
     }
     
     @Test

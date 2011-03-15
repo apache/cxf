@@ -784,7 +784,7 @@ public final class JAXRSUtils {
             return c;
         }
         
-        return InjectionUtils.handleParameter(c.getValue(), pClass, ParameterType.COOKIE, m);
+        return InjectionUtils.handleParameter(c.getValue(), false, pClass, ParameterType.COOKIE, m);
     }
     
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {

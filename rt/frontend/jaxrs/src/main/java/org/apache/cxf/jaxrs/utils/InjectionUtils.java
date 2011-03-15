@@ -269,6 +269,7 @@ public final class InjectionUtils {
     }
     
     public static Object handleParameter(String value, 
+                                         boolean decoded,
                                          Class<?> pClass, 
                                          ParameterType pType,
                                          Message message) {
@@ -278,13 +279,15 @@ public final class InjectionUtils {
         }
         
         if (pType == ParameterType.PATH) {
-            PathSegment ps = new PathSegmentImpl(value, false);    
             if (PathSegment.class.isAssignableFrom(pClass)) {
-                return ps;   
+                return new PathSegmentImpl(value, decoded);   
             } else {
-                value = ps.getPath();                 
+                value = new PathSegmentImpl(value, false).getPath();                 
             }
         }
+        
+        value = decodeValue(value, decoded, pType);
+        
         
         if (pClass.isPrimitive()) {
             try {
@@ -485,9 +488,9 @@ public final class InjectionUtils {
                             paramValue = InjectionUtils.handleBean(type, processedValues,
                                                             pType, message, decoded);
                         } else {
-                            String value = decodeValue(processedValues.values().iterator().next().get(0),
-                                                       decoded, pType);
-                            paramValue = InjectionUtils.handleParameter(value, type, pType, message);
+                            paramValue = InjectionUtils.handleParameter(
+                                processedValues.values().iterator().next().get(0), 
+                                decoded, type, pType, message);
                         }
 
                         if (paramValue != null) {
@@ -631,8 +634,8 @@ public final class InjectionUtils {
             List<String> valuesList = values.values().iterator().next();
             valuesList = checkPathSegment(valuesList, realType, pathParam);
             for (int ind = 0; ind < valuesList.size(); ind++) {
-                String value = decodeValue(valuesList.get(ind), decoded, pathParam);
-                Object o = InjectionUtils.handleParameter(value, realType, pathParam, message);
+                Object o = InjectionUtils.handleParameter(valuesList.get(ind), decoded, 
+                                                          realType, pathParam, message);
                 addToCollectionValues(theValues, o, ind);
             }
         }
@@ -707,8 +710,7 @@ public final class InjectionUtils {
                                 : paramValues.get(0);
             }
             if (result != null) {
-                result = decodeValue(result, decoded, pathParam);
-                value = InjectionUtils.handleParameter(result, paramType, pathParam, message);
+                value = InjectionUtils.handleParameter(result, decoded, paramType, pathParam, message);
             }
         }
         return value;

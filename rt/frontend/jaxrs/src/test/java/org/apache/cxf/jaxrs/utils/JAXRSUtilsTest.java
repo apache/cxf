@@ -1003,14 +1003,14 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testMatrixParameters() throws Exception {
-        Class[] argType = {String.class, String.class, String.class, String.class, List.class};
+        Class[] argType = {String.class, String.class, String.class, String.class, List.class, String.class};
         Method m = Customer.class.getMethod("testMatrixParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         
-        messageImpl.put(Message.REQUEST_URI, "/foo;p4=0;p3=3/bar;p1=1;p2/baz;p4=4;p4=5");
+        messageImpl.put(Message.REQUEST_URI, "/foo;p4=0;p3=3/bar;p1=1;p2/baz;p4=4;p4=5;p5");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
                                                            null, messageImpl);
-        assertEquals("5 Matrix params should've been identified", 5, params.size());
+        assertEquals("5 Matrix params should've been identified", 6, params.size());
         
         assertEquals("First Matrix Parameter not matched correctly", 
                      "1", params.get(0));
@@ -1025,6 +1025,8 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("0", list.get(0));
         assertEquals("4", list.get(1));
         assertEquals("5", list.get(2));
+        assertEquals("Sixth Matrix Parameter was not matched correctly", 
+                     "", params.get(5));
     }
     
     @Test
