@@ -23,7 +23,6 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSSConfig;
 
 import interop.client.KeystorePasswordCallback;
 
