@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -184,7 +184,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 /*
                  * Get the action first.
                  */
-                List<Integer> actions = new Vector<Integer>();
+                List<Integer> actions = new ArrayList<Integer>();
                 String action = getString(WSHandlerConstants.ACTION, mc);
                 if (action == null) {
                     throw new SoapFault(new Message("NO_ACTION", LOG), version

@@ -525,7 +525,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
             if (cbHandler == null) {
                 try {
-                    cbHandler = getPasswordCB(reqData);
+                    cbHandler = getPasswordCallbackHandler(reqData);
                 } catch (WSSecurityException sec) {
                     Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
                     if (ep != null && ep.getEndpointInfo() != null) {
