@@ -105,7 +105,7 @@ public class OsgiServletTest extends Assert {
         observer = control.createMock(MessageObserver.class);
         extensor = control.createMock(AddressType.class);
         endpoint = new EndpointInfo();
-        endpoint.setAddress(ADDRESS);
+        endpoint.setAddress(PATH);
         endpoint.setName(QNAME);
         ServiceInfo service = new ServiceInfo();
         service.setInterface(new InterfaceInfo(service, QNAME));
@@ -148,9 +148,14 @@ public class OsgiServletTest extends Assert {
     @Test
     public void testInvokeGetServices() throws Exception {
         setUpRequest(SERVICES, null, 1);
+        paths.add(PATH);
+        EasyMock.expect(request.getContextPath()).andReturn("");
+        EasyMock.expect(request.getServletPath()).andReturn("/cxf");
+        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(destination);
+        
         setUpResponse(0, TEXT_LIST, 
                       "<span class=\"field\">Endpoint address:</span> "
-                      + "<span class=\"value\">" + ADDRESS + "</span>");
+                      + "<span class=\"value\">" + ROOT + URI + "</span>");
 
         control.replay();
 
@@ -229,9 +234,10 @@ public class OsgiServletTest extends Assert {
         EasyMock.expect(destination.getEndpointInfo()).andReturn(endpoint).anyTimes();
         EasyMock.expect(destination.getBus()).andReturn(bus).anyTimes();
 
+        String defaultPath = SERVICES.equals(requestURI) ? "/services" : PATH;
         EasyMock.expect(request.getPathInfo()).andReturn(path != null 
                                                 ? path
-                                                : ADDRESS).anyTimes();
+                                                : defaultPath).anyTimes();
         if (path != null) {
             EasyMock.expect(registry.getDestinationForPath(path)).andReturn(destination);
         }
@@ -325,12 +331,14 @@ public class OsgiServletTest extends Assert {
     }
 
     private void setUpRestful() {
-        paths.add(ADDRESS);
-        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(null);
-        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(destination).times(2);
+        paths.add(PATH);
+        EasyMock.expect(request.getContextPath()).andReturn("");
+        EasyMock.expect(request.getServletPath()).andReturn("/cxf");
+        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(null);
+        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(destination).times(2);
         EasyMock.expect(destination.getMessageObserver()).andReturn(observer);
         endpoint.addExtensor(extensor);
-        extensor.setLocation(EasyMock.eq(ROOT + "/cxf/Soap" + ADDRESS));
+        extensor.setLocation(EasyMock.eq(ROOT + URI));
         EasyMock.expectLastCall();
     }
 
