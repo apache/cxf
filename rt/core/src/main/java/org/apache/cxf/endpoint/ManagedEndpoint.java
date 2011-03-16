@@ -23,6 +23,7 @@ import javax.management.JMException;
 import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedAttribute;
@@ -33,6 +34,8 @@ import org.apache.cxf.management.annotation.ManagedResource;
                  description = "Responsible for managing server instances.")
 
 public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListener {
+    public static final String ENDPOINT_NAME = "managed.endpoint.name";
+    public static final String SERVICE_NAME = "managed.service.name";
 
     private Bus bus;
     private Endpoint endpoint;
@@ -91,9 +94,19 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
         buffer.append(ManagementConstants.TYPE_PROP + "=" + "Bus.Service.Endpoint,");
        
 
-        String serviceName = ObjectName.quote(endpoint.getService().getName().toString());
+        String serviceName = (String)endpoint.get(SERVICE_NAME);
+        if (StringUtils.isEmpty(serviceName)) {
+            serviceName = endpoint.getService().getName().toString();
+        }
+        serviceName = ObjectName.quote(serviceName);
         buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
-        String endpointName = ObjectName.quote(endpoint.getEndpointInfo().getName().getLocalPart());
+        
+        
+        String endpointName = (String)endpoint.get(ENDPOINT_NAME);
+        if (StringUtils.isEmpty(endpointName)) {
+            endpointName = endpoint.getEndpointInfo().getName().getLocalPart();
+        }
+        endpointName = ObjectName.quote(endpointName);
         buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName);
         
         //Use default domain name of server
