@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -49,7 +49,7 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
 
     @Before
     public void setUp() throws Exception {
-        JAXBDataBinding.clearCaches();
+        JAXBContextCache.clearCaches();
         builder = new JaxwsServiceBuilder();
         builder.setBus(BusFactory.getDefaultBus());
         generator.setBus(builder.getBus());

@@ -80,7 +80,8 @@ public final class JettySpringTypesFactory {
         }
         return map;
     }
-    public Map<String, ThreadingParameters> createThreadingParametersMap(String s) 
+    public Map<String, ThreadingParameters> createThreadingParametersMap(String s,
+                                                                         JAXBContext ctx) 
         throws Exception {
         Document doc = DOMUtils.readXml(new StringReader(s));
         List <ThreadingParametersIdentifiedType> threadingParametersIdentifiedTypes = 
@@ -88,13 +89,14 @@ public final class JettySpringTypesFactory {
                 .parseListElement(doc.getDocumentElement(), 
                                   new QName(JettyHTTPServerEngineFactoryBeanDefinitionParser.HTTP_JETTY_NS,
                                             "identifiedThreadingParameters"), 
-                                  ThreadingParametersIdentifiedType.class);
+                                  ThreadingParametersIdentifiedType.class, ctx);
         Map<String, ThreadingParameters> threadingParametersMap =
             toThreadingParameters(threadingParametersIdentifiedTypes);
         return threadingParametersMap;
     }
     
-    public Map<String, TLSServerParameters> createTLSServerParametersMap(String s) 
+    public Map<String, TLSServerParameters> createTLSServerParametersMap(String s,
+                                                                         JAXBContext ctx) 
         throws Exception {
         Document doc = DOMUtils.readXml(new StringReader(s));
         
@@ -103,7 +105,8 @@ public final class JettySpringTypesFactory {
                 .parseListElement(doc.getDocumentElement(), 
                                   new QName(JettyHTTPServerEngineFactoryBeanDefinitionParser.HTTP_JETTY_NS,
                                             "identifiedTLSServerParameters"),
-                                  TLSServerParametersIdentifiedType.class);
+                                  TLSServerParametersIdentifiedType.class,
+                                  ctx);
         Map<String, TLSServerParameters> tlsServerParametersMap =
             toTLSServerParamenters(tlsServerParameters);
         return tlsServerParametersMap;
@@ -112,18 +115,11 @@ public final class JettySpringTypesFactory {
     @SuppressWarnings("unchecked")
     public static <V> List<V> parseListElement(Element parent, 
                                            QName name, 
-                                           Class<?> c) throws JAXBException {                                
+                                           Class<?> c,
+                                           JAXBContext context) throws JAXBException {
         List<V> list = new ArrayList<V>();
         Node data = null;
            
-        JAXBContext context = null;
-        String pkg = "";
-        if (null != c && c.getPackage() != null) {
-            pkg = c.getPackage().getName();
-            context = JAXBContext.newInstance(pkg, c.getClassLoader());
-        } else {
-            context = JAXBContext.newInstance(pkg);
-        }
         Unmarshaller u = context.createUnmarshaller();
         Node node = parent.getFirstChild();           
         while (node != null) {

@@ -22,7 +22,7 @@ package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 import java.io.File;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
@@ -36,7 +36,7 @@ public class JaxwsServiceBuilderRPCTest extends ProcessorTestBase {
 
     @Before
     public void setUp() throws Exception {
-        JAXBDataBinding.clearCaches();
+        JAXBContextCache.clearCaches();
         builder.setBus(BusFactory.getDefaultBus());
         generator.setBus(builder.getBus());
     }

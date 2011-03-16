@@ -75,6 +75,7 @@ import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -257,6 +258,13 @@ public final class EndpointReferenceUtils {
     
     private static final org.apache.cxf.ws.addressing.wsdl.ObjectFactory WSA_WSDL_OBJECT_FACTORY = 
         new org.apache.cxf.ws.addressing.wsdl.ObjectFactory();
+    
+    
+    private static final Set<Class<?>> ADDRESSING_CLASSES = new HashSet<Class<?>>();
+    static {
+        ADDRESSING_CLASSES.add(WSA_WSDL_OBJECT_FACTORY.getClass());
+        ADDRESSING_CLASSES.add(WSAEndpointReferenceUtils.WSA_OBJECT_FACTORY.getClass());
+    }
     
     private EndpointReferenceUtils() {
         // Utility class - never constructed
@@ -1007,10 +1015,9 @@ public final class EndpointReferenceUtils {
     
     public static Source convertToXML(EndpointReferenceType epr) {
         try {
-            JAXBContext jaxbContext = 
-                JAXBContext.newInstance(new Class[] {
-                                            WSA_WSDL_OBJECT_FACTORY.getClass(), 
-                                            WSAEndpointReferenceUtils.WSA_OBJECT_FACTORY.getClass()});
+            JAXBContext jaxbContext = JAXBContextCache.getCachedContextAndSchemas(ADDRESSING_CLASSES,
+                                                                                  null, null, null,
+                                                                                  false).getContext();
             javax.xml.bind.Marshaller jm = jaxbContext.createMarshaller();
             jm.setProperty(Marshaller.JAXB_FRAGMENT, true);
             QName qname = new QName("http://www.w3.org/2005/08/addressing", "EndpointReference");

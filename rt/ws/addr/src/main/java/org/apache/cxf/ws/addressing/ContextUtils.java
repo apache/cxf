@@ -22,6 +22,8 @@ package org.apache.cxf.ws.addressing;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
@@ -45,6 +47,8 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.io.DelegatingInputStream;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -93,6 +97,7 @@ public final class ContextUtils {
     private static final String URN_UUID = "urn:uuid:";
     
     private static JAXBContext jaxbContext;
+    private static Set<Class<?>> jaxbContextClasses;
      
     /**
      * Used by MAPAggregator to cache bad MAP fault name
@@ -722,11 +727,15 @@ public final class ContextUtils {
      */
     public static JAXBContext getJAXBContext() throws JAXBException {
         synchronized (ContextUtils.class) {
-            if (jaxbContext == null) {
-                jaxbContext =
-                    JAXBContext.newInstance(
-                        WSA_OBJECT_FACTORY.getClass().getPackage().getName(),
-                        WSA_OBJECT_FACTORY.getClass().getClassLoader());
+            if (jaxbContext == null || jaxbContextClasses == null) {
+                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                JAXBContextCache.addPackage(tmp, WSA_OBJECT_FACTORY.getClass().getPackage().getName(), 
+                                            WSA_OBJECT_FACTORY.getClass().getClassLoader());
+                JAXBContextCache.scanPackages(tmp);
+                CachedContextAndSchemas ccs 
+                    = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
+                jaxbContextClasses = ccs.getClasses();
+                jaxbContext = ccs.getContext();
             }
         }
         return jaxbContext;
@@ -740,6 +749,7 @@ public final class ContextUtils {
     public static void setJAXBContext(JAXBContext ctx) throws JAXBException {
         synchronized (ContextUtils.class) {
             jaxbContext = ctx;
+            jaxbContextClasses = new HashSet<Class<?>>();
         }
     }
     

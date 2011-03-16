@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.policy.builder.jaxb;
 
+import java.util.Set;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -26,7 +28,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
@@ -36,6 +39,8 @@ import org.apache.neethi.PolicyComponent;
  * 
  */
 public class JaxbAssertion<T> extends PrimitiveAssertion {
+    private JAXBContext context;
+    private Set<Class<?>> classes;
     
     private T data;
 
@@ -84,12 +89,21 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
         return (JaxbAssertion<T>)a;
     }
 
+    private synchronized JAXBContext getContext() throws JAXBException {
+        if (context == null || classes == null) {
+            CachedContextAndSchemas ccs 
+                = JAXBContextCache.getCachedContextAndSchemas(data.getClass());
+            classes = ccs.getClasses();
+            context = ccs.getContext();
+        }
+        return context;
+    }
+    
     @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         try {
-            JAXBContext context = JAXBContext.newInstance(PackageUtils.getPackageName(data.getClass()),
-                                                          data.getClass().getClassLoader());
-            Marshaller marshaller = context.createMarshaller();
+            JAXBContext ctx = getContext();
+            Marshaller marshaller = ctx.createMarshaller();
             marshaller.setProperty("jaxb.fragment", Boolean.TRUE);
             marshaller.marshal(data, writer);
         } catch (JAXBException ex) {

@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy.builder.jaxb;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +35,8 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
@@ -45,10 +47,11 @@ import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JaxbAssertionBuilder.class);
-    private Unmarshaller unmarshaller;
     private Collection<QName> supportedTypes;
     private Class<T> type;
-    
+    private JAXBContext context;
+    private Set<Class<?>> classes;
+
     /**
      * Constructs a JAXBAssertionBuilder from the QName of the schema type
      * @param qn the schema type
@@ -84,27 +87,24 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
         supportedTypes = Collections.singletonList(qn);
     }
        
-    protected Unmarshaller getUnmarshaller() {
-        if (unmarshaller == null) {
-            try {
-                createUnmarhsaller();
-            } catch (JAXBException e) {
-                throw new RuntimeException(e);
-            }
+    private synchronized JAXBContext getContext() throws JAXBException {
+        if (context == null || classes == null) {
+            CachedContextAndSchemas ccs 
+                = JAXBContextCache.getCachedContextAndSchemas(type);
+            classes = ccs.getClasses();
+            context = ccs.getContext();
         }
-        
-        return unmarshaller;
+        return context;
     }
     
-    protected synchronized void createUnmarhsaller()  throws JAXBException {
-        if (unmarshaller != null) {
-            return;
+    protected Unmarshaller getUnmarshaller() {
+        try {
+            return getContext().createUnmarshaller();
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
         }
-        
-        JAXBContext context = JAXBContext.newInstance(PackageUtils.getPackageName(type), 
-                                                      type.getClassLoader());
-        unmarshaller = context.createUnmarshaller();
     }
+    
     
     public Assertion build(Element element, AssertionBuilderFactory factory) {
         QName name = new QName(element.getNamespaceURI(), element.getLocalName());

@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +53,8 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.staxutils.StaxUtils;
 
 
@@ -63,10 +66,13 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeserializer {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);
 
-    JAXBContext context;
     final Class<? extends ExtensibilityElement> typeClass;
     final String namespace;
     String jaxbNamespace;
+
+    private JAXBContext context;
+    private Set<Class<?>> classes;
+
       
     public JAXBExtensionHelper(Class<? extends ExtensibilityElement> cls,
                                String ns) {
@@ -176,24 +182,18 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         }
     }
 
-    protected JAXBContext getJAXBContext() {
-        if (context == null) {
+    private synchronized JAXBContext getContext() throws JAXBException {
+        if (context == null || classes == null) {
             try {
-                createJAXBContext();
+                CachedContextAndSchemas ccs 
+                    = JAXBContextCache.getCachedContextAndSchemas(typeClass);
+                classes = ccs.getClasses();
+                context = ccs.getContext();
             } catch (JAXBException e) {
                 throw new RuntimeException(e);
             }
         }
         return context;
-    }
-    
-    protected synchronized void createJAXBContext() throws JAXBException {
-        if (context != null) {
-            return;
-        }
-        
-        context = JAXBContext.newInstance(PackageUtils.getPackageName(typeClass), 
-                                          typeClass.getClassLoader());
     }
     
     /* (non-Javadoc)
@@ -205,7 +205,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                          final Definition wsdl, ExtensionRegistry registry) throws WSDLException {
         // TODO Auto-generated method stub
         try {
-            Marshaller u = getJAXBContext().createMarshaller();
+            Marshaller u = getContext().createMarshaller();
             u.setProperty("jaxb.encoding", "UTF-8");
             u.setProperty("jaxb.fragment", Boolean.TRUE);
             u.setProperty("jaxb.formatted.output", Boolean.TRUE);
@@ -274,7 +274,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     public ExtensibilityElement unmarshall(Class parent, QName qname, Element element, Definition wsdl,
                                            ExtensionRegistry registry) throws WSDLException {
         try {
-            Unmarshaller u = getJAXBContext().createUnmarshaller();
+            Unmarshaller u = getContext().createUnmarshaller();
         
             Object o = null;
             if (namespace == null) {

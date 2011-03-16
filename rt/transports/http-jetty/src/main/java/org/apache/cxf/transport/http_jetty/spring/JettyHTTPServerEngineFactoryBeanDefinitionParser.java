@@ -36,6 +36,8 @@ import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
+import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIdentifiedType;
+import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIdentifiedType;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -85,11 +87,11 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
             }
 
             bean.addConstructorArg(mapElementToJaxbBean(element,
-                                                        Map.class,
+                                                        TLSServerParametersIdentifiedType.class,
                                                         JettySpringTypesFactory.class,
-                                "createTLSServerParametersMap"));
+                                                        "createTLSServerParametersMap"));
             bean.addConstructorArg(mapElementToJaxbBean(element,
-                                                        Map.class,
+                                                        ThreadingParametersIdentifiedType.class,
                                                         JettySpringTypesFactory.class,
                                 "createThreadingParametersMap"));
             
@@ -159,6 +161,4 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
             }
         }
     }
-    
-
 }

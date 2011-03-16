@@ -22,7 +22,6 @@ package org.apache.cxf.jaxb;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -38,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -47,7 +45,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -59,14 +56,10 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.CacheMap;
-import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.AbstractWrapperHelper;
@@ -77,6 +70,7 @@ import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentSchemaValidationHack;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
@@ -106,34 +100,6 @@ public class JAXBDataBinding extends AbstractDataBinding
                                                                                Node.class,
                                                                                XMLEventWriter.class,
                                                                                XMLStreamWriter.class};
-
-    private static final class CachedContextAndSchemas {
-        private WeakReference<JAXBContext> context;
-        private Collection<DOMSource> schemas;
-
-        CachedContextAndSchemas(JAXBContext context) {
-            this.context = new WeakReference<JAXBContext>(context);
-        }
-
-        public JAXBContext getContext() {
-            return context.get();
-        }
-
-        public Collection<DOMSource> getSchemas() {
-            return schemas;
-        }
-
-        public void setSchemas(Collection<DOMSource> schemas) {
-            this.schemas = schemas;
-        }
-
-    }
-
-    private static final Map<Set<Class<?>>, CachedContextAndSchemas> JAXBCONTEXT_CACHE
-        = new CacheMap<Set<Class<?>>, CachedContextAndSchemas>();
-
-    private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
-        = new CacheMap<Package, CachedClass>();
 
     private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
     static {
@@ -323,27 +289,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         try {
             cachedContextAndSchemas = createJAXBContextAndSchemas(contextClasses, tns);
         } catch (JAXBException e1) {
-            // load jaxb needed class and try to create jaxb context for more
-            // times
-            boolean added = addJaxbObjectFactory(e1);
-            while (cachedContextAndSchemas == null && added) {
-                try {
-                    ctx = JAXBContext.newInstance(contextClasses
-                                                  .toArray(new Class[contextClasses.size()]), null);
-                    cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
-                } catch (JAXBException e) {
-                    e1 = e;
-                    added = addJaxbObjectFactory(e1);
-                }
-            }
-
-            if (ctx == null) {
-                throw new ServiceConstructionException(e1);
-            } else {
-                synchronized (JAXBCONTEXT_CACHE) {
-                    JAXBCONTEXT_CACHE.put(contextClasses, cachedContextAndSchemas);
-                }
-            }
+            throw new ServiceConstructionException(e1);
         }
         ctx = cachedContextAndSchemas.getContext();
         if (LOG.isLoggable(Level.FINE)) {
@@ -460,126 +406,21 @@ public class JAXBDataBinding extends AbstractDataBinding
     public CachedContextAndSchemas createJAXBContextAndSchemas(Set<Class<?>> classes,
                                                                String defaultNs)
         throws JAXBException {
-
-        JAXBUtils.scanPackages(classes, extraClass, OBJECT_FACTORY_CACHE);
-        //JAXBUtils.scanPackages(classes, new HashMap<Package, CachedClass>());
+        //add user extra class into jaxb context
+        if (extraClass != null && extraClass.length > 0) {
+            for (Class clz : extraClass) {
+                classes.add(clz);
+            }
+        }
+        JAXBContextCache.scanPackages(classes);
         addWsAddressingTypes(classes);
 
-        for (Class<?> clz : classes) {
-            if (clz.getName().endsWith("ObjectFactory")
-                && checkObjectFactoryNamespaces(clz)) {
-                // kind of a hack, but ObjectFactories may be created with empty
-                // namespaces
-                defaultNs = null;
-            }
-        }
+        return JAXBContextCache.getCachedContextAndSchemas(classes, defaultNs,  
+                                                          contextProperties, 
+                                                          typeRefs, true);
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        if (defaultNs != null) {
-            map.put("com.sun.xml.bind.defaultNamespaceRemap", defaultNs);
-        }
-
-        if (contextProperties != null) {
-            // add any specified context properties into the properties map
-            map.putAll(contextProperties);
-        }
-
-        CachedContextAndSchemas cachedContextAndSchemas = null;
-        if (typeRefs.isEmpty()) {
-            synchronized (JAXBCONTEXT_CACHE) {
-                cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
-            }
-        }
-        if (cachedContextAndSchemas != null) {
-            context = cachedContextAndSchemas.getContext();
-        }
-        if (context == null) {
-            context = createContext(classes, map);
-            cachedContextAndSchemas = new CachedContextAndSchemas(context);
-            synchronized (JAXBCONTEXT_CACHE) {
-                if (typeRefs.isEmpty()) {
-                    JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
-                }
-            }
-        }
-
-        return cachedContextAndSchemas;
     }
 
-    private JAXBContext createContext(Set<Class<?>> classes,
-                                      Map<String, Object> map)
-        throws JAXBException {
-        JAXBContext ctx;
-        if (!typeRefs.isEmpty()) {
-            Class<?> fact = null;
-            String pfx = "com.sun.xml.bind.";
-            try {
-                fact = ClassLoaderUtils.loadClass("com.sun.xml.bind.v2.ContextFactory",
-                                                  getClass());
-            } catch (Throwable t) {
-                try {
-                    fact = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.v2.ContextFactory",
-                                                      getClass());
-                    pfx = "com.sun.xml.internal.bind.";
-                } catch (Throwable t2) {
-                    //ignore
-                }
-            }
-            if (fact != null) {
-                for (Method m : fact.getMethods()) {
-                    if ("createContext".equals(m.getName())
-                        && m.getParameterTypes().length == 9) {
-                        try {
-                            return (JAXBContext)m.invoke(null,
-                                     classes.toArray(new Class[classes.size()]),
-                                     typeRefs,
-                                     map.get(pfx + "subclassReplacements"),
-                                     map.get(pfx + "defaultNamespaceRemap"),
-                                     map.get(pfx + "c14n") == null
-                                         ? Boolean.FALSE
-                                             : map.get(pfx + "c14n"),
-                                     map.get(pfx + "v2.model.annotation.RuntimeAnnotationReader"),
-                                     map.get(pfx + "XmlAccessorFactory") == null
-                                         ? Boolean.FALSE
-                                             : map.get(pfx + "XmlAccessorFactory"),
-                                     map.get(pfx + "treatEverythingNillable") == null
-                                         ? Boolean.FALSE : map.get(pfx + "treatEverythingNillable"),
-                                     map.get("retainReferenceToInfo") == null
-                                         ? Boolean.FALSE : map.get("retainReferenceToInfo"));
-                        } catch (Throwable e) {
-                            //ignore
-                        }
-                    }
-                }
-            }
-        }
-        try {
-            ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
-        } catch (JAXBException ex) {
-            if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")
-                && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
-                map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
-                        map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
-                ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
-            } else {
-                throw ex;
-            }
-        }
-        return ctx;
-    }
-
-    private boolean checkObjectFactoryNamespaces(Class<?> clz) {
-        for (Method meth : clz.getMethods()) {
-            XmlElementDecl decl = meth.getAnnotation(XmlElementDecl.class);
-            if (decl != null
-                && XmlElementDecl.GLOBAL.class.equals(decl.scope())
-                && StringUtils.isEmpty(decl.namespace())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private void addWsAddressingTypes(Set<Class<?>> classes) {
         if (classes.contains(ObjectFactory.class)) {
@@ -598,36 +439,6 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     public Set<Class<?>> getContextClasses() {
         return Collections.unmodifiableSet(this.contextClasses);
-    }
-
-    // Now we can not add all the classes that Jaxb needed into JaxbContext,
-    // especially when
-    // an ObjectFactory is pointed to by an jaxb @XmlElementDecl annotation
-    // added this workaround method to load the jaxb needed ObjectFactory class
-    public boolean addJaxbObjectFactory(JAXBException e1) {
-        boolean added = false;
-        java.io.ByteArrayOutputStream bout = new java.io.ByteArrayOutputStream();
-        java.io.PrintStream pout = new java.io.PrintStream(bout);
-        e1.printStackTrace(pout);
-        String str = new String(bout.toByteArray());
-        Pattern pattern = Pattern.compile("(?<=There's\\sno\\sObjectFactory\\swith\\san\\s"
-                                          + "@XmlElementDecl\\sfor\\sthe\\selement\\s\\{)\\S*(?=\\})");
-        java.util.regex.Matcher matcher = pattern.matcher(str);
-        while (matcher.find()) {
-            String pkgName = JAXBUtils.namespaceURIToPackage(matcher.group());
-            try {
-                Class clz = getClass().getClassLoader().loadClass(pkgName + "." + "ObjectFactory");
-
-                if (!contextClasses.contains(clz)) {
-                    contextClasses.add(clz);
-                    added = true;
-                }
-            } catch (ClassNotFoundException e) {
-                // do nothing
-            }
-
-        }
-        return added;
     }
 
     /**
@@ -744,15 +555,6 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     public void setUnwrapJAXBElement(boolean unwrapJAXBElement) {
         this.unwrapJAXBElement = unwrapJAXBElement;
-    }
-
-    public static void clearCaches() {
-        synchronized (JAXBCONTEXT_CACHE) {
-            JAXBCONTEXT_CACHE.clear();
-        }
-        synchronized (OBJECT_FACTORY_CACHE) {
-            OBJECT_FACTORY_CACHE.clear();
-        }
     }
 
     public WrapperHelper createWrapperHelper(Class<?> wrapperType, QName wrapperName, List<String> partNames,

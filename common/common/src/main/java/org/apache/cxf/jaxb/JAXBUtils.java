@@ -790,6 +790,10 @@ public final class JAXBUtils {
     }
     
     public static void scanPackages(Set<Class<?>> classes,
+                                    Map<Package, CachedClass> objectFactoryCache) {
+        scanPackages(classes, null, objectFactoryCache);
+    }
+    public static void scanPackages(Set<Class<?>> classes,
                                     Class[] extraClass,
                                     Map<Package, CachedClass> objectFactoryCache) {
         

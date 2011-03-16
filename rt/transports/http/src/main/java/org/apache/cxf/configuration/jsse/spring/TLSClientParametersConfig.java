@@ -21,6 +21,8 @@ package org.apache.cxf.configuration.jsse.spring;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.GeneralSecurityException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -33,6 +35,8 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
@@ -43,16 +47,23 @@ import org.apache.cxf.staxutils.StaxUtils;
  */
 @NoJSR250Annotations
 public final class TLSClientParametersConfig {
-    static JAXBContext context;
+    private static Set<Class<?>> classes;
+    private static JAXBContext context;
     
     private TLSClientParametersConfig() {
         //not constructed
     }
     
     private static synchronized JAXBContext getContext() throws JAXBException {
-        if (context == null) {
-            context = JAXBContext.newInstance(PackageUtils.getPackageName(TLSClientParametersType.class), 
-                                              TLSClientParametersConfig.class.getClassLoader());            
+        if (context == null || classes == null) {
+            Set<Class<?>> c2 = new HashSet<Class<?>>();
+            JAXBContextCache.addPackage(c2, 
+                                        PackageUtils.getPackageName(TLSClientParametersType.class), 
+                                        TLSClientParametersConfig.class.getClassLoader());
+            CachedContextAndSchemas ccs 
+                = JAXBContextCache.getCachedContextAndSchemas(c2, null, null, null, false);
+            classes = ccs.getClasses();
+            context = ccs.getContext();
         }
         return context;
     }

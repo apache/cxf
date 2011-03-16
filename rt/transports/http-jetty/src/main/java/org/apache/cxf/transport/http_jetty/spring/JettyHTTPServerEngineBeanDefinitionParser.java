@@ -25,6 +25,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.xml.bind.JAXBContext;
 
 import org.w3c.dom.Element;
 
@@ -81,24 +82,28 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
                     mapElementToJaxbPropertyFactory(elem,
                                                     bean,
                                                     "tlsServerParameters",
+                                                    TLSServerParametersType.class,
                                                     JettyHTTPServerEngineBeanDefinitionParser.class,
                                                     "createTLSServerParametersConfig");
                 } else if ("threadingParameters".equals(name)) {
                     mapElementToJaxbPropertyFactory(elem,
                                                     bean,
                                                     "threadingParameters",
+                                                    ThreadingParametersType.class,
                                                     JettyHTTPServerEngineBeanDefinitionParser.class,
                                                     "createThreadingParameters");
                 } else if ("tlsServerParametersRef".equals(name)) {
                     mapElementToJaxbPropertyFactory(elem,
                                                     bean,
                                                     "tlsServerParametersRef",
+                                                    TLSServerParametersIdentifiedType.class,
                                                     JettyHTTPServerEngineBeanDefinitionParser.class,
                                                     "createTLSServerParametersConfigRef");
                 } else if ("threadingParametersRef".equals(name)) {
                     mapElementToJaxbPropertyFactory(elem,
                                                     bean,
                                                     "threadingParametersRef",
+                                                    ThreadingParametersIdentifiedType.class,
                                                     JettyHTTPServerEngineBeanDefinitionParser.class,
                                                     "createThreadingParametersRef"
                                                     );
@@ -209,35 +214,35 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         
 
     
-    public static TLSServerParametersConfig createTLSServerParametersConfig(String s) 
+    public static TLSServerParametersConfig createTLSServerParametersConfig(String s, 
+                                                                            JAXBContext context) 
         throws GeneralSecurityException, IOException {
         
-        TLSServerParametersType parametersType = unmarshalFactoryString(s, 
+        TLSServerParametersType parametersType = unmarshalFactoryString(s, context,
                                                                         TLSServerParametersType.class);
         
         return new TLSServerParametersConfig(parametersType);
     }
-    public static String createTLSServerParametersConfigRef(String s)
+    public static String createTLSServerParametersConfigRef(String s, JAXBContext context)
     
         throws GeneralSecurityException, IOException {
         
         TLSServerParametersIdentifiedType parameterTypeRef 
-            = unmarshalFactoryString(s, TLSServerParametersIdentifiedType.class);
+            = unmarshalFactoryString(s, context, TLSServerParametersIdentifiedType.class);
         
         return parameterTypeRef.getId(); 
     } 
     
-    public static ThreadingParameters createThreadingParameters(String s) {
+    public static ThreadingParameters createThreadingParameters(String s, JAXBContext context) {
         
-        ThreadingParametersType parametersType = unmarshalFactoryString(s, 
+        ThreadingParametersType parametersType = unmarshalFactoryString(s, context,
                                                                         ThreadingParametersType.class);
         
         return toThreadingParameters(parametersType);
     }
-    public static String createThreadingParametersRef(String s) {
-
+    public static String createThreadingParametersRef(String s, JAXBContext context) {
         ThreadingParametersIdentifiedType parametersType 
-            = unmarshalFactoryString(s, ThreadingParametersIdentifiedType.class);
+            = unmarshalFactoryString(s, context, ThreadingParametersIdentifiedType.class);
         return parametersType.getId();
     }
 }

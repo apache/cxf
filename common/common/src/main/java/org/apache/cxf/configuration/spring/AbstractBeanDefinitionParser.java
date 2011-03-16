@@ -20,7 +20,8 @@ package org.apache.cxf.configuration.spring;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -39,9 +40,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.CacheMap;
-import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -55,13 +56,12 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractBeanDefinitionParser 
     extends org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser {
     public static final String WIRE_BUS_ATTRIBUTE = AbstractBeanDefinitionParser.class.getName() + ".wireBus";
-
-    private static Map<String, JAXBContext> packageContextCache = new CacheMap<String, JAXBContext>(); 
-    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBeanDefinitionParser.class);
     
     private Class beanClass;
-    
+    private JAXBContext context;
+    private Set<Class<?>> classes;
+
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         boolean setBus = parseAttributes(element, ctx, bean);        
@@ -245,23 +245,48 @@ public abstract class AbstractBeanDefinitionParser
         }
         mapElementToJaxbProperty(data, bean, propertyName, c);
     }
-    
+
+    private synchronized JAXBContext getContext(Class<?> cls) {
+        if (context == null || classes == null || !classes.contains(cls)) {
+            try {
+                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                if (classes != null) {
+                    tmp.addAll(classes);
+                }
+                JAXBContextCache.addPackage(tmp, getJaxbPackage(), 
+                                            cls == null 
+                                            ? getClass().getClassLoader() 
+                                                : cls.getClassLoader());
+                if (cls != null) {
+                    boolean hasOf = false;
+                    for (Class<?> c : tmp) {
+                        if (c.getPackage() == cls.getPackage()
+                            && "ObjectFactory".equals(c.getSimpleName())) {
+                            hasOf = true;
+                        }
+                    }
+                    if (!hasOf) {
+                        tmp.add(cls);
+                    }
+                }
+                JAXBContextCache.scanPackages(tmp);
+                CachedContextAndSchemas ccs 
+                    = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
+                classes = ccs.getClasses();
+                context = ccs.getContext();
+            } catch (JAXBException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return context;
+    }
+
     @SuppressWarnings("deprecation")
     protected void mapElementToJaxbProperty(Element data, 
                                             BeanDefinitionBuilder bean, 
                                             String propertyName, 
                                             Class<?> c) {
-        JAXBContext context = null;
         try {
-            String pkg = getJaxbPackage();
-            if (null != c) {
-                pkg = PackageUtils.getPackageName(c);
-            }
-            context = packageContextCache.get(pkg);
-            if (context == null) {
-                context = JAXBContext.newInstance(pkg, getClass().getClassLoader());
-                packageContextCache.put(pkg, context);
-            }
             try {
                 StringWriter writer = new StringWriter();
                 XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
@@ -271,12 +296,12 @@ public abstract class AbstractBeanDefinitionParser
                 BeanDefinitionBuilder jaxbbean 
                     = BeanDefinitionBuilder.rootBeanDefinition(JAXBBeanFactory.class);
                 jaxbbean.getRawBeanDefinition().setFactoryMethodName("createJAXBBean");
-                jaxbbean.addConstructorArg(context);
+                jaxbbean.addConstructorArg(getContext(c));
                 jaxbbean.addConstructorArg(writer.toString());
                 jaxbbean.addConstructorArg(c);
                 bean.addPropertyValue(propertyName, jaxbbean.getBeanDefinition());
             } catch (Exception ex) {
-                Unmarshaller u = context.createUnmarshaller();
+                Unmarshaller u = getContext(c).createUnmarshaller();
                 Object obj;
                 if (c != null) {
                     obj = u.unmarshal(data, c);
@@ -300,17 +325,26 @@ public abstract class AbstractBeanDefinitionParser
     public void mapElementToJaxbPropertyFactory(Element data, 
                                                 BeanDefinitionBuilder bean, 
                                                 String propertyName, 
+                                                Class<?> type,
                                                 Class<?> factory,
                                                 String method,
                                                 Object ... args) {
-        bean.addPropertyValue(propertyName, mapElementToJaxbBean(data, factory,
-                                                                 null, method, args));
+        bean.addPropertyValue(propertyName, mapElementToJaxbBean(data, 
+                                                                 factory,
+                                                                 null, type, method, args));
     }
-    
+    public AbstractBeanDefinition mapElementToJaxbBean(Element data, 
+                                                       Class<?> cls,
+                                                      Class<?> factory,
+                                                      String method,
+                                                      Object ... args) {
+        return mapElementToJaxbBean(data, cls, factory, cls, method, args);
+    }    
     @SuppressWarnings("deprecation")
     public AbstractBeanDefinition mapElementToJaxbBean(Element data, 
                                                        Class<?> cls,
                                                       Class<?> factory,
+                                                      Class<?> jaxbClass,
                                                       String method,
                                                       Object ... args) {
         StringWriter writer = new StringWriter();
@@ -329,6 +363,7 @@ public abstract class AbstractBeanDefinitionParser
         }
         jaxbbean.getRawBeanDefinition().setFactoryMethodName(method);
         jaxbbean.addConstructorArg(writer.toString());
+        jaxbbean.addConstructorArg(getContext(jaxbClass));
         if (args != null) {
             for (Object o : args) {
                 jaxbbean.addConstructorArg(o);
@@ -337,18 +372,11 @@ public abstract class AbstractBeanDefinitionParser
         return jaxbbean.getBeanDefinition();
     }
     
-    protected static <T> T unmarshalFactoryString(String s, Class<T> cls) {
+    protected static <T> T unmarshalFactoryString(String s, JAXBContext ctx, Class<T> cls) {
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
         try {
-            String pkg = cls.getPackage().getName();
-            JAXBContext context = packageContextCache.get(pkg);
-            if (context == null) {
-                context = JAXBContext.newInstance(pkg, cls.getClassLoader());
-                packageContextCache.put(pkg, context);
-            }
-            
-            Unmarshaller u = context.createUnmarshaller();
+            Unmarshaller u = ctx.createUnmarshaller();
             JAXBElement<?> obj = u.unmarshal(data, cls);
             return cls.cast(obj.getValue());
         } catch (RuntimeException e) {
