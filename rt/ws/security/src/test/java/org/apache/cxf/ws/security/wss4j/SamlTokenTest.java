@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.MessageFactory;
@@ -40,12 +41,14 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -77,8 +80,13 @@ public class SamlTokenTest extends AbstractSecurityTest {
             "org.apache.cxf.ws.security.wss4j.SAML1CallbackHandler"
         );
         
-        Map<String, String> inProperties = new HashMap<String, String>();
+        Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -108,8 +116,14 @@ public class SamlTokenTest extends AbstractSecurityTest {
             "org.apache.cxf.ws.security.wss4j.SAML2CallbackHandler"
         );
         
-        Map<String, String> inProperties = new HashMap<String, String>();
+        Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        validator.setRequireSAML1Assertion(false);
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -142,12 +156,17 @@ public class SamlTokenTest extends AbstractSecurityTest {
             WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler()
         );
         
-        Map<String, String> inProperties = new HashMap<String, String>();
+        Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(
             WSHandlerConstants.ACTION, 
             WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
         );
         inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -184,12 +203,18 @@ public class SamlTokenTest extends AbstractSecurityTest {
             WSHandlerConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler()
         );
         
-        Map<String, String> inProperties = new HashMap<String, String>();
+        Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(
             WSHandlerConstants.ACTION, 
             WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
         );
         inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        validator.setRequireSAML1Assertion(false);
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -230,16 +255,29 @@ public class SamlTokenTest extends AbstractSecurityTest {
             WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
         );
         
-        Map<String, String> inProperties = new HashMap<String, String>();
+        Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(
             WSHandlerConstants.ACTION, 
             WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE
         );
         inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
+        
+        try {
+            makeInvocation(outProperties, xpaths, inProperties);
+            fail("Failure expected in SAML Validator");
+        } catch (Fault ex) {
+            // expected
+        }
+        validator.setRequireSenderVouches(false);
 
         List<WSHandlerResult> handlerResults = 
             makeInvocation(outProperties, xpaths, inProperties);
@@ -275,16 +313,37 @@ public class SamlTokenTest extends AbstractSecurityTest {
             WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
         );
         
-        Map<String, String> inProperties = new HashMap<String, String>();
+        Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(
             WSHandlerConstants.ACTION, 
             WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE
         );
         inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
+        
+        try {
+            makeInvocation(outProperties, xpaths, inProperties);
+            fail("Failure expected in SAML Validator");
+        } catch (Fault ex) {
+            // expected
+        }
+        validator.setRequireSenderVouches(false);
+        
+        try {
+            makeInvocation(outProperties, xpaths, inProperties);
+            fail("Failure expected in SAML Validator");
+        } catch (Fault ex) {
+            // expected
+        }
+        validator.setRequireSAML1Assertion(false);
 
         List<WSHandlerResult> handlerResults = 
             makeInvocation(outProperties, xpaths, inProperties);
@@ -304,7 +363,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
     private List<WSHandlerResult> makeInvocation(
         Map<String, Object> outProperties,
         List<String> xpaths,
-        Map<String, String> inProperties
+        Map<String, Object> inProperties
     ) throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
@@ -348,15 +407,11 @@ public class SamlTokenTest extends AbstractSecurityTest {
         db.setEntityResolver(new NullResolver());
         doc = StaxUtils.read(db, reader, false);
 
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
+        WSS4JInInterceptor inHandler = new WSS4JInInterceptor(inProperties);
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
-
-        for (String key : inProperties.keySet()) {
-            inHandler.setProperty(key, inProperties.get(key));
-        }
 
         inHandler.handleMessage(inmsg);
 
