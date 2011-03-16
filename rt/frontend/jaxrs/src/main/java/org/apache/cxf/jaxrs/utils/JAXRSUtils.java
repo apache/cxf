@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -813,6 +814,8 @@ public final class JAXRSUtils {
             o = new MessageContextImpl(m);
         } else if (SearchContext.class.isAssignableFrom(clazz)) {
             o = new SearchContextImpl(m);
+        } else if (Application.class.isAssignableFrom(clazz)) {
+            o = contextMessage.getExchange().getEndpoint().get(Application.class.getName());
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
             o = createServletResourceValue(contextMessage, clazz);
@@ -862,8 +865,8 @@ public final class JAXRSUtils {
             value = m.get(AbstractHTTPDestination.HTTP_REQUEST);
         }
         if (HttpServletResponse.class.isAssignableFrom(clazz)) {
-            value = new HttpServletResponseFilter(
-                            (HttpServletResponse)m.get(AbstractHTTPDestination.HTTP_RESPONSE), m);
+            HttpServletResponse response = (HttpServletResponse)m.get(AbstractHTTPDestination.HTTP_RESPONSE);
+            value = response != null ? new HttpServletResponseFilter(response, m) : null;
         }
         if (ServletContext.class.isAssignableFrom(clazz)) {
             value = m.get(AbstractHTTPDestination.HTTP_CONTEXT);

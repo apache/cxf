@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
@@ -81,28 +82,25 @@ public abstract class AbstractResourceInfo {
         for (Field f : cls.getDeclaredFields()) {
             for (Annotation a : f.getAnnotations()) {
                 if (a.annotationType() == Context.class) {
-                    if (contextFields == null) {
-                        contextFields = new HashMap<Class<?>, List<Field>>();
+                    contextFields = addContextField(contextFields, f);
+                    if (f.getType() != Application.class) {
+                        fieldProxyMap = getProxyMap(Field.class, fieldProxyMap);
+                        addToMap(fieldProxyMap, f, InjectionUtils.createThreadLocalProxy(f.getType()));
                     }
-                    addContextField(contextFields, f);
-                    if (fieldProxyMap == null) {
-                        fieldProxyMap = new HashMap<Class<?>, Map<Field, ThreadLocalProxy>>();
-                    }
-                    addToMap(fieldProxyMap, f, InjectionUtils.createThreadLocalProxy(f.getType()));
                 } else if (a.annotationType() == Resource.class 
                            && AnnotationUtils.isContextClass(f.getType())) {
-                    if (resourceFields == null) {
-                        resourceFields = new HashMap<Class<?>, List<Field>>();
-                    }
-                    addContextField(resourceFields, f);
-                    if (resourceProxyMap == null) {
-                        resourceProxyMap = new HashMap<Class<?>, Map<Field, ThreadLocalProxy>>();
-                    }
+                    resourceFields = addContextField(resourceFields, f);
+                    resourceProxyMap = getProxyMap(Field.class, resourceProxyMap);
                     addToMap(resourceProxyMap, f, InjectionUtils.createThreadLocalProxy(f.getType()));
                 }
             }
         }
         findContextFields(cls.getSuperclass());
+    }
+    
+    private <T> Map<Class<?>, Map<T, ThreadLocalProxy>> getProxyMap(Class<T> keyClass,
+        Map<Class<?>, Map<T, ThreadLocalProxy>> map) {
+        return map == null ? new HashMap<Class<?>, Map<T, ThreadLocalProxy>>() : map;
     }
     
     private void findContextSetterMethods(Class<?> cls) {
@@ -145,11 +143,11 @@ public abstract class AbstractResourceInfo {
             contextMethods = new HashMap<Class<?>, Map<Class<?>, Method>>();
         }
         addToMap(contextMethods, contextClass, m);
-        if (setterProxyMap == null) {
-            setterProxyMap = new HashMap<Class<?>, Map<Method, ThreadLocalProxy>>();
+        if (m.getParameterTypes()[0] != Application.class) {
+            setterProxyMap = getProxyMap(Method.class, setterProxyMap);
+            addToMap(setterProxyMap, m, 
+                     InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]));
         }
-        addToMap(setterProxyMap, m, 
-                 InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]));
     }
     
     public boolean isRoot() {
@@ -200,7 +198,10 @@ public abstract class AbstractResourceInfo {
         }
     }
     
-    private void addContextField(Map<Class<?>, List<Field>> theFields, Field f) {
+    private Map<Class<?>, List<Field>> addContextField(Map<Class<?>, List<Field>> theFields, Field f) {
+        
+        theFields = theFields == null ? new HashMap<Class<?>, List<Field>>() : theFields;
+        
         List<Field> fields = theFields.get(serviceClass);
         if (fields == null) {
             fields = new ArrayList<Field>();
@@ -209,6 +210,7 @@ public abstract class AbstractResourceInfo {
         if (!fields.contains(f)) {
             fields.add(f);
         }
+        return theFields;
     }
     
     private <T, V> void addToMap(Map<Class<?>, Map<T, V>> theFields, 
