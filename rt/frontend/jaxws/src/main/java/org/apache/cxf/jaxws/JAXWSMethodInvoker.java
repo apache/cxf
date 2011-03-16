@@ -59,7 +59,6 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
                 params = Collections.singletonList(null);
             }
             res = CastUtils.cast((List)super.invoke(exchange, serviceObject, m, params));
-            addHandlerProperties(ctx, handlerScopedStuff);
             //update the webservice response context
             updateWebServiceContext(exchange, ctx);
         } catch (Fault f) {
@@ -67,6 +66,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             updateHeader(exchange, ctx);
             throw f;
         } finally {
+            addHandlerProperties(ctx, handlerScopedStuff);
             //clear the WebServiceContextImpl's ThreadLocal variable
             WebServiceContextImpl.clear();
         }
