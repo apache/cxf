@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.management;
 
+import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -28,18 +29,62 @@ import javax.management.ObjectName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.workqueue.WorkQueueManager;
+import org.apache.hello_world_soap_http.Greeter;
+import org.apache.hello_world_soap_http.GreeterImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ManagedBusTest extends Assert {
     public static final String JMX_PORT1 = TestUtil.getPortNumber("Server.1");
     public static final String JMX_PORT2 = TestUtil.getPortNumber(ManagedBusTest.class, 3);
+    public static final String SERVICE_PORT = TestUtil.getPortNumber(ManagedBusTest.class, 4);
 
+    @Test
+    public void testTwoSameNamedEndpoint() throws Exception {
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus();
+        try {
+            InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
+            assertNotNull(im);
+            InstrumentationManagerImpl imi = (InstrumentationManagerImpl)im;
+            imi.setServer(ManagementFactory.getPlatformMBeanServer());
+            imi.setEnabled(true);
+            imi.init();
+
+            
+            Greeter greeter1 = new GreeterImpl();
+            JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+            svrFactory.setAddress("http://localhost:" + SERVICE_PORT + "/Hello");
+            svrFactory.setServiceBean(greeter1);
+            svrFactory.getProperties(true).put("managed.endpoint.name", "greeter1");
+            svrFactory.create();
+
+            Greeter greeter2 = new GreeterImpl();
+            svrFactory = new JaxWsServerFactoryBean();
+            svrFactory.setAddress("http://localhost:" + SERVICE_PORT + "/Hello2");
+            svrFactory.setServiceBean(greeter2);
+            svrFactory.getProperties(true).put("managed.endpoint.name", "greeter2");
+            svrFactory.create();
+            
+            MBeanServer mbs = im.getMBeanServer(); 
+            
+            ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+                                             + ":type=Bus.Service.Endpoint,*");
+            Set s = mbs.queryMBeans(name, null);
+            assertEquals(2, s.size());
+        } finally {
+            bus.shutdown(true);
+        }
+        
+    }
+    
     @Test
     public void testManagedSpringBus() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();

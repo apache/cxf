@@ -19,6 +19,7 @@
 package org.apache.cxf.endpoint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +150,12 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     }
 
     public Map<String, Object> getProperties() {
+        return properties;
+    }
+    public Map<String, Object> getProperties(boolean create) {
+        if (create && properties == null) {
+            properties = new HashMap<String, Object>();
+        }
         return properties;
     }
 
