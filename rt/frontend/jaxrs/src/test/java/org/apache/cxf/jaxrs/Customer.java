@@ -34,12 +34,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -100,6 +102,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     @Context private Request request;
     @Context private SecurityContext sContext;
     @Context private Providers bodyWorkers;
+    @Context private Application application1;
+    private Application application2;
+    private int applicationInjections;
     
     @Resource private HttpServletRequest servletRequest;
     @Resource private HttpServletResponse servletResponse;
@@ -174,6 +179,23 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     public void testMatrixBean(@MatrixParam("") CustomerBean cb) {
         
+    }
+    
+    public Application getApplication1() {
+        return application1;
+    }
+    
+    public Application getApplication2() {
+        if (applicationInjections > 1) {
+            throw new RuntimeException();
+        }
+        return application2;
+    }
+    
+    @Context
+    public void setApplication(Application app) {
+        applicationInjections++;
+        application2 = app;
     }
     
     public UriInfo getUriInfo() {
@@ -255,6 +277,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
     @Produces("text/xml")
     @Consumes("text/xml")
+    @GET
     public void test() {
         // complete
     }

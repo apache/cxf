@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Application;
+
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -64,6 +66,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
     private ResourceComparator rc;
+    private Application application;
     
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -71,6 +74,14 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
 
     public JAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
         super(sf);
+    }
+    
+    /**
+     * Saves the reference to the JAX-RS {@link Application}
+     * @param app
+     */
+    public void setApplication(Application app) {
+        application = app;    
     }
     
     /**
@@ -121,6 +132,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 ep.getService().setInvoker(invoker);
             }
             
+            ep.put(Application.class.getName(), application);
             ProviderFactory factory = setupFactory(ep);
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
@@ -305,8 +317,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private void injectContexts() {
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.isSingleton()) {
-                InjectionUtils.injectContextProxies(cri, 
-                                                    cri.getResourceProvider().getInstance(null));
+                InjectionUtils.injectContextProxiesAndApplication(cri, 
+                                                    cri.getResourceProvider().getInstance(null),
+                                                    application);
             }
         }
     }

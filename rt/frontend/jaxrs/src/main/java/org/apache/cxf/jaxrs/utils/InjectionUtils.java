@@ -48,6 +48,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -769,25 +770,33 @@ public final class InjectionUtils {
         }
     }
     
-    public static void injectContextProxies(AbstractResourceInfo cri, Object instance) {
+    public static void injectContextProxiesAndApplication(AbstractResourceInfo cri, 
+                                                          Object instance,
+                                                          Application app) {
         if (!cri.isSingleton()) {
             return;
         }
         
         for (Map.Entry<Class<?>, Method> entry : cri.getContextMethods().entrySet()) {
-            ThreadLocalProxy proxy = cri.getContextSetterProxy(entry.getValue());
-            InjectionUtils.injectThroughMethod(instance, entry.getValue(), proxy);
+            Method method = entry.getValue();
+            Object value = method.getParameterTypes()[0] == Application.class 
+                ? app : cri.getContextSetterProxy(method);
+            InjectionUtils.injectThroughMethod(instance, method, value);
         }
         
         for (Field f : cri.getContextFields()) {
-            ThreadLocalProxy proxy = cri.getContextFieldProxy(f);
-            InjectionUtils.injectFieldValue(f, instance, proxy);
+            Object value = f.getType() == Application.class ? app : cri.getContextFieldProxy(f);
+            InjectionUtils.injectFieldValue(f, instance, value);
         }
         
         for (Field f : cri.getResourceFields()) {
             ThreadLocalProxy proxy = cri.getResourceFieldProxy(f);
             InjectionUtils.injectFieldValue(f, instance, proxy);
         }
+    }
+    
+    public static void injectContextProxies(AbstractResourceInfo cri, Object instance) {
+        injectContextProxiesAndApplication(cri, instance, null);
     }
     
     @SuppressWarnings("unchecked")
@@ -809,16 +818,21 @@ public final class InjectionUtils {
     public static void injectContextMethods(Object requestObject,
                                             AbstractResourceInfo cri,
                                             Message message) {
+        
         for (Map.Entry<Class<?>, Method> entry : cri.getContextMethods().entrySet()) {
+            Method method = entry.getValue();
+            if (method.getParameterTypes()[0] == Application.class && cri.isSingleton()) {
+                continue;
+            }
             Object o = JAXRSUtils.createContextValue(message, 
-                                              entry.getValue().getGenericParameterTypes()[0],
+                                              method.getGenericParameterTypes()[0],
                                               entry.getKey());
             
             if (o != null) {
                 if (!cri.isSingleton()) {
-                    InjectionUtils.injectThroughMethod(requestObject, entry.getValue(), o);
+                    InjectionUtils.injectThroughMethod(requestObject, method, o);
                 } else {
-                    ThreadLocalProxy proxy = cri.getContextSetterProxy(entry.getValue());
+                    ThreadLocalProxy proxy = cri.getContextSetterProxy(method);
                     if (proxy != null) {
                         proxy.set(o);
                     }
@@ -835,6 +849,9 @@ public final class InjectionUtils {
                                            Message m) {
         
         for (Field f : cri.getContextFields()) {
+            if (f.getType() == Application.class && cri.isSingleton()) {
+                continue;
+            }
             Object value = JAXRSUtils.createContextValue(m, f.getGenericType(), f.getType());
             InjectionUtils.injectContextField(cri, f, o, value, false);
         }
