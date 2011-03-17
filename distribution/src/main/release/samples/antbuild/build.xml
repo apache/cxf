@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project name="Hello world demo" default="compile" basedir=".">
+
+    <property environment="env"/>
+    <property name="build.dir" location ="${basedir}/build"/>
+    <property name="build.classes.dir" location ="${build.dir}/classes"/>
+    <property name="src.dir" location ="${basedir}/src"/>
+    <property name="build.src.dir" location ="${build.dir}/src"/>
+    <property name="build.var.dir" location ="${build.dir}/var"/>
+    <property name="codegen.timestamp.file" value="${build.src.dir}/.CODEGEN_DONE"/>
+    <property name="war.dir" location="${build.dir}/war"/>
+
+    <property name="wsdl.dir" location="${basedir}/wsdl"/>
+
+    <!-- Determine cxf.home, either from the environment variable CXF_HOME
+        - or using ../..
+        -->
+    <condition property="cxf.home" value="${env.CXF_HOME}">
+        <isset property="env.CXF_HOME"/>
+    </condition>
+    <property name="cxf.home" location="../.."/>
+    <property name="cxf.etc.dir" location="${cxf.home}/etc"/>
+
+    <!-- JAX-WS 2.2 and JAXB 2.2 require the API jars to be endorsed -->
+    <condition property="cxf.endorsed.dir" value="${cxf.home}/lib/endorsed">
+         <available file="${cxf.home}/lib/endorsed" type="dir" property=""/>
+     </condition>
+     <condition property="cxf.endorsed.flag" value="-Djava.endorsed.dirs=${cxf.endorsed.dir}">
+         <available file="${cxf.home}/lib/endorsed" type="dir" property=""/>
+     </condition>
+     <property name="cxf.endorsed.dir" location="${cxf.home}"/>
+     <property name="cxf.endorsed.flag" value="-Dnone=none"/>
+
+     <!-- Set the classpath for the CXF libraries -->
+     <path id="cxf.classpath">
+         <pathelement location="${basedir}"/>
+         <pathelement location="${build.classes.dir}"/>
+         <pathelement path="${srcbuild.classpath}"/>
+         <pathelement location="${cxf.home}/lib/cxf-manifest.jar"/>
+         <fileset dir="${cxf.endorsed.dir}">
+             <include name="*.jar"/>
+         </fileset>
+     </path>
+
+
+    <!-- Sample macrodef to setup and run the CXF wsdl2java tool -->
+    <macrodef name="wsdl2java">
+        <attribute name="srcdestdir" default="${build.src.dir}"/>
+        <attribute name="destdir" default="${build.classes.dir}"/>
+        <attribute name="file"/>
+        <attribute name="servicename.arg" default=""/>
+        <attribute name="bindingfile" default=""/>
+        <attribute name="databinding" default=""/>
+        <attribute name="dir" default="${wsdl.dir}"/>
+        <attribute name="package" default="NOT_SPECIFIED"/>
+        <sequential>
+            <mkdir dir="@{destdir}"/>
+            <mkdir dir="@{srcdestdir}"/>
+            <condition property="package.arg.@{file}" value="-p @{package}">
+                <not>
+                    <equals arg1="@{package}" arg2="NOT_SPECIFIED"/>
+                </not>
+            </condition>
+            <property name="package.arg.@{file}" value=""/>
+            <condition property="binding.arg" value='-b "@{bindingfile}"'>
+                <not>
+                    <equals arg1="@{bindingfile}" arg2=""/>
+                </not>
+            </condition>
+            <property name="binding.arg" value=""/>
+            <condition property="databinding.arg" value='-db "@{databinding}"'>
+                <not>
+                    <equals arg1="@{databinding}" arg2=""/>
+                </not>
+            </condition>
+            <property name="databinding.arg" value=""/>
+            <java failonerror="true" classname="org.apache.cxf.tools.wsdlto.WSDLToJava" fork="yes">
+                <classpath>
+                    <path refid="cxf.classpath" />
+                </classpath>
+                <jvmarg value="${cxf.endorsed.flag}"/>
+                <sysproperty key="java.util.logging.config.file" value="${cxf.etc.dir}/logging.properties"/>
+                <sysproperty key="exitOnFinish" value="true"/>
+                <arg line="@{servicename.arg}"/>
+                <arg line="${package.arg.@{file}}"/>
+                <arg line="${databinding.arg}"/>
+                <arg line="${binding.arg}"/>
+                <arg value="-verbose"/>
+                <arg value="-d"/>
+                <arg value="@{srcdestdir}"/>
+                <arg value="@{dir}/@{file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+
+    <!-- Targets to run the sample client and server -->
+    <target name="client" description="run demo client" depends="compile">
+        <property name="param" value=""/>
+        <cxfrun classname="demo.hw_http.client.Client"
+                param1="${basedir}/wsdl/hello_world.wsdl"/>
+    </target>
+    <target name="server" description="run demo server" depends="compile">
+        <cxfrun classname="demo.hw_http.server.Server"/>
+    </target>
+
+
+    <!-- detect if the wsdl2java needs to be rerun -->
+    <uptodate property="codegen.notrequired" value="true">
+        <srcfiles dir="${wsdl.dir}" includes="**/*.wsdl"/>
+        <srcfiles dir="${wsdl.dir}" includes="**/*.xsd"/>
+        <mapper type="merge" to="${codegen.timestamp.file}"/>
+    </uptodate>
+
+    <target name="generate.code">
+        <echo level="info" message="Generating code using wsdl2java..."/>
+        <wsdl2java file="hello_world.wsdl"/>
+    </target>
+    <target name="maybe.generate.code" unless="codegen.notrequired">
+        <antcall target="generate.code"/>
+        <touch file="${codegen.timestamp.file}"/>
+    </target>
+
+    <!-- Compiles all the code.   Depends on the targets that would call wsdl2java -->
+    <target name="compile" depends="maybe.generate.code">
+        <mkdir dir="${build.classes.dir}"/>
+        <mkdir dir="${build.src.dir}"/>
+
+        <javac destdir="${build.classes.dir}" debug="true" fork="true" encoding="utf-8" includeantruntime="false">
+            <compilerarg line="-J${cxf.endorsed.flag}"/>
+            <src path="${src.dir}"/>
+            <src path="${build.src.dir}"/>
+            <classpath>
+                <path refid="cxf.classpath"/>
+            </classpath>
+        </javac>
+
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${src.dir}" excludes="**/*.java" />
+            <fileset dir="${build.src.dir}" includes="**/*.java" />
+        </copy>
+    </target>
+
+    <target name="clean" description="clean">
+        <delete dir="${build.classes.dir}"/>
+        <delete dir="${build.src.dir}"/>
+        <delete file="${codegen.timestamp.file}"/>
+        <delete file="demo.log"/>
+        <delete dir="${build.var.dir}"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+    <!-- Sample macrodef for running an application that would include the requirements that CXF needs
+        It sets up the classpath and the endorsed dirs and add the logging properties and such --> 
+    <macrodef name="cxfrun">
+        <attribute name="logging-properties-file" default="${cxf.etc.dir}/logging.properties"/>
+        <attribute name="classname"/>
+        <attribute name="param1" default=""/>
+        <attribute name="param2" default=""/>
+        <attribute name="param3" default=""/>
+        <attribute name="param4" default=""/>
+        <attribute name="param5" default=""/>
+        <attribute name="jvmarg1" default="-D' '"/>
+        <attribute name="jvmarg2" default="-D' '"/>
+        <attribute name="jvmarg3" default="-D' '"/>
+        <attribute name="jvmarg4" default="-D' '"/>
+        <attribute name="jvmarg5" default="-D' '"/>
+        <sequential>
+            <java classname="@{classname}" fork="yes">
+                <classpath>
+                    <path refid="cxf.classpath"/>
+                </classpath>
+                <arg value="@{param1}"/>
+                <arg value="@{param2}"/>
+                <arg value="@{param3}"/>
+                <arg value="@{param4}"/>
+                <arg value="@{param5}"/>
+                <jvmarg value="-Dcxf.home=${cxf.home}"/>
+                <jvmarg value="${cxf.endorsed.flag}"/>
+                <jvmarg value="@{jvmarg1}"/>
+                <jvmarg value="@{jvmarg2}"/>
+                <jvmarg value="@{jvmarg3}"/>
+                <jvmarg value="@{jvmarg4}"/>
+                <jvmarg value="@{jvmarg5}"/>
+                <sysproperty key="java.util.logging.config.file" value="@{logging-properties-file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+
+</project>
