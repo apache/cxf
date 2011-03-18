@@ -48,22 +48,6 @@
         <module>manifest</module>
     </modules>
 
-    <!-- Temporarily add the Shibboleth repo to get the Opensaml2 artifacts -->
-    <repositories>
-        <repository>
-            <id>shibboleth</id>
-            <name>Shibboleth Repository</name>
-            <url>http://shibboleth.internet2.edu/downloads/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
