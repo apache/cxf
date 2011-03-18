@@ -52,6 +52,9 @@ public class Server {
         Endpoint ep = Endpoint.create(obj);
         ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES, "etc/bob.properties");
+        if (url.contains("192")) {
+            ep.getProperties().put(SecurityConstants.IS_BSP_COMPLIANT, "false");
+        }
         ep.publish(url);
     }
     

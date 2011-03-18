@@ -47,7 +47,7 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="interop.client.UTPasswordCallback"/>
-            <entry key="futureTimeToLive" value="60"/>
+            <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="https://.*/UserNameOverTransport.*">
@@ -70,7 +70,7 @@
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="etc/alice.properties"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
-            <entry key="futureTimeToLive" value="60"/>
+            <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
 
@@ -84,7 +84,7 @@
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="etc/alice.properties"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
-            <entry key="futureTimeToLive" value="60"/>
+            <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
         </jaxws:properties>
     </jaxws:client>
 
