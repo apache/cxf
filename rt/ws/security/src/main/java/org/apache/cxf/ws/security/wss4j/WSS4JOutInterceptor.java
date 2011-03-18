@@ -164,6 +164,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             }
             SoapVersion version = mc.getVersion();
             RequestData reqData = new RequestData();
+            translateProperties(mc);
     
             reqData.setMsgContext(mc);
             

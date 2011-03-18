@@ -64,6 +64,22 @@ public final class SecurityConstants {
     public static final String ALWAYS_ENCRYPT_UT = "ws-security.username-token.always.encrypted";
     
     /**
+     * Whether to ensure compliance with the Basic Security Profile (BSP) 1.1 or not. The
+     * default value is "true".
+     */
+    public static final String IS_BSP_COMPLIANT = "ws-security.is-bsp-compliant";
+    
+    /**
+     * This configuration tag specifies the time in seconds in the future within which
+     * the Created time of an incoming Timestamp is valid. WSS4J rejects by default any
+     * timestamp which is "Created" in the future, and so there could potentially be
+     * problems in a scenario where a client's clock is slightly askew. The default
+     * value for this parameter is "0", meaning that no future-created Timestamps are
+     * allowed.
+     */
+    public static final String TIMESTAMP_FUTURE_TTL = "ws-security.timestamp.futureTimeToLive";
+    
+    /**
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
      * the full security on the message. These properties control the way the STS client
      * will decrypt the EncryptedData elements in the response
@@ -92,7 +108,7 @@ public final class SecurityConstants {
             STS_TOKEN_DO_CANCEL, TIMESTAMP_TTL, ALWAYS_ENCRYPT_UT,
             STS_TOKEN_ACT_AS, STS_TOKEN_USERNAME, STS_TOKEN_USE_CERT_FOR_KEYINFO,
             SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
-            SIGNATURE_TOKEN_VALIDATOR
+            SIGNATURE_TOKEN_VALIDATOR, IS_BSP_COMPLIANT, TIMESTAMP_FUTURE_TTL
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

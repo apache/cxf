@@ -38,12 +38,14 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {
@@ -154,6 +156,18 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     protected boolean isRequestor(SoapMessage message) {
         return MessageUtils.isRequestor(message);
     }  
+    
+    protected void translateProperties(SoapMessage msg) {
+        String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
+        if (bspCompliant != null) {
+            setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
+        }
+        String futureTTL = 
+            (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_FUTURE_TTL);
+        if (futureTTL != null) {
+            setProperty(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
+        }
+    }
 
     @Override
     protected Crypto loadCryptoFromPropertiesFile(

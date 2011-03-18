@@ -175,6 +175,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
         boolean utWithCallbacks = 
             MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
+        translateProperties(msg);
         
         RequestData reqData = new CXFRequestData();
 
