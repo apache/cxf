@@ -148,7 +148,7 @@
                 <artifactId>maven-jibx-plugin</artifactId>
                 <version>${cxf.jibx.version}</version>
                 <configuration>
-                    <directory>${basedir}/target/generated/src/test/java/jibx_bindings</directory>
+                    <directory>target/generated/src/test/java/jibx_bindings</directory>
                     <!--load>true</load-->
                     <!--validate>true</validate-->
                     <!--verify>true</verify-->
