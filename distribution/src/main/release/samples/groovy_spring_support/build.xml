@@ -20,45 +20,39 @@
 <project name="Groovy Spring demo" default="build" basedir=".">
 
     <property name="maven.repo" value="http://repo1.maven.org/maven2"/>
-    <property name="spring.version" value="2.0.6"/>
     <property name="groovy.version" value="1.7.5"/>
     
-    <property name="spring-aop.jar" value="spring-aop-${spring.version}.jar"/>
-    <property name="spring-support.jar" value="spring-support-${spring.version}.jar"/>
-    <property name="spring-repo" value="${maven.repo}/org/springframework"/>
 
     <property name="groovy.jar" value="groovy-${groovy.version}.jar" />
     <property name="antlr.jar" value="antlr-2.7.6.jar" />
     <property name="groovy-repo" value="${maven.repo}/org/codehaus/groovy/groovy/${groovy.version}"/>
 
-    <property name="thirdparty.classpath" 
-	      value="../../lib/${spring-aop.jar}${path.separator}../../lib/${spring-support.jar}${path.separator}lib/${groovy.jar}${path.separator}lib/${antlr.jar}"/>
+    <property name="thirdparty.classpath"
+        value="${path.separator}lib/${groovy.jar}${path.separator}lib/${antlr.jar}"/>
 
     <import file="../common_build.xml"/>
 
     <target name="get.dep" description="Get the thirdpaty jars">
-	<get src="${spring-repo}/spring-aop/${spring.version}/${spring-aop.jar}" dest="${cxf.home}/lib/${spring-aop.jar}" usetimestamp="true"/>
-	<get src="${spring-repo}/spring-support/${spring.version}/${spring-support.jar}" dest="${cxf.home}/lib/${spring-support.jar}" usetimestamp="true"/>
-
-	<mkdir dir="lib"/>
-	<get src="${groovy-repo}/${groovy.jar}" dest="lib/${groovy.jar}" usetimestamp="true"/>
-	<get src="${maven.repo}/antlr/antlr/2.7.6/${antlr.jar}" dest="lib/${antlr.jar}" usetimestamp="true"/>
+        <mkdir dir="lib"/>
+        <get src="${groovy-repo}/${groovy.jar}" dest="lib/${groovy.jar}" usetimestamp="true"/>
+        <get src="${maven.repo}/antlr/antlr/2.7.6/${antlr.jar}" dest="lib/${antlr.jar}" usetimestamp="true"/>
     </target>
 
     <target name="client" description="run demo client" depends="build">
         <property name="param" value=""/>
         <cxfrun classname="demo.spring.client.Client" />
-    </target> 
+    </target>
         
+
     <target name="server" description="run demo server" depends="build">
         <copy todir="build/classes/demo/spring">
-          <fileset dir="src/demo/spring" excludes="**/*.java"/>
+            <fileset dir="src/demo/spring" excludes="**/*.java"/>
         </copy>
         <cxfrun classname="demo.spring.servlet.Server"/>
     </target>
 
     <property name="cxf.war.file.name" value="spring_http"/>
-      <target name="war" depends="build">
-	  <cxfwar filename="${cxf.war.file.name}.war" webxml="webapp/WEB-INF/web.xml" />
+    <target name="war" depends="build">
+        <cxfwar filename="${cxf.war.file.name}.war" webxml="webapp/WEB-INF/web.xml" />
     </target>
 </project>

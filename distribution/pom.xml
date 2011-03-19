@@ -382,48 +382,6 @@
                                     <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-webapp</artifactId>
-                                    <version>${cxf.jetty.version}</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-servlet</artifactId>
-                                    <version>${cxf.jetty.version}</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-security</artifactId>
-                                    <version>${cxf.jetty.version}</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.eclipse.jetty</groupId>
-                                    <artifactId>jetty-xml</artifactId>
-                                    <version>${cxf.jetty.version}</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>junit</groupId>
-                                    <artifactId>junit</artifactId>
-                                    <version>4.8.1</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>commons-httpclient</groupId>
-                                    <artifactId>commons-httpclient</artifactId>
-                                    <version>3.1</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.geronimo.specs</groupId>
-                                    <artifactId>geronimo-ejb_3.0_spec</artifactId>
-                                    <version>1.0.1</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>javax.xml.bind</groupId>
                                     <artifactId>jaxb-api</artifactId>
                                     <version>${cxf.jaxb22.version}</version>
@@ -471,22 +429,16 @@
                             <tasks>
                                 <mkdir dir="${basedir}/target" />
                                 <pathconvert property="cp" refid="maven.runtime.classpath" />
-                                <path id="samples.libs">
-                                    <fileset dir="${basedir}/target/sample-libs">
-                                        <include name="**/*.jar"/>
-                                    </fileset>
-                                </path>
-                                <pathconvert property="samples.libs.cp" refid="samples.libs" />
-                                <condition property="output.cp" value="set CXF_CLASSPATH=${cp}:${samples.libs.cp}">
+                                <condition property="output.cp" value="set CXF_CLASSPATH=${cp}">
                                     <os family="windows" />
                                 </condition>
                                 <condition property="output.ext" value=".bat">
                                     <os family="windows" />
                                 </condition>
-                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}:${samples.libs.cp}" />
+                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}" />
                                 <property name="output.ext" value="" />
                                 <echo file="${basedir}/target/srcbuild_env${output.ext}" message="${output.cp}" />
-                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}:${samples.libs.cp}" />
+                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}" />
                                 <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}" />
                                 <copy file="${basedir}/src/main/assembly/jbi.xml" tofile="${basedir}/target/jbi.xml" overwrite="yes">
                                     <filterset>

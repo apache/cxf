@@ -24,21 +24,6 @@ javac, and java to build and run the demos, you must set the
 environment.
 
 
-Building and running the demo using Ant
----------------------------------------
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo. 
-The server and client targets automatically build the demo.
-
-Using either UNIX or Windows:
-
-  ant server  (from one command line window)
-  ant client  (from a second command line window)
-    
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".
-
 Building and running the demo using Maven
 ---------------------------------------
 

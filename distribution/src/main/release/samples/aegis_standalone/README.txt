@@ -16,18 +16,6 @@ javac, and java to build and run the demos, you must set the
 environment.
 
 
-Building and running the demo using Ant
----------------------------------------
-
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo. 
-
-Using either UNIX or Windows:
-
-  ant
-    
-
-To remove the .class files, run "ant clean"
 
 Building and running the demo using Maven
 ---------------------------------------
@@ -38,7 +26,8 @@ located), the pom.xml file is used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install   (builds the demo)
-  mvn -Prun  (from one command line window)
+  mvn -Pwrite  (from one command line window)
+  mvn -Pread  (from one command line window)
 
 
 To remove the generated code, run "mvn clean".
