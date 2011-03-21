@@ -18,9 +18,16 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -32,10 +39,28 @@ public class CustomOutInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.MARSHAL);
     }
 
+    @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault {
-        MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
-        headers.putSingle("BookId", "123");
-        message.put(Message.PROTOCOL_HEADERS, headers);
+        
+        HttpHeaders requestHeaders = new HttpHeadersImpl(message.getExchange().getInMessage());
+        if (!requestHeaders.getRequestHeader("PLAIN-MAP").isEmpty()) {
+            Map<String, List<String>> headers = (Map<String, List<String>>)
+                message.get(Message.PROTOCOL_HEADERS);
+            if (headers == null) {
+                headers = new HashMap<String, List<String>>();
+                message.put(Message.PROTOCOL_HEADERS, headers);
+            }
+            headers.put("BookId", Arrays.asList("321"));
+            headers.put("MAP-NAME", Arrays.asList(Map.class.getName()));
+            message.put(Message.PROTOCOL_HEADERS, headers);
+        } else {
+
+            MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
+            headers.putSingle("BookId", "123");
+            headers.putSingle("MAP-NAME", MultivaluedMap.class.getName());
+            message.put(Message.PROTOCOL_HEADERS, headers);
+        }
+        
     }
 
 }
