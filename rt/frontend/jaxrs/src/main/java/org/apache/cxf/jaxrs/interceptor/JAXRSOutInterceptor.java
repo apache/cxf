@@ -169,23 +169,23 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         boolean responseHeadersCopied = isResponseHeadersCopied(message);
         setResponseStatus(message, status, responseHeadersCopied);
         
-        Map<String, List<String>> theHeaders = 
-            (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
+        Map<String, List<Object>> theHeaders = 
+            (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS);
         if (firstTry && theHeaders != null) {
             // some headers might've been setup by custom cxf interceptors
             theHeaders.putAll((Map)response.getMetadata());
         } else {
-            message.put(Message.PROTOCOL_HEADERS, response.getMetadata());
+            theHeaders = response.getMetadata();
         }
-        Map<String, List<Object>> rh = 
-            (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS);
         MultivaluedMap<String, Object> responseHeaders;
-        if (!(rh instanceof MultivaluedMap)) {
-            responseHeaders = new MetadataMap<String, Object>(rh);
+        if (!(theHeaders instanceof MultivaluedMap)) {
+            responseHeaders = new MetadataMap<String, Object>(theHeaders);
         } else {
-            responseHeaders = (MultivaluedMap)rh;
+            responseHeaders = (MultivaluedMap)theHeaders;
         }
-        setResponseDate((MultivaluedMap)responseHeaders, firstTry);
+        message.put(Message.PROTOCOL_HEADERS, responseHeaders);
+        
+        setResponseDate(responseHeaders, firstTry);
         if (isResponseNull(responseObj)) {
             return;
         }

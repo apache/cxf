@@ -68,6 +68,32 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookWithCustomHeader() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/books/123"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        Book b = wc.get(Book.class);
+        assertEquals(123L, b.getId());
+        
+        MultivaluedMap<String, Object> headers = wc.getResponse().getMetadata();
+        assertEquals("123", headers.getFirst("BookId"));
+        assertEquals(MultivaluedMap.class.getName(), headers.getFirst("MAP-NAME"));
+        
+        assertNotNull(headers.getFirst("Date"));
+        
+        wc.header("PLAIN-MAP", "true");
+        b = wc.get(Book.class);
+        assertEquals(123L, b.getId());
+        
+        headers = wc.getResponse().getMetadata();
+        assertEquals("321", headers.getFirst("BookId"));
+        assertEquals(Map.class.getName(), headers.getFirst("MAP-NAME"));
+        
+        assertNotNull(headers.getFirst("Date"));
+    }
+    
+    @Test
     public void testGetBookWithNameInQuery() throws Exception {
         
         String endpointAddress =
