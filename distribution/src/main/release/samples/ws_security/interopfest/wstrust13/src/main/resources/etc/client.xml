@@ -53,6 +53,7 @@
             	<entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
             	<entry key="ws-security.encryption.properties" value="etc/wssip.properties"/> 
+            	<entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
     		</map>
     	</property>
     </bean>
@@ -73,7 +74,8 @@
 			    			<entry key="ws-security.password" value="eoj"/>
 							<entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
 				        	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
-				        	<entry key="ws-security.encryption.properties" value="etc/bob.properties"/>			    			
+				        	<entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
+				        	<entry key="ws-security.timestamp.futureTimeToLive" value="60"/>			    			
 			    		</map>
 			    	</property>
 			    </bean>            
@@ -97,7 +99,8 @@
 			    			<entry key="ws-security.password" value="eoj"/>
 							<entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
 				        	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
-				        	<entry key="ws-security.encryption.properties" value="etc/bob.properties"/>			    			
+				        	<entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
+				        	<entry key="ws-security.timestamp.futureTimeToLive" value="60"/>			    			
 			    		</map>
 			    	</property>
 			    </bean>            
@@ -122,7 +125,9 @@
 			    			<entry key="ws-security.password" value="eoj"/>
 							<entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
 				        	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
-				        	<entry key="ws-security.encryption.properties" value="etc/bob.properties"/>			    			
+				        	<entry key="ws-security.encryption.properties" value="etc/bob.properties"/>
+				        	<entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
+				        	<entry key="ws-security.is-bsp-compliant" value="false"/>			    			
 			    		</map>
 			    	</property>
 			    </bean>            
@@ -149,6 +154,7 @@
 				        	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
 				        	<entry key="ws-security.encryption.properties" value="etc/bob.properties"/>	
 				        	<entry key="ws-security.sts.token.properties" value="etc/bob.properties"/>
+				        	<entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
 			    		</map>
 			    	</property>
 			    </bean>            
@@ -164,7 +170,9 @@
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
             <entry key="ws-security.callback-handler.sct" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties.sct" value="etc/alice.properties"/>
-            <entry key="ws-security.encryption.properties.sct" value="etc/bob.properties"/>            
+            <entry key="ws-security.encryption.properties.sct" value="etc/bob.properties"/>  
+            <entry key="ws-security.timestamp.futureTimeToLive.sct" value="60"/>         
+            <entry key="ws-security.is-bsp-compliant.sct" value="false"/> 
         </jaxws:properties>
     </jaxws:client>
     
