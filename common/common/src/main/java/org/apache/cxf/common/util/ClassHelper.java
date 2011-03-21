@@ -28,7 +28,7 @@ public class ClassHelper {
         ClassHelper theHelper = null;
         try {
             theHelper = new SpringAopClassHelper();
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             theHelper = new ClassHelper();
         }
         HELPER = theHelper;
