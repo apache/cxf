@@ -136,6 +136,16 @@ public class BookStore {
     }
     
     @GET
+    @Path("webappexceptionXML")
+    public Book throwExceptionXML() {
+        
+        Response response = Response.status(406).type("application/xml")
+                            .entity("<Book><name>Exception</name><id>999</id></Book>")
+                            .build();
+        throw new WebApplicationException(response);
+    }
+    
+    @GET
     @Path("tempredirect")
     public Response tempRedirectAndSetCookies() {
         URI uri = UriBuilder.fromPath("whatever/redirection")
