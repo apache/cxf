@@ -249,14 +249,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                 Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
                 if (s != null) {
-                    message.put("decryptionPropRefId", "RefId-" + s.toString());
+                    message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + s.toString());
                     message.put("RefId-" + s.toString(), getProps(s, message));
                     if (e == null) {
                         e = s;
                     }
                 }
                 if (e != null) {
-                    message.put("SignaturePropRefId", "RefId-" + e.toString());
+                    message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + e.toString());
                     message.put("RefId-" + e.toString(), getProps(e, message));
                 }
             }
@@ -284,14 +284,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                     Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
                     if (s != null) {
-                        message.put("decryptionPropRefId", "RefId-" + s.toString());
+                        message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + s.toString());
                         message.put("RefId-" + s.toString(), getProps(s, message));
                         if (e == null) {
                             e = s;
                         }
                     }
                     if (e != null) {
-                        message.put("SignaturePropRefId", "RefId-" + e.toString());
+                        message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + e.toString());
                         message.put("RefId-" + e.toString(), getProps(e, message));
                     }
                 }
@@ -325,20 +325,20 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
                 if (isRequestor(message)) {
                     if (e != null) {
-                        message.put("SignaturePropRefId", "RefId-" + e.toString());
+                        message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + e.toString());
                         message.put("RefId-" + e.toString(), getProps(e, message));
                     }
                     if (s != null) {
-                        message.put("decryptionPropRefId", "RefId-" + s.toString());
+                        message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + s.toString());
                         message.put("RefId-" + s.toString(), getProps(s, message));
                     }
                 } else {
                     if (s != null) {
-                        message.put("SignaturePropRefId", "RefId-" + s.toString());
+                        message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + s.toString());
                         message.put("RefId-" + s.toString(), getProps(s, message));
                     }
                     if (e != null) {
-                        message.put("decryptionPropRefId", "RefId-" + e.toString());
+                        message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + e.toString());
                         message.put("RefId-" + e.toString(), getProps(e, message));
                     }
                 }
