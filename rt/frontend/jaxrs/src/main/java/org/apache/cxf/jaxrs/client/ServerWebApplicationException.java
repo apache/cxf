@@ -19,17 +19,28 @@
 
 package org.apache.cxf.jaxrs.client;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.ext.MessageBodyReader;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 /**
  * Utility Exception class which makes it easier to get the response status,
@@ -51,19 +62,29 @@ public class ServerWebApplicationException extends WebApplicationException {
         super(cause, response);
     }
     
-    public int getStatus() {
-        return getResponse().getStatus();    
-    }
-    
-    public MultivaluedMap<String, String> getHeaders() {
-        MultivaluedMap<String, Object> metadata = getResponse().getMetadata();
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>(metadata.size());
-        for (String key : metadata.keySet()) {
-            for (Object strObject : metadata.get(key)) {
-                headers.add(key, strObject.toString());
+    @Override
+    public Response getResponse() {
+        Response response = super.getResponse();
+        
+        ResponseBuilder rb = Response.status(response.getStatus());
+        MultivaluedMap<String, Object> headers = response.getMetadata();
+        for (String header : headers.keySet()) {
+            List<Object> values = headers.get(header);
+            for (Object value : values) {
+                rb.header(header, value);
             }
         }
-        return headers;
+        rb.entity(new ByteArrayInputStream(getMessage().getBytes()));
+        return rb.build();
+    }
+    
+    public int getStatus() {
+        return super.getResponse().getStatus();    
+    }
+    
+    @SuppressWarnings("unchecked")
+    public MultivaluedMap<String, String> getHeaders() {
+        return (MultivaluedMap<String, String>)((MultivaluedMap)super.getResponse().getMetadata());
     }
     
     @Override
@@ -75,7 +96,7 @@ public class ServerWebApplicationException extends WebApplicationException {
     }
     
     private String readErrorMessage() {
-        Object entity = getResponse().getEntity();
+        Object entity = super.getResponse().getEntity();
         try {
             return entity == null ? "" : entity instanceof InputStream 
                 ? IOUtils.readStringFromStream((InputStream)entity) : entity.toString();
@@ -110,5 +131,56 @@ public class ServerWebApplicationException extends WebApplicationException {
             sb.append(message).append(lineSep); 
         }
         return sb.toString();
+    }
+    
+    /**
+     * Returns the typed error message 
+     * @param client the client
+     * @param cls the entity class
+     * @return the typed entity
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T toErrorObject(Client client, Class<T> entityCls) {
+        Response response = getResponse();
+        try {
+            MultivaluedMap headers = response.getMetadata();
+            Object contentType = headers.getFirst("Content-Type");
+            InputStream inputStream = (InputStream)response.getEntity();
+            if (contentType == null || inputStream == null) {
+                return null;
+            }
+            Annotation[] annotations = new Annotation[]{};
+            MediaType mt = MediaType.valueOf(contentType.toString());
+            
+            Endpoint ep = WebClient.getConfig(client).getConduitSelector().getEndpoint();
+            Exchange exchange = new ExchangeImpl();
+            Message inMessage = new MessageImpl();
+            inMessage.setExchange(exchange);
+            exchange.put(Endpoint.class, ep);
+            exchange.setOutMessage(new MessageImpl());
+            exchange.setInMessage(inMessage);
+            inMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+            inMessage.put(Message.PROTOCOL_HEADERS, headers);
+            
+            ProviderFactory pf = (ProviderFactory)ep.get(ProviderFactory.class.getName());
+            
+            MessageBodyReader reader = pf.createMessageBodyReader(entityCls, 
+                                                             entityCls, 
+                                                             annotations, 
+                                                             mt, 
+                                                             inMessage);
+            
+            
+            
+            if (reader == null) {
+                return null;
+            }
+            
+            return (T)reader.readFrom(entityCls, entityCls, annotations, mt, 
+                                      (MultivaluedMap<String, String>)headers, 
+                                      inputStream);
+        } catch (Exception ex) {
+            throw new ClientWebApplicationException(ex);
+        }
     }
 }
