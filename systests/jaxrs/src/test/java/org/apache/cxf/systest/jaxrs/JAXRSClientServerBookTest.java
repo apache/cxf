@@ -293,7 +293,24 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             fail("Exception expected");
         } catch (ServerWebApplicationException ex) {
             assertEquals(406, ex.getStatus());
-            Book exBook = reader.readEntity(wc, ex.getResponse(), Book.class);
+            Book exBook = ex.toErrorObject(wc, Book.class);
+            assertEquals("Exception", exBook.getName());
+            assertEquals(999L, exBook.getId());
+        }
+    }
+    
+    @Test
+    public void testServerWebApplicationExceptionXMLWithProxy() throws Exception {
+        ResponseReader reader = new ResponseReader();
+        reader.setEntityClass(Book.class);
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT,
+                                                    BookStore.class, Collections.singletonList(reader));
+        try {
+            proxy.throwExceptionXML();
+            fail("Exception expected");
+        } catch (ServerWebApplicationException ex) {
+            assertEquals(406, ex.getStatus());
+            Book exBook = ex.toErrorObject(WebClient.client(proxy), Book.class);
             assertEquals("Exception", exBook.getName());
             assertEquals(999L, exBook.getId());
         }

@@ -34,13 +34,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Providers;
 
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
 
 public class ResponseReader implements MessageBodyReader<Response> {
 
@@ -106,60 +101,5 @@ public class ResponseReader implements MessageBodyReader<Response> {
     
     protected MessageContext getContext() {
         return context;
-    }
-    
-    /**
-     * 
-     * @param client the client
-     * @param response {@link Response} object with the response input stream
-     * @param cls the entity class
-     * @return the typed entity
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T readEntity(Client client, Response response, Class<T> cls) {
-        Class<?> oldClass = entityCls;
-        setEntityClass(cls);
-        try {
-            MultivaluedMap headers = response.getMetadata();
-            Object contentType = headers.getFirst("Content-Type");
-            InputStream inputStream = (InputStream)response.getEntity();
-            if (contentType == null || inputStream == null) {
-                return null;
-            }
-            Annotation[] annotations = new Annotation[]{};
-            MediaType mt = MediaType.valueOf(contentType.toString());
-            
-            Endpoint ep = WebClient.getConfig(client).getConduitSelector().getEndpoint();
-            Exchange exchange = new ExchangeImpl();
-            Message inMessage = new MessageImpl();
-            inMessage.setExchange(exchange);
-            exchange.put(Endpoint.class, ep);
-            exchange.setOutMessage(new MessageImpl());
-            exchange.setInMessage(inMessage);
-            inMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
-            inMessage.put(Message.PROTOCOL_HEADERS, headers);
-            
-            ProviderFactory pf = (ProviderFactory)ep.get(ProviderFactory.class.getName());
-            
-            MessageBodyReader reader = pf.createMessageBodyReader(entityCls, 
-                                                             entityCls, 
-                                                             annotations, 
-                                                             mt, 
-                                                             inMessage);
-            
-            
-            
-            if (reader == null) {
-                return null;
-            }
-            
-            return (T)reader.readFrom(entityCls, entityCls, annotations, mt, 
-                                      (MultivaluedMap<String, String>)headers, 
-                                      inputStream);
-        } catch (Exception ex) {
-            throw new ClientWebApplicationException(ex);
-        } finally {
-            entityCls = oldClass;
-        }
     }
 }
