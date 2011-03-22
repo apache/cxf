@@ -51,7 +51,7 @@
     		<entry key="ws-security.password" value="abcd!1234"/>
             	<entry key="ws-security.sts.token.properties" value="etc/bob.properties"/> 
             	<entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
-                <entry key="futureTimeToLive" value="60"/>
+                <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
     		</map>
     	</property>
     </bean>
@@ -68,7 +68,7 @@
             	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
             	<entry key="ws-security.encryption.properties" value="etc/wssip.properties"/> 
             	<entry key="ws-security.sts.token.properties" value="etc/bob.properties"/> 
-                <entry key="futureTimeToLive" value="60"/>
+                <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
     		</map>
     	</property>
     </bean>
@@ -85,7 +85,7 @@
             	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
             	<entry key="ws-security.encryption.properties" value="etc/wssip.properties"/> 
             	<entry key="ws-security.sts.token.properties" value="etc/bob.properties"/> 
-                <entry key="futureTimeToLive" value="60"/>
+                <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
     		</map>
     	</property>
     </bean>
@@ -93,8 +93,8 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
-            <entry key="futureTimeToLive" value="60"/>
-            <entry key="isBspCompliant" value="false"/>
+            <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
         </jaxws:properties>
     </jaxws:client>
     
@@ -110,7 +110,7 @@
             	<entry key="ws-security.signature.properties" value="etc/alice.properties"/> 
             	<entry key="ws-security.encryption.properties" value="etc/wssip.properties"/> 
             	<entry key="ws-security.sts.token.properties" value="etc/bob.properties"/> 
-                <entry key="futureTimeToLive" value="60"/>
+                <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
     		</map>
     	</property>
     </bean>
@@ -118,8 +118,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler.sct" value="interop.client.KeystorePasswordCallback"/>
             <entry key="ws-security.encryption.properties.sct" value="etc/bob.properties"/> 
-            <entry key="futureTimeToLive" value="60"/>
-            <entry key="isBspCompliant" value="false"/>
+            <entry key="ws-security.is-bsp-compliant.sct" value="false"/>
         </jaxws:properties>
     </jaxws:client>
         
@@ -137,15 +136,15 @@
             	<entry key="ws-security.signature.properties" value="etc/wssip.properties"/> 
             	<entry key="ws-security.sts.token.properties" value="etc/wssip.properties"/> 
             	<entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
-                <entry key="futureTimeToLive" value="60"/>
+                <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
     		</map>
     	</property>
     </bean>
     <jaxws:client name="{http://tempuri.org/}Scenario_7_IssuedTokenOverTransport_UsernameOverTransport" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
-            <entry key="futureTimeToLive" value="60"/>
-            <entry key="isBspCompliant" value="false"/>
+            <entry key="ws-security.timestamp.futureTimeToLive" value="60"/>
+            <entry key="ws-security.is-bsp-compliant.sct" value="false"/>
         </jaxws:properties>
     </jaxws:client>
     
@@ -173,6 +172,7 @@
             <entry key="ws-security.encryption.properties" value="etc/bob.properties"/> 
             <entry key="futureTimeToLive" value="60"/>
             <entry key="isBspCompliant" value="false"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
         </jaxws:properties>
     </jaxws:client>
     
