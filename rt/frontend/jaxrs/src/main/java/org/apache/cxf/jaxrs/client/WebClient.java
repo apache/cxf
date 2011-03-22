@@ -634,7 +634,7 @@ public class WebClient extends AbstractClient {
             ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange());
             Response currentResponse = rb.clone().build();
             
-            Object entity = readBody(currentResponse, conn, outMessage, responseClass, genericType,
+            Object entity = readBody(currentResponse, outMessage, responseClass, genericType,
                                      new Annotation[]{});
             rb.entity(entity instanceof Response 
                       ? ((Response)entity).getEntity() : entity);
