@@ -460,7 +460,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             return r;
         }
         
-        return readBody(r, connect, outMessage, method.getReturnType(), 
+        return readBody(r, outMessage, method.getReturnType(), 
                         method.getGenericReturnType(), method.getDeclaredAnnotations());
     }
 

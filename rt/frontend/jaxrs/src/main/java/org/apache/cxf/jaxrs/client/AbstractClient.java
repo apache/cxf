@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.client;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -408,30 +407,27 @@ public class AbstractClient implements Client {
     }
     
     @SuppressWarnings("unchecked")
-    protected Object readBody(Response r, HttpURLConnection conn, Message outMessage, Class<?> cls, 
+    protected Object readBody(Response r, Message inMessage, Class<?> cls, 
                               Type type, Annotation[] anns) {
 
         InputStream inputStream = (InputStream)r.getEntity();
         if (inputStream == null) {
             return cls == Response.class ? r : null;
         }
-        try {
-            int status = conn.getResponseCode();
-            if (status < 200 || status == 204 || status > 300) {
-                Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
-                if (length == null || Integer.parseInt(length.toString()) == 0
-                    || status >= 400) {
-                    return cls == Response.class ? r : status >= 400 ? inputStream : null;
-                }
+        
+        int status = r.getStatus();
+        if (status < 200 || status == 204 || status > 300) {
+            Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
+            if (length == null || Integer.parseInt(length.toString()) == 0
+                || status >= 400) {
+                return cls == Response.class ? r : status >= 400 ? inputStream : null;
             }
-        } catch (IOException ex) {
-            // won't happen at this stage
         }
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader mbr = ProviderFactory.getInstance(outMessage).createMessageBodyReader(
-            cls, type, anns, contentType, outMessage);
+        MessageBodyReader mbr = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
+            cls, type, anns, contentType, inMessage);
         if (mbr != null) {
             try {
                 return mbr.readFrom(cls, type, anns, contentType, 
