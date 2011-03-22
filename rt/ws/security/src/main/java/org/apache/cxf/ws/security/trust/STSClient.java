@@ -148,6 +148,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     
     Object actAs;
     String tokenType;
+    boolean sendKeyType = true;
 
     Map<String, Object> ctx = new HashMap<String, Object>();
     
@@ -307,6 +308,10 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
+    }
+    
+    public void setSendKeyType(boolean sendKeyType) {
+        this.sendKeyType = sendKeyType;
     }
 
     /**
@@ -479,9 +484,9 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (keySize <= 0) {
             keySize = 256;
         }
-        if (keyType.endsWith("SymmetricKey")) {
+        if (keyType != null && keyType.endsWith("SymmetricKey")) {
             requestorEntropy = writeElementsForRSTSymmetricKey(writer, wroteKeySize);
-        } else if (keyType.endsWith("PublicKey")) {
+        } else if (keyType != null && keyType.endsWith("PublicKey")) {
             crypto = createCrypto(false);
             cert = getCert(crypto);
             writeElementsForRSTPublicKey(writer, cert);
@@ -801,7 +806,7 @@ public class STSClient implements Configurable, InterceptorProvider {
                 writer.writeEndElement();
                 keyType = namespace + "/SymmetricKey";
             }
-        } else if (keyType == null) {
+        } else if (keyType == null && sendKeyType) {
             writer.writeStartElement("wst", "KeyType", namespace);
             writer.writeCharacters(namespace + "/SymmetricKey");
             writer.writeEndElement();
