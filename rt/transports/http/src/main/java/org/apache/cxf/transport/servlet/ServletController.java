@@ -103,7 +103,7 @@ public class ServletController extends AbstractServletController {
                             respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
                             return;
                         }
-                    } else if ("/".equals(pathInfo) || pathInfo.length() == 0) {
+                    } else {
                         updateDests(request);
                     }
                     invokeDestination(request, res, d);
