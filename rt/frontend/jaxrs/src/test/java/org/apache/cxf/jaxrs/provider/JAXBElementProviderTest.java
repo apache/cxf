@@ -1019,7 +1019,7 @@ public class JAXBElementProviderTest extends Assert {
             assertNotNull(context2);
             assertSame(context, context2);
         } finally {
-            JAXBElementProvider.clearContexts();
+            p.clearContexts();
         }
         
     }

@@ -83,12 +83,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     
-    private static Map<String, JAXBContext> packageContexts = new HashMap<String, JAXBContext>();
-    private static Map<Class<?>, JAXBContext> classContexts = new HashMap<Class<?>, JAXBContext>();
-
-   
     protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
-    protected JAXBContext collectionContext; 
     
     protected Map<String, String> jaxbElementClassMap;
     protected boolean unmarshalAsJaxbElement;
@@ -101,6 +96,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     protected Map<String, String> inElementsMap;
     protected Map<String, String> inAppendMap;
     private boolean attributesToElements;
+    
+    private Map<String, JAXBContext> packageContexts = new HashMap<String, JAXBContext>();
+    private Map<Class<?>, JAXBContext> classContexts = new HashMap<Class<?>, JAXBContext>();
     
     private MessageContext mc;
     private Schema schema;
@@ -236,9 +234,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                 collectionContextClasses.add(CollectionWrapper.class);
                 collectionContextClasses.add(type);
             }
-            collectionContext = JAXBContext.newInstance(collectionContextClasses.toArray(new Class[]{}), 
+            return JAXBContext.newInstance(collectionContextClasses.toArray(new Class[]{}), 
                                                         cProperties);
-            return collectionContext;
         }
     }
     
@@ -533,7 +530,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
 
     
-    public static void clearContexts() {
+    public void clearContexts() {
         classContexts.clear();
         packageContexts.clear();
     }

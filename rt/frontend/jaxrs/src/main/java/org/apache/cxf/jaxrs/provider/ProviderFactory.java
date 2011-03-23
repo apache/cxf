@@ -61,10 +61,14 @@ public final class ProviderFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactory.class);
     private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
     
+    private static final String JAXB_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JAXBElementProvider";
+    private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JSONProvider";
+    
     static {
-        setDefaultProvider(SHARED_FACTORY, "org.apache.cxf.jaxrs.provider.JAXBElementProvider");
-        setDefaultProvider(SHARED_FACTORY, "org.apache.cxf.jaxrs.provider.JSONProvider");        
-        SHARED_FACTORY.setProviders(new BinaryDataProvider(),
+        SHARED_FACTORY.setProviders(true,
+                                    createProvider(JAXB_PROVIDER_NAME),
+                                    createProvider(JSON_PROVIDER_NAME),
+                                    new BinaryDataProvider(),
                                     new SourceProvider(),
                                     new FormEncodingProvider(),
                                     new PrimitiveTextProvider(),
@@ -90,16 +94,16 @@ public final class ProviderFactory {
     private List<ProviderInfo<ResponseExceptionMapper>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper>>(1);
     private RequestPreprocessor requestPreprocessor;
+    private Set<Object> clonedProviders = new HashSet<Object>();
     
     private ProviderFactory() {
     }
     
     
-    private static void setDefaultProvider(ProviderFactory factory, String className) {
+    private static Object createProvider(String className) {
         
         try {
-            Object provider = ClassLoaderUtils.loadClass(className, ProviderFactory.class).newInstance();
-            factory.setProviders(provider);
+            return ClassLoaderUtils.loadClass(className, ProviderFactory.class).newInstance();
         } catch (Throwable ex) {
             String message = "Problem with setting the default provider " + className;
             if (ex.getMessage() != null) {
@@ -109,6 +113,7 @@ public final class ProviderFactory {
             }
             LOG.info(message);
         }
+        return null;
     }
     
     public static ProviderFactory getInstance() {
@@ -267,6 +272,7 @@ public final class ProviderFactory {
     
     
     
+    @SuppressWarnings("unchecked")
     public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> bodyType,
                                                             Type parameterType,
                                                             Annotation[] parameterAnnotations,
@@ -283,8 +289,32 @@ public final class ProviderFactory {
         if (mr != null ||  this == SHARED_FACTORY) {
             return mr;
         }
-        return SHARED_FACTORY.createMessageBodyReader(bodyType, parameterType, 
+        mr = SHARED_FACTORY.createMessageBodyReader(bodyType, parameterType, 
                                                         parameterAnnotations, mediaType, m);
+        return (MessageBodyReader)cloneSharedProviderIfNeeded(mr);
+    }
+    
+    private Object cloneSharedProviderIfNeeded(Object sharedProvider) {
+        if (sharedProvider != null) {
+            String clsName = sharedProvider.getClass().getName();
+            if (JAXB_PROVIDER_NAME.equals(clsName) || JSON_PROVIDER_NAME.equals(clsName)) {
+                try {
+                    synchronized (this) {
+                        for (Object cloned : clonedProviders) {
+                            if (cloned.getClass().getName().equals(clsName)) {
+                                return cloned;
+                            }
+                        }
+                        Object provider = sharedProvider.getClass().newInstance();
+                        setProviders(false, provider);
+                        return provider;
+                    }
+                } catch (Exception ex) {
+                    // won't happen at this stage
+                }
+            }
+        }
+        return sharedProvider;
     }
     
     public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
@@ -315,6 +345,7 @@ public final class ProviderFactory {
         return Collections.unmodifiableList(responseHandlers);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> MessageBodyWriter<T> createMessageBodyWriter(Class<T> bodyType,
                                                             Type parameterType,
                                                             Annotation[] parameterAnnotations,
@@ -331,12 +362,13 @@ public final class ProviderFactory {
         if (mw != null || this == SHARED_FACTORY) {
             return mw;
         }
-        return SHARED_FACTORY.createMessageBodyWriter(bodyType, parameterType, 
+        mw = SHARED_FACTORY.createMessageBodyWriter(bodyType, parameterType, 
                                                         parameterAnnotations, mediaType, m);
+        return (MessageBodyWriter)cloneSharedProviderIfNeeded(mw);
     }
     
 //CHECKSTYLE:OFF       
-    private void setProviders(Object... providers) {
+    private void setProviders(boolean sort, Object... providers) {
         
         for (Object o : providers) {
             if (o == null) {
@@ -376,9 +408,10 @@ public final class ProviderFactory {
                 paramHandlers.add(new ProviderInfo<ParameterHandler>((ParameterHandler)o)); 
             }
         }
-        
-        sortReaders();
-        sortWriters();
+        if (sort) {
+            sortReaders();
+            sortWriters();
+        }
         
         injectContexts(messageReaders, messageWriters, contextResolvers, requestHandlers, responseHandlers,
                        exceptionMappers);
@@ -537,7 +570,7 @@ public final class ProviderFactory {
      * @param entityProviders the entityProviders to set
      */
     public void setUserProviders(List<?> userProviders) {
-        setProviders(userProviders.toArray());
+        setProviders(true, userProviders.toArray());
     }
 
     private static class MessageBodyReaderComparator 

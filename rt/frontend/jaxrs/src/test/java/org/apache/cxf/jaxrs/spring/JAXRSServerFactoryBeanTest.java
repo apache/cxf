@@ -91,6 +91,6 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         assertNotNull(c1);
         JAXBContext c2 = provider.getClassContext(SuperBook.class);
         assertSame(c1, c2);
-        JAXBElementProvider.clearContexts();
+        provider.clearContexts();
     }
 }

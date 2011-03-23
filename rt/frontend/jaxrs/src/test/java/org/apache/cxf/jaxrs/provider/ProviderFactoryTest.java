@@ -128,6 +128,76 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testDefaultJaxbProviderCloned() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        MessageBodyReader customJaxbReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(customJaxbReader instanceof JAXBElementProvider);
+        
+        MessageBodyReader customJaxbReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(customJaxbReader, customJaxbReader2);
+        
+        MessageBodyWriter customJaxbWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(customJaxbReader, customJaxbWriter);
+        
+        MessageBodyReader jaxbReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+            (Class<?>)Book.class, null, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(jaxbReader instanceof JAXBElementProvider);
+        assertNotSame(jaxbReader, customJaxbReader);
+    }
+    
+    @Test
+    public void testCustomJaxbProvider() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        JAXBElementProvider provider = new JAXBElementProvider();
+        pf.registerUserProvider(provider);
+        MessageBodyReader customJaxbReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(customJaxbReader, provider);
+        
+        MessageBodyWriter customJaxbWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(customJaxbWriter, provider);
+    }
+    
+    @Test
+    public void testCustomJsonProvider() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        JSONProvider provider = new JSONProvider();
+        pf.registerUserProvider(provider);
+        MessageBodyReader customJsonReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                               MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertSame(customJsonReader, provider);
+        
+        MessageBodyWriter customJsonWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+                                               MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertSame(customJsonWriter, provider);
+    }
+    
+    @Test
+    public void testDefaultJsonProviderCloned() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        MessageBodyReader customJsonReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertTrue(customJsonReader instanceof JSONProvider);
+        
+        MessageBodyReader customJsonReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertSame(customJsonReader, customJsonReader2);
+        
+        MessageBodyWriter customJsonWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertSame(customJsonReader, customJsonWriter);
+        
+        MessageBodyReader jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+            (Class<?>)Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        assertTrue(jsonReader instanceof JSONProvider);
+        assertNotSame(jsonReader, customJsonReader);
+    }
+    
+    @Test
     public void testSchemaLocations() {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.setSchemaLocations(Collections.singletonList("classpath:/test.xsd"));
