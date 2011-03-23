@@ -306,6 +306,7 @@ public final class ProviderFactory {
                             }
                         }
                         Object provider = sharedProvider.getClass().newInstance();
+                        clonedProviders.add(provider);
                         setProviders(false, provider);
                         return provider;
                     }
