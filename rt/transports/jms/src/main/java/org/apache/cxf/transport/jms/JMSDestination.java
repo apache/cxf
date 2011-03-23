@@ -316,7 +316,7 @@ public class JMSDestination extends AbstractMultiplexDestination
             });
 
         } catch (JMSException ex) {
-            JmsUtils.convertJmsAccessException(ex);
+            throw JmsUtils.convertJmsAccessException(ex);
         }
     }
 
