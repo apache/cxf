@@ -799,7 +799,12 @@ public class STSClient implements Configurable, InterceptorProvider {
                 throw new Fault("No alias specified for retrieving PublicKey", LOG);
             }
         }
-        return crypto.getCertificates(alias)[0];
+
+        X509Certificate certs[] = crypto.getX509Certificates(alias);
+        if (certs == null || certs.length == 0) {
+            throw new Fault("Could not get X509Certificate for alias " + alias, LOG);
+        }
+        return certs[0];
     }
 
     private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
