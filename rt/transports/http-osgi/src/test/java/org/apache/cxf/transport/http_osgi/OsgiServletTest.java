@@ -203,9 +203,7 @@ public class OsgiServletTest extends Assert {
         EasyMock.expect(request.getContextPath()).andReturn("");
         EasyMock.expect(request.getServletPath()).andReturn("/cxf");
         paths.add(PATH);
-        // TODO How can the registry first return null then destination for the same path?
-        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(null);
-        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(destination);
+        EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(destination).anyTimes();
         EasyMock.expect(registry.checkRestfulRequest(EasyMock.isA(String.class))).andReturn(destination);
         EasyMock.expect(destination.getMessageObserver()).andReturn(observer);
         endpoint.addExtensor(extensor);
@@ -233,7 +231,7 @@ public class OsgiServletTest extends Assert {
                                                 ? path
                                                 : PATH).anyTimes();
         if (path != null) {
-            EasyMock.expect(registry.getDestinationForPath(path)).andReturn(destination);
+            EasyMock.expect(registry.getDestinationForPath(path, true)).andReturn(destination);
         }
 
         if (destinationCount == -1) {

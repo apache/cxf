@@ -50,18 +50,18 @@ public class OsgiServletController extends AbstractServletController {
     
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         try {
-            String address = request.getPathInfo() == null ? "" : request.getPathInfo();
-            AbstractHTTPDestination d = destinationRegistry.getDestinationForPath(address);
+            String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
+            AbstractHTTPDestination d = destinationRegistry.getDestinationForPath(pathInfo, true);
 
             if (d == null) {
                 if (!isHideServiceList && (request.getRequestURI().endsWith(serviceListRelativePath)
-                    || request.getRequestURI().endsWith(serviceListRelativePath + "/"))
-                    || StringUtils.isEmpty(request.getPathInfo())
-                    || "/".equals(request.getPathInfo())) {
+                    || request.getRequestURI().endsWith(serviceListRelativePath + "/")
+                    || StringUtils.isEmpty(pathInfo)
+                    || "/".equals(pathInfo))) {
                     updateDests(request, true);
                     serviceListGenerator.service(request, res);
                 } else {
-                    d = destinationRegistry.checkRestfulRequest(address);
+                    d = destinationRegistry.checkRestfulRequest(pathInfo);
                     if (d == null || d.getMessageObserver() == null) {
                         LOG.warning("Can't find the the request for "
                                     + request.getRequestURL() + "'s Observer ");
@@ -104,7 +104,7 @@ public class OsgiServletController extends AbstractServletController {
                             respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
                             return;
                         }
-                    } else if ("/".equals(address) || address.length() == 0) {
+                    } else if ("/".equals(pathInfo) || pathInfo.length() == 0) {
                         updateDests(request);
                     }
                     invokeDestination(request, res, d);

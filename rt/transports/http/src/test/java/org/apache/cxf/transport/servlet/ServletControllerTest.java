@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.easymock.classextension.EasyMock;
@@ -130,10 +131,12 @@ public class ServletControllerTest extends Assert {
         AbstractHTTPDestination dest = EasyMock.createMock(AbstractHTTPDestination.class);
         registry.checkRestfulRequest("");
         EasyMock.expectLastCall().andReturn(dest).atLeastOnce();
+        dest.getMessageObserver();
+        EasyMock.expectLastCall().andReturn(EasyMock.createMock(MessageObserver.class)).atLeastOnce();
         
         expectServiceListGeneratorNotCalled();
         
-        EasyMock.replay(req, registry, serviceListGenerator);
+        EasyMock.replay(req, registry, serviceListGenerator, dest);
         TestServletController sc = new TestServletController(registry, serviceListGenerator);
         sc.setHideServiceList(true);
         sc.invoke(req, res);
