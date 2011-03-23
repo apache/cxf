@@ -18,9 +18,15 @@
  */
 package org.apache.cxf.ws.rm.persistence;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
+
 public class RMMessage {
     
-    private byte[] content;
+    private CachedOutputStream content;
     private long messageNumber;
     private String to;
     
@@ -44,17 +50,50 @@ public class RMMessage {
     /**
      * Returns the content of the message as an input stream.
      * @return the content
+     * @deprecated
      */
     public byte[] getContent() {
-        return content;
+        byte[] bytes = null;
+        try {
+            bytes = content.getBytes();
+        } catch (IOException e) {
+            // ignore and treat it as null
+        }
+        return bytes;
     }
 
 
     /**
      * Sets the message content as an input stream.
      * @param content the message content
+     * @deprecated
      */
     public void setContent(byte[] c) {
+        content = new CachedOutputStream();
+        content.holdTempFile();
+        try {
+            content.write(c);
+        } catch (IOException e) {
+            // ignore
+        }
+    }
+    
+    /**
+     * Sets the message content using the input stream.
+     * @param in
+     * @throws IOException
+     */
+    public void setContent(InputStream in) throws IOException {
+        content = new CachedOutputStream();
+        content.holdTempFile();
+        IOUtils.copy(in, content);
+    }
+
+    /**
+     * Sets the message content using the cached output stream.
+     * @param c
+     */
+    public void setContent(CachedOutputStream c) {
         content = c;
     }
     
@@ -75,11 +114,29 @@ public class RMMessage {
         to = t;
     }
 
-
+    /**
+     * Returns the input stream of this message content.
+     * @return
+     * @throws IOException
+     */
+    public InputStream getInputStream() throws IOException {
+        return content.getInputStream();
+    }
     
+    /**
+     * Returns the associated cached output stream.
+     * @return
+     */
+    public CachedOutputStream getCachedOutputStream() {
+        return content;
+    }
     
-    
-    
-    
-    
+    /**
+     * Returns the length of the message content in bytes.
+     * 
+     * @return
+     */
+    public int getSize() {
+        return content.size();
+    }
 }

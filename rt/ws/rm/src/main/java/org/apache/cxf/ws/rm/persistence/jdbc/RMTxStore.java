@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +44,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
 import org.apache.cxf.ws.rm.Identifier;
@@ -106,6 +104,12 @@ public class RMTxStore implements RMStore {
         = "INSERT INTO {0} VALUES(?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
+    private static final String SELECT_DEST_SEQUENCE_STMT_STR =
+        "SELECT ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
+        + "WHERE SEQ_ID = ?";
+    private static final String SELECT_SRC_SEQUENCE_STMT_STR =
+        "SELECT CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID FROM CXF_RM_SRC_SEQUENCES "
+        + "WHERE SEQ_ID = ?";
     private static final String SELECT_DEST_SEQUENCES_STMT_STR =
         "SELECT SEQ_ID, ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
         + "WHERE ENDPOINT_ID = ?";
@@ -131,6 +135,8 @@ public class RMTxStore implements RMStore {
     private PreparedStatement updateSrcSequenceStmt;
     private PreparedStatement selectDestSequencesStmt;
     private PreparedStatement selectSrcSequencesStmt;
+    private PreparedStatement selectDestSequenceStmt;
+    private PreparedStatement selectSrcSequenceStmt;
     private PreparedStatement createInboundMessageStmt;
     private PreparedStatement createOutboundMessageStmt;
     private PreparedStatement deleteInboundMessageStmt;
@@ -242,6 +248,68 @@ public class RMTxStore implements RMStore {
         }
     }
     
+    public DestinationSequence getDestinationSequence(Identifier sid) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.info("Getting destination sequence for id: " + sid);
+        }
+        try {
+            if (null == selectDestSequenceStmt) {
+                selectDestSequenceStmt = 
+                    connection.prepareStatement(SELECT_DEST_SEQUENCE_STMT_STR);               
+            }
+            selectDestSequenceStmt.setString(1, sid.getValue());
+            
+            ResultSet res = selectDestSequenceStmt.executeQuery(); 
+            if (res.next()) {
+                EndpointReferenceType acksTo = RMUtils.createReference2004(res.getString(1));  
+                long lm = res.getLong(2);
+                InputStream is = res.getBinaryStream(3); 
+                SequenceAcknowledgement ack = null;
+                if (null != is) {
+                    ack = PersistenceUtils.getInstance()
+                        .deserialiseAcknowledgment(is); 
+                }
+                return new DestinationSequence(sid, acksTo, lm, ack);
+            }
+        } catch (SQLException ex) {
+            LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
+        }
+        return null;
+    }
+    
+    public SourceSequence getSourceSequence(Identifier sid) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.info("Getting source sequences for id: " + sid);
+        }
+        try {
+            if (null == selectSrcSequenceStmt) {
+                selectSrcSequenceStmt = 
+                    connection.prepareStatement(SELECT_SRC_SEQUENCE_STMT_STR);     
+            }
+            selectSrcSequenceStmt.setString(1, sid.getValue());
+            ResultSet res = selectSrcSequenceStmt.executeQuery();
+            
+            if (res.next()) {
+                long cmn = res.getLong(1);
+                boolean lm = res.getBoolean(2);
+                long lval = res.getLong(3);
+                Date expiry = 0 == lval ? null : new Date(lval);
+                String oidValue = res.getString(4);
+                Identifier oi = null;
+                if (null != oidValue) {
+                    oi = RMUtils.getWSRMFactory().createIdentifier();
+                    oi.setValue(oidValue);
+                }                            
+                return new SourceSequence(sid, expiry, oi, cmn, lm);
+                          
+            }
+        } catch (SQLException ex) {
+            // ignore
+            LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
+        }
+        return null;
+    }
+
     public void removeDestinationSequence(Identifier sid) {
         try {
             beginTransaction();
@@ -367,17 +435,16 @@ public class RMTxStore implements RMStore {
                 long mn = res.getLong(1);
                 String to = res.getString(2);
                 Blob blob = res.getBlob(3);
-                byte[] bytes = blob.getBytes(1, (int)blob.length());     
                 RMMessage msg = new RMMessage();
                 msg.setMessageNumber(mn);
                 msg.setTo(to);
-                msg.setContent(bytes);
+                msg.setContent(blob.getBinaryStream());
                 msgs.add(msg);                
             }            
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             LOG.log(Level.WARNING, new Message(outbound ? "SELECT_OUTBOUND_MSGS_FAILED_MSG"
                 : "SELECT_INBOUND_MSGS_FAILED_MSG", LOG).toString(), ex);
-        }        
+        }
         return msgs;
     }
 
@@ -496,12 +563,7 @@ public class RMTxStore implements RMStore {
         stmt.setString(i++, id);  
         stmt.setBigDecimal(i++, new BigDecimal(nr));
         stmt.setString(i++, to); 
-        byte[] bytes = msg.getContent();    
-        stmt.setBinaryStream(i++, new ByteArrayInputStream(bytes) {
-            public String toString() {
-                return IOUtils.newStringFromBytes(buf, 0, count);
-            }
-        }, bytes.length);
+        stmt.setBinaryStream(i++, msg.getInputStream(), msg.getSize());
         stmt.execute();
         LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
                 new Object[] {outbound ? "outbound" : "inbound", nr, id});

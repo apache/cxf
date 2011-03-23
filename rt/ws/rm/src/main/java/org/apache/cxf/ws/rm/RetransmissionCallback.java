@@ -20,10 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
@@ -37,8 +34,6 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
  */
 public class RetransmissionCallback implements CachedOutputStreamCallback {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(RetransmissionCallback.class);
-
     Message message;
     RMManager manager;
     
@@ -47,18 +42,16 @@ public class RetransmissionCallback implements CachedOutputStreamCallback {
         manager = mgr;
     }
     public void onClose(CachedOutputStream cos) {
-   
-        //REVISIT - would be nice to keep the cache on disk instead of in-memory 
-        byte bytes[] = null;
+        // make a copy as the original gets affected when its resetOut is called
+        CachedOutputStream saved = new CachedOutputStream();
+        saved.holdTempFile();
         try {
-            bytes = cos.getBytes();
+            cos.writeCacheTo(saved);            
         } catch (IOException e) {
-            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_CACHED_STREAM", 
-                                                                   LOG, 
-                                                                   cos.getOut().getClass()));
+            // ignore
         }
-        
-        message.put(RMMessageConstants.SAVED_CONTENT, bytes);            
+
+        message.put(RMMessageConstants.SAVED_CONTENT, saved);
         manager.getRetransmissionQueue().addUnacknowledged(message);
         
         RMStore store = manager.getStore();
@@ -75,7 +68,7 @@ public class RetransmissionCallback implements CachedOutputStreamCallback {
                     msg.setTo(maps.getTo().getValue());
                 }
             }
-            msg.setContent(bytes);
+            msg.setContent(saved);
             store.persistOutgoing(ss, msg); 
         }
     }

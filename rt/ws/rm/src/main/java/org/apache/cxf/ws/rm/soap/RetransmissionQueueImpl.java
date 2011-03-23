@@ -21,6 +21,7 @@ package org.apache.cxf.ws.rm.soap;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -336,19 +337,26 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     }
                 }
             }
-            byte[] content = (byte[])message
+            CachedOutputStream content = (CachedOutputStream)message
                 .get(RMMessageConstants.SAVED_CONTENT);
-            if (null == content) {                
-                content = message.getContent(byte[].class); 
+            InputStream bis = null;
+            if (null == content) {
+                byte[] savedbytes = message.getContent(byte[].class);
+                bis = new ByteArrayInputStream(savedbytes); 
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Using saved byte array: " + Arrays.toString(content));
+                    LOG.fine("Using saved byte array: " + Arrays.toString(savedbytes));
                 }
             } else {
+                bis = content.getInputStream();
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Using saved output stream: " + IOUtils.newStringFromBytes(content));
+                    if (content.size() < 65536) {
+                        LOG.fine("Using saved output stream: " 
+                                 + IOUtils.newStringFromBytes(content.getBytes()));                        
+                    } else {                        
+                        LOG.fine("Using saved output stream: ...");                        
+                    }
                 }
             }
-            ByteArrayInputStream bis = new ByteArrayInputStream(content);
 
             // copy saved output stream to new output stream in chunks of 1024
             IOUtils.copyAndCloseInput(bis, os);
@@ -474,6 +482,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             next = null;
             if (null != nextTask) {
                 nextTask.cancel();
+                releaseSavedMessage();
             }
         }
         
@@ -483,9 +492,17 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         protected void cancel() {
             if (null != nextTask) {
                 nextTask.cancel();
+                releaseSavedMessage();
             }
         }
 
+        private void releaseSavedMessage() {
+            CachedOutputStream saved = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            if (saved != null) {
+                saved.releaseTempFileHold();
+            }
+
+        }
         /**
          * @return associated message context
          */

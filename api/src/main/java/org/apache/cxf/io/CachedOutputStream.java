@@ -189,6 +189,12 @@ public class CachedOutputStream extends OutputStream {
     }
 
     public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof CachedOutputStream) {
+            return currentStream.equals(((CachedOutputStream)obj).currentStream);
+        }
         return currentStream.equals(obj);
     }
 

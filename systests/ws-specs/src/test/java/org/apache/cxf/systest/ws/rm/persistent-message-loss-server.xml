@@ -23,8 +23,10 @@
        xmlns:wsa="http://cxf.apache.org/ws/addressing"
        xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
        xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
        xsi:schemaLocation="
 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
 http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd
 http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
 http://cxf.apache.org/configuration/beans http://cxf.apache.org/schemas/configuration/cxf-beans.xsd
@@ -48,5 +50,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
             <ref bean="messageLoss"/>
         </cxf:outInterceptors>
     </cxf:bus>
-   
+    
+    <http:conduit name="http://localhost.*">
+      <http:client Connection="close"/>
+    </http:conduit>
+    
 </beans>

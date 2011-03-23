@@ -455,7 +455,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                     RMContextUtils.storeMAPs(maps, message, true, false);
                 }
                                     
-                message.setContent(byte[].class, m.getContent());
+                message.put(RMMessageConstants.SAVED_CONTENT, m.getCachedOutputStream());
                           
                 retransmissionQueue.addUnacknowledged(message);
             }            

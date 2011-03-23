@@ -43,6 +43,20 @@ public interface RMStore {
     void createDestinationSequence(DestinationSequence seq);
     
     /**
+     * Retrieve the source sequence with the specified identifier from persistent store. 
+     * @param seq the sequence
+     * @return the sequence if present; otherwise null
+     */
+    SourceSequence getSourceSequence(Identifier seq);
+    
+    /**
+     * Retrieve the destination sequence with the specified identifier from persistent store. 
+     * @param seq the sequence
+     * @return the sequence if present; otherwise null
+     */
+    DestinationSequence getDestinationSequence(Identifier seq);
+
+    /**
      * Remove the source sequence with the specified identifier from persistent store. 
      * @param seq the sequence
      */

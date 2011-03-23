@@ -19,7 +19,9 @@
 
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -227,7 +229,8 @@ public class RMTxStoreTest extends Assert {
         sid1.setValue("sequence1");
         EasyMock.expect(msg.getMessageNumber()).andReturn(ONE).times(2); 
         byte[] bytes = new byte[89];
-        EasyMock.expect(msg.getContent()).andReturn(bytes).times(2);
+        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
+        EasyMock.expect(msg.getSize()).andReturn(bytes.length);
         
         control.replay();
         store.beginTransaction();
@@ -238,7 +241,8 @@ public class RMTxStoreTest extends Assert {
         
         control.reset();
         EasyMock.expect(msg.getMessageNumber()).andReturn(ONE); 
-        EasyMock.expect(msg.getContent()).andReturn(bytes);
+        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
+        EasyMock.expect(msg.getSize()).andReturn(bytes.length);
         
         control.replay();
         store.beginTransaction();
@@ -252,7 +256,8 @@ public class RMTxStoreTest extends Assert {
         
         control.reset();
         EasyMock.expect(msg.getMessageNumber()).andReturn(TEN).times(2); 
-        EasyMock.expect(msg.getContent()).andReturn(bytes).times(2); 
+        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
+        EasyMock.expect(msg.getSize()).andReturn(bytes.length);
         
         control.replay();
         store.beginTransaction();
@@ -411,6 +416,62 @@ public class RMTxStoreTest extends Assert {
     }
 
     @Test
+    public void testGetDestinationSequence() throws SQLException, IOException {
+        
+        Identifier sid1 = null;
+        Identifier sid2 = null;
+        
+        DestinationSequence seq = store.getDestinationSequence(RMUtils.getWSRMFactory().createIdentifier());
+        assertNull(seq);
+
+        try {
+            sid1 = setupDestinationSequence("sequence1");
+
+            seq = store.getDestinationSequence(sid1);
+            assertNotNull(seq);
+
+            sid2 = setupDestinationSequence("sequence2");
+            seq = store.getDestinationSequence(sid2);
+            assertNotNull(seq);
+        } finally {
+            if (null != sid1) {
+                store.removeDestinationSequence(sid1);
+            }
+            if (null != sid2) {
+                store.removeDestinationSequence(sid2);
+            }
+        }
+    }
+
+    @Test
+    public void testGetSourceSequence() throws SQLException, IOException {
+        
+        Identifier sid1 = null;
+        Identifier sid2 = null;
+        
+        SourceSequence seq = store.getSourceSequence(RMUtils.getWSRMFactory().createIdentifier());
+        assertNull(seq);
+        
+        try {
+            sid1 = setupSourceSequence("sequence1");
+
+            seq = store.getSourceSequence(sid1);
+            assertNotNull(seq);
+
+            sid2 = setupSourceSequence("sequence2");
+            seq = store.getSourceSequence(sid2);
+            assertNotNull(seq);
+        } finally {
+            if (null != sid1) {
+                store.removeSourceSequence(sid1);
+            }
+            if (null != sid2) {
+                store.removeSourceSequence(sid2);
+            }
+        }
+    }
+
+    @Test
     public void testGetMessages() throws SQLException, IOException {
         
         Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
@@ -528,8 +589,9 @@ public class RMTxStoreTest extends Assert {
         RMMessage msg = control.createMock(RMMessage.class);
         EasyMock.expect(msg.getMessageNumber()).andReturn(mn);
         EasyMock.expect(msg.getTo()).andReturn(to);
-        String value = "Message " + mn.longValue();
-        EasyMock.expect(msg.getContent()).andReturn(value.getBytes());
+        byte[] value = ("Message " + mn.longValue()).getBytes();
+        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(value));
+        EasyMock.expect(msg.getSize()).andReturn(value.length);
         
         control.replay();
         store.beginTransaction();
@@ -593,8 +655,12 @@ public class RMTxStoreTest extends Assert {
             } else {
                 assertNull(msg.getTo());
             }
-            byte[] actual = msg.getContent();
-            assertEquals(new String("Message " + mn), IOUtils.newStringFromBytes(actual));
+            try {
+                InputStream actual = msg.getInputStream();
+                assertEquals(new String("Message " + mn), IOUtils.readStringFromStream(actual));
+            } catch (IOException e) {
+                fail("failed to get the input stream");
+            }
         }
     }
     

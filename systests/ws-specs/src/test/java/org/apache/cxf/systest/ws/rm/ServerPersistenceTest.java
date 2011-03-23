@@ -101,6 +101,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         LOG.fine("Created bus " + bus + " with default cfg");
         ControlService cs = new ControlService();
         Control control = cs.getControlPort();
+        ConnectionHelper.setKeepAliveConnection(control, false, true);
         updateAddressPort(control, PORT);
         
         assertTrue("Failed to start greeter", control.startGreeter(SERVER_LOSS_CFG)); 
@@ -119,7 +120,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         LOG.fine("Created greeter client.");
  
-        ConnectionHelper.setKeepAliveConnection(greeter, true);
+        ConnectionHelper.setKeepAliveConnection(greeter, false, true);
 
         Client c = ClientProxy.getClient(greeter);
         HTTPConduit hc = (HTTPConduit)(c.getConduit());
@@ -166,11 +167,15 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     }
     
     void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
-        awaitMessages(5, 8, 60000);
+        awaitMessages(5, 7, 30000);
 
-        // wait another while to prove that response to second request is indeed lost
-        Thread.sleep(4000);
         int nDone = 0;
+        for (int i = 0; i < 3; i++) {
+            // wait another while to prove that response to second request is indeed lost
+            if (!responses[i].isDone()) {
+                Thread.sleep(4000);
+            }
+        }
         for (int i = 0; i < 3; i++) {
             if (responses[i].isDone()) {
                 nDone++;

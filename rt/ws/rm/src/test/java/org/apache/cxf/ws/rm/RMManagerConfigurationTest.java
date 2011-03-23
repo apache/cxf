@@ -153,6 +153,16 @@ public class RMManagerConfigurationTest extends Assert {
             // TODO Auto-generated method stub
             
         }
+
+        public SourceSequence getSourceSequence(Identifier seq) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public DestinationSequence getDestinationSequence(Identifier seq) {
+            // TODO Auto-generated method stub
+            return null;
+        }
         
     }
 }
