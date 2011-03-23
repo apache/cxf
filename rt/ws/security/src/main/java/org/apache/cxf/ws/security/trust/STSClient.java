@@ -800,7 +800,7 @@ public class STSClient implements Configurable, InterceptorProvider {
             }
         }
 
-        X509Certificate certs[] = crypto.getX509Certificates(alias);
+        X509Certificate certs[] = crypto.getCertificates(alias);
         if (certs == null || certs.length == 0) {
             throw new Fault("Could not get X509Certificate for alias " + alias, LOG);
         }
