@@ -814,6 +814,14 @@ public final class InjectionUtils {
         }
     }
     
+    public static void injectContexts(Object requestObject,
+                                 AbstractResourceInfo resource,
+                                 Message message) {
+        injectContextMethods(requestObject, resource, message);
+        injectContextFields(requestObject, resource, message);
+        injectResourceFields(requestObject, resource, message);
+    }
+    
     @SuppressWarnings("unchecked")
     public static void injectContextMethods(Object requestObject,
                                             AbstractResourceInfo cri,

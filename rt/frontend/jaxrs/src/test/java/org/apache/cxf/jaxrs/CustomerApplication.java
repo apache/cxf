@@ -19,7 +19,14 @@
 package org.apache.cxf.jaxrs;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 public class CustomerApplication extends Application {
-
+    @Context
+    private UriInfo uriInfo;
+    
+    public UriInfo getUriInfo() {
+        return uriInfo;
+    }
 }

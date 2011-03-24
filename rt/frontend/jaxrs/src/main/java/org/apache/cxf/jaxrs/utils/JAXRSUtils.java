@@ -92,6 +92,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -183,12 +184,11 @@ public final class JAXRSUtils {
     }
     
     @SuppressWarnings("unchecked")
-    public static void handleSetters(OperationResourceInfo ori,
-                                     Object requestObject,
-                                     Message message) {
+    public static void injectParameters(OperationResourceInfo ori,
+                                        Object requestObject,
+                                        Message message) {
         ClassResourceInfo cri = ori.getClassResourceInfo();
-        InjectionUtils.injectContextMethods(requestObject, cri, message);
-        
+                
         if (cri.isSingleton() 
             && (!cri.getParameterMethods().isEmpty() || !cri.getParameterFields().isEmpty())) {
             LOG.fine("Injecting request parameters into singleton resource is not thread-safe");
@@ -814,7 +814,9 @@ public final class JAXRSUtils {
         } else if (SearchContext.class.isAssignableFrom(clazz)) {
             o = new SearchContextImpl(m);
         } else if (Application.class.isAssignableFrom(clazz)) {
-            o = contextMessage.getExchange().getEndpoint().get(Application.class.getName());
+            ProviderInfo<?> providerInfo = 
+                (ProviderInfo)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
+            o = providerInfo == null ? providerInfo : providerInfo.getProvider();
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
             o = createServletResourceValue(contextMessage, clazz);
