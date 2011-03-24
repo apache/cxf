@@ -60,16 +60,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.antlr</groupId>
+            <groupId>antlr</groupId>
             <artifactId>antlr</artifactId>
         </dependency>
         <dependency>
-	  <groupId>org.apache.ws.xmlschema</groupId>
-	  <artifactId>xmlschema-core</artifactId>
+            <groupId>org.apache.ws.xmlschema</groupId>
+            <artifactId>xmlschema-core</artifactId>
         </dependency>
         <dependency>
-	    <groupId>${cxf.stax.impl.groupId}</groupId>
-	    <artifactId>${cxf.stax.impl.artifactId}</artifactId>
+            <groupId>${cxf.stax.impl.groupId}</groupId>
+            <artifactId>${cxf.stax.impl.artifactId}</artifactId>
         </dependency>
         <dependency>
             <groupId>wsdl4j</groupId>
