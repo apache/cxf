@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -94,6 +95,8 @@ public final class ProviderFactory {
     private List<ProviderInfo<ResponseExceptionMapper>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper>>(1);
     private RequestPreprocessor requestPreprocessor;
+    private ProviderInfo<Application> application;
+    
     private Set<Object> clonedProviders = new HashSet<Object>();
     
     private ProviderFactory() {
@@ -607,6 +610,10 @@ public final class ProviderFactory {
         }
     }
     
+    public void setApplicationProvider(ProviderInfo<Application> app) {
+        application = app;
+    }
+    
     public void setRequestPreprocessor(RequestPreprocessor rp) {
         this.requestPreprocessor = rp;
     }
@@ -622,6 +629,9 @@ public final class ProviderFactory {
                      requestHandlers,
                      responseHandlers,
                      exceptionMappers);
+        if (application != null) {
+            application.clearThreadLocalProxies();
+        }
         if (this != SHARED_FACTORY) {
             SHARED_FACTORY.clearThreadLocalProxies();
         }

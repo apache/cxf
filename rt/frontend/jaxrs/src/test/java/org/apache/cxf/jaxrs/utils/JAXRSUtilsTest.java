@@ -119,7 +119,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testInjectApplicationInSingleton() throws Exception {
-        Application app = new CustomerApplication();
+        CustomerApplication app = new CustomerApplication();
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         Customer customer = new Customer();
         sf.setServiceBeanObjects(customer);
@@ -128,19 +128,25 @@ public class JAXRSUtilsTest extends Assert {
         Server server = sf.create();  
         assertSame(app, customer.getApplication1());
         assertSame(app, customer.getApplication2());
+        ThreadLocalProxy proxy = (ThreadLocalProxy)app.getUriInfo();
+        assertNotNull(proxy);
         invokeCustomerMethod(sf.getServiceFactory().getClassResourceInfo().get(0),
                              customer, server);
         assertSame(app, customer.getApplication2());
+        assertTrue(proxy.get() instanceof UriInfo);
     }
     
     @Test
     public void testInjectApplicationInPerRequestResource() throws Exception {
-        Application app = new CustomerApplication();
+        CustomerApplication app = new CustomerApplication();
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setServiceClass(Customer.class);
         sf.setApplication(app);
         sf.setStart(false);
         Server server = sf.create();  
+        
+        ThreadLocalProxy proxy = (ThreadLocalProxy)app.getUriInfo();
+        assertNotNull(proxy);
         
         ClassResourceInfo cri = sf.getServiceFactory().getClassResourceInfo().get(0);
         
@@ -153,6 +159,8 @@ public class JAXRSUtilsTest extends Assert {
         invokeCustomerMethod(cri, customer, server);
         assertSame(app, customer.getApplication1());
         assertSame(app, customer.getApplication2());
+        
+        assertTrue(proxy.get() instanceof UriInfo);
     }
     
     private void invokeCustomerMethod(ClassResourceInfo cri, 
@@ -1425,7 +1433,7 @@ public class JAXRSUtilsTest extends Assert {
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri); 
         Message message = new MessageImpl();
-        JAXRSUtils.handleSetters(ori, c, message);
+        InjectionUtils.injectContextMethods(c, ori.getClassResourceInfo(), message);
         assertNotNull(c.getUriInfo());
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo().getClass());
         assertSame(UriInfoImpl.class, 
@@ -1446,7 +1454,7 @@ public class JAXRSUtilsTest extends Assert {
         headers.add("AHeader2", "theAHeader2");
         m.put(Message.PROTOCOL_HEADERS, headers);
         m.put(Message.QUERY_STRING, "a=aValue&query2=b");
-        JAXRSUtils.handleSetters(ori, c, m);
+        JAXRSUtils.injectParameters(ori, c, m);
         assertEquals("aValue", c.getQueryParam());
         assertEquals("theAHeader2", c.getAHeader2());
     }
@@ -1464,7 +1472,7 @@ public class JAXRSUtilsTest extends Assert {
         headers.add("AHeader", "theAHeader");
         m.put(Message.PROTOCOL_HEADERS, headers);
         m.put(Message.QUERY_STRING, "b=bValue");
-        JAXRSUtils.handleSetters(ori, c, m);
+        JAXRSUtils.injectParameters(ori, c, m);
         assertEquals("bValue", c.getB());
         assertEquals("theAHeader", c.getAHeader());
     }

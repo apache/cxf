@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -46,6 +47,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -121,15 +123,21 @@ public class JAXRSInvoker extends AbstractInvoker {
                     
             if (cri.isRoot()) {
                 Object realResourceObject = ClassHelper.getRealObject(resourceObject);
-                JAXRSUtils.handleSetters(ori, realResourceObject,
+                JAXRSUtils.injectParameters(ori, realResourceObject,
                                          exchange.getInMessage());
     
-                InjectionUtils.injectContextFields(realResourceObject,
-                                                   ori.getClassResourceInfo(),
-                                                   exchange.getInMessage());
-                InjectionUtils.injectResourceFields(realResourceObject,
-                                                ori.getClassResourceInfo(),
-                                                exchange.getInMessage());
+                InjectionUtils.injectContexts(realResourceObject,
+                                              ori.getClassResourceInfo(),
+                                              exchange.getInMessage());
+                
+                ProviderInfo<?> appProvider = 
+                    (ProviderInfo)exchange.getEndpoint().get(Application.class.getName());
+                if (appProvider != null) {
+                    InjectionUtils.injectContexts(appProvider.getProvider(),
+                                                  appProvider,
+                                                  exchange.getInMessage());
+                }
+                
             }
         }
         

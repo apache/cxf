@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.service.factory.FactoryBeanListener;
@@ -72,7 +73,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
     private ResourceComparator rc;
-    private Application application;
+    private ProviderInfo<Application> appProvider;
     
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -87,7 +88,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param app
      */
     public void setApplication(Application app) {
-        application = app;    
+        appProvider = new ProviderInfo<Application>(app);    
     }
     
     /**
@@ -138,8 +139,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 ep.getService().setInvoker(invoker);
             }
             
-            ep.put(Application.class.getName(), application);
             ProviderFactory factory = setupFactory(ep);
+            ep.put(Application.class.getName(), appProvider);
+            factory.setApplicationProvider(appProvider);
+            
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
             if (rc != null) {
@@ -321,12 +324,17 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     private void injectContexts() {
+        Application application = appProvider == null ? null : appProvider.getProvider();
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.isSingleton()) {
                 InjectionUtils.injectContextProxiesAndApplication(cri, 
                                                     cri.getResourceProvider().getInstance(null),
                                                     application);
             }
+        }
+        if (application != null) {
+            InjectionUtils.injectContextProxiesAndApplication(appProvider, 
+                                                              application, null);
         }
     }
     
