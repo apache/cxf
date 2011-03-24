@@ -41,9 +41,7 @@ public class JAXWS22SpringEndpointImpl extends org.apache.cxf.jaxws22.EndpointIm
     
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         if (getBus() == null) {
-            Bus bus = BusFactory.getThreadDefaultBus();
-            BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
-            setBus(bus);
+            setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
         }
     }
 }
