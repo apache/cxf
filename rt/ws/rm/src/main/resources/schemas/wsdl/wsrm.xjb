@@ -17,10 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxb:bindings version="1.0" 
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
-  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+<jaxb:bindings version="1.0"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
   jaxb:extensionBindingPrefixes="xjc">
     <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/ws/2004/08/addressing" node="/xs:schema">
         <jaxb:schemaBindings>
@@ -31,8 +31,41 @@
         <jaxb:schemaBindings>
             <jaxb:package name="org.apache.cxf.ws.rm"/>
         </jaxb:schemaBindings>
-        <jaxb:globalBindings generateIsSetMethod="true">
-            <jaxb:javaType name="java.lang.Long" xmlType="xs:unsignedLong"/>
-        </jaxb:globalBindings>
+        <jaxb:globalBindings generateIsSetMethod="true"/>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="wsrm.xsd" node="//xs:element[@name='Nack']">
+        <jaxb:property>
+            <jaxb:baseType>
+                <jaxb:javaType name="java.lang.Long"/>
+            </jaxb:baseType>
+        </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="wsrm.xsd" node="//xs:element[@name='MessageNumber']">
+        <jaxb:property>
+            <jaxb:baseType>
+                <jaxb:javaType name="java.lang.Long"/>
+            </jaxb:baseType>
+        </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="wsrm.xsd" node="//xs:element[@name='MaxMessageNumberUsed']">
+        <jaxb:property>
+            <jaxb:baseType>
+                <jaxb:javaType name="java.lang.Long"/>
+            </jaxb:baseType>
+        </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="wsrm.xsd" node="//xs:attribute[@name='Upper']">
+        <jaxb:property>
+            <jaxb:baseType>
+                <jaxb:javaType name="java.lang.Long"/>
+            </jaxb:baseType>
+        </jaxb:property>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="wsrm.xsd" node="//xs:attribute[@name='Lower']">
+        <jaxb:property>
+            <jaxb:baseType>
+                <jaxb:javaType name="java.lang.Long"/>
+            </jaxb:baseType>
+        </jaxb:property>
     </jaxb:bindings>
 </jaxb:bindings>

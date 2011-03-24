@@ -38,141 +38,141 @@ No other rights are granted by implication, estoppel or otherwise.
 
 -->
 <xs:schema targetNamespace="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" elementFormDefault="qualified" attributeFormDefault="unqualified">
-  <xs:import namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" schemaLocation="http://schemas.xmlsoap.org/ws/2004/08/addressing"/>
-  <!-- Protocol Elements -->
-  <xs:complexType name="SequenceType">
-    <xs:sequence>
-      <xs:element ref="wsrm:Identifier"/>
-      <xs:element name="MessageNumber" type="xs:unsignedLong"/>
-      <xs:element name="LastMessage" minOccurs="0">
+    <xs:import namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" schemaLocation="http://schemas.xmlsoap.org/ws/2004/08/addressing"/>
+    <!-- Protocol Elements -->
+    <xs:complexType name="SequenceType">
+        <xs:sequence>
+            <xs:element ref="wsrm:Identifier"/>
+            <xs:element name="MessageNumber" type="xs:unsignedLong"/>
+            <xs:element name="LastMessage" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+    <xs:element name="Sequence" type="wsrm:SequenceType"/>
+    <xs:element name="SequenceAcknowledgement">
         <xs:complexType>
-          <xs:sequence/>
+            <xs:sequence>
+                <xs:element ref="wsrm:Identifier"/>
+                <xs:choice>
+                    <xs:element name="AcknowledgementRange" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:sequence/>
+                            <xs:attribute name="Upper" type="xs:unsignedLong" use="required"/>
+                            <xs:attribute name="Lower" type="xs:unsignedLong" use="required"/>
+                            <xs:anyAttribute namespace="##other" processContents="lax"/>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Nack" type="xs:unsignedLong" maxOccurs="unbounded"/>
+                </xs:choice>
+                <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:anyAttribute namespace="##other" processContents="lax"/>
         </xs:complexType>
-      </xs:element>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="Sequence" type="wsrm:SequenceType"/>  
-  <xs:element name="SequenceAcknowledgement">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="wsrm:Identifier"/>
-        <xs:choice>
-          <xs:element name="AcknowledgementRange" maxOccurs="unbounded">
-            <xs:complexType>
-              <xs:sequence/>
-              <xs:attribute name="Upper" type="xs:unsignedLong" use="required"/>
-              <xs:attribute name="Lower" type="xs:unsignedLong" use="required"/>
-              <xs:anyAttribute namespace="##other" processContents="lax"/>
-            </xs:complexType>
-          </xs:element>
-          <xs:element name="Nack" type="xs:unsignedLong" maxOccurs="unbounded"/>
-        </xs:choice>
-        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-      </xs:sequence>
-      <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:element>
+    <xs:complexType name="AckRequestedType">
+        <xs:sequence>
+            <xs:element ref="wsrm:Identifier"/>
+            <xs:element name="MaxMessageNumberUsed" type="xs:unsignedLong" minOccurs="0"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="AckRequestedType">
-    <xs:sequence>
-      <xs:element ref="wsrm:Identifier"/>
-      <xs:element name="MaxMessageNumberUsed" type="xs:unsignedLong" minOccurs="0"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="AckRequested" type="wsrm:AckRequestedType"/>
-  <xs:element name="Identifier">
-    <xs:complexType>
-      <xs:annotation>
-        <xs:documentation>
+    <xs:element name="AckRequested" type="wsrm:AckRequestedType"/>
+    <xs:element name="Identifier">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>
 This type is for elements whose [children] is an anyURI and can have arbitrary attributes.
-                     </xs:documentation>
-      </xs:annotation>
-      <xs:simpleContent>
-        <xs:extension base="xs:anyURI">
-          <xs:anyAttribute namespace="##other" processContents="lax"/>
-        </xs:extension>
-      </xs:simpleContent>
+                </xs:documentation>
+            </xs:annotation>
+            <xs:simpleContent>
+                <xs:extension base="xs:anyURI">
+                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <!-- Fault Container and Codes -->
+    <xs:simpleType name="FaultCodes">
+        <xs:restriction base="xs:QName">
+            <xs:enumeration value="wsrm:UnknownSequence"/>
+            <xs:enumeration value="wsrm:SequenceTerminated"/>
+            <xs:enumeration value="wsrm:InvalidAcknowledgement"/>
+            <xs:enumeration value="wsrm:MessageNumberRollover"/>
+            <xs:enumeration value="wsrm:CreateSequenceRefused"/>
+            <xs:enumeration value="wsrm:LastMessageNumberExceeded"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="SequenceFaultType">
+        <xs:sequence>
+            <xs:element name="FaultCode" type="xs:QName"/>
+            <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax"/>
     </xs:complexType>
-  </xs:element>
-  <!-- Fault Container and Codes -->
-  <xs:simpleType name="FaultCodes">
-    <xs:restriction base="xs:QName">
-      <xs:enumeration value="wsrm:UnknownSequence"/>
-      <xs:enumeration value="wsrm:SequenceTerminated"/>
-      <xs:enumeration value="wsrm:InvalidAcknowledgement"/>
-      <xs:enumeration value="wsrm:MessageNumberRollover"/>
-      <xs:enumeration value="wsrm:CreateSequenceRefused"/>
-       <xs:enumeration value="wsrm:LastMessageNumberExceeded"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:complexType name="SequenceFaultType">
-    <xs:sequence>
-      <xs:element name="FaultCode" type="xs:QName"/>
-      <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##any" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="SequenceFault" type="wsrm:SequenceFaultType"/>
-  <xs:element name="CreateSequence" type="wsrm:CreateSequenceType"/>
-  <xs:element name="CreateSequenceResponse" type="wsrm:CreateSequenceResponseType"/>
-  <xs:element name="TerminateSequence" type="wsrm:TerminateSequenceType"/>
-  <xs:complexType name="CreateSequenceType">
-    <xs:sequence>
-      <xs:element ref="wsrm:AcksTo"/>
-      <xs:element ref="wsrm:Expires" minOccurs="0"/>
-      <xs:element name="Offer" type="wsrm:OfferType" minOccurs="0"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
-        <xs:annotation>
-          <xs:documentation>
-It is the authors intent that this extensibility be used to transfer a Security Token Reference as defined in WS-Security. 
-</xs:documentation>
-        </xs:annotation>
-      </xs:any>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:complexType name="CreateSequenceResponseType">
-    <xs:sequence>
-      <xs:element ref="wsrm:Identifier"/>
-      <xs:element ref="wsrm:Expires" minOccurs="0"/>
-      <xs:element name="Accept" type="wsrm:AcceptType" minOccurs="0"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:complexType name="TerminateSequenceType">
-    <xs:sequence>
-      <xs:element ref="wsrm:Identifier"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="AcksTo" type="wsa:EndpointReferenceType"/>
-  <xs:complexType name="OfferType">
-    <xs:sequence>
-      <xs:element ref="wsrm:Identifier"/>
-      <xs:element ref="wsrm:Expires" minOccurs="0"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:complexType name="AcceptType">
-    <xs:sequence>
-      <xs:element ref="wsrm:AcksTo"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="Expires">
-    <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base="xs:duration">
-          <xs:anyAttribute namespace="##other" processContents="lax"/>
-        </xs:extension>
-      </xs:simpleContent>
+    <xs:element name="SequenceFault" type="wsrm:SequenceFaultType"/>
+    <xs:element name="CreateSequence" type="wsrm:CreateSequenceType"/>
+    <xs:element name="CreateSequenceResponse" type="wsrm:CreateSequenceResponseType"/>
+    <xs:element name="TerminateSequence" type="wsrm:TerminateSequenceType"/>
+    <xs:complexType name="CreateSequenceType">
+        <xs:sequence>
+            <xs:element ref="wsrm:AcksTo"/>
+            <xs:element ref="wsrm:Expires" minOccurs="0"/>
+            <xs:element name="Offer" type="wsrm:OfferType" minOccurs="0"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+It is the authors intent that this extensibility be used to transfer a Security Token Reference as defined in WS-Security.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
     </xs:complexType>
-  </xs:element>  
+    <xs:complexType name="CreateSequenceResponseType">
+        <xs:sequence>
+            <xs:element ref="wsrm:Identifier"/>
+            <xs:element ref="wsrm:Expires" minOccurs="0"/>
+            <xs:element name="Accept" type="wsrm:AcceptType" minOccurs="0"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+    <xs:complexType name="TerminateSequenceType">
+        <xs:sequence>
+            <xs:element ref="wsrm:Identifier"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+    <xs:element name="AcksTo" type="wsa:EndpointReferenceType"/>
+    <xs:complexType name="OfferType">
+        <xs:sequence>
+            <xs:element ref="wsrm:Identifier"/>
+            <xs:element ref="wsrm:Expires" minOccurs="0"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+    <xs:complexType name="AcceptType">
+        <xs:sequence>
+            <xs:element ref="wsrm:AcksTo"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+    <xs:element name="Expires">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:duration">
+                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
 </xs:schema>
