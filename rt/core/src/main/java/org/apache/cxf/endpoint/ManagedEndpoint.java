@@ -78,7 +78,7 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
     
     @ManagedAttribute(description = "TransportId Attribute", currencyTimeLimit = 60)
     public String getTransportId() {
-        return endpoint.getEndpointInfo().getAddress();
+        return endpoint.getEndpointInfo().getTransportId();
     }
     
     @ManagedAttribute(description = "Server State")
