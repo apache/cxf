@@ -236,6 +236,30 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-databinding-jibx</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-bind</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-run</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-schema</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-tools</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-sdo</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>

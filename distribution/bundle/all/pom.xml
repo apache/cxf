@@ -78,6 +78,30 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-databinding-jibx</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-bind</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-run</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-schema</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jibx</groupId>
+                    <artifactId>jibx-tools</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-sdo</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
@@ -324,10 +348,12 @@
                             org.eclipse.jetty*;resolution:=optional,
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
+                            org.jibx*;resolution:=optional;version="[1.2.3,2)",
                             org.junit*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
                             org.objectweb.asm*;version="[2.0,4)",
                             org.omg*;resolution:=optional,
+                            org.opensaml*;resolution:=optional;version="[2.0,3)",
                             org.slf4j*;resolution:=optional;version="[1.5,2)",
                             org.springframework*;resolution:=optional;version="[2.5,4)",
                             javax.activation;version="[0.0,2)",
