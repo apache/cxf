@@ -57,7 +57,8 @@ public class ServletControllerTest extends Assert {
         EasyMock.expectLastCall().andReturn("");
         req.getServletPath();
         EasyMock.expectLastCall().andReturn("");
-        
+        req.setAttribute("org.apache.cxf.transport.endpoint.address", "http://localhost:8080");
+        EasyMock.expectLastCall().anyTimes();
         req.getRequestURI();
         EasyMock.expectLastCall().andReturn(requestUri).times(2);
         req.getParameter("stylesheet");
@@ -108,6 +109,8 @@ public class ServletControllerTest extends Assert {
         EasyMock.expectLastCall().andReturn("false");
         req.getRequestURL();
         EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost:8080/services"));
+        req.setAttribute("org.apache.cxf.transport.endpoint.address", "http://localhost:8080");
+        EasyMock.expectLastCall().anyTimes();
         registry.getDestinationsPaths();
         EasyMock.expectLastCall().andReturn(Collections.emptySet()).atLeastOnce();
         registry.getDestinationForPath("", true);
@@ -153,90 +156,7 @@ public class ServletControllerTest extends Assert {
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
     }
-    
-    private String testGetBaseURL(String requestUrl, String contextPath, 
-                                     String servletPath, String pathInfo) {
-        req.getRequestURL();
-        EasyMock.expectLastCall().andReturn(new StringBuffer(requestUrl));
-        
-        req.getContextPath();
-        EasyMock.expectLastCall().andReturn(contextPath);
-        req.getServletPath();
-        EasyMock.expectLastCall().andReturn(servletPath);
-        
-        req.getPathInfo();
-        EasyMock.expectLastCall().andReturn(pathInfo).times(2);
-        
-        String basePath = contextPath + servletPath;
-        if (basePath.length() == 0) {
-            req.getRequestURI();
-            EasyMock.expectLastCall().andReturn(pathInfo);
-        }
-        
-        EasyMock.replay(req);
-        return new ServletController(null, null, null).getBaseURL(req);
-    }
-    
-    @Test
-    public void testGetRequestURL() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar", 
-                                       "", "/services", "/bar");
-        assertEquals("http://localhost:8080/services", url);
-    }
-    
-    @Test
-    public void testGetRequestURL2() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar", 
-                                       "/services", "", "/bar");
-        assertEquals("http://localhost:8080/services", url);
-    }
-    
-    @Test
-    public void testGetRequestURL3() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar", 
-                                       "", "", "/services/bar");
-        assertEquals("http://localhost:8080", url);
-    }
-    
-    @Test
-    public void testGetRequestURLSingleMatrixParam() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar;a=b", 
-                                       "", "/services", "/bar");
-        assertEquals("http://localhost:8080/services", url);
-    }
-    
-    @Test
-    public void testGetRequestURLMultipleMatrixParam() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar;a=b;c=d;e=f",
-                                       "", "/services", "/bar");
-        assertEquals("http://localhost:8080/services", url);
-        
-    }
-    
-    @Test
-    public void testGetRequestURLMultipleMatrixParam2() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar;a=b;c=d;e=f",
-                                       "", "/services", "/bar;a=b;c=d");
-        assertEquals("http://localhost:8080/services", url);
-        
-    }
-    
-    @Test
-    public void testGetRequestURLMultipleMatrixParam3() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar;a=b;c=d;e=f", 
-                                       "", "/services", "/bar;a=b");
-        assertEquals("http://localhost:8080/services", url);
-        
-    }
-    
-    @Test
-    public void testGetRequestURLMultipleMatrixParam4() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar;a=b;c=d;e=f;", 
-                                       "", "/services", "/bar;a=b");
-        assertEquals("http://localhost:8080/services", url);
-        
-    }
-    
+ 
     public static class TestServletController extends ServletController {
         private boolean invokeDestinationCalled;
 
@@ -245,6 +165,10 @@ public class ServletControllerTest extends Assert {
             super(destinationRegistry, null, serviceListGenerator);
         }
         
+        public void setHideServiceList(boolean b) {
+            this.isHideServiceList = b;
+        }
+
         @Override
         protected void updateDests(HttpServletRequest request) { 
         }

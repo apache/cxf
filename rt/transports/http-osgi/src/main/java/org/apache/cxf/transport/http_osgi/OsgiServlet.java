@@ -26,12 +26,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.AbstractHTTPServlet;
+import org.apache.cxf.transport.servlet.ServletController;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 public class OsgiServlet extends AbstractHTTPServlet {
     
     private DestinationRegistry destinationRegistry;
-    private OsgiServletController controller;
+    private ServletController controller;
     private HttpServlet serviceListGenerator;
     
     public OsgiServlet(DestinationRegistry destinationRegistry) {
@@ -45,9 +46,9 @@ public class OsgiServlet extends AbstractHTTPServlet {
 
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
-        controller = new OsgiServletController(servletConfig,
-                                               this.destinationRegistry, 
-                                               serviceListGenerator);
+        controller = new ServletController(this.destinationRegistry, 
+                                           servletConfig,
+                                           serviceListGenerator);
     }
     
     @Override

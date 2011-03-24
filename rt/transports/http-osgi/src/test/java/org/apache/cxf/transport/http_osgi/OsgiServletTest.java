@@ -43,6 +43,7 @@ import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.servlet.ServletController;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.http.AddressType;
@@ -57,14 +58,14 @@ import org.junit.Test;
 
 public class OsgiServletTest extends Assert {
 
-    private final class TestOsgiServletController extends OsgiServletController {
+    private final class TestOsgiServletController extends ServletController {
         private boolean invokeDestinationCalled;
 
 
         private TestOsgiServletController(ServletConfig config, 
                                           DestinationRegistry destinationRegistry,
                                           HttpServlet serviceListGenerator) {
-            super(config, destinationRegistry, serviceListGenerator);
+            super(destinationRegistry, config, serviceListGenerator);
         }
 
         @Override
@@ -200,15 +201,15 @@ public class OsgiServletTest extends Assert {
     @Test
     public void testInvokeRestful() throws Exception {
         setUpRequest(URI, null, -1);
-        EasyMock.expect(request.getContextPath()).andReturn("");
-        EasyMock.expect(request.getServletPath()).andReturn("/cxf");
+        //EasyMock.expect(request.getContextPath()).andReturn("");
+        //EasyMock.expect(request.getServletPath()).andReturn("/cxf");
         paths.add(PATH);
         EasyMock.expect(registry.getDestinationForPath(PATH)).andReturn(destination).anyTimes();
         EasyMock.expect(registry.checkRestfulRequest(EasyMock.isA(String.class))).andReturn(destination);
         EasyMock.expect(destination.getMessageObserver()).andReturn(observer);
         endpoint.addExtensor(extensor);
-        extensor.setLocation(EasyMock.eq(ROOT + URI));
-        EasyMock.expectLastCall();
+        //extensor.setLocation(EasyMock.eq(ROOT + URI));
+        //EasyMock.expectLastCall();
 
         control.replay();
         OsgiServlet servlet = new OsgiServlet(registry);
@@ -234,10 +235,8 @@ public class OsgiServletTest extends Assert {
             EasyMock.expect(registry.getDestinationForPath(path, true)).andReturn(destination);
         }
 
-        if (destinationCount == -1) {
-            EasyMock.expect(registry.getDestinationsPaths()).andReturn(paths).anyTimes();
-        } else if (destinationCount >= 0) {
-            EasyMock.expect(registry.getDestinationsPaths()).andReturn(paths);
+        EasyMock.expect(registry.getDestinationsPaths()).andReturn(paths).anyTimes();
+        if (destinationCount >= 0) {
             List<AbstractHTTPDestination> destinations =
                 new ArrayList<AbstractHTTPDestination>();
             for (int i = 0; i < destinationCount; i++) {

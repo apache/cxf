@@ -35,6 +35,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 
@@ -47,9 +48,7 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
     protected Bus bus;
     protected ServletTransportFactory servletTransportFactory;
     protected ServletController controller;
-    
-    private boolean disableAddressUpdates;
-        
+  
     public static Logger getLogger() {
         return LogUtils.getL7dLogger(AbstractCXFServlet.class);
     }
@@ -61,9 +60,6 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
             new ServletController(servletTransportFactory.getRegistry(),
                                   servletConfig,
                                   serviceListGeneratorServlet);
-        if (servletConfig.getInitParameter("disable-address-updates") == null) {
-            newController.setDisableAddressUpdates(disableAddressUpdates);
-        }
         
         return newController;
     }
@@ -97,7 +93,9 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
    
     protected DestinationFactory createServletTransportFactory() {
         if (servletTransportFactory == null) {
-            servletTransportFactory = new ServletTransportFactory(bus);
+            DestinationRegistryImpl registry = new DestinationRegistryImpl();
+            servletTransportFactory = new ServletTransportFactory(registry);
+            servletTransportFactory.setBus(bus);
         }
         return servletTransportFactory;
     }
@@ -153,10 +151,4 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
         }
     }
 
-    // this makes it a bit easier to disable the address 
-    // updates when creating servlets programmatically
-    public void setDisableAddressUpdates(boolean disableAddressUpdates) {
-        this.disableAddressUpdates = disableAddressUpdates;
-    }
-    
 }

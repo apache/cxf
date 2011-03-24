@@ -21,8 +21,6 @@
 package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -32,19 +30,13 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
+import org.apache.cxf.transport.http.DestinationRegistry;
 
 public class ServletTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
    
-    public ServletTransportFactory(Bus b) {
-        super.setBus(b);
-        List<String> ids = Arrays.asList(new String[] {
-            "http://cxf.apache.org/transports/http",
-            "http://cxf.apache.org/transports/http/configuration",
-            "http://schemas.xmlsoap.org/wsdl/http",
-            "http://schemas.xmlsoap.org/wsdl/http/",
-        });
-        this.setTransportIds(ids);
+    public ServletTransportFactory(DestinationRegistry registry) {
+        super(registry);
     }
 
     public ServletTransportFactory() {
