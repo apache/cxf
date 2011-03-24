@@ -25,8 +25,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -107,9 +105,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
-                Bus bus = BusFactory.getThreadDefaultBus();
-                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
-                setBus(bus);
+                setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }
     }

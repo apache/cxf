@@ -156,22 +156,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         
         setupGreeter("org/apache/cxf/systest/interceptor/no-addr.xml", false);
 
-        // all interceptors pass
-
-        /*
-        greeter.greetMeOneWay("one");
-        assertEquals("TWO", greeter.greetMe("two"));
-        try {
-            greeter.pingMe();
-            fail("Expected PingMeFault not thrown.");
-        } catch (PingMeFault f) {
-            assertEquals(20, (int)f.getFaultInfo().getMajor());
-            assertEquals(10, (int)f.getFaultInfo().getMinor());
-        }
-        */
-
         // behaviour is identicial for all phases
-        
         Iterator<Phase> it = inPhases.iterator();
         Phase p = null;
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
@@ -192,7 +177,6 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         setupGreeter("org/apache/cxf/systest/interceptor/addr.xml", false);
 
         // all interceptors pass
-
         greeter.greetMeOneWay("one");
         assertEquals("TWO", greeter.greetMe("two"));
         try {
@@ -247,7 +231,6 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         
         control.setFaultLocation(location);       
        
-        String expectedMsg = getExpectedInterceptorFaultMessage(location.getPhase());
 
         // oneway reports a plain fault (although server sends a soap fault)
 
@@ -266,6 +249,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             assertEquals(FAULT_MESSAGE, ex.getMessage());
         }
         
+        String expectedMsg = getExpectedInterceptorFaultMessage(location.getPhase());
         try {
             greeter.greetMe("cxf");
             fail("Twoway operation unexpectedly succeded.");

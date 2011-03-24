@@ -70,6 +70,10 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             } else if (!"id".equals(name) && !"name".equals(name) && isAttribute(pre, name)) {
                 if ("bus".equals(name)) {
                     setBus = true;
+                    if (!val.startsWith("#")) {
+                        //bus attributes always need to be a reference
+                        val = "#" + val;
+                    }
                 }
                 mapAttribute(factoryBean, element, name, val);
             } 

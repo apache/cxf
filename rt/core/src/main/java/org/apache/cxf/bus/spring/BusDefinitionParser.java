@@ -27,17 +27,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
@@ -53,11 +52,12 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         String bus = element.getAttribute("bus");        
         if (StringUtils.isEmpty(bus)) {
-            addBusWiringAttribute(bean, BusWiringType.CONSTRUCTOR);
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY);
         } else {
-            bean.addConstructorArgReference(bus);
-            element.removeAttribute("bus");
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus);
         }
+        element.removeAttribute("bus");
+        bean.addConstructorArgValue(bus);
         bean.setLazyInit(false);
         super.doParse(element, ctx, bean);
     }
@@ -86,72 +86,142 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         return id;
     }
     @NoJSR250Annotations
-    public static class BusConfig implements ApplicationContextAware {
+    public static class BusConfig extends AbstractBasicInterceptorProvider
+        implements ApplicationContextAware {
+        
         CXFBusImpl bus;
-        boolean defaultBus;
-        public BusConfig() {
-            bus = (CXFBusImpl)BusFactory.getDefaultBus();
-            defaultBus = true;
+        String busName;
+        Collection<AbstractFeature> features;
+        Map<String, Object> properties;
+        
+        public BusConfig(String busName) {
+            this.busName = busName;
         }
         
-        public BusConfig(Bus b) {
-            bus = (CXFBusImpl)b;
+        public void setBus(Bus bb) {
+            CXFBusImpl b = (CXFBusImpl)bb;
+            if (features != null) {
+                b.setFeatures(features);
+                features = null;
+            }
+            if (properties != null) {
+                b.setProperties(properties);
+                properties = null;
+            }
+            if (!getInInterceptors().isEmpty()) {
+                b.setInInterceptors(getInInterceptors());
+            }
+            if (!getOutInterceptors().isEmpty()) {
+                b.setOutInterceptors(getOutInterceptors());
+            }
+            if (!getInFaultInterceptors().isEmpty()) {
+                b.setInFaultInterceptors(getInFaultInterceptors());
+            }
+            if (!getOutFaultInterceptors().isEmpty()) {
+                b.setOutFaultInterceptors(getOutFaultInterceptors());
+            }
+            bus = b;
         }
-        
+
         public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-            if (defaultBus
-                && applicationContext.getAutowireCapableBeanFactory() instanceof ConfigurableBeanFactory) {
-                ConfigurableBeanFactory bf = (ConfigurableBeanFactory)applicationContext
-                    .getAutowireCapableBeanFactory();
-                bf.registerSingleton("cxf", bus);
+            if (bus != null) {
+                return;
+            }
+            if (busName == null) {
+                setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(applicationContext));
+            } else {
+                setBus(BusWiringBeanFactoryPostProcessor.addBus(applicationContext, busName));                
             }
         }
         
         public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
-            return bus.getOutFaultInterceptors();
+            if (bus != null) {
+                return bus.getOutFaultInterceptors();
+            }
+            return super.getOutFaultInterceptors();
         }
 
         public List<Interceptor<? extends Message>> getInFaultInterceptors() {
-            return bus.getInFaultInterceptors();
+            if (bus != null) {
+                return bus.getInFaultInterceptors();
+            }
+            return super.getInFaultInterceptors();
         }
 
         public List<Interceptor<? extends Message>> getInInterceptors() {
-            return bus.getInInterceptors();
+            if (bus != null) {
+                return bus.getInInterceptors();
+            }
+            return super.getInInterceptors();
         }
 
         public List<Interceptor<? extends Message>> getOutInterceptors() {
-            return bus.getOutInterceptors();
+            if (bus != null) {
+                return bus.getOutInterceptors();
+            }
+            return super.getOutInterceptors();
         }
 
         public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
-            bus.setInInterceptors(interceptors);
+            if (bus != null) {
+                bus.setInInterceptors(interceptors);
+            } else {
+                super.setInInterceptors(interceptors);
+            }
         }
 
         public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
-            bus.setInFaultInterceptors(interceptors);
+            if (bus != null) {
+                bus.setInFaultInterceptors(interceptors);
+            } else {
+                super.setInFaultInterceptors(interceptors);
+            }
         }
 
         public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
-            bus.setOutInterceptors(interceptors);
+            if (bus != null) {
+                bus.setOutInterceptors(interceptors);
+            } else {
+                super.setOutInterceptors(interceptors);
+            }
         }
 
         public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
-            bus.setOutFaultInterceptors(interceptors);
+            if (bus != null) {
+                bus.setOutFaultInterceptors(interceptors);
+            } else {
+                super.setOutFaultInterceptors(interceptors);
+            }
         }
         
         public Collection<AbstractFeature> getFeatures() {
-            return bus.getFeatures();
+            if (bus != null) {
+                return bus.getFeatures();
+            }
+            return features;
         }
 
         public void setFeatures(Collection<AbstractFeature> features) {
-            bus.setFeatures(features);
+            if (bus != null) {
+                bus.setFeatures(features);
+            } else {
+                this.features = features;
+            }
+            
         }
         
         public Map<String, Object> getProperties() {
-            return bus.getProperties();
+            if (bus != null) {
+                return bus.getProperties();
+            } 
+            return properties;
         }
         public void setProperties(Map<String, Object> s) {
-            bus.setProperties(s);
+            if (bus != null) {
+                bus.setProperties(s);
+            } else {
+                this.properties = s;
+            }
         }
 
 

@@ -86,7 +86,25 @@ public class BusDefinitionParserTest extends Assert {
             }
         }
     }
-
+    @Test
+    public void testBusConfigureCreateBus() {
+        ClassPathXmlApplicationContext context = null;
+        try {
+            context = new ClassPathXmlApplicationContext("org/apache/cxf/bus/spring/customerBus2.xml");
+            Bus cxf1 = (Bus)context.getBean("cxf1");
+            
+            assertTrue(cxf1.getOutInterceptors().size() == 1);
+            assertTrue(cxf1.getInInterceptors().size() == 0);
+            
+            Bus cxf2 = (Bus)context.getBean("cxf2");
+            assertTrue(cxf2.getInInterceptors().size() == 1);
+            assertTrue(cxf2.getOutInterceptors().size() == 0);
+        } finally {
+            if (context != null) {
+                context.close();
+            }
+        }
+    }
     @Test
     public void testLazyInit() {
         String cfgFile = "org/apache/cxf/bus/spring/lazyInitBus.xml";

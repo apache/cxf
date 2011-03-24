@@ -297,7 +297,7 @@ public class SpringBeansTest extends Assert {
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/clients.xml"});
 
         ClientHolderBean greeters = (ClientHolderBean)ctx.getBean("greeters");
-        assertEquals(3, greeters.greeterCount());
+        assertEquals(4, greeters.greeterCount());
         
         Object bean = ctx.getBean("client1.proxyFactory");
         assertNotNull(bean);
@@ -377,6 +377,25 @@ public class SpringBeansTest extends Assert {
             }
         }
         fail("Did not configure the client");
+    }
+    @Test
+    public void testClientUsingDifferentBus() throws Exception {
+        ClassPathXmlApplicationContext ctx =
+            new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/clients.xml"});
+        Greeter greeter = (Greeter) ctx.getBean("differentBusGreeter");
+        assertNotNull(greeter);
+        Client client = ClientProxy.getClient(greeter);
+        assertEquals("snarf", client.getBus().getProperty("foo"));
+
+        Greeter greeter1 = (Greeter) ctx.getBean("client1");
+        assertNotNull(greeter1);
+        Client client1 = ClientProxy.getClient(greeter1);
+        assertEquals("barf", client1.getBus().getProperty("foo"));
+        Greeter greeter2 = (Greeter) ctx.getBean("wsdlLocation");
+        assertNotNull(greeter2);
+        Client client2 = ClientProxy.getClient(greeter2);
+        assertSame(client1.getBus(), client2.getBus());
+
     }
 
 }

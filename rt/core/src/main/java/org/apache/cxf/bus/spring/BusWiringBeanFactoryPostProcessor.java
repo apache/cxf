@@ -22,14 +22,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
-import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -38,6 +34,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -49,13 +47,11 @@ import org.springframework.context.ConfigurableApplicationContext;
  * arguments one place to the right and adds a reference to "cxf" as the first constructor argument. This
  * processor is intended to operate on beans defined via Spring namespace support which require a reference to
  * the CXF bus.
- * 
- * @author Ian Roberts
  */
 public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(BusWiringBeanFactoryPostProcessor.class);
     Bus bus;
+    String busName;
     
     public BusWiringBeanFactoryPostProcessor() {
     }
@@ -63,26 +59,62 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
     public BusWiringBeanFactoryPostProcessor(Bus b) {
         bus = b;
     }
+    public BusWiringBeanFactoryPostProcessor(String n) {
+        busName = n;
+    }
+    private static Bus getBusForName(String name,
+                                        ApplicationContext context) {
+        if (!context.containsBean(name)) {
+            SpringBus b = new SpringBus();
+            b.setApplicationContext(context);
+            ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)context;
+            cctx.getBeanFactory().registerSingleton(name, b);
+        }
+        return context.getBean(name, Bus.class);
+    }
+    private Object getBusForName(String name,
+                                        ConfigurableListableBeanFactory factory) {
+        if (!factory.containsBeanDefinition(name)) {
+            DefaultListableBeanFactory df = (DefaultListableBeanFactory)factory;
+            df.registerBeanDefinition(name, 
+                                      new RootBeanDefinition(SpringBus.class));
+        }
+        return new RuntimeBeanReference(name);        
+    }
+    
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
         Object inject = bus;
-        if (factory.containsBeanDefinition(Bus.DEFAULT_BUS_ID)) {
-            inject = new RuntimeBeanReference(Bus.DEFAULT_BUS_ID);
+        if (inject == null) {
+            inject = getBusForName(Bus.DEFAULT_BUS_ID, factory);
+        } else {
+            if (!factory.containsBeanDefinition(Bus.DEFAULT_BUS_ID)
+                && !factory.containsSingleton(Bus.DEFAULT_BUS_ID)) {
+                factory.registerSingleton(Bus.DEFAULT_BUS_ID, bus);
+            }
         }
         for (String beanName : factory.getBeanDefinitionNames()) {
-            LOG.fine("Checking bean " + beanName);
             BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
-            if (BusWiringType.PROPERTY == beanDefinition
-                .getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE)) {
-                LOG.fine("Found " + AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE + " attribute "
-                         + BusWiringType.PROPERTY + " on bean " + beanName);
+            BusWiringType type 
+                = (BusWiringType)beanDefinition.getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE);
+            if (type == null) {
+                continue;
+            }
+            String busname = (String)beanDefinition.getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_NAME);
+            Object inj = inject;
+            if (busname != null) {
+                if (bus != null) {
+                    continue;
+                }
+                inj = getBusForName(busname, factory);
+            }
+            beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_NAME);
+            beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE);
+            if (BusWiringType.PROPERTY == type) {
                 beanDefinition.getPropertyValues()
-                    .addPropertyValue("bus", inject);
-            } else if (BusWiringType.CONSTRUCTOR == beanDefinition
-                .getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE)) {
-                LOG.fine("Found " + AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE + " attribute "
-                         + BusWiringType.CONSTRUCTOR + " on bean " + beanName);
+                    .addPropertyValue("bus", inj);
+            } else if (BusWiringType.CONSTRUCTOR == type) {
                 ConstructorArgumentValues constructorArgs = beanDefinition.getConstructorArgumentValues();
-                insertConstructorArg(constructorArgs, inject);
+                insertConstructorArg(constructorArgs, inj);
             }
         }
     }
@@ -112,14 +144,17 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         constructorArgs.addIndexedArgumentValue(0, valueToInsert);
     }
     
-    public static void updateBusReferencesInContext(Bus bus, ApplicationContext ctx) {
-        Configurer conf = bus.getExtension(Configurer.class);
-        if (conf instanceof ConfigurerImpl) {
-            ((ConfigurerImpl)conf).addApplicationContext(ctx);
+    public static Bus addDefaultBus(ApplicationContext ctx) {
+        if (!ctx.containsBean(Bus.DEFAULT_BUS_ID)) {
+            Bus b = getBusForName(Bus.DEFAULT_BUS_ID, ctx);
+            if (ctx instanceof ConfigurableApplicationContext) {
+                ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)ctx;
+                new BusWiringBeanFactoryPostProcessor(b).postProcessBeanFactory(cctx.getBeanFactory());
+            }
         }
-        if (ctx instanceof ConfigurableApplicationContext) {
-            ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)ctx;
-            new BusWiringBeanFactoryPostProcessor(bus).postProcessBeanFactory(cctx.getBeanFactory());
-        }
+        return ctx.getBean(Bus.DEFAULT_BUS_ID, Bus.class);
+    }
+    public static Bus addBus(ApplicationContext ctx, String name) {
+        return getBusForName(name, ctx);
     }
 }

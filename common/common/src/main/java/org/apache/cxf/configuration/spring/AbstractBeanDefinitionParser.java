@@ -56,6 +56,7 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractBeanDefinitionParser 
     extends org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser {
     public static final String WIRE_BUS_ATTRIBUTE = AbstractBeanDefinitionParser.class.getName() + ".wireBus";
+    public static final String WIRE_BUS_NAME = AbstractBeanDefinitionParser.class.getName() + ".wireBusName";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBeanDefinitionParser.class);
     
     private Class beanClass;
@@ -211,9 +212,19 @@ public abstract class AbstractBeanDefinitionParser
         return DOMUtils.getFirstElement(element);
     }
 
-    protected void addBusWiringAttribute(BeanDefinitionBuilder bean, BusWiringType type) {
+    protected void addBusWiringAttribute(BeanDefinitionBuilder bean, 
+                                         BusWiringType type) {
+        addBusWiringAttribute(bean, type, null);
+    }
+                                         
+    protected void addBusWiringAttribute(BeanDefinitionBuilder bean, 
+                                         BusWiringType type,
+                                         String busName) {
         LOG.fine("Adding " + WIRE_BUS_ATTRIBUTE + " attribute " + type + " to bean " + bean);
         bean.getRawBeanDefinition().setAttribute(WIRE_BUS_ATTRIBUTE, type);
+        if (busName != null) {
+            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME, busName); 
+        }
     }
     
     protected void mapElementToJaxbProperty(Element parent, 

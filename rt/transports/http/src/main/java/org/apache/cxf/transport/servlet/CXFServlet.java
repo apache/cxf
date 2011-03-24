@@ -133,7 +133,7 @@ public class CXFServlet extends AbstractCXFServlet implements ApplicationListene
          */
         if (ctx == null) {            
             LOG.info("LOAD_BUS_WITHOUT_APPLICATION_CONTEXT");
-            bus = new SpringBusFactory().createBus();
+            bus = new SpringBusFactory().createBus(new String[0]);
             ctx = bus.getExtension(BusApplicationContext.class);
         } else {
             LOG.info("LOAD_BUS_WITH_APPLICATION_CONTEXT");

@@ -15,13 +15,15 @@
 		License.
 	-->
 <beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
 	xmlns:soap="http://cxf.apache.org/bindings/soap" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
 	<context:annotation-config />
 
@@ -97,5 +99,24 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
         </jaxws:inInterceptors>
+    </jaxws:client>
+    
+    <!-- this configures the default bus "cxf" -->
+    <cxf:bus>
+        <cxf:properties>
+            <entry key="foo" value="barf"/>
+        </cxf:properties>
+    </cxf:bus>
+    
+    <!-- This will create a new bus named "FooSnarf" and configure it -->
+    <cxf:bus bus="FooSnarf">
+        <cxf:properties>
+            <entry key="foo" value="snarf"/>
+        </cxf:properties>
+    </cxf:bus>
+    <jaxws:client id="differentBusGreeter"
+        bus="FooSnarf"
+        serviceClass="org.apache.hello_world_soap_http.Greeter" address="http://localhost:9000/foo"
+        serviceName="s:SOAPService" xmlns:s="http://apache.org/hello_world_soap_http">
     </jaxws:client>
 </beans>
