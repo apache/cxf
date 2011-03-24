@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxws22.spring;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.springframework.beans.BeansException;
