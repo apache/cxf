@@ -23,10 +23,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * References the concrete response or request class for 
+ * WADL generator be able to generate representations and link
+ * them to schema elements. For example, it can be applied to 
+ * methods returning a JAX-RS {@link Response}. 
+ * 
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD })
-public @interface WadlElement {
-    Class<?> request() default WadlElement.class;
-    Class<?> response() default WadlElement.class;
+public @interface ElementClass {
+    Class<?> request() default Object.class;
+    Class<?> response() default Object.class;
 }
 

@@ -35,8 +35,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.cxf.aegis.type.java5.IgnoreProperty;
-import org.apache.cxf.jaxrs.ext.Description;
-import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
@@ -67,16 +65,25 @@ public class BookStore {
     
     @POST
     @Path("books/{bookid}")
-    @Description("Update the books collection")
+    @Descriptions({ 
+        @Description(value = "Update the books collection", target = DocTarget.METHOD),
+        @Description(value = "Requested Book", target = DocTarget.RETURN),
+        @Description(value = "Request", target = DocTarget.REQUEST),
+        @Description(value = "Response", target = DocTarget.RESPONSE)
+    })
+    
     //CHECKSTYLE:OFF
-    public Book addBook(@PathParam("id") int id,
+    public Book addBook(@Description("book id")
+                        @PathParam("id") int id,
                         @PathParam("bookid") int bookId,
                         @MatrixParam("mid") int matrixId,
+                        @Description("header param")
                         @HeaderParam("hid") int headerId,
                         @CookieParam("cid") int cookieId,
                         @QueryParam("provider.bar") int queryParam,
                         @Context HttpHeaders headers,
-                        @XMLName(value = "{http://books}thesuperbook2", prefix = "p1")
+                        @Description("InputBook")      
+                        @XMLName(value = "{http://books}thesuperbook2")
                         Book2 b) {
         return new Book(1);
     }
@@ -105,7 +112,7 @@ public class BookStore {
     
     @GET
     @Path("chapter2")
-    @WadlElement(response = Chapter.class)
+    @ElementClass(response = Chapter.class)
     public Response getChaper2() {
         return Response.ok().entity(new Chapter(1)).build();
     }

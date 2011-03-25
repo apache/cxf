@@ -27,14 +27,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.cxf.jaxrs.ext.Description;
-import org.apache.cxf.jaxrs.ext.xml.XMLName;
+import org.apache.cxf.jaxrs.model.wadl.Description;
 import org.apache.cxf.jaxrs.model.wadl.FormInterface;
+import org.apache.cxf.jaxrs.model.wadl.XMLName;
 
 @XmlRootElement(name = "thebook", namespace = "http://superbooks")
 @XmlType(name = "book", namespace = "http://superbooks")
 @Description("Book subresource")
-@XMLName(value = "{http://books}thesuperbook", prefix = "p1")
+@XMLName(value = "{http://books}thesuperbook")
 public class Book implements FormInterface {
 
     private int id;

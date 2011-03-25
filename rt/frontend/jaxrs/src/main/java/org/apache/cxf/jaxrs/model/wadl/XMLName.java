@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext;
+package org.apache.cxf.jaxrs.model.wadl;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,28 +25,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Can be used to document resource classes and methods
+ * Can be used to assign qualified XML names to arbitrary classes
+ * for the purpose of matching them with external schema definitions 
  * 
- * See {@link <a href="http://www.w3.org/Submission/wadl/#x3-80002.3">WADL Documentation</a>}.
  */
-@Target({ElementType.TYPE, ElementType.METHOD })
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Description {
+public @interface XMLName {
     /**
-     * This value, if set, will be set as WADL doc content
+     * Qualified name, example {http://books}book
      */
     String value() default "";
     /**
-     * Maps to WADL doc/@xml:lang attribute 
+     * Optional prefix 
      **/
-    String lang() default "";
-    /**
-     * Maps to WADL doc/@title attribute 
-     **/
-    String title() default "";
-    /**
-     * This uri, if set, will be used to retrieve 
-     * the content which will be set as WADL doc content
-     */
-    String docuri() default "";
+    String prefix() default "";
 }

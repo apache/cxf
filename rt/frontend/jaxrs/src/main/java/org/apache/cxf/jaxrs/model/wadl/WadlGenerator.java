@@ -77,10 +77,8 @@ import org.apache.cxf.jaxb.JAXBBeanInfo;
 import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
-import org.apache.cxf.jaxrs.ext.Description;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -183,7 +181,7 @@ public class WadlGenerator implements RequestHandler {
         Set<ClassResourceInfo> visitedResources = new HashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
             startResourceTag(sbResources, cri.getServiceClass(), cri.getURITemplate().getValue());
-            handleDocs(cri.getServiceClass().getAnnotations(), sbResources);
+            handleDocs(cri.getServiceClass().getAnnotations(), sbResources, DocTarget.RESOURCE, true);
             handleResource(sbResources, allTypes, qnameResolver, clsMap, cri, visitedResources);
             sbResources.append("</resource>");
         }
@@ -237,11 +235,11 @@ public class WadlGenerator implements RequestHandler {
             OperationResourceInfo ori = sortedOps.get(i);
 
             if (ori.getHttpMethod() == null) {
-                Class<?> cls = ori.getMethodToInvoke().getReturnType();
+                Class<?> cls = getMethod(ori).getReturnType();
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
                 if (subcri != null && !visitedResources.contains(subcri)) {
                     startResourceTag(sb, subcri.getServiceClass(), ori.getURITemplate().getValue());
-                    handleDocs(subcri.getServiceClass().getAnnotations(), sb);
+                    handleDocs(subcri.getServiceClass().getAnnotations(), sb, DocTarget.RESOURCE, true);
                     handlePathAndMatrixParams(sb, ori);
                     handleResource(sb, jaxbTypes, qnameResolver, clsMap, subcri,
                                    visitedResources);
@@ -276,7 +274,7 @@ public class WadlGenerator implements RequestHandler {
     private void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
         sb.append("<method name=\"").append(ori.getHttpMethod()).append("\"");
         if (addResourceAndMethodIds) {
-            sb.append(" id=\"").append(ori.getMethodToInvoke().getName()).append("\"");
+            sb.append(" id=\"").append(getMethod(ori).getName()).append("\"");
         }
         sb.append(">");
     }
@@ -309,9 +307,11 @@ public class WadlGenerator implements RequestHandler {
         }
 
         startMethodTag(sb, ori);
-        handleDocs(ori.getAnnotatedMethod().getAnnotations(), sb);
-        if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
+        Annotation[] anns = getMethod(ori).getAnnotations();
+        handleDocs(anns, sb, DocTarget.METHOD, true);
+        if (getMethod(ori).getParameterTypes().length != 0) {
             sb.append("<request>");
+            handleDocs(anns, sb, DocTarget.REQUEST, false);
             if (isFormRequest(ori)) {
                 handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori));
             } else {
@@ -322,15 +322,17 @@ public class WadlGenerator implements RequestHandler {
             sb.append("</request>");
         }
         sb.append("<response");
-        boolean isVoid = void.class == ori.getMethodToInvoke().getReturnType();
+        Class<?> returnType = getMethod(ori).getReturnType();
+        boolean isVoid = void.class == returnType;
         if (isVoid) {
-            boolean oneway = ori.getMethodToInvoke().getAnnotation(Oneway.class) != null;
+            boolean oneway = getMethod(ori).getAnnotation(Oneway.class) != null;
             sb.append(" status=\"" + (oneway ? 202 : 204) + "\"");
         }
         sb.append(">");
-        if (void.class != ori.getMethodToInvoke().getReturnType()) {
+        handleDocs(anns, sb, DocTarget.RESPONSE, false);
+        if (!isVoid) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori,
-                                 ori.getMethodToInvoke().getReturnType(), false);
+                                 returnType, false);
         }
         sb.append("</response>");
 
@@ -402,7 +404,7 @@ public class WadlGenerator implements RequestHandler {
     private void handleParameter(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                  ElementQNameResolver qnameResolver,
                                  Map<Class<?>, QName> clsMap, OperationResourceInfo ori, Parameter pm) {
-        Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+        Class<?> cls = getMethod(ori).getParameterTypes()[pm.getIndex()];
         if (pm.getType() == ParameterType.REQUEST_BODY) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, cls, true);
             return;
@@ -425,22 +427,24 @@ public class WadlGenerator implements RequestHandler {
     }
 
     private Annotation[] getBodyAnnotations(OperationResourceInfo ori, boolean inbound) {
+        Method opMethod = getMethod(ori);
         if (inbound) {
             for (Parameter pm : ori.getParameters()) {
                 if (pm.getType() == ParameterType.REQUEST_BODY) {
-                    return ori.getAnnotatedMethod().getParameterAnnotations()[pm.getIndex()];
+                    return opMethod.getParameterAnnotations()[pm.getIndex()];
                 }
             }
             return new Annotation[]{};
         } else {
-            return ori.getAnnotatedMethod().getDeclaredAnnotations();
+            return opMethod.getDeclaredAnnotations();
         }
     }
 
     private void writeParam(StringBuilder sb, Parameter pm, OperationResourceInfo ori) {
-        Class<?> type = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+        Method method = getMethod(ori);
+        Class<?> type = method.getParameterTypes()[pm.getIndex()];
         if (!"".equals(pm.getName())) {
-            doWriteParam(sb, pm, type, pm.getName());
+            doWriteParam(sb, pm, type, pm.getName(), method.getParameterAnnotations()[pm.getIndex()]);
         } else {
             doWriteBeanParam(sb, type, pm, null);
         }
@@ -454,14 +458,15 @@ public class WadlGenerator implements RequestHandler {
                 name = parentName + "." + name;
             }
             if (InjectionUtils.isPrimitive(entry.getValue())) {
-                doWriteParam(sb, entry.getKey(), entry.getValue(), name);
+                doWriteParam(sb, entry.getKey(), entry.getValue(), name, new Annotation[]{});
             } else {
                 doWriteBeanParam(sb, entry.getValue(), entry.getKey(), name);
             }
         }
     }
 
-    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName) {
+    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName,
+                                Annotation[] anns) {
         sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template"
                        : ParameterType.FORM == pm.getType() ? "query"
@@ -475,9 +480,25 @@ public class WadlGenerator implements RequestHandler {
         if (value != null) {
             sb.append(" type=\"").append(value).append("\"");
         }
-        sb.append("/>");
+        addDocsAndCloseElement(sb, anns, "param", DocTarget.PARAM, true);
     }
 
+    private void addDocsAndCloseElement(StringBuilder sb, Annotation[] anns, String elementName,
+                                        String category, boolean allowDefault) {
+        if (isDocAvailable(anns)) {
+            sb.append(">");
+            handleDocs(anns, sb, category, allowDefault);
+            sb.append("</" + elementName + ">");
+        } else {
+            sb.append("/>");
+        }
+    }
+    
+    private boolean isDocAvailable(Annotation[] anns) {
+        return AnnotationUtils.getAnnotation(anns, Description.class) != null
+                   || AnnotationUtils.getAnnotation(anns, Descriptions.class) != null;
+    }
+    
     private void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                       ElementQNameResolver qnameResolver,
                                       Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
@@ -489,25 +510,38 @@ public class WadlGenerator implements RequestHandler {
             types = Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM_TYPE);
         } 
         
+        Method opMethod = getMethod(ori);
         boolean isPrimitive = InjectionUtils.isPrimitive(type);
         for (MediaType mt : types) {
             
             sb.append("<representation");
             sb.append(" mediaType=\"").append(mt.toString()).append("\"");
 
+            boolean allowDefault = true;
+            String docCategory;
+            Annotation[] anns;
+            if (inbound) {
+                int index = getRequestBodyParam(ori).getIndex();
+                anns = opMethod.getParameterAnnotations()[index];
+                docCategory = DocTarget.PARAM;
+            } else {
+                anns = opMethod.getAnnotations();
+                docCategory = DocTarget.RETURN;
+                allowDefault = false;
+            }
             if (isPrimitive) {
                 sb.append(">");    
                 Parameter p = inbound ? getRequestBodyParam(ori) 
                     : new Parameter(ParameterType.REQUEST_BODY, 0, "result"); 
-                doWriteParam(sb, p, type, p.getName() == null ? "request" : p.getName());
+                doWriteParam(sb, p, type, p.getName() == null ? "request" : p.getName(), anns);
                 sb.append("</representation>");
             } else  { 
-                type = getActualJaxbType(type, ori.getAnnotatedMethod(), inbound);
+                type = getActualJaxbType(type, opMethod, inbound);
                 if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
                     generateQName(sb, qnameResolver, clsMap, type,
                                   getBodyAnnotations(ori, inbound));
                 }
-                sb.append("/>");
+                addDocsAndCloseElement(sb, anns, "representation", docCategory, allowDefault);
             }
         }
         
@@ -546,8 +580,15 @@ public class WadlGenerator implements RequestHandler {
     }
 
     protected Class<?> getActualJaxbType(Class<?> type, Method resourceMethod, boolean inbound) {
-        WadlElement element = resourceMethod.getAnnotation(WadlElement.class);
-        return element == null ? type : inbound ? element.request() : element.response();
+        ElementClass element = resourceMethod.getAnnotation(ElementClass.class);
+        if  (element != null) {
+            Class<?> cls = inbound ? element.request() : element.response();
+            if (cls != Object.class) {
+                return cls;
+            }
+        }
+        return type;
+        
     }
 
     protected List<OperationResourceInfo> sortOperationsByPath(Set<OperationResourceInfo> ops) {
@@ -684,7 +725,7 @@ public class WadlGenerator implements RequestHandler {
         for (Parameter p : ori.getParameters()) {
             if (p.getType() == ParameterType.FORM
                 || p.getType() == ParameterType.REQUEST_BODY 
-                && ori.getMethodToInvoke().getParameterTypes()[p.getIndex()] == MultivaluedMap.class) {
+                && getMethod(ori).getParameterTypes()[p.getIndex()] == MultivaluedMap.class) {
                 return true;
             }
         }
@@ -797,11 +838,20 @@ public class WadlGenerator implements RequestHandler {
         this.ignoreMessageWriters = ignoreMessageWriters;
     }
 
-    private void handleDocs(Annotation[] anns, StringBuilder sb) {
+    private void handleDocs(Annotation[] anns, StringBuilder sb, String category, boolean allowDefault) {
         for (Annotation a : anns) {
+            if (a.annotationType() == Descriptions.class) {
+                Descriptions ds = (Descriptions)a;
+                handleDocs(ds.value(), sb, category, allowDefault);
+                return;
+            }
             if (a.annotationType() == Description.class) {
                 Description d = (Description)a;
-
+                if (d.target().length() == 0 && !allowDefault 
+                    || d.target().length() > 0 && !d.target().equals(category)) {
+                    continue;
+                }
+                
                 sb.append("<doc");
                 if (d.lang().length() > 0) {
                     sb.append(" xml:lang=\"" + d.lang() + "\"");
@@ -1139,6 +1189,11 @@ public class WadlGenerator implements RequestHandler {
         this.addResourceAndMethodIds = addResourceAndMethodIds;
     }
 
+    private Method getMethod(OperationResourceInfo ori) {
+        Method annMethod = ori.getAnnotatedMethod();
+        return annMethod != null ? annMethod : ori.getMethodToInvoke();
+    }
+    
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
         private Map<String, String> locsMap;

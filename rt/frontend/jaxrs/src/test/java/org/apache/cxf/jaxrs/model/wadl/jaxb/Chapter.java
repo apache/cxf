@@ -24,13 +24,13 @@ import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.cxf.jaxrs.ext.Description;
-import org.apache.cxf.jaxrs.ext.xml.XMLName;
+import org.apache.cxf.jaxrs.model.wadl.Description;
+import org.apache.cxf.jaxrs.model.wadl.XMLName;
 
 @XmlRootElement(name = "thechapter", namespace = "http://superbooks")
 @XmlType(name = "chapter", namespace = "http://superbooks")
 @Description("Chapter subresource")
-@XMLName(value = "{http://books}thesuperchapter", prefix = "p1")
+@XMLName(value = "{http://books}thesuperchapter")
 public class Chapter {
 
     private int id;
