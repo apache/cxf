@@ -375,6 +375,7 @@ public class WadlGeneratorTest extends Assert {
         verifyGetResourceMethod(resourceEls.get(0), book2El, null);
         
         //verify resource starting with /books/{bookid}
+        checkDocs(resourceEls.get(1), "", "Resource books/{bookid}", "");
         verifyParameters(resourceEls.get(1), 3, 
                          new Param("id", "template", "xs:int", "book id"),
                          new Param("bookid", "template", "xs:int"),

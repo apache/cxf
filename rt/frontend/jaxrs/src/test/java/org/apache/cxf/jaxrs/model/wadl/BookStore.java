@@ -63,16 +63,18 @@ public class BookStore {
         return new Book(1);
     }
     
-    @POST
-    @Path("books/{bookid}")
+    
     @Descriptions({ 
         @Description(value = "Update the books collection", target = DocTarget.METHOD),
         @Description(value = "Requested Book", target = DocTarget.RETURN),
         @Description(value = "Request", target = DocTarget.REQUEST),
-        @Description(value = "Response", target = DocTarget.RESPONSE)
+        @Description(value = "Response", target = DocTarget.RESPONSE),
+        @Description(value = "Resource books/{bookid}", target = DocTarget.RESOURCE)
     })
     
     //CHECKSTYLE:OFF
+    @POST
+    @Path("books/{bookid}")
     public Book addBook(@Description("book id")
                         @PathParam("id") int id,
                         @PathParam("bookid") int bookId,

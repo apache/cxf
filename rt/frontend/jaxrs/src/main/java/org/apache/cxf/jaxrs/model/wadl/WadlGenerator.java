@@ -287,6 +287,8 @@ public class WadlGenerator implements RequestHandler {
                                  OperationResourceInfo nextOp,
                                  boolean resourceTagOpened,
                                  int index) {
+        Annotation[] anns = getMethod(ori).getAnnotations();
+        
     //CHECKSTYLE:ON
         boolean samePathOperationFollows = singleResourceMultipleMethods && compareOperations(ori, nextOp);
 
@@ -301,13 +303,13 @@ public class WadlGenerator implements RequestHandler {
                 }
             }
             sb.append("<resource path=\"").append(path).append("\">");
+            handleDocs(anns, sb, DocTarget.RESOURCE, false);
             handlePathAndMatrixParams(sb, ori);
         } else if (index == 0) {
             handlePathAndMatrixParams(sb, ori);
         }
 
         startMethodTag(sb, ori);
-        Annotation[] anns = getMethod(ori).getAnnotations();
         handleDocs(anns, sb, DocTarget.METHOD, true);
         if (getMethod(ori).getParameterTypes().length != 0) {
             sb.append("<request>");
