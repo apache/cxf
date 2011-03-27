@@ -42,9 +42,9 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
+import org.apache.cxf.transport.servlet.CXFServlet;
 
-public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
+public class CXFNonSpringJaxrsServlet extends CXFServlet {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
     
@@ -62,10 +62,10 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
     
+    
     @Override
-    public void loadBus(ServletConfig servletConfig) throws ServletException {
-        super.loadBus(servletConfig);
-        
+    public void init(ServletConfig servletConfig) throws ServletException {
+        super.init(servletConfig);
         String applicationClass = servletConfig.getInitParameter(JAXRS_APPLICATION_PARAM);
         if (applicationClass != null) {
             createServerFromApplication(applicationClass, servletConfig);
@@ -73,6 +73,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         
         JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
+        bean.setBus(getBus());
         
         String address = servletConfig.getInitParameter(SERVICE_ADDRESS_PARAM);
         if (address == null) {

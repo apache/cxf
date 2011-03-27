@@ -24,7 +24,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
+import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -48,16 +48,15 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
 
             ServletContextHandler root = new ServletContextHandler(contexts, "/",
                                                                    ServletContextHandler.SESSIONS);
-
-            CXFNonSpringServlet cxf = new CXFNonSpringServlet();
+            Bus bus = BusFactory.getDefaultBus(true);
+            CXFServlet cxf = new CXFServlet();
+            cxf.setBus(bus);
             ServletHolder servlet = new ServletHolder(cxf);
             servlet.setName("soap");
             servlet.setForcedPath("soap");
             root.addServlet(servlet, "/soap/*");
 
             httpServer.start();
-
-            Bus bus = cxf.getBus();
             setBus(bus);
             BusFactory.setDefaultBus(bus);
             GreeterImpl impl = new GreeterImpl();
@@ -65,7 +64,7 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             HelloImpl helloImpl = new HelloImpl();
             Endpoint.publish("/Hello", helloImpl);
             
-            ((EndpointImpl)Endpoint.create(helloImpl)).publish();
+            ((EndpointImpl)Endpoint.create(helloImpl)).publish("/");
 
         } catch (Exception e) {
             throw new RuntimeException(e);

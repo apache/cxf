@@ -25,7 +25,7 @@ import org.apache.cxf.transport.AbstractDestination;
 
 
 public interface DestinationRegistry {
-    void addDestination(String path, AbstractHTTPDestination destination);
+    void addDestination(AbstractHTTPDestination destination);
 
     void removeDestination(String path);
 
@@ -41,5 +41,4 @@ public interface DestinationRegistry {
 
     Set<String> getDestinationsPaths();
 
-    String getTrimmedPath(String path);
 }

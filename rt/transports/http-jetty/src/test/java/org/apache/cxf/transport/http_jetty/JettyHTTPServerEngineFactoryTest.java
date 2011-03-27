@@ -27,6 +27,8 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.http.HTTPTransportFactory;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -78,7 +80,7 @@ public class JettyHTTPServerEngineFactoryTest
             destFM.getDestinationFactory(
                     "http://cxf.apache.org/transports/http");
         assertNotNull("No DestinationFactory", destF);
-        assertTrue(JettyHTTPTransportFactory.class.isInstance(destF));
+        assertTrue(HTTPTransportFactory.class.isInstance(destF));
 
         // And the JettyHTTPServerEngineFactory should be there.
         JettyHTTPServerEngineFactory factory =

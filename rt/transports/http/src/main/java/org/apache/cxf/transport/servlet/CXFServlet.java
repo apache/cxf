@@ -16,200 +16,98 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.transport.servlet;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-
-import org.apache.cxf.bus.spring.BusApplicationContext;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.resource.URIResolver;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
+public class CXFServlet extends AbstractHTTPServlet {
 
-/**
- * A Servlet which supports loading of JAX-WS endpoints from an
- * XML file and handling requests for endpoints created via other means
- * such as Spring beans, or the Java API. All requests are passed on
- * to the {@link ServletController}.
- *
- */
-public class CXFServlet extends AbstractCXFServlet implements ApplicationListener {
+    private HTTPTransportFactory transportFactory;
+    private Bus bus;
+
+    private ServletController controller;
     
-    private GenericApplicationContext childCtx;
-    private boolean inRefresh;
-    
-    
-    public static Logger getLogger() {
-        return LogUtils.getL7dLogger(CXFServlet.class);
+    public CXFServlet() {
     }
-    
-    public void loadBus(ServletConfig servletConfig) throws ServletException {
-        String springCls = "org.springframework.context.ApplicationContext";
-        try {
-            ClassLoaderUtils.loadClass(springCls, getClass());
-            loadSpringBus(servletConfig);
-        } catch (ClassNotFoundException e) {                
-            LOG.log(Level.SEVERE, "FAILED_TO_LOAD_SPRING_BUS", new Object[]{e});
-            throw new ServletException("Can't load bus with Spring context class", e);
-        }
-    }
-    
-    
-    private void loadSpringBus(ServletConfig servletConfig) throws ServletException {
-        
-        // try to pull an existing ApplicationContext out of the
-        // ServletContext
-        ServletContext svCtx = getServletContext();
 
-        // Spring 1.x
-        ApplicationContext ctx = (ApplicationContext)svCtx
-            .getAttribute("interface org.springframework.web.context.WebApplicationContext.ROOT");
-
-        // Spring 2.0
-        if (ctx == null) {
-            Object ctxObject = svCtx
-                .getAttribute("org.springframework.web.context.WebApplicationContext.ROOT");
-            if (ctxObject instanceof ApplicationContext) {
-                ctx = (ApplicationContext) ctxObject;
-            } else if (ctxObject != null) {
-                // it should be a runtime exception                
-                Exception ex = (Exception) ctxObject;
-                throw new ServletException(ex);
-            }                   
-        }
-        
-        updateContext(servletConfig, ctx);
-
-        if (ctx instanceof ConfigurableApplicationContext) {
-            ((ConfigurableApplicationContext)ctx).addApplicationListener(this);
-        }
-        if (ctx instanceof AbstractApplicationContext) {
-            Collection<ApplicationListener> lst = getListeners(ctx);
-            if (lst != null && !lst.contains(this)) {
-                lst.add(this);
+    @Override
+    public void init(ServletConfig sc) throws ServletException {
+        super.init(sc);
+        if (this.bus == null) {
+            ApplicationContext wac = WebApplicationContextUtils.
+                getWebApplicationContext(sc.getServletContext());
+            String configLocation = sc.getInitParameter("config-location");
+            if (wac == null && (configLocation != null)) {
+                wac = new ClassPathXmlApplicationContext(configLocation);
+            }
+            if (wac != null) {
+                this.bus = wac.getBean("cxf", Bus.class);
+            } else {
+                this.bus = BusFactory.newInstance().createBus();
             }
         }
-    }
-    private Collection<ApplicationListener> getListeners(ApplicationContext ctx) {
-        try {
-            Object o = ctx.getClass().getMethod("getApplicationListeners").invoke(ctx);
-            return CastUtils.cast((Collection<?>)o);
-        } catch (Exception e) {
-            //ignore
-        }
-        return null;
-    }
-    
-    private void updateContext(ServletConfig servletConfig, ApplicationContext ctx) {
-        /* If ctx is null, normally no ContextLoaderListener 
-         * was defined in web.xml.  Default bus with all extensions
-         * will be created in this case.
-         * 
-         * If ctx not null, was already created by ContextLoaderListener.
-         * Bus with only those extensions defined in the ctx will be created. 
-         */
-        if (ctx == null) {            
-            LOG.info("LOAD_BUS_WITHOUT_APPLICATION_CONTEXT");
-            bus = new SpringBusFactory().createBus(new String[0]);
-            ctx = bus.getExtension(BusApplicationContext.class);
-        } else {
-            LOG.info("LOAD_BUS_WITH_APPLICATION_CONTEXT");
-            inRefresh = true;
-            try {
-                bus = new SpringBusFactory(ctx).createBus();
-            } finally {
-                inRefresh = false;
-            }
-        }        
-        
+
         ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
         resourceManager.addResourceResolver(new ServletContextResourceResolver(
-                                               servletConfig.getServletContext()));
-        
-        replaceDestinationFactory();
+                                               sc.getServletContext()));
 
-        // Set up the ServletController
-        controller = createServletController(servletConfig);
-        
-        // build endpoints from the web.xml or a config file
-        loadAdditionalConfig(ctx, servletConfig);
-    }
-
-    private void loadAdditionalConfig(ApplicationContext ctx, 
-                                        ServletConfig servletConfig) {
-        String location = servletConfig.getInitParameter("config-location");
-        if (location == null) {
-            location = "/WEB-INF/cxf-servlet.xml";
-        }
-        InputStream is = null;
-        try {
-            is = servletConfig.getServletContext().getResourceAsStream(location);
-            
-            if (is == null || is.available() == -1) {
-                URIResolver resolver = new URIResolver(location);
-
-                if (resolver.isResolved()) {
-                    is = resolver.getInputStream();
-                }
-            }
-        } catch (IOException e) {
-            //throw new ServletException(e);
-        }
-        
-        if (is != null) {
-            LOG.log(Level.INFO, "BUILD_ENDPOINTS_FROM_CONFIG_LOCATION", new Object[]{location});
-            childCtx = new GenericApplicationContext(ctx);
-            
-            XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(childCtx);
-            reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
-            reader.loadBeanDefinitions(new InputStreamResource(is, location));
-            
-            childCtx.refresh();
-        } 
-    }
-
-    public void destroy() {
-        if (childCtx != null) {
-            childCtx.destroy();
-        }
-        super.destroy();        
-    }
-
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (!inRefresh && event instanceof ContextRefreshedEvent && getServletConfig() != null) {
-            //need to re-do the bus/controller stuff
+        if (transportFactory == null) {
+            DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
             try {
-                inRefresh = true;
-                updateContext(this.getServletConfig(), 
-                          ((ContextRefreshedEvent)event).getApplicationContext());
-            } finally {
-                inRefresh = false;
+                DestinationFactory df = dfm
+                    .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
+                if (df instanceof HTTPTransportFactory) {
+                    transportFactory = (HTTPTransportFactory)df;
+                }
+            } catch (BusException e) {
+                // why are we throwing a busexception if the DF isn't found?
             }
+        }
+        this.controller = createServletController(sc);
+    }
+
+    private ServletController createServletController(ServletConfig servletConfig) {
+        HttpServlet serviceListGeneratorServlet = 
+            new ServiceListGeneratorServlet(transportFactory.getRegistry(), bus);
+        ServletController newController =
+            new ServletController(transportFactory.getRegistry(),
+                                  servletConfig,
+                                  serviceListGeneratorServlet);        
+        return newController;
+    }
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    public void setBus(Bus bus) {
+        this.bus = bus;
+    }
+
+    @Override
+    protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        try {
+            BusFactory.setThreadDefaultBus(bus);
+            controller.invoke(request, response);
+        } finally {
+            BusFactory.setThreadDefaultBus(null);
         }
     }
 
-    
 }

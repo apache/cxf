@@ -61,6 +61,7 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
@@ -110,7 +111,7 @@ public class JettyHTTPDestinationTest extends Assert {
     private QueryHandler wsdlQueryHandler;
     private QueryHandlerRegistry  queryHandlerRegistry;
     private List<QueryHandler> queryHandlerList;
-    private JettyHTTPTransportFactory transportFactory; 
+    private HTTPTransportFactory transportFactory; 
 
     /**
      * This class replaces the engine in the Jetty Destination.
@@ -169,8 +170,8 @@ public class JettyHTTPDestinationTest extends Assert {
     
     @Test
     public void testRandomPortAllocation() throws Exception {
-        transportFactory = new JettyHTTPTransportFactory();
-        transportFactory.setBus(new CXFBusImpl());
+        transportFactory = new HTTPTransportFactory();
+        transportFactory.setBus(BusFactory.getDefaultBus());
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));
         EndpointInfo ei = new EndpointInfo(serviceInfo, "");
@@ -221,17 +222,16 @@ public class JettyHTTPDestinationTest extends Assert {
                 return httpEngine;
             }
         };
-        transportFactory = new JettyHTTPTransportFactory();
+        transportFactory = new HTTPTransportFactory();
         transportFactory.setBus(new CXFBusImpl());
         transportFactory.getBus().setExtension(
             factory, JettyHTTPServerEngineFactory.class);
         
-        
         TestJettyDestination testDestination = 
             new TestJettyDestination(transportFactory.getBus(), 
                                      transportFactory.getRegistry(), 
-                                     ei, 
-                                     transportFactory.getJettyHTTPServerEngineFactory());
+                                     ei,
+                                     factory);
         testDestination.finalizeConfig();
         Message mi = testDestination.retrieveFromContinuation(httpRequest);
         assertNull("Continuations must be ignored", mi);
@@ -239,8 +239,8 @@ public class JettyHTTPDestinationTest extends Assert {
     
     @Test
     public void testGetMultiple() throws Exception {
-        transportFactory = new JettyHTTPTransportFactory();
-        transportFactory.setBus(new CXFBusImpl());
+        transportFactory = new HTTPTransportFactory();
+        transportFactory.setBus(BusFactory.getDefaultBus(true));
         
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));        
@@ -432,7 +432,7 @@ public class JettyHTTPDestinationTest extends Assert {
         address = getEPR("bar/foo");
         bus = new CXFBusImpl();
         
-        transportFactory = new JettyHTTPTransportFactory();
+        transportFactory = new HTTPTransportFactory();
         transportFactory.setBus(bus);
         
         ServiceInfo serviceInfo = new ServiceInfo();
@@ -527,16 +527,7 @@ public class JettyHTTPDestinationTest extends Assert {
         address = getEPR("bar/foo");
         
 
-        transportFactory = new JettyHTTPTransportFactory() {
-            JettyHTTPServerEngineFactory serverEngineFactory;
-            @Override
-            public JettyHTTPServerEngineFactory getJettyHTTPServerEngineFactory() {
-                if (serverEngineFactory == null) {
-                    serverEngineFactory = new JettyHTTPServerEngineFactory();
-                }
-                return serverEngineFactory;   
-            }
-        };
+        transportFactory = new HTTPTransportFactory();
 
         final ConduitInitiator ci = new ConduitInitiator() {
             public Conduit getConduit(EndpointInfo targetInfo) throws IOException {

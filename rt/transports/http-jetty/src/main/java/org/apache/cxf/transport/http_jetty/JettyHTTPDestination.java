@@ -139,13 +139,14 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
      * after the configuration items have been set.
      *
      */
-    public void finalizeConfig() 
-        throws GeneralSecurityException,
-               IOException {
-        
+    public void finalizeConfig() {
         assert !configFinalized;
         
-        retrieveEngine();
+        try {
+            retrieveEngine();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         configFinalized = true;
     }
     

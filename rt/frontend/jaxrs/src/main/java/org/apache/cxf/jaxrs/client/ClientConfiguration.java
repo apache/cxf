@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -36,9 +35,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
 import org.apache.cxf.transport.http.HTTPConduit;
 
 /**
@@ -83,19 +80,6 @@ public class ClientConfiguration implements InterceptorProvider {
             getConduitSelector().prepare(message);
         } catch (Fault ex) {
             LOG.fine("Failure to prepare a message from conduit selector");
-            if (ex.getCause() instanceof BusException) {
-                String code = ((BusException)ex.getCause()).getCode();
-                if ("NO_CONDUIT_INITIATOR".equals(code)) {
-                    ConduitInitiatorManager cim = getBus().getExtension(ConduitInitiatorManager.class);
-                    ClientOnlyHTTPTransportFactory factory = new ClientOnlyHTTPTransportFactory();
-                    factory.setBus(getBus());                   
-                    cim.registerConduitInitiator(
-                        getConduitSelector().getEndpoint().getEndpointInfo().getTransportId(), factory);
-                    getConduitSelector().prepare(message);
-                } else {
-                    throw ex;
-                }
-            }
         }
     }
     

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,17 +28,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.AbstractTransportFactory;
+import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.ConduitInitiator;
+import org.apache.cxf.transport.Destination;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.servlet.ServletDestinationFactory;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.http.AddressType;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
@@ -45,9 +54,10 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 /**
  *
  */
-public abstract class AbstractHTTPTransportFactory 
+@NoJSR250Annotations(unlessNull = "bus")
+public class HTTPTransportFactory 
     extends AbstractTransportFactory 
-    implements WSDLEndpointFactory {
+    implements WSDLEndpointFactory, ConduitInitiator, DestinationFactory {
 
     public static final List<String> DEFAULT_NAMESPACES 
         = Arrays.asList(
@@ -69,20 +79,25 @@ public abstract class AbstractHTTPTransportFactory
 
     protected final DestinationRegistry registry;
     
-    public AbstractHTTPTransportFactory() {
+    public HTTPTransportFactory() {
         this(new DestinationRegistryImpl());
     }
-    public AbstractHTTPTransportFactory(Bus b) {
+    public HTTPTransportFactory(Bus b) {
         this(b, new DestinationRegistryImpl());
     }
-    public AbstractHTTPTransportFactory(Bus b, DestinationRegistry registry) {
+    public HTTPTransportFactory(Bus b, DestinationRegistry registry) {
         super(DEFAULT_NAMESPACES, b);
         this.registry = registry;
     }
 
-    public AbstractHTTPTransportFactory(DestinationRegistry registry) {
+    public HTTPTransportFactory(DestinationRegistry registry) {
         super(DEFAULT_NAMESPACES);
         this.registry = registry;
+    }
+    
+    @Resource 
+    public void setBus(Bus b) {
+        super.setBus(b);
     }
 
     public DestinationRegistry getRegistry() {
@@ -198,6 +213,53 @@ public abstract class AbstractHTTPTransportFactory
             setLocation(locationURI);
         }
         
+    }
+    
+    /**
+     * This call creates a new HTTPConduit for the endpoint. It is equivalent
+     * to calling getConduit without an EndpointReferenceType.
+     */
+    public Conduit getConduit(EndpointInfo endpointInfo) throws IOException {
+        return getConduit(endpointInfo, endpointInfo.getTarget());
+    }
+
+    /**
+     * This call creates a new HTTP Conduit based on the EndpointInfo and
+     * EndpointReferenceType.
+     * TODO: What are the formal constraints on EndpointInfo and 
+     * EndpointReferenceType values?
+     */
+    public Conduit getConduit(
+            EndpointInfo endpointInfo,
+            EndpointReferenceType target
+    ) throws IOException {
+        HTTPConduit conduit = new HTTPConduit(bus, endpointInfo, target);
+        // Spring configure the conduit.  
+        String address = conduit.getAddress();
+        if (address != null && address.indexOf('?') != -1) {
+            address = address.substring(0, address.indexOf('?'));
+        }
+        configure(conduit, conduit.getBeanName(), address);
+        conduit.finalizeConfig();
+        return conduit;
+    }
+    
+    public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
+        AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
+        if (d == null) {
+            HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
+            HttpDestinationFactory servletFactory = new ServletDestinationFactory();
+            String addr = endpointInfo.getAddress();
+            HttpDestinationFactory factory = servletFactory;
+            if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
+                factory = jettyFactory;
+            }
+            d = factory.createDestination(endpointInfo, getBus(), registry);
+            registry.addDestination(d);
+            configure(d);
+            d.finalizeConfig();
+        }
+        return d;
     }
 
 }

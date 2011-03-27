@@ -24,13 +24,6 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <bean id="ServletTransportFactory"
-          class="org.apache.cxf.transport.servlet.ServletTransportFactory"
-          lazy-init="true">
-        <constructor-arg ref="osgiDestinationRegistry"/>
-        <property name="bus" ref="cxf"/>
-    </bean>
-
     <osgi:reference id="osgiDestinationRegistry"
                     interface="org.apache.cxf.transport.http.DestinationRegistry" />
 

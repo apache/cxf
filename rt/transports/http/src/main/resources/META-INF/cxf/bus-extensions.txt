@@ -1,4 +1,4 @@
-org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory::true
+org.apache.cxf.transport.http.HTTPTransportFactory::true
 org.apache.cxf.transport.http.HTTPWSDLExtensionLoader::true
 org.apache.cxf.transport.http.policy.HTTPClientAssertionBuilder::true
 org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder::true

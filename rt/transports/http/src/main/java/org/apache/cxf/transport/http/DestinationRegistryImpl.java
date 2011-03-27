@@ -42,11 +42,11 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     public DestinationRegistryImpl() {
     }
 
-    public void addDestination(String path, AbstractHTTPDestination destination) {
-        String p = getTrimmedPath(path);
-        destinations.putIfAbsent(p, destination);
+    public void addDestination(AbstractHTTPDestination destination) {
+        String path = getTrimmedPath(destination.getEndpointInfo().getAddress());
+        destinations.putIfAbsent(path, destination);
         try {
-            decodedDestinations.put(URLDecoder.decode(p, "ISO-8859-1"), destination);
+            decodedDestinations.put(URLDecoder.decode(path, "ISO-8859-1"), destination);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Unsupported Encoding", e);
         }
@@ -127,7 +127,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
      * @param path 
      * @return trimmed path
      */
-    public String getTrimmedPath(String path) {
+    public static String getTrimmedPath(String path) {
         if (path == null) {
             return "/";
         }

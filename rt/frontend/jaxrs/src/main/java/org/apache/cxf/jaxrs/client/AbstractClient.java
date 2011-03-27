@@ -48,7 +48,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -70,9 +69,7 @@ import org.apache.cxf.phase.PhaseChainCache;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
 
 /**
  * Common proxy and http-centric client implementation
@@ -540,20 +537,7 @@ public class AbstractClient implements Client {
         try {
             cfg.prepareConduitSelector(message);
         } catch (Fault ex) {
-            LOG.fine("Failure to prepare a message from conduit selector");
-            if (ex.getCause() instanceof BusException) {
-                String code = ((BusException)ex.getCause()).getCode();
-                if ("NO_CONDUIT_INITIATOR".equals(code)) {
-                    ConduitInitiatorManager cim = cfg.getBus().getExtension(ConduitInitiatorManager.class);
-                    ClientOnlyHTTPTransportFactory factory = new ClientOnlyHTTPTransportFactory();
-                    factory.setBus(cfg.getBus());                   
-                    cim.registerConduitInitiator(
-                        cfg.getConduitSelector().getEndpoint().getEndpointInfo().getTransportId(), factory);
-                    cfg.prepareConduitSelector(message);
-                } else {
-                    throw ex;
-                }
-            }
+            LOG.warning("Failure to prepare a message from conduit selector");
         }
         message.getExchange().put(ConduitSelector.class, cfg.getConduitSelector());
     }

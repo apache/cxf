@@ -632,6 +632,9 @@ public abstract class AbstractHTTPDestination
     protected boolean contextMatchOnExact() {
         return "exact".equals(contextMatchStrategy);
     }    
+    
+    public void finalizeConfig() {
+    }
 
     public String getBeanName() {
         String beanName = null;
