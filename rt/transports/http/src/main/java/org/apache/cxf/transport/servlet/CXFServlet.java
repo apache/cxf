@@ -21,7 +21,6 @@ package org.apache.cxf.transport.servlet;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.management.RuntimeErrorException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
