@@ -170,7 +170,6 @@
                         </DynamicImport-Package>
                         <Import-Package>
                             !org.apache.cxf.*,
-                            !org.w3._2001.xmlschema,
                             !META-INF.cxf,
                             !META-INF.cxf.osgi,
                             !schemas*,

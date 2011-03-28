@@ -318,7 +318,6 @@
                         <Import-Package>
                             !org.apache.cxf.*,
                             repackage;resolution:=optional,
-                            !org.w3._2001.xmlschema,
                             !META-INF.cxf,
                             !META-INF.cxf.osgi,
                             antlr*;resolution:=optional,
