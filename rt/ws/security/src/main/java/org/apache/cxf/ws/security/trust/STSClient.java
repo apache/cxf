@@ -148,6 +148,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     
     Object actAs;
     String tokenType;
+    String keyType;
     boolean sendKeyType = true;
 
     Map<String, Object> ctx = new HashMap<String, Object>();
@@ -313,6 +314,10 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setSendKeyType(boolean sendKeyType) {
         this.sendKeyType = sendKeyType;
     }
+    
+    public void setKeyType(String keyType) {
+        this.keyType = keyType;
+    }
 
     /**
      * Indicate whether to use the signer's public X509 certificate for the subject confirmation key info 
@@ -443,7 +448,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeNamespace("wst", namespace);
         boolean wroteKeySize = false;
         
-        String keyType = null;
+        String keyTypeTemplate = null;
         String sptt = null;
         
         if (template != null) {
@@ -455,7 +460,7 @@ public class STSClient implements Configurable, InterceptorProvider {
             while (tl != null) {
                 StaxUtils.copy(tl, writer);
                 if ("KeyType".equals(tl.getLocalName())) {
-                    keyType = DOMUtils.getContent(tl);
+                    keyTypeTemplate = DOMUtils.getContent(tl);
                 } else if ("KeySize".equals(tl.getLocalName())) {
                     wroteKeySize = true;
                     keySize = Integer.parseInt(DOMUtils.getContent(tl));
@@ -475,7 +480,10 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (sptt == null) {
             addTokenType(writer);
         }
-        keyType = writeKeyType(writer, keyType);
+        if (keyTypeTemplate == null) {
+            keyTypeTemplate = keyType;
+        }
+        keyTypeTemplate = writeKeyType(writer, keyType);
 
         byte[] requestorEntropy = null;
         X509Certificate cert = null;
@@ -484,9 +492,9 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (keySize <= 0) {
             keySize = 256;
         }
-        if (keyType != null && keyType.endsWith("SymmetricKey")) {
+        if (keyTypeTemplate != null && keyTypeTemplate.endsWith("SymmetricKey")) {
             requestorEntropy = writeElementsForRSTSymmetricKey(writer, wroteKeySize);
-        } else if (keyType != null && keyType.endsWith("PublicKey")) {
+        } else if (keyTypeTemplate != null && keyTypeTemplate.endsWith("PublicKey")) {
             crypto = createCrypto(false);
             cert = getCert(crypto);
             writeElementsForRSTPublicKey(writer, cert);
@@ -797,22 +805,27 @@ public class STSClient implements Configurable, InterceptorProvider {
         return !STSUtils.WST_NS_05_02.equals(namespace);
     }
 
-    private String writeKeyType(W3CDOMStreamWriter writer, String keyType) throws XMLStreamException {
+    private String writeKeyType(W3CDOMStreamWriter writer, String keyTypeToWrite) 
+        throws XMLStreamException {
         if (isSecureConv) {
             addLifetime(writer);
-            if (keyType == null) {
+            if (keyTypeToWrite == null) {
                 writer.writeStartElement("wst", "TokenType", namespace);
                 writer.writeCharacters(STSUtils.getTokenTypeSCT(namespace));
                 writer.writeEndElement();
-                keyType = namespace + "/SymmetricKey";
+                keyTypeToWrite = namespace + "/SymmetricKey";
             }
-        } else if (keyType == null && sendKeyType) {
+        } else if (keyTypeToWrite == null && sendKeyType) {
             writer.writeStartElement("wst", "KeyType", namespace);
             writer.writeCharacters(namespace + "/SymmetricKey");
             writer.writeEndElement();
-            keyType = namespace + "/SymmetricKey";
+            keyTypeToWrite = namespace + "/SymmetricKey";
+        } else if (keyTypeToWrite != null) {
+            writer.writeStartElement("wst", "KeyType", namespace);
+            writer.writeCharacters(keyTypeToWrite);
+            writer.writeEndElement();
         }
-        return keyType;
+        return keyTypeToWrite;
     }
 
     private X509Certificate getCert(Crypto crypto) throws Exception {
