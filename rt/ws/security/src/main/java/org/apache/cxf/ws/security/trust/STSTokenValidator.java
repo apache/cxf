@@ -31,23 +31,36 @@ import org.apache.ws.security.validate.Validator;
  * 
  */
 public class STSTokenValidator implements Validator {
-    Validator delegate;
+    private STSSamlAssertionValidator samlValidator = new STSSamlAssertionValidator();
+    private boolean alwaysValidateToSts;
     
     public STSTokenValidator() {
     }
-    public STSTokenValidator(Validator delegate) {
-        this.delegate = delegate;
+    
+    /**
+     * Construct a new instance.
+     * @param alwaysValidateToSts whether to always validate the token to the STS
+     */
+    public STSTokenValidator(boolean alwaysValidateToSts) {
+        this.alwaysValidateToSts = alwaysValidateToSts;
     }
     
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-        if (delegate != null) {
-            credential = delegate.validate(credential, data);
-        }
         SoapMessage m = (SoapMessage)data.getMsgContext();
         SecurityToken token = new SecurityToken();
         
         try {
             if (credential.getAssertion() != null) {
+                if (!alwaysValidateToSts) {
+                    //
+                    // Try to validate the Assertion locally first. If trust verification fails
+                    // then send it off to the STS for validation
+                    //
+                    samlValidator.validate(credential, data);
+                    if (samlValidator.isTrustVerificationSucceeded()) {
+                        return credential;
+                    }
+                }
                 token.setToken(credential.getAssertion().getElement());
             } else if (credential.getUsernametoken() != null) {
                 token.setToken(credential.getUsernametoken().getElement());
