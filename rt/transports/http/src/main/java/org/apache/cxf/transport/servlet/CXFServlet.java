@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.transport.servlet;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.management.RuntimeErrorException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -50,17 +54,7 @@ public class CXFServlet extends AbstractHTTPServlet {
     public void init(ServletConfig sc) throws ServletException {
         super.init(sc);
         if (this.bus == null) {
-            ApplicationContext wac = WebApplicationContextUtils.
-                getWebApplicationContext(sc.getServletContext());
-            String configLocation = sc.getInitParameter("config-location");
-            if (wac == null && (configLocation != null)) {
-                wac = new ClassPathXmlApplicationContext(configLocation);
-            }
-            if (wac != null) {
-                this.bus = wac.getBean("cxf", Bus.class);
-            } else {
-                this.bus = BusFactory.newInstance().createBus();
-            }
+            loadBus(sc);
         }
 
         ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
@@ -80,6 +74,25 @@ public class CXFServlet extends AbstractHTTPServlet {
             }
         }
         this.controller = createServletController(sc);
+    }
+
+    private void loadBus(ServletConfig sc) {
+        ApplicationContext wac = WebApplicationContextUtils.
+            getWebApplicationContext(sc.getServletContext());
+        String configLocation = sc.getInitParameter("config-location");
+        if (wac == null && (configLocation != null)) {
+            try {
+                URL configUrl = sc.getServletContext().getResource(configLocation);
+                wac = new ClassPathXmlApplicationContext(configUrl.toExternalForm());
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+        if (wac != null) {
+            this.bus = wac.getBean("cxf", Bus.class);
+        } else {
+            this.bus = BusFactory.newInstance().createBus();
+        }
     }
 
     private ServletController createServletController(ServletConfig servletConfig) {

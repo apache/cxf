@@ -272,7 +272,7 @@ public class CXFNonSpringJaxrsServlet extends CXFServlet {
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, MessageUtils.isTrue(ignoreParam));
-        
+        bean.setBus(getBus());
         bean.create();
     }
     
