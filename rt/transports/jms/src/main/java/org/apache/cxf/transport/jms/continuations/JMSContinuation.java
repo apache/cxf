@@ -41,11 +41,11 @@ public class JMSContinuation implements Continuation {
     private AbstractMessageListenerContainer jmsListener;
     private JMSConfiguration jmsConfig;
     
-    private Object userObject;
+    private volatile Object userObject;
     
-    private boolean isNew = true;
-    private boolean isPending;
-    private boolean isResumed;
+    private volatile boolean isNew = true;
+    private volatile boolean isPending;
+    private volatile boolean isResumed;
     private Timer timer;
     
     public JMSContinuation(Bus b, Message m, MessageObserver observer,
@@ -93,7 +93,7 @@ public class JMSContinuation implements Continuation {
         doResume();
     }
     
-    protected void doResume() {
+    protected synchronized void doResume() {
         updateContinuations(true);
         BusFactory.setThreadDefaultBus(bus);
         try {

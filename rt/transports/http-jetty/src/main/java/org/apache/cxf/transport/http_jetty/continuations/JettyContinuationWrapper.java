@@ -30,13 +30,13 @@ import org.eclipse.jetty.server.AsyncContext;
 import org.eclipse.jetty.server.Request;
 
 public class JettyContinuationWrapper implements Continuation, ContinuationListener {
-    boolean isNew;
-    boolean isResumed;
-    boolean isPending;
-    Object obj;
+    volatile boolean isNew;
+    volatile boolean isResumed;
+    volatile boolean isPending;
+    volatile Object obj;
     
     private Message message;
-    private AsyncContext context;
+    private final AsyncContext context;
     private final Request req;
     
     public JettyContinuationWrapper(HttpServletRequest request, 

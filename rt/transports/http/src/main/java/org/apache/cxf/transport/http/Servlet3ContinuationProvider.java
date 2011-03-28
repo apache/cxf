@@ -61,11 +61,11 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
     }
     
     public class Servlet3Continuation implements Continuation, AsyncListener {
-        AsyncContext context;
-        boolean isNew;
-        boolean isResumed;
-        boolean isPending;
-        Object obj;
+        final AsyncContext context;
+        volatile boolean isNew;
+        volatile boolean isResumed;
+        volatile boolean isPending;
+        volatile Object obj;
         
         public Servlet3Continuation() {
             // It looks current Servlet3 implementation request doesn't pass the isAsyncStart 
