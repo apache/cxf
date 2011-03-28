@@ -26,9 +26,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
+import org.apache.cxf.transport.http.HTTPTransportFactory;
 
-public class JAXWSHttpSpiTransportFactory extends AbstractHTTPTransportFactory implements DestinationFactory {
+public class JAXWSHttpSpiTransportFactory extends HTTPTransportFactory implements DestinationFactory {
 
     private HttpContext context;
     private JAXWSHttpSpiDestination destination;
