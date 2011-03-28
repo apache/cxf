@@ -27,4 +27,7 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
     <osgi:reference id="osgiDestinationRegistry"
                     interface="org.apache.cxf.transport.http.DestinationRegistry" />
 
+	<bean id="org.apache.cxf.transport.http.HTTPTransportFactory" class="org.apache.cxf.transport.http.HTTPTransportFactory">
+		<constructor-arg ref="osgiDestinationRegistry"/>
+	</bean>
 </beans>
