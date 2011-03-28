@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.transport.servlet;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.InputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -35,8 +34,11 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class CXFServlet extends AbstractHTTPServlet {
@@ -80,17 +82,35 @@ public class CXFServlet extends AbstractHTTPServlet {
             getWebApplicationContext(sc.getServletContext());
         String configLocation = sc.getInitParameter("config-location");
         if (wac == null && (configLocation != null)) {
-            try {
-                URL configUrl = sc.getServletContext().getResource(configLocation);
-                wac = new ClassPathXmlApplicationContext(configUrl.toExternalForm());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            wac = createSpringContext(sc, configLocation);
         }
         if (wac != null) {
             this.bus = wac.getBean("cxf", Bus.class);
         } else {
             this.bus = BusFactory.newInstance().createBus();
+        }
+    }
+
+    /**
+     * Try to create a spring application context from the config location.
+     * Will first try to resolve the location using the servlet context.
+     * If that does not work then the location is given as is to spring
+     * 
+     * @param sc
+     * @param configLocation
+     * @return
+     */
+    private ApplicationContext createSpringContext(ServletConfig sc, String configLocation) {
+        InputStream is = sc.getServletContext().getResourceAsStream(configLocation);
+        if (is != null) {
+            GenericApplicationContext ctx = new GenericApplicationContext();
+            XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(ctx);
+            reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
+            reader.loadBeanDefinitions(new InputStreamResource(is, configLocation));
+            ctx.refresh();
+            return ctx;
+        } else {
+            return new ClassPathXmlApplicationContext(configLocation);
         }
     }
 
