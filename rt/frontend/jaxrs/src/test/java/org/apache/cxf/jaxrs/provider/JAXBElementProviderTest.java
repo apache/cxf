@@ -64,6 +64,7 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2NoRootElement;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -1024,6 +1025,14 @@ public class JAXBElementProviderTest extends Assert {
                                  new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
     }
     
+    
+    @Test 
+    public void testXMLSourceIsNotReadable() {
+        JAXBElementProvider p = new JAXBElementProvider();
+        assertFalse(p.isReadable(XMLSource.class, 
+                                 XMLSource.class, 
+                                 new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
+    }
     @Test 
     public void testPackageContextObjectFactory() {
         JAXBElementProvider p = new JAXBElementProvider();

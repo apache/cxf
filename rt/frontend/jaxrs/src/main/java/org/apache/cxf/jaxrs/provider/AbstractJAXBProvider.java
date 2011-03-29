@@ -225,7 +225,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             }
         }
         
-        return unmarshalAsJaxbElement || isSupported(type, genericType, anns);
+        return marshalAsJaxbElement || isSupported(type, genericType, anns);
     }
     
     protected JAXBContext getCollectionContext(Class<?> type) throws JAXBException {
@@ -324,9 +324,13 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        return (marshalAsJaxbElement && type != Response.class) || isSupported(type, genericType, anns);
+        return canBeReadAsJaxbElement(type) || isSupported(type, genericType, anns);
     }
 
+    protected boolean canBeReadAsJaxbElement(Class<?> type) {
+        return unmarshalAsJaxbElement && type != Response.class;
+    }
+    
     public void setSchemaLocations(List<String> locations) {
         schema = SchemaHandler.createSchema(locations, getBus());    
     }
