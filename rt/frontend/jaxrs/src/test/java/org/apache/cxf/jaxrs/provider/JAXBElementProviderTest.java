@@ -41,6 +41,7 @@ import java.util.TreeSet;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -1004,6 +1005,23 @@ public class JAXBElementProviderTest extends Assert {
         assertTrue(p.isReadable(TestBean.class, 
                                 TestBean.class, 
                                 new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
+    }
+    
+    @Test 
+    public void testResponseIsNotReadable() {
+        JAXBElementProvider p = new JAXBElementProvider();
+        assertFalse(p.isReadable(Response.class, 
+                                 Response.class, 
+                                 new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
+    }
+    
+    @Test 
+    public void testResponseIsNotReadable2() {
+        JAXBElementProvider p = new JAXBElementProvider();
+        p.setUnmarshallAsJaxbElement(true);
+        assertFalse(p.isReadable(Response.class, 
+                                 Response.class, 
+                                 new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
     }
     
     @Test 

@@ -337,7 +337,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        return marshalAsJaxbElement || isSupported(type, genericType, anns);
+        return (marshalAsJaxbElement && type != Response.class) || isSupported(type, genericType, anns);
     }
 
     public void setSchemaLocations(List<String> locations) {
