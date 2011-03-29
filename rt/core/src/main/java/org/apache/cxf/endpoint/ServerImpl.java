@@ -157,8 +157,8 @@ public class ServerImpl implements Server {
                 return;
             }
         }
-        getDestination().setMessageObserver(null);
         getDestination().shutdown();
+        getDestination().setMessageObserver(null);
     }
     
     public void destroy() {
