@@ -37,6 +37,14 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.apache.aries.blueprint</groupId>
+            <artifactId>org.apache.aries.blueprint.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -54,9 +62,9 @@
         </dependency>
 
         <dependency>
-             <groupId>xml-resolver</groupId>
-             <artifactId>xml-resolver</artifactId>
-         </dependency>
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>asm</groupId>
@@ -166,19 +174,19 @@
                         </configuration>
                     </execution>
                     <execution>
-                         <id>add-spi</id>
-                         <phase>generate-resources</phase>
-                         <goals>
-                             <goal>add-resource</goal>
-                         </goals>
-                         <configuration>
-                             <resources>
-                                 <resource>
-                                     <directory>${basedir}/src/main/${cxf.spi-dir}</directory>
-                                 </resource>
-                             </resources>
-                         </configuration>
-                     </execution>
+                        <id>add-spi</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/${cxf.spi-dir}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
 
                 </executions>
             </plugin>
@@ -195,10 +203,10 @@
                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                 </dependency>
                 <dependency>
-            		<groupId>org.apache.cxf</groupId>
-           	 		<artifactId>cxf-rt-transports-http</artifactId>
-            		<version>${project.version}</version>
-        		</dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-transports-http</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
             </dependencies>
             <properties>
                 <cxf.spi-dir>spi-2.2</cxf.spi-dir>
@@ -239,23 +247,23 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
-                             <execution>
-                                 <id>create-endorsed-dir</id>
-                                 <phase>validate</phase>
-                                 <goals>
-                                     <goal>copy</goal>
-                                 </goals>
-                                 <configuration>
-                                     <artifactItems>
-                                         <artifactItem>
-                                             <groupId>org.apache.geronimo.specs</groupId>
-                                             <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                                             <outputDirectory>${basedir}/target/endorsed</outputDirectory>
-                                         </artifactItem>
-                                     </artifactItems>
-                                 </configuration>
-                             </execution>
-                         </executions>
+                            <execution>
+                                <id>create-endorsed-dir</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.geronimo.specs</groupId>
+                                            <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                                            <outputDirectory>${basedir}/target/endorsed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
                 <pluginManagement>
@@ -298,10 +306,10 @@
             </properties>
             <dependencies>
                 <dependency>
-            		<groupId>org.apache.cxf</groupId>
-           	 		<artifactId>cxf-rt-transports-http</artifactId>
-            		<version>${project.version}</version>
-        		</dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-transports-http</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -319,17 +327,17 @@
                     <artifactId>saaj-api</artifactId>
                 </dependency>
                 <dependency>
-                     <groupId>org.apache.geronimo.specs</groupId>
-                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                 </dependency>
-                 <dependency>
-                     <groupId>org.apache.geronimo.specs</groupId>
-                     <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-                 </dependency>
-                 <dependency>
-                     <groupId>${cxf.saaj.impl.groupId}</groupId>
-                     <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
-                 </dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${cxf.saaj.impl.groupId}</groupId>
+                    <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
+                </dependency>
             </dependencies>
             <build>
                 <plugins>

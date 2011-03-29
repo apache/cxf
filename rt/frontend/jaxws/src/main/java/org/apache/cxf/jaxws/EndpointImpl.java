@@ -311,7 +311,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         
         ServerImpl serv = null;
         
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
+            if (bus != null) {
+                ClassLoader newLoader = bus.getExtension(ClassLoader.class);
+                if (newLoader != null) {
+                    Thread.currentThread().setContextClassLoader(newLoader);
+                }
+            }
             serv = getServer(addr);
             if (addr != null) {            
                 EndpointInfo endpointInfo = serv.getEndpoint().getEndpointInfo();
@@ -341,6 +348,8 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             }
             
             throw new WebServiceException(ex);
+        } finally {
+            Thread.currentThread().setContextClassLoader(loader);
         }
     }
     
@@ -352,102 +361,113 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         if (server == null) {
             checkProperties();
 
-            // Initialize the endpointName so we can do configureObject
-            QName origEpn = endpointName;
-            if (endpointName == null) {
-                JaxWsImplementorInfo implInfo = new JaxWsImplementorInfo(getImplementorClass());
-                endpointName = implInfo.getEndpointName();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            try {
+                if (bus != null) {
+                    ClassLoader newLoader = bus.getExtension(ClassLoader.class);
+                    if (newLoader != null) {
+                        Thread.currentThread().setContextClassLoader(newLoader);
+                    }
+                }
+    
+                // Initialize the endpointName so we can do configureObject
+                QName origEpn = endpointName;
+                if (endpointName == null) {
+                    JaxWsImplementorInfo implInfo = new JaxWsImplementorInfo(getImplementorClass());
+                    endpointName = implInfo.getEndpointName();
+                }
+                
+                if (serviceFactory != null) {
+                    serverFactory.setServiceFactory(serviceFactory);
+                }
+    
+                /*if (serviceName != null) {
+                    serverFactory.getServiceFactory().setServiceName(serviceName);
+                }*/
+    
+                configureObject(this);
+                endpointName = origEpn;
+                
+                // Set up the server factory
+                serverFactory.setAddress(addr);
+                serverFactory.setStart(false);
+                serverFactory.setEndpointName(endpointName);
+                serverFactory.setServiceBean(implementor);
+                serverFactory.setBus(bus);
+                serverFactory.setFeatures(getFeatures());
+                serverFactory.setInvoker(invoker);
+                serverFactory.setSchemaLocations(schemaLocations);
+                if (serverFactory.getProperties() != null) {
+                    serverFactory.getProperties().putAll(properties);
+                } else {
+                    serverFactory.setProperties(properties);
+                }
+                
+                // Be careful not to override any serverfactory settings as a user might
+                // have supplied their own.
+                if (getWsdlLocation() != null) {
+                    serverFactory.setWsdlURL(getWsdlLocation());
+                }
+                
+                if (bindingUri != null) {
+                    serverFactory.setBindingId(bindingUri);
+                }
+    
+                if (serviceName != null) {
+                    serverFactory.getServiceFactory().setServiceName(serviceName);
+                }
+                
+                if (implementorClass != null) {
+                    serverFactory.setServiceClass(implementorClass);
+                }
+                
+                if (executor != null) {
+                    serverFactory.getServiceFactory().setExecutor(executor);
+                }
+                if (handlers.size() > 0) {
+                    serverFactory.addHandlers(handlers);
+                }
+    
+                configureObject(serverFactory);
+                
+                server = serverFactory.create();
+                
+                org.apache.cxf.endpoint.Endpoint endpoint = getEndpoint();
+                if (in != null) {
+                    endpoint.getInInterceptors().addAll(in);
+                }
+                if (out != null) {
+                    endpoint.getOutInterceptors().addAll(out);
+                }
+                if (inFault != null) {
+                    endpoint.getInFaultInterceptors().addAll(inFault);
+                }
+                if (outFault != null) {
+                    endpoint.getOutFaultInterceptors().addAll(outFault);
+                }
+                
+                if (properties != null) {
+                    endpoint.putAll(properties);
+                }
+                
+                configureObject(endpoint.getService());
+                configureObject(endpoint);
+                this.service = endpoint.getService();
+                
+                if (getWsdlLocation() == null) {
+                    //hold onto the wsdl location so cache won't clear till we go away
+                    setWsdlLocation(serverFactory.getWsdlURL());
+                }
+                
+                if (serviceName == null) {
+                    setServiceName(serverFactory.getServiceFactory().getServiceQName());
+                }
+                if (endpointName == null) {
+                    endpointName = endpoint.getEndpointInfo().getName();
+                }
+            } finally {
+                Thread.currentThread().setContextClassLoader(loader);
             }
-            
-            if (serviceFactory != null) {
-                serverFactory.setServiceFactory(serviceFactory);
-            }
-
-            /*if (serviceName != null) {
-                serverFactory.getServiceFactory().setServiceName(serviceName);
-            }*/
-
-            configureObject(this);
-            endpointName = origEpn;
-            
-            // Set up the server factory
-            serverFactory.setAddress(addr);
-            serverFactory.setStart(false);
-            serverFactory.setEndpointName(endpointName);
-            serverFactory.setServiceBean(implementor);
-            serverFactory.setBus(bus);
-            serverFactory.setFeatures(getFeatures());
-            serverFactory.setInvoker(invoker);
-            serverFactory.setSchemaLocations(schemaLocations);
-            if (serverFactory.getProperties() != null) {
-                serverFactory.getProperties().putAll(properties);
-            } else {
-                serverFactory.setProperties(properties);
-            }
-            
-            // Be careful not to override any serverfactory settings as a user might
-            // have supplied their own.
-            if (getWsdlLocation() != null) {
-                serverFactory.setWsdlURL(getWsdlLocation());
-            }
-            
-            if (bindingUri != null) {
-                serverFactory.setBindingId(bindingUri);
-            }
-
-            if (serviceName != null) {
-                serverFactory.getServiceFactory().setServiceName(serviceName);
-            }
-            
-            if (implementorClass != null) {
-                serverFactory.setServiceClass(implementorClass);
-            }
-            
-            if (executor != null) {
-                serverFactory.getServiceFactory().setExecutor(executor);
-            }
-            if (handlers.size() > 0) {
-                serverFactory.addHandlers(handlers);
-            }
-
-            configureObject(serverFactory);
-            
-            server = serverFactory.create();
-            
-            org.apache.cxf.endpoint.Endpoint endpoint = getEndpoint();
-            if (in != null) {
-                endpoint.getInInterceptors().addAll(in);
-            }
-            if (out != null) {
-                endpoint.getOutInterceptors().addAll(out);
-            }
-            if (inFault != null) {
-                endpoint.getInFaultInterceptors().addAll(inFault);
-            }
-            if (outFault != null) {
-                endpoint.getOutFaultInterceptors().addAll(outFault);
-            }
-            
-            if (properties != null) {
-                endpoint.putAll(properties);
-            }
-            
-            configureObject(endpoint.getService());
-            configureObject(endpoint);
-            this.service = endpoint.getService();
-            
-            if (getWsdlLocation() == null) {
-                //hold onto the wsdl location so cache won't clear till we go away
-                setWsdlLocation(serverFactory.getWsdlURL());
-            }
-            
-            if (serviceName == null) {
-                setServiceName(serverFactory.getServiceFactory().getServiceQName());
-            }
-            if (endpointName == null) {
-                endpointName = endpoint.getEndpointInfo().getName();
-            }
-
         }
         return (ServerImpl) server;
     }

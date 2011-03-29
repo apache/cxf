@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<xsd:schema xmlns="http://cxf.apache.org/blueprint/jaxws"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:beans="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="http://cxf.apache.org/blueprint/jaxws" 
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"  >
+
+  <xsd:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0" schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
+  <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
+
+  <xsd:element name="endpoint">
+    <xsd:annotation>
+      <xsd:documentation>Configures a JAX-WS server. This element is associated with the org.apache.cxf.jaxws.EndpointImpl object.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="beans:Tcomponent">
+          <xsd:all>
+            <xsd:element name="binding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the message binding used by the endpoint. Message bindings are configured using implementations of the 
+                  org.apache.cxf.binding.BindingFactory interface. The SOAP binding is configured using the soap:soapBinding bean.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="executor" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures a Java executor to handle the service.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="features" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of beans that configure advanced features like WS-RM.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of JAX-WS handlers to add to the endpoint's processing chain.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="implementor" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the bean implementing the service. If this child is used you should not use the implementor attribute.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming requests.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="invoker" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies an implementation of the org.apache.cxf.service.Invoker interface to be used by the service. The Invoker 
+                  implementation controls how a service is invoked. For example, it controls if each request is handled by a new instance of the 
+                  service implementation or if state is preserved across invocations.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing responses.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="properties" type="beans:Tmap" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a map of properties that are passed to the endpoint.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
+            <xsd:element name="serviceFactory" type="xsd:anyType" minOccurs="0"/>
+          </xsd:all>
+          <!-- xsd:attributeGroup ref="cxf-beans:beanAttributes"/-->
+          <xsd:attribute name="address" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the HTTP address of the endpoint. This value will override the value specified in the services 
+                contract.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="bindingUri" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the ID of the data binding the service will use. For SOAP bindings the IDs are defined in the JAX-WS 
+                specification. For other data bindings, the ID is the namespace of the WSDL extensions used to configure the
+                binding.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="bus" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the ID of the Spring bean configuring the bus managing the endpoint.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="implementor" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the class implementing the service. You can specify the implementation class using either the class 
+                name or an ID reference to a Spring bean configuring the implementation class. This class needs to be on the 
+                classpath.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="implementorClass" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the name of the class implementing the service. This attribute is useful when you specify the implementor 
+                with the ref bean which is wrapped by using Spring AOP.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="publish" type="xsd:boolean" default="true">
+            <xsd:annotation>
+              <xsd:documentation>Specifies if the service should be automatically published.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="publishedEndpointUrl" type="xsd:string"/>
+          <xsd:attribute name="endpointName" type="xsd:QName">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the value of the service's WSDL port element's name attribute.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="serviceName" type="xsd:QName">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the value of the service's WSDL service element's name attribute.</xsd:documentation>
+            </xsd:annotation>            
+          </xsd:attribute>
+          <xsd:attribute name="transportId" type="xsd:string">
+        	<xsd:annotation>
+              <xsd:documentation>Specifies the transportId that endpoint will use, it will override the transport which is defined in the wsdl.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>  
+          <xsd:attribute name="wsdlLocation" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the location of the endpoint's WSDL contract. The WSDL contract's location is relative to the folder 
+                from which the service is deployed.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="server">
+    <xsd:annotation>
+      <xsd:documentation>Configures a JAX-WS server. The element is associated with the org.apache.cxf.jaxws.support.JaxWsServerFactoryBean object.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="beans:Tcomponent">
+          <xsd:all>
+            <xsd:element name="binding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the message binding used by the endpoint. Message bindings are configured using implementations of the 
+                  org.apache.cxf.binding.BindingFactory interface. The SOAP binding is configured using the soap:soapBinding bean.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is
+                  org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="executor" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures a Java executor to handle the service.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="features" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of beans that configure advanced features like WS-RM.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of JAX-WS handlers to add to the endpoint's processing chain.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming requests.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="invoker" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies an implementation of the org.apache.cxf.service.Invoker interface to be used by the service. The Invoker 
+                  implementation controls how a service is invoked. For example, it controls if each request is handled by a new instance of the 
+                  service implementation or if state is preserved across invocations.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing responses.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="properties" type="beans:Tmap" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a map of properties that are passed to the endpoint.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
+            <xsd:element name="serviceBean" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the bean implementing the service. If this child is used you should not use the serviceBean attribute.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="serviceFactory" type="xsd:anyType" minOccurs="0"/>
+          </xsd:all>
+          <!-- xsd:attributeGroup ref="cxf-beans:beanAttributes"/-->
+          <xsd:attribute name="address" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the HTTP address of the endpoint. This value will override the value specified in the services 
+                contract.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="bindingId" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the ID of the data binding the service will use. For SOAP bindings the IDs are defined in the JAX-WS 
+                specification. For other data bindings, the ID is the namespace of the WSDL extensions used to configure the
+                binding.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="bus" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the ID of the Spring bean configuring the bus managing the endpoint.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="serviceClass" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the name of the class implementing the service. This attribute is useful when you specify the implementor 
+                with the ref bean which is wrapped by using Spring AOP.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="serviceBean" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the class implementing the service. You can specify the implementation class using either the class 
+                name or an ID reference to a Spring bean configuring the implementation class. This class needs to be on the 
+                classpath.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="start" type="xsd:boolean" default="true">
+            <xsd:annotation>
+              <xsd:documentation>Specifies if the service should be automatically published.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+           <xsd:attribute name="transportId" type="xsd:string">
+        	<xsd:annotation>
+              <xsd:documentation>Specifies the transportId that endpoint will use, it will override the transport which is defined in the wsdl.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="wsdlLocation" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the location of the endpoint's WSDL contract. The WSDL contract's location is relative to the folder 
+                from which the service is deployed.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="endpointName" type="xsd:QName">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the value of the service's WSDL port element's name attribute.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="serviceName" type="xsd:QName">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the value of the service's WSDL service element's name attribute.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="client">
+    <xsd:annotation>
+      <xsd:documentation>Configures a JAX-WS client.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="beans:Tcomponent">
+          <xsd:all>
+            <xsd:element name="binding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the message binding used by the endpoint. Message bindings are configured using implementations of the 
+                  org.apache.cxf.binding.BindingFactory interface. The SOAP binding is configured using the soap:soapBinding bean.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the data binding used by the endpoint. The class implementing the JAXB data binding is org.apache.cxf.jaxb.JAXBDataBinding.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="features" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of beans that configure advanced features like WS-RM.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="handlers" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of JAX-WS handlers to add to the endpoint's processing chain.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming responses.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process incoming fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing requests.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a list of interceptors to process outgoing fault messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="properties" type="beans:Tmap" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a map of properties that are passed to the endpoint.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="conduitSelector" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Specifies a org.apache.cxf.endpoint.ConduitSelector implementation. ConduitSelector implementations override the 
+                  strategy used to select the Conduit used to process outgoing messages.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:all>
+          <!-- xsd:attributeGroup ref="cxf-beans:beanAttributes"/-->
+          <xsd:attribute name="address" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the HTTP address of the endpoint on which the client makes requests. This value will override the value 
+                specified in the services contract.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="bindingId" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the ID of the data binding the client will use. For SOAP bindings the IDs are defined in the JAX-WS 
+                specification. For other data bindings, the ID is the namespace of the WSDL extensions used to configure the
+                binding.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="bus" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the ID of the Spring bean configuring the bus managing the endpoint.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="endpointName" type="xsd:QName">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the value of the WSDL port element's name attribute for the service on which the client is making 
+                requests.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies a password that is used for simple username/password authentication.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="serviceClass" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the name of the class implementing the client.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="serviceName" type="xsd:QName">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the value of the WSDL service element's name attribute for the service on which the client is making 
+                requests.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="username" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies a password that is used for simple username/password authentication.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="transportId" type="xsd:string">
+        	<xsd:annotation>
+              <xsd:documentation>Specifies the transportId that endpoint will use, it will override the transport which is defined in the wsdl.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="wsdlLocation" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Specifies the location of the endpoint's WSDL contract. The WSDL contract's location is relative to the folder 
+                from which the client is deployed.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:complexType name="schemasType">
+    <xsd:sequence>
+      <xsd:element name="schemaLocation" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  
+</xsd:schema>

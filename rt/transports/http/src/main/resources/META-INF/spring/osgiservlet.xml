@@ -45,7 +45,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 
     <bean id="destinationRegistry" class="org.apache.cxf.transport.http.DestinationRegistryImpl" />
 
-    <bean id="osgiServlet" class="org.apache.cxf.transport.servlet.CXFServlet">
+    <!--bean id="osgiServlet" class="org.apache.cxf.transport.servlet.CXFServlet">
         <constructor-arg ref="destinationRegistry"/>
     </bean>
 
@@ -62,7 +62,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
             <entry key="redirect-servlet-name" value="${org.apache.cxf.servlet.redirect-servlet-name}"/>
             <entry key="redirect-servlet-path" value="${org.apache.cxf.servlet.redirect-servlet-path}"/>
         </osgi:service-properties>
-    </osgi:service>
+    </osgi:service-->
 
     <osgi:service ref="destinationRegistry" interface="org.apache.cxf.transport.http.DestinationRegistry">
     </osgi:service>

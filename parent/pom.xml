@@ -86,6 +86,8 @@
         <cxf.xmlschema.version>2.0</cxf.xmlschema.version>
         <cxf.jibx.version>1.2.3</cxf.jibx.version>
         <cxf.axiom.version>1.2.10</cxf.axiom.version>
+        <cxf.aries.version>0.3</cxf.aries.version>
+        <cxf.osgi.version>4.2.0</cxf.osgi.version>
         <cxf.checkstyle.extension />
 
         <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
@@ -363,7 +365,18 @@
                 <artifactId>jsr311-api</artifactId>
                 <version>1.1.1</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.aries.blueprint</groupId>
+                <artifactId>org.apache.aries.blueprint.core</artifactId>
+                <version>${cxf.aries.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${cxf.osgi.version}</version>
+                <scope>provided</scope>
+            </dependency>
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib-nodep</artifactId>
@@ -520,6 +533,7 @@
                         <artifactId>wstx-asl</artifactId>
                     </exclusion>
  
+
 
 
                 </exclusions>
