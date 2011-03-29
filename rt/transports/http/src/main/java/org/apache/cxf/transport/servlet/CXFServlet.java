@@ -21,19 +21,9 @@ package org.apache.cxf.transport.servlet;
 import java.io.InputStream;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.transport.http.HTTPTransportFactory;
-import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -41,43 +31,13 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class CXFServlet extends AbstractHTTPServlet {
+public class CXFServlet extends CXFNonSpringServlet {
 
-    private HTTPTransportFactory transportFactory;
-    private Bus bus;
-
-    private ServletController controller;
-    
     public CXFServlet() {
     }
 
     @Override
-    public void init(ServletConfig sc) throws ServletException {
-        super.init(sc);
-        if (this.bus == null) {
-            loadBus(sc);
-        }
-
-        ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
-        resourceManager.addResourceResolver(new ServletContextResourceResolver(
-                                               sc.getServletContext()));
-
-        if (transportFactory == null) {
-            DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-            try {
-                DestinationFactory df = dfm
-                    .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
-                if (df instanceof HTTPTransportFactory) {
-                    transportFactory = (HTTPTransportFactory)df;
-                }
-            } catch (BusException e) {
-                // why are we throwing a busexception if the DF isn't found?
-            }
-        }
-        this.controller = createServletController(sc);
-    }
-
-    private void loadBus(ServletConfig sc) {
+    protected void loadBus(ServletConfig sc) {
         ApplicationContext wac = WebApplicationContextUtils.
             getWebApplicationContext(sc.getServletContext());
         String configLocation = sc.getInitParameter("config-location");
@@ -85,9 +45,9 @@ public class CXFServlet extends AbstractHTTPServlet {
             wac = createSpringContext(sc, configLocation);
         }
         if (wac != null) {
-            this.bus = wac.getBean("cxf", Bus.class);
+            setBus(wac.getBean("cxf", Bus.class));
         } else {
-            this.bus = BusFactory.newInstance().createBus();
+            setBus(BusFactory.newInstance().createBus());
         }
     }
 
@@ -111,34 +71,6 @@ public class CXFServlet extends AbstractHTTPServlet {
             return ctx;
         } else {
             return new ClassPathXmlApplicationContext(configLocation);
-        }
-    }
-
-    private ServletController createServletController(ServletConfig servletConfig) {
-        HttpServlet serviceListGeneratorServlet = 
-            new ServiceListGeneratorServlet(transportFactory.getRegistry(), bus);
-        ServletController newController =
-            new ServletController(transportFactory.getRegistry(),
-                                  servletConfig,
-                                  serviceListGeneratorServlet);        
-        return newController;
-    }
-
-    public Bus getBus() {
-        return bus;
-    }
-
-    public void setBus(Bus bus) {
-        this.bus = bus;
-    }
-
-    @Override
-    protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        try {
-            BusFactory.setThreadDefaultBus(bus);
-            controller.invoke(request, response);
-        } finally {
-            BusFactory.setThreadDefaultBus(null);
         }
     }
 

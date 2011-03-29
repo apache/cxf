@@ -42,9 +42,9 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.transport.servlet.CXFServlet;
+import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
-public class CXFNonSpringJaxrsServlet extends CXFServlet {
+public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
     
