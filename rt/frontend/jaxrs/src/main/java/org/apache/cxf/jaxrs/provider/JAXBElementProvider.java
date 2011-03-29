@@ -56,6 +56,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
@@ -94,6 +95,11 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         
         return super.isReadable(type, genericType, anns, mt);
+    }
+    
+    @Override
+    protected boolean canBeReadAsJaxbElement(Class<?> type) {
+        return type != XMLSource.class && super.canBeReadAsJaxbElement(type);
     }
     
     @Context
