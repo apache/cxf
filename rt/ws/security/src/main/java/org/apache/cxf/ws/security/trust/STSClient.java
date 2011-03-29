@@ -141,6 +141,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     AlgorithmSuite algorithmSuite;
     String namespace = STSUtils.WST_NS_05_12;
     String addressingNamespace;
+    Element onBehalfOfElement;
 
     boolean useCertificateForConfirmationKeyInfo;
     boolean isSecureConv;
@@ -318,6 +319,10 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
+    
+    public void setOnBehalfOfElement(Element onBehalfOfElement) {
+        this.onBehalfOfElement = onBehalfOfElement;
+    }
 
     /**
      * Indicate whether to use the signer's public X509 certificate for the subject confirmation key info 
@@ -477,13 +482,14 @@ public class STSClient implements Configurable, InterceptorProvider {
 
         addRequestType(requestType, writer);
         addAppliesTo(writer, appliesTo);
+        addOnBehalfOf(writer);
         if (sptt == null) {
             addTokenType(writer);
         }
         if (keyTypeTemplate == null) {
             keyTypeTemplate = keyType;
         }
-        keyTypeTemplate = writeKeyType(writer, keyType);
+        keyTypeTemplate = writeKeyType(writer, keyTypeTemplate);
 
         byte[] requestorEntropy = null;
         X509Certificate cert = null;
@@ -599,6 +605,14 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + requestType);
         writer.writeEndElement();
+    }
+    
+    private void addOnBehalfOf(W3CDOMStreamWriter writer) throws XMLStreamException  {
+        if (onBehalfOfElement != null) {
+            writer.writeStartElement("wst", "OnBehalfOf", namespace);
+            StaxUtils.copy(onBehalfOfElement, writer);
+            writer.writeEndElement();
+        }
     }
     
     private Element getDocumentElement(DOMSource ds) {

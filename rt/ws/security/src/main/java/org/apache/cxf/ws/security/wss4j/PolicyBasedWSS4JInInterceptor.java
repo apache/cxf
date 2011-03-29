@@ -281,6 +281,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 TransportToken token = binding.getTransportToken();
                 if (token != null && token.getToken() instanceof IssuedToken) {
                     action = addToAction(action, "Signature", true);
+                    action = addToAction(action, "Encrypt", true);
                     Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                     Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
                     if (s != null) {
