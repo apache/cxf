@@ -883,11 +883,26 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         provider.setOutTransformElements(outMap);
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/adapter-list",
                                         Collections.singletonList(provider));
-        
         Collection<? extends Book> books = wc.type("application/xml").accept("application/xml")
             .postAndGetCollection(new Books(new Book("CXF", 123L)), Book.class);
         assertEquals(1, books.size());
         assertEquals(123L, books.iterator().next().getId());
+    }
+    
+    @Test
+    public void testPostGetBookAdapterListJSON() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> outMap = new HashMap<String, String>();
+        outMap.put("Books", "CollectionWrapper");
+        outMap.put("books", "Book");
+        provider.setOutTransformElements(outMap);
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/adapter-list",
+                                        Collections.singletonList(provider));
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        Response r = wc.type("application/xml").accept("application/json")
+            .post(new Books(new Book("CXF", 123L)));
+        assertEquals("{\"Books\":[{\"id\":123,\"name\":\"CXF\"}]}",
+                     IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
     
     @Test

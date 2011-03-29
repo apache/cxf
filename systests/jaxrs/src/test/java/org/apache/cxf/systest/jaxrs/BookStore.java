@@ -29,14 +29,11 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -535,21 +532,23 @@ public class BookStore {
     public BookInfo getBookAdapter() throws Exception {
         return new BookInfo(doGetBook("123"));
     }
-    
     @POST
     @Path("/books/adapter-list")
-    @XmlJavaTypeAdapter(BookInfoAdapterList.class)
-    public Set<Book> getBookAdapterList(Set<Book> collection) 
+    @XmlJavaTypeAdapter(BookInfoAdapter.class)
+    @Consumes("application/xml")
+    @Produces({"application/xml", "application/json" })
+    public List<BookInfo> getBookAdapterList(@XmlJavaTypeAdapter(BookInfoAdapter.class) 
+                                              List<BookInfo> collection) 
         throws Exception {
         if (collection.size() != 1) {
             throw new WebApplicationException(400);
         }
-        return Collections.singleton(doGetBook(Long.toString(collection.iterator().next().getId())));
+        return collection;
     }
     
     @GET
     @Path("/books/interface/adapter")
-    public BookInfoInterface getBookAdapter2() throws Exception {
+    public BookInfoInterface getBookAdapterInterface() throws Exception {
         return new BookInfo2(doGetBook("123"));
     }
     
@@ -898,19 +897,7 @@ public class BookStore {
             super(b);
         }
     }
-    
-    public static class BookInfoAdapterList extends XmlAdapter<List<Book>, Set<Book>> {
-
-        public List marshal(Set<Book> set) throws Exception {
-            return new ArrayList<Book>(set);
-        }
-
-        public Set<Book> unmarshal(List<Book> list) throws Exception {
-            return new HashSet<Book>(list);
-        }
         
-    }
-    
     public static class BookInfoAdapter extends XmlAdapter<Book, BookInfo> {
 
         @Override

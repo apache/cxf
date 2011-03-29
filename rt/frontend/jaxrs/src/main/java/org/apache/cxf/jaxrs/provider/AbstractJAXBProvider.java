@@ -504,10 +504,16 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return theType;
     }
     
+    protected static Object checkAdapter(Object obj, Class<?> cls, Annotation[] anns, boolean marshal) {
+        return useAdapter(obj, getAdapter(obj.getClass(), anns), marshal); 
+    }
+    
     @SuppressWarnings("unchecked")
-    protected Object checkAdapter(Object obj, Class<?> cls, Annotation[] anns, boolean marshal) {
-        XmlJavaTypeAdapter typeAdapter = getAdapter(obj.getClass(), anns); 
+    protected static Object useAdapter(Object obj, XmlJavaTypeAdapter typeAdapter, boolean marshal) {
         if (typeAdapter != null) {
+            if (InjectionUtils.isSupportedCollectionOrArray(typeAdapter.value().getClass())) {
+                return obj;
+            }
             try {
                 XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
                 if (marshal) {
@@ -523,7 +529,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return obj;
     }
     
-    protected XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {
+    protected static XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {
         XmlJavaTypeAdapter typeAdapter = AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class);
         if (typeAdapter == null) {
             typeAdapter = objectClass.getAnnotation(XmlJavaTypeAdapter.class);
@@ -695,14 +701,17 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
         
         @SuppressWarnings("unchecked")
-        public <T> Object getCollectionOrArray(Class<T> type, Class<?> origType) {
+        public <T> Object getCollectionOrArray(Class<T> type, Class<?> origType,
+                                               XmlJavaTypeAdapter adapter) {
             List<?> theList = getList();
+            boolean adapterChecked = false;
             if (theList.size() > 0) {
                 Object first = theList.get(0);
                 if (first instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
+                    adapterChecked = true;
                     List<Object> newList = new ArrayList<Object>(theList.size());
                     for (Object o : theList) {
-                        newList.add(((JAXBElement)o).getValue());
+                        newList.add(useAdapter(((JAXBElement)o).getValue(), adapter, false));
                     }
                     theList = newList;
                 }
@@ -710,13 +719,22 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             if (origType.isArray()) {
                 T[] values = (T[])Array.newInstance(type, theList.size());
                 for (int i = 0; i < theList.size(); i++) {
-                    values[i] = (T)theList.get(i);
+                    values[i] = (T)useAdapter(theList.get(i), adapter, false);
                 }
                 return values;
-            } else if (origType == Set.class) {
-                return new HashSet(theList);
             } else {
-                return theList;
+                if (!adapterChecked && adapter != null) {
+                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    for (Object o : theList) {
+                        newList.add(useAdapter(o, adapter, false));
+                    }
+                    theList = newList;
+                }
+                if (origType == Set.class) {
+                    return new HashSet(theList);
+                } else {
+                    return theList;
+                }
             }
         }
         
