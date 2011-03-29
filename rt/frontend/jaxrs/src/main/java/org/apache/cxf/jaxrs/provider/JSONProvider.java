@@ -27,8 +27,10 @@ import java.io.OutputStream;
 import java.io.SequenceInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,12 +41,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -268,18 +270,17 @@ public class JSONProvider extends AbstractJAXBProvider  {
         throws IOException {
         try {
             
-            Object actualObject = checkAdapter(obj, cls, anns, true);
-            Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
-            if (cls == genericType) {
-                genericType = actualClass;
-            }
             String encoding = HttpUtils.getSetEncoding(m, headers, "UTF-8");
             
-            if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
-                actualClass = InjectionUtils.getActualType(genericType);
-                actualClass = getActualType(actualClass, genericType, anns);
-                marshalCollection(cls, actualObject, actualClass, genericType, encoding, os, m);
+            if (InjectionUtils.isSupportedCollectionOrArray(cls)) {
+                marshalCollection(cls, obj, genericType, encoding, os, m, anns);
             } else {
+                Object actualObject = checkAdapter(obj, cls, anns, true);
+                Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
+                if (cls == genericType) {
+                    genericType = actualClass;
+                }
+                
                 marshal(actualObject, actualClass, genericType, encoding, os);
             }
             
@@ -292,19 +293,31 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
     }
 
-    protected void marshalCollection(Class<?> originalCls, Object actualObject, Class<?> actualClass,
-                                     Type genericType, String encoding, OutputStream os, MediaType m) 
+    protected void marshalCollection(Class<?> originalCls, Object collection, 
+                                     Type genericType, String encoding, 
+                                     OutputStream os, MediaType m, Annotation[] anns) 
         throws Exception {
         
+        Class<?> actualClass = InjectionUtils.getActualType(genericType);
+        actualClass = getActualType(actualClass, genericType, anns);
+        
+        Collection c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
+                                             : (Collection) collection;
+
+        Iterator it = c.iterator();
+        
+        Object firstObj = it.hasNext() ? it.next() : null;
+
         String startTag = null;
         String endTag = null;
         if (!dropCollectionWrapperElement) {
-            QName qname = getCollectionWrapperQName(actualClass, genericType, actualObject, false);
-            if (qname == null) {
-                String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT", 
-                                                                        BUNDLE).toString();
-                throw new WebApplicationException(Response.serverError()
-                                                  .entity(message).build());
+            QName qname = null;
+            if (firstObj instanceof JAXBElement) {
+                JAXBElement el = (JAXBElement)firstObj;
+                qname = el.getName();
+                actualClass = el.getDeclaredType();
+            } else {
+                qname = getCollectionWrapperQName(actualClass, genericType, firstObj, true);
             }
             if (qname.getNamespaceURI().length() > 0) {
                 startTag = "{\"ns1." + qname.getLocalPart() + "\":[";
@@ -319,21 +332,35 @@ public class JSONProvider extends AbstractJAXBProvider  {
             startTag = "{";
             endTag = "}";
         }
+        
         os.write(startTag.getBytes());
-        Object[] arr = originalCls.isArray() ? (Object[])actualObject : ((Collection)actualObject).toArray();
-        for (int i = 0; i < arr.length; i++) {
-            Object obj = convertToJaxbElementIfNeeded(arr[i], actualClass, genericType);
-            Class<?> cls = actualClass;
-            if (obj instanceof JAXBElement && actualClass != JAXBElement.class) {
-                cls = JAXBElement.class;
-            }
-            Marshaller ms = createMarshaller(obj, cls, genericType, encoding);
-            marshal(ms, obj, cls, genericType, encoding, os, true);
-            if (i + 1 < arr.length) {
+        if (firstObj != null) {
+            XmlJavaTypeAdapter adapter = getAdapter(firstObj.getClass(), anns);
+            marshalCollectionMember(useAdapter(firstObj, adapter, true),
+                                    actualClass, genericType, encoding, os);
+            while (it.hasNext()) {
                 os.write(",".getBytes());
+                marshalCollectionMember(useAdapter(it.next(), adapter, true), 
+                                        actualClass, genericType, encoding, os);
             }
         }
         os.write(endTag.getBytes());
+    }
+    
+    protected void marshalCollectionMember(Object obj, Class<?> cls, Type genericType,
+                                           String enc, OutputStream os) throws Exception {
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();    
+        } else {
+            obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
+        }
+        
+        if (obj instanceof JAXBElement && cls != JAXBElement.class) {
+            cls = JAXBElement.class;
+        }
+        Marshaller ms = createMarshaller(obj, cls, genericType, enc);
+        marshal(ms, obj, cls, genericType, enc, os, true);
+        
     }
     
     protected void marshal(Marshaller ms, Object actualObject, Class<?> actualClass, 

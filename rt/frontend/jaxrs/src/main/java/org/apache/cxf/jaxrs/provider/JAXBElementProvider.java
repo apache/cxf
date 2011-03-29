@@ -45,6 +45,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -164,10 +165,11 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 response = ((JAXBElement)response).getValue();    
             }
             if (isCollection) {
-                response = ((CollectionWrapper)response).getCollectionOrArray(theType, type); 
+                response = ((CollectionWrapper)response).getCollectionOrArray(theType, type, 
+                                                         getAdapter(theType, anns)); 
+            } else {
+                response = checkAdapter(response, type, anns, false);
             }
-            
-            response = checkAdapter(response, type, anns, false);
             return response;
             
         } catch (JAXBException e) {
@@ -234,14 +236,13 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         try {
-            Object actualObject = checkAdapter(obj, cls, anns, true);
-            Class<?> actualClass = obj != actualObject || cls.isInterface() ? actualObject.getClass() : cls;
             String encoding = HttpUtils.getSetEncoding(m, headers, null);
-            if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
-                actualClass = InjectionUtils.getActualType(genericType);
-                actualClass = getActualType(actualClass, genericType, anns);
-                marshalCollection(cls, actualObject, actualClass, genericType, encoding, os, m);
+            if (InjectionUtils.isSupportedCollectionOrArray(cls)) {
+                marshalCollection(cls, obj, genericType, encoding, os, m, anns);
             } else {
+                Object actualObject = checkAdapter(obj, cls, anns, true);
+                Class<?> actualClass = obj != actualObject || cls.isInterface() 
+                    ? actualObject.getClass() : cls;
                 marshal(actualObject, actualClass, genericType, encoding, os, m);
             }
         } catch (JAXBException e) {
@@ -254,12 +255,16 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
     }
 
-    protected void marshalCollection(Class<?> originalCls, Object actualObject, Class<?> actualClass,
-                                     Type genericType, String encoding, OutputStream os, MediaType m) 
+    protected void marshalCollection(Class<?> originalCls, Object collection, 
+                                     Type genericType, String encoding, OutputStream os, 
+                                     MediaType m, Annotation[] anns) 
         throws Exception {
         
-        Collection c = originalCls.isArray() ? Arrays.asList((Object[]) actualObject) 
-                                             : (Collection) actualObject;
+        Class<?> actualClass = InjectionUtils.getActualType(genericType);
+        actualClass = getActualType(actualClass, genericType, anns);
+        
+        Collection c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
+                                             : (Collection) collection;
 
         Iterator it = c.iterator();
         
@@ -271,7 +276,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             qname = el.getName();
             actualClass = el.getDeclaredType();
         } else {
-            qname = getCollectionWrapperQName(actualClass, genericType, actualObject, true);
+            qname = getCollectionWrapperQName(actualClass, genericType, firstObj, true);
         }
         if (qname == null) {
             String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT", 
@@ -292,24 +297,37 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         os.write(startTag.getBytes());
         if (firstObj != null) {
-            marshalCollectionMember(firstObj instanceof JAXBElement 
-                ? ((JAXBElement) firstObj).getValue() : firstObj, actualClass, genericType, encoding, os, m, 
-                qname.getNamespaceURI());
+            XmlJavaTypeAdapter adapter = getAdapter(firstObj.getClass(), anns);
+            marshalCollectionMember(useAdapter(firstObj, adapter, true), 
+                                    actualClass, genericType, encoding, os, m, 
+                                    qname.getNamespaceURI());
             while (it.hasNext()) {
-                Object o = it.next();
-                marshalCollectionMember(o instanceof JAXBElement ? ((JAXBElement)o).getValue() : o, 
-                                    actualClass, genericType, encoding, os, m, qname.getNamespaceURI());
+                marshalCollectionMember(useAdapter(it.next(), adapter, true), actualClass, 
+                                        genericType, encoding, os, m, 
+                                        qname.getNamespaceURI());
             }
         }
         os.write(endTag.getBytes());
     }
     
-    protected void marshalCollectionMember(Object obj, Class<?> cls, Type genericType, 
-                           String enc, OutputStream os, MediaType mt, String ns) throws Exception {
-        obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
+    protected void marshalCollectionMember(Object obj, 
+                                           Class<?> cls, 
+                                           Type genericType, 
+                                           String enc, 
+                                           OutputStream os, 
+                                           MediaType mt, 
+                                           String ns) throws Exception {
+        
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();    
+        } else {
+            obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
+        }
+        
         if (obj instanceof JAXBElement && cls != JAXBElement.class) {
             cls = JAXBElement.class;
         }
+        
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         ms.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         if (ns.length() > 0) {
