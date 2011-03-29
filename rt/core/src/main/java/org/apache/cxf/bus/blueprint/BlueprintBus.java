@@ -22,13 +22,18 @@ package org.apache.cxf.bus.blueprint;
 
 import org.apache.aries.blueprint.utils.BundleDelegatingClassLoader;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.apache.cxf.configuration.Configurer;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.blueprint.container.BlueprintContainer;
 
 /**
  * 
  */
 public class BlueprintBus extends ExtensionManagerBus {
+
     BundleContext context;
+    BlueprintContainer container;
     
     public BlueprintBus() {
     }
@@ -38,6 +43,12 @@ public class BlueprintBus extends ExtensionManagerBus {
         super.setExtension(new BundleDelegatingClassLoader(c.getBundle(), 
                                                            this.getClass().getClassLoader()),
                            ClassLoader.class);
-        //setExtension(new ConfigurerImpl(c), Configurer.class);
+    }
+    public void setBlueprintContainer(BlueprintContainer con) {
+        container = con;
+        setExtension(new ConfigurerImpl(con), Configurer.class);
+        setExtension(new BlueprintBeanLocator(getExtension(ConfiguredBeanLocator.class), container),
+                           ConfiguredBeanLocator.class);
+        
     }
 }

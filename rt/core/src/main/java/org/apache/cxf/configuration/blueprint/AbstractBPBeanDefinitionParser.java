@@ -247,11 +247,11 @@ public abstract class AbstractBPBeanDefinitionParser {
             && !cdr.containsComponentDefinition(name)) {
             //Create a bus
             
-            //FIXME - mgmt stuff, configuration stuff, etc...
             MutableBeanMetadata bus = context.createMetadata(MutableBeanMetadata.class);
             bus.setId(name);
             bus.setRuntimeClass(BlueprintBus.class);
             bus.addProperty("bundleContext", createRef(context, "blueprintBundleContext"));
+            bus.addProperty("blueprintContainer", createRef(context, "blueprintContainer"));
             bus.setDestroyMethod("shutdown");
             bus.setInitMethod("initialize");
             
