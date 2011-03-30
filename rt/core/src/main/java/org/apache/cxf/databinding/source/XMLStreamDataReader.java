@@ -198,9 +198,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         
         CachedOutputStream out = new CachedOutputStream();
         try {
-            XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(out);
-            StaxUtils.copy(input, xsw);
-            xsw.close();
+            StaxUtils.copy(input, out);
             return out.getInputStream();
         } finally {
             out.close();

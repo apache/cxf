@@ -21,22 +21,31 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxSource;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.transform.InTransformReader;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,9 +80,31 @@ public class SourceProviderTest extends Assert {
         assertTrue(Document.class.isAssignableFrom(verifyRead(p, Document.class).getClass()));
     }
     
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadFromStreamReader() throws Exception {
+        TestSourceProvider p = new TestSourceProvider();
+        
+        InputStream is = new ByteArrayInputStream("<test xmlns=\"http://bar\"/>".getBytes());
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        reader = new InTransformReader(reader, 
+                                       Collections.singletonMap("{http://bar}test", "test2"),
+                                       null, false);
+        
+        p.getMessage().setContent(XMLStreamReader.class, reader);
+        
+        Source source = (Source)p.readFrom((Class)Source.class,
+                   null, null, null, null, is);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        TransformerFactory.newInstance().newTransformer()
+            .transform(source, new StreamResult(bos));
+        assertTrue(bos.toString().contains("test2"));
+    }
+    
     @Test
     public void testReadFromWithPreferredFormat() throws Exception {
-        SourceProvider p = new TestSourceProvider("sax");
+        TestSourceProvider p = new TestSourceProvider();
+        p.getMessage().put("source-preferred-format", "sax");        
         assertSame(StaxSource.class, verifyRead(p, Source.class).getClass());
     }
     
@@ -92,8 +123,8 @@ public class SourceProviderTest extends Assert {
     }
     
     @SuppressWarnings("unchecked")
-    private <T> Object verifyRead(MessageBodyReader p, Class<T> type) throws Exception {
-        return p.readFrom(type,
+    private <T> T verifyRead(MessageBodyReader p, Class<T> type) throws Exception {
+        return (T)p.readFrom(type,
                    null, null, null, null,
                    new ByteArrayInputStream("<test/>".getBytes()));
     }
@@ -107,22 +138,17 @@ public class SourceProviderTest extends Assert {
     
     private static class TestSourceProvider extends SourceProvider {
         
-        private String format;
+        private Message m = new MessageImpl();
         
         public TestSourceProvider() {
-            
         }
         
-        public TestSourceProvider(String format) {
-            this.format = format;    
-        }
-
-        protected Message getCurrentMessage() {
-            Message m = new MessageImpl();
-            if (format != null) {
-                m.put("source-preferred-format", format);
-            }
+        public Message getMessage() {
             return m;
+        }
+        
+        protected MessageContext getContext() {
+            return new MessageContextImpl(m);
         };
     }
 }

@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -345,13 +346,18 @@ public class XMLSource {
     
     private <T> T readFromSource(Source s, Class<T> cls) {
         try {
+            
             JAXBElementProvider provider = new JAXBElementProvider();
             JAXBContext c = provider.getPackageContext(cls);
             if (c == null) {
                 c = provider.getClassContext(cls);
             }
             Unmarshaller u = c.createUnmarshaller();
-            return cls.cast(u.unmarshal(s));
+            if (cls.getAnnotation(XmlRootElement.class) != null) {
+                return cls.cast(u.unmarshal(s));
+            } else {
+                return u.unmarshal(s, cls).getValue();
+            }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

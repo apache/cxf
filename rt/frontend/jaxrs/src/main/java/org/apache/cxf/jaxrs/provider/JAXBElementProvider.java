@@ -52,6 +52,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Source;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
@@ -100,7 +101,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     @Override
     protected boolean canBeReadAsJaxbElement(Class<?> type) {
-        return type != XMLSource.class && super.canBeReadAsJaxbElement(type);
+        return super.canBeReadAsJaxbElement(type) 
+            && type != XMLSource.class && !Source.class.isAssignableFrom(type);
     }
     
     @Context

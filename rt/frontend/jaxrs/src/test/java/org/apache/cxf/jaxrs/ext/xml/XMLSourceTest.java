@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
@@ -100,6 +101,15 @@ public class XMLSourceTest extends Assert {
         XMLSource xp = new XMLSource(is);
         Bar bar = xp.getNode("/foo/bar", Bar.class);
         assertNotNull(bar);
+    }
+    
+    @Test
+    public void testGetNodeAsJaxbElement() {
+        InputStream is = new ByteArrayInputStream("<foo><bar name=\"foo\"/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        Bar3 bar = xp.getNode("/foo/bar", Bar3.class);
+        assertNotNull(bar);
+        assertEquals("foo", bar.getName());
     }
     
     @Test
@@ -217,6 +227,17 @@ public class XMLSourceTest extends Assert {
     
     @XmlRootElement(name = "bar", namespace = "http://baz")
     private static class Bar2 {
+        
+    }
+    
+    private static class Bar3 {
+        
+        @XmlAttribute
+        private String name;
+
+        public String getName() {
+            return name;
+        }
         
     }
 }

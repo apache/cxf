@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -43,10 +44,10 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -57,6 +58,9 @@ public class SourceProvider extends AbstractConfigurableProvider implements
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 
     private static final String PREFERRED_FORMAT = "source-preferred-format";
+    @Context
+    private MessageContext context;
+    
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Source.class.isAssignableFrom(type);
@@ -83,7 +87,7 @@ public class SourceProvider extends AbstractConfigurableProvider implements
         if (DOMSource.class.isAssignableFrom(theSource) || Document.class.isAssignableFrom(theSource)) {
             
             boolean docRequired = Document.class.isAssignableFrom(theSource);
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+            XMLStreamReader reader = getReader(is);
             try {
                 Document doc = StaxUtils.read(reader);
                 return docRequired ? doc : new DOMSource(doc);
@@ -100,17 +104,50 @@ public class SourceProvider extends AbstractConfigurableProvider implements
             }
         } else if (SAXSource.class.isAssignableFrom(theSource)
                   || StaxSource.class.isAssignableFrom(theSource)) {
-            return new StaxSource(StaxUtils.createXMLStreamReader(is));
+            return new StaxSource(getReader(is));
         } else if (StreamSource.class.isAssignableFrom(theSource)
                    || Source.class.isAssignableFrom(theSource)) {
-            return new StreamSource(is);
+            return new StreamSource(getRealStream(is));
         } else if (XMLSource.class.isAssignableFrom(theSource)) {
-            return new XMLSource(is);
+            return new XMLSource(getRealStream(is));
         }
         
         throw new IOException("Unrecognized source");
     }
 
+    protected XMLStreamReader getReader(InputStream is) {
+        XMLStreamReader reader = getReaderFromMessage();
+        return reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
+    }
+    
+    protected InputStream getRealStream(InputStream is) throws IOException {
+        XMLStreamReader reader = getReaderFromMessage();
+        return reader == null ? is : getStreamFromReader(reader);
+    }
+    
+    private InputStream getStreamFromReader(XMLStreamReader input) 
+        throws IOException {
+        
+        CachedOutputStream out = new CachedOutputStream();
+        try {
+            StaxUtils.copy(input, out);
+            return out.getInputStream();
+        } catch (XMLStreamException ex) {
+            throw new IOException(ex);
+        } finally {
+            out.close();
+        }
+    }
+    
+    protected XMLStreamReader getReaderFromMessage() {
+        MessageContext mc = getContext();
+        if (mc != null) {
+            return (XMLStreamReader)mc.getContent(XMLStreamReader.class);
+        } else {
+            return null;
+        }
+    }
+    
     public void writeTo(Source source, Class<?> clazz, Type genericType, Annotation[] annotations,  
         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
@@ -143,16 +180,15 @@ public class SourceProvider extends AbstractConfigurableProvider implements
     }
     
     protected String getPreferredSource() {
-        Message m = getCurrentMessage();
-        if (m != null) {
-            return (String)m.getContextualProperty(PREFERRED_FORMAT);
+        MessageContext mc = getContext();
+        if (mc != null) {
+            return (String)mc.getContextualProperty(PREFERRED_FORMAT);
         } else {
             return "sax";
         }
     }
     
-    protected Message getCurrentMessage() {
-        return PhaseInterceptorChain.getCurrentMessage();
+    protected MessageContext getContext() {
+        return context;    
     }
-    
 }
