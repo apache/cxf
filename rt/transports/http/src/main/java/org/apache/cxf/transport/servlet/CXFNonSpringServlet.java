@@ -30,17 +30,21 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
-    private HTTPTransportFactory transportFactory;
+    private DestinationRegistry destinationRegistry;
     private Bus bus;
-
     private ServletController controller;
     
     public CXFNonSpringServlet() {
+    }
+
+    public CXFNonSpringServlet(DestinationRegistry destinationRegistry) {
+        this.destinationRegistry = destinationRegistry;
     }
 
     @Override
@@ -54,19 +58,25 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         resourceManager.addResourceResolver(new ServletContextResourceResolver(
                                                sc.getServletContext()));
 
-        if (transportFactory == null) {
-            DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-            try {
-                DestinationFactory df = dfm
-                    .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
-                if (df instanceof HTTPTransportFactory) {
-                    transportFactory = (HTTPTransportFactory)df;
-                }
-            } catch (BusException e) {
-                // why are we throwing a busexception if the DF isn't found?
-            }
+        if (destinationRegistry == null) {
+            this.destinationRegistry = getDestinationRegistryFromBus(this.bus);
         }
         this.controller = createServletController(sc);
+    }
+
+    private static DestinationRegistry getDestinationRegistryFromBus(Bus bus) {
+        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+        try {
+            DestinationFactory df = dfm
+                .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
+            if (df instanceof HTTPTransportFactory) {
+                HTTPTransportFactory transportFactory = (HTTPTransportFactory)df;
+                return transportFactory.getRegistry();
+            }
+        } catch (BusException e) {
+            // why are we throwing a busexception if the DF isn't found?
+        }
+        return null;
     }
 
     protected void loadBus(ServletConfig sc) {
@@ -75,9 +85,9 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
     private ServletController createServletController(ServletConfig servletConfig) {
         HttpServlet serviceListGeneratorServlet = 
-            new ServiceListGeneratorServlet(transportFactory.getRegistry(), bus);
+            new ServiceListGeneratorServlet(destinationRegistry, bus);
         ServletController newController =
-            new ServletController(transportFactory.getRegistry(),
+            new ServletController(destinationRegistry,
                                   servletConfig,
                                   serviceListGeneratorServlet);        
         return newController;
