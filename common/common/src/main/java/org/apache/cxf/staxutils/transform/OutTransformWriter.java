@@ -37,7 +37,6 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private QNamesMap elementsMap;
     private Map<QName, QName> appendMap = new HashMap<QName, QName>(5);
     private Map<String, String> nsMap = new HashMap<String, String>(5);
-    private Set<String> prefixes = new HashSet<String>(2);
     private Set<String> writtenUris = new HashSet<String>(2);
     
     private Set<QName> dropElements;
@@ -46,6 +45,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private List<Integer> appendedIndexes = new LinkedList<Integer>();
     private int currentDepth;
     private boolean attributesToElements;
+    private DelegatingNamespaceContext namespaceContext;
     
     public OutTransformWriter(XMLStreamWriter writer, 
                               Map<String, String> outMap,
@@ -58,6 +58,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         TransformUtils.convertToMapOfQNames(append, appendMap);
         dropElements = XMLUtils.convertStringsToQNames(dropEls);
         this.attributesToElements = attributesToElements;
+        namespaceContext = new DelegatingNamespaceContext(
+            writer.getNamespaceContext(), nsMap);
     }
 
     @Override
@@ -129,27 +131,17 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         String prefix = "";
         if (name.getNamespaceURI().length() > 0) {
             if (qname.getPrefix().length() == 0) {
-                prefix = findUniquePrefix();
+                prefix = namespaceContext.findUniquePrefix(name.getNamespaceURI());
                 writeNs = true;
             } else {
                 prefix = qname.getPrefix();
-                prefixes.add(prefix);
+                namespaceContext.addPrefix(prefix, qname.getNamespaceURI());    
             }
-            prefixes.add(prefix);
+            
         }
         super.writeStartElement(prefix, name.getLocalPart(), name.getNamespaceURI());
         if (writeNs) {
             this.writeNamespace(prefix, name.getNamespaceURI());
-        }
-    }
-    
-    private String findUniquePrefix() {
-        
-        int i = 0;
-        while (true) {
-            if (!prefixes.contains("ps" + ++i)) {
-                return "ps" + i;
-            }
         }
     }
     
@@ -172,7 +164,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     
     @Override
     public NamespaceContext getNamespaceContext() {
-        return new DelegatingNamespaceContext(super.getNamespaceContext(), nsMap);
+        return namespaceContext; 
     }
     
     @Override

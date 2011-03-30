@@ -464,6 +464,14 @@ public final class StaxUtils {
         copy(reader, writer);
     }
     
+    public static void copy(XMLStreamReader reader, OutputStream os)
+        throws XMLStreamException {
+        XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(os);
+        StaxUtils.copy(reader, xsw);
+        xsw.close();
+    }
+    
+    
     /**
      * Copies the reader to the writer. The start and end document methods must
      * be handled on the writer manually. TODO: if the namespace on the reader
@@ -519,9 +527,10 @@ public final class StaxUtils {
 
     private static void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer)
         throws XMLStreamException {
-        String local = reader.getLocalName();
         String uri = reader.getNamespaceURI();
         String prefix = reader.getPrefix();
+        String local = reader.getLocalName();
+        
         if (prefix == null) {
             prefix = "";
         }
@@ -560,13 +569,14 @@ public final class StaxUtils {
             if (nsPrefix == null) {
                 nsPrefix = "";
             }
-
-            if (nsPrefix.length() == 0) {
-                writer.writeDefaultNamespace(nsURI);
-                writer.setDefaultNamespace(nsURI);
-            } else {
-                writer.writeNamespace(nsPrefix, nsURI);
-                writer.setPrefix(nsPrefix, nsURI);
+            if (nsURI.length() > 0) {
+                if (nsPrefix.length() == 0) {
+                    writer.writeDefaultNamespace(nsURI);
+                    writer.setDefaultNamespace(nsURI);
+                } else {
+                    writer.writeNamespace(nsPrefix, nsURI);
+                    writer.setPrefix(nsPrefix, nsURI);
+                }
             }
 
             if (nsURI.equals(uri) && nsPrefix.equals(prefix)) {

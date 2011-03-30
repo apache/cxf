@@ -41,6 +41,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     private QName previousQName;
     private int previousDepth = -1;
     private boolean blockOriginalReader = true;
+    private DelegatingNamespaceContext namespaceContext;
     
     public InTransformReader(XMLStreamReader reader, 
                              Map<String, String> inMap,
@@ -51,6 +52,8 @@ public class InTransformReader extends DepthXMLStreamReader {
         this.blockOriginalReader = blockOriginalReader;
         TransformUtils.convertToQNamesMap(inMap, inElementsMap, nsMap);
         TransformUtils.convertToMapOfQNames(appendMap, inAppendMap);
+        namespaceContext = new DelegatingNamespaceContext(
+            reader.getNamespaceContext(), nsMap);
     }
     
     @Override
@@ -100,9 +103,38 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
     
     public NamespaceContext getNamespaceContext() {
-        return new DelegatingNamespaceContext(super.getNamespaceContext(), nsMap);
+        return namespaceContext;
     }
 
+    public String getPrefix() {
+        QName name = readCurrentElement();
+        String prefix = name.getPrefix();
+        if (prefix.length() == 0) {
+            prefix = namespaceContext.findUniquePrefix(name.getNamespaceURI());
+        }
+        return prefix;
+    }
+     
+    public String getNamespaceURI(int index) {
+        String ns = super.getNamespaceURI(index);
+        String actualNs = nsMap.get(ns);
+        if (actualNs != null) {
+            return actualNs;
+        } else {
+            return ns;
+        }
+    }
+    
+    public String getNamespacePrefix(int index) {
+        String ns = super.getNamespaceURI(index);
+        String actualNs = nsMap.get(ns);
+        if (actualNs != null) {
+            return namespaceContext.findUniquePrefix(actualNs);
+        } else {
+            return namespaceContext.getPrefix(ns);
+        }
+    }
+    
     public String getNamespaceURI() {
      
         QName theName = readCurrentElement();
@@ -127,7 +159,8 @@ public class InTransformReader extends DepthXMLStreamReader {
         }
         String ns = super.getNamespaceURI();
         String name = super.getLocalName();
-        return new QName(ns, name);
+        String prefix = super.getPrefix();
+        return new QName(ns, name, prefix == null ? "" : prefix);
     }
     
     public QName getName() { 
