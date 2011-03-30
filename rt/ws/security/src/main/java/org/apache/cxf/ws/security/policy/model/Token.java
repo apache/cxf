@@ -36,6 +36,8 @@ public abstract class Token extends AbstractSecurityAssertion {
     private boolean impliedDerivedKeys;
 
     private boolean explicitDerivedKeys;
+    
+    private String issuerName;
 
     public Token(SPConstants version) {
         super(version);
@@ -94,4 +96,11 @@ public abstract class Token extends AbstractSecurityAssertion {
         this.impliedDerivedKeys = impliedDerivedKeys;
     }
 
+    public String getIssuerName() {
+        return issuerName;
+    }
+    
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
+    }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soap:Header>
+  <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+  <saml1:Assertion AssertionID="4D2CF5C052E2084C8F13014023748318" IssueInstant="2011-03-29T12:39:34.831Z" Issuer="www.example.com" MajorVersion="1" MinorVersion="1" xmlns:saml1="urn:oasis:names:tc:SAML:1.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="saml1:AssertionType"><saml1:ConditionsType NotBefore="2011-03-29T12:39:34.832Z" NotOnOrAfter="2011-03-29T12:44:34.832Z"/><saml1:AuthenticationStatement AuthenticationInstant="2011-03-29T12:39:34.831Z" AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:password" xsi:type="saml1:AuthenticationStatementType"><saml1:Subject><saml1:NameIdentifier Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified" NameQualifier="www.example.com">uid=joe,ou=people,ou=saml-demo,o=example.com</saml1:NameIdentifier><saml1:SubjectConfirmation><saml1:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:sender-vouches</saml1:ConfirmationMethod></saml1:SubjectConfirmation></saml1:Subject></saml1:AuthenticationStatement></saml1:Assertion>
+  </wsse:Security>
+  </soap:Header>
+  <soap:Body>
+    <echo xmlns="http://www.sdj.pl">
+      <in0>A</in0>    
+    </echo>
+  </soap:Body>
+</soap:Envelope>

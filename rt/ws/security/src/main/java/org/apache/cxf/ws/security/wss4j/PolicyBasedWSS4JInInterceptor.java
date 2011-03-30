@@ -74,6 +74,7 @@ import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
@@ -517,7 +518,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-            switch (actInt.intValue()) {                    
+            switch (actInt.intValue()) {   
             case WSConstants.SIGN:
                 if (hasDerivedKeys == null) {
                     hasDerivedKeys = Boolean.FALSE;
@@ -568,6 +569,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         }
                     }
                 }
+                break;
+            case WSConstants.ST_SIGNED:
+            case WSConstants.ST_UNSIGNED:
+                SamlTokenPolicyValidator validator = new SamlTokenPolicyValidator();
+                validator.validatePolicy(aim, wser);
                 break;
             case WSConstants.TS:
                 assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.security.wss4j;
+package org.apache.cxf.ws.security.wss4j.saml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,6 +47,10 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.security.wss4j.AbstractSecurityTest;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -77,7 +81,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
         outProperties.put(
             WSHandlerConstants.SAML_CALLBACK_CLASS, 
-            "org.apache.cxf.ws.security.wss4j.SAML1CallbackHandler"
+            "org.apache.cxf.ws.security.wss4j.saml.SAML1CallbackHandler"
         );
         
         Map<String, Object> inProperties = new HashMap<String, Object>();
@@ -113,7 +117,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
         outProperties.put(
             WSHandlerConstants.SAML_CALLBACK_CLASS, 
-            "org.apache.cxf.ws.security.wss4j.SAML2CallbackHandler"
+            "org.apache.cxf.ws.security.wss4j.saml.SAML2CallbackHandler"
         );
         
         Map<String, Object> inProperties = new HashMap<String, Object>();

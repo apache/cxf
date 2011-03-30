@@ -46,6 +46,7 @@ import org.apache.cxf.ws.security.policy.builders.ProtectionTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.RecipientTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.RequiredElementsBuilder;
 import org.apache.cxf.ws.security.policy.builders.RequiredPartsBuilder;
+import org.apache.cxf.ws.security.policy.builders.SamlTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.SecureConversationTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.SecurityContextTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.SignedElementsBuilder;
@@ -103,6 +104,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new RecipientTokenBuilder(pbuild));
         reg.registerBuilder(new RequiredElementsBuilder());
         reg.registerBuilder(new RequiredPartsBuilder());
+        reg.registerBuilder(new SamlTokenBuilder(pbuild));
         reg.registerBuilder(new SecureConversationTokenBuilder(pbuild));
         reg.registerBuilder(new SecurityContextTokenBuilder());
         reg.registerBuilder(new SignedElementsBuilder());

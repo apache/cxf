@@ -122,7 +122,11 @@ public final class SP12Constants extends SPConstants {
             SPConstants.CONTENT_ENCRYPTED_ELEMENTS, SP12Constants.SP_PREFIX);
 
     public static final QName USERNAME_TOKEN = new QName(SP12Constants.SP_NS,
-            SPConstants.USERNAME_TOKEN , SP12Constants.SP_PREFIX);
+            SPConstants.USERNAME_TOKEN, SP12Constants.SP_PREFIX);
+    
+    public static final QName SAML_TOKEN = new QName(SP12Constants.SP_NS,
+            SPConstants.SAML_TOKEN, SP12Constants.SP_PREFIX);
+    
     public static final QName KEYVALUE_TOKEN = new QName(SP12Constants.SP_NS,
                                                          SPConstants.KEYVALUE_TOKEN ,
                                                          SP12Constants.SP_PREFIX);
@@ -438,6 +442,9 @@ public final class SP12Constants extends SPConstants {
     }
     public QName getUserNameToken() {
         return USERNAME_TOKEN;
+    }
+    public QName getSamlToken() {
+        return SAML_TOKEN;
     }
     public QName getKeyValueToken() {
         return KEYVALUE_TOKEN;

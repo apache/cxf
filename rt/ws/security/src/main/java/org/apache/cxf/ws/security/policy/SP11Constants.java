@@ -101,6 +101,9 @@ public final class SP11Constants extends SPConstants {
 
     public static final QName USERNAME_TOKEN = new QName(SP11Constants.SP_NS,
             SPConstants.USERNAME_TOKEN , SP11Constants.SP_PREFIX);
+    
+    public static final QName SAML_TOKEN = new QName(SP11Constants.SP_NS,
+            SPConstants.SAML_TOKEN , SP11Constants.SP_PREFIX);
 
     public static final QName WSS_USERNAME_TOKEN10 = new QName(SP11Constants.SP_NS,
             SPConstants.USERNAME_TOKEN10 , SP11Constants.SP_PREFIX);
@@ -238,7 +241,7 @@ public final class SP11Constants extends SPConstants {
     public static final QName MUST_SUPPORT_ISSUED_TOKENS = new QName(
             SP11Constants.SP_NS, SPConstants.MUST_SUPPORT_ISSUED_TOKENS , SP11Constants.SP_PREFIX);
 
-    public static final QName ISSUER = new QName(SP11Constants.SP_NS, SPConstants.ISSUER ,
+    public static final QName ISSUER = new QName(SP11Constants.SP_NS, SPConstants.ISSUER,
             SP11Constants.SP_PREFIX);
 
     public static final QName REQUIRE_DERIVED_KEYS = new QName(SP11Constants.SP_NS,
@@ -377,6 +380,9 @@ public final class SP11Constants extends SPConstants {
     }
     public QName getUserNameToken() {
         return USERNAME_TOKEN;
+    }
+    public QName getSamlToken() {
+        return SAML_TOKEN;
     }
     public QName getX509Token() {
         return X509_TOKEN;

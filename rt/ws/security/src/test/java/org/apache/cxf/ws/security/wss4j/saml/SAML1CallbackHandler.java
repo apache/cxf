@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.security.wss4j;
+package org.apache.cxf.ws.security.wss4j.saml;
 
 import java.io.IOException;
 

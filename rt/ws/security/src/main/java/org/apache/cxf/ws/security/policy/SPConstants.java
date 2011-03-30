@@ -122,14 +122,21 @@ public abstract class SPConstants {
 
     public static final String WSS_X509_PKI_PATH_V1_TOKEN11 = "WssX509PkiPathV1Token11";
     
-    
     public static final String USERNAME_TOKEN = "UsernameToken";
+    
+    public static final String SAML_TOKEN = "SamlToken";
+
     public static final String KEYVALUE_TOKEN = "KeyValueToken";
     
     public static final String USERNAME_TOKEN10 = "WssUsernameToken10";
     
     public static final String USERNAME_TOKEN11 = "WssUsernameToken11";
-
+    
+    public static final String SAML_11_TOKEN_10 = "WssSamlV11Token10";
+    
+    public static final String SAML_11_TOKEN_11 = "WssSamlV11Token11";
+    
+    public static final String SAML_20_TOKEN_11 = "WssSamlV20Token11";
     
     public static final String TRANSPORT_TOKEN = "TransportToken";
     
@@ -372,6 +379,8 @@ public abstract class SPConstants {
     
     public static final String ISSUER = "Issuer";
     
+    public static final String ISSUER_NAME = "IssuerName";
+    
     public static final String REQUIRE_DERIVED_KEYS = "RequireDerivedKeys";
     
     public static final String REQUIRE_IMPLIED_DERIVED_KEYS = "RequireImpliedDerivedKeys";
@@ -439,6 +448,7 @@ public abstract class SPConstants {
     public abstract QName getTransportBinding();
     public abstract QName getTransportToken();
     public abstract QName getUserNameToken();
+    public abstract QName getSamlToken();
     public abstract QName getX509Token();
     
     public abstract QName getSupportingTokens();
