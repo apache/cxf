@@ -46,6 +46,9 @@ public class BusApplicationListenerTest extends Assert {
         listener.postShutdown();
         EasyMock.expectLastCall().times(1);
         EasyMock.replay(listener);
+        AbstractRefreshableApplicationContext context = 
+            (AbstractRefreshableApplicationContext)factory.getApplicationContext();
+        context.close();
         parent.close();
         EasyMock.verify(listener);
     }
