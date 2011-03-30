@@ -64,6 +64,8 @@ public class STSTokenValidator implements Validator {
                 token.setToken(credential.getAssertion().getElement());
             } else if (credential.getUsernametoken() != null) {
                 token.setToken(credential.getUsernametoken().getElement());
+            } else if (credential.getBinarySecurityToken() != null) {
+                token.setToken(credential.getBinarySecurityToken().getElement());
             }
             
             STSClient c = STSUtils.getClient(m, "sts");
