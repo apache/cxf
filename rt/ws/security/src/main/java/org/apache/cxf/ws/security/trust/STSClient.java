@@ -642,8 +642,11 @@ public class STSClient implements Configurable, InterceptorProvider {
     }
     
     public List<SecurityToken> validateSecurityToken(SecurityToken tok) throws Exception {
-        return validateSecurityToken(tok,
-                                     namespace + "/RSTR/Status");
+        String validateTokenType = tokenType;
+        if (validateTokenType == null) {
+            validateTokenType = namespace + "/RSTR/Status";
+        }
+        return validateSecurityToken(tok, validateTokenType);
     }
     
     private List<SecurityToken> validateSecurityToken(SecurityToken tok, String tokentype) 
@@ -716,15 +719,21 @@ public class STSClient implements Configurable, InterceptorProvider {
             if ("Status".equals(el.getLocalName())) {
                 Element e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Code");
                 String s = DOMUtils.getContent(e2);
-                valid =  s.endsWith("/status/valid");
+                valid = s.endsWith("/status/valid");
                 
                 e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Reason");
                 if (e2 != null) {
                     reason = DOMUtils.getContent(e2);
                 }
             } else if ("RequestedSecurityToken".equals(el.getLocalName())) {
-                //TODO: get the token out of it.  Need to find an STS that actually
-                //suports this first to test it
+                Element requestedSecurityTokenElement = DOMUtils.getFirstElement(el);
+                String id = findID(null, null, requestedSecurityTokenElement);
+                if (StringUtils.isEmpty(id)) {
+                    throw new TrustException("NO_ID", LOG);
+                }
+                SecurityToken requestedSecurityToken = new SecurityToken(id);
+                requestedSecurityToken.setToken(requestedSecurityTokenElement);
+                tokens.add(requestedSecurityToken);
             }
             el = DOMUtils.getNextElement(el);
         }

@@ -20,10 +20,13 @@
 package org.apache.cxf.ws.security.trust;
 
 
+import java.util.List;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
 
@@ -71,7 +74,12 @@ public class STSTokenValidator implements Validator {
             STSClient c = STSUtils.getClient(m, "sts");
             synchronized (c) {
                 System.setProperty("noprint", "true");
-                c.validateSecurityToken(token);
+                List<SecurityToken> tokens = c.validateSecurityToken(token);
+                SecurityToken returnedToken = tokens.get(0);
+                if (returnedToken != token) {
+                    AssertionWrapper assertion = new AssertionWrapper(returnedToken.getToken());
+                    credential.setTransformedToken(assertion);
+                }
                 return credential;
             }
         } catch (RuntimeException e) {
