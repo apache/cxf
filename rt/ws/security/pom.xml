@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>1.6-SNAPSHOT</version>
+            <version>${cxf.wss4j.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>xerces</groupId>
