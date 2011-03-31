@@ -187,7 +187,29 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
         }
         return server;
     }
-
+    public void init() {
+        if (getServer() == null) {
+            ClassLoader orig = Thread.currentThread().getContextClassLoader();
+            try {
+                if (bus != null) {
+                    ClassLoader loader = bus.getExtension(ClassLoader.class);
+                    if (loader != null) {
+                        Thread.currentThread().setContextClassLoader(loader);
+                    }
+                }
+                create();
+            } finally {
+                Thread.currentThread().setContextClassLoader(orig);
+            }
+        }
+    }
+    
+    public void destroy() {
+        if (getServer() != null) {
+            getServer().destroy();
+            setServer(null);
+        }
+    }
 
     @Override
     protected void initializeServiceFactory() {

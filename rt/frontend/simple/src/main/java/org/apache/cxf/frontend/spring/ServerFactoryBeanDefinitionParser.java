@@ -120,12 +120,6 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         public SpringServerFactoryBean(ReflectionServiceFactoryBean fact) {
             super(fact);
         }
-        public void destroy() {
-            if (getServer() != null) {
-                getServer().destroy();
-                setServer(null);
-            }
-        }
 
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {

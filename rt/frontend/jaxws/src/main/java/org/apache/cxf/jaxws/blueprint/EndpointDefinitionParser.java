@@ -71,10 +71,6 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
         //Endpoint definition
         MutableBeanMetadata cxfBean = context.createMetadata(MutableBeanMetadata.class);
 
-        //Add a blueprintContainer ref
-
-        //cxfBean.addProperty("blueprintContainer", NSUtils.createRef(context, "blueprintContainer"));
-        //cxfBean.addProperty("bundleContext", NSUtils.createRef(context, "blueprintBundleContext"));
         if (!StringUtils.isEmpty(getIdOrName(element))) {
             cxfBean.setId(getIdOrName(element));
         } else {

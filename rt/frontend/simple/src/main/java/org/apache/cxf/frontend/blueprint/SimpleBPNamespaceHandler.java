@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxws.blueprint;
+package org.apache.cxf.frontend.blueprint;
 
 import java.net.URL;
 import java.util.Set;
@@ -27,10 +27,6 @@ import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.cxf.frontend.blueprint.ClientProxyFactoryBeanDefinitionParser;
-import org.apache.cxf.frontend.blueprint.ServerFactoryBeanDefinitionParser;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
@@ -38,27 +34,23 @@ import org.osgi.service.blueprint.reflect.Metadata;
 /**
  * 
  */
-public class JAXWSBPNamespaceHandler implements NamespaceHandler {
+public class SimpleBPNamespaceHandler implements NamespaceHandler {
     private BlueprintContainer blueprintContainer;
     
-    public JAXWSBPNamespaceHandler() {
+    public SimpleBPNamespaceHandler() {
     }
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("/schemas/blueprint/jaxws.xsd");
+        return getClass().getClassLoader().getResource("/schemas/blueprint/simple.xsd");
     }
 
 
     public Metadata parse(Element element, ParserContext context) {
         String s = element.getLocalName();
-        if ("endpoint".equals(s)) {
-            return new EndpointDefinitionParser().parse(element, context);
-        } else if ("server".equals(s)) {
-            return new ServerFactoryBeanDefinitionParser(JaxWsServerFactoryBean.class)
-                .parse(element, context);
+        if ("server".equals(s)) {
+            return new ServerFactoryBeanDefinitionParser().parse(element, context);
         } else if ("client".equals(s)) {
-            return new ClientProxyFactoryBeanDefinitionParser(JaxWsProxyFactoryBean.class)
-                .parse(element, context);
+            //TODO
         }
         return null;
     }

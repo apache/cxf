@@ -23,29 +23,64 @@ import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 /**
  * 
  */
 public class SimpleBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
-    Class<?> cls;
+    protected Class<?> cls;
     
     public SimpleBPBeanDefinitionParser(Class<?> cls) {
         this.cls = cls;
     }
 
-    public String getId(Element element) {
+    public String getFactorySuffix() {
+        return null;
+    }
+    public String getFactoryCreateType(Element element) {
+        return null;
+    }
+    
+    public String getId(Element element, ParserContext context) {
         return element.hasAttribute("id") ? element.getAttribute("id") : null;
     }
     
     public Metadata parse(Element element, ParserContext context) {
         MutableBeanMetadata cxfBean = context.createMetadata(MutableBeanMetadata.class);
         cxfBean.setRuntimeClass(cls);
-        cxfBean.setId(getId(element));
+        String fact = getFactorySuffix();
+        if (fact == null) {
+            cxfBean.setId(getId(element, context));
+        } else {
+            cxfBean.setId(getId(element, context) + fact);            
+        }
         parseAttributes(element, context, cxfBean);
         parseChildElements(element, context, cxfBean);
+        if (hasBusProperty()) {
+            boolean foundBus = false;
+            for (BeanProperty bp : cxfBean.getProperties()) {
+                if ("bus".equals(bp.getName())) {
+                    foundBus = true;
+                }
+            }
+            if (!foundBus) {
+                cxfBean.addProperty("bus", getBusRef(context, "cxf"));
+            }
+        }
+        if (fact != null) {
+            context.getComponentDefinitionRegistry().registerComponentDefinition(cxfBean);
+            
+            MutableBeanMetadata bean = context.createMetadata(MutableBeanMetadata.class);
+            bean.setId(getId(element, context));
+            bean.setFactoryComponent(cxfBean);
+            bean.setFactoryMethod("create");
+            bean.setClassName(getFactoryCreateType(element));
+            return bean;
+        }
         return cxfBean;
     }
 
+    
 }

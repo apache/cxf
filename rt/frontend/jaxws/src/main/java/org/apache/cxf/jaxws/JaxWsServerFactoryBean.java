@@ -181,13 +181,13 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     
     public Server create() {
         Server server = super.create();
-        init();
+        initializeResourcesAndHandlerChain();
         checkPrivateEndpoint(server.getEndpoint());
         
         return server;
     }
     
-    private synchronized void init() {
+    private synchronized void initializeResourcesAndHandlerChain() {
         if (doInit) {
             try {
                 injectResources(getServiceBean());
