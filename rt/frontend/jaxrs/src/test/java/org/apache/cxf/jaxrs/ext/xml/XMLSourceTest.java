@@ -29,6 +29,10 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.Source;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 
@@ -54,6 +58,15 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream("<foo><bar attr=\"baz\">barValue</bar></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
         assertEquals("baz", xp.getValue("/foo/bar/@attr"));
+    }
+    
+    @Test
+    public void testAttributeValueAsNode() {
+        InputStream is = new ByteArrayInputStream("<foo><bar attr=\"baz\">barValue</bar></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        Node node = xp.getNode("/foo/bar/@attr", Node.class);
+        assertNotNull(node);
+        assertEquals("baz", node.getTextContent());
     }
     
     @Test
@@ -101,6 +114,29 @@ public class XMLSourceTest extends Assert {
         XMLSource xp = new XMLSource(is);
         Bar bar = xp.getNode("/foo/bar", Bar.class);
         assertNotNull(bar);
+    }
+    
+    @Test
+    public void testGetNodeAsElement() {
+        InputStream is = new ByteArrayInputStream("<foo><bar/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        Element element = xp.getNode("/foo/bar", Element.class);
+        assertNotNull(element);
+    }
+    
+    @Test
+    public void testGetNodeAsSource() {
+        InputStream is = new ByteArrayInputStream("<foo><bar/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        Source element = xp.getNode("/foo/bar", Source.class);
+        assertNotNull(element);
+    }
+    
+    @Test
+    public void testGetNodeNull() {
+        InputStream is = new ByteArrayInputStream("<foo><bar/></foo>".getBytes());
+        XMLSource xp = new XMLSource(is);
+        assertNull(xp.getNode("/foo/bar1", Element.class));
     }
     
     @Test

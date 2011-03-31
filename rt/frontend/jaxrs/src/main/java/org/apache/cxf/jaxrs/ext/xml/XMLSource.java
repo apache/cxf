@@ -120,7 +120,7 @@ public class XMLSource {
         if (cls.isPrimitive() || cls == String.class) {
             return readPrimitiveValue(node, cls);    
         } else {
-            return readFromSource(new DOMSource(node), cls);
+            return readNode(node, cls);
         }
     }
     
@@ -162,7 +162,7 @@ public class XMLSource {
             if (InjectionUtils.isPrimitive(cls)) {
                 values[i] = readPrimitiveValue(node, cls);
             } else {
-                values[i] = readFromSource(new DOMSource(node), cls);
+                values[i] = readNode(node, cls);
             }
         }
         return values;
@@ -344,7 +344,17 @@ public class XMLSource {
     }
     
     
-    private <T> T readFromSource(Source s, Class<T> cls) {
+    private <T> T readNode(Node node, Class<T> cls) {
+        
+        if (Node.class.isAssignableFrom(cls)) {
+            return cls.cast(node);
+        }
+        
+        DOMSource s = new DOMSource(node);
+        if (Source.class == cls || DOMSource.class == cls) {
+            return cls.cast(s);
+        }
+        
         try {
             
             JAXBElementProvider provider = new JAXBElementProvider();
