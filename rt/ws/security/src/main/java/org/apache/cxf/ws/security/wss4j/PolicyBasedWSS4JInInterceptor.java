@@ -448,6 +448,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     action = addToAction(action, WSHandlerConstants.USERNAME_TOKEN, true);
                 }
             }
+            if (containsPolicy(aim, SP12Constants.SAML_TOKEN) && isRequestor(message)) {
+                assertPolicy(aim, SP12Constants.SAML_TOKEN);
+            }
             
             //relatively irrelevant stuff from a verification standpoint
             assertPolicy(aim, SP12Constants.LAYOUT);

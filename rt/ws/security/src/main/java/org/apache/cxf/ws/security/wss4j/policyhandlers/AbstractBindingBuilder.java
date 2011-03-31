@@ -81,6 +81,7 @@ import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
@@ -118,6 +119,8 @@ import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
@@ -553,8 +556,13 @@ public abstract class AbstractBindingBuilder {
                     encryptedTokensIdList.add(sig.getBSTTokenId());
                 }
                 ret.put(token, sig);                
+            } else if (token instanceof SamlToken) {
+                AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+                if (assertionWrapper != null) {
+                    addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                    // TODO ret.put(token, utBuilder);
+                }
             }
-            
         }
         return ret;
     }
@@ -662,6 +670,46 @@ public abstract class AbstractBindingBuilder {
             policyNotAsserted(token, "No username available");
         }
         return null;
+    }
+    
+    protected AssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {
+        AssertionInfo info = null;
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
+        for (AssertionInfo ai : ais) {
+            if (ai.getAssertion() == token) {
+                info = ai;
+                if (!isRequestor()) {
+                    info.setAsserted(true);
+                    return null;
+                }
+            }
+        }
+        
+        //
+        // Get the SAML CallbackHandler
+        //
+        Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
+    
+        CallbackHandler handler = null;
+        if (o instanceof CallbackHandler) {
+            handler = (CallbackHandler)o;
+        } else if (o instanceof String) {
+            try {
+                handler = (CallbackHandler)ClassLoaderUtils
+                    .loadClass((String)o, this.getClass()).newInstance();
+            } catch (Exception e) {
+                handler = null;
+            }
+        }
+        if (handler == null) {
+            policyNotAsserted(token, "No SAML CallbackHandler available");
+            return null;
+        }
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(handler);
+        info.setAsserted(true);
+        return new AssertionWrapper(samlParms);
     }
     
     public String getPassword(String userName, Assertion info, int type) {
