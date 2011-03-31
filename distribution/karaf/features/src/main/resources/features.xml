@@ -33,8 +33,8 @@
         <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/${cxf.geronimo.servlet.version}</bundle>
     </feature>
 
-    <feature name='jaxb' version='${cxf.jaxb.bundle.version}'>
-        <feature version="${project.verion}">cxf-specs</feature>
+    <feature name='cxf-jaxb' version='${cxf.jaxb.bundle.version}'>
+        <feature version="${project.version}">cxf-specs</feature>
         <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${cxf.jaxb.bundle.version}</bundle>
         <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
     </feature>
@@ -82,7 +82,7 @@
         <bundle>mvn:org.apache.abdera/abdera-extensions-json/${cxf.abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-client/${cxf.abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-server/${cxf.abdera.version}</bundle-->
-        <feature version='${cxf.jaxb.bundle.version}'>jaxb</feature>
+        <feature version='${cxf.jaxb.bundle.version}'>cxf-jaxb</feature>
     </feature>
     <feature name="wss4j" version="${cxf.wss4j.version}">
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/${cxf.xmlsec.bundle.version}</bundle>
@@ -103,6 +103,7 @@
         <bundle start-level='20'>mvn:org.codehaus.woodstox/stax2-api/${cxf.woodstox.stax2-api.version}</bundle>
         <bundle start-level='20'>mvn:org.codehaus.woodstox/woodstox-core-asl/${cxf.woodstox.core.version}</bundle>
 
+        <feature version='${cxf.jaxb.bundle.version}'>cxf-jaxb</feature>
         <feature version="${cxf.spring.osgi.version}">spring-dm</feature>
         <feature version="${cxf.karaf.version}">http</feature>
         <feature version="${cxf.karaf.version}">war</feature>
@@ -110,7 +111,6 @@
         <feature version="${cxf.spring.version}">spring-jms</feature>
         <feature version="${cxf.wss4j.version}">wss4j</feature>
         <feature version="${cxf.jetty.version}">jetty7</feature>
-        <feature version='${cxf.jaxb.bundle.version}'>jaxb</feature>
         <feature version='${cxf.abdera.version}'>abdera</feature>
 
         <bundle>mvn:org.apache.neethi/neethi/${cxf.neethi.version}</bundle>

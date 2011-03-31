@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Application;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -112,13 +113,30 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         serviceFactory.setEnableStaticResolution(enableStatic);
     }
 
+    
+    /**
+     * Creates the JAX-RS Server instance
+     * @return the server
+     */
+    public void init() {
+        if (server == null) {
+            create();
+        }
+    }
+    
     /**
      * Creates the JAX-RS Server instance
      * @return the server
      */
     public Server create() {
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            serviceFactory.setBus(getBus());
+            Bus bus = getBus();
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
+            serviceFactory.setBus(bus);
             checkResources(true);
             if (serviceFactory.getService() == null) {
                 serviceFactory.setServiceName(getServiceName());
@@ -168,6 +186,8 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             throw new ServiceConstructionException(e);
         } catch (Exception e) {
             throw new ServiceConstructionException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
 
         return server;
