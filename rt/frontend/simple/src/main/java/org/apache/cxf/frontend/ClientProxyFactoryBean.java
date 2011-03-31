@@ -117,54 +117,65 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
      * @return the proxy. You must cast the returned object to the appropriate class before using it.
      */
     public Object create() {
-        configureObject();
-        
-        if (properties == null) {
-            properties = new HashMap<String, Object>();
+        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        try {
+            if (getBus() != null) {
+                ClassLoader loader = getBus().getExtension(ClassLoader.class);
+                if (loader != null) {
+                    Thread.currentThread().setContextClassLoader(loader);
+                }
+            }
+            configureObject();
+            
+            if (properties == null) {
+                properties = new HashMap<String, Object>();
+            }
+    
+            if (username != null) {
+                AuthorizationPolicy authPolicy = new AuthorizationPolicy();
+                authPolicy.setUserName(username);
+                authPolicy.setPassword(password);
+                properties.put(AuthorizationPolicy.class.getName(), authPolicy);
+            }
+    
+            initFeatures();
+            clientFactoryBean.setProperties(properties);
+    
+            if (bus != null) {
+                clientFactoryBean.setBus(bus);
+            }
+    
+            if (dataBinding != null) {
+                clientFactoryBean.setDataBinding(dataBinding);
+            }
+    
+            Client c = clientFactoryBean.create();
+            if (getInInterceptors() != null) {
+                c.getInInterceptors().addAll(getInInterceptors());
+            }
+            if (getOutInterceptors() != null) {
+                c.getOutInterceptors().addAll(getOutInterceptors());
+            }
+            if (getInFaultInterceptors() != null) {
+                c.getInFaultInterceptors().addAll(getInFaultInterceptors());
+            }
+            if (getOutFaultInterceptors() != null) {
+                c.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
+            }
+    
+            ClientProxy handler = clientClientProxy(c);
+    
+            Class classes[] = getImplementingClasses();
+            Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(),
+                                                classes,
+                                                handler);
+    
+            this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PROXY_CREATED,
+                                               classes, handler, obj);
+            return obj;
+        } finally {
+            Thread.currentThread().setContextClassLoader(orig);
         }
-
-        if (username != null) {
-            AuthorizationPolicy authPolicy = new AuthorizationPolicy();
-            authPolicy.setUserName(username);
-            authPolicy.setPassword(password);
-            properties.put(AuthorizationPolicy.class.getName(), authPolicy);
-        }
-
-        initFeatures();
-        clientFactoryBean.setProperties(properties);
-
-        if (bus != null) {
-            clientFactoryBean.setBus(bus);
-        }
-
-        if (dataBinding != null) {
-            clientFactoryBean.setDataBinding(dataBinding);
-        }
-
-        Client c = clientFactoryBean.create();
-        if (getInInterceptors() != null) {
-            c.getInInterceptors().addAll(getInInterceptors());
-        }
-        if (getOutInterceptors() != null) {
-            c.getOutInterceptors().addAll(getOutInterceptors());
-        }
-        if (getInFaultInterceptors() != null) {
-            c.getInFaultInterceptors().addAll(getInFaultInterceptors());
-        }
-        if (getOutFaultInterceptors() != null) {
-            c.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
-        }
-
-        ClientProxy handler = clientClientProxy(c);
-
-        Class classes[] = getImplementingClasses();
-        Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(),
-                                            classes,
-                                            handler);
-
-        this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PROXY_CREATED,
-                                           classes, handler, obj);
-        return obj;
     }
 
     protected Class[] getImplementingClasses() {

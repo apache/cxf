@@ -177,7 +177,9 @@ public final class JAXBContextCache {
                         throw ex;
                     }
                 }
-
+                if (context == null) {
+                    throw ex;
+                }
             }
             cachedContextAndSchemas = new CachedContextAndSchemas(context, classes);
             synchronized (JAXBCONTEXT_CACHE) {

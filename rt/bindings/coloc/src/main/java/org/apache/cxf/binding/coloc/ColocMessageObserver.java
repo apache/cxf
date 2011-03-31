@@ -57,8 +57,13 @@ public class ColocMessageObserver extends ChainInitiationObserver {
 
     public void onMessage(Message m) {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus(bus);
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
+            BusFactory.setThreadDefaultBus(bus);
             if (LOG.isLoggable(Level.FINER)) {
                 LOG.finer("Processing Message at collocated endpoint.  Request message: " + m);
             }
@@ -99,6 +104,7 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             setOutBoundMessage(ex, m.getExchange());
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
     

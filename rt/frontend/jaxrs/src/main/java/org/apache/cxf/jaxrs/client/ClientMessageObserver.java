@@ -43,12 +43,17 @@ class ClientMessageObserver implements MessageObserver {
         message.getExchange().setInMessage(message);
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(cfg.getBus());
-
-        // execute chain
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = cfg.getBus().getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
+            // execute chain
             chain.doIntercept(message);
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
     

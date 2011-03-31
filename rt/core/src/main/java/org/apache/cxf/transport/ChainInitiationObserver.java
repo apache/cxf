@@ -58,7 +58,12 @@ public class ChainInitiationObserver implements MessageObserver {
     public void onMessage(Message m) {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             InterceptorChain phaseChain = null;
             
             if (m.getInterceptorChain() != null) {
@@ -114,6 +119,7 @@ public class ChainInitiationObserver implements MessageObserver {
             
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
     private void addToChain(InterceptorChain chain, Message m) {

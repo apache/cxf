@@ -276,11 +276,17 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
 
         // REVISIT: service on executor if associated with endpoint
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             BusFactory.setThreadDefaultBus(bus); 
             serviceRequest(context, req, resp);
         } finally {
-            BusFactory.setThreadDefaultBus(null);  
+            BusFactory.setThreadDefaultBus(null);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }    
     }
 

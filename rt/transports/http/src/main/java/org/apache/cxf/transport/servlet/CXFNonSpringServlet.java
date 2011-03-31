@@ -103,11 +103,17 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
     @Override
     protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             BusFactory.setThreadDefaultBus(bus);
             controller.invoke(request, response);
         } finally {
             BusFactory.setThreadDefaultBus(null);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
 

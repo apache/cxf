@@ -59,7 +59,12 @@ public class MultipleEndpointObserver implements MessageObserver {
     public void onMessage(Message message) {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             Exchange exchange = message.getExchange();
             if (exchange == null) {
                 exchange = new ExchangeImpl();
@@ -91,6 +96,7 @@ public class MultipleEndpointObserver implements MessageObserver {
             chain.doIntercept(message);
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
 

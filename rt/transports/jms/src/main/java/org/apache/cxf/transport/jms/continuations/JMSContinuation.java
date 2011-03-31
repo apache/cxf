@@ -95,12 +95,18 @@ public class JMSContinuation implements Continuation {
     
     protected synchronized void doResume() {
         updateContinuations(true);
-        BusFactory.setThreadDefaultBus(bus);
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            BusFactory.setThreadDefaultBus(bus);
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             incomingObserver.onMessage(inMessage);
         } finally {
             isPending = false;
             BusFactory.setThreadDefaultBus(null);
+            Thread.currentThread().setContextClassLoader(origLoader);            
         }
     }
 

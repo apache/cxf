@@ -181,7 +181,12 @@ public class JMSDestination extends AbstractMultiplexDestination
         onMessage(message, null);
     }
     public void onMessage(javax.jms.Message message, Session session) {
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             getLogger().log(Level.FINE, "server received request: ", message);
              // Build CXF message from JMS message
             Message inMessage = new MessageImpl();            
@@ -248,6 +253,7 @@ public class JMSDestination extends AbstractMultiplexDestination
             getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
         } finally {
             BusFactory.setThreadDefaultBus(null);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
 

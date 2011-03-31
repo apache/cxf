@@ -130,18 +130,29 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
      */
     @Override
     public Object create() {
-        Object obj = super.create();
-        Service service = getServiceFactory().getService();
-        if (needWrapperClassInterceptor(service.getServiceInfos().get(0))) {
-            List<Interceptor<? extends Message>> in = super.getInInterceptors();
-            List<Interceptor<? extends Message>> out = super.getOutInterceptors();
-            in.add(new WrapperClassInInterceptor());
-            in.add(new HolderInInterceptor());
-            out.add(new WrapperClassOutInterceptor());
-            out.add(new HolderOutInterceptor());
+        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        try {
+            if (getBus() != null) {
+                ClassLoader loader = getBus().getExtension(ClassLoader.class);
+                if (loader != null) {
+                    Thread.currentThread().setContextClassLoader(loader);
+                }
+            }
+            
+            Object obj = super.create();
+            Service service = getServiceFactory().getService();
+            if (needWrapperClassInterceptor(service.getServiceInfos().get(0))) {
+                List<Interceptor<? extends Message>> in = super.getInInterceptors();
+                List<Interceptor<? extends Message>> out = super.getOutInterceptors();
+                in.add(new WrapperClassInInterceptor());
+                in.add(new HolderInInterceptor());
+                out.add(new WrapperClassOutInterceptor());
+                out.add(new HolderOutInterceptor());
+            }
+            return obj;
+        } finally {
+            Thread.currentThread().setContextClassLoader(orig);
         }
-        return obj;
-              
     }
     
     private boolean needWrapperClassInterceptor(ServiceInfo serviceInfo) {

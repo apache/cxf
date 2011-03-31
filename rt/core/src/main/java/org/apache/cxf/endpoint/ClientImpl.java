@@ -420,8 +420,13 @@ public class ClientImpl
                               Map<String, Object> context,
                               Exchange exchange) throws Exception {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus(bus);
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            BusFactory.setThreadDefaultBus(bus);
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             if (exchange == null) {
                 exchange = new ExchangeImpl();
             }
@@ -488,6 +493,7 @@ public class ClientImpl
                 return processResult(message, exchange, oi, resContext);
             }
         } finally {
+            Thread.currentThread().setContextClassLoader(origLoader);
             BusFactory.setThreadDefaultBus(origBus);
         }
     }

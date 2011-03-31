@@ -51,9 +51,10 @@ public abstract class AbstractBPBeanDefinitionParser {
     }
 
     public Metadata createValue(ParserContext context, QName qName) {
-        MutableValueMetadata v = context.createMetadata(MutableValueMetadata.class);
-        v.setType(QName.class.getName());
-        v.setStringValue(qName.toString());
+        MutableBeanMetadata v = context.createMetadata(MutableBeanMetadata.class);
+        v.setRuntimeClass(QName.class);
+        v.addArgument(createValue(context, qName.getNamespaceURI()), null, 0);
+        v.addArgument(createValue(context, qName.getLocalPart()), null, 1);
         return v;
     }
 

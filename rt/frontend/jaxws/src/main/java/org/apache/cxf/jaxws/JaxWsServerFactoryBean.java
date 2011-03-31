@@ -180,11 +180,23 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     }
     
     public Server create() {
-        Server server = super.create();
-        initializeResourcesAndHandlerChain();
-        checkPrivateEndpoint(server.getEndpoint());
-        
-        return server;
+        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        try {
+            if (bus != null) {
+                ClassLoader loader = bus.getExtension(ClassLoader.class);
+                if (loader != null) {
+                    Thread.currentThread().setContextClassLoader(loader);
+                }
+            }
+
+            Server server = super.create();
+            initializeResourcesAndHandlerChain();
+            checkPrivateEndpoint(server.getEndpoint());
+            
+            return server;
+        } finally {
+            Thread.currentThread().setContextClassLoader(orig);
+        }
     }
     
     private synchronized void initializeResourcesAndHandlerChain() {

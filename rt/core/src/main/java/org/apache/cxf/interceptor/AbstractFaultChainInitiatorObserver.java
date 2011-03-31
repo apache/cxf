@@ -52,7 +52,12 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
         
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ClassLoader loader = bus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
             
             Exchange exchange = message.getExchange();
     
@@ -103,6 +108,7 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
             }
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
 

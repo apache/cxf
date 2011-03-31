@@ -304,10 +304,10 @@
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
                         <DynamicImport-Package>
-                            com.sun.xml.bind.api,
-                            com.sun.xml.bind.api.*,
-                            com.sun.xml.internal.bind.api,
-                            com.sun.xml.internal.bind.api.*,
+                            com.sun.xml.bind,
+                            com.sun.xml.bind.*,
+                            com.sun.xml.internal.bind,
+                            com.sun.xml.internal.bind.*,
                             com.ctc.wstx.*,
                             org.apache.commons.logging.*,
                             org.slf4j.*,

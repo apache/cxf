@@ -129,63 +129,75 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     
 
     public Server create() {
+        ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
-            if (getServiceFactory().getProperties() == null) {
-                getServiceFactory().setProperties(getProperties());
-            } else if (getProperties() != null) {
-                getServiceFactory().getProperties().putAll(getProperties());
-            }
-            if (serviceBean != null && getServiceClass() == null) {
-                setServiceClass(ClassHelper.getRealClass(serviceBean));
-            }
-            if (invoker != null) {
-                getServiceFactory().setInvoker(invoker);
-            } else if (serviceBean != null) {
-                invoker = createInvoker();
-                getServiceFactory().setInvoker(invoker);
-            }
-
-            Endpoint ep = createEndpoint();
-            server = new ServerImpl(getBus(),
-                                    ep,
-                                    getDestinationFactory(),
-                                    getBindingFactory());
-
-            if (ep.getService().getInvoker() == null) {
-                if (invoker == null) {
-                    ep.getService().setInvoker(createInvoker());
-                } else {
-                    ep.getService().setInvoker(invoker);
+            try {
+                if (bus != null) {
+                    ClassLoader loader = bus.getExtension(ClassLoader.class);
+                    if (loader != null) {
+                        Thread.currentThread().setContextClassLoader(loader);
+                    }
                 }
+    
+                if (getServiceFactory().getProperties() == null) {
+                    getServiceFactory().setProperties(getProperties());
+                } else if (getProperties() != null) {
+                    getServiceFactory().getProperties().putAll(getProperties());
+                }
+                if (serviceBean != null && getServiceClass() == null) {
+                    setServiceClass(ClassHelper.getRealClass(serviceBean));
+                }
+                if (invoker != null) {
+                    getServiceFactory().setInvoker(invoker);
+                } else if (serviceBean != null) {
+                    invoker = createInvoker();
+                    getServiceFactory().setInvoker(invoker);
+                }
+    
+                Endpoint ep = createEndpoint();
+                server = new ServerImpl(getBus(),
+                                        ep,
+                                        getDestinationFactory(),
+                                        getBindingFactory());
+    
+                if (ep.getService().getInvoker() == null) {
+                    if (invoker == null) {
+                        ep.getService().setInvoker(createInvoker());
+                    } else {
+                        ep.getService().setInvoker(invoker);
+                    }
+                }
+    
+            } catch (EndpointException e) {
+                throw new ServiceConstructionException(e);
+            } catch (BusException e) {
+                throw new ServiceConstructionException(e);
+            } catch (IOException e) {
+                throw new ServiceConstructionException(e);
             }
-
-        } catch (EndpointException e) {
-            throw new ServiceConstructionException(e);
-        } catch (BusException e) {
-            throw new ServiceConstructionException(e);
-        } catch (IOException e) {
-            throw new ServiceConstructionException(e);
-        }
-
-        if (serviceBean != null) {
-            initializeAnnotationInterceptors(server.getEndpoint(),
-                                             ClassHelper.getRealClass(getServiceBean()));
-        } else if (getServiceClass() != null) {
-            initializeAnnotationInterceptors(server.getEndpoint(), getServiceClass());
-        }
-
-        applyFeatures();
-
-        getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED, server, serviceBean,
-                                      serviceBean == null 
-                                      ? getServiceClass() == null 
-                                          ? getServiceFactory().getServiceClass() : getServiceClass()
-                                          : ClassHelper.getRealClass(getServiceBean()));
-        
-        if (start) {
-            server.start();
-        }
-        return server;
+    
+            if (serviceBean != null) {
+                initializeAnnotationInterceptors(server.getEndpoint(),
+                                                 ClassHelper.getRealClass(getServiceBean()));
+            } else if (getServiceClass() != null) {
+                initializeAnnotationInterceptors(server.getEndpoint(), getServiceClass());
+            }
+    
+            applyFeatures();
+    
+            getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED, server, serviceBean,
+                                          serviceBean == null 
+                                          ? getServiceClass() == null 
+                                              ? getServiceFactory().getServiceClass() : getServiceClass()
+                                              : ClassHelper.getRealClass(getServiceBean()));
+            
+            if (start) {
+                server.start();
+            }
+            return server;
+        } finally {
+            Thread.currentThread().setContextClassLoader(orig);
+        }            
     }
     public void init() {
         if (getServer() == null) {
