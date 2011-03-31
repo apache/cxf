@@ -27,14 +27,45 @@
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>2.4.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty.version>7.2.2.v20101205</cxf.jetty.version>
-        <cxf.abdera.version>1.1</cxf.abdera.version>
     </properties>
 
+
+    <profiles>
+        <profile>
+            <id>server</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                   <mainClass>demo.service.Server</mainClass>
+                                   <systemProperties>
+                                      <systemProperty>
+                                        <key>java.util.logging.config.file</key>
+                                        <value>${basedir}/logging.properties</value>
+                                      </systemProperty>
+                                   </systemProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
@@ -46,27 +77,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>demo.service.Server</mainClass>
-                            <systemProperties>
-                                <systemProperty>
-                                    <key>java.util.logging.config.file</key>
-                                    <value>${basedir}/logging.properties</value>
-                                </systemProperty>
-                            </systemProperties>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     
@@ -86,18 +96,15 @@
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
-            <version>${cxf.abdera.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-parser</artifactId>
-            <version>${cxf.abdera.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>${cxf.jetty.version}</version>
         </dependency>
     </dependencies>
 </project>
