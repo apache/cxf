@@ -133,7 +133,7 @@ public class SourceProvider extends AbstractConfigurableProvider implements
             StaxUtils.copy(input, out);
             return out.getInputStream();
         } catch (XMLStreamException ex) {
-            throw new IOException(ex);
+            throw new IOException("XMLStreamException:" + ex.getMessage());
         } finally {
             out.close();
         }
