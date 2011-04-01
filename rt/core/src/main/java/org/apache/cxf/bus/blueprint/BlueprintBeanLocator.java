@@ -28,9 +28,12 @@ import java.util.Set;
 
 import org.apache.aries.blueprint.ExtendedBlueprintContainer;
 import org.apache.aries.blueprint.container.BeanRecipe;
+import org.apache.aries.blueprint.di.ExecutionContext;
 import org.apache.aries.blueprint.di.Recipe;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 
 /**
@@ -39,11 +42,14 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
 public class BlueprintBeanLocator implements ConfiguredBeanLocator {
     ConfiguredBeanLocator orig;
     ExtendedBlueprintContainer container;
-
-    public BlueprintBeanLocator(ConfiguredBeanLocator orig, BlueprintContainer cont) {
+    BundleContext context;
+    
+    public BlueprintBeanLocator(ConfiguredBeanLocator orig, 
+                                BlueprintContainer cont, 
+                                BundleContext context) {
         this.orig = orig;
         this.container = (ExtendedBlueprintContainer)cont;
-        
+        this.context = context;
         if (orig instanceof ExtensionManagerImpl) {
             List<String> names = new ArrayList<String>(container.getComponentIds());
             ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
@@ -54,12 +60,18 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
         Set<String> names = new LinkedHashSet<String>();
-        for (String s : container.getComponentIds()) {
-            Recipe r = container.getRepository().getRecipe(s);
-            if (r instanceof BeanRecipe 
-                && type.isAssignableFrom(((BeanRecipe)r).getType())) {
-                names.add(s);
+        ExecutionContext origContext 
+            = ExecutionContext.Holder.setContext((ExecutionContext)container.getRepository());
+        try {
+            for (String s : container.getComponentIds()) {
+                Recipe r = container.getRepository().getRecipe(s);
+                if (r instanceof BeanRecipe 
+                    && type.isAssignableFrom(((BeanRecipe)r).getType())) {
+                    names.add(s);
+                }
             }
+        } finally {
+            ExecutionContext.Holder.setContext(origContext);
         }
         names.addAll(orig.getBeanNamesOfType(type));
         return new ArrayList<String>(names);
@@ -68,55 +80,87 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
     /** {@inheritDoc}*/
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
         List<T> list = new ArrayList<T>();
-        for (String s : container.getComponentIds()) {
-            Recipe r = container.getRepository().getRecipe(s);
-            if (r instanceof BeanRecipe 
-                && type.isAssignableFrom(((BeanRecipe)r).getType())) {
-                
-                list.add(type.cast(container.getComponentInstance(s)));
+        
+        ExecutionContext origContext 
+            = ExecutionContext.Holder.setContext((ExecutionContext)container.getRepository());
+        try {
+            for (String s : container.getComponentIds()) {
+                Recipe r = container.getRepository().getRecipe(s);
+                if (r instanceof BeanRecipe 
+                    && type.isAssignableFrom(((BeanRecipe)r).getType())) {
+                    
+                    list.add(type.cast(container.getComponentInstance(s)));
+                }
             }
+        } finally {
+            ExecutionContext.Holder.setContext(origContext);
         }
         list.addAll(orig.getBeansOfType(type));
+        if (list.isEmpty()) {
+            try {
+                ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
+                if (refs != null) {
+                    for (ServiceReference r : refs) {
+                        list.add(type.cast(context.getService(r)));
+                    }
+                }
+            } catch (Exception ex) {
+                //ignore, just don't support the OSGi services
+            }
+        }
+        
         return list;
     }
 
     /** {@inheritDoc}*/
     public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
         List<String> names = new ArrayList<String>();
-        for (String s : container.getComponentIds()) {
-            Recipe r = container.getRepository().getRecipe(s);
-            if (r instanceof BeanRecipe 
-                && type.isAssignableFrom(((BeanRecipe)r).getType())) {
-                names.add(s);
-            }
-        }
-        Collections.reverse(names);
         boolean loaded = false;
-        for (String s : names) {
-            BeanRecipe r = (BeanRecipe)container.getRepository().getRecipe(s);
-            Class<?> beanType = r.getType();
-            Class<? extends T> t = beanType.asSubclass(type);
-            if (listener.loadBean(s, t)) {
-                Object o = container.getComponentInstance(s);
-                if (listener.beanLoaded(s, type.cast(o))) {
-                    return true;
+        ExecutionContext origContext 
+            = ExecutionContext.Holder.setContext((ExecutionContext)container.getRepository());
+        try {
+            for (String s : container.getComponentIds()) {
+                Recipe r = container.getRepository().getRecipe(s);
+                if (r instanceof BeanRecipe 
+                    && type.isAssignableFrom(((BeanRecipe)r).getType())) {
+                    names.add(s);
                 }
-                loaded = true;
             }
+            Collections.reverse(names);
+            for (String s : names) {
+                BeanRecipe r = (BeanRecipe)container.getRepository().getRecipe(s);
+                Class<?> beanType = r.getType();
+                Class<? extends T> t = beanType.asSubclass(type);
+                if (listener.loadBean(s, t)) {
+                    Object o = container.getComponentInstance(s);
+                    if (listener.beanLoaded(s, type.cast(o))) {
+                        return true;
+                    }
+                    loaded = true;
+                }
+            }
+        } finally {
+            ExecutionContext.Holder.setContext(origContext);
         }
         return loaded || orig.loadBeansOfType(type, listener);
     }
 
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value) {
-        Recipe r = container.getRepository().getRecipe(beanName);
-        if (r instanceof BeanRecipe) {
-            BeanRecipe br = (BeanRecipe)r;
-            Object o = br.getProperty(propertyName);
-            if (o == null) {
+        ExecutionContext origContext 
+            = ExecutionContext.Holder.setContext((ExecutionContext)container.getRepository());
+        try {
+            Recipe r = container.getRepository().getRecipe(beanName);
+            if (r instanceof BeanRecipe) {
+                BeanRecipe br = (BeanRecipe)r;
+                Object o = br.getProperty(propertyName);
+                if (o == null) {
+                    return false;
+                }
+                //TODO - need to check the values of the property
                 return false;
             }
-            //TODO - need to check the values of the property
-            return false;
+        } finally {
+            ExecutionContext.Holder.setContext(origContext);
         }
         return orig.hasConfiguredPropertyValue(beanName, propertyName, value);
     }

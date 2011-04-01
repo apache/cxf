@@ -83,10 +83,16 @@ public class HTTPTransportFactory
         this(new DestinationRegistryImpl());
     }
     public HTTPTransportFactory(Bus b) {
-        this(b, new DestinationRegistryImpl());
+        this(b, null);
     }
     public HTTPTransportFactory(Bus b, DestinationRegistry registry) {
         super(DEFAULT_NAMESPACES, b);
+        if (registry == null && b != null) {
+            registry = b.getExtension(DestinationRegistry.class);
+        }
+        if (registry == null) {
+            registry = new DestinationRegistryImpl();
+        }
         this.registry = registry;
     }
 

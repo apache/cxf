@@ -47,8 +47,8 @@ public class BlueprintBus extends ExtensionManagerBus {
     public void setBlueprintContainer(BlueprintContainer con) {
         container = con;
         setExtension(new ConfigurerImpl(con), Configurer.class);
-        setExtension(new BlueprintBeanLocator(getExtension(ConfiguredBeanLocator.class), container),
+        setExtension(new BlueprintBeanLocator(getExtension(ConfiguredBeanLocator.class), container, context),
                            ConfiguredBeanLocator.class);
-        
     }
+    
 }
