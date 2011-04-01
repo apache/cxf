@@ -48,6 +48,7 @@ public class SimpleBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser
     }
     
     public Metadata parse(Element element, ParserContext context) {
+        
         MutableBeanMetadata cxfBean = context.createMetadata(MutableBeanMetadata.class);
         cxfBean.setRuntimeClass(cls);
         String fact = getFactorySuffix();

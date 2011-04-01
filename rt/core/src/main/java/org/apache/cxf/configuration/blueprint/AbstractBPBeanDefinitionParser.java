@@ -19,6 +19,8 @@
 package org.apache.cxf.configuration.blueprint;
 
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -28,6 +30,8 @@ import org.apache.aries.blueprint.ComponentDefinitionRegistry;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.PassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
+import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableRefMetadata;
 import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.apache.cxf.bus.blueprint.BlueprintBus;
@@ -61,9 +65,12 @@ public abstract class AbstractBPBeanDefinitionParser {
     protected Metadata parseListData(ParserContext context, 
                                      ComponentMetadata enclosingComponent, 
                                      Element element) {
-        return context.parseElement(CollectionMetadata.class, 
+        MutableCollectionMetadata m
+            = (MutableCollectionMetadata)context.parseElement(CollectionMetadata.class, 
                                     enclosingComponent, 
                                     element);
+        m.setCollectionClass(List.class);
+        return m;
     }
     protected Metadata parseMapData(ParserContext context, 
                                      ComponentMetadata enclosingComponent, 
@@ -244,6 +251,13 @@ public abstract class AbstractBPBeanDefinitionParser {
         if (meta instanceof PassThroughMetadata) {
             blueprintBundle = (Bundle) ((PassThroughMetadata) meta).getObject();
         }
+        if (!cdr.containsComponentDefinition(InterceptorTypeConverter.class.getName())) {
+            MutablePassThroughMetadata md = context.createMetadata(MutablePassThroughMetadata.class);
+            md.setObject(new InterceptorTypeConverter());
+            
+            md.setId(InterceptorTypeConverter.class.getName());
+            context.getComponentDefinitionRegistry().registerTypeConverter(md);
+        }
         if (blueprintBundle != null
             && !cdr.containsComponentDefinition(name)) {
             //Create a bus
@@ -257,6 +271,7 @@ public abstract class AbstractBPBeanDefinitionParser {
             bus.setInitMethod("initialize");
             
             context.getComponentDefinitionRegistry().registerComponentDefinition(bus);
+            
             return bus;
         }
         return (MutableBeanMetadata)cdr.getComponentDefinition(name);
