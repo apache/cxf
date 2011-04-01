@@ -19,6 +19,6 @@
 --
 
 
-SYSTEM "http://schemas.xmlsoap.org/ws/2004/08/addressing" "../../../../../../common/schemas/src/main/resources/schemas/wsdl/addressing.xsd"
+SYSTEM "http://schemas.xmlsoap.org/ws/2004/08/addressing" "../../../../../../api/src/main/resources/schemas/wsdl/addressing.xsd"
 
 SYSTEM "http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd" "../resources/schemas/configuration/wsrm-policy.xsd" 
