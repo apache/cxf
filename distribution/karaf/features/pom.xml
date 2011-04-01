@@ -32,7 +32,7 @@
     <packaging>pom</packaging>
     <name>CXF :: Apache Karaf :: Features</name>
     
-    <!-- The validate plugin will export these provided dependencies bundles' export packages first -->  
+    <!-- The validate plugin will export these provided dependencies bundles' export packages first -->
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -45,7 +45,7 @@
             <artifactId>pax-logging-api</artifactId>
             <version>${cxf.pax.logging.version}</version>
             <scope>provided</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-service</artifactId>
@@ -64,87 +64,105 @@
             <version>${cxf.felix.configadmin.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${cxf.javax.mail.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-
+    <repositories>
+        <repository>
+            <id>java.net.maven2</id>
+            <url>http://download.java.net/maven/2</url>
+            <name>java.net maven 2 repo</name>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
     <build>
-      <resources>
-        <resource>
-          <directory>src/main/resources</directory>
-          <filtering>true</filtering>
-        </resource>
-      </resources>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <executions>
-             <execution>
-                <id>filter</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>resources</goal>
-                </goals>
-             </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-artifacts</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>attach-artifact</goal>
-                </goals>
-                <configuration>
-                  <artifacts>
-                    <artifact>
-                      <file>target/classes/features.xml</file>
-                       <type>xml</type>
-                       <classifier>features</classifier>
-                     </artifact>
-                   </artifacts>
-                 </configuration>
-               </execution>
-           </executions>
-         </plugin>
-      </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>filter</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>target/classes/features.xml</file>
+                                    <type>xml</type>
+                                    <classifier>features</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
-       <profile>
-          <id>validate</id>
-          <build>
-             <plugins>
-                <plugin>
-                   <groupId>org.apache.karaf.tooling</groupId>
-                   <artifactId>features-maven-plugin</artifactId>
-                   <version>${karaf-version}</version>
-                   <configuration>
-                       <file>${project.build.directory}/classes/features.xml</file>
-                       <karafConfig>${project.build.directory}/classes/config.properties</karafConfig>
-                   </configuration>
-                   <executions>
-                     <execution>
-                       <id>validate</id>
-                       <phase>process-resources</phase>
-                       <goals>
-                         <goal>validate</goal>
-                       </goals>
-                     </execution>
-                   </executions>
-                   <dependencies>
-                    <dependency>
-                     <groupId>org.slf4j</groupId>
-                     <artifactId>slf4j-simple</artifactId>
-                     <version>1.4.3</version>
-                </dependency>
-                 </dependencies>
-               </plugin>
-              </plugins>
-           </build>
+        <profile>
+            <id>validate</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.karaf.tooling</groupId>
+                        <artifactId>features-maven-plugin</artifactId>
+                        <version>${karaf-version}</version>
+                        <configuration>
+                            <file>${project.build.directory}/classes/features.xml</file>
+                            <karafConfig>${project.build.directory}/classes/config.properties</karafConfig>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>validate</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>validate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-simple</artifactId>
+                                <version>1.4.3</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
-     </profiles>
+    </profiles>
 
 </project>

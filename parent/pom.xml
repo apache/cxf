@@ -101,6 +101,7 @@
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
         <cxf.geronimo.ws.metadata.version>1.1.3</cxf.geronimo.ws.metadata.version>
         <cxf.geronimo.servlet.version>1.0</cxf.geronimo.servlet.version>
+        <cxf.geronimo.servlet25.version>1.1.2</cxf.geronimo.servlet25.version>
 
         <cxf.commons-codec.version>1.4</cxf.commons-codec.version>
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
@@ -110,9 +111,9 @@
         <cxf.fastinfoset.bundle.version>1.2.7_3</cxf.fastinfoset.bundle.version>
 
         <!-- various OSGi related versions -->
-        <cxf.aries.version>0.2-incubating</cxf.aries.version>
+        <cxf.aries.version>0.3</cxf.aries.version>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
-        <cxf.karaf.version>2.1.4</cxf.karaf.version>
+        <cxf.karaf.version>2.2.0</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>

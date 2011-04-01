@@ -17,8 +17,7 @@
       limitations under the License.
 -->
 <features>
-    <repository>mvn:org.apache.karaf/apache-karaf/${cxf.karaf.version}/xml/features</repository>
-
+    <repository>mvn:org.apache.karaf.assemblies.features/standard/${cxf.karaf.version}/xml/features</repository>
 
     <feature name="cxf-specs" version="${project.version}">
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${cxf.servicemix.specs.version}</bundle>
@@ -30,7 +29,6 @@
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/${cxf.servicemix.specs.version}</bundle>
         <bundle>mvn:http://download.java.net/maven/2!javax.mail/mail/${cxf.javax.mail.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1/${cxf.servicemix.specs.version}</bundle>
-        <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/${cxf.geronimo.servlet.version}</bundle>
     </feature>
 
     <feature name='cxf-jaxb' version='${cxf.jaxb.bundle.version}'>
@@ -47,16 +45,9 @@
         <bundle>mvn:org.springframework/spring-tx/${cxf.spring.version}</bundle>
         <bundle>mvn:org.springframework/spring-web/${cxf.spring.version}</bundle>
     </feature>
-    <feature name="spring-dm" version="${cxf.spring.osgi.version}">
-        <feature version="${cxf.spring.version}">spring</feature>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.cglib/${cxf.cglib.bundle.version}</bundle>
-        <bundle>mvn:org.springframework.osgi/spring-osgi-io/${cxf.spring.osgi.version}</bundle>
-        <bundle>mvn:org.springframework.osgi/spring-osgi-core/${cxf.spring.osgi.version}</bundle>
-        <bundle>mvn:org.springframework.osgi/spring-osgi-extender/${cxf.spring.osgi.version}</bundle>
-        <bundle>mvn:org.springframework.osgi/spring-osgi-annotation/${cxf.spring.osgi.version}</bundle>
-        <bundle>mvn:org.apache.karaf.deployer/org.apache.karaf.deployer.spring/${cxf.karaf.version}</bundle>
-    </feature>
-    <feature name='jetty7' version='${cxf.jetty.version}'>
+    <feature name='jetty' version='${cxf.jetty.version}'>
+        <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/${cxf.geronimo.servlet25.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.asm/${cxf.asm.bundle.version}</bundle>
         <bundle>mvn:org.eclipse.jetty/jetty-util/${cxf.jetty.version}</bundle>
         <bundle>mvn:org.eclipse.jetty/jetty-io/${cxf.jetty.version}</bundle>
         <bundle>mvn:org.eclipse.jetty/jetty-http/${cxf.jetty.version}</bundle>
@@ -104,13 +95,13 @@
         <bundle start-level='20'>mvn:org.codehaus.woodstox/woodstox-core-asl/${cxf.woodstox.core.version}</bundle>
 
         <feature version='${cxf.jaxb.bundle.version}'>cxf-jaxb</feature>
-        <feature version="${cxf.spring.osgi.version}">spring-dm</feature>
         <feature version="${cxf.karaf.version}">http</feature>
         <feature version="${cxf.karaf.version}">war</feature>
         <feature version="${cxf.spring.version}">spring</feature>
+        <feature version="${cxf.spring.osgi.version}">spring-dm</feature>
         <feature version="${cxf.spring.version}">spring-jms</feature>
         <feature version="${cxf.wss4j.version}">wss4j</feature>
-        <feature version="${cxf.jetty.version}">jetty7</feature>
+        <feature version="${cxf.jetty.version}">jetty</feature>
         <feature version='${cxf.abdera.version}'>abdera</feature>
 
         <bundle>mvn:org.apache.neethi/neethi/${cxf.neethi.version}</bundle>
