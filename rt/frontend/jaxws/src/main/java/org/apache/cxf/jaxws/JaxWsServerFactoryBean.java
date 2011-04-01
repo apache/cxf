@@ -49,14 +49,14 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 /**
- * Bean to help easily create Server endpoints for JAX-WS. Example:
+ * Bean to help easily create Server endpoints for JAX-WS.
  * <pre>
- * JaxWsServerFactoryBean sf = JaxWsServerFactoryBean();
+ * JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
  * sf.setServiceClass(MyService.class);
  * sf.setAddress("http://acme.com/myService");
  * sf.create();
  * </pre>
- * This will start a server for you and register it with the ServerManager. 
+ * This will start a server and register it with the ServerManager. 
  */
 public class JaxWsServerFactoryBean extends ServerFactoryBean {
     protected boolean doInit;
