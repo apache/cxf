@@ -374,20 +374,21 @@ public class XMLSource {
     }
     
     private InputSource getSource() {
-        try {
-            if (!markFailed && buffering) {
+        if (!markFailed && buffering) {
+            try {
+                stream.reset();
+                stream.mark(stream.available());
+            } catch (IOException ex) {
+                LOG.fine(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
+                markFailed = true;
                 try {
-                    stream.reset();
-                    stream.mark(stream.available());
-                } catch (IOException ex) {
-                    markFailed = true;
-                    LOG.warning(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
                     stream = IOUtils.loadIntoBAIS(stream);
+                } catch (IOException ex2) {
+                    throw new RuntimeException(ex2);
                 }
             }
-        } catch (IOException ex) {
-            LOG.warning(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
         }
+        
         return new InputSource(stream);
     }
 }
