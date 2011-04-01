@@ -53,6 +53,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.provider.AbstractJAXBProvider.CollectionWrapper;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
@@ -171,24 +172,32 @@ public class JSONProvider extends AbstractJAXBProvider  {
         throws IOException {
         
         try {
-            Class<?> theType = getActualType(type, genericType, anns);
-            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
+            boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
+            Class<?> theType = isCollection ? InjectionUtils.getActualType(genericType) : type;
+            theType = getActualType(theType, genericType, anns);
+            
+            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             
             InputStream realStream = getInputStream(type, genericType, is);
-            XMLStreamReader xsw = createReader(type, realStream);
+            XMLStreamReader xsr = createReader(type, realStream, isCollection);
             
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type) 
                 || unmarshalAsJaxbElement
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
-                response = unmarshaller.unmarshal(xsw, theType);
+                response = unmarshaller.unmarshal(xsr, theType);
             } else {
-                response = unmarshaller.unmarshal(xsw);
+                response = unmarshaller.unmarshal(xsr);
             }
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
                 response = ((JAXBElement)response).getValue();    
             }
-            response = checkAdapter(response, type, anns, false);
+            if (isCollection) {
+                response = ((CollectionWrapper)response).getCollectionOrArray(theType, type, 
+                                                         getAdapter(theType, anns)); 
+            } else {
+                response = checkAdapter(response, type, anns, false);
+            }
             return response;
             
         } catch (JAXBException e) {
@@ -204,6 +213,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
         return null;
     }
 
+    protected XMLStreamReader createReader(Class<?> type, InputStream is, boolean isCollection) 
+        throws Exception {
+        XMLStreamReader reader = createReader(type, is);
+        return isCollection ? new JAXBCollectionWrapperReader(reader) : reader;
+    }
+    
     protected XMLStreamReader createReader(Class<?> type, InputStream is) 
         throws Exception {
         if (BADGER_FISH_CONVENTION.equals(convention)) {

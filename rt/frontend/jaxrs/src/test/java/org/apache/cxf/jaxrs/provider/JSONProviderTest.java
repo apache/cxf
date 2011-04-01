@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -57,6 +59,7 @@ import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
 
+    
     
     @Test
     public void testWriteCollectionWithoutXmlRootElement() 
@@ -324,17 +327,60 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
-    @Ignore
+    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-104 gets resolved")
+    public void testReadUnqualifiedCollection() throws Exception {
+        String data = "{\"Book\":[{\"id\":\"123\",\"name\":\"CXF in Action\"}"
+            + ",{\"id\":\"124\",\"name\":\"CXF Rocks\"}]}";
+        doReadUnqualifiedCollection(data, "setBooks", List.class);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void doReadUnqualifiedCollection(String data, String mName, Class<?> type) throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Method m = CollectionsResource.class.getMethod(mName, 
+                                                       new Class[]{type});
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom(
+                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
+                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                       new MetadataMap<String, String>(), is);
+        assertNotNull(o);
+        Book b1 = null;
+        Book b2 = null;
+        if (type.isArray()) {
+            assertEquals(2, ((Book[])o).length);
+            b1 = ((Book[])o)[0];
+            b2 = ((Book[])o)[1];
+        } else if (type == Set.class) {
+            Set<Book> set = (Set)o;
+            List<Book> books = new ArrayList<Book>(new TreeSet<Book>(set));
+            b1 = books.get(0);
+            b2 = books.get(1);
+        } else {
+            List<Book> books = (List<Book>)o;
+            b1 = books.get(0);
+            b2 = books.get(1);
+        }
+        
+        assertEquals(123, b1.getId());
+        assertEquals("CXF in Action", b1.getName());
+        
+        assertEquals(124, b2.getId());
+        assertEquals("CXF Rocks", b2.getName());    
+    }
+    
+    @Test
+    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-104 gets resolved")
     public void testReadQualifiedCollection() throws Exception {
-        String data = "{\"ns1.tag\":[{\"group\":\"b\",\"name\":\"a\"}"
+        String data = "{\"ns1.thetag\":[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]}";
         doReadQualifiedCollection(data, false);
     }
     
     @Test
-    @Ignore
+    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-104 gets resolved")
     public void testReadQualifiedArray() throws Exception {
-        String data = "{\"ns1.tag\":[{\"group\":\"b\",\"name\":\"a\"}"
+        String data = "{\"ns1.thetag\":[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]}";
         doReadQualifiedCollection(data, true);
     }
@@ -343,7 +389,6 @@ public class JSONProviderTest extends Assert {
     public void doReadQualifiedCollection(String data, boolean isArray) throws Exception {
         
         JSONProvider provider = new JSONProvider();
-        provider.setCollectionWrapperName("{http://tags}tag");
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         provider.setNamespaceMap(namespaceMap);
@@ -372,11 +417,11 @@ public class JSONProviderTest extends Assert {
             t1 = (TagVO2)((Object[])o)[0];
             t2 = (TagVO2)((Object[])o)[1];
         }
-        assertEquals("A", t1.getName());
-        assertEquals("B", t1.getGroup());
+        assertEquals("a", t1.getName());
+        assertEquals("b", t1.getGroup());
         
-        assertEquals("C", t2.getName());
-        assertEquals("D", t2.getGroup());
+        assertEquals("c", t2.getName());
+        assertEquals("d", t2.getGroup());
     }
     
     @Test

@@ -72,6 +72,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
 public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
@@ -324,6 +325,12 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            type = InjectionUtils.getActualType(genericType);
+            if (type == null) {
+                return false;
+            }
+        }    
         return canBeReadAsJaxbElement(type) || isSupported(type, genericType, anns);
     }
 
@@ -606,6 +613,23 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return skipJaxbChecks;
     }
 
+    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
+                                                            OutputStream os) {
+        return TransformUtils.createTransformWriterIfNeeded(writer, os, 
+                                                      outElementsMap,
+                                                      outDropElements,
+                                                      outAppendMap,
+                                                      attributesToElements);
+    }
+    
+    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
+        return TransformUtils.createTransformReaderIfNeeded(reader, is,
+                                                            inDropElements,
+                                                            inElementsMap,
+                                                            inAppendMap,
+                                                            true);
+    }
+    
     @XmlRootElement
     protected static class CollectionWrapper {
         
@@ -663,20 +687,35 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         
     }
     
-    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
-                                                            OutputStream os) {
-        return TransformUtils.createTransformWriterIfNeeded(writer, os, 
-                                                      outElementsMap,
-                                                      outDropElements,
-                                                      outAppendMap,
-                                                      attributesToElements);
+    protected static class JAXBCollectionWrapperReader extends DepthXMLStreamReader {
+        
+        private boolean firstName;
+        private boolean firstNs;
+        
+        public JAXBCollectionWrapperReader(XMLStreamReader reader) {
+            super(reader);
+        }
+        
+        @Override
+        public String getNamespaceURI() {
+            if (!firstNs) {
+                firstNs = true;
+                return "";
+            }
+            return super.getNamespaceURI();
+        }
+        
+        @Override
+        public String getLocalName() {
+            if (!firstName) {
+                firstName = true;
+                return "collectionWrapper";
+            }
+            
+            return super.getLocalName();
+        }
+        
     }
     
-    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
-        return TransformUtils.createTransformReaderIfNeeded(reader, is,
-                                                            inDropElements,
-                                                            inElementsMap,
-                                                            inAppendMap,
-                                                            true);
-    }
+    
 }
