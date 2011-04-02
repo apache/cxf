@@ -184,8 +184,11 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     
                     if (msgInfo != null && msgInfo.getMessageParts() != null 
                         && msgInfo.getMessageParts().size() > 0) {
-                        assert msgInfo.getMessageParts().size() > paramNum;
-                        p = msgInfo.getMessageParts().get(paramNum);
+                        if (msgInfo.getMessageParts().size() > paramNum) {
+                            p = msgInfo.getMessageParts().get(paramNum);
+                        } else {
+                            p = null;
+                        }
                     } else {
                         p = findMessagePart(exchange, operations, elName, client, paramNum, message);
                     }
