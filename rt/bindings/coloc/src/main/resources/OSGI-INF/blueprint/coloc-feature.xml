@@ -24,7 +24,7 @@
 
   <service interface="org.apache.aries.blueprint.NamespaceHandler">
     <service-properties>
-      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/blueprint/binding/coloc"/>
+      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/binding/coloc"/>
     </service-properties>
     <bean class="org.apache.cxf.binding.coloc.blueprint.ColocBPNamespaceHandler"/>
   </service>

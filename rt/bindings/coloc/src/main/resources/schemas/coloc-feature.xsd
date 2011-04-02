@@ -18,9 +18,9 @@
   under the License.
   -->
 
-<xs:schema xmlns="http://cxf.apache.org/blueprint/binding/coloc"
-           targetNamespace="http://cxf.apache.org/blueprint/binding/coloc"
-           xmlns:tns="http://cxf.apache.org/blueprint/binding/coloc"
+<xs:schema xmlns="http://cxf.apache.org/binding/coloc"
+           targetNamespace="http://cxf.apache.org/binding/coloc"
+           xmlns:tns="http://cxf.apache.org/binding/coloc"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">
