@@ -26,7 +26,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean id="org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory"
 	  class="org.apache.cxf.bus.spring.OldSpringSupport" lazy-init="true">
         <constructor-arg ref="cxf"/>
-        <constructor-arg value="org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory"/>
+        <constructor-arg value="org.apache.cxf.transport.http.HTTPTransportFactory"/>
         <constructor-arg value="cxf-extension-http.xml"/>
     </bean>
     

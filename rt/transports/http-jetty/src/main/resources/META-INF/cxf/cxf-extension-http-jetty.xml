@@ -27,7 +27,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean id="org.apache.cxf.transport.http_jetty.JettyHTTPTransportFactory"
        class="org.apache.cxf.bus.spring.OldSpringSupport" lazy-init="true">
         <constructor-arg ref="cxf"/>
-        <constructor-arg value="org.apache.cxf.transport.http_jetty.JettyHTTPTransportFactory"/>
+        <constructor-arg value="org.apache.cxf.transport.http_jetty.JettyDestinationFactory"/>
         <constructor-arg value="cxf-extension-http-jetty.xml"/>
     </bean>
 

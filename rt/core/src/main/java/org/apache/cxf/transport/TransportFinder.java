@@ -139,11 +139,13 @@ public class TransportFinder<T> {
     }
 
     private void registerBean(T bean) {
-        if (bean instanceof AbstractTransportFactory) {
-            for (String ns 
-                 : ((AbstractTransportFactory)bean).getTransportIds()) {
-                if (!map.containsKey(ns)) {
-                    map.put(ns, bean);
+        if (bean instanceof AbstractTransportFactory) { 
+            if (((AbstractTransportFactory)bean).getTransportIds() != null) {
+                for (String ns 
+                    : ((AbstractTransportFactory)bean).getTransportIds()) {
+                    if (!map.containsKey(ns)) {
+                        map.put(ns, bean);
+                    }
                 }
             }
         } else {

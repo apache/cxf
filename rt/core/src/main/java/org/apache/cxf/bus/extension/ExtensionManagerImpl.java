@@ -29,9 +29,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.resource.ObjectTypeResolver;
@@ -40,11 +43,14 @@ import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
 
 public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLocator {
-
+    public static final Logger LOG = LogUtils.getL7dLogger(ExtensionManagerImpl.class);
+    
+    
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";
     public static final String ACTIVATION_NAMESPACES_PROPERTY_NAME = "activationNamespaces";
     public static final String ACTIVATION_NAMESPACES_SETTER_METHOD_NAME = "setActivationNamespaces";
     public static final String BUS_EXTENSION_RESOURCE_XML = "META-INF/cxf/bus-extensions.xml";
+    public static final String BUS_EXTENSION_RESOURCE_OLD_XML = "bus-extensions.xml";
     public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.txt";
     
     private final ClassLoader loader;
@@ -55,7 +61,8 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
     public ExtensionManagerImpl(ClassLoader cl, Map<Class, Object> initialExtensions, 
                                 ResourceManager rm, Bus b) {
-        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_XML},
+        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_XML,
+                           BUS_EXTENSION_RESOURCE_OLD_XML},
                  cl, initialExtensions, rm, b);
     }
     public ExtensionManagerImpl(String resource, 
@@ -132,10 +139,11 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         Enumeration<URL> urls = loader.getResources(resource);
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
-            
             InputStream is = url.openStream();
             List<Extension> exts;
             if (resource.endsWith("xml")) {
+                LOG.log(Level.WARNING, "DEPRECATED_EXTENSIONS", 
+                        new Object[] {resource, url, BUS_EXTENSION_RESOURCE});
                 exts = new ExtensionFragmentParser().getExtensionsFromXML(is);
             } else {
                 exts = new ExtensionFragmentParser().getExtensionsFromText(is);
