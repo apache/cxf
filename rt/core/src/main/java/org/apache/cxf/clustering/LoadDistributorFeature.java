@@ -16,15 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.clustering.spring;
+package org.apache.cxf.clustering;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.endpoint.Client;
 
-public class NamespaceHandler extends NamespaceHandlerSupport {
-    public void init() {
-        registerBeanDefinitionParser("failover",
-                                     new FailoverBeanDefinitionParser());
-        registerBeanDefinitionParser("loadDistributor",
-                                     new LoadDistributorBeanDefinitionParser());
+/**
+ * This feature may be applied to a Client so as to enable
+ * load distribution amongst a set of target endpoints or addresses
+ * Note that this feature changes the conduit on the fly and thus makes
+ * the Client not thread safe.
+ */
+@NoJSR250Annotations
+public class LoadDistributorFeature extends FailoverFeature {
+
+    @Override
+    public void initialize(Client client, Bus bus) {
+        LoadDistributorTargetSelector selector =
+            new LoadDistributorTargetSelector();
+        selector.setEndpoint(client.getEndpoint());
+        selector.setStrategy(getStrategy());
+        client.setConduitSelector(selector);
     }
+
 }
