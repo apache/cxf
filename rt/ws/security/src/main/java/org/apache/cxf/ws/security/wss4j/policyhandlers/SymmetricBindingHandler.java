@@ -185,11 +185,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                             == encryptionToken.getInclusion())) {
                     
                     Element el = tok.getToken();
-                    this.addEncyptedKeyElement(cloneElement(el));
+                    this.addEncryptedKeyElement(cloneElement(el));
                     attached = true;
                 } else if (encryptionToken instanceof X509Token && isRequestor()) {
                     Element el = tok.getToken();
-                    this.addEncyptedKeyElement(cloneElement(el));
+                    this.addEncryptedKeyElement(cloneElement(el));
                     attached = true;
                 }
                 
@@ -307,12 +307,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 
                 Element el = sigTok.getToken();
                 sigTokElem = cloneElement(el);
-                this.addEncyptedKeyElement((Element)sigTokElem);
+                this.addEncryptedKeyElement((Element)sigTokElem);
             } else if (isRequestor() && sigToken instanceof X509Token) {
                 Element el = sigTok.getToken();
                 sigTokElem = (Element)secHeader.getSecurityHeader().getOwnerDocument()
                         .importNode(el, true);
-                this.addEncyptedKeyElement((Element)sigTokElem);
+                this.addEncryptedKeyElement((Element)sigTokElem);
             } else {
                 tokIncluded = false;
             }

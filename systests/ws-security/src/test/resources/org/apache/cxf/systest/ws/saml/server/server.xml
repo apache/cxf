@@ -86,4 +86,44 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="Saml2TokenOverSymmetric"
+       address="http://localhost:9001/DoubleItSaml2Symmetric" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml2SymmetricPort"
+       xmlns:s="http://WSSec/saml"
+       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="Saml2TokenOverAsymmetric"
+       address="http://localhost:9001/DoubleItSaml2Asymmetric" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml2AsymmetricPort"
+       xmlns:s="http://WSSec/saml"
+       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.username" value="bob"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.encryption.username" value="alice"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>

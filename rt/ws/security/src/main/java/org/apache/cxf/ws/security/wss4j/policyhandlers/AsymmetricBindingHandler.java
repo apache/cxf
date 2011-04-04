@@ -120,7 +120,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                     == inclusion)) {
                             
                             Element el = secToken.getToken();
-                            this.addEncyptedKeyElement(cloneElement(el));
+                            this.addEncryptedKeyElement(cloneElement(el));
                             attached = true;
                         } 
                     }
@@ -210,7 +210,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                 == inclusion)) {
                         
                         Element el = secToken.getToken();
-                        this.addEncyptedKeyElement(cloneElement(el));
+                        this.addEncryptedKeyElement(cloneElement(el));
                         attached = true;
                     } 
                 }
@@ -381,7 +381,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         // Add internal refs
                         encryptedKeyElement.appendChild(refList);
                     }
-                    this.addEncyptedKeyElement(encryptedKeyElement);
+                    this.addEncryptedKeyElement(encryptedKeyElement);
                     return encr;
                 } catch (WSSecurityException e) {
                     policyNotAsserted(recToken, e.getMessage());
@@ -580,7 +580,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
         
         // Add the EncryptedKey
-        this.addEncyptedKeyElement(encrKey.getEncryptedKeyElement());
+        this.addEncryptedKeyElement(encrKey.getEncryptedKeyElement());
         encryptedKeyValue = encrKey.getEphemeralKey();
         encryptedKeyId = encrKey.getId();
         
