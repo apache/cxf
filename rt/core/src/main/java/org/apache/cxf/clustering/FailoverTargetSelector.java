@@ -41,13 +41,15 @@ import org.apache.cxf.transport.Conduit;
  * Implements a target selection strategy based on failover to an 
  * alternate target endpoint when a transport level failure is 
  * encountered.
+ * Note that this feature changes the conduit on the fly and thus makes
+ * the Client not thread safe.
  */
 public class FailoverTargetSelector extends AbstractConduitSelector {
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(FailoverTargetSelector.class);
-    private Map<InvocationKey, InvocationContext> inProgress;
-    private FailoverStrategy failoverStrategy;
+    protected Map<InvocationKey, InvocationContext> inProgress;
+    protected FailoverStrategy failoverStrategy;
     
     /**
      * Normal constructor.
@@ -101,7 +103,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     }
 
     /**
-     * Called on completion of the MEP for which the Condit was required.
+     * Called on completion of the MEP for which the Conduit was required.
      * 
      * @param exchange represents the completed MEP
      */
@@ -191,7 +193,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @param exchange the current Exchange
      * @return boolean true if a failover should be attempted
      */
-    private boolean requiresFailover(Exchange exchange) {
+    protected boolean requiresFailover(Exchange exchange) {
         Message outMessage = exchange.getOutMessage();
         Exception ex = outMessage.get(Exception.class) != null
                        ? outMessage.get(Exception.class)
@@ -218,7 +220,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @param invocation the current InvocationContext
      * @return a failover endpoint if one is available
      */
-    private Endpoint getFailoverTarget(Exchange exchange,
+    protected Endpoint getFailoverTarget(Exchange exchange,
                                        InvocationContext invocation) {
         List<String> alternateAddresses = null;
         if (!invocation.hasAlternates()) {
@@ -259,7 +261,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * 
      * @param context the request context
      */
-    private void overrideAddressProperty(Map<String, Object> context) {
+    protected void overrideAddressProperty(Map<String, Object> context) {
         Map<String, Object> requestContext =
             CastUtils.cast((Map)context.get(Client.REQUEST_CONTEXT));
         if (requestContext != null) {
@@ -273,10 +275,10 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     /**
      * Used to wrap an Exchange for usage as a Map key. The raw Exchange
      * is not a suitable key type, as the hashCode is computed from its
-     * current contents, which may obvioulsy change over the lifetime of
+     * current contents, which may obviously change over the lifetime of
      * an invocation.
      */
-    private static class InvocationKey {
+    protected static class InvocationKey {
         private Exchange exchange;
         
         InvocationKey(Exchange ex) {
@@ -299,7 +301,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     /**
      * Records the context of an invocation.
      */
-    private class InvocationContext {
+    protected class InvocationContext {
         private Endpoint originalEndpoint;
         private String originalAddress;
         private BindingOperationInfo bindingOperationInfo;

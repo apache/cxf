@@ -63,14 +63,14 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
     protected static final String REPLICA_D =
         "http://localhost:9054/SoapContext/ReplicatedPortD"; 
     private static final Logger LOG =
-        LogUtils.getLogger(FailoverTest.class);
+        LogUtils.getLogger(FailoverAddressOverrideTest.class);
     private static final String FAILOVER_CONFIG =
         "org/apache/cxf/systest/clustering/failover_address_override.xml";
 
-    private Bus bus;
+    protected Bus bus;
+    protected Greeter greeter;
+    protected List<String> targets;
     private Control control;
-    private Greeter greeter;
-    private List<String> targets;
     private MAPAggregator mapAggregator;
     private MAPCodec mapCodec;
 
@@ -80,12 +80,16 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         assertTrue("server did not launch correctly",
                    launchServer(Server.class));
     }
+    
+    protected String getConfig() {
+        return FAILOVER_CONFIG;
+    }
             
     @Before
     public void setUp() {
         targets = new ArrayList<String>();
         SpringBusFactory bf = new SpringBusFactory();    
-        bus = bf.createBus(FAILOVER_CONFIG);
+        bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);
     }
     
@@ -152,7 +156,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
     }
     
 
-    private void startTarget(String address) {
+    protected void startTarget(String address) {
         ControlService cs = new ControlService();
         control = cs.getControlPort();
 
@@ -162,7 +166,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         targets.add(address);
     }
     
-    private void stopTarget(String address) {
+    protected void stopTarget(String address) {
         if (control != null
             && targets.contains(address)) {
             LOG.info("starting replicated target: " + address);
@@ -171,38 +175,38 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         }
     }
 
-    private void verifyCurrentEndpoint(String replica) {
+    protected void verifyCurrentEndpoint(String replica) {
         assertEquals("unexpected current endpoint",
                      replica,
                      getCurrentEndpoint(greeter));
     }
     
-    private String getCurrentEndpoint(Object proxy) {
+    protected String getCurrentEndpoint(Object proxy) {
         return ClientProxy.getClient(proxy).getEndpoint().getEndpointInfo().getAddress();
     }
     
-    private void setupGreeterA() {
+    protected void setupGreeterA() {
         greeter = new ClusteredGreeterService().getReplicatedPortA();
         verifyConduitSelector(greeter);
     }
 
-    private void setupGreeterB() {
+    protected void setupGreeterB() {
         greeter = new ClusteredGreeterService().getReplicatedPortB();
         verifyConduitSelector(greeter);
     }
 
-    private void setupGreeterC() {
+    protected void setupGreeterC() {
         greeter = new ClusteredGreeterService().getReplicatedPortC();
         verifyConduitSelector(greeter);
     }
         
-    private void verifyConduitSelector(Greeter g) {
+    protected void verifyConduitSelector(Greeter g) {
         assertTrue("unexpected conduit slector",
                    ClientProxy.getClient(g).getConduitSelector()
                    instanceof FailoverTargetSelector);
     }
 
-    private void verifyStrategy(Object proxy, Class clz, int count) {
+    protected void verifyStrategy(Object proxy, Class clz, int count) {
         ConduitSelector conduitSelector =
             ClientProxy.getClient(proxy).getConduitSelector();
         if (conduitSelector instanceof FailoverTargetSelector) {

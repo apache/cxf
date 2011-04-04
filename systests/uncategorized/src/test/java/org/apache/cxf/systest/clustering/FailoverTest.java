@@ -67,10 +67,10 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     private static final String FAILOVER_CONFIG =
         "org/apache/cxf/systest/clustering/failover.xml";
 
-    private Bus bus;
-    private Control control;
-    private Greeter greeter;
-    private List<String> targets;
+    protected Bus bus;
+    protected Greeter greeter;
+    protected List<String> targets;
+    protected Control control;
     private MAPAggregator mapAggregator;
     private MAPCodec mapCodec;
 
@@ -81,11 +81,15 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                    launchServer(Server.class));
     }
             
+    protected String getConfig() {
+        return FAILOVER_CONFIG;
+    }
+    
     @Before
     public void setUp() {
         targets = new ArrayList<String>();
         SpringBusFactory bf = new SpringBusFactory();    
-        bus = bf.createBus(FAILOVER_CONFIG);
+        bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);
     }
     
@@ -296,7 +300,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         strategyTest(REPLICA_A, REPLICA_B, REPLICA_C, true);
     }
     
-    private void strategyTest(String activeReplica1,
+    protected void strategyTest(String activeReplica1,
                               String activeReplica2,
                               String inactiveReplica,
                               boolean expectRandom) {
@@ -328,7 +332,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                      randomized);
     }
 
-    private void startTarget(String address) {
+    protected void startTarget(String address) {
         ControlService cs = new ControlService();
         control = cs.getControlPort();
 
@@ -337,7 +341,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         targets.add(address);
     }
     
-    private void stopTarget(String address) {
+    protected void stopTarget(String address) {
         if (control != null
             && targets.contains(address)) {
             LOG.info("starting replicated target: " + address);
@@ -346,17 +350,17 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private void verifyCurrentEndpoint(String replica) {
+    protected void verifyCurrentEndpoint(String replica) {
         assertEquals("unexpected current endpoint",
                      replica,
                      getCurrentEndpoint(greeter));
     }
     
-    private String getCurrentEndpoint(Object proxy) {
+    protected String getCurrentEndpoint(Object proxy) {
         return ClientProxy.getClient(proxy).getEndpoint().getEndpointInfo().getAddress();
     }
     
-    private void setupGreeter() {
+    protected void setupGreeter() {
         ClusteredGreeterService cs = new ClusteredGreeterService();
         // REVISIT: why doesn't the generic (i.e. non-Port-specific)
         // Service.getPort() load the <jaxws:client> configuration?
@@ -367,7 +371,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                    instanceof FailoverTargetSelector);
     }
         
-    private void verifyStrategy(Object proxy, Class clz) {
+    protected void verifyStrategy(Object proxy, Class clz) {
         ConduitSelector conduitSelector =
             ClientProxy.getClient(proxy).getConduitSelector();
         if (conduitSelector instanceof FailoverTargetSelector) {
