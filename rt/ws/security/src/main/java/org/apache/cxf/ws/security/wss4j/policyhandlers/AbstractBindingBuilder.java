@@ -618,17 +618,23 @@ public abstract class AbstractBindingBuilder {
                 part = new WSEncryptionPart(unt.getId());
                 part.setElement(unt.getUsernameTokenElement());
             } else if (tempTok instanceof AssertionWrapper) {
-                AssertionWrapper assertionWrapper = (AssertionWrapper)tempTok;
-                part = new WSEncryptionPart(assertionWrapper.getId());
-                part.setElement(assertionWrapper.getElement());
-                
-                // TODO We only support using a KeyIdentifier for the moment
-                SecurityTokenReference secRef = 
-                    createSTRForSamlAssertion(assertionWrapper, false);
-                addSupportingElement(secRef.getElement());
-                part = new WSEncryptionPart("STRTransform", null, "Element");
-                part.setId(secRef.getID());
-                part.setElement(secRef.getElement());
+                boolean selfSignAssertion = 
+                    MessageUtils.getContextualBoolean(
+                        message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
+                    );
+                if (!selfSignAssertion) {
+                    AssertionWrapper assertionWrapper = (AssertionWrapper)tempTok;
+                    part = new WSEncryptionPart(assertionWrapper.getId());
+                    part.setElement(assertionWrapper.getElement());
+                    
+                    // TODO We only support using a KeyIdentifier for the moment
+                    SecurityTokenReference secRef = 
+                        createSTRForSamlAssertion(assertionWrapper, false);
+                    addSupportingElement(secRef.getElement());
+                    part = new WSEncryptionPart("STRTransform", null, "Element");
+                    part.setId(secRef.getID());
+                    part.setElement(secRef.getElement());
+                }
             } else {
                 policyNotAsserted(entry.getKey(), "UnsupportedTokenInSupportingToken: " + tempTok);  
             }
@@ -771,7 +777,39 @@ public abstract class AbstractBindingBuilder {
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(handler);
         info.setAsserted(true);
-        return new AssertionWrapper(samlParms);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        
+        boolean selfSignAssertion = 
+            MessageUtils.getContextualBoolean(
+                message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
+            );
+        if (selfSignAssertion) {
+            Crypto crypto = getSignatureCrypto(null);
+            
+            String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
+            String user = (String)message.getContextualProperty(userNameKey);
+            if (crypto != null && StringUtils.isEmpty(user)) {
+                try {
+                    user = crypto.getDefaultX509Identifier();
+                } catch (WSSecurityException e1) {
+                    throw new Fault(e1);
+                }
+            }
+            if (StringUtils.isEmpty(user)) {
+                policyNotAsserted(token, "No username found.");
+                return null;
+            }
+    
+            String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
+            if (password == null) {
+                password = "";
+            }
+         
+            // TODO configure using a KeyValue here
+            assertion.signAssertion(user, password, crypto, false);
+        }
+        
+        return assertion;
     }
     
     public String getPassword(String userName, Assertion info, int type) {
@@ -1224,11 +1262,13 @@ public abstract class AbstractBindingBuilder {
                     properties = new Properties();
                     properties.load(ins);
                     ins.close();
-                } else {
+                } else if (wrapper != null) {
                     policyNotAsserted(wrapper, "Could not find properties file " + o);
                 }
             } catch (IOException e) {
-                policyNotAsserted(wrapper, e);
+                if (wrapper != null) {
+                    policyNotAsserted(wrapper, e);
+                }
             }
         } else if (o instanceof URL) {
             properties = new Properties();
@@ -1237,7 +1277,9 @@ public abstract class AbstractBindingBuilder {
                 properties.load(ins);
                 ins.close();
             } catch (IOException e) {
-                policyNotAsserted(wrapper, e);
+                if (wrapper != null) {
+                    policyNotAsserted(wrapper, e);
+                }
             }            
         }
         

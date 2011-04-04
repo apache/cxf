@@ -82,6 +82,13 @@ public final class SecurityConstants {
     public static final String TIMESTAMP_FUTURE_TTL = "ws-security.timestamp.futureTimeToLive";
     
     /**
+     * This configuration tag specifies whether to self-sign a SAML Assertion or not. If this
+     * is set to true, then an enveloped signature will be generated when the SAML Assertion is
+     * constructed. The default is false.
+     */
+    public static final String SELF_SIGN_SAML_ASSERTION = "ws-security.self-sign-saml-assertion";
+    
+    /**
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
      * the full security on the message. These properties control the way the STS client
      * will decrypt the EncryptedData elements in the response

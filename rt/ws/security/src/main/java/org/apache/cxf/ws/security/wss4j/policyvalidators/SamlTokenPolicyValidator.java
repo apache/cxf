@@ -50,6 +50,7 @@ public class SamlTokenPolicyValidator {
 
                 if (!checkVersion(samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
+                    return;
                 }
                 /*
                 if (!checkIssuerName(samlToken, assertionWrapper)) {

@@ -60,7 +60,6 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.Header;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.RequiredElements;
 import org.apache.cxf.ws.security.policy.model.RequiredParts;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
@@ -280,7 +279,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             for (AssertionInfo ai : ais) {
                 TransportBinding binding = (TransportBinding)ai.getAssertion();
                 TransportToken token = binding.getTransportToken();
-                if (token != null && token.getToken() instanceof IssuedToken) {
+                if (token != null) {
                     action = addToAction(action, "Signature", true);
                     action = addToAction(action, "Encrypt", true);
                     Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
