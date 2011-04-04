@@ -147,6 +147,15 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         constructorArgs.addIndexedArgumentValue(0, valueToInsert);
     }
     
+    
+    /**
+     * This is deprecated and is there to support 2.3.x compatibility.
+     * Code should be updated to call addDefaultBus(ctx) instead to get the bus
+     * associated with the context.
+     * @param bus
+     * @param ctx
+     */
+    @Deprecated
     public static void updateBusReferencesInContext(Bus bus, ApplicationContext ctx) {
         Configurer conf = bus.getExtension(Configurer.class);
         if (conf instanceof NullConfigurer) {
