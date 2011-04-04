@@ -504,11 +504,15 @@ public abstract class AbstractBindingBuilder {
                     sig.setX509Certificate(secToken.getX509Certificate());
                     sig.setCustomTokenId(secToken.getId());
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                    // TODO Add support for SAML2 here
-                    if (secToken.getTokenType() == null) {
+                    String tokenType = secToken.getTokenType();
+                    if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
                         sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                        sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                    } else if (tokenType != null) {
+                        sig.setCustomTokenValueType(tokenType);
                     } else {
-                        sig.setCustomTokenValueType(secToken.getTokenType());
+                        sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                     }
                     sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
                     sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
@@ -1658,10 +1662,14 @@ public abstract class AbstractBindingBuilder {
             }
             
         } else {
-            if (tok.getTokenType() != null) {
-                sig.setCustomTokenValueType(tok.getTokenType());
+            String tokenType = tok.getTokenType();
+            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            } else if (tokenType != null) {
+                sig.setCustomTokenValueType(tokenType);
             } else {
-                // TODO Add support for SAML2 here
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
             }
             sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);

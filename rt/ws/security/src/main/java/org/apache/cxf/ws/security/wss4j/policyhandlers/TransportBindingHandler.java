@@ -428,7 +428,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             WSSecSignature sig = new WSSecSignature(wssConfig);
             if (secTok.getTokenType() == null) {
                 sig.setCustomTokenId(secTok.getId());
-                // TODO Add support for SAML2 here
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {
@@ -440,8 +439,14 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     sig.setCustomTokenId(secTok.getWsuId());
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
                 }
-                sig.setCustomTokenValueType(secTok.getTokenType());
-                sig.setCustomTokenValueType(secTok.getTokenType());
+                String tokenType = secTok.getTokenType();
+                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                } else {
+                    sig.setCustomTokenValueType(tokenType);
+                }
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             }
             Crypto crypto = null;
