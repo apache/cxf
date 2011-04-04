@@ -121,10 +121,19 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
-            <scope>runtime</scope>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <optional>true</optional>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -155,8 +164,39 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-xjc-plugin</artifactId>
+            <version>${cxf.xjc-utils.version}</version>
+            <executions>
+                <execution>
+                    <id>generate-sources</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>xsdtojava</goal>
+                    </goals>
+                    <configuration>
+                        <extensions>
+                            <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                        </extensions>
+                        <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                        <xsdOptions>
+                            <xsdOption>
+                                <extension>true</extension>
+                                <xsd>${basedir}/src/main/model/ws-trust-1.3.xsd</xsd>
+                                <bindingFile>${basedir}/src/main/model/binding.xjb</bindingFile>
+                            </xsdOption>
+                        </xsdOptions>
+                    </configuration>
+                </execution>
+            </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-    <profiles>
+     <profiles>
         <profile>
             <id>ibmjdk</id>
             <activation>
@@ -215,20 +255,20 @@
                                             <outputDirectory>${basedir}/target/endorsed</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
-                                 </configuration>
-                             </execution>
-                         </executions>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
-                         <groupId>org.apache.maven.plugins</groupId>
-                         <artifactId>maven-surefire-plugin</artifactId>
-                         <configuration>
-                             <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
-                         </configuration>
-                     </plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
-    </profiles>
+        </profiles>
 
 </project>

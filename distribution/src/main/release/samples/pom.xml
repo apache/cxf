@@ -82,6 +82,7 @@
         <module>wsdl_first_rpclit</module>
         <module>jms_pubsub</module>
         <module>jax_rs/spring_security</module>
+        <module>sts_issue_operation</module>
 <!--
         <module>logbrowser</module>
 -->
