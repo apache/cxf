@@ -130,6 +130,14 @@ import org.apache.xml.security.transforms.Transforms;
  */
 public abstract class AbstractBindingBuilder {
     public static final String CRYPTO_CACHE = "ws-security.crypto.cache";
+    
+    // TODO Remove these once WSS4J 1.5.12 is released
+    public static final String SAMLTOKEN_NS11 = 
+        "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
+    public static final String WSS_SAML_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV1.1";
+    public static final String WSS_SAML2_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV2.0";
+    public static final String WSS_SAML2_KI_VALUE_TYPE = SAMLTOKEN_NS11 + "#SAMLID";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBindingBuilder.class);
     
     
@@ -474,11 +482,16 @@ public abstract class AbstractBindingBuilder {
                     sig.setX509Certificate(secToken.getX509Certificate());
                     sig.setCustomTokenId(secToken.getId());
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                    if (secToken.getTokenType() == null) {
+                    String tokenType = secToken.getTokenType();
+                    if (WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
                         sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
                                                     + WSConstants.SAML_ASSERTION_ID);
+                    } else if (WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                        sig.setCustomTokenValueType(WSS_SAML2_KI_VALUE_TYPE);
+                    } else if (tokenType != null) {
+                        sig.setCustomTokenValueType(tokenType);
                     } else {
-                        sig.setCustomTokenValueType(secToken.getTokenType());
+                        sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                     }
                     sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
                     sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
@@ -1519,11 +1532,15 @@ public abstract class AbstractBindingBuilder {
             }
             
         } else {
-            if (tok.getTokenType() != null) {
-                sig.setCustomTokenValueType(tok.getTokenType());
+            String tokenType = tok.getTokenType();
+            if (WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            } else if (WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSS_SAML2_KI_VALUE_TYPE);
+            } else if (tokenType != null) {
+                sig.setCustomTokenValueType(tokenType);
             } else {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
-                                            + WSConstants.SAML_ASSERTION_ID);
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
             }
             sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         }

@@ -663,6 +663,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     sig.setEncrKeySha1value(tok.getSHA1());
                     sig.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
                 }
+            } else if (WSS_SAML_TOKEN_TYPE.equals(tok.getTokenType())) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                                            + WSConstants.SAML_ASSERTION_ID);
+            } else if (WSS_SAML2_TOKEN_TYPE.equals(tok.getTokenType())) {
+                sig.setCustomTokenValueType(WSS_SAML2_KI_VALUE_TYPE);
             } else if (tok.getTokenType() != null) { 
                 sig.setCustomTokenValueType(tok.getTokenType());
                 sig.setKeyIdentifierType(type);
