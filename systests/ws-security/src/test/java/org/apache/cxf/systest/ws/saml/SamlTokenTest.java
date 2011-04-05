@@ -22,6 +22,9 @@ package org.apache.cxf.systest.ws.saml;
 import java.math.BigInteger;
 import java.net.URL;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
@@ -38,6 +41,8 @@ import wssec.saml.DoubleItService;
  * A set of tests for SAML Tokens.
  */
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
+    
+    private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -92,6 +97,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSaml2OverSymmetric() throws Exception {
 
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -132,6 +140,10 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSaml2OverAsymmetric() throws Exception {
 
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -192,4 +204,23 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         assert result.equals(BigInteger.valueOf(50));
     }
     
+    
+    private boolean checkUnrestrictedPoliciesInstalled() {
+        try {
+            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+
+            SecretKey key192 = new SecretKeySpec(
+                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
+                            "AES");
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.ENCRYPT_MODE, key192);
+            c.doFinal(data);
+            return true;
+        } catch (Exception e) {
+            //
+        }
+        return false;
+    }
 }

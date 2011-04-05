@@ -30,6 +30,7 @@ import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.opensaml.common.SAMLVersion;
 
@@ -59,7 +60,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setIssuer("sts");
                 String subjectName = "uid=sts-client,o=mock-sts.com";
                 String subjectQualifier = "www.mock-sts.com";
-                String confirmationMethod = SAML2Constants.CONF_BEARER;
+                String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
+                if (!saml2) {
+                    confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
+                }
                 SubjectBean subjectBean = 
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
