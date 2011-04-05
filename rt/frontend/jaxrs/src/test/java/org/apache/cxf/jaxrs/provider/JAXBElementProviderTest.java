@@ -65,6 +65,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2NoRootElement;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -380,6 +381,8 @@ public class JAXBElementProviderTest extends Assert {
                          Book2NoRootElement.class,
                          new Annotation[0], MediaType.TEXT_XML_TYPE, 
                          new MetadataMap<String, Object>(), bos);
+        assertTrue(bos.toString().contains("book2"));
+        assertTrue(bos.toString().contains("http://superbooks"));
         provider.setUnmarshallAsJaxbElement(true);
         
         ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
@@ -387,6 +390,28 @@ public class JAXBElementProviderTest extends Assert {
             (Book2NoRootElement)provider.readFrom(
                        (Class)Book2NoRootElement.class, 
                        Book2NoRootElement.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertEquals(book2.getId(), book.getId());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testWriteWithXmlRootElementAndPackageInfo() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Book2 book = new Book2(333);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(book, Book2.class, 
+                         Book2.class,
+                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        assertTrue(bos.toString().contains("thebook2"));
+        assertTrue(bos.toString().contains("http://superbooks"));
+        
+        ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
+        Book2 book2 = 
+            (Book2)provider.readFrom(
+                       (Class)Book2.class, 
+                       Book2.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(book2.getId(), book.getId());
     }

@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.jaxrs.fortest.jaxb.packageinfo;
 
+import javax.xml.bind.annotation.XmlType;
 
+@XmlType(name = "book2")
 public class Book2NoRootElement {
 
     private int id;

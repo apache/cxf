@@ -778,7 +778,7 @@ public final class JAXBUtils {
     }
     
     public static String getPackageNamespace(Class<?> cls) {
-        Package p = Package.getPackage(PackageUtils.getPackageName(cls));
+        Package p = cls.getPackage();
         if (p != null) {
             javax.xml.bind.annotation.XmlSchema schemaAnn = 
                 p.getAnnotation(javax.xml.bind.annotation.XmlSchema.class);
