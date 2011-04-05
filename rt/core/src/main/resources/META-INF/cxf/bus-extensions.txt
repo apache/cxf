@@ -10,3 +10,5 @@ org.apache.cxf.catalog.OASISCatalogManager:org.apache.cxf.catalog.OASISCatalogMa
 org.apache.cxf.service.factory.FactoryBeanListenerManager::true
 org.apache.cxf.endpoint.ServerLifeCycleManagerImpl:org.apache.cxf.endpoint.ServerLifeCycleManager:true
 org.apache.cxf.endpoint.ClientLifeCycleManagerImpl:org.apache.cxf.endpoint.ClientLifeCycleManager:true
+org.apache.cxf.bus.resource.ResourceManagerImpl:org.apache.cxf.resource.ResourceManager:true
+
