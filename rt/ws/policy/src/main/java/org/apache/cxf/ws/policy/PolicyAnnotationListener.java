@@ -207,6 +207,9 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         if (list != null) {
             addPolicies(factory, server.getEndpoint(), cls, list, Policy.Placement.BINDING);
         }
+        if (cls == null) {
+            return;
+        }
         Policy p = cls.getAnnotation(Policy.class);
         Policies ps = cls.getAnnotation(Policies.class);
         if (p != null || ps != null) {
@@ -267,6 +270,9 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
 
 
     private void addPolicies(AbstractServiceFactoryBean factory, InterfaceInfo ii, Class<?> cls) {
+        if (cls == null) {
+            return;
+        }
         Policy p = cls.getAnnotation(Policy.class);
         Policies ps = cls.getAnnotation(Policies.class);
         if (p != null || ps != null) {
@@ -334,7 +340,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             if (src != null) {
                 try {
                     Document doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src));
-                    if (service.getDescription() == null) {
+                    if (service.getDescription() == null && cls != null) {
                         service.setDescription(new DescriptionInfo());
                         service.getDescription().setBaseURI(cls.getResource("/").toString());
                     }
