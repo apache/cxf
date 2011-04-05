@@ -18,9 +18,7 @@
  */
 package org.apache.cxf.configuration.blueprint;
 
-
 import java.util.List;
-
 import javax.xml.namespace.QName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -47,6 +45,7 @@ import org.osgi.service.blueprint.reflect.RefMetadata;
 import org.osgi.service.blueprint.reflect.ValueMetadata;
 
 public abstract class AbstractBPBeanDefinitionParser {
+
     private static final String XMLNS_BLUEPRINT = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
     private static final String COMPONENT_ID = "component-id";
 
@@ -65,22 +64,20 @@ public abstract class AbstractBPBeanDefinitionParser {
     protected Metadata parseListData(ParserContext context, 
                                      ComponentMetadata enclosingComponent, 
                                      Element element) {
-        MutableCollectionMetadata m
-            = (MutableCollectionMetadata)context.parseElement(CollectionMetadata.class, 
-                                    enclosingComponent, 
-                                    element);
+        MutableCollectionMetadata m 
+            = (MutableCollectionMetadata) context.parseElement(CollectionMetadata.class, 
+                                                               enclosingComponent, element);
         m.setCollectionClass(List.class);
         return m;
     }
+
     protected Metadata parseMapData(ParserContext context, 
-                                     ComponentMetadata enclosingComponent, 
-                                     Element element) {
-        return context.parseElement(MapMetadata.class, 
-                                    enclosingComponent, 
-                                    element);
+                                    ComponentMetadata enclosingComponent, 
+                                    Element element) {
+        return context.parseElement(MapMetadata.class, enclosingComponent, element);
     }
 
-    protected void setFirstChildAsProperty(Element element,
+    protected void setFirstChildAsProperty(Element element, 
                                            ParserContext ctx, 
                                            MutableBeanMetadata bean, 
                                            String propertyName) {
@@ -101,24 +98,11 @@ public abstract class AbstractBPBeanDefinitionParser {
                 }
                 bean.addProperty(propertyName, createRef(ctx, id));
             } else {
-                if ("bean".equals(name)) {
-                    //TODO FIX beans and refs
-                    // /       BeanDefinitionHolder bdh = ctx.getDelegate().parseBeanDefinitionElement(first);
-                    //   child = bdh.getBeanDefinition();
-                    //     bean.addPropertyValue(propertyName, child);
-                } else {
-                    throw new UnsupportedOperationException(
-                        "Elements with the name " + name 
-                        + " are not currently " 
-                        + "supported as sub elements of " 
-                        + element.getLocalName());
-                }
+                //Rely on BP to handle these ones.
+                bean.addProperty(propertyName, ctx.parseElement(Metadata.class, bean, first));
             }
         } else {
-            throw new UnsupportedOperationException(
-                "Elements with the name " + first.getLocalName() 
-                + " are not currently " 
-                + "supported as sub elements of " + element.getLocalName());
+            bean.addProperty(propertyName, ctx.parseElement(Metadata.class, bean, first));
         }
     }
 
@@ -163,43 +147,42 @@ public abstract class AbstractBPBeanDefinitionParser {
             String pre = node.getPrefix();
             String name = node.getLocalName();
             String prefix = node.getPrefix();
-            
+
             // Don't process namespaces
             if (isNamespace(name, prefix)) {
                 continue;
             }
-            
+
             if ("createdFromAPI".equals(name) || "abstract".equals(name)) {
                 bean.setScope(BeanMetadata.SCOPE_PROTOTYPE);
-            } else if ("depends-on".equals(name)) {
-                bean.addDependsOn(val);
-            } else if (!"id".equals(name) && !"name".equals(name) && isAttribute(pre, name)) {
-                if ("bus".equals(name)) {
-                    if (this.hasBusProperty()) {
-                        bean.addProperty("bus", getBusRef(ctx, val));
+            } else {
+                if ("depends-on".equals(name)) {
+                    bean.addDependsOn(val);
+                } else if (!"id".equals(name) && !"name".equals(name) && isAttribute(pre, name)) {
+                    if ("bus".equals(name)) {
+                        if (this.hasBusProperty()) {
+                            bean.addProperty("bus", getBusRef(ctx, val));
+                        } else {
+                            bean.addArgument(getBusRef(ctx, val), null, 0);
+                        }
                     } else {
-                        bean.addArgument(getBusRef(ctx, val), null, 0);
+                        mapAttribute(bean, element, name, val, ctx);
                     }
-                } else {
-                    mapAttribute(bean, element, name, val, ctx);
-                }    
+                }
             }
-        } 
+        }
         return setBus;
     }
 
-    protected void mapAttribute(MutableBeanMetadata bean, 
-                                Element e, String name, 
-                                String val, ParserContext context) {
+    protected void mapAttribute(MutableBeanMetadata bean, Element e, 
+                                String name, String val, ParserContext context) {
         mapToProperty(bean, name, val, context);
     }
 
     protected boolean isAttribute(String pre, String name) {
-        return !"xmlns".equals(name) 
-            && (pre == null || !pre.equals("xmlns")) 
-            && !"abstract".equals(name) 
-            && !"lazy-init".equals(name) && !"id"
-            .equals(name);
+        return !"xmlns".equals(name) && (pre == null || !pre.equals("xmlns")) 
+            && !"abstract".equals(name) && !"lazy-init".equals(name) 
+            && !"id".equals(name);
     }
 
     protected boolean isNamespace(String name, String prefix) {
@@ -225,6 +208,7 @@ public abstract class AbstractBPBeanDefinitionParser {
             }
         }
     }
+
     public static ValueMetadata createValue(ParserContext context, String value) {
         MutableValueMetadata v = context.createMetadata(MutableValueMetadata.class);
         v.setStringValue(value);
@@ -236,14 +220,14 @@ public abstract class AbstractBPBeanDefinitionParser {
         r.setComponentId(value);
         return r;
     }
+
     public static MutableBeanMetadata createObjectOfClass(ParserContext context, String value) {
         MutableBeanMetadata v = context.createMetadata(MutableBeanMetadata.class);
         v.setClassName(value);
         return v;
     }
 
-    protected MutableBeanMetadata getBus(ParserContext context,
-                                    String name) {
+    protected MutableBeanMetadata getBus(ParserContext context, String name) {
         ComponentDefinitionRegistry cdr = context.getComponentDefinitionRegistry();
         ComponentMetadata meta = cdr.getComponentDefinition("blueprintBundle");
 
@@ -254,14 +238,13 @@ public abstract class AbstractBPBeanDefinitionParser {
         if (!cdr.containsComponentDefinition(InterceptorTypeConverter.class.getName())) {
             MutablePassThroughMetadata md = context.createMetadata(MutablePassThroughMetadata.class);
             md.setObject(new InterceptorTypeConverter());
-            
+
             md.setId(InterceptorTypeConverter.class.getName());
             context.getComponentDefinitionRegistry().registerTypeConverter(md);
         }
-        if (blueprintBundle != null
-            && !cdr.containsComponentDefinition(name)) {
+        if (blueprintBundle != null && !cdr.containsComponentDefinition(name)) {
             //Create a bus
-            
+
             MutableBeanMetadata bus = context.createMetadata(MutableBeanMetadata.class);
             bus.setId(name);
             bus.setRuntimeClass(BlueprintBus.class);
@@ -269,20 +252,20 @@ public abstract class AbstractBPBeanDefinitionParser {
             bus.addProperty("blueprintContainer", createRef(context, "blueprintContainer"));
             bus.setDestroyMethod("shutdown");
             bus.setInitMethod("initialize");
-            
+
             context.getComponentDefinitionRegistry().registerComponentDefinition(bus);
-            
+
             return bus;
         }
-        return (MutableBeanMetadata)cdr.getComponentDefinition(name);
+        return (MutableBeanMetadata) cdr.getComponentDefinition(name);
     }
-    protected RefMetadata getBusRef(ParserContext context,
-                                    String name) {
+
+    protected RefMetadata getBusRef(ParserContext context, String name) {
 
         getBus(context, name);
         return createRef(context, name);
     }
-    
+
     protected void parseChildElements(Element element, ParserContext ctx, MutableBeanMetadata bean) {
         Element el = DOMUtils.getFirstElement(element);
         while (el != null) {
@@ -291,6 +274,4 @@ public abstract class AbstractBPBeanDefinitionParser {
             el = DOMUtils.getNextElement(el);
         }
     }
-    
-
 }
