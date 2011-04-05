@@ -27,6 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +50,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -59,9 +61,6 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.common.util.ReflectionInvokationHandler;
-import org.apache.cxf.jaxb.JAXBBeanInfo;
-import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -86,7 +85,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
     
-    protected Map<String, String> jaxbElementClassMap;
+    protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
     protected boolean unmarshalAsJaxbElement;
     protected boolean marshalAsJaxbElement;
     
@@ -105,7 +104,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private Schema schema;
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
-    private List<String> jaxbElementClassNames;
+    private List<String> jaxbElementClassNames = Collections.emptyList();
     private Map<String, Object> cProperties;
     private Map<String, Object> uProperties;
     
@@ -182,27 +181,27 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return null;
     }
     
+    protected static boolean isXmlRoot(Class<?> cls) {
+        return cls.getAnnotation(XmlRootElement.class) != null;
+    }
+    
     @SuppressWarnings("unchecked")
     protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
         throws Exception {
         
+        boolean asJaxbElement = jaxbElementClassNames.contains(cls.getName());
+        if (!asJaxbElement && isXmlRoot(cls)) {
+            return obj;
+        }
+        
         QName name = null;
-        if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName()) 
-            || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(cls.getName())) {
-            if (jaxbElementClassMap != null) {
-                name = JAXRSUtils.convertStringToQName(jaxbElementClassMap.get(cls.getName()));
-            } else {
-                name = getJaxbQName(cls, genericType, obj, false);
-            }
+        String expandedName = jaxbElementClassMap.get(cls.getName());
+        if (expandedName != null) {
+            name = JAXRSUtils.convertStringToQName(expandedName);
+        } else if (marshalAsJaxbElement || asJaxbElement) {
+            name = getJaxbQName(cls, genericType, obj, false);
         }
-        if (name == null && marshalAsJaxbElement) {
-            name = new QName(getPackageNamespace(cls),
-                             cls.getSimpleName());
-        }
-        if (name != null) {
-            return new JAXBElement(name, cls, null, obj);
-        }
-        return obj;
+        return name != null ? new JAXBElement(name, cls, null, obj) : obj;
     }
     
     public void setCollectionWrapperName(String wName) {
@@ -269,32 +268,23 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
         
         XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
-        QName qname = null;
         if (root != null) {
-            String namespace = getNamespace(root.namespace());
-            if ("".equals(namespace)) {
-                namespace = getPackageNamespace(cls);
-            }
-            String name = getLocalName(root.name(), cls.getSimpleName(), pluralName);
-            return new QName(namespace, name);
+            return getQNameFromNamespaceAndName(root.namespace(), root.name(), cls, pluralName);
+        } else if (cls.getAnnotation(XmlType.class) != null) {
+            XmlType xmlType = cls.getAnnotation(XmlType.class);
+            return getQNameFromNamespaceAndName(xmlType.namespace(), xmlType.name(), cls, pluralName);
         } else {
-            JAXBContext context = getJAXBContext(cls, type);
-            JAXBContextProxy proxy = ReflectionInvokationHandler.createProxyWrapper(context,
-                                                                                    JAXBContextProxy.class);
-            JAXBBeanInfo info = JAXBUtils.getBeanInfo(proxy, cls);
-            if (info != null) {
-                try {
-                    Object instance = object == null ? cls.newInstance() : object;
-                    String name = getLocalName(info.getElementLocalName(instance), cls.getSimpleName(), 
-                                               pluralName);
-                    String namespace = getNamespace(info.getElementNamespaceURI(instance));
-                    return new QName(namespace, name);
-                } catch (Exception ex) {
-                    // ignore
-                }
-            }
+            return new QName(getPackageNamespace(cls), cls.getSimpleName());
         }
-        return qname;
+    }
+    
+    private QName getQNameFromNamespaceAndName(String ns, String localName, Class<?> cls, boolean plural) {
+        String name = getLocalName(localName, cls.getSimpleName() , plural);
+        String namespace = getNamespace(ns);
+        if ("".equals(namespace)) {
+            namespace = getPackageNamespace(cls);
+        }
+        return new QName(namespace, name);
     }
     
     private String getLocalName(String name, String clsName, boolean pluralName) {
@@ -427,7 +417,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             || isSkipJaxbChecks()) {
             return true;
         }
-        return type.getAnnotation(XmlRootElement.class) != null
+        return isXmlRoot(type)
             || JAXBElement.class.isAssignableFrom(type)
             || objectFactoryOrIndexAvailable(type)
             || (type != genericType && objectFactoryForType(genericType))
