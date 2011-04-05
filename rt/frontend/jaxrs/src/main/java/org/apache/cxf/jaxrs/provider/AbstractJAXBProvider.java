@@ -337,6 +337,12 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            type = InjectionUtils.getActualType(genericType);
+            if (type == null) {
+                return false;
+            }
+        }    
         return canBeReadAsJaxbElement(type) || isSupported(type, genericType, anns);
     }
 
@@ -909,6 +915,34 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             this.writeStartElement(uri, local);
             this.writeCharacters(value);
             this.writeEndElement();
+        }
+    } 
+    protected static class JAXBCollectionWrapperReader extends DepthXMLStreamReader {
+        
+        private boolean firstName;
+        private boolean firstNs;
+        
+        public JAXBCollectionWrapperReader(XMLStreamReader reader) {
+            super(reader);
+        }
+        
+        @Override
+        public String getNamespaceURI() {
+            if (!firstNs) {
+                firstNs = true;
+                return "";
+            }
+            return super.getNamespaceURI();
+        }
+        
+        @Override
+        public String getLocalName() {
+            if (!firstName) {
+                firstName = true;
+                return "collectionWrapper";
+            }
+            
+            return super.getLocalName();
         }
     }
     

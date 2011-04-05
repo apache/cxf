@@ -62,7 +62,6 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Produces({"application/xml", "application/*+xml", "text/xml" })
@@ -84,18 +83,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         
     }
     
-    @Override
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        
-        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
-            type = InjectionUtils.getActualType(genericType);
-            if (type == null) {
-                return false;
-            }
-        }
-        
-        return super.isReadable(type, genericType, anns, mt);
-    }
     
     @Override
     protected boolean canBeReadAsJaxbElement(Class<?> type) {
@@ -465,37 +452,5 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         throws Exception {
         ms.marshal(obj, writer);
     }
-    
-    
-    protected static class JAXBCollectionWrapperReader extends DepthXMLStreamReader {
-        
-        private boolean firstName;
-        private boolean firstNs;
-        
-        public JAXBCollectionWrapperReader(XMLStreamReader reader) {
-            super(reader);
-        }
-        
-        @Override
-        public String getNamespaceURI() {
-            if (!firstNs) {
-                firstNs = true;
-                return "";
-            }
-            return super.getNamespaceURI();
-        }
-        
-        @Override
-        public String getLocalName() {
-            if (!firstName) {
-                firstName = true;
-                return "collectionWrapper";
-            }
-            
-            return super.getLocalName();
-        }
-        
-    }
-    
     
 }
