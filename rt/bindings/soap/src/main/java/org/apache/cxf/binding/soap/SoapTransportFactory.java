@@ -133,8 +133,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             }
             return destinationFactory.getDestination(ei);
         } catch (BusException e) {
-            throw new RuntimeException("Could not find destination factory for transport "
-                                       + transId);
+            IOException ex = new IOException("Could not find destination factory for transport " + transId);
+            ex.initCause(e);
+            throw ex;
         }
     }
 
