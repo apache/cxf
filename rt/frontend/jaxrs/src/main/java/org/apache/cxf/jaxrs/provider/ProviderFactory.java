@@ -97,8 +97,6 @@ public final class ProviderFactory {
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
     
-    private Set<Object> clonedProviders = new HashSet<Object>();
-    
     private ProviderFactory() {
     }
     
@@ -289,33 +287,46 @@ public final class ProviderFactory {
                                                       m);
         
         //If none found try the default ones
-        if (mr != null ||  this == SHARED_FACTORY) {
+        if (mr != null) {
             return mr;
         }
-        mr = SHARED_FACTORY.createMessageBodyReader(bodyType, parameterType, 
-                                                        parameterAnnotations, mediaType, m);
-        return (MessageBodyReader)cloneSharedProviderIfNeeded(mr);
+        mr = SHARED_FACTORY.chooseMessageReader(bodyType,
+                                                parameterType,
+                                                parameterAnnotations,
+                                                mediaType,
+                                                m);
+        return (MessageBodyReader)cloneSharedProviderIfNeeded(mr, m);
     }
     
-    private Object cloneSharedProviderIfNeeded(Object sharedProvider) {
-        if (sharedProvider != null) {
-            String clsName = sharedProvider.getClass().getName();
-            if (JAXB_PROVIDER_NAME.equals(clsName) || JSON_PROVIDER_NAME.equals(clsName)) {
-                try {
-                    synchronized (this) {
-                        for (Object cloned : clonedProviders) {
-                            if (cloned.getClass().getName().equals(clsName)) {
-                                return cloned;
-                            }
+    private boolean isJaxbBasedProvider(Object sharedProvider) {
+        String clsName = sharedProvider.getClass().getName();
+        return JAXB_PROVIDER_NAME.equals(clsName) || JSON_PROVIDER_NAME.equals(clsName);
+    }
+    
+    private Object cloneSharedProviderIfNeeded(Object sharedProvider, Message m) {
+        if (sharedProvider != null && isJaxbBasedProvider(sharedProvider)) {
+            try {
+                synchronized (this) {
+                    ProviderInfo<?> info = null;
+                    for (int i = messageReaders.size() - 1; i >= 0; i--)  {
+                        ProviderInfo<?> lastInfo = messageReaders.get(i);
+                        if (lastInfo.getProvider().getClass().getName().equals(
+                                 sharedProvider.getClass().getName())) {
+                            info = lastInfo;
+                            break;
                         }
-                        Object provider = sharedProvider.getClass().newInstance();
-                        clonedProviders.add(provider);
-                        setProviders(false, provider);
-                        return provider;
                     }
-                } catch (Exception ex) {
-                    // won't happen at this stage
+                    if (info == null) {
+                        setProviders(false, sharedProvider.getClass().newInstance());
+                        info = messageReaders.get(messageReaders.size() - 1);
+                    }
+                    InjectionUtils.injectContextFields(info.getProvider(), info, m);
+                    InjectionUtils.injectContextMethods(info.getProvider(), info, m);
+                    
+                    return info.getProvider();
                 }
+            } catch (Exception ex) {
+                // won't happen at this stage
             }
         }
         return sharedProvider;
@@ -363,12 +374,15 @@ public final class ProviderFactory {
                                                       m);
         
         //If none found try the default ones
-        if (mw != null || this == SHARED_FACTORY) {
+        if (mw != null) {
             return mw;
         }
-        mw = SHARED_FACTORY.createMessageBodyWriter(bodyType, parameterType, 
-                                                        parameterAnnotations, mediaType, m);
-        return (MessageBodyWriter)cloneSharedProviderIfNeeded(mw);
+        mw = SHARED_FACTORY.chooseMessageWriter(bodyType,
+                                                parameterType,
+                                                parameterAnnotations,
+                                                mediaType,
+                                                m);
+        return (MessageBodyWriter)cloneSharedProviderIfNeeded(mw, m);
     }
     
 //CHECKSTYLE:OFF       
@@ -426,6 +440,9 @@ public final class ProviderFactory {
         for (List<?> list : providerLists) {
             for (Object p : list) {
                 ProviderInfo pi = (ProviderInfo)p;
+                //if (ProviderFactory.SHARED_FACTORY == this && isJaxbBasedProvider(pi.getProvider())) {
+                //    continue;
+                //}
                 InjectionUtils.injectContextProxies(pi, pi.getProvider());
             }
         }
@@ -468,8 +485,10 @@ public final class ProviderFactory {
         for (ProviderInfo<MessageBodyReader> ep : messageReaders) {
             if (matchesReaderCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
                 if (this == SHARED_FACTORY) {
-                    InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                    InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                    if (!isJaxbBasedProvider(ep.getProvider())) {
+                        InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+                        InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                    }
                     return ep.getProvider();
                 }
                 handleMapper((List)candidates, ep, type, m, MessageBodyReader.class);
@@ -522,8 +541,10 @@ public final class ProviderFactory {
         for (ProviderInfo<MessageBodyWriter> ep : messageWriters) {
             if (matchesWriterCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
                 if (this == SHARED_FACTORY) {
-                    InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                    InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                    if (!isJaxbBasedProvider(ep.getProvider())) {
+                        InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+                        InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                    }
                     return ep.getProvider();
                 }
                 handleMapper((List)candidates, ep, type, m, MessageBodyWriter.class);
@@ -700,9 +721,7 @@ public final class ProviderFactory {
     }
 
     public void initProviders(List<ClassResourceInfo> cris) {
-        Set<Object> set = new HashSet<Object>();
-        set.addAll(messageReaders);
-        set.addAll(messageWriters);
+        Set<Object> set = getReadersWriters();
         for (Object o : set) {
             Object provider = ((ProviderInfo)o).getProvider();
             if (provider instanceof AbstractConfigurableProvider) {
@@ -712,6 +731,13 @@ public final class ProviderFactory {
         if (this != SHARED_FACTORY) {
             SHARED_FACTORY.initProviders(cris);
         }
+    }
+    
+    Set<Object> getReadersWriters() {
+        Set<Object> set = new HashSet<Object>();
+        set.addAll(messageReaders);
+        set.addAll(messageWriters);
+        return set;
     }
     
     private static class ExceptionMapperComparator implements 

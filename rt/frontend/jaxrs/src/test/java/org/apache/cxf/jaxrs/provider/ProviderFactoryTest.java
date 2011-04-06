@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -36,6 +40,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -51,6 +56,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
@@ -67,6 +73,7 @@ import org.easymock.classextension.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ProviderFactoryTest extends Assert {
@@ -130,22 +137,71 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testDefaultJaxbProviderCloned() {
         ProviderFactory pf = ProviderFactory.getInstance();
+        doTestDefaultJaxbProviderCloned(pf, "http://localhost:8080/base/");
+        checkJaxbProvider(pf);
+    }
+    
+    @Test
+    public void testDefaultJaxbProviderClonedMultipleThreads() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
+                                                             new ArrayBlockingQueue<Runnable>(10));
+        CountDownLatch startSignal = new CountDownLatch(1);
+        CountDownLatch doneSignal = new CountDownLatch(5);
+        
+        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/1"));
+        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/2"));
+        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/3"));
+        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/4"));
+        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/5"));
+        
+        startSignal.countDown();
+        doneSignal.await(10, TimeUnit.SECONDS);
+        executor.shutdownNow();
+        assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
+        checkJaxbProvider(pf);
+    }
+    
+    private void doTestDefaultJaxbProviderCloned(ProviderFactory pf, String property) {
+        Message message = new MessageImpl();
+        message.put(Message.QUERY_STRING, "uri=" + property);
         MessageBodyReader customJaxbReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
-                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+                                                              MediaType.TEXT_XML_TYPE, message);
         assertTrue(customJaxbReader instanceof JAXBElementProvider);
         
-        MessageBodyReader customJaxbReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
-                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
-        assertSame(customJaxbReader, customJaxbReader2);
+        JAXBElementProvider provider = (JAXBElementProvider)customJaxbReader;
+        MessageContext mc = provider.getContext();
+        assertNotNull(mc);
+        UriInfo ui = mc.getUriInfo();
+        MultivaluedMap<String, String> queries = ui.getQueryParameters();
+        assertEquals(1, queries.size());
+        List<String> uriQuery = queries.get("uri");
+        assertEquals(1, uriQuery.size());
+        assertEquals(property, uriQuery.get(0));
         
+        
+        MessageBodyReader customJaxbReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+                                                              MediaType.TEXT_XML_TYPE, message);
+        assertSame(customJaxbReader, customJaxbReader2);
+         
         MessageBodyWriter customJaxbWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
-                                                              MediaType.TEXT_XML_TYPE, new MessageImpl());
+                                                              MediaType.TEXT_XML_TYPE, message);
         assertSame(customJaxbReader, customJaxbWriter);
         
         MessageBodyReader jaxbReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
-            (Class<?>)Book.class, null, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
+            (Class<?>)Book.class, null, null, MediaType.TEXT_XML_TYPE, message);
         assertTrue(jaxbReader instanceof JAXBElementProvider);
         assertNotSame(jaxbReader, customJaxbReader);
+    }
+    
+    private void checkJaxbProvider(ProviderFactory pf) {
+        int count = 0;
+        for (Object provider : pf.getReadersWriters()) {
+            if (((ProviderInfo)provider).getProvider() instanceof JAXBElementProvider) {
+                count++;
+            }
+        }
+        assertEquals(1, count);
     }
     
     @Test
@@ -728,6 +784,37 @@ public class ProviderFactoryTest extends Assert {
 
         public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
             return null;
+        }
+        
+    }
+    
+    @Ignore
+    private class TestRunnable implements Runnable {
+
+        private CountDownLatch startSignal;
+        private CountDownLatch doneSignal;
+        private ProviderFactory pf;
+        private String property; 
+        public TestRunnable(ProviderFactory pf,
+                            CountDownLatch startSignal,
+                            CountDownLatch doneSignal,
+                            String property) {
+            this.startSignal = startSignal;
+            this.doneSignal = doneSignal;
+            this.pf = pf;
+            this.property = property;
+        }
+        
+        public void run() {
+            
+            try {
+                startSignal.await();
+                ProviderFactoryTest.this.doTestDefaultJaxbProviderCloned(pf, property);
+                doneSignal.countDown();
+            } catch (Exception ex) {
+                Assert.fail(ex.getMessage());
+            } 
+            
         }
         
     }
