@@ -229,12 +229,6 @@
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
         </dependency>
-
-        <dependency>
-          <groupId>org.apache.cxf</groupId>
-          <artifactId>cxf-rt-testsupport</artifactId>
-          <version>${project.version}</version>
-        </dependency>
     </dependencies>
     <properties>
         <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>

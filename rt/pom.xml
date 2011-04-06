@@ -34,7 +34,6 @@
     <modules>
         <module>core</module>
         <module>transports/local</module>
-        <module>testsupport</module>
         <module>databinding/jaxb</module>
         <module>databinding/xmlbeans</module>
         <module>databinding/aegis</module>

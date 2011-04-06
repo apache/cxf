@@ -341,11 +341,6 @@
             <artifactId>commons-httpclient</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.apache.cxf</groupId>
-          <artifactId>cxf-rt-testsupport</artifactId>
-          <version>${project.version}</version>
-        </dependency>
 
     </dependencies>
     <properties>

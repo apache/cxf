@@ -214,12 +214,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-testsupport</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
           <groupId>javax.annotation</groupId>
           <artifactId>jsr250-api</artifactId>
           <version>1.0</version>
