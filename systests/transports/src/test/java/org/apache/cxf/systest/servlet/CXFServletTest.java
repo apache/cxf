@@ -38,7 +38,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.testsupport.AbstractServletTest;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
 
 import org.junit.Before;

@@ -31,7 +31,6 @@ import com.meterware.servletunit.ServletUnitClient;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.testsupport.AbstractServletTest;
 
 import org.junit.Test;
 

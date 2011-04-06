@@ -25,7 +25,6 @@ import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.testsupport.AbstractServletTest;
 
 import org.junit.Test;
 

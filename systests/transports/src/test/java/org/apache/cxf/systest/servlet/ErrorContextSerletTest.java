@@ -21,7 +21,6 @@ package org.apache.cxf.systest.servlet;
 import com.meterware.servletunit.ServletRunner;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.apache.cxf.testsupport.AbstractServletTest;
 
 import org.junit.Before;
 import org.junit.Test;
