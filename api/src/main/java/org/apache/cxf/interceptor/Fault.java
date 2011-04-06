@@ -44,7 +44,13 @@ public class Fault extends UncheckedException {
     
     public Fault(Message message, Throwable throwable) {
         super(message, throwable);
-        this.message = message.toString();
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(message.toString());
+        if (throwable != null) {
+            buffer.append(" Caused by :");
+            buffer.append(throwable.getMessage());
+        }
+        this.message = buffer.toString();
         code = FAULT_CODE_SERVER;
     }
     
