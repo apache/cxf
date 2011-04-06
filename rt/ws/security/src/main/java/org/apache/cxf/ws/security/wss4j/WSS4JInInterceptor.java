@@ -58,6 +58,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -430,7 +431,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
         for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            if (p != null) {
+            if (p != null && isSecurityContextPrincipal(p, wsResult)) {
                 msg.put(PRINCIPAL_RESULT, p);
                 if (!utWithCallbacks) {
                     WSS4JTokenConverter.convertToken(msg, p);
@@ -444,6 +445,23 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
+    /**
+     * Checks if a given WSS4J Principal can be represented as a user principal
+     * inside SecurityContext. Example, UsernameToken or PublicKey principals can
+     * be used to facilitate checking the user roles, etc.
+     */
+    protected boolean isSecurityContextPrincipal(Principal p, List<WSSecurityEngineResult> wsResult) {
+        boolean derivedKeyPrincipal = p instanceof WSDerivedKeyTokenPrincipal;
+        if (derivedKeyPrincipal) {
+            // If it is a derived key principal then let it be a SecurityContext
+            // principal only if no other principals are available.
+            // The derived key principal will still be visible to
+            // custom interceptors as part of the WSHandlerConstants.RECV_RESULTS value
+            return wsResult.size() > 1 ? false : true;
+        } else {
+            return true;
+        }
+    }
     
     protected SecurityContext createSecurityContext(final Principal p) {
         return new SecurityContext() {

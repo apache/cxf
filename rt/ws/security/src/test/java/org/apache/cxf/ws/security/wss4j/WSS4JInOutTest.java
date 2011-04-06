@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,8 +58,10 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+
 import org.junit.Test;
 
 
@@ -398,6 +402,18 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             (java.util.List<Object>) handlerResults.get(0).getResults();
         assertNotNull(protectionResults);
         assertSame(protectionResults.size(), 2);
+        
+        WSSecurityEngineResult wsResult1 = (WSSecurityEngineResult)protectionResults.get(0);
+        WSSecurityEngineResult wsResult2 = (WSSecurityEngineResult)protectionResults.get(1);
+
+        final Principal p1 = (Principal)wsResult1.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        final Principal p2 = (Principal)wsResult2.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(p1 instanceof WSUsernameTokenPrincipal || p2 instanceof WSUsernameTokenPrincipal);
+        
+        Principal utPrincipal = p1 instanceof WSUsernameTokenPrincipal ? p1 : p2;
+        
+        Principal secContextPrincipal = (Principal)inmsg.get(WSS4JInInterceptor.PRINCIPAL_RESULT);
+        assertSame(secContextPrincipal, utPrincipal);
     }
     
     @Test
