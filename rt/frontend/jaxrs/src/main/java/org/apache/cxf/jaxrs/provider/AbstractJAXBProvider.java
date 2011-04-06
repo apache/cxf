@@ -51,7 +51,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
@@ -493,28 +492,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     protected static Object checkAdapter(Object obj, Class<?> cls, Annotation[] anns, boolean marshal) {
-        return useAdapter(obj, getAdapter(obj.getClass(), anns), marshal); 
-    }
-    
-    @SuppressWarnings("unchecked")
-    protected static Object useAdapter(Object obj, XmlJavaTypeAdapter typeAdapter, boolean marshal) {
-        if (typeAdapter != null) {
-            if (InjectionUtils.isSupportedCollectionOrArray(typeAdapter.value().getClass())) {
-                return obj;
-            }
-            try {
-                XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
-                if (marshal) {
-                    return xmlAdapter.marshal(obj);
-                } else {
-                    return xmlAdapter.unmarshal(obj);
-                }
-            } catch (Exception ex) {
-                LOG.warning("Problem using the XmlJavaTypeAdapter");
-                ex.printStackTrace();
-            }
-        }
-        return obj;
+        return org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(obj, getAdapter(obj.getClass(), anns), 
+                                                               marshal); 
     }
     
     protected static XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {
@@ -648,7 +627,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                     adapterChecked = true;
                     List<Object> newList = new ArrayList<Object>(theList.size());
                     for (Object o : theList) {
-                        newList.add(useAdapter(((JAXBElement)o).getValue(), adapter, false));
+                        newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(
+                                        ((JAXBElement)o).getValue(), adapter, false));
                     }
                     theList = newList;
                 }
@@ -656,14 +636,15 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             if (origType.isArray()) {
                 T[] values = (T[])Array.newInstance(type, theList.size());
                 for (int i = 0; i < theList.size(); i++) {
-                    values[i] = (T)useAdapter(theList.get(i), adapter, false);
+                    values[i] = (T)org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(
+                                       theList.get(i), adapter, false);
                 }
                 return values;
             } else {
                 if (!adapterChecked && adapter != null) {
                     List<Object> newList = new ArrayList<Object>(theList.size());
                     for (Object o : theList) {
-                        newList.add(useAdapter(o, adapter, false));
+                        newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(o, adapter, false));
                     }
                     theList = newList;
                 }

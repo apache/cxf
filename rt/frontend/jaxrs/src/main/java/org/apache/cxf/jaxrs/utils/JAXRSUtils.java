@@ -202,6 +202,7 @@ public final class JAXRSUtils {
             Object o = createHttpParameterValue(p, 
                                                 m.getParameterTypes()[0],
                                                 m.getGenericParameterTypes()[0],
+                                                m.getParameterAnnotations()[0],
                                                 message,
                                                 values,
                                                 ori);
@@ -213,6 +214,7 @@ public final class JAXRSUtils {
             Object o = createHttpParameterValue(p, 
                                                 f.getType(),
                                                 f.getGenericType(),
+                                                f.getAnnotations(),
                                                 message,
                                                 values,
                                                 ori);
@@ -603,6 +605,7 @@ public final class JAXRSUtils {
             return createHttpParameterValue(parameter,
                                             parameterClass,
                                             parameterType,
+                                            parameterAnns,
                                             message,
                                             values,
                                             ori);
@@ -612,6 +615,7 @@ public final class JAXRSUtils {
     public static Object createHttpParameterValue(Parameter parameter, 
                                             Class<?> parameterClass, 
                                             Type genericParam,
+                                            Annotation[] paramAnns,
                                             Message message,
                                             MultivaluedMap<String, String> values,
                                             OperationResourceInfo ori) {
@@ -625,33 +629,33 @@ public final class JAXRSUtils {
         Object result = null;
         
         if (parameter.getType() == ParameterType.PATH) {
-            result = readFromUriParam(message, parameter.getName(), parameterClass, genericParam, 
-                                      values, defaultValue, !isEncoded);
+            result = readFromUriParam(message, parameter.getName(), parameterClass, genericParam,
+                                      paramAnns, values, defaultValue, !isEncoded);
         } 
         
         if (parameter.getType() == ParameterType.QUERY) {
-            result = readQueryString(parameter.getName(), parameterClass, genericParam, message, 
-                                   defaultValue, !isEncoded);
+            result = readQueryString(parameter.getName(), parameterClass, genericParam, 
+                                     paramAnns, message, defaultValue, !isEncoded);
         }
         
         if (parameter.getType() == ParameterType.MATRIX) {
-            result = processMatrixParam(message, parameter.getName(), parameterClass, genericParam, 
-                                      defaultValue, !isEncoded);
+            result = processMatrixParam(message, parameter.getName(), parameterClass, genericParam,
+                                        paramAnns, defaultValue, !isEncoded);
         }
         
         if (parameter.getType() == ParameterType.FORM) {
             result = processFormParam(message, parameter.getName(), parameterClass, genericParam, 
-                                      defaultValue, !isEncoded);
+                                      paramAnns, defaultValue, !isEncoded);
         }
         
         if (parameter.getType() == ParameterType.COOKIE) {
             result = processCookieParam(message, parameter.getName(), parameterClass, genericParam,
-                                        defaultValue);
+                                        paramAnns, defaultValue);
         } 
         
         if (parameter.getType() == ParameterType.HEADER) {
-            result = processHeaderParam(message, parameter.getName(), parameterClass, genericParam, 
-                                        defaultValue);
+            result = processHeaderParam(message, parameter.getName(), parameterClass, genericParam,
+                                        paramAnns, defaultValue);
         } 
 
         return result;
@@ -659,6 +663,7 @@ public final class JAXRSUtils {
     
     private static Object processMatrixParam(Message m, String key, 
                                              Class<?> pClass, Type genericType,
+                                             Annotation[] paramAnns,
                                              String defaultValue,
                                              boolean decode) {
         List<PathSegment> segments = JAXRSUtils.getPathSegments(
@@ -675,12 +680,13 @@ public final class JAXRSUtils {
             }
             
             if ("".equals(key)) {
-                return InjectionUtils.handleBean(pClass, params, ParameterType.MATRIX, m, false);
+                return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.MATRIX, m, false);
             } else {
                 List<String> values = params.get(key);
                 return InjectionUtils.createParameterObject(values, 
                                                             pClass, 
                                                             genericType,
+                                                            paramAnns, 
                                                             defaultValue,
                                                             false,
                                                             ParameterType.MATRIX,
@@ -693,6 +699,7 @@ public final class JAXRSUtils {
     
     private static Object processFormParam(Message m, String key, 
                                            Class<?> pClass, Type genericType,
+                                           Annotation[] paramAnns,
                                            String defaultValue,
                                            boolean decode) {
         
@@ -728,13 +735,14 @@ public final class JAXRSUtils {
         }
         
         if ("".equals(key)) {
-            return InjectionUtils.handleBean(pClass, params, ParameterType.FORM, m, false);
+            return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.FORM, m, false);
         } else {
             List<String> results = params.get(key);
     
             return InjectionUtils.createParameterObject(results, 
                                                         pClass, 
                                                         genericType,
+                                                        paramAnns,
                                                         defaultValue,
                                                         false,
                                                         ParameterType.FORM,
@@ -752,8 +760,9 @@ public final class JAXRSUtils {
     
     private static Object processHeaderParam(Message m, 
                                              String header, 
-                                             Class<?> pClass, 
+                                             Class<?> pClass,
                                              Type genericType, 
+                                             Annotation[] paramAnns,
                                              String defaultValue) {
         
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(header);
@@ -763,6 +772,7 @@ public final class JAXRSUtils {
         return InjectionUtils.createParameterObject(values, 
                                                     pClass, 
                                                     genericType,
+                                                    paramAnns,
                                                     defaultValue,
                                                     false,
                                                     ParameterType.HEADER,
@@ -772,7 +782,8 @@ public final class JAXRSUtils {
     }
 
     private static Object processCookieParam(Message m, String cookieName, 
-                              Class<?> pClass, Type genericType, String defaultValue) {
+                              Class<?> pClass, Type genericType, 
+                              Annotation[] paramAnns, String defaultValue) {
         Cookie c = new HttpHeadersImpl(m).getCookies().get(cookieName);
         
         if (c == null && defaultValue != null) {
@@ -786,7 +797,8 @@ public final class JAXRSUtils {
             return c;
         }
         
-        return InjectionUtils.handleParameter(c.getValue(), false, pClass, ParameterType.COOKIE, m);
+        return InjectionUtils.handleParameter(c.getValue(), false, pClass, paramAnns, 
+                                              ParameterType.COOKIE, m);
     }
     
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
@@ -879,22 +891,24 @@ public final class JAXRSUtils {
         
         return clazz.cast(value);
     }
-
+    //CHECKSTYLE:OFF
     private static Object readFromUriParam(Message m,
                                            String parameterName,
                                            Class<?> paramType,
                                            Type genericType,
+                                           Annotation[] paramAnns,
                                            MultivaluedMap<String, String> values,
                                            String defaultValue,
                                            boolean decoded) {
-        
+    //CHECKSTYLE:ON    
         if ("".equals(parameterName)) {
-            return InjectionUtils.handleBean(paramType, values, ParameterType.PATH, m, decoded);
+            return InjectionUtils.handleBean(paramType, paramAnns, values, ParameterType.PATH, m, decoded);
         } else {
             List<String> results = values.get(parameterName);
             return InjectionUtils.createParameterObject(results, 
                                                     paramType, 
                                                     genericType,
+                                                    paramAnns,
                                                     defaultValue,
                                                     decoded,
                                                     ParameterType.PATH,
@@ -908,6 +922,7 @@ public final class JAXRSUtils {
     private static Object readQueryString(String queryName,
                                           Class<?> paramType,
                                           Type genericType,
+                                          Annotation[] paramAnns,
                                           Message m, 
                                           String defaultValue,
                                           boolean decode) {
@@ -915,11 +930,12 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> queryMap = new UriInfoImpl(m, null).getQueryParameters(decode);
         
         if ("".equals(queryName)) {
-            return InjectionUtils.handleBean(paramType, queryMap, ParameterType.QUERY, m, false);
+            return InjectionUtils.handleBean(paramType, paramAnns, queryMap, ParameterType.QUERY, m, false);
         } else {
             return InjectionUtils.createParameterObject(queryMap.get(queryName), 
                                                         paramType, 
                                                         genericType,
+                                                        paramAnns,
                                                         defaultValue,
                                                         false,
                                                         ParameterType.QUERY, m);

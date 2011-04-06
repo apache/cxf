@@ -55,6 +55,8 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
@@ -171,6 +173,13 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void testQueryBean(@QueryParam("") CustomerBean cb) {
         
     }
+    
+    public void testXmlAdapter(@QueryParam("a") 
+                               @XmlJavaTypeAdapter(CustomerBeanAdapter.class) 
+                               CustomerBean cb) {
+        
+    }
+    
     public void testPathBean(@PathParam("") CustomerBean cb) {
         
     }
@@ -410,5 +419,22 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     
     public void testContextResolvers(@Context ContextResolver<JAXBContext> resolver) {
         // complete
+    }
+    
+    public static class CustomerBeanAdapter extends XmlAdapter<String, CustomerBean> {
+
+        @Override
+        public CustomerBean unmarshal(String value) throws Exception {
+            CustomerBean bean = new CustomerBean();
+            bean.setA(value);
+            return bean;
+        }
+
+        @Override
+        public String marshal(CustomerBean v) throws Exception {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
     }
 };
