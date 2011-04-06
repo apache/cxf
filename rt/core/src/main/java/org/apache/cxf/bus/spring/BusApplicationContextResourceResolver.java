@@ -53,6 +53,14 @@ public class BusApplicationContextResourceResolver
                 //ignore and return null
             }
         } 
+        r = context.getResource("/" + name);
+        if (r != null && r.exists()) {
+            try {
+                return r.getInputStream();
+            } catch (IOException e) {
+                //ignore and return null
+            }
+        } 
         return null;
     }
 
@@ -71,6 +79,7 @@ public class BusApplicationContextResourceResolver
             } else if (URL.class.isAssignableFrom(resourceType)) {
                 Resource r = context.getResource(resourceName);
                 if (r != null && r.exists()) {
+                    r.getInputStream().close(); //checks to see if the URL really can resolve
                     return resourceType.cast(r.getURL());
                 }
             }

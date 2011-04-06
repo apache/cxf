@@ -23,6 +23,7 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
+import org.apache.cxf.resource.ResourceManager;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -56,6 +57,9 @@ public class SpringBus extends ExtensionManagerBus
             ac = ac.getParent();
         }
         setExtension(new ConfigurerImpl(applicationContext), Configurer.class);
+        
+        ResourceManager m = getExtension(ResourceManager.class);
+        m.addResourceResolver(new BusApplicationContextResourceResolver(applicationContext));
     }
 
     public void onApplicationEvent(ApplicationEvent event) {

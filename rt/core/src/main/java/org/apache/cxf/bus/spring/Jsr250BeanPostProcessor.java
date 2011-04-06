@@ -71,18 +71,22 @@ public class Jsr250BeanPostProcessor
                 resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
             } else {
                 ResourceManager m = null;
+                Bus b = null;
                 try {
                     m = (ResourceManager)context.getBean(ResourceManager.class.getName());
                 } catch (NoSuchBeanDefinitionException t) {
                     //ignore - no resource manager
                 }
                 if (resourceManager == null && m == null) {
-                    Bus b = (Bus)context.getBean("cxf");
+                    b = (Bus)context.getBean("cxf");
                     m = b.getExtension(ResourceManager.class);
                 }
                 if (resourceManager == null && m != null) {
                     resourceManager = m;
-                    resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
+                    if (!(b instanceof SpringBus)) {
+                        resourceManager
+                            .addResourceResolver(new BusApplicationContextResourceResolver(context));
+                    }
                 }
             }
             isProcessing = temp;
@@ -108,7 +112,9 @@ public class Jsr250BeanPostProcessor
         if (!isProcessing) {
             return bean;
         }
-        
+        if (bean instanceof Bus) {
+            getResourceManager(bean);
+        }
         /*
         if (bean.getClass().getName().contains("Corb")) {
             Thread.dumpStack();
