@@ -246,7 +246,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             if (!expectOnewayFault) {
                 fail("Oneway operation unexpectedly failed.");
             }
-            assertTrue("Get the wrong fault message.", ex.getMessage().startsWith(FAULT_MESSAGE));
+            assertEquals(FAULT_MESSAGE, ex.getMessage());
         }
         
         String expectedMsg = getExpectedInterceptorFaultMessage(location.getPhase());
