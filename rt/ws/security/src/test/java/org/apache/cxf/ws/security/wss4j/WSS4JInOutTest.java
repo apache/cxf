@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,9 +59,11 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.WSSecurityUtil;
+
 import org.junit.Test;
 
 
@@ -105,7 +109,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security/ds:Signature");
 
         List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+            getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
          
@@ -133,7 +137,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security/ds:Signature");
 
         List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+            getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
          
@@ -163,7 +167,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         xpaths.add("//s:Body/xenc:EncryptedData");
 
         List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+            getResults(makeInvocation(outProperties, xpaths, inProperties));
 
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
@@ -223,8 +227,8 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
 
-        List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+        SoapMessage inmsg = makeInvocation(outProperties, xpaths, inProperties);
+        List<WSHandlerResult> handlerResults = getResults(inmsg);
 
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
@@ -236,6 +240,15 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             (java.util.List<WSSecurityEngineResult>) handlerResults.get(0).getResults();
         assertNotNull(protectionResults);
         assertSame(protectionResults.size(), 2);
+        
+        final Principal p1 = (Principal)protectionResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        final Principal p2 = (Principal)protectionResults.get(1).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(p1 instanceof WSUsernameTokenPrincipal || p2 instanceof WSUsernameTokenPrincipal);
+        
+        Principal utPrincipal = p1 instanceof WSUsernameTokenPrincipal ? p1 : p2;
+        
+        Principal secContextPrincipal = (Principal)inmsg.get(WSS4JInInterceptor.PRINCIPAL_RESULT);
+        assertSame(secContextPrincipal, utPrincipal);
     }
     
     @Test
@@ -438,7 +451,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security/ds:Signature");
 
         List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+            getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.SIGN);
          
@@ -476,7 +489,13 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         return ret;
     }
     
-    private List<WSHandlerResult> makeInvocation(
+    private List<WSHandlerResult> getResults(SoapMessage inmsg) {
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
+        return handlerResults;
+    }
+    
+    private SoapMessage makeInvocation(
         Map<String, String> outProperties,
         List<String> xpaths,
         Map<String, String> inProperties
@@ -535,9 +554,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         inHandler.handleMessage(inmsg);
 
-        final List<WSHandlerResult> handlerResults = 
-            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
-        return handlerResults;
+        return inmsg;
     }
     
     // FOR DEBUGGING ONLY
