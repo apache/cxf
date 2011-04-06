@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:beans="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="http://cxf.apache.org/blueprint/policy" 
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"  >
+  
+  <xsd:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0" schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
+  <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
+
+  <xsd:annotation>
+    <xsd:documentation>
+      This schema defines features and beans to configure the CXF Policy Framework.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="policies">
+    <xsd:annotation>
+      <xsd:documentation>
+        The policies feature enables and configures the CXF Policy Framework.
+        It can have any number of Policy or PolicyReference child elements.
+        When this feature applies to a client or service endpoint, these policies
+        are merged with other policies attached to policy scope that contain
+        the policy subject to obtain the effective policy for the subject.
+        When this feature is applied to the bus, its policies are relevant to all
+        client and server endpoints created on that bus.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="alternativeSelector" type="xsd:anyType" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+                The alternative selector to use when choosing one of multiple policy alternatives.
+                The child element of this element must be a bean whose bean class implements 
+                org.apache.cxf.ws.policy.selector.AlternativeSelector, or a reference to such a bean.
+            </xsd:documentation>          
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="ignoreUnknownAssertions" type="xsd:boolean" default="false"/>
+      <xsd:attribute name="namespace" type="xsd:string"/>
+      <xsd:attribute name="id" type="xsd:string"/>
+      <xsd:attribute name="enabled" type="xsd:boolean"/>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="engine">
+    <xsd:complexType>
+      <xsd:all>        
+        <xsd:element name="alternativeSelector" type="xsd:anyType" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>
+                The alternative selector to use when choosing one of multiple policy alternatives.
+                The child element of this element must be a bean whose bean class implements 
+                org.apache.cxf.ws.policy.selector.AlternativeSelector, or a reference to such a bean.
+            </xsd:documentation>          
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:all>
+      <!-- xsd:attributeGroup ref="cxf-beans:beanAttributes"/-->       
+      <xsd:attribute name="enabled" type="xsd:boolean" default="false">         
+        <xsd:annotation>
+          <xsd:documentation>
+              The state of the policy engine.
+              If enabled, the policy interceptors will be added to the interceptor
+              chains of all messages and faults, and in turn may add feature specific
+              interceptors depending on the capabilities and requirements of the
+              underlying message exchange.
+              By default, the engine is turned off.
+          </xsd:documentation>          
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="ignoreUnknownAssertions" type="xsd:boolean" default="false">
+        <xsd:annotation>
+          <xsd:documentation>
+              Indicates how to handle assertions for which no AssertionBuilders are registered.
+              By default, the policy engine throws an Exception upon encoutering an
+              unknown assertion type. If this attribute is set to true, it will only
+              log a warning.              
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="bus" type="xsd:string">        
+        <xsd:annotation>
+          <xsd:documentation>
+              The name of the bus to apply these settings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+ 
+  <xsd:element name="externalAttachment">
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="beans:Tcomponent">
+          <!-- xsd:attributeGroup ref="cxf-beans:beanAttributes"/-->        
+          <xsd:attribute name="location" type="xsd:string" default="http://www.w3.org/2006/07/ws-policy">
+            <xsd:annotation>
+              <xsd:documentation>
+                  Location of the external attachment document. 
+                  It must be specified in form of a Spring Resource type property, e.g.
+                  classpath:etc/policies.xml or file:/x1/resources/polcies.xml.          
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  
+</xsd:schema>
