@@ -440,9 +440,9 @@ public final class ProviderFactory {
         for (List<?> list : providerLists) {
             for (Object p : list) {
                 ProviderInfo pi = (ProviderInfo)p;
-                //if (ProviderFactory.SHARED_FACTORY == this && isJaxbBasedProvider(pi.getProvider())) {
-                //    continue;
-                //}
+                if (ProviderFactory.SHARED_FACTORY == this && isJaxbBasedProvider(pi.getProvider())) {
+                    continue;
+                }
                 InjectionUtils.injectContextProxies(pi, pi.getProvider());
             }
         }
