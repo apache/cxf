@@ -854,6 +854,22 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testXmlAdapterBean() throws Exception {
+        Class[] argType = {Customer.CustomerBean.class};
+        Method m = Customer.class.getMethod("testXmlAdapter", argType);
+        Message messageImpl = createMessage();
+        messageImpl.put(Message.QUERY_STRING, "a=aValue");
+
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+                                                           null, messageImpl);
+        assertEquals(1, params.size());
+        
+        Customer.CustomerBean bean = (Customer.CustomerBean)params.get(0);
+        assertEquals("aValue", bean.getA());
+    }
+    
+    
+    @Test
     public void testPathParametersBean() throws Exception {
         Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testPathBean", argType);

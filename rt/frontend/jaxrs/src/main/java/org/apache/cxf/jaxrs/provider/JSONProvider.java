@@ -56,6 +56,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.provider.AbstractJAXBProvider.CollectionWrapper;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXBUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.SimpleConverter;
@@ -351,11 +352,11 @@ public class JSONProvider extends AbstractJAXBProvider  {
         os.write(startTag.getBytes());
         if (firstObj != null) {
             XmlJavaTypeAdapter adapter = getAdapter(firstObj.getClass(), anns);
-            marshalCollectionMember(useAdapter(firstObj, adapter, true),
+            marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true),
                                     actualClass, genericType, encoding, os);
             while (it.hasNext()) {
                 os.write(",".getBytes());
-                marshalCollectionMember(useAdapter(it.next(), adapter, true), 
+                marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true), 
                                         actualClass, genericType, encoding, os);
             }
         }

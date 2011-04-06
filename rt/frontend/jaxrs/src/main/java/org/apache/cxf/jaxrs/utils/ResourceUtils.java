@@ -535,7 +535,7 @@ public final class ResourceUtils {
             } else {
                 Parameter p = ResourceUtils.getParameter(i, anns[i]);
                 values[i] = JAXRSUtils.createHttpParameterValue(
-                                p, params[i], genericTypes[i], m, templateValues, null);
+                                p, params[i], genericTypes[i], anns[i], m, templateValues, null);
             }
         }
         return values;

@@ -52,6 +52,7 @@ public class PrimitiveTextProvider
                     IOUtils.readStringFromStream(is), 
                     false,
                     type,
+                    anns,
                     ParameterType.REQUEST_BODY, null);
         
     }
