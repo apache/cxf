@@ -379,6 +379,23 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/fileform")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookFilesForm(MultipartBody body) 
+        throws Exception {
+        String owner = body.getAttachmentObject("owner", String.class);
+        Book book = body.getAttachmentObject("file", Book.class);
+        if (!"CXF in Action - 1".equals(book.getName())
+            || !"Larry".equals(owner)) {
+            throw new WebApplicationException();
+        }
+        book.setId(124);
+        book.setName("CXF in Action - 2");
+        return Response.ok(book).build();
+    }
+    
+    @POST
     @Path("/books/jaxbform")
     @Produces("text/xml")
     @Consumes("multipart/form-data")

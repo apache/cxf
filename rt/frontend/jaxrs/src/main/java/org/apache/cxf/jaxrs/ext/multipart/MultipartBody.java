@@ -85,6 +85,10 @@ public class MultipartBody {
             if (contentId.equalsIgnoreCase(a.getContentId())) {
                 return a;
             }
+            ContentDisposition cd = a.getContentDisposition();
+            if (cd != null && contentId.equals(cd.getParameter("name"))) {
+                return a;
+            }
         }
         return null;
     }
