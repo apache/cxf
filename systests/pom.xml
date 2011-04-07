@@ -35,6 +35,7 @@
         <module>container-integration</module> 
         <module>uncategorized</module> 
         <module>transports</module>
+        <module>transport-jms</module>
         <module>jaxws</module>
         <module>databinding</module>
         <module>jaxrs</module>
