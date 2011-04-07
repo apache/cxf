@@ -27,14 +27,14 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 
 public class Server {
 
-   static {
-      // set the configuration file
-      SpringBusFactory factory = new SpringBusFactory();
-      Bus bus = factory.createBus("ServerConfig.xml");
-      BusFactory.setDefaultBus(bus);
-   }
+    static {
+        // set the configuration file
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("ServerConfig.xml");
+        BusFactory.setDefaultBus(bus);
+    }
    
-   protected Server() throws Exception {
+    protected Server() throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(CustomerService.class);
         sf.setResourceProvider(CustomerService.class, 

@@ -40,9 +40,9 @@ public final class Client {
         File truststore = new File(args[1]);
 
         Protocol authhttps = new Protocol("https",
-            new AuthSSLProtocolSocketFactory(wibble.toURL(), "password",
-            truststore.toURL(), "password"),
-            9000);
+                new AuthSSLProtocolSocketFactory(wibble.toURL(), "password",
+                truststore.toURL(), "password"),
+                9000);
         Protocol.registerProtocol("https", authhttps);
 
         // Sent HTTP GET request to query customer info
