@@ -76,17 +76,20 @@ public class ${service.Name} extends ${serviceSuperclass} {
     public final static QName $port.Name = new QName("$service.Namespace", "$port.PortName");
 #end
     static {
-#if ($wsdlLocation != "")
+#if ($wsdlLocation == "")
+        WSDL_LOCATION = null;
+#elseif ($wsdlLocation == "null")       
+        WSDL_LOCATION = null;
+#else
         URL url = null;
         try {
             url = new URL("$wsdlLocation");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from $wsdlLocation");
-            // e.printStackTrace();
+            java.util.logging.Logger.getLogger(${service.Name}.class.getName())
+                .log(java.util.logging.Level.INFO, 
+                     "Can not initialize the default wsdl from {0}", "$wsdlLocation");
         }
         WSDL_LOCATION = url;
-#else
-        WSDL_LOCATION = null;
 #end
     }
 
