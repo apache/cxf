@@ -127,7 +127,7 @@ public class ProxyFactory {
             Pattern pattern = PatternBuilder.build(policy.getNonProxyHosts());
             if (pattern.matcher(hostname).matches()) {
                 // Excluded hostname -> no proxy
-                return null;
+                return Proxy.NO_PROXY;
             }
         }
         // Either nonProxyHosts is not set or the pattern did not match

@@ -252,7 +252,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         
         if (send) {
             //proxy = control.createMock(Proxy.class);
-            proxy =  null;
+            proxy = null;
             connection =
                 control.createMock(HttpURLConnection.class);
             connectionFactory.createConnection((TLSClientParameters)EasyMock.isNull(),
