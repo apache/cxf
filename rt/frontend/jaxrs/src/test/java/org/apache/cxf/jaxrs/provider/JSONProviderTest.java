@@ -509,6 +509,29 @@ public class JSONProviderTest extends Assert {
         assertEquals(1, list.size());
         SuperBook book = (SuperBook)list.get(0);
         assertEquals(124L, book.getSuperId());
+        assertEquals(123L, book.getId());
+        assertEquals("CXF Rocks", book.getName());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-89 gets resolved")
+    public void testReadListOfDerivedTypesWithNullField() throws Exception {
+        JSONProvider p = new JSONProvider();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
+        p.setNamespaceMap(namespaceMap);
+        String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
+            + "\"name\":null,\"superId\":124}}}";
+        byte[] bytes = data.getBytes();
+        Object books2Object = p.readFrom((Class)Books2.class, null, null, 
+                                          null, null, new ByteArrayInputStream(bytes));
+        Books2 books = (Books2)books2Object;
+        List<? extends Book> list = books.getBooks();
+        assertEquals(1, list.size());
+        SuperBook book = (SuperBook)list.get(0);
+        assertEquals(124L, book.getSuperId());
+        assertEquals(0, book.getName().length());
     }
     
     @Test

@@ -40,4 +40,5 @@ public class SuperBook extends Book {
     public long getSuperId() {
         return superId;
     }
+
 }
