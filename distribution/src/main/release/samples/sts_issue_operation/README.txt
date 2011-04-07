@@ -3,7 +3,7 @@ STS Issue Operation
 
 This demo illustrates a sample implementation of WS-Trust Issue operation
 for the STS provider framework in CXF. This sample implementation 
-supports UsernameToken and X509Token as request credentials in the RST
+supports X509Token as request credentials in the RST
 and on successful authentication responds back with a signed SAMLToken.
 
 The requestor can request for a SAML 1.1 or a SAML 2.0 token to be issued

@@ -30,6 +30,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -329,12 +330,16 @@ public class SAMLTokenIssueOperation implements IssueOperation {
         try {
             DigestMethod method = signFactory.newDigestMethod(
                     DigestMethod.SHA1, null);
-            Transform transform = signFactory.newTransform(
+            Transform transform1 = signFactory.newTransform(
                     Transform.ENVELOPED,
                     (TransformParameterSpec) null);
-            Reference ref = signFactory.newReference('#' + refId, method,
-                    Collections.singletonList(transform), null, null);
+            Transform transform2 = signFactory.newTransform(
+                    CanonicalizationMethod.EXCLUSIVE,
+                    (TransformParameterSpec) null);
 
+            Reference ref = signFactory.newReference('#' + refId, method,
+                    Arrays.asList(transform1, transform2), null, null);
+  
             CanonicalizationMethod canonMethod = signFactory
                     .newCanonicalizationMethod(
                             CanonicalizationMethod.EXCLUSIVE,
