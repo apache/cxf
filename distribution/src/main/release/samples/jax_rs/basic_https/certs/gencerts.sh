@@ -20,10 +20,13 @@
 #
 #
 # This file uses openssl and keytool to generate 2 chains of 3 certificates 
-# CN=Wibble             CN=Cherry
+# CN=Wibble (client)            CN=Cherry (service)
 #             CN=TheRA
 #             CN=TheCA
 # and generates a CRL to revoke the "CN=TheRA" certificate.
+#
+# These keys are not for production use (they're not signed by a reputable
+# 3rd-party CA), for testing/code samples only.
 #
 # This file also serves as a specification on what needs to be done to
 # get the underlying CXF to work correctly.
@@ -80,23 +83,23 @@ EOF
 # The current version of CXF using PCKS12 will not work for a number of 
 # internal CXF reasons.
 
-    rm -f wibble.jks
+    rm -f clientKeystore.jks
 
     keytool -genkey \
     -dname "CN=Wibble, OU=NOT FOR PRODUCTION, O=Apache, ST=NY, C=US" \
-    -keystore wibble.jks -storetype jks -storepass password -keypass password
+    -keystore clientKeystore.jks -storetype jks -storepass password -keypass password
 
-    keytool -certreq -keystore wibble.jks -storetype jks -storepass password \
+    keytool -certreq -keystore clientKeystore.jks -storetype jks -storepass password \
     -keypass password -file csrwibble.pem
 
 
-    rm -f cherry.jks
+    rm -f serverKeystore.jks
 
     keytool -genkey \
     -dname "CN=Cherry, OU=NOT FOR PRODUCTION, O=Apache, ST=NY, C=US" \
-    -keystore cherry.jks -storetype jks -storepass password -keypass password
+    -keystore serverKeystore.jks -storetype jks -storepass password -keypass password
 
-    keytool -certreq -keystore cherry.jks -storetype jks -storepass password \
+    keytool -certreq -keystore serverKeystore.jks -storetype jks -storepass password \
     -keypass password -file csrcherry.pem
 
 
@@ -126,10 +129,10 @@ EOF
 # Replace the certificate in the Wibble keystore with their respective
 # full chains.
 
-    keytool -import -file wibble.chain -keystore wibble.jks -storetype jks \
+    keytool -import -file wibble.chain -keystore clientKeystore.jks -storetype jks \
     -storepass password -keypass password -noprompt
 
-    keytool -import -file cherry.chain -keystore cherry.jks -storetype jks \
+    keytool -import -file cherry.chain -keystore serverKeystore.jks -storetype jks \
     -storepass password -keypass password -noprompt
 
 # Revoke the CN=TheRA certificate (happens in the Openssl DB)
@@ -144,18 +147,18 @@ EOF
 
 # Create the Truststore file containing the CA cert.
 
-    rm -f truststore.jks
+    rm -f commonTruststore.jks
     
-    keytool -import -file cacert.pem -alias TheCA -keystore truststore.jks \
+    keytool -import -file cacert.pem -alias TheCA -keystore commonTruststore.jks \
     -storepass password -noprompt
 
 # Uncomment to see what's in the Keystores and CRL
 
-    keytool -v -list -keystore wibble.jks -storepass password
+    keytool -v -list -keystore clientKeystore.jks -storepass password
     
-    keytool -v -list -keystore cherry.jks -storepass password
+    keytool -v -list -keystore serverKeystore.jks -storepass password
     
-    keytool -v -list -keystore truststore.jks -storepass password
+    keytool -v -list -keystore commonTruststore.jks -storepass password
     
     openssl crl -in ca.crl -text -noout
 

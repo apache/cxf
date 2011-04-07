@@ -86,10 +86,6 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>demo.jaxrs.client.Client</mainClass>
-                                    <arguments>
-                                        <argument>${basedir}/certs/wibble.jks</argument>
-                                        <argument>${basedir}/certs/truststore.jks</argument>
-                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>

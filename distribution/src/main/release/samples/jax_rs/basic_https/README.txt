@@ -52,7 +52,7 @@ Using either UNIX or Windows:
   mvn -Pclient  (from a second command line window)
     
 
-To remove the target dir, run mvn clean".
+To remove the target dir, run "mvn clean".
 
 
 
@@ -60,9 +60,9 @@ To remove the target dir, run mvn clean".
 Certificates
 ------------
 
-If the certificates are expired for some reason, a shell script in 
-bin/gencerts.sh will generate the set of certificates needed for
-this sample. Just do the following:
+If the certificates are expired or unusable for some reason, a shell 
+script in the certs folder will generate a new set of certificates 
+needed for this sample. Just do the following:
 
-        cd certs
-        sh ../bin/gencerts.sh
+  cd certs
+  sh gencerts.sh

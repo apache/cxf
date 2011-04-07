@@ -32,27 +32,29 @@ import org.apache.commons.httpclient.protocol.Protocol;
 
 public final class Client {
 
+    private static final String CLIENT_CONFIG_FILE = "ClientConfig.xml";
+
     private Client() {
     }
 
     public static void main(String args[]) throws Exception {
-        File wibble = new File(args[0]);
-        File truststore = new File(args[1]);
+       
+        File clientKeystore = new File("certs/clientKeystore.jks");
+        File truststore = new File("certs/commonTruststore.jks");
 
+        // Send HTTP GET request to query customer info - using portable HttpClient method
         Protocol authhttps = new Protocol("https",
-                new AuthSSLProtocolSocketFactory(wibble.toURL(), "password",
-                truststore.toURL(), "password"),
+                new AuthSSLProtocolSocketFactory(clientKeystore.toURI().toURL(), "password",
+                truststore.toURI().toURL(), "password"),
                 9000);
         Protocol.registerProtocol("https", authhttps);
 
-        // Sent HTTP GET request to query customer info
         System.out.println("Sent HTTPS GET request to query customer info");
         HttpClient httpclient = new HttpClient();
         GetMethod httpget = new GetMethod("https://localhost:9000/customerservice/customers/123");
         httpget.addRequestHeader("Accept" , "text/xml");
         
-        // If Basic Authentication required (not needed in this sample) could 
-        // do so via the following:
+        // If Basic Authentication required (not needed in this sample) could use: 
         /*
         String authorizationHeader = "Basic " 
            + org.apache.cxf.common.util.Base64Utility.encode("username:password".getBytes());
@@ -65,10 +67,9 @@ public final class Client {
             httpget.releaseConnection();
         }
 
-        // Sent HTTP PUT request to update customer info
+        // Send HTTP PUT request to update customer info
         System.out.println("\n");
         System.out.println("Sent HTTPS PUT request to update customer info");
-        Client client = new Client();
         String inputFile = Client.class.getClassLoader().getResource("update_customer.xml").getFile();
         File input = new File(inputFile);
         PutMethod put = new PutMethod("https://localhost:9000/customerservice/customers");
@@ -84,7 +85,7 @@ public final class Client {
             put.releaseConnection();
         }
 
-        // Sent HTTP POST request to add customer
+        // Send HTTP POST request to add customer
         System.out.println("\n");
         System.out.println("Sent HTTPS POST request to add customer");
         inputFile = Client.class.getClassLoader().getResource("add_customer.xml").getFile();
