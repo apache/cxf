@@ -39,6 +39,11 @@ import org.opensaml.xml.signature.KeyInfo;
 public class Saml1TokenProvider implements TokenProvider {
 
     private static final Logger LOG = LogUtils.getL7dLogger(Saml1TokenProvider.class);
+    private static final String RESPONSE_TOKENTYPE_SAML1 = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1";
+    
+    public String getResponseTokentype() {
+        return RESPONSE_TOKENTYPE_SAML1;
+    }
 
     public String getTokenType() {
         return SAMLConstants.SAML1_NS;

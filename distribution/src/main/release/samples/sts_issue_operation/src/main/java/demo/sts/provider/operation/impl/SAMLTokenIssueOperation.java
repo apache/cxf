@@ -86,7 +86,7 @@ public class SAMLTokenIssueOperation implements IssueOperation {
         = new org.apache.cxf.ws.security.sts.provider.model.ObjectFactory();
     private static final org.apache.cxf.ws.security.sts.provider.model.secext.ObjectFactory WSSE_FACTORY 
         = new org.apache.cxf.ws.security.sts.provider.model.secext.ObjectFactory();
-
+    
     private static final String SIGN_FACTORY_TYPE = "DOM";
     private static final String JKS_INSTANCE = "JKS";
     private static final String X_509 = "X.509";
@@ -114,7 +114,7 @@ public class SAMLTokenIssueOperation implements IssueOperation {
         String tokenType = SAMLConstants.SAML20_NS;
         X509Certificate certificate = null;
         String username = null;
-
+  
         // parse input arguments
         for (Object requestObject : request.getAny()) {
             // certificate
@@ -184,7 +184,7 @@ public class SAMLTokenIssueOperation implements IssueOperation {
 
         // prepare response
         RequestSecurityTokenResponseType response = wrapAssertionToResponse(
-                tokenType, elementToken, tokenId);
+                tokenProvider.getResponseTokentype(), elementToken, tokenId);
 
         RequestSecurityTokenResponseCollectionType responseCollection = WS_TRUST_FACTORY
                 .createRequestSecurityTokenResponseCollectionType();

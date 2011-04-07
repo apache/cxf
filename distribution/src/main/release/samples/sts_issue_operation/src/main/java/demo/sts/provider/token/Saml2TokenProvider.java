@@ -58,9 +58,13 @@ import org.opensaml.xml.signature.KeyInfo;
 public class Saml2TokenProvider implements TokenProvider {
 
     private static final String SAML_AUTH_CONTEXT = "ac:classes:X509";
-    
+    private static final String RESPONSE_TOKENTYPE_SAML2 = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private static final Logger LOG = LogUtils.getL7dLogger(Saml2TokenProvider.class);
 
+    public String getResponseTokentype() {
+        return RESPONSE_TOKENTYPE_SAML2;
+    }
+    
     public String getTokenType() {
         return SAMLConstants.SAML20_NS;
     }

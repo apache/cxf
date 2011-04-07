@@ -32,4 +32,6 @@ public interface TokenProvider {
     Element createToken(X509Certificate certificate);
 
     String getTokenId(Element token);
+    
+    String getResponseTokentype();
 }
