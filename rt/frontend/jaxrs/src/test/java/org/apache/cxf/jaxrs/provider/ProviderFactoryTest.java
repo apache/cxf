@@ -135,31 +135,43 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
-    public void testDefaultJaxbProviderCloned() {
+    public void testDefaultJaxbProvider() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         doTestDefaultJaxbProviderCloned(pf, "http://localhost:8080/base/");
         checkJaxbProvider(pf);
     }
     
     @Test
-    public void testDefaultJaxbProviderClonedMultipleThreads() throws Exception {
+    public void testDefaultJaxbProviderMultipleThreads() throws Exception {
+        for (int i = 0; i < 100; i++) {
+            doTestDefaultJaxbProviderClonedMultipleThreads();
+        }
+    }
+    
+    
+    public void doTestDefaultJaxbProviderClonedMultipleThreads() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(50, 50, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
-        CountDownLatch doneSignal = new CountDownLatch(5);
+        CountDownLatch doneSignal = new CountDownLatch(50);
         
-        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/1"));
-        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/2"));
-        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/3"));
-        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/4"));
-        executor.execute(new TestRunnable(pf, startSignal, doneSignal, "http://localhost:8080/base/5"));
+        addThreads(executor, pf, startSignal, doneSignal, 50);
         
         startSignal.countDown();
-        doneSignal.await(10, TimeUnit.SECONDS);
+        doneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
         assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
         checkJaxbProvider(pf);
+    }
+    
+    private void addThreads(ThreadPoolExecutor executor, ProviderFactory pf,
+                            CountDownLatch startSignal, CountDownLatch doneSignal, int count) {
+        
+        for (int i = 1; i <= count; i++) {
+            executor.execute(new TestRunnable(pf, startSignal, doneSignal, 
+                                              "http://localhost:8080/base/" + i));
+        }
     }
     
     private void doTestDefaultJaxbProviderCloned(ProviderFactory pf, String property) {
@@ -178,7 +190,6 @@ public class ProviderFactoryTest extends Assert {
         List<String> uriQuery = queries.get("uri");
         assertEquals(1, uriQuery.size());
         assertEquals(property, uriQuery.get(0));
-        
         
         MessageBodyReader customJaxbReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, message);
@@ -812,6 +823,7 @@ public class ProviderFactoryTest extends Assert {
                 ProviderFactoryTest.this.doTestDefaultJaxbProviderCloned(pf, property);
                 doneSignal.countDown();
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Assert.fail(ex.getMessage());
             } 
             

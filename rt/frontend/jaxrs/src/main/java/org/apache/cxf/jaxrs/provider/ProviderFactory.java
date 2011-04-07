@@ -66,10 +66,7 @@ public final class ProviderFactory {
     private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JSONProvider";
     
     static {
-        SHARED_FACTORY.setProviders(true,
-                                    createProvider(JAXB_PROVIDER_NAME),
-                                    createProvider(JSON_PROVIDER_NAME),
-                                    new BinaryDataProvider(),
+        SHARED_FACTORY.setProviders(new BinaryDataProvider(),
                                     new SourceProvider(),
                                     new FormEncodingProvider(),
                                     new PrimitiveTextProvider(),
@@ -97,8 +94,33 @@ public final class ProviderFactory {
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
     
+    private List<ProviderInfo<MessageBodyReader>> jaxbReaders = 
+        new ArrayList<ProviderInfo<MessageBodyReader>>();
+    private List<ProviderInfo<MessageBodyWriter>> jaxbWriters = 
+        new ArrayList<ProviderInfo<MessageBodyWriter>>();
+    
     private ProviderFactory() {
+        initJaxbProviders();
     }
+    
+    // Not ideal but in the end seems like the simplest option compared 
+    // to adding default readers/writers to existing messageReaders/Writers 
+    // (due to all sort of conflicts with custom providers) and cloning 
+    // at the request time
+    private void initJaxbProviders() {
+        Object jaxbProvider = createProvider(JAXB_PROVIDER_NAME);
+        if (jaxbProvider != null) {
+            jaxbReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)jaxbProvider));
+            jaxbWriters.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)jaxbProvider));
+        }
+        Object jsonProvider = createProvider(JSON_PROVIDER_NAME);
+        if (jsonProvider != null) {
+            jaxbReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)jsonProvider));
+            jaxbWriters.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)jsonProvider));
+        }
+        injectContexts(jaxbReaders, jaxbWriters);
+    }
+    
     
     
     private static Object createProvider(String className) {
@@ -273,63 +295,41 @@ public final class ProviderFactory {
     
     
     
-    @SuppressWarnings("unchecked")
     public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> bodyType,
                                                             Type parameterType,
                                                             Annotation[] parameterAnnotations,
                                                             MediaType mediaType,
                                                             Message m) {
         // Try user provided providers
-        MessageBodyReader<T> mr = chooseMessageReader(bodyType,
+        MessageBodyReader<T> mr = chooseMessageReader(messageReaders,
+                                                      bodyType,
                                                       parameterType,
                                                       parameterAnnotations,
                                                       mediaType,
                                                       m);
         
-        //If none found try the default ones
-        if (mr != null) {
+        if (mr == null) {
+            mr = chooseMessageReader(jaxbReaders,
+                                     bodyType,
+                                     parameterType,
+                                     parameterAnnotations,
+                                     mediaType,
+                                     m);
+        }
+        
+        if (mr != null || SHARED_FACTORY == this) {
             return mr;
         }
-        mr = SHARED_FACTORY.chooseMessageReader(bodyType,
-                                                parameterType,
-                                                parameterAnnotations,
-                                                mediaType,
-                                                m);
-        return (MessageBodyReader)cloneSharedProviderIfNeeded(mr, m);
+        return SHARED_FACTORY.createMessageBodyReader(bodyType,
+                                                      parameterType,
+                                                      parameterAnnotations,
+                                                      mediaType,
+                                                      m);
     }
     
     private boolean isJaxbBasedProvider(Object sharedProvider) {
         String clsName = sharedProvider.getClass().getName();
         return JAXB_PROVIDER_NAME.equals(clsName) || JSON_PROVIDER_NAME.equals(clsName);
-    }
-    
-    private Object cloneSharedProviderIfNeeded(Object sharedProvider, Message m) {
-        if (sharedProvider != null && isJaxbBasedProvider(sharedProvider)) {
-            try {
-                synchronized (this) {
-                    ProviderInfo<?> info = null;
-                    for (int i = messageReaders.size() - 1; i >= 0; i--)  {
-                        ProviderInfo<?> lastInfo = messageReaders.get(i);
-                        if (lastInfo.getProvider().getClass().getName().equals(
-                                 sharedProvider.getClass().getName())) {
-                            info = lastInfo;
-                            break;
-                        }
-                    }
-                    if (info == null) {
-                        setProviders(false, sharedProvider.getClass().newInstance());
-                        info = messageReaders.get(messageReaders.size() - 1);
-                    }
-                    InjectionUtils.injectContextFields(info.getProvider(), info, m);
-                    InjectionUtils.injectContextMethods(info.getProvider(), info, m);
-                    
-                    return info.getProvider();
-                }
-            } catch (Exception ex) {
-                // won't happen at this stage
-            }
-        }
-        return sharedProvider;
     }
     
     public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
@@ -360,33 +360,41 @@ public final class ProviderFactory {
         return Collections.unmodifiableList(responseHandlers);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> MessageBodyWriter<T> createMessageBodyWriter(Class<T> bodyType,
                                                             Type parameterType,
                                                             Annotation[] parameterAnnotations,
                                                             MediaType mediaType,
                                                             Message m) {
         // Try user provided providers
-        MessageBodyWriter<T> mw = chooseMessageWriter(bodyType,
+        MessageBodyWriter<T> mw = chooseMessageWriter(messageWriters, 
+                                                      bodyType,
                                                       parameterType,
                                                       parameterAnnotations,
                                                       mediaType,
                                                       m);
         
-        //If none found try the default ones
-        if (mw != null) {
+        if (mw == null) {
+            mw = chooseMessageWriter(jaxbWriters, 
+                                     bodyType,
+                                     parameterType,
+                                     parameterAnnotations,
+                                     mediaType,
+                                     m);
+        }
+        
+        if (mw != null || SHARED_FACTORY == this) {
             return mw;
         }
-        mw = SHARED_FACTORY.chooseMessageWriter(bodyType,
-                                                parameterType,
-                                                parameterAnnotations,
-                                                mediaType,
-                                                m);
-        return (MessageBodyWriter)cloneSharedProviderIfNeeded(mw, m);
+        
+        return SHARED_FACTORY.createMessageBodyWriter(bodyType,
+                                                  parameterType,
+                                                  parameterAnnotations,
+                                                  mediaType,
+                                                  m);
     }
     
 //CHECKSTYLE:OFF       
-    private void setProviders(boolean sort, Object... providers) {
+    private void setProviders(Object... providers) {
         
         for (Object o : providers) {
             if (o == null) {
@@ -426,10 +434,8 @@ public final class ProviderFactory {
                 paramHandlers.add(new ProviderInfo<ParameterHandler>((ParameterHandler)o)); 
             }
         }
-        if (sort) {
-            sortReaders();
-            sortWriters();
-        }
+        sortReaders();
+        sortWriters();
         
         injectContexts(messageReaders, messageWriters, contextResolvers, requestHandlers, responseHandlers,
                        exceptionMappers);
@@ -476,13 +482,14 @@ public final class ProviderFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> MessageBodyReader<T> chooseMessageReader(Class<T> type,
+    private <T> MessageBodyReader<T> chooseMessageReader(List<ProviderInfo<MessageBodyReader>> readers,
+                                                         Class<T> type,
                                                          Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
         List<MessageBodyReader<T>> candidates = new LinkedList<MessageBodyReader<T>>();
-        for (ProviderInfo<MessageBodyReader> ep : messageReaders) {
+        for (ProviderInfo<MessageBodyReader> ep : readers) {
             if (matchesReaderCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
                 if (this == SHARED_FACTORY) {
                     if (!isJaxbBasedProvider(ep.getProvider())) {
@@ -532,13 +539,14 @@ public final class ProviderFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> MessageBodyWriter<T> chooseMessageWriter(Class<T> type,
+    private <T> MessageBodyWriter<T> chooseMessageWriter(List<ProviderInfo<MessageBodyWriter>> writers,
+                                                         Class<T> type,
                                                          Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
         List<MessageBodyWriter<T>> candidates = new LinkedList<MessageBodyWriter<T>>();
-        for (ProviderInfo<MessageBodyWriter> ep : messageWriters) {
+        for (ProviderInfo<MessageBodyWriter> ep : writers) {
             if (matchesWriterCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
                 if (this == SHARED_FACTORY) {
                     if (!isJaxbBasedProvider(ep.getProvider())) {
@@ -595,7 +603,7 @@ public final class ProviderFactory {
      * @param entityProviders the entityProviders to set
      */
     public void setUserProviders(List<?> userProviders) {
-        setProviders(true, userProviders.toArray());
+        setProviders(userProviders.toArray());
     }
 
     private static class MessageBodyReaderComparator 
@@ -706,16 +714,9 @@ public final class ProviderFactory {
                                                             List.class, schemas);
         }
         if (!schemasMethodAvailable) {
-            for (ProviderInfo<MessageBodyReader> r : SHARED_FACTORY.messageReaders) {
-                try {
-                    Method m = r.getProvider().getClass().getMethod("setSchemas", 
-                                                         new Class[]{List.class});
-                    Object provider = r.getProvider().getClass().newInstance();
-                    m.invoke(provider, new Object[]{schemas});
-                    registerUserProvider(provider);
-                } catch (Exception ex) {
-                    // ignore
-                }
+            for (ProviderInfo<MessageBodyReader> r : jaxbReaders) {
+                schemasMethodAvailable = injectProviderProperty(r.getProvider(), "setSchemas", 
+                                                                List.class, schemas);
             }
         }
     }
@@ -736,7 +737,9 @@ public final class ProviderFactory {
     Set<Object> getReadersWriters() {
         Set<Object> set = new HashSet<Object>();
         set.addAll(messageReaders);
+        set.addAll(jaxbReaders);
         set.addAll(messageWriters);
+        set.addAll(jaxbWriters);
         return set;
     }
     
