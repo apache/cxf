@@ -62,7 +62,7 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.jaxrs.server.Server</mainClass>
+                                    <mainClass>jaxrs.server.Server</mainClass>
                                 </configuration>
                             </execution>
                         </executions>
@@ -85,7 +85,7 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.jaxrs.client.Client</mainClass>
+                                    <mainClass>jaxrs.client.Client</mainClass>
                                 </configuration>
                             </execution>
                         </executions>
