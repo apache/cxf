@@ -235,7 +235,8 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
     private void setStackTrace(Fault fault, Message msg) {
         Map<String, String> ns = new HashMap<String, String>();
         XPathUtils xu = new XPathUtils(ns);
-        String ss = (String) xu.getValue("/" + Fault.STACKTRACE + "/text()", fault.getDetail(),
+        ns.put("s", Fault.STACKTRACE_NAMESPACE);
+        String ss = (String) xu.getValue("//s:" + Fault.STACKTRACE + "/text()", fault.getDetail(),
                 XPathConstants.STRING);
         List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
         if (!StringUtils.isEmpty(ss)) {

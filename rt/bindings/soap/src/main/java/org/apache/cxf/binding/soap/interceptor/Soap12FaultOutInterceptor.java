@@ -112,6 +112,8 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 writer.writeEndElement();
                 writer.writeEndElement();
 
+                prepareStackTrace(message, fault);
+                
                 if (fault.hasDetails()) {
                     Element detail = fault.getDetail();
                     writer.writeStartElement(defaultPrefix, "Detail", ns);
