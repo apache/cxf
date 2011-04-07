@@ -170,7 +170,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            ex.printStackTrace();
             assert ex.getMessage().contains("Wrong SAML Version");
         }
         
@@ -201,6 +200,32 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler(false)
         );
         BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
+        assert result.equals(BigInteger.valueOf(50));
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSaml2OverSymmetricProtection() throws Exception {
+
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricProtectionPort();
+        
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler",
+            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler()
+        );
+        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
         assert result.equals(BigInteger.valueOf(50));
     }
     
