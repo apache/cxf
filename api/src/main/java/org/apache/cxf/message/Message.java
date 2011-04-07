@@ -89,6 +89,7 @@ public interface Message extends StringMap {
     String MTOM_THRESHOLD = "mtom-threshold";
     String SCHEMA_VALIDATION_ENABLED = "schema-validation-enabled";
     String FAULT_STACKTRACE_ENABLED = "faultStackTraceEnabled";
+    String EXCEPTION_MESSAGE_CAUSE_ENABLED = "exceptionMessageCauseEnabled";
     String CONTENT_TYPE = "Content-Type";    
     String ACCEPT_CONTENT_TYPE = "Accept";
     String BASE_PATH = Message.class.getName() + ".BASE_PATH";
