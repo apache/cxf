@@ -44,46 +44,6 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyResources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client" />
-                                <copy file="${basedir}/src/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client" />
-                                <copy file="${basedir}/CherryServer.xml" todir="${basedir}/target/classes" />
-                                <copy todir="${basedir}/src">
-                                    <fileset dir="${basedir}/contrib">
-                                        <include name="*.java" />
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>removeContribFromSrc</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <delete>
-                                    <fileset dir="${basedir}/src">
-                                        <include name="*.java" />
-                                    </fileset>
-                                </delete>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -103,12 +63,6 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>demo.jaxrs.server.Server</mainClass>
-                                    <systemProperties>
-                                        <property>
-                                            <key>cxf.config.file</key>
-                                            <value>CherryServer.xml</value>
-                                        </property>
-                                    </systemProperties>
                                 </configuration>
                             </execution>
                         </executions>
@@ -147,28 +101,18 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>2.4.0-SNAPSHOT</version>
         </dependency>
-        <!-- Jetty is needed if you're using Jetty container -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>2.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>${httpclient.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
         </dependency>
     </dependencies>
 </project>

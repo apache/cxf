@@ -40,9 +40,9 @@ public final class Client {
         File truststore = new File(args[1]);
 
         Protocol authhttps = new Protocol("https",
-                                          new AuthSSLProtocolSocketFactory(wibble.toURL(), "password",
-                                                                           truststore.toURL(), "password"),
-                                          9000);
+            new AuthSSLProtocolSocketFactory(wibble.toURL(), "password",
+            truststore.toURL(), "password"),
+            9000);
         Protocol.registerProtocol("https", authhttps);
 
         // Sent HTTP GET request to query customer info
@@ -50,6 +50,14 @@ public final class Client {
         HttpClient httpclient = new HttpClient();
         GetMethod httpget = new GetMethod("https://localhost:9000/customerservice/customers/123");
         httpget.addRequestHeader("Accept" , "text/xml");
+        
+        // If Basic Authentication required (not needed in this sample) could 
+        // do so via the following:
+        /*
+        String authorizationHeader = "Basic " 
+           + org.apache.cxf.common.util.Base64Utility.encode("username:password".getBytes());
+        httpget.addRequestHeader("Authorization", authorizationHeader);
+        */
         try {
             httpclient.executeMethod(httpget);
             System.out.println(httpget.getResponseBodyAsString());
@@ -61,7 +69,7 @@ public final class Client {
         System.out.println("\n");
         System.out.println("Sent HTTPS PUT request to update customer info");
         Client client = new Client();
-        String inputFile = client.getClass().getResource("update_customer.xml").getFile();
+        String inputFile = Client.class.getClassLoader().getResource("update_customer.xml").getFile();
         File input = new File(inputFile);
         PutMethod put = new PutMethod("https://localhost:9000/customerservice/customers");
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
@@ -79,7 +87,7 @@ public final class Client {
         // Sent HTTP POST request to add customer
         System.out.println("\n");
         System.out.println("Sent HTTPS POST request to add customer");
-        inputFile = client.getClass().getResource("add_customer.xml").getFile();
+        inputFile = Client.class.getClassLoader().getResource("add_customer.xml").getFile();
         input = new File(inputFile);
         PostMethod post = new PostMethod("https://localhost:9000/customerservice/customers");
         post.addRequestHeader("Accept" , "text/xml");

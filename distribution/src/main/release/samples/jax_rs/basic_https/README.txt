@@ -30,6 +30,10 @@ may be configured programatically so using user interaction may be
 employed to keep passwords from being stored in configuration files.
 The approach taken here is for demonstration reasons only. 
 
+NOTE: Classes AuthSSLInitializationError, AuthSSLProtocolSocketFactory, 
+and AuthSSLX509TrustManager are files copied from the Apache HTTP Client
+project and used by the client for certificate validation.
+
 Please review the README in the samples directory before
 continuing.
 

@@ -19,12 +19,22 @@
 
 package demo.jaxrs.server;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 
 public class Server {
 
-    protected Server() throws Exception {
+   static {
+      // set the configuration file
+      SpringBusFactory factory = new SpringBusFactory();
+      Bus bus = factory.createBus("ServerConfig.xml");
+      BusFactory.setDefaultBus(bus);
+   }
+   
+   protected Server() throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(CustomerService.class);
         sf.setResourceProvider(CustomerService.class, 
