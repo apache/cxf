@@ -36,7 +36,7 @@ import org.apache.cxf.helpers.DOMUtils;
 public class Fault extends UncheckedException {
     public static final QName FAULT_CODE_CLIENT = new QName("http://cxf.apache.org/faultcode", "client");
     public static final QName FAULT_CODE_SERVER = new QName("http://cxf.apache.org/faultcode", "server");
-    
+    public static final String STACKTRACE_NAMESPACE = "http://cxf.apache.org/fault";
     public static final String STACKTRACE = "stackTrace";
     private Element detail;
     private String message;

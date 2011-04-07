@@ -27,7 +27,13 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -64,5 +70,35 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             prefix = StaxUtils.getUniquePrefix(writer, codeNs, true);
         }        
         return prefix;
-    }    
+    }
+    
+    protected void prepareStackTrace(SoapMessage message, SoapFault fault) throws Exception {
+        String config = (String)message
+            .getContextualProperty(org.apache.cxf.message.Message.FAULT_STACKTRACE_ENABLED);
+        if (config != null && Boolean.valueOf(config).booleanValue() && fault.getCause() != null) {
+            StringBuilder sb = new StringBuilder();
+            for (StackTraceElement ste : fault.getCause().getStackTrace()) {
+                sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName() + "!"
+                          + ste.getLineNumber() + "\n");
+            }
+            Element detail = fault.getDetail();
+            String soapNamespace = message.getVersion().getNamespace();
+            if (detail == null) {
+                Document doc = XMLUtils.newDocument();
+                Element stackTrace = doc.createElementNS(
+                    Fault.STACKTRACE_NAMESPACE, Fault.STACKTRACE);
+                stackTrace.setTextContent(sb.toString());
+                detail = doc.createElementNS(
+                    soapNamespace, "detail");
+                fault.setDetail(detail);
+                detail.appendChild(stackTrace);
+            } else {
+                Element stackTrace = 
+                    detail.getOwnerDocument().createElementNS(Fault.STACKTRACE_NAMESPACE,
+                                                              Fault.STACKTRACE);
+                stackTrace.setTextContent(sb.toString());
+                detail.appendChild(stackTrace);
+            }
+        }
+    }
 }

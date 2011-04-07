@@ -25,15 +25,12 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -92,29 +89,7 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
                     writer.writeCharacters("Fault occurred while processing.");
                 }
                 writer.writeEndElement();
-                String config = (String)message.getContextualProperty(
-                        org.apache.cxf.message.Message.FAULT_STACKTRACE_ENABLED);
-                if (config != null && Boolean.valueOf(config).booleanValue() && fault.getCause() != null) {
-                    StringBuilder sb = new StringBuilder();
-                    for (StackTraceElement ste : fault.getCause().getStackTrace()) {                    
-                        sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName()  
-                                + "!" + ste.getLineNumber() + "\n");
-                    }
-                    Element detail = fault.getDetail(); 
-                    if (detail == null) {
-                        Document doc = XMLUtils.newDocument();
-                        Element stackTrace = doc.createElementNS(Soap11.SOAP_NAMESPACE, Fault.STACKTRACE);
-                        stackTrace.setTextContent(sb.toString());
-                        detail = doc.createElementNS(Soap11.SOAP_NAMESPACE, "detail");
-                        fault.setDetail(detail);
-                        detail.appendChild(stackTrace);
-                    } else {
-                        Element stackTrace = detail.getOwnerDocument().createElementNS(
-                                Soap11.SOAP_NAMESPACE, Fault.STACKTRACE);
-                        stackTrace.setTextContent(sb.toString());
-                        detail.appendChild(stackTrace);
-                    }                    
-                }
+                prepareStackTrace(message, fault);
     
                 if (fault.hasDetails()) {
                     Element detail = fault.getDetail();
