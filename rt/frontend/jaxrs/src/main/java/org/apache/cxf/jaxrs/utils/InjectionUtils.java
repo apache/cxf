@@ -911,7 +911,9 @@ public final class InjectionUtils {
                     propertyName = propertyName.substring(0, 1).toLowerCase()
                                    + propertyName.substring(1);
                 }
-                if (baseName.contains(propertyName) || "class".equals(propertyName)) {
+                if (baseName.contains(propertyName) 
+                    || "class".equals(propertyName)
+                    || "declaringClass".equals(propertyName)) {
                     continue;
                 }
                 if (!"".equals(baseName)) {
