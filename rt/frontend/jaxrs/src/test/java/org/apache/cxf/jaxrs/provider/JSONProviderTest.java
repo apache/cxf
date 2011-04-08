@@ -327,7 +327,6 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
-    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-104 gets resolved")
     public void testReadUnqualifiedCollection() throws Exception {
         String data = "{\"Book\":[{\"id\":\"123\",\"name\":\"CXF in Action\"}"
             + ",{\"id\":\"124\",\"name\":\"CXF Rocks\"}]}";
@@ -370,7 +369,6 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
-    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-104 gets resolved")
     public void testReadQualifiedCollection() throws Exception {
         String data = "{\"ns1.thetag\":[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]}";
