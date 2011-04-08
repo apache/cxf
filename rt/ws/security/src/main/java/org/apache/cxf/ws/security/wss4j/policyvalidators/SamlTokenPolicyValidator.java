@@ -36,7 +36,7 @@ import org.opensaml.common.SAMLVersion;
  */
 public class SamlTokenPolicyValidator {
     
-    public void validatePolicy(
+    public boolean validatePolicy(
         AssertionInfoMap aim,
         WSSecurityEngineResult wser
     ) {
@@ -50,7 +50,7 @@ public class SamlTokenPolicyValidator {
 
                 if (!checkVersion(samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
-                    return;
+                    return false;
                 }
                 /*
                 if (!checkIssuerName(samlToken, assertionWrapper)) {
@@ -59,6 +59,7 @@ public class SamlTokenPolicyValidator {
                 */
             }
         }
+        return true;
     }
     
     /**

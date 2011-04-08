@@ -48,6 +48,7 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -203,20 +204,21 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     return;
                 }
                 if (!isRequestor(message)) {
-                    boolean found = false;
                     List<WSHandlerResult> results = 
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null) {
                         for (WSHandlerResult rResult : results) {
-                            SecurityToken token = findIssuedToken(rResult.getResults());
-                            if (token != null) {
-                                found = true;
+                            WSSecurityEngineResult wser = 
+                                findSecurityResult(rResult.getResults());
+                            if (wser != null) {
+                                IssuedTokenPolicyValidator issuedValidator = 
+                                    new IssuedTokenPolicyValidator();
+                                issuedValidator.validatePolicy(aim, wser);
+                                
+                                SecurityToken token = createSecurityToken(wser);
                                 message.getExchange().put(SecurityConstants.TOKEN, token);
                             }
                         }
-                    }
-                    for (AssertionInfo inf : ais) {
-                        inf.setAsserted(found);
                     }
                 } else {
                     //client side should be checked on the way out
@@ -227,7 +229,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         
-        private SecurityToken findIssuedToken(
+        private WSSecurityEngineResult findSecurityResult(
             List<WSSecurityEngineResult> wsSecEngineResults
         ) {
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
@@ -235,24 +237,33 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (actInt.intValue() == WSConstants.ST_SIGNED) {
                     AssertionWrapper assertionWrapper = 
                         (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                    SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-                    if (subjectKeyInfo != null) {
-                        SecurityToken token = new SecurityToken(assertionWrapper.getId());
-                        token.setSecret(subjectKeyInfo.getSecret());
-                        X509Certificate[] certs = subjectKeyInfo.getCerts();
-                        if (certs != null && certs.length > 0) {
-                            token.setX509Certificate(certs[0], null);
-                        }
-                        if (assertionWrapper.getSaml1() != null) {
-                            token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                        } else if (assertionWrapper.getSaml2() != null) {
-                            token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-                        }
-                        return token;
+                    if (assertionWrapper.getSubjectKeyInfo() != null) {
+                        return wser;
                     }
                 }
             }
             return null;
+        }
+        
+        private SecurityToken createSecurityToken(
+            WSSecurityEngineResult wser
+        ) {
+            AssertionWrapper assertionWrapper = 
+                (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
+            
+            SecurityToken token = new SecurityToken(assertionWrapper.getId());
+            token.setSecret(subjectKeyInfo.getSecret());
+            X509Certificate[] certs = subjectKeyInfo.getCerts();
+            if (certs != null && certs.length > 0) {
+                token.setX509Certificate(certs[0], null);
+            }
+            if (assertionWrapper.getSaml1() != null) {
+                token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            } else if (assertionWrapper.getSaml2() != null) {
+                token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            }
+            return token;
         }
     }
 }
