@@ -36,12 +36,8 @@ public class ByteType extends AegisType {
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
-        if (object instanceof Integer) {
-            writer.writeValueAsByte((Byte)object);
-        } else {
-            int intValue = ((Number)object).intValue();
-            byte byteValue = (byte)(intValue & 0xff);
-            writer.writeValueAsByte(new Byte(byteValue));
-        }
+        int intValue = ((Number)object).intValue();
+        byte byteValue = (byte)(intValue & 0xff);
+        writer.writeValueAsByte(new Byte(byteValue));
     }
 }
