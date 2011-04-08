@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package demo.jaxrs.server;
+package httpsdemo.server;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -36,9 +36,9 @@ public class Server {
    
     protected Server() throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(CustomerService.class);
-        sf.setResourceProvider(CustomerService.class, 
-            new SingletonResourceProvider(new CustomerService()));
+        sf.setResourceClasses(CustomerServiceImpl.class);
+        sf.setResourceProvider(CustomerServiceImpl.class, 
+            new SingletonResourceProvider(new CustomerServiceImpl()));
         sf.setAddress("https://localhost:9000/");
 
         sf.create();

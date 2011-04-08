@@ -7,12 +7,12 @@ by doing the communication using HTTPS.
 The JAX-RS server is configured with a HTTPS listener. The listener 
 requires client authentication so the client must provide suitable 
 credentials. The listener configuration is taken from the 
-"CherryServer.xml" file located under demo directory.  
+"ServerConfig.xml" file located under demo directory.  
 
 The client is configured to provide its certificate "CN=Wibble" and
-chain stored in the Java KeyStore "certs/wibble.jks" to the server. The
-server authenticates the client's certificate using its trust store
-"certs/truststore.jks", which holds the Certificate Authorities'
+chain stored in the Java KeyStore "certs/clientKeystore.jks" to the server. 
+The server authenticates the client's certificate using the truststore
+"certs/commonstore.jks", which holds the Certificate Authorities'
 certificates.
 
 Likewise the client authenticates the server's certificate "CN=Cherry"
@@ -26,7 +26,7 @@ argument to the JVM.
 But please note that it is not adviseable to store sensitive data such
 as passwords stored in a clear text configuration file, unless the
 file is sufficiently protected by OS level permissions. The KeyStores
-may be configured programatically so using user interaction may be
+may be configured programmatically so using user interaction may be
 employed to keep passwords from being stored in configuration files.
 The approach taken here is for demonstration reasons only. 
 

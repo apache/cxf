@@ -17,23 +17,25 @@
  * under the License.
  */
 
-package demo.jaxrs.client;
+package httpsdemo.client;
 
 import java.io.File;
-
+import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.contrib.ssl.AuthSSLProtocolSocketFactory;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.WebClient;
+import httpsdemo.common.Customer;
+import httpsdemo.common.CustomerService;
 
 public final class Client {
 
     private static final String CLIENT_CONFIG_FILE = "ClientConfig.xml";
-
+    private static final String BASE_SERVICE_URL = 
+        "https://localhost:9000/customerservice/customers";
+    
     private Client() {
     }
 
@@ -49,12 +51,12 @@ public final class Client {
                 9000);
         Protocol.registerProtocol("https", authhttps);
 
-        System.out.println("Sent HTTPS GET request to query customer info");
+        System.out.println("Sending HTTPS GET request to query customer info");
         HttpClient httpclient = new HttpClient();
-        GetMethod httpget = new GetMethod("https://localhost:9000/customerservice/customers/123");
+        GetMethod httpget = new GetMethod(BASE_SERVICE_URL + "/123");
         httpget.addRequestHeader("Accept" , "text/xml");
         
-        // If Basic Authentication required (not needed in this sample) could use: 
+        // If Basic Authentication required could use: 
         /*
         String authorizationHeader = "Basic " 
            + org.apache.cxf.common.util.Base64Utility.encode("username:password".getBytes());
@@ -67,45 +69,33 @@ public final class Client {
             httpget.releaseConnection();
         }
 
-        // Send HTTP PUT request to update customer info
+        /*
+         *  Send HTTP PUT request to update customer info, using CXF WebClient method
+         *  Note: if need to use basic authentication, use the WebClient.create(baseAddress,
+         *  username,password,configFile) variant, where configFile can be null if you're
+         *  not using certificates.
+         */
+        System.out.println("Sending HTTPS PUT to update customer name");
+        WebClient wc = WebClient.create(BASE_SERVICE_URL, CLIENT_CONFIG_FILE);
+        Customer customer = new Customer();
+        customer.setId(123);
+        customer.setName("Mary");
+        Response resp = wc.put(customer);
+
+        /*
+         *  Send HTTP POST request to add customer, using JAXRSClientProxy
+         *  Note: if need to use basic authentication, use the JAXRSClientFactory.create(baseAddress,
+         *  username,password,configFile) variant, where configFile can be null if you're
+         *  not using certificates.
+         */
         System.out.println("\n");
-        System.out.println("Sent HTTPS PUT request to update customer info");
-        String inputFile = Client.class.getClassLoader().getResource("update_customer.xml").getFile();
-        File input = new File(inputFile);
-        PutMethod put = new PutMethod("https://localhost:9000/customerservice/customers");
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        put.setRequestEntity(entity);
-
-        try {
-            int result = httpclient.executeMethod(put);
-            System.out.println("Response status code: " + result);
-            System.out.println("Response body: ");
-            System.out.println(put.getResponseBodyAsString());
-        } finally {
-            put.releaseConnection();
-        }
-
-        // Send HTTP POST request to add customer
-        System.out.println("\n");
-        System.out.println("Sent HTTPS POST request to add customer");
-        inputFile = Client.class.getClassLoader().getResource("add_customer.xml").getFile();
-        input = new File(inputFile);
-        PostMethod post = new PostMethod("https://localhost:9000/customerservice/customers");
-        post.addRequestHeader("Accept" , "text/xml");
-        entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        post.setRequestEntity(entity);
-
-        try {
-            int result = httpclient.executeMethod(post);
-            System.out.println("Response status code: " + result);
-            System.out.println("Response body: ");
-            System.out.println(post.getResponseBodyAsString());
-        } finally {
-            // Release current connection to the connection pool once you are
-            // done
-            post.releaseConnection();
-        }
-
+        System.out.println("Sending HTTPS POST request to add customer");
+        CustomerService proxy = JAXRSClientFactory.create(BASE_SERVICE_URL, CustomerService.class,
+              CLIENT_CONFIG_FILE);
+        customer = new Customer();
+        customer.setName("Jack");
+        resp = wc.post(customer);
+        
         System.out.println("\n");
         System.exit(0);
     }
