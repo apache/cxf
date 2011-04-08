@@ -513,7 +513,6 @@ public class JSONProviderTest extends Assert {
     
     @SuppressWarnings("unchecked")
     @Test
-    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-89 gets resolved")
     public void testReadListOfDerivedTypesWithNullField() throws Exception {
         JSONProvider p = new JSONProvider();
         Map<String, String> namespaceMap = new HashMap<String, String>();
