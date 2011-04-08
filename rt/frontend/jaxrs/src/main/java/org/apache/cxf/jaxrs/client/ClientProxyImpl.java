@@ -374,10 +374,10 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
     }
 
-    private MultivaluedMap<String, Object> handleForm(MultivaluedMap<ParameterType, Parameter> map, 
+    private MultivaluedMap<String, String> handleForm(MultivaluedMap<ParameterType, Parameter> map, 
                                                       Object[] params) {
         
-        MultivaluedMap<String, Object> form = new MetadataMap<String, Object>();
+        MultivaluedMap<String, String> form = new MetadataMap<String, String>();
         
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
