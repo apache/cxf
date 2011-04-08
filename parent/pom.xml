@@ -93,6 +93,7 @@
         <cxf.joda.time.version>1.6.2</cxf.joda.time.version>
         <cxf.opensaml.version>2.4.1</cxf.opensaml.version>
         <cxf.opensamlws.version>1.4.1</cxf.opensamlws.version>
+        <cxf.opensaml.osgi.version>2.4.1_1-SNAPSHOT</cxf.opensaml.osgi.version>
         <cxf.opensaml.xmltooling.version>1.3.1</cxf.opensaml.xmltooling.version>
         <cxf.neethi.version>3.0.0</cxf.neethi.version>
 
