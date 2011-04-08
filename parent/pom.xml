@@ -94,7 +94,7 @@
         <cxf.opensaml.version>2.4.1</cxf.opensaml.version>
         <cxf.opensamlws.version>1.4.1</cxf.opensamlws.version>
         <cxf.opensaml.xmltooling.version>1.3.1</cxf.opensaml.xmltooling.version>
-        <cxf.neethi.version>3.0.0-SNAPSHOT</cxf.neethi.version>
+        <cxf.neethi.version>3.0.0</cxf.neethi.version>
 
         <cxf.geronimo.annotation.version>1.1.1</cxf.geronimo.annotation.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
