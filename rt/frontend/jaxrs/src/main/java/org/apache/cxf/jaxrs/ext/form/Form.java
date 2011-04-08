@@ -29,8 +29,16 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
  *
  */
 public class Form {
-    private MultivaluedMap<String, Object> map = 
-        new MetadataMap<String, Object>();
+    private MultivaluedMap<String, String> map = 
+        new MetadataMap<String, String>();
+    
+    public Form() {
+        
+    }
+    
+    public Form(MultivaluedMap<String, String> map) {
+        this.map = map;
+    }
     
     public Form set(String name, Object value) {
         
@@ -38,8 +46,8 @@ public class Form {
         return this;
     }
     
-    public MultivaluedMap<String, Object> getData() {
-        return new MetadataMap<String, Object>(map);
+    public MultivaluedMap<String, String> getData() {
+        return map;
     }
     
 }

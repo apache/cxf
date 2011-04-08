@@ -43,6 +43,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
@@ -103,7 +104,7 @@ public class FormEncodingProvider implements
             
             persistParamsOnMessage(params);
             
-            return params;
+            return getFormObject(clazz, params);
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -120,10 +121,15 @@ public class FormEncodingProvider implements
     
     @SuppressWarnings("unchecked")
     protected MultivaluedMap<String, String> createMap(Class<?> clazz) throws Exception {
-        if (clazz == MultivaluedMap.class) {
+        if (clazz == MultivaluedMap.class || clazz == Form.class) {
             return new MetadataMap<String, String>();
         }
         return (MultivaluedMap<String, String>)clazz.newInstance();
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Object getFormObject(Class<?> clazz, MultivaluedMap<String, String> params) {
+        return Form.class.isAssignableFrom(clazz) ? new Form((MultivaluedMap)params) : params;
     }
     
     /**
@@ -167,10 +173,10 @@ public class FormEncodingProvider implements
 
     private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
                                 MediaType mt) {
-        return MultivaluedMap.class.isAssignableFrom(type)
-            || mt.getType().equalsIgnoreCase("multipart") 
+        return (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type)) 
+            || (mt.getType().equalsIgnoreCase("multipart") 
             && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
-            && (MultipartBody.class.isAssignableFrom(type) || Attachment.class.isAssignableFrom(type));
+            && (MultipartBody.class.isAssignableFrom(type) || Attachment.class.isAssignableFrom(type)));
     }
     
     @SuppressWarnings("unchecked")
@@ -189,7 +195,8 @@ public class FormEncodingProvider implements
             provider.setMessageContext(mc);
             provider.writeTo(body, body.getClass(), body.getClass(), anns, mt, headers, os);
         } else {
-            MultivaluedMap<String, String> map = (MultivaluedMap<String, String>)obj;
+            MultivaluedMap<String, String> map = 
+                (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).getData() : obj);
             boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
             
             String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");

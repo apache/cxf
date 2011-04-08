@@ -31,6 +31,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
@@ -54,6 +55,18 @@ public class FormEncodingProviderTest extends Assert {
         MultivaluedMap<String, String> mvMap = 
             (MultivaluedMap<String, String>)ferp.readFrom((Class)MultivaluedMap.class, null, 
                 new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
+        assertEquals("Wrong entry for foo", "bar", mvMap.getFirst("foo"));
+        assertEquals("Wrong entry for boo", "far", mvMap.getFirst("boo"));
+
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadFromForm() throws Exception {
+        InputStream is = getClass().getResourceAsStream("singleValPostBody.txt");
+        Form form = (Form)ferp.readFrom((Class)Form.class, null, 
+                new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
+        MultivaluedMap<String, String> mvMap = form.getData();
         assertEquals("Wrong entry for foo", "bar", mvMap.getFirst("foo"));
         assertEquals("Wrong entry for boo", "far", mvMap.getFirst("boo"));
 
@@ -169,6 +182,17 @@ public class FormEncodingProviderTest extends Assert {
         assertEquals("Wrong value", "a=a1&b=b1", result);  
     }
     
+    @Test
+    public void testWriteForm() throws Exception {
+        Form form = new Form();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        ferp.writeTo(form.set("a", "a1").set("b", "b1"), Form.class, Form.class, 
+                     new Annotation[0], MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
+                     new MetadataMap<String, Object>(), bos);
+        String result = bos.toString();
+        assertEquals("Wrong value", "a=a1&b=b1", result);  
+    }
+    
     @SuppressWarnings("unchecked")
     @Test
     public void testValidation() throws Exception {
@@ -225,8 +249,13 @@ public class FormEncodingProviderTest extends Assert {
     }
 
     @Test
-    public void testReadable() {
+    public void testReadableMap() {
         assertTrue(ferp.isReadable(MultivaluedMap.class, null, null, null));
+    }
+    
+    @Test
+    public void testReadableForm() {
+        assertTrue(ferp.isReadable(Form.class, null, null, null));
     }
 
     @Test
