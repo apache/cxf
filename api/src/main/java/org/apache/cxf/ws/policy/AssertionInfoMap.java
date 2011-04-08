@@ -72,6 +72,11 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             ail = new ArrayList<AssertionInfo>();
             put(a.getName(), ail);
         }
+        for (AssertionInfo ai2 : ail) {
+            if (ai2.getAssertion() == a) {
+                return;
+            }
+        }
         ail.add(ai);
     }
     

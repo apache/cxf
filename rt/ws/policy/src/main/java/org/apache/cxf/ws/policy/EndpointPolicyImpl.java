@@ -182,6 +182,14 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return alternatives;
     }
     
+    private void addAll(Collection<Assertion> target, Collection<Assertion> l1) {
+        for (Assertion l : l1) {
+            if (!target.contains(l)) {
+                target.add(l);
+            }
+        }
+    }
+    
     void initializeVocabulary() {
         vocabulary = new ArrayList<Assertion>();
         if (requestor) {
@@ -213,9 +221,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             }
             Collection<Assertion> c = engine.getAssertions(p, false);
             if (c != null) {
-                vocabulary.addAll(c);
+                addAll(vocabulary, c);
                 if (null != faultVocabulary) {
-                    faultVocabulary.addAll(c);
+                    addAll(faultVocabulary, c);
                 }
             }
             if (this.requestor) {
@@ -226,9 +234,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             }
             c = engine.getAssertions(p, false);
             if (c != null) {
-                vocabulary.addAll(c);
+                addAll(vocabulary, c);
                 if (null != faultVocabulary) {
-                    faultVocabulary.addAll(c);
+                    addAll(faultVocabulary, c);
                 }
             }
             if (boi.getFaults() != null) {
@@ -241,9 +249,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                     }
                     c = engine.getAssertions(p, false);
                     if (c != null) {
-                        vocabulary.addAll(c);
+                        addAll(vocabulary, c);
                         if (null != faultVocabulary) {
-                            faultVocabulary.addAll(c);
+                            addAll(faultVocabulary, c);
                         }
                     }
                 }
