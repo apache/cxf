@@ -31,11 +31,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class XPathUtils {
-    private static final XPathFactory FACTORY = XPathFactory.newInstance();
     private XPath xpath;
 
     public XPathUtils() {
-        xpath = FACTORY.newXPath();
+        xpath = XPathFactory.newInstance().newXPath();
     }
 
     public XPathUtils(final Map<String, String> ns) {
@@ -52,10 +51,14 @@ public class XPathUtils {
     }
 
     public Object getValue(String xpathExpression, Node node, QName type) {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
+            Thread.currentThread().setContextClassLoader(xpath.getClass().getClassLoader());
             return xpath.evaluate(xpathExpression, node, type);
         } catch (Exception e) {
             return null;
+        } finally {
+            Thread.currentThread().setContextClassLoader(loader);
         }
     }
     public NodeList getValueList(String xpathExpression, Node node) {
@@ -72,7 +75,4 @@ public class XPathUtils {
         return getValue(xpathExpression, node, type) != null;
     }
 
-    public static XPathFactory getFactory() {
-        return FACTORY;
-    }
 }
