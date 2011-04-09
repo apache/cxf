@@ -124,6 +124,20 @@ http://cxf.apache.org/schemas/core.xsd">
        <bean class="org.apache.cxf.systest.jaxrs.XMLStreamWriterOutInterceptor"/>
     </jaxrs:outInterceptors>
     
+  </jaxrs:server>
+  
+  <jaxrs:server id="bookJsonp" address="/jsonp">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		  
+
+    <jaxrs:inInterceptors>
+       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpInInterceptor"/>
+    </jaxrs:inInterceptors>
+    <jaxrs:outInterceptors>
+       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPreStreamInterceptor"/>
+       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPostStreamInterceptor"/>
+    </jaxrs:outInterceptors> 
   </jaxrs:server> 
   
   <util:map id="outTemplates">

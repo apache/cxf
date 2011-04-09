@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -128,6 +129,32 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
         getBook(endpointAddress, "resources/expected_get_book123json.txt",
                 "application/jettison");
+    }
+    
+    
+    @Test
+    public void testGetBookJsonp() throws Exception {
+        String url = "http://localhost:" + PORT + "/the/jsonp/books/123";
+        WebClient client = WebClient.create(url);
+        client.accept("application/json, application/x-javascript");
+        client.query("_jsonp", "callback");
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response r = client.get();
+        assertEquals("application/x+javascript", r.getMetadata().getFirst("Content-Type"));
+        assertEquals("callback({\"Book\":{\"id\":123,\"name\":\"CXF in Action\"}});",
+                     IOUtils.readStringFromStream((InputStream)r.getEntity()));
+    }
+    
+    @Test
+    public void testGetBookWithoutJsonpCallback() throws Exception {
+        String url = "http://localhost:" + PORT + "/the/jsonp/books/123";
+        WebClient client = WebClient.create(url);
+        client.accept("application/json, application/x-javascript");
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response r = client.get();
+        assertEquals("application/json", r.getMetadata().getFirst("Content-Type"));
+        assertEquals("{\"Book\":{\"id\":123,\"name\":\"CXF in Action\"}}",
+                     IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
     
     @Test
