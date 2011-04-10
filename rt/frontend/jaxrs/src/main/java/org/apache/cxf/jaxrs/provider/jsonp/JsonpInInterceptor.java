@@ -52,7 +52,7 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
             if (getAcceptType() != null) {
                 // may be needed to enforce the selection of 
                 // JSON-awarenprovider
-                message.put(Message.CONTENT_TYPE, getAcceptType());
+                message.put(Message.ACCEPT_CONTENT_TYPE, getAcceptType());
             }
             message.getExchange().put(CALLBACK_KEY, callbackValue);
         }
