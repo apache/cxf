@@ -29,10 +29,7 @@ Building and running the demo using Maven
 From the base directory of this sample (i.e., where this README file is
 located), the maven pom.xml file can be used to build and run the demo. 
 
-Using either UNIX or Windows:
-  mvn install
-  mvn -Pserver  (from one command line window)
-  mvn -Pclient  (from a second command line window)
+mvn install
     
 To remove the code generated from the WSDL file and the .class
 files, run "mvn clean".
