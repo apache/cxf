@@ -51,9 +51,13 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
 
     @SuppressWarnings("unchecked")
     public Object postProcessBeforeInitialization(Object bean, String beanId) throws BeansException {
-        if (null != getBus() && bean instanceof BusExtension) {
+        if (bean instanceof BusExtension && null != getBus()) {
             Class cls = ((BusExtension)bean).getRegistrationType();
             getBus().setExtension(bean, cls);
+        } else if (bean instanceof Bus && Bus.DEFAULT_BUS_ID.equals(beanId)) {
+            bus = (Bus)bean;
+            bus.setExtension(context, ApplicationContext.class);
+            bus.setExtension(new SpringBeanLocator(context), ConfiguredBeanLocator.class);
         }
         return bean;
     }
