@@ -235,6 +235,7 @@ public abstract class BusFactory {
         try {
             busFactoryClass = ClassLoaderUtils.loadClass(className, BusFactory.class)
                 .asSubclass(BusFactory.class);
+            
             instance = busFactoryClass.newInstance();
         } catch (Exception ex) {
             LogUtils.log(LOG, Level.SEVERE, "BUS_FACTORY_INSTANTIATION_EXC", ex);
@@ -294,7 +295,15 @@ public abstract class BusFactory {
             if (isValidBusFactoryClass(busFactoryClass)) {
                 if (busFactoryCondition != null) {
                     try {
-                        classLoader.loadClass(busFactoryCondition);
+                        Class<?> cls =  ClassLoaderUtils.loadClass(busFactoryClass, BusFactory.class)
+                            .asSubclass(BusFactory.class);
+                        int idx = busFactoryCondition.indexOf(',');
+                        while (idx != -1) {
+                            cls.getClassLoader().loadClass(busFactoryCondition.substring(0, idx));
+                            busFactoryCondition = busFactoryCondition.substring(idx + 1);
+                            idx = busFactoryCondition.indexOf(',');
+                        }
+                        cls.getClassLoader().loadClass(busFactoryCondition);
                         return busFactoryClass;
                     } catch (ClassNotFoundException e) {
                         return DEFAULT_BUS_FACTORY;
