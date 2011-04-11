@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -55,6 +56,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * 
@@ -207,24 +209,45 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     List<WSHandlerResult> results = 
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null) {
-                        for (WSHandlerResult rResult : results) {
-                            WSSecurityEngineResult wser = 
-                                findSecurityResult(rResult.getResults());
-                            if (wser != null) {
-                                IssuedTokenPolicyValidator issuedValidator = 
-                                    new IssuedTokenPolicyValidator();
-                                issuedValidator.validatePolicy(aim, wser);
-                                
-                                SecurityToken token = createSecurityToken(wser);
-                                message.getExchange().put(SecurityConstants.TOKEN, token);
-                            }
-                        }
+                        parseHandlerResults(results, message, aim);
                     }
                 } else {
                     //client side should be checked on the way out
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
                     }                    
+                }
+            }
+        }
+        
+        private void parseHandlerResults(
+            List<WSHandlerResult> results,
+            Message message,
+            AssertionInfoMap aim
+        ) {
+            if (results != null) {
+                for (WSHandlerResult rResult : results) {
+                    WSSecurityEngineResult wser = 
+                        findSecurityResult(rResult.getResults());
+                    if (wser != null) {
+                        List<WSSecurityEngineResult> signedResults = 
+                            new ArrayList<WSSecurityEngineResult>();
+                        WSSecurityUtil.fetchAllActionResults(
+                            rResult.getResults(), WSConstants.SIGN, signedResults
+                        );
+                        
+                        //
+                        // Validate the Issued Token policy
+                        //
+                        IssuedTokenPolicyValidator issuedValidator = 
+                            new IssuedTokenPolicyValidator(signedResults, message);
+                        if (!issuedValidator.validatePolicy(aim, wser)) {
+                            break;
+                        }
+                        
+                        SecurityToken token = createSecurityToken(wser);
+                        message.getExchange().put(SecurityConstants.TOKEN, token);
+                    }
                 }
             }
         }

@@ -624,8 +624,6 @@ public abstract class AbstractBindingBuilder {
                     );
                 if (!selfSignAssertion) {
                     AssertionWrapper assertionWrapper = (AssertionWrapper)tempTok;
-                    part = new WSEncryptionPart(assertionWrapper.getId());
-                    part.setElement(assertionWrapper.getElement());
                     
                     // TODO We only support using a KeyIdentifier for the moment
                     SecurityTokenReference secRef = 

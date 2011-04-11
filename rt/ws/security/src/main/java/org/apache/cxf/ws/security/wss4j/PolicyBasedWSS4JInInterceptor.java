@@ -22,6 +22,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -82,6 +83,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * 
@@ -518,6 +520,12 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         boolean hasEndorsement = false;
         Protections prots = Protections.NONE;
         
+        //
+        // Prefetch all signature results
+        //
+        List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, signedResults);
+
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             switch (actInt.intValue()) {   
@@ -574,7 +582,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 break;
             case WSConstants.ST_SIGNED:
             case WSConstants.ST_UNSIGNED:
-                SamlTokenPolicyValidator validator = new SamlTokenPolicyValidator();
+                SamlTokenPolicyValidator validator = 
+                    new SamlTokenPolicyValidator(soapBody, signedResults, msg);
                 validator.validatePolicy(aim, wser);
                 break;
             case WSConstants.TS:
@@ -624,7 +633,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
             assertPolicy(aim, SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         }
-        
         super.doResults(msg, actor, soapHeader, soapBody, results, utWithCallbacks);
     }
     private void assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 

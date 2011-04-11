@@ -19,11 +19,15 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.security.cert.Certificate;
 import java.util.Collection;
+import java.util.List;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -39,7 +43,18 @@ import org.opensaml.common.SAMLVersion;
  * Validate a WSSecurityEngineResult corresponding to the processing of a SAML Assertion
  * against an IssuedToken policy.
  */
-public class IssuedTokenPolicyValidator {
+public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
+    
+    private List<WSSecurityEngineResult> signedResults;
+    private Message message;
+
+    public IssuedTokenPolicyValidator(
+        List<WSSecurityEngineResult> signedResults,
+        Message message
+    ) {
+        this.signedResults = signedResults;
+        this.message = message;
+    }
     
     public boolean validatePolicy(
         AssertionInfoMap aim,
@@ -51,13 +66,23 @@ public class IssuedTokenPolicyValidator {
                 AssertionWrapper assertionWrapper = 
                     (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
+                ai.setAsserted(true);
+                
                 Element template = issuedToken.getRstTemplate();
                 if (template != null && !checkIssuedTokenTemplate(template, assertionWrapper)) {
                     ai.setNotAsserted("Error in validating the IssuedToken policy");
                     return false;
                 }
-
-                ai.setAsserted(true);
+                
+                TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+                Certificate[] tlsCerts = null;
+                if (tlsInfo != null) {
+                    tlsCerts = tlsInfo.getPeerCertificates();
+                }
+                if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
+                    ai.setNotAsserted("Assertion fails holder-of-key requirements");
+                    return false;
+                }
             }
         }
         return true;
