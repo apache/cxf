@@ -17,5 +17,5 @@
   under the License.
 --
 
-SYSTEM "http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" "../../../../../../common/schemas/src/main/resources/schemas/wsdl/wsdl.xsd"
-SYSTEM "http://schemas.xmlsoap.org/wsdl/" "../../../../../../common/schemas/src/main/resources/schemas/wsdl/wsdl.xsd"
+SYSTEM "http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" "../../../../../../api/src/main/resources/schemas/wsdl/wsdl.xsd"
+SYSTEM "http://schemas.xmlsoap.org/wsdl/" "../../../../../../api/src/main/resources/schemas/wsdl/wsdl.xsd"
