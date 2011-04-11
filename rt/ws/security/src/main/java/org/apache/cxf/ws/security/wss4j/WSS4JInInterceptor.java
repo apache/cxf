@@ -288,6 +288,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 }
             }
             advanceBody(msg, doc.getSOAPBody());
+            SAAJInInterceptor.replaceHeaders(doc, msg);
 
             if (doTimeLog) {
                 t3 = System.currentTimeMillis();
