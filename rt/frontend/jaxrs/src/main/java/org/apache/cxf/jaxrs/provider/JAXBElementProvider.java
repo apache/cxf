@@ -44,7 +44,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -78,7 +77,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                     Marshaller.JAXB_SCHEMA_LOCATION});
     
     private Map<String, Object> mProperties = Collections.emptyMap();
-    private ValidationEventHandler eventHandler;
     
     public JAXBElementProvider() {
         
@@ -93,10 +91,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
-    }
-    
-    public void setValidationHandler(ValidationEventHandler handler) {
-        eventHandler = handler;
     }
     
     public void setEnableBuffering(boolean enableBuf) {
@@ -139,9 +133,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             theType = getActualType(theType, genericType, anns);
 
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
-            if (eventHandler != null) {
-                unmarshaller.setEventHandler(eventHandler);
-            }
             addAttachmentUnmarshaller(unmarshaller);
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type) 

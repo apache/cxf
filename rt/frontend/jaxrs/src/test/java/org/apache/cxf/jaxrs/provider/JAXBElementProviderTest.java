@@ -1028,6 +1028,53 @@ public class JAXBElementProviderTest extends Assert {
         assertNotNull("schema can not be read from disk", s);
     }
     
+    @Test
+    public void testWriteWithValidation() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        List<String> locations = new ArrayList<String>();
+        String loc = getClass().getClassLoader().getResource("book1.xsd").toURI().getPath();
+        locations.add(loc);
+        provider.setSchemas(locations);
+        Schema s = provider.getSchema();
+        assertNotNull("schema can not be read from disk", s);
+        
+        provider.setValidateOutput(true);
+        provider.setValidateBeforeWrite(true);
+        
+        Book2 book2 = new Book2();
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(book2, Book2.class, Book2.class, new Annotation[]{}, MediaType.TEXT_XML_TYPE,
+                         new MetadataMap<String, Object>(), bos);
+        
+        assertTrue(bos.toString().contains("http://superbooks"));
+    }
+    
+    @Test
+    public void testWriteWithFailedValidation() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        List<String> locations = new ArrayList<String>();
+        String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
+        locations.add(loc);
+        provider.setSchemas(locations);
+        Schema s = provider.getSchema();
+        assertNotNull("schema can not be read from disk", s);
+        
+        provider.setValidateOutput(true);
+        provider.setValidateBeforeWrite(true);
+
+        try {
+            provider.writeTo(new Book2(), Book2.class, Book2.class, new Annotation[]{}, 
+                             MediaType.TEXT_XML_TYPE,
+                             new MetadataMap<String, Object>(), new ByteArrayOutputStream());
+            fail("Validation exception expected");
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause();
+            assertTrue(cause.getMessage().contains("Cannot find the declaration of element"));
+        }
+        
+    }
+    
     @Test 
     public void testIsReadableWithJaxbIndex() {
         JAXBElementProvider p = new JAXBElementProvider();
