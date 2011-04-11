@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,12 +38,17 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.JAXBElementProviderTest.TagVO2Holder;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -59,6 +65,64 @@ import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadEmbeddedArray() throws Exception {
+        String input = 
+                "{\"store\":"
+               + "{\"books\":{"
+               + "     \"book\":["
+               + "         {           "
+               + "           \"name\":\"CXF 1\""
+               + "         },          "
+               + "         {           "
+               + "           \"name\":\"CXF 2\""
+               + "         }           "
+               + "      ]              " 
+               + "   }                 "
+               + " }                   "
+               + "}                    ";
+        
+        Object storeObject = new JSONProvider().readFrom((Class)Store.class, null, null, 
+                                       null, null, new ByteArrayInputStream(input.getBytes()));
+        Store store = (Store)storeObject;
+        List<Book> books = store.getBooks();
+        assertEquals(2, books.size());
+        assertEquals("CXF 1", books.get(0).getName());
+        assertEquals("CXF 2", books.get(1).getName());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadEmbeddedArrayWithNamespaces() throws Exception {
+        String input = 
+                "{\"ns1.store\":"
+               + "{\"ns1.books\":{"
+               + "     \"ns1.thebook2\":["
+               + "         {           "
+               + "           \"name\":\"CXF 1\""
+               + "         },          "
+               + "         {           "
+               + "           \"name\":\"CXF 2\""
+               + "         }           "
+               + "      ]              " 
+               + "   }                 "
+               + " }                   "
+               + "}                    ";
+        
+        JSONProvider p = new JSONProvider();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://superbooks", "ns1");
+        p.setNamespaceMap(namespaceMap);
+        
+        Object storeObject = p.readFrom((Class)QualifiedStore.class, null, null, 
+                                       null, null, new ByteArrayInputStream(input.getBytes()));
+        QualifiedStore store = (QualifiedStore)storeObject;
+        List<Book2> books = store.getBooks();
+        assertEquals(2, books.size());
+        assertEquals("CXF 1", books.get(0).getName());
+        assertEquals("CXF 2", books.get(1).getName());
+    }
     
     
     @Test
@@ -991,4 +1055,27 @@ public class JSONProviderTest extends Assert {
         }
     }
 
+    @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+    @XmlRootElement(name = "store")
+    public static class Store {
+        private List<Book> books = new LinkedList<Book>();
+       
+        @XmlElement(name = "book")
+        @XmlElementWrapper(name = "books")
+        public List<Book> getBooks() {
+            return books;
+        }
+    }
+    
+    @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+    @XmlRootElement(name = "store", namespace = "http://superbooks")
+    public static class QualifiedStore {
+        private List<Book2> books = new LinkedList<Book2>();
+       
+        @XmlElement(name = "thebook2", namespace = "http://superbooks")
+        @XmlElementWrapper(name = "books", namespace = "http://superbooks")
+        public List<Book2> getBooks() {
+            return books;
+        }
+    }
 }

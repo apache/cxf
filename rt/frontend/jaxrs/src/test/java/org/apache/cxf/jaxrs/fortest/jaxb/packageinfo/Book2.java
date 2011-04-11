@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "thebook2")
 public class Book2 {
 
+    private String name;
     private int id;
     
     public Book2() {
@@ -38,5 +39,13 @@ public class Book2 {
     
     public void setId(int ident) {
         id = ident;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 }
