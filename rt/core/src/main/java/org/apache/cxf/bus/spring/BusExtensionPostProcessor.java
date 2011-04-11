@@ -21,7 +21,6 @@ package org.apache.cxf.bus.spring;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.extension.BusExtension;
 
 import org.springframework.beans.BeansException;
@@ -51,9 +50,11 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
 
     @SuppressWarnings("unchecked")
     public Object postProcessBeforeInitialization(Object bean, String beanId) throws BeansException {
-        if (null != getBus() && bean instanceof BusExtension) {
+        if (bean instanceof BusExtension && null != getBus()) {
             Class cls = ((BusExtension)bean).getRegistrationType();
             getBus().setExtension(bean, cls);
+        } else if (bean instanceof Bus && Bus.DEFAULT_BUS_ID.equals(beanId)) {
+            bus = (Bus)bean;
         }
         return bean;
     }
@@ -61,11 +62,6 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     private Bus getBus() {
         if (bus == null) {
             bus = (Bus)context.getBean(Bus.DEFAULT_BUS_ID);
-            bus.setExtension(context, ApplicationContext.class);
-            ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
-            if (!(loc instanceof SpringBeanLocator)) {
-                bus.setExtension(new SpringBeanLocator(context, bus), ConfiguredBeanLocator.class);
-            }
         }
         return bus;
     }

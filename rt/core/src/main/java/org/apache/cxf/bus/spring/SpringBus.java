@@ -21,6 +21,7 @@ package org.apache.cxf.bus.spring;
 
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.resource.ResourceManager;
@@ -60,6 +61,12 @@ public class SpringBus extends ExtensionManagerBus
         
         ResourceManager m = getExtension(ResourceManager.class);
         m.addResourceResolver(new BusApplicationContextResourceResolver(applicationContext));
+        
+        setExtension(applicationContext, ApplicationContext.class);
+        ConfiguredBeanLocator loc = getExtension(ConfiguredBeanLocator.class);
+        if (!(loc instanceof SpringBeanLocator)) {
+            setExtension(new SpringBeanLocator(applicationContext, this), ConfiguredBeanLocator.class);
+        }
     }
 
     public void onApplicationEvent(ApplicationEvent event) {
