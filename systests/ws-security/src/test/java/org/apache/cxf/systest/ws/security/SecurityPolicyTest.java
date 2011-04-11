@@ -54,6 +54,7 @@ import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.policytest.doubleit.DoubleIt;
 import org.apache.cxf.policytest.doubleit.DoubleItFault_Exception;
 import org.apache.cxf.policytest.doubleit.DoubleItPortType;
@@ -204,7 +205,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        SecurityPolicyTest.class.getResource("alice.properties").toString());
         ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
                        SecurityPolicyTest.class.getResource("alice.properties").toString());
-
+        ei.setProperty(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE); 
     }
     
     @Test

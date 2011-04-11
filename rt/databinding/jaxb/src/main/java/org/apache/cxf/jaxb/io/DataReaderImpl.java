@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.namespace.QName;
 
@@ -56,6 +57,24 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     public Object read(T input) {
         return read(null, input);
     }
+    
+    private static class WSUIDValidationHandler implements ValidationEventHandler {
+        ValidationEventHandler origHandler;
+        WSUIDValidationHandler(ValidationEventHandler o) {
+            origHandler = o;
+        }
+        
+        public boolean handleEvent(ValidationEvent event) {
+            String msg = event.getMessage();
+            if (msg.startsWith("cvc-type.3.1.1: ") && msg.contains(":Id")) {
+                return true;
+            }
+            if (origHandler != null) {
+                return origHandler.handleEvent(event);
+            }
+            return false;
+        }
+    }
     public void setProperty(String prop, Object value) {
         if (prop.equals(JAXBDataBinding.UNWRAP_JAXB_ELEMENT)) {
             unwrapJAXBElement = Boolean.TRUE.equals(value);
@@ -84,7 +103,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 um.setListener(databinding.getUnmarshallerListener());
             }
             if (setEventHandler) {
-                um.setEventHandler(veventHandler);
+                um.setEventHandler(new WSUIDValidationHandler(veventHandler));
             }
             if (databinding.getUnmarshallerProperties() != null) {
                 for (Map.Entry<String, Object> propEntry 
