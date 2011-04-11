@@ -48,6 +48,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -56,6 +57,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
+
+import org.xml.sax.helpers.DefaultHandler;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -110,6 +113,14 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private boolean skipJaxbChecks;
     private boolean singleJaxbContext;
     private Class[] extraClass;
+    
+    private boolean validateOutput;
+    private boolean validateBeforeWrite;
+    private ValidationEventHandler eventHandler;
+    
+    public void setValidationHandler(ValidationEventHandler handler) {
+        eventHandler = handler;
+    }
     
     public void setSingleJaxbContext(boolean useSingleContext) {
         singleJaxbContext = useSingleContext;
@@ -446,6 +457,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         if (schema != null) {
             unmarshaller.setSchema(schema);
         }
+        if (eventHandler != null) {
+            unmarshaller.setEventHandler(eventHandler);
+        }
         if (uProperties != null) {
             for (Map.Entry<String, Object> entry : uProperties.entrySet()) {
                 unmarshaller.setProperty(entry.getKey(), entry.getValue());
@@ -465,9 +479,21 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         if (enc != null) {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, enc);
         }
+        validateObjectIfNeeded(marshaller, obj);
         return marshaller;
     }
     
+    protected void validateObjectIfNeeded(Marshaller marshaller, Object obj) 
+        throws JAXBException {
+        if (validateOutput && schema != null) {
+            marshaller.setEventHandler(eventHandler);
+            marshaller.setSchema(schema);
+            if (validateBeforeWrite) {
+                marshaller.marshal(obj, new DefaultHandler());
+                marshaller.setSchema(null);
+            }
+        }
+    }
         
     protected Class<?> getActualType(Class<?> type, Type genericType, Annotation[] anns) {
         Class<?> theType = null;
@@ -599,6 +625,14 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                                                             true);
     }
     
+    public void setValidateBeforeWrite(boolean validateBeforeWrite) {
+        this.validateBeforeWrite = validateBeforeWrite;
+    }
+
+    public void setValidateOutput(boolean validateOutput) {
+        this.validateOutput = validateOutput;
+    }
+
     @XmlRootElement
     protected static class CollectionWrapper {
         
