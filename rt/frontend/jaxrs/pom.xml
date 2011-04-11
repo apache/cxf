@@ -123,7 +123,6 @@
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
-            <version>1.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -206,11 +205,4 @@
             
         </plugins>
     </build>
-    <!-- will get removed immediately after Jettison 1.3 gets released and pushed into Central-->
-    <repositories>
-       <repository>
-         <id>codehause-snapshots</id>
-         <url>http://snapshots.repository.codehaus.org</url>
-       </repository>
-    </repositories>
 </project>
