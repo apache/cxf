@@ -66,7 +66,9 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
         
         public boolean handleEvent(ValidationEvent event) {
             String msg = event.getMessage();
-            if (msg.startsWith("cvc-type.3.1.1: ") && msg.contains(":Id")) {
+            if ((msg.startsWith("cvc-type.3.1.1: ") 
+                || msg.startsWith("cvc-type.3.2.2: "))  
+                && msg.contains(":Id")) {
                 return true;
             }
             if (origHandler != null) {
