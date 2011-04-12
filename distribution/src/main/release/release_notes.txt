@@ -1,5 +1,5 @@
 
-Apache CXF 2.3.3 Release Notes
+Apache CXF 2.3.4 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ New features include:
    for the Stax parser
 
 
-2.3.3 fixes over 52 JIRA issues reported by users and the community.
+2.3.4 fixes over 59 JIRA issues reported by users and the community.
 
 
 
@@ -108,71 +108,75 @@ for caveats when upgrading from CXF 2.2.x to 2.3.x.
 
 
 ** Bug
-    * [CXF-3077] - java.lang.InstantiationException: org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl
-    * [CXF-3230] - CXF over JMS leaks JMS resources  when no replay queue is specified
-    * [CXF-3253] - LocalConduit with DirectDispatch does not work with interceptors that decorate the OutputStream
-    * [CXF-3254] - idl2wsdl should be able to honor #if preprocessor
-    * [CXF-3257] - ServiceImpl.getPorts not returning ports created with addPort
-    * [CXF-3264] - idl2wsdl tool shouldn't fail when encounter #pragma directive
-    * [CXF-3266] - CXF uses the incorrect namespace to refer to an Encrypted Key
-    * [CXF-3271] - WS-RM code does not support InOrder assurances
-    * [CXF-3274] - JAX RS @FormParam error
-    * [CXF-3277] - soap headers can't be carried back when exception happen
-    * [CXF-3280] - idl2wsdl does not process multiple include directories -I <dir> correctly.
-    * [CXF-3286] - idl2wsdl tool should be able to honor local keyword
-    * [CXF-3288] - Multiple Client.getResponse() calls do not work
-    * [CXF-3289] - idl2wsdl fails if reference to interface is used inside the interface itself.
-    * [CXF-3290] - wsdl2java fails to generate working client code if web service and portType have the same name
-    * [CXF-3292] - MultipartProvider does not support reading Maps
-    * [CXF-3293] - idl2wsdl tool fails if parameter refer an interface from other module in an included idl file
-    * [CXF-3294] - idl2wsdl tool fails if inherit interface has oneway method
-    * [CXF-3295] - idl2wsdl tool fails for some comment format
-    * [CXF-3296] - wsdl2java tool should always use catalog to resovle the overwriten url firstly 
-    * [CXF-3297] - idl2wsdl fails with NPE if IDL contains typeprefix keyword
-    * [CXF-3298] - JAXRSUtils uses a split function to find name and value of the query and matrix params
-    * [CXF-3299] - jaxws frontend should not reference http and local transports
-    * [CXF-3303] - idl2wsdl fails with NPE if a type cannot be resolved
-    * [CXF-3304] - WebClient POST to a resource that returns 401 returns a blank InputStream when there's supposed to be text
-    * [CXF-3305] - Request payload as StaxSource: first event is -1
-    * [CXF-3314] - Separate loggers for LoggingInInterceptor and LoggingOutInterceptor
-    * [CXF-3319] - idl2wsdl defines XSD types multiple times in wsdl. 
-    * [CXF-3326] - Fixed the test error of simple frontend
-    * [CXF-3330] - URITemplate does not escape literal '+' characters
-    * [CXF-3332] - SourceDataBinding doesn't create a thread safe DataReader 
-    * [CXF-3340] - wsdl2java caches the input wsdl file or result so there is no differnce in the output when called a second time from the same process and with the same wsdl file path
-    * [CXF-3345] - cxt-rt-core references spring-beans-2.5.xsd - breaks Spring 3 compatibility
-    * [CXF-3347] - ws_security's ut and sign_enc samples define ConciseFormatter with the wrong package name
-    * [CXF-3349] - NPE may be thrown in WS-RM scenarios at the server side when rebasing the response
-    * [CXF-3351] - JAXBElementProvider ignores stream readers when creating JAXBElements 
-    * [CXF-3353] - can't refer to java.lang.Exception in gererated fault code
+    * [CXF-2916] - unmarshalling the JSON of a subclass fails when a field value is null
+    * [CXF-3117] - Inapppropriate use of naked RuntimeException
+    * [CXF-3171] - http.proxyHost and http.proxyPort of System properties win when no proxy is required
+    * [CXF-3204] - DynamicClientFactory.setupClasspath method cannot handle spaces in path
+    * [CXF-3265] - Compilation error for schemas with types named as standard java classes
+    * [CXF-3316] - \apache-cxf-2.3.2\samples\ws_security\interopfest\wstrust13\pom.xml contains wrong CXF version
+    * [CXF-3317] - Sample for wstrust13 contains unavailable url 
+    * [CXF-3331] - Schema validation breaks with multiple Instances of Java first JAX-WS service
+    * [CXF-3342] - NullPointerException in Soap12FaultOutInterceptor when an exception is thrown from a SOAP 1.2 endpoint
+    * [CXF-3360] - repeated replace() function calls damage the performance
+    * [CXF-3361] - Configuring Log4jLogger requires SecurityPermission setContextClassLoader
+    * [CXF-3362] - CXF Servlet doesn't support servlet async feature rightly
+    * [CXF-3364] - No wsdl elements generated for Exception.class
+    * [CXF-3367] - SOAPAction value not extracted in the inbound processing if the header name does not match exactly "SOAPAction"
+    * [CXF-3369] - jetty SecurityHandler should be on top of org.apache.cxf.transport.http_jetty.JettyHTTPHandler
+    * [CXF-3374] - CXF Service Builder fails if the binding is imported from different file and has different target namespace than one imported into.
+    * [CXF-3376] - Exception while sending array of byte (byte[]) 
+    * [CXF-3379] - @Context fails to inject Application instance
+    * [CXF-3381] - CXF-2841 resurfaced in 2.3.x
+    * [CXF-3383] - byte[] mtom attachments unmarshal error
+    * [CXF-3395] - cxf transfer hashmap can't be chinese word
+    * [CXF-3396] - InstrumentationManager not registering correctly in the standalone mode (i.e. when not using the framework's server)
+    * [CXF-3397] - ServiceConstructionException: Could not resolve a binding for http://schemas.xmlsoap.org/wsdl/soap/
+    * [CXF-3398] - JMX Naming issue - cannot register the mutil endpoints with same service bean
+    * [CXF-3400] - Spring request-scoped beans can not have context and parameter properties injected 
+    * [CXF-3401] - soap.env.ns.map cannot be set on enpoint
+    * [CXF-3403] - ServletController getBaseURL can not handle encoded URIs in some cases
+    * [CXF-3404] - Encoded semicolons are not correctly handled by the JAX-RS runtime
+    * [CXF-3406] - Handler scoped properties not restored into the context after application fault
+    * [CXF-3407] - Failure initializing ClassHelper
+    * [CXF-3408] - Custom headers may get lost if CXF interceptors do not use MultivaluedMap
+    * [CXF-3410] - org.apache.cxf.ws.policy.PolicyAnnotationListener throws NPE on endpoints with wsdlURL only (i.e. no serviceClass)
+    * [CXF-3411] - JMSTransport: swallowed exception by provider send exchange
+    * [CXF-3412] - ManagedEndpoint.getTransportId return endpoint address
+    * [CXF-3413] - IndexOutOfBoundsException in DocLiteralInInterceptor
+    * [CXF-3422] - 'Cannot find target method' when certain hex-encoded characters are used in @PathParam in GET requests
+    * [CXF-3426] - CXF JMSContinuation leaks threads
+    * [CXF-3427] - JMSContinuation should be thread safe
+    * [CXF-3428] - Context closed twice with Spring setup
+    * [CXF-3429] - ServerImpl should shutdown Destination before setMessageObserver=null
+    * [CXF-3430] - XmlJavaTypeAdapter is not used correctly with explicit collections
+    * [CXF-3444] - WSS4JInIntereptor does not always set the 'best' Principal as SecurityContext Principal
+    * [CXF-3446] - InjectorUtils class goes to deep when it handles an enum value
+    * [CXF-3447] - Error creating bean with name 'cxf': Requested bean is currently in creation: Is there an unresolvable circular reference? 
+    * [CXF-3452] - WS-Security Encrypted headers fail with JAX-WS Binding
+    * [CXF-3453] - WS-Security signed headers fail when schema validation enabled
 
 
 ** Improvement
-    * [CXF-3124] - Accessing HTTPConduit in the CXF JAXRS client code requires the cxf-rt-transports-http-jetty dependency
-    * [CXF-3170] - NullPointerException in StaxUtils.java:961
-    * [CXF-3261] - JAX-RS: Performance improvement for JAXRSOutInterceptor.checkBufferingMode
-    * [CXF-3262] - JAX-RS: Performance Improvement: Don't use IllegalArgumentException to determine if a URI chunk is a variable or literal
-    * [CXF-3279] - Marking the imports of the CORABA package to be optional
-    * [CXF-3285] - JAX-RS: Avoid implicit use of regular expression in JAXRSUtils.intersectMimeTypes
-    * [CXF-3310] - Cannot use <jaxws:client createdFromAPI=true> to configure proxies created with JaxWsProxyFactory
-    * [CXF-3311] - Incremental generation for XMLBeans
-    * [CXF-3322] - Introduce the extended SecurityContext interface
-    * [CXF-3324] - JAXRSUtils: Avoid calling Message unless it'll be logged
-    * [CXF-3325] - Logging interceptors should show the HTTP method
-    * [CXF-3327] - PhaseInterceptorChain should warn user if the interceptor phase can't be found
-    * [CXF-3334] - cxf-jms should support topicReplyToName option in the JMS URI
-    * [CXF-3348] - [cxf-rt-ws-security] Fix for TokenType support  
-    * [CXF-3355] - Exports the properties of OSGi transport Servlet
+    * [CXF-2716] - Collection Support for JSONProvider
+    * [CXF-3224] - WS-Trust: remove current wst:KeyType and wst:KeySize defaults
+    * [CXF-3363] - Use MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL) instead of MessageFactory.newInstance()
+    * [CXF-3373] - Allow for providing classloader for bus extensions resolution
+    * [CXF-3378] - Upgrade Jetty to 7.3.1 (from 7.2.2)
+    * [CXF-3391] - Provide a better support for extra JAXB classes and add more tests
+    * [CXF-3392] - Update FormEncodingProvider to support org.apache.cxf.jaxrs.ext.form.Form
+    * [CXF-3436] - Javadoc fixes for o.a.c.jaxws.JaxWsServerFactoryBean
+    * [CXF-3442] - Fault should not swallow the cause exception message
+    * [CXF-3443] - Check XmlJavaTypeAdapters for all types of JAX-RS parameters 
+    * [CXF-3455] - Migrate to current version of Neethi (2.0.5 or 3.0.0)
 
+** New Feature
+    * [CXF-3005] - Add support for jsonp in CXF JAX-RS
+    * [CXF-3385] - Add a new option in WSD2Java to skip the generate the type classes from schema
+    * [CXF-3424] - LoadDistributorFeature for CXF
 
-
-
-
-
-
-
-
-
+** Task
+    * [CXF-3368] - Clean up the soap over jms wsdl extension schema
+    * [CXF-3417] - Support the injection of contexts into injected Applications
 
 
 
