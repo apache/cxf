@@ -42,7 +42,7 @@
 
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-        <cxf.build-utils.version>2.3.3-SNAPSHOT</cxf.build-utils.version>
+        <cxf.build-utils.version>2.3.2</cxf.build-utils.version>
         <cxf.xjc-utils.version>2.3.2</cxf.xjc-utils.version>
         <cxf.jdk.version>1.6</cxf.jdk.version>
     </properties>
