@@ -514,16 +514,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             theType = type;
         }
         XmlJavaTypeAdapter adapter = getAdapter(theType, anns);
-        if (adapter != null) {
-            if (adapter.type() != XmlJavaTypeAdapter.DEFAULT.class) {
-                theType = adapter.type();
-            } else {
-                Type[] types = InjectionUtils.getActualTypes(adapter.value().getGenericSuperclass());
-                if (types != null && types.length == 2) {
-                    theType = InjectionUtils.getActualType(types[0]);
-                }
-            }
-        }
+        theType = org.apache.cxf.jaxrs.utils.JAXBUtils.getTypeFromAdapter(adapter, theType, false);
         
         return theType;
     }
