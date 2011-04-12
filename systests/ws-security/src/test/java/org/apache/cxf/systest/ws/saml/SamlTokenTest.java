@@ -29,6 +29,7 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -76,8 +77,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler()
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         try {
             saml1Port.doubleIt(BigInteger.valueOf(25));
@@ -87,8 +87,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
 
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler(false)
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
         assert result.equals(BigInteger.valueOf(50));
@@ -110,7 +109,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricPort();
-        
+       
         try {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with no SAML Assertion");
@@ -119,8 +118,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler(false)
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         try {
             saml2Port.doubleIt(BigInteger.valueOf(25));
@@ -130,11 +128,44 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler()
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
         assert result.equals(BigInteger.valueOf(50));
+    }
+    
+    /**
+     * Some negative tests. Send a sender-vouches assertion as a SupportingToken...this will
+     * fail as the provider will demand that there is a signature covering both the assertion
+     * and the message body.
+     */
+    @org.junit.Test
+    public void testSaml2OverSymmetricSupporting() throws Exception {
+
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricSupportingPort();
+        
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+        );
+        
+        try {
+            saml2Port.doubleIt(BigInteger.valueOf(25));
+            fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assert ex.getMessage().contains("Assertion fails sender-vouches requirements");
+        }
     }
 
     @org.junit.Test
@@ -163,8 +194,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler(false)
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         try {
             saml2Port.doubleIt(BigInteger.valueOf(25));
@@ -174,8 +204,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler()
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
         assert result.equals(BigInteger.valueOf(50));
@@ -196,8 +225,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType saml1Port = service.getDoubleItSaml1SelfSignedTransportPort();
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler(false)
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
         assert result.equals(BigInteger.valueOf(50));
@@ -222,8 +250,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricProtectionPort();
         
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler",
-            new org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler()
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
         assert result.equals(BigInteger.valueOf(50));

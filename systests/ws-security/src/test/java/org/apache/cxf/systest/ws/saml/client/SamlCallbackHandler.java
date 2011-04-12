@@ -39,6 +39,7 @@ import org.opensaml.common.SAMLVersion;
  */
 public class SamlCallbackHandler implements CallbackHandler {
     private boolean saml2 = true;
+    private String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     
     public SamlCallbackHandler() {
         //
@@ -46,6 +47,10 @@ public class SamlCallbackHandler implements CallbackHandler {
     
     public SamlCallbackHandler(boolean saml2) {
         this.saml2 = saml2;
+    }
+    
+    public void setConfirmationMethod(String confirmationMethod) {
+        this.confirmationMethod = confirmationMethod;
     }
     
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -60,8 +65,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setIssuer("sts");
                 String subjectName = "uid=sts-client,o=mock-sts.com";
                 String subjectQualifier = "www.mock-sts.com";
-                String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
-                if (!saml2) {
+                if (!saml2 && SAML2Constants.CONF_SENDER_VOUCHES.equals(confirmationMethod)) {
                     confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
                 }
                 SubjectBean subjectBean = 

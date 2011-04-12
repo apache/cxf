@@ -59,9 +59,20 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
        </jaxws:properties>
-   </jaxws:client>  
+    </jaxws:client>
+    
+      <jaxws:client name="{http://WSSec/saml}DoubleItSaml2SymmetricSupportingPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+       </jaxws:properties>
+     </jaxws:client>  
    
-   <jaxws:client name="{http://WSSec/saml}DoubleItSaml2AsymmetricPort" 
+    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2AsymmetricPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.username" value="alice"/>
@@ -73,9 +84,9 @@
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
        </jaxws:properties>
-   </jaxws:client> 
+    </jaxws:client> 
 
-   <jaxws:client name="{http://WSSec/saml}DoubleItSaml1SelfSignedTransportPort" 
+    <jaxws:client name="{http://WSSec/saml}DoubleItSaml1SelfSignedTransportPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -85,9 +96,9 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
            <entry key="ws-security.self-sign-saml-assertion" value="true"/>
        </jaxws:properties>
-   </jaxws:client>  
+    </jaxws:client>  
    
-   <jaxws:client name="{http://WSSec/saml}DoubleItSaml2SymmetricProtectionPort" 
+    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2SymmetricProtectionPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -96,6 +107,6 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
        </jaxws:properties>
-   </jaxws:client>  
+    </jaxws:client>  
     
 </beans>
