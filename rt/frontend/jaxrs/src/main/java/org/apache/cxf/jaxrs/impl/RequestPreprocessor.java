@@ -41,6 +41,7 @@ import org.apache.cxf.message.Message;
 public class RequestPreprocessor {
     
     private static final String ACCEPT_QUERY = "_type";
+    private static final String CTYPE_QUERY = "_ctype";
     private static final String METHOD_QUERY = "_method";
     private static final String METHOD_HEADER = "X-HTTP-Method-Override";
     
@@ -76,6 +77,7 @@ public class RequestPreprocessor {
         
         MultivaluedMap<String, String> queries = u.getQueryParameters();
         handleTypeQuery(m, queries);
+        handleCType(m, queries);
         handleMethod(m, queries, new HttpHeadersImpl(m));
         Response r = checkMetadataRequest(m);
         if (r == null) {
@@ -150,6 +152,13 @@ public class RequestPreprocessor {
                 type = SHORTCUTS.get(type);
             }
             updateAcceptTypeHeader(m, type);
+        }
+    }
+    
+    private void handleCType(Message m, MultivaluedMap<String, String> queries) {
+        String type = queries.getFirst(CTYPE_QUERY);
+        if (type != null) {
+            m.put(Message.CONTENT_TYPE, type);
         }
     }
     
