@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -28,13 +29,45 @@ public final class JAXBUtils {
         
     }
     
-    public static Object convertWithAdapter(String value, Annotation[] anns) throws Exception {
-        
-        return useAdapter(value,
+    public static Object convertWithAdapter(Object obj, 
+                                            Annotation[] anns) {
+        return useAdapter(obj, 
                           AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class),
-                          false,
-                          null);
-            
+                          false, 
+                          obj);
+    }
+    
+    public static Class<?> getValueTypeFromAdapter(Class<?> expectedBoundType,
+                                                   Class<?> defaultClass,
+                                                   Annotation[] anns) {
+        try {
+            XmlJavaTypeAdapter adapter = AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class);
+            if (adapter != null) {
+                Class<?> boundType = JAXBUtils.getTypeFromAdapter(adapter, null, true);
+                if (boundType != null && boundType.isAssignableFrom(expectedBoundType)) {
+                    return JAXBUtils.getTypeFromAdapter(adapter, null, false);
+                }
+            }
+        } catch (Throwable ex) {
+            // ignore
+        }
+        return defaultClass; 
+    }
+    
+    public static Class<?> getTypeFromAdapter(XmlJavaTypeAdapter adapter, Class<?> theType,
+                                              boolean boundType) {
+        if (adapter != null) {
+            if (adapter.type() != XmlJavaTypeAdapter.DEFAULT.class) {
+                theType = adapter.type();
+            } else {
+                Type[] types = InjectionUtils.getActualTypes(adapter.value().getGenericSuperclass());
+                if (types != null && types.length == 2) {
+                    int index = boundType ? 1 : 0;
+                    theType = InjectionUtils.getActualType(types[index]);
+                }
+            }
+        }
+        return theType;
     }
     
     public static Object useAdapter(Object obj, 

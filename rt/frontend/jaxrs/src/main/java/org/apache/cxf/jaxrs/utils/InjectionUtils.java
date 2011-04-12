@@ -305,34 +305,42 @@ public final class InjectionUtils {
                 throw new WebApplicationException(nfe, Response.Status.BAD_REQUEST);
             }
         }
+        
+        boolean adapterHasToBeUsed = false;
+        Class<?> valueType = JAXBUtils.getValueTypeFromAdapter(pClass, pClass, paramAnns);
+        if (valueType != pClass) {
+            pClass = valueType;
+            adapterHasToBeUsed = true;
+        }
+        
+        Object result = null;
         // check constructors accepting a single String value
         try {
             Constructor<?> c = pClass.getConstructor(new Class<?>[]{String.class});
-            return c.newInstance(new Object[]{value});
+            result = c.newInstance(new Object[]{value});
         } catch (NoSuchMethodException ex) {
             // try valueOf
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (Exception ex) {
-            Object result = createFromParameterHandler(value, pClass, message);
-            if (result != null) {
-                return result;
+            result = createFromParameterHandler(value, pClass, message);
+            if (result == null) {
+                LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
+                                                                   BUNDLE, 
+                                                                   pClass.getName()).toString());
+                throw new WebApplicationException(ex, HttpUtils.getParameterFailureStatus(pType));
             }
-            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
-                                                               BUNDLE, 
-                                                               pClass.getName()).toString());
-            throw new WebApplicationException(ex, HttpUtils.getParameterFailureStatus(pType));
         }
-        
-        Object result = null;
-        // check for valueOf(String) static methods
-        String[] methodNames = pClass.isEnum() 
-            ? new String[] {"fromString", "fromValue", "valueOf"} 
-            : new String[] {"valueOf", "fromString"};
-        for (String mName : methodNames) {   
-            result = evaluateFactoryMethod(value, pClass, pType, mName);
-            if (result != null) {
-                break;
+        if (result == null) {
+            // check for valueOf(String) static methods
+            String[] methodNames = pClass.isEnum() 
+                ? new String[] {"fromString", "fromValue", "valueOf"} 
+                : new String[] {"valueOf", "fromString"};
+            for (String mName : methodNames) {   
+                result = evaluateFactoryMethod(value, pClass, pType, mName);
+                if (result != null) {
+                    break;
+                }
             }
         }
         
@@ -340,12 +348,12 @@ public final class InjectionUtils {
             result = createFromParameterHandler(value, pClass, message);
         }
         
-        if (result == null) {
+        if (result != null && adapterHasToBeUsed) {
             // as the last resort, try XmlJavaTypeAdapters
             try {
-                result = JAXBUtils.convertWithAdapter(value, paramAnns);
+                result = JAXBUtils.convertWithAdapter(result, paramAnns);
             } catch (Throwable ex) {
-                // ignore - may be to do with JAXB classes not being available 
+                result = null; 
             }
         }
         

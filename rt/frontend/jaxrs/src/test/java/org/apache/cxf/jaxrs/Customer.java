@@ -180,6 +180,12 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         
     }
     
+    public void testXmlAdapter2(@QueryParam("a") 
+                               @XmlJavaTypeAdapter(CustomerBeanAdapter2.class) 
+                               CustomerBean cb) {
+        
+    }
+    
     public void testPathBean(@PathParam("") CustomerBean cb) {
         
     }
@@ -432,6 +438,38 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
         @Override
         public String marshal(CustomerBean v) throws Exception {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
+    
+    public static final class ABean {
+        private String value;
+        private ABean(String value) {
+            this.value = value;
+        }
+        
+        public String getValue() {
+            return value;
+        }
+        
+        public static ABean fromString(String value) {
+            return new ABean(value);
+        }
+    }
+    
+    public static class CustomerBeanAdapter2 extends XmlAdapter<ABean, CustomerBean> {
+
+        @Override
+        public CustomerBean unmarshal(ABean value) throws Exception {
+            CustomerBean bean = new CustomerBean();
+            bean.setA(value.getValue());
+            return bean;
+        }
+
+        @Override
+        public ABean marshal(CustomerBean v) throws Exception {
             // TODO Auto-generated method stub
             return null;
         }
