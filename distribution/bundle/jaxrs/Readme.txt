@@ -48,7 +48,6 @@ cxf-rt-databinding-jaxb
 cxf-rt-frontend-jaxws
 cxf-rt-frontend-js
 cxf-rt-frontend-simple
-cxf-rt-transports-http-osgi
 
 If your code depends on any of the above modules then
 please use either an all-inclusive cxf-bundle bundle or 
