@@ -29,7 +29,7 @@ import org.apache.cxf.jaxrs.ext.search.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 /**
- * Builds client-side search condition that passed to backend can be consumed by {@link FiqlParser}.
+ * Builds a FIQL search condition.
  * <p>
  * Examples:
  * 
@@ -121,125 +121,130 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         }
 
         public CompleteCondition after(Date date) {
-            result += FiqlParser.GT + toString(date);
-            return this;
+            return condition(FiqlParser.GT, toString(date));
         }
 
         public CompleteCondition before(Date date) {
-            result += FiqlParser.LT + toString(date);
-            return this;
+            return condition(FiqlParser.LT, toString(date));
         }
 
         public CompleteCondition equalTo(String literalOrPattern) {
-            result += FiqlParser.EQ + literalOrPattern;
-            return this;
+            return condition(FiqlParser.EQ, literalOrPattern);
         }
 
         public CompleteCondition equalTo(double number) {
-            result += FiqlParser.EQ + number;
-            return this;
+            return condition(FiqlParser.EQ, number);
+        }
+        
+        public CompleteCondition equalTo(long number) {
+            return condition(FiqlParser.EQ, number);
         }
 
         public CompleteCondition equalTo(Date date) {
-            result += FiqlParser.EQ + toString(date);
-            return this;
+            return condition(FiqlParser.EQ, toString(date));
         }
 
         public CompleteCondition greaterOrEqualTo(double number) {
-            result += FiqlParser.GE + number;
-            return this;
+            return condition(FiqlParser.GE, number);
+        }
+        
+        public CompleteCondition greaterOrEqualTo(long number) {
+            return condition(FiqlParser.GE, number);
         }
 
         public CompleteCondition greaterThan(double number) {
-            result += FiqlParser.GT + number;
-            return this;
+            return condition(FiqlParser.GT, number);
+        }
+        
+        public CompleteCondition greaterThan(long number) {
+            return condition(FiqlParser.GT, number);
         }
 
         public CompleteCondition lessOrEqualTo(double number) {
-            result += FiqlParser.LE + number;
-            return this;
+            return condition(FiqlParser.LE, number);
+        }
+        
+        public CompleteCondition lessOrEqualTo(long number) {
+            return condition(FiqlParser.LE, number);
         }
 
         public CompleteCondition lessThan(double number) {
-            result += FiqlParser.LT + number;
-            return this;
+            return condition(FiqlParser.LT, number);
+        }
+        
+        public CompleteCondition lessThan(long number) {
+            return condition(FiqlParser.LT, number);
         }
 
         public CompleteCondition lexicalAfter(String literal) {
-            result += FiqlParser.GT + literal;
-            return this;
+            return condition(FiqlParser.GT, literal);
         }
 
         public CompleteCondition lexicalBefore(String literal) {
-            result += FiqlParser.LT + literal;
-            return this;
+            return condition(FiqlParser.LT, literal);
         }
 
         public CompleteCondition lexicalNotAfter(String literal) {
-            result += FiqlParser.LE + literal;
-            return this;
+            return condition(FiqlParser.LE, literal);
         }
 
         public CompleteCondition lexicalNotBefore(String literal) {
-            result += FiqlParser.GE + literal;
-            return this;
+            return condition(FiqlParser.GE, literal);
         }
 
         public CompleteCondition notAfter(Date date) {
-            result += FiqlParser.LE + toString(date);
-            return this;
+            return condition(FiqlParser.LE, toString(date));
         }
 
         public CompleteCondition notBefore(Date date) {
-            result += FiqlParser.GE + toString(date);
-            return this;
+            return condition(FiqlParser.GE, toString(date));
         }
 
         public CompleteCondition notEqualTo(String literalOrPattern) {
-            result += FiqlParser.NEQ + literalOrPattern;
-            return this;
+            return condition(FiqlParser.NEQ, literalOrPattern);
         }
 
         public CompleteCondition notEqualTo(double number) {
-            result += FiqlParser.NEQ + number;
-            return this;
+            return condition(FiqlParser.NEQ, number);
+        }
+        
+        public CompleteCondition notEqualTo(long number) {
+            return condition(FiqlParser.NEQ, number);
         }
 
         public CompleteCondition notEqualTo(Date date) {
-            result += FiqlParser.NEQ + toString(date);
-            return this;
+            return condition(FiqlParser.NEQ, toString(date));
         }
 
         public CompleteCondition after(Duration distanceFromNow) {
-            result += FiqlParser.GT + distanceFromNow;
-            return this;
+            return condition(FiqlParser.GT, distanceFromNow);
         }
 
         public CompleteCondition before(Duration distanceFromNow) {
-            result += FiqlParser.LT + distanceFromNow;
-            return this;
+            return condition(FiqlParser.LT, distanceFromNow);
         }
 
         public CompleteCondition equalTo(Duration distanceFromNow) {
-            result += FiqlParser.EQ + distanceFromNow;
-            return this;
+            return condition(FiqlParser.EQ, distanceFromNow);
         }
 
         public CompleteCondition notAfter(Duration distanceFromNow) {
-            result += FiqlParser.LE + distanceFromNow;
-            return this;
+            return condition(FiqlParser.LE, distanceFromNow);
         }
 
         public CompleteCondition notBefore(Duration distanceFromNow) {
-            result += FiqlParser.GE + distanceFromNow;
-            return this;
+            return condition(FiqlParser.GE, distanceFromNow);
         }
 
         public CompleteCondition notEqualTo(Duration distanceFromNow) {
-            result += FiqlParser.NEQ + distanceFromNow;
-            return this;
+            return condition(FiqlParser.NEQ, distanceFromNow);
         }
 
+        protected CompleteCondition condition(String operator, Object value) {
+            result += operator + value;
+            return this;
+        }
+        
         public PartialCondition and() {
             result += FiqlParser.AND;
             return this;

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.client;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -31,21 +31,23 @@ import java.util.Map;
  */
 public abstract class SearchConditionBuilder implements PartialCondition {
 
-    private static Map<String, SearchConditionBuilder> lang2impl;
-    private static SearchConditionBuilder defaultImpl;
-    static {
-        defaultImpl = new FiqlSearchConditionBuilder();
-        lang2impl = new HashMap<String, SearchConditionBuilder>();
-        lang2impl.put("fiql", defaultImpl);
-    }
-
+    public static final String DEFAULT_LANGUAGE = "FIQL";
     /**
      * Creates instance of builder.
      * 
      * @return default implementation of builder.
      */
     public static SearchConditionBuilder instance() {
-        return instance("FIQL");
+        return instance(DEFAULT_LANGUAGE);
+    }
+    
+    /**
+     * Creates instance of builder with provided properties
+     * @param properties
+     * @return default implementation of builder.
+     */
+    public static SearchConditionBuilder instance(Map<String, String> properties) {
+        return instance(DEFAULT_LANGUAGE, properties);
     }
 
     /**
@@ -56,14 +58,14 @@ public abstract class SearchConditionBuilder implements PartialCondition {
      * @return implementation of expected or default builder.
      */
     public static SearchConditionBuilder instance(String language) {
-        SearchConditionBuilder impl = null;
-        if (language != null) {
-            impl = lang2impl.get(language.toLowerCase());
+        return instance(language, Collections.<String, String>emptyMap());
+    }
+    
+    public static SearchConditionBuilder instance(String language, Map<String, String> properties) {
+        if (!DEFAULT_LANGUAGE.equalsIgnoreCase(language)) {
+            throw new IllegalArgumentException("Unsupported query language: " + language);
         }
-        if (impl == null) {
-            impl = new FiqlSearchConditionBuilder();
-        }
-        return impl;
+        return new FiqlSearchConditionBuilder(properties);
     }
 
     /** Finalize condition construction and build search condition query. */

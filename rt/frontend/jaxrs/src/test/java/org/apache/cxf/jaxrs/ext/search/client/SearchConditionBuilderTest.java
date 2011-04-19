@@ -31,21 +31,16 @@ public class SearchConditionBuilderTest {
 
     @Test
     public void testFiqlImpl() throws Exception {
-        assertTrue(SearchConditionBuilder.instance("fiql") instanceof FiqlSearchConditionBuilder);
+        assertTrue(SearchConditionBuilder.instance("FIQL") instanceof FiqlSearchConditionBuilder);
     }
 
     @Test
     public void testCaseInsensitive() throws Exception {
-        assertTrue(SearchConditionBuilder.instance("fiQL") instanceof FiqlSearchConditionBuilder);
+        assertTrue(SearchConditionBuilder.instance("fiql") instanceof FiqlSearchConditionBuilder);
     }
 
-    @Test
-    public void testDefaultFallback() throws Exception {
-        assertTrue(SearchConditionBuilder.instance("unknown language") instanceof FiqlSearchConditionBuilder);
-    }
-
-    @Test
-    public void testNullLang() throws Exception {
-        assertTrue(SearchConditionBuilder.instance(null) instanceof FiqlSearchConditionBuilder);
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnknownQueryLanguage() throws Exception {
+        SearchConditionBuilder.instance("unknown language");
     }
 }

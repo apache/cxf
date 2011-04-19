@@ -29,9 +29,12 @@ public interface Property {
     /** Is textual property equal to given literal or matching given pattern? */
     CompleteCondition equalTo(String literalOrPattern);
 
-    /** Is numeric property equal to given number? */
+    /** Is numeric property equal to given double number? */
     CompleteCondition equalTo(double number);
 
+    /** Is numeric property equal to given long number? */
+    CompleteCondition equalTo(long number);
+    
     /** Is date property same as given date? */
     CompleteCondition equalTo(Date date);
 
@@ -41,8 +44,11 @@ public interface Property {
     /** Is textual property different than given literal or not matching given pattern? */
     CompleteCondition notEqualTo(String literalOrPattern);
 
-    /** Is numeric property different than given number? */
+    /** Is numeric property different than given double number? */
     CompleteCondition notEqualTo(double number);
+    
+    /** Is numeric property different than given long number? */
+    CompleteCondition notEqualTo(long number);
 
     /** Is date property different than given date? */
     CompleteCondition notEqualTo(Date date);
@@ -52,15 +58,27 @@ public interface Property {
 
     /** Is numeric property greater than given number? */
     CompleteCondition greaterThan(double number);
+    
+    /** Is numeric property greater than given number? */
+    CompleteCondition greaterThan(long number);
 
     /** Is numeric property less than given number? */
     CompleteCondition lessThan(double number);
+    
+    /** Is numeric property less than given number? */
+    CompleteCondition lessThan(long number);
 
     /** Is numeric property greater or equal to given number? */
     CompleteCondition greaterOrEqualTo(double number);
+    
+    /** Is numeric property greater or equal to given number? */
+    CompleteCondition greaterOrEqualTo(long number);
 
     /** Is numeric property less or equal to given number? */
     CompleteCondition lessOrEqualTo(double number);
+    
+    /** Is numeric property less or equal to given number? */
+    CompleteCondition lessOrEqualTo(long number);
 
     /** Is date property after (greater than) given date? */
     CompleteCondition after(Date date);

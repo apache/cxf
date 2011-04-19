@@ -153,9 +153,15 @@ public class FiqlSearchConditionBuilderTest {
     }
     
     @Test
-    public void testGreaterThanNumber() {
-        String ret = b.is("foo").greaterThan(25).query();
+    public void testGreaterThanNumberDouble() {
+        String ret = b.is("foo").greaterThan(25.0).query();
         assertEquals("foo=gt=25.0", ret);
+    }
+    
+    @Test
+    public void testGreaterThanLong() {
+        String ret = b.is("foo").greaterThan(25).query();
+        assertEquals("foo=gt=25", ret);
     }
 
     @Test
@@ -165,15 +171,27 @@ public class FiqlSearchConditionBuilderTest {
     }
 
     @Test
-    public void testLessOrEqualToNumber() {
-        String ret = b.is("foo").lessOrEqualTo(0).query();
+    public void testLessOrEqualToNumberDouble() {
+        String ret = b.is("foo").lessOrEqualTo(0.0).query();
         assertEquals("foo=le=0.0", ret);
+    }
+    
+    @Test
+    public void testLessOrEqualToNumberLong() {
+        String ret = b.is("foo").lessOrEqualTo(0).query();
+        assertEquals("foo=le=0", ret);
     }
 
     @Test
-    public void testGreaterOrEqualToNumber() {
-        String ret = b.is("foo").greaterOrEqualTo(-5).query();
+    public void testGreaterOrEqualToNumberDouble() {
+        String ret = b.is("foo").greaterOrEqualTo(-5.0).query();
         assertEquals("foo=ge=-5.0", ret);
+    }
+    
+    @Test
+    public void testGreaterOrEqualToNumberLong() {
+        String ret = b.is("foo").greaterOrEqualTo(-5).query();
+        assertEquals("foo=ge=-5", ret);
     }
 
     @Test
@@ -235,13 +253,13 @@ public class FiqlSearchConditionBuilderTest {
     @Test
     public void testOrSimple() {
         String ret = b.is("foo").greaterThan(20).or().is("foo").lessThan(10).query();
-        assertEquals("foo=gt=20.0,foo=lt=10.0", ret);
+        assertEquals("foo=gt=20,foo=lt=10", ret);
     }    
     
     @Test
     public void testAndSimple() {
         String ret = b.is("foo").greaterThan(20).and().is("bar").equalTo("plonk").query();
-        assertEquals("foo=gt=20.0;bar==plonk", ret);
+        assertEquals("foo=gt=20;bar==plonk", ret);
     }
     
     @Test
@@ -261,7 +279,7 @@ public class FiqlSearchConditionBuilderTest {
         String ret = b.is("foo").equalTo(123.4).or().and(
             b.is("bar").equalTo("asadf*"), 
             b.is("baz").lessThan(20)).query();
-        assertEquals("foo==123.4,(bar==asadf*;baz=lt=20.0)", ret);
+        assertEquals("foo==123.4,(bar==asadf*;baz=lt=20)", ret);
     }
 
     @Test
@@ -272,6 +290,6 @@ public class FiqlSearchConditionBuilderTest {
                 b.is("sub1").equalTo(0),
                 b.is("sub2").equalTo(0))).query();
         
-        assertEquals("foo==123.4,foo==null;(bar==asadf*,baz=lt=20.0;(sub1==0.0,sub2==0.0))", ret);
+        assertEquals("foo==123.4,foo==null;(bar==asadf*,baz=lt=20;(sub1==0,sub2==0))", ret);
     }
 }
