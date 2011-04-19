@@ -171,6 +171,10 @@ public final class Names {
     public static final QName ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_QNAME =
         new QName(WSA_NAMESPACE_NAME, ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_NAME);
     
+    public static final String INVALID_CARDINALITY_NAME = "InvalidCardinality";
+    public static final QName INVALID_CARDINALITY_QNAME = new QName(WSA_NAMESPACE_NAME,
+                                                                    INVALID_CARDINALITY_NAME);
+           
     public static final String SOAP11HTTP_ADDRESSING_BINDING = 
         "http://schemas.xmlsoap.org/soap/envelope/?addressing=ms";
     public static final String SOAP12HTTP_ADDRESSING_BINDING = 

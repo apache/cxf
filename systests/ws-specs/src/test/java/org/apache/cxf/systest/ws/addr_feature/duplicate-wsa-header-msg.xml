@@ -1,0 +1,21 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Header>
+		<Action xmlns="http://www.w3.org/2005/08/addressing">http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/addNumbers
+		</Action>
+		<MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:19cbc77a-a910-4f41-8bc4-ecb0e7af34ab
+		</MessageID>
+		<To xmlns="http://www.w3.org/2005/08/addressing">http://localhost:$PORT$/jaxws/add</To>
+		<ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
+			<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+		</ReplyTo>
+		<ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
+			<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+		</ReplyTo>
+	</soap:Header>
+	<soap:Body>
+		<addNumbers xmlns="http://apache.org/cxf/systest/ws/addr_feature/">
+			<number1>1</number1>
+			<number2>2</number2>
+		</addNumbers>
+	</soap:Body>
+</soap:Envelope>

@@ -19,11 +19,20 @@
 
 package org.apache.cxf.systest.ws.addr_feature;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.URL;
 import javax.xml.namespace.QName;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
+import javax.xml.ws.Service;
 import javax.xml.ws.soap.AddressingFeature;
+import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -101,7 +110,39 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
+    
+    //CXF-3456
+    @Test
+    public void testDuplicateHeaders() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
+        assertNotNull("WSDL is null", wsdl);
 
+        AddNumbersService service = new AddNumbersService(wsdl, serviceName);
+        QName portName = new QName("http://apache.org/cxf/systest/ws/addr_feature/", "AddNumbersPort");
+        Dispatch<SOAPMessage> disp = service.createDispatch(portName, SOAPMessage.class,
+                                                            Service.Mode.MESSAGE,
+                                                            new AddressingFeature(false, false));
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                 "http://localhost:" + PORT + "/jaxws/add");
+        
+        InputStream msgIns = getClass().getResourceAsStream("./duplicate-wsa-header-msg.xml");
+        String msg = new String(IOUtils.readBytesFromStream(msgIns));
+        msg = msg.replaceAll("$PORT", PORT);
+        
+        ByteArrayInputStream bout = new ByteArrayInputStream(msg.getBytes());
+        
+        SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, bout);
+        assertNotNull(soapReqMsg);
+        
+        try {
+            disp.invoke(soapReqMsg);
+            fail("SOAPFaultFxception is expected");
+        } catch (SOAPFaultException ex) {
+            assertTrue("WSA header exception is expected",
+                       ex.getMessage().indexOf("A header representing a Message Addressing") > -1);
+        }         
+    }
+    
     private AddNumbersPortType getPort() throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);
