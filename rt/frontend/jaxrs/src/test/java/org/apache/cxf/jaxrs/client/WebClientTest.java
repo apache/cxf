@@ -164,6 +164,45 @@ public class WebClientTest extends Assert {
     }
     
     @Test
+    public void testReplaceQuery() {
+        WebClient wc = WebClient.create(URI.create("http://foo"));
+        wc.path("bar").path("baz").query("foo", "bar");
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/bar/baz?foo=bar"), wc.getCurrentURI());
+        wc.replaceQuery("foo1=bar1");
+        assertEquals(URI.create("http://foo/bar/baz?foo1=bar1"), wc.getCurrentURI());
+    }
+    
+    @Test
+    public void testReplaceQueryParam() {
+        WebClient wc = WebClient.create(URI.create("http://foo"));
+        wc.path("bar").path("baz").query("foo", "bar").query("foo1", "bar1");
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/bar/baz?foo=bar&foo1=bar1"), wc.getCurrentURI());
+        wc.replaceQueryParam("foo1", "baz");
+        assertEquals(URI.create("http://foo/bar/baz?foo=bar&foo1=baz"), wc.getCurrentURI());
+    }
+    
+    @Test
+    public void testReplacePathAll() {
+        WebClient wc = WebClient.create(URI.create("http://foo"));
+        wc.path("bar").path("baz");
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/bar/baz"), wc.getCurrentURI());
+        wc.replacePath("/new");
+        assertEquals(URI.create("http://foo/new"), wc.getCurrentURI());
+    }
+    @Test
+    public void testReplacePathLastSegment() {
+        WebClient wc = WebClient.create(URI.create("http://foo"));
+        wc.path("bar").path("baz");
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/bar/baz"), wc.getCurrentURI());
+        wc.replacePath("new");
+        assertEquals(URI.create("http://foo/bar/new"), wc.getCurrentURI());
+    }
+    
+    @Test
     public void testFragment() {
         WebClient wc = WebClient.create(URI.create("http://foo"));
         wc.path("bar").path("baz").query("foo", "bar").fragment("1");

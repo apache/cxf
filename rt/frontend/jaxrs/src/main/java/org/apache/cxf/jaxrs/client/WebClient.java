@@ -499,11 +499,48 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Replaces the current path with the new value.
+     * @param path new path value. If it starts from "/" then all the current
+     * path starting from the base URI will be replaced, otherwise only the 
+     * last path segment will be replaced. Providing a null value is equivalent
+     * to calling back(true)  
+     * @return updated WebClient
+     */
+    public WebClient replacePath(String path) {
+        if (path == null) {
+            return back(true);
+        }
+        back(path.startsWith("/") ? true : false);
+        return path(path);
+    }
+    
+    /**
      * Resets the current query
      * @return updated WebClient
      */
     public WebClient resetQuery() {
-        getCurrentBuilder().replaceQuery(null);
+        return replaceQuery(null);
+    }
+    
+    /**
+     * Replaces the current query with the new value.
+     * @param queryString the new value, providing a null is
+     *        equivalent to calling resetQuery().  
+     * @return updated WebClient
+     */
+    public WebClient replaceQuery(String queryString) {
+        getCurrentBuilder().replaceQuery(queryString);
+        return this;
+    }
+    
+    /**
+     * Replaces the current query with the new value.
+     * @param queryString the new value, providing a null is
+     *        equivalent to calling resetQuery().  
+     * @return updated WebClient
+     */
+    public WebClient replaceQueryParam(String queryParam, Object... value) {
+        getCurrentBuilder().replaceQueryParam(queryParam, value);
         return this;
     }
     
