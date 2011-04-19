@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -76,6 +77,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(MAPCodec.class);
     private static final String IS_REFERENCE_PARAM_ATTR_NAME = "IsReferenceParameter";
+    private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
     private static final String ONE_WAY_DECOUPLED_FAULT_SUPPORT = 
         "org.apache.cxf.ws.addressing.oneway.decoupled_fault_support";
     
@@ -495,7 +497,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 LOG.log(Level.FINE, "Inbound WS-Addressing headers");
                 Unmarshaller unmarshaller = null;
                 Set<Element> referenceParameterHeaders = null;
-
+                QName invalidCardinalityQName = null;
                 Iterator<Header> iter = header.iterator();
                 while (iter.hasNext()) {
                     Header hdr = iter.next();
@@ -518,12 +520,15 @@ public class MAPCodec extends AbstractSoapInterceptor {
                             }
                             String localName = headerElement.getLocalName();
                             if (Names.WSA_MESSAGEID_NAME.equals(localName)) {
+                                invalidCardinalityQName = maps.getMessageID() != null
+                                    ? Names.WSA_MESSAGEID_QNAME : null;
                                 maps.setMessageID(decodeAsNative(
                                                        headerURI,
                                                        AttributedURIType.class,
                                                        headerElement, 
                                                        unmarshaller));
                             } else if (Names.WSA_TO_NAME.equals(localName)) {
+                                invalidCardinalityQName = maps.getTo() != null ? Names.WSA_TO_QNAME : null;
                                 AttributedURIType addr = decodeAsNative(
                                                        headerURI,
                                                        AttributedURIType.class,
@@ -531,18 +536,26 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                                        unmarshaller);
                                 maps.setTo(EndpointReferenceUtils.getEndpointReference(addr));
                             } else if (Names.WSA_FROM_NAME.equals(localName)) {
+                                invalidCardinalityQName = maps.getFrom() != null
+                                    ? Names.WSA_FROM_QNAME : null;
                                 maps.setFrom(decodeAsNative(
                                                        headerURI,
                                                        EndpointReferenceType.class,
                                                        headerElement, 
                                                        unmarshaller));
                             } else if (Names.WSA_REPLYTO_NAME.equals(localName)) {
+                                invalidCardinalityQName = maps.getReplyTo() != null
+                                                                   ? Names.WSA_REPLYTO_QNAME : null;
+
                                 maps.setReplyTo(decodeAsNative(
                                                        headerURI,
                                                        EndpointReferenceType.class,
                                                        headerElement, 
                                                        unmarshaller));
                             } else if (Names.WSA_FAULTTO_NAME.equals(localName)) {
+                                invalidCardinalityQName = maps.getFaultTo() != null
+                                    ? Names.WSA_FAULTTO_QNAME : null;
+
                                 maps.setFaultTo(decodeAsNative(
                                                        headerURI,
                                                        EndpointReferenceType.class,
@@ -555,6 +568,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                                        headerElement, 
                                                        unmarshaller));
                             } else if (Names.WSA_ACTION_NAME.equals(localName)) {
+                                invalidCardinalityQName = maps.getAction() != null
+                                    ? Names.WSA_ACTION_QNAME : null;
                                 maps.setAction(decodeAsNative(
                                                        headerURI,
                                                        AttributedURIType.class,
@@ -576,13 +591,24 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 if (null != referenceParameterHeaders && null != maps) {
                     decodeReferenceParameters(referenceParameterHeaders, maps, unmarshaller);
                 }
+                if (invalidCardinalityQName != null) {
+                    storeInvalidCardinalityFault(message, invalidCardinalityQName);
+                }
+
             }
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_DECODE_FAILURE_MSG", je); 
         }
         return maps;
     }
-    
+        
+    private void storeInvalidCardinalityFault(SoapMessage message, QName wsaHeaderName) {
+        LOG.log(Level.WARNING, "INVALID_CARDINALITY_MESSAGE", wsaHeaderName);
+        String reason = BUNDLE.getString("INVALID_ADDRESSING_PROPERTY_MESSAGE");
+        ContextUtils.storeMAPFaultName(Names.INVALID_CARDINALITY_NAME, message);
+        ContextUtils.storeMAPFaultReason(reason, message);
+    }
+        
     private void decodeReferenceParameters(Set<Element> referenceParameterHeaders, 
                                            AddressingPropertiesImpl maps, 
                                            Unmarshaller unmarshaller) 

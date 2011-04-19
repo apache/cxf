@@ -1250,6 +1250,10 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             valid = false;
         }
         
+        if (Names.INVALID_CARDINALITY_NAME.equals(ContextUtils.retrieveMAPFaultName(message))) {
+            valid = false;
+        }
+        
         return valid;
     }
 }
