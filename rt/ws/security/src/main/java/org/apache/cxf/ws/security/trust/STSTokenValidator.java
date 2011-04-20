@@ -23,6 +23,7 @@ package org.apache.cxf.ws.security.trust;
 import java.util.List;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
@@ -49,21 +50,20 @@ public class STSTokenValidator implements Validator {
     }
     
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-        SoapMessage m = (SoapMessage)data.getMsgContext();
+        
+        if (isValidatedLocally(credential, data)) {
+            return credential;
+        }
+        
+        return validateWithSTS(credential, (SoapMessage)data.getMsgContext());
+    }
+    
+    public Credential validateWithSTS(Credential credential, Message message) throws WSSecurityException {
+        
         SecurityToken token = new SecurityToken();
         
         try {
             if (credential.getAssertion() != null) {
-                if (!alwaysValidateToSts) {
-                    //
-                    // Try to validate the Assertion locally first. If trust verification fails
-                    // then send it off to the STS for validation
-                    //
-                    samlValidator.validate(credential, data);
-                    if (samlValidator.isTrustVerificationSucceeded()) {
-                        return credential;
-                    }
-                }
                 token.setToken(credential.getAssertion().getElement());
             } else if (credential.getUsernametoken() != null) {
                 token.setToken(credential.getUsernametoken().getElement());
@@ -71,7 +71,7 @@ public class STSTokenValidator implements Validator {
                 token.setToken(credential.getBinarySecurityToken().getElement());
             }
             
-            STSClient c = STSUtils.getClient(m, "sts");
+            STSClient c = STSUtils.getClient(message, "sts");
             synchronized (c) {
                 System.setProperty("noprint", "true");
                 List<SecurityToken> tokens = c.validateSecurityToken(token);
@@ -87,6 +87,22 @@ public class STSTokenValidator implements Validator {
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e);
         }
+    }
+    
+    protected boolean isValidatedLocally(Credential credential, RequestData data) 
+        throws WSSecurityException {
+        
+        if (!alwaysValidateToSts && credential.getAssertion() != null) {
+            try {
+                samlValidator.validate(credential, data);
+                return samlValidator.isTrustVerificationSucceeded();
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e);
+            }
+        }
+        return false;
     }
 
 }
