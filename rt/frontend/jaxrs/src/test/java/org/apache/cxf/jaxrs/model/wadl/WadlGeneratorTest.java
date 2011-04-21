@@ -193,7 +193,8 @@ public class WadlGeneratorTest extends Assert {
     @Test
     public void testSingleRootResource() throws Exception {
         WadlGenerator wg = new WadlGenerator();
-        
+        wg.setApplicationTitle("My Application");
+        wg.setNamespacePrefix("ns");
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
         Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
@@ -201,10 +202,10 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkDocs(doc.getDocumentElement(), "My Application", "", "");
         checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
-        checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
-        
+        checkBookStoreInfo(els.get(0), "ns1:thebook", "ns1:thebook2", "ns1:thechapter");
     }
     
     @Test
@@ -263,6 +264,16 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("/orders", orderResource.getAttribute("path"));
     }
 
+    private void checkDocs(Element el, String title, String value, String language) {
+        List<Element> docsEls = DOMUtils.getChildrenWithName(el, 
+                                                             WadlGenerator.WADL_NS, "doc");
+        assertEquals(1, docsEls.size());
+        assertEquals(title, docsEls.get(0).getAttribute("title"));
+        assertEquals(value, docsEls.get(0).getTextContent());
+        assertEquals(language, 
+            docsEls.get(0).getAttributeNS("http://www.w3.org/XML/1998/namespace", "lang"));
+    }
+    
     private void checkGrammars(Element appElement, String bookEl, String book2El, String chapterEl) {
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
                                                                 "grammars");
