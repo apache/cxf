@@ -56,22 +56,22 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
 
     public void handleMessage(Message message) {
         Exchange ex = message.getExchange();
-        BindingOperationInfo bin = ex.get(BindingOperationInfo.class);
-        if (null != bin && null != bin.getOperationInfo() && bin.getOperationInfo().isOneWay()) {
+        BindingOperationInfo binding = ex.get(BindingOperationInfo.class);
+        if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
             closeInput(message);
             return;
         }
         Message out = ex.getOutMessage();
         if (out != null) {
             getBackChannelConduit(message);
-            if (bin != null) {
-                out.put(MessageInfo.class, bin.getOperationInfo().getOutput());
-                out.put(BindingMessageInfo.class, bin.getOutput());
+            if (binding != null) {
+                out.put(MessageInfo.class, binding.getOperationInfo().getOutput());
+                out.put(BindingMessageInfo.class, binding.getOutput());
             }
             
             InterceptorChain outChain = out.getInterceptorChain();
             if (outChain == null) {
-                outChain = getChain(ex);
+                outChain = OutgoingChainInterceptor.getChain(ex, chainCache);
                 out.setInterceptorChain(outChain);
             }
             outChain.doIntercept(out);
@@ -164,7 +164,8 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             chain.add(((InterceptorProvider)m.getDestination()).getOutInterceptors());
         }
     }
-    private PhaseInterceptorChain getChain(Exchange ex) {
+    
+    private static PhaseInterceptorChain getChain(Exchange ex, PhaseChainCache chainCache) {
         Bus bus = ex.get(Bus.class);
         Binding binding = ex.get(Binding.class);
         
