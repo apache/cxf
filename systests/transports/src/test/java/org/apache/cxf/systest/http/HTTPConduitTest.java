@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -298,13 +299,14 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     public void testLogLevelIssueCXF3466() throws Exception {
         startServer("Mortimer");
         Greeter mortimer = getMortimerGreeter();
-
-        LogManager.getLogManager().getLogger("").setLevel(Level.FINE);
+        Logger rootLogger = LogManager.getLogManager().getLogger("");
+        Level oldLevel = rootLogger.getLevel();
+        rootLogger.setLevel(Level.FINE);
         try {
             // Will throw exception Stream is closed if bug is present
             mortimer.sayHi();
         } finally {
-            LogManager.getLogManager().getLogger("").setLevel(Level.INFO);        
+            rootLogger.setLevel(oldLevel);
         }
     }
 
