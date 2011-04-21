@@ -109,11 +109,13 @@ public class WadlGenerator implements RequestHandler {
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     private static final String CLASSPATH_PREFIX = "classpath:";
+    private static final String DEFAULT_NS_PREFIX = "prefix";
 
     private String wadlNamespace;
     private boolean ignoreMessageWriters = true;
     private boolean singleResourceMultipleMethods = true;
     private boolean useSingleSlashResource;
+    private boolean ignoreForwardSlash;
     private boolean addResourceAndMethodIds;
 
     private boolean useJaxbContextForQnames = true;
@@ -123,7 +125,9 @@ public class WadlGenerator implements RequestHandler {
     private Map<String, List<String>> externalQnamesMap;
     private ElementQNameResolver resolver;
     private List<String> privateAddresses;
-
+    private String applicationTitle;
+    private String nsPrefix = DEFAULT_NS_PREFIX;
+    
     public WadlGenerator() {
 
     }
@@ -191,6 +195,7 @@ public class WadlGenerator implements RequestHandler {
 
         sbGrammars.append("</grammars>");
         sbMain.append(">");
+        handleApplicationDocs(sbMain);
         sbMain.append(sbGrammars.toString());
         sbMain.append(sbResources.toString());
         sbMain.append("</application>");
@@ -256,7 +261,7 @@ public class WadlGenerator implements RequestHandler {
     }
 
     private void startResourceTag(StringBuilder sb, Class<?> serviceClass, String path) {
-        sb.append("<resource path=\"").append(path).append("\"");
+        sb.append("<resource path=\"").append(getPath(path)).append("\"");
         if (addResourceAndMethodIds) {
             QName jaxbQname = null;
             if (useJaxbContextForQnames) {
@@ -271,6 +276,14 @@ public class WadlGenerator implements RequestHandler {
         sb.append(">");
     }
 
+    private String getPath(String path) {
+        if (ignoreForwardSlash && path.startsWith("/") && path.length() > 0) {
+            return path.substring(1);
+        } else {
+            return path;
+        }
+    }
+    
     private void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
         sb.append("<method name=\"").append(ori.getHttpMethod()).append("\"");
         if (addResourceAndMethodIds) {
@@ -302,7 +315,7 @@ public class WadlGenerator implements RequestHandler {
                     path = path.substring(1);
                 }
             }
-            sb.append("<resource path=\"").append(path).append("\">");
+            sb.append("<resource path=\"").append(getPath(path)).append("\">");
             handleDocs(anns, sb, DocTarget.RESOURCE, false);
             handlePathAndMatrixParams(sb, ori);
         } else if (index == 0) {
@@ -718,7 +731,7 @@ public class WadlGenerator implements RequestHandler {
         }
         if (prefix == null) {
             int size = new HashSet<QName>(clsMap.values()).size();
-            prefix = "prefix" + (size + 1);
+            prefix = nsPrefix + (size + 1);
         }
         return prefix;
     }
@@ -840,6 +853,12 @@ public class WadlGenerator implements RequestHandler {
         this.ignoreMessageWriters = ignoreMessageWriters;
     }
 
+    private void handleApplicationDocs(StringBuilder sbApp) {
+        if (applicationTitle != null) {
+            sbApp.append("<doc title=\"" + applicationTitle + "\"/>");
+        }
+    }
+    
     private void handleDocs(Annotation[] anns, StringBuilder sb, String category, boolean allowDefault) {
         for (Annotation a : anns) {
             if (a.annotationType() == Descriptions.class) {
@@ -1196,6 +1215,18 @@ public class WadlGenerator implements RequestHandler {
         return annMethod != null ? annMethod : ori.getMethodToInvoke();
     }
     
+    public void setApplicationTitle(String applicationTitle) {
+        this.applicationTitle = applicationTitle;
+    }
+
+    public void setNamespacePrefix(String prefix) {
+        this.nsPrefix = prefix;
+    }
+
+    public void setIgnoreForwardSlash(boolean ignoreForwardSlash) {
+        this.ignoreForwardSlash = ignoreForwardSlash;
+    }
+
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
         private Map<String, String> locsMap;
