@@ -1280,7 +1280,7 @@ public class HTTPConduit
                     + connection.getURL()
                     + " Conduit :"
                     + conduitName
-                    + "\nContent-Type: " + connection.getContentType() + "\n");
+                    + "\n");
             }
         }
         

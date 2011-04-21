@@ -23,6 +23,7 @@ package org.apache.cxf.systest.http;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -267,11 +270,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
         return fac.getTrustManagers();
     }
-    
-    
-    @Test
-    public void testBasicConnection() throws Exception {
-        startServer("Mortimer");
+
+    private Greeter getMortimerGreeter() throws MalformedURLException {
         URL wsdl = getClass().getResource("resources/greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
@@ -281,10 +281,31 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
         updateAddressPort(mortimer, PORT0);
+        return mortimer;
+    }
+
+    @Test
+    public void testBasicConnection() throws Exception {
+        startServer("Mortimer");
+        Greeter mortimer = getMortimerGreeter();
 
         String answer = mortimer.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Mortimer".equals(answer));
+    }
+
+    @Test
+    public void testLogLevelIssueCXF3466() throws Exception {
+        startServer("Mortimer");
+        Greeter mortimer = getMortimerGreeter();
+
+        LogManager.getLogManager().getLogger("").setLevel(Level.FINE);
+        try {
+            // Will throw exception Stream is closed if bug is present
+            mortimer.sayHi();
+        } finally {
+            LogManager.getLogManager().getLogger("").setLevel(Level.INFO);        
+        }
     }
 
     /**
