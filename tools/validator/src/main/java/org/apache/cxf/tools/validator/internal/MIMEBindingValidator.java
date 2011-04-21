@@ -47,6 +47,9 @@ public class MIMEBindingValidator
             Iterator itOperation = binding.getBindingOperations().iterator();
             while (itOperation.hasNext()) {
                 BindingOperation bindingOperation = (BindingOperation)itOperation.next();
+                if (bindingOperation.getBindingInput() == null) {
+                    continue;
+                }
                 Iterator itInputExt = bindingOperation.getBindingInput().getExtensibilityElements()
                     .iterator();
                 while (itInputExt.hasNext()) {
