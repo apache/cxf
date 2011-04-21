@@ -75,9 +75,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setSubject(subjectBean);
                 
                 AttributeStatementBean attrBean = new AttributeStatementBean();
-                if (subjectBean != null) {
-                    attrBean.setSubject(subjectBean);
-                }
+                attrBean.setSubject(subjectBean);
+                
                 AttributeBean attributeBean = new AttributeBean();
                 attributeBean.setSimpleName("subject-role");
                 attributeBean.setAttributeValues(Collections.singletonList("system-user"));
