@@ -150,7 +150,7 @@ public class Entry {
         private static final String MESSAGE_TAG = "message";
         private static final String LEVEL_TAG = "level";
         private static final String THROWABLE_TAG = "throwable";
-        private static final String EVENT_TIMESTAMP_TAG = "eventTimestamp";
+        private static final String EVENT_TIMESTAMP_TAG = "date";
 
         private static final DateTimeFormat DATETIME_FORMATTER =
             DateTimeFormat.getFormat("yyyy-MM-ddTHH:mm:ss'.'SSSZ");
