@@ -25,7 +25,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -84,21 +83,12 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.newDocument();
-        Element utElement = 
-            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
         
-        Element nameElement = 
-            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_LN);
-        nameElement.setTextContent(policy.getUserName());
-        Element passwordElement = 
-            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.PASSWORD_LN);
-        passwordElement.setTextContent(policy.getPassword());
-        passwordElement.setAttribute(WSConstants.PASSWORD_TYPE_ATTR, 
-                                     WSConstants.USERNAMETOKEN_NS + "#"  + WSConstants.PASSWORD_TEXT);
-        
-        utElement.appendChild(nameElement);
-        utElement.appendChild(passwordElement);
-        return new UsernameToken(utElement);
+        UsernameToken token = new UsernameToken(false, doc, 
+                                                WSConstants.PASSWORD_TEXT);
+        token.setName(policy.getUserName());
+        token.setPassword(policy.getPassword());
+        return token;
     }
 
     public void setValidator(STSTokenValidator validator) {
