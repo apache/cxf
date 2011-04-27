@@ -144,9 +144,8 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         
 
-        Method methodToInvoke = cri.getMethodDispatcher().getMethod(ori);
-        //InjectionUtils.checkProxy(
-        //    cri.getMethodDispatcher().getMethod(ori), resourceObject);
+        Method methodToInvoke = InjectionUtils.checkProxy(
+            cri.getMethodDispatcher().getMethod(ori), resourceObject);
         
         List<Object> params = null;
         if (request instanceof List) {
