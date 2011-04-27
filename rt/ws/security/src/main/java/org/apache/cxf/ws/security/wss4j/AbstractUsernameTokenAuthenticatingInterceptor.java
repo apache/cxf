@@ -210,7 +210,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
             }
             String user = usernameToken.getName();
             String password = usernameToken.getPassword();
-            boolean isHashed = usernameToken.isDerivedKey();
+            boolean isHashed = usernameToken.isHashed();
             String nonce = usernameToken.getNonce();
             String createdTime = usernameToken.getCreated();
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
