@@ -526,6 +526,20 @@ public class BookStore {
                                      doGetBook("123"));
     }
     
+    @POST
+    @Path("/books/element/echo")
+    public JAXBElement<Book> echoBookElement(JAXBElement<Book> element) throws Exception {
+        return element;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @POST
+    @Path("/books/element/echo")
+    public JAXBElement<? super Book> echoBookElementWildcard(JAXBElement<? extends Book> element) 
+        throws Exception {
+        return (JAXBElement<? super Book>)element;
+    }
+    
     @GET
     @Path("/books/adapter")
     @XmlJavaTypeAdapter(BookInfoAdapter.class)

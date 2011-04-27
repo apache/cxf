@@ -30,6 +30,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -200,7 +201,15 @@ public final class InjectionUtils {
         if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
             if (genericType instanceof TypeVariable) {
                 genericType = getType(((TypeVariable)genericType).getBounds(), pos);
+            } else if (genericType instanceof WildcardType) { 
+                WildcardType wildcardType = (WildcardType)genericType;
+                Type[] bounds = wildcardType.getLowerBounds();
+                if (bounds.length == 0) { 
+                    bounds = wildcardType.getUpperBounds();
+                }
+                genericType = getType(bounds, pos);
             }
+
             Class<?> cls = (Class<?>)genericType;
             return cls.isArray() ? cls.getComponentType() : cls;
         }
