@@ -28,13 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-//import javax.xml.stream.XMLStreamException;
-//import javax.xml.stream.XMLStreamReader;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-//import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -42,10 +38,9 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-//import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 @Ignore
 public class TCPConduitTest {

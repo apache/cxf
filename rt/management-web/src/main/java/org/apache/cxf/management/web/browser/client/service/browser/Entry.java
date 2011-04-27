@@ -20,6 +20,7 @@
 package org.apache.cxf.management.web.browser.client.service.browser;
 
 import java.util.Date;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -28,7 +29,8 @@ import com.google.gwt.xml.client.Element;
 import com.google.gwt.xml.client.Node;
 import com.google.gwt.xml.client.NodeList;
 
-import static com.google.gwt.xml.client.Node.*;
+import static com.google.gwt.xml.client.Node.ELEMENT_NODE;
+import static com.google.gwt.xml.client.Node.TEXT_NODE;
 
 /**
  * The class represents log record, which is parsed from DOM representation of {@link LogRecord}.

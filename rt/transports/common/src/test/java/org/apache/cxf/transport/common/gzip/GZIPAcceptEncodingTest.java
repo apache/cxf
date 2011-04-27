@@ -35,11 +35,13 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.*;
+import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.FORCE;
+import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.YES;
 
 /**
  * Test for the parsing of Accept-Encoding by the GZIPOutInterceptor. For
