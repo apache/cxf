@@ -33,6 +33,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -865,6 +867,29 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/element",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+    }
+    
+    @Test
+    public void testEchoBookElement() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        JAXBElement<Book> element = store.echoBookElement(new JAXBElement<Book>(new QName("", "Book"),
+                                     Book.class,
+                                     new Book("CXF", 123L)));
+        Book book = element.getValue();
+        assertEquals(123L, book.getId());
+        assertEquals("CXF", book.getName());
+    }
+    
+    @Test
+    public void testEchoBookElementWildcard() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        JAXBElement<? super Book> element = store.echoBookElementWildcard(
+                                        new JAXBElement<Book>(new QName("", "Book"),
+                                        Book.class,
+                                        new Book("CXF", 123L)));
+        Book book = (Book)element.getValue();
+        assertEquals(123L, book.getId());
+        assertEquals("CXF", book.getName());
     }
     
     @Test
