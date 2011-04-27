@@ -65,6 +65,8 @@ public class JAXRSInvoker extends AbstractInvoker {
     private static final String REQUEST_SCOPE = "request";    
     private static final String LAST_SERVICE_OBJECT = "org.apache.cxf.service.object.last";
     private static final String REQUEST_WAS_SUSPENDED = "org.apache.cxf.service.request.suspended";
+    private static final String PROXY_INVOCATION_ERROR_FRAGMENT 
+        = "object is not an instance of declaring class"; 
     
     public JAXRSInvoker() {
     }
@@ -142,8 +144,9 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         
 
-        Method methodToInvoke = InjectionUtils.checkProxy(
-            cri.getMethodDispatcher().getMethod(ori), resourceObject);
+        Method methodToInvoke = cri.getMethodDispatcher().getMethod(ori);
+        //InjectionUtils.checkProxy(
+        //    cri.getMethodDispatcher().getMethod(ori), resourceObject);
         
         List<Object> params = null;
         if (request instanceof List) {
@@ -161,6 +164,16 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
+            String errorMessage = ex.getCause().getMessage();
+            if (errorMessage != null 
+                && errorMessage.contains(PROXY_INVOCATION_ERROR_FRAGMENT)) {
+                org.apache.cxf.common.i18n.Message errorM =
+                    new org.apache.cxf.common.i18n.Message("PROXY_INVOCATION_FAILURE",
+                                                           BUNDLE,
+                                                           methodToInvoke,
+                                                           cri.getServiceClass().getName());
+                LOG.severe(errorM.toString());
+            }
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), 
                                                                      exchange.getInMessage());
             if (excResponse == null) {
