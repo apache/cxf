@@ -54,6 +54,7 @@
         <module>wsdl_first_soap12</module>
         <module>wsdl_first_dynamic_client</module>
         <module>jms_queue</module>
+        <module>jms_spring_config</module>
         <module>restful_dispatch</module>
         <module>wsdl_first</module>
         <module>aegis_standalone</module>
