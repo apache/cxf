@@ -19,8 +19,6 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,11 +39,9 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -166,9 +162,7 @@ public class FormEncodingProvider implements
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
                                MediaType mt) {
-        return isSupported(type, genericType, annotations, mt)
-            || mt.getType().equalsIgnoreCase("multipart")
-            && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE) && File.class == type;
+        return isSupported(type, genericType, annotations, mt);
     }
 
     private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
@@ -176,7 +170,7 @@ public class FormEncodingProvider implements
         return (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type)) 
             || (mt.getType().equalsIgnoreCase("multipart") 
             && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
-            && (MultipartBody.class.isAssignableFrom(type) || Attachment.class.isAssignableFrom(type)));
+            && (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type)));
     }
     
     @SuppressWarnings("unchecked")
@@ -184,38 +178,27 @@ public class FormEncodingProvider implements
                         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException, WebApplicationException {
         
-        if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
-            Object body = obj;
-            if (obj.getClass() == File.class) {
-                File f = (File)obj;
-                ContentDisposition cd = new ContentDisposition("attachment;filename=" + f.getName());
-                body = new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, new FileInputStream(f), cd);
-            }
-            MultipartProvider provider = new MultipartProvider();
-            provider.setMessageContext(mc);
-            provider.writeTo(body, body.getClass(), body.getClass(), anns, mt, headers, os);
-        } else {
-            MultivaluedMap<String, String> map = 
-                (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).getData() : obj);
-            boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
-            
-            String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
-            
-            for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
-                Map.Entry<String, List<String>> entry = it.next();
-                for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
-                    String value = entryIterator.next();
-                    os.write(entry.getKey().getBytes(encoding));
-                    os.write('=');
-                    String data = encoded ? value : HttpUtils.urlEncode(value);
-                    os.write(data.getBytes(encoding));
-                    if (entryIterator.hasNext() || it.hasNext()) {
-                        os.write('&');
-                    }
+        MultivaluedMap<String, String> map = 
+            (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).getData() : obj);
+        boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
+        
+        String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        
+        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, List<String>> entry = it.next();
+            for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
+                String value = entryIterator.next();
+                os.write(entry.getKey().getBytes(encoding));
+                os.write('=');
+                String data = encoded ? value : HttpUtils.urlEncode(value);
+                os.write(data.getBytes(encoding));
+                if (entryIterator.hasNext() || it.hasNext()) {
+                    os.write('&');
                 }
-    
             }
+
         }
+        
     }
 
 }
