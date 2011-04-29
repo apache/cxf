@@ -137,8 +137,11 @@ public class LocalConduit extends AbstractConduit {
                             destination.getMessageObserver().onMessage(inMsg);
                         }
                     };
-                    
-                    new Thread(receiver).start();
+                    if (transportFactory.getExecutor() != null) {
+                        transportFactory.getExecutor().execute(receiver);
+                    } else {
+                        new Thread(receiver).start();
+                    }
                 }
             };
         message.setContent(OutputStream.class, cout);

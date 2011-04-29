@@ -67,7 +67,7 @@ public abstract class AbstractJaxWsTest extends AbstractCXFTest {
         dfm.registerDestinationFactory(SoapBindingConstants.SOAP12_BINDING_ID, soapDF);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", soapDF);
         
-        localTransport = new LocalTransportFactory();
+        localTransport = new LocalTransportFactory(bus);
         localTransport.setUriPrefixes(new HashSet<String>(Arrays.asList("http", "local")));
         dfm.registerDestinationFactory(LocalTransportFactory.TRANSPORT_ID, localTransport);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/http", localTransport);

@@ -97,8 +97,11 @@ public class LocalDestination extends AbstractDestination {
                                     conduit.getMessageObserver().onMessage(m);
                                 }
                             };
-                            
-                            new Thread(receiver).start();
+                            if (localDestinationFactory.getExecutor() != null) {
+                                localDestinationFactory.getExecutor().execute(receiver);
+                            } else {
+                                new Thread(receiver).start();
+                            }
                         }
                     };
                 

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -41,6 +42,7 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
@@ -70,6 +72,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;
     private Set<String> uriPrefixes = new HashSet<String>(URI_PREFIXES);
+    private volatile Executor executor;
 
     public LocalTransportFactory() {
         this(null);
@@ -115,6 +118,24 @@ public class LocalTransportFactory extends AbstractTransportFactory
 
     void remove(LocalDestination destination) {
         destinations.remove(destination);
+    }
+    
+    public Executor getExecutor() {
+        if (executor == null && bus != null) {
+            synchronized (this) {
+                if (executor == null) {
+                    WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
+                    if (manager != null) {
+                        executor =  manager.getAutomaticWorkQueue();
+                    }
+                }
+            }
+        }
+        return executor;
+    }
+    
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
     }
 
     public Conduit getConduit(EndpointInfo ei) throws IOException {

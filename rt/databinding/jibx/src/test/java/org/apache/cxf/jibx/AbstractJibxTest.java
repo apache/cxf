@@ -60,7 +60,7 @@ public abstract class AbstractJibxTest extends AbstractCXFTest {
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/", soapDF);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", soapDF);
 
-        localTransport = new LocalTransportFactory();
+        localTransport = new LocalTransportFactory(bus);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
         dfm.registerDestinationFactory("http://cxf.apache.org/bindings/xformat", localTransport);

@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -47,7 +49,9 @@ public class LocalTransportFactoryTest extends Assert {
     }
     
     private void testInvocation(boolean isDirectDispatch) throws Exception {
-        LocalTransportFactory factory = new LocalTransportFactory();
+        // Need to create a DefaultBus
+        Bus bus = BusFactory.getDefaultBus();
+        LocalTransportFactory factory = new LocalTransportFactory(bus);
         
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         AddressType a = new AddressType();

@@ -340,7 +340,7 @@ public class ConfiguredEndpointTest extends Assert {
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/", soapDF);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/", soapDF);
 
-        LocalTransportFactory localTransport = new LocalTransportFactory();
+        LocalTransportFactory localTransport = new LocalTransportFactory(bus);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
     }

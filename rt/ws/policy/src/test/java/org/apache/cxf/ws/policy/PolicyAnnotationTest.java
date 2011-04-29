@@ -67,7 +67,7 @@ public class PolicyAnnotationTest extends Assert {
             "http://cxf.apache.org/transports/http/configuration",
             "http://cxf.apache.org/bindings/xformat");
         
-        LocalTransportFactory f = new LocalTransportFactory();
+        LocalTransportFactory f = new LocalTransportFactory(bus);
         f.getUriPrefixes().add("http");
         f.setTransportIds(tp);
         f.setBus(bus);
