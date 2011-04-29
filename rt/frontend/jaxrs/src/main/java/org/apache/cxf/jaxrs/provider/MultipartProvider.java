@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,7 +56,9 @@ import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
@@ -66,7 +71,7 @@ import org.apache.cxf.message.MessageUtils;
 
 @Provider
 @Consumes({"multipart/related", "multipart/mixed", "multipart/alternative", "multipart/form-data" })
-@Produces({"multipart/related", "multipart/mixed", "multipart/alternative" })
+@Produces({"multipart/related", "multipart/mixed", "multipart/alternative", "multipart/form-data" })
 public class MultipartProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
@@ -92,21 +97,25 @@ public class MultipartProvider extends AbstractConfigurableProvider
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
                               MediaType mt) {
-        return isSupported(type, genericType, annotations, mt)
-             || (mt.getType().equals("multipart") && mt.getSubtype().equals("form-data") 
-                && !MultivaluedMap.class.isAssignableFrom(type));
+        return isSupported(type, genericType, annotations, mt);
     }
     
     private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
                                 MediaType mt) {
         if (DataHandler.class.isAssignableFrom(type) || DataSource.class.isAssignableFrom(type)
             || Attachment.class.isAssignableFrom(type) || MultipartBody.class.isAssignableFrom(type)
-            || mediaTypeSupported(mt)) {
+            || mediaTypeSupported(mt)
+            || isSupportedFormDataType(type, mt)) {
             return true;
         }
         return false;
     }
 
+    private boolean isSupportedFormDataType(Class<?> type, MediaType mt) {
+        return mt.getType().equals("multipart") && mt.getSubtype().equals("form-data") 
+            && !MultivaluedMap.class.isAssignableFrom(type) && !Form.class.isAssignableFrom(type);
+    }
+    
     protected void checkContentLength() {
         if (mc != null) {
             List<String> values = mc.getHttpHeaders().getRequestHeader(HttpHeaders.CONTENT_LENGTH);
@@ -247,6 +256,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 Attachment handler = createDataHandler(value, value.getClass(), value.getClass(), 
                                                        new Annotation[]{},
                                                        entry.getKey().toString(),
+                                                       mt.toString(),
                                                        i++);
                 handlers.add(handler);
             }
@@ -263,7 +273,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 }
                 Attachment handler = createDataHandler(obj,
                                                        type, genericType, anns,
-                                                       rootMediaType, 1);
+                                                       rootMediaType, mt.toString(), 1);
                 return Collections.singletonList(handler);
             }
         }
@@ -275,7 +285,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             Object value = objects.get(i);
             Attachment handler = createDataHandler(value,
                                            value.getClass(), value.getClass(), new Annotation[]{},
-                                           rootMediaType, i);
+                                           rootMediaType, rootMediaType, i);
             handlers.add(handler);
         }
         return handlers;
@@ -284,7 +294,9 @@ public class MultipartProvider extends AbstractConfigurableProvider
     private Attachment createDataHandler(Object obj, 
                                          Class<?> cls, Type genericType,
                                          Annotation[] anns,
-                                         String mimeType, int id) {
+                                         String mimeType,
+                                         String mainMediaType,
+                                         int id) {
         DataHandler dh = null;
         if (InputStream.class.isAssignableFrom(obj.getClass())) {
             dh = createInputStreamDH((InputStream)obj, mimeType);
@@ -292,6 +304,15 @@ public class MultipartProvider extends AbstractConfigurableProvider
             dh = (DataHandler)obj;
         } else if (DataSource.class.isAssignableFrom(obj.getClass())) {
             dh = new DataHandler((DataSource)obj);
+        } else if (File.class.isAssignableFrom(obj.getClass())) {
+            File f = (File)obj;
+            ContentDisposition cd = mainMediaType.startsWith(MediaType.MULTIPART_FORM_DATA) 
+                ? new ContentDisposition("form-data;name=file;filename=" + f.getName()) :  null;
+            try {
+                return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, new FileInputStream(f), cd);
+            } catch (FileNotFoundException ex) {
+                throw new WebApplicationException(ex);
+            }
         } else if (Attachment.class.isAssignableFrom(obj.getClass())) {
             Attachment att = (Attachment)obj;
             if (att.getObject() == null) {

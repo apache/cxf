@@ -79,7 +79,9 @@ public class Attachment {
     
     public Attachment(String id, InputStream is, ContentDisposition cd) {
         handler = new DataHandler(new InputStreamDataSource(is, "application/octet-stream"));
-        headers.putSingle("Content-Disposition", cd.toString());
+        if (cd != null) {
+            headers.putSingle("Content-Disposition", cd.toString());
+        }
         headers.putSingle("Content-ID", id);
         headers.putSingle("Content-Type", "application/octet-stream");
     }

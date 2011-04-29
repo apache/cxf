@@ -506,7 +506,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image2 = IOUtils.readBytesFromStream(is2);
         assertTrue(Arrays.equals(image1, image2));
         ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
-        assertEquals("attachment;filename=java.jpg", cd2.toString());
+        assertEquals("form-data;name=file;filename=java.jpg", cd2.toString());
         assertEquals("java.jpg", cd2.getParameter("filename"));
     }
     
