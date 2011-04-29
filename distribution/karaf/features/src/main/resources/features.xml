@@ -16,7 +16,7 @@
       See the License for the specific language governing permissions and
       limitations under the License.
 -->
-<features>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-${project.version}">
     <repository>mvn:org.apache.karaf.assemblies.features/standard/${cxf.karaf.version}/xml/features</repository>
 
     <feature name="cxf-specs" version="${project.version}">
