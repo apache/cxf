@@ -35,13 +35,14 @@ wsdl2service -transport http -e servicename -p portname -n bindingname HelloWorl
 	
 	   	    <option id="transport" maxOccurs="1">
 		       <annotation>
-		            If the payload being sent over the wire is jms, use 
-		            -transport jms. For all other payloads use -transport http.
+		            Specifies the transport to use. If the payload being sent over the 
+		            wire using jms, use -transport jms. All other payloads settings 
+		            assume that HTTP is being used.
 		       </annotation>
 				<switch>transport</switch>
 				<associatedArgument placement="afterSpace">
-				    <annotation>soap/xml/jms</annotation>
-				  	<valueenum>soap|xml|jms</valueenum>
+				    <annotation>soap/xml/jms/http</annotation>
+				  	<valueenum>soap|xml|jms|http</valueenum>
 				</associatedArgument>
 		    </option>
 	
@@ -87,10 +88,9 @@ wsdl2service -transport http -e servicename -p portname -n bindingname HelloWorl
 				</associatedArgument>
 		</option>
 
-
 		<option id="soap12" maxOccurs="1">
 		    <annotation>
-			Specifies the SOAP version to SOAP 1.2
+			Specifies to use SOAP 1.2
 		    </annotation>
 		    <switch>soap12</switch>
 		</option>
