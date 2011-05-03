@@ -32,6 +32,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 
 import org.junit.BeforeClass;
 
@@ -132,6 +133,19 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
         assert result.equals(BigInteger.valueOf(50));
+        
+        try {
+            SamlCallbackHandler callbackHandler = 
+                new SamlCallbackHandler();
+            callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+            ((BindingProvider)saml2Port).getRequestContext().put(
+                "ws-security.saml-callback-handler", callbackHandler
+            );
+            saml2Port.doubleIt(BigInteger.valueOf(25));
+            fail("Expected failure on an invocation with a invalid SAML2 Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assert ex.getMessage().contains("SAML token security failure");
+        }
     }
     
     /**
