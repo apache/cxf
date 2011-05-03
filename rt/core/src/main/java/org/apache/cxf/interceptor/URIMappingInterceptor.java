@@ -314,8 +314,10 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         if (!StringUtils.isEmpty(query)) {            
             List<String> parts = Arrays.asList(query.split("&"));
             for (String part : parts) {
-                String[] keyValue = part.split("=");
-                queries.put(keyValue[0], uriDecode(keyValue[1]));
+                if (part.contains("=")) {
+                    String[] keyValue = part.split("=");
+                    queries.put(keyValue[0], uriDecode(keyValue[1]));
+                }
             }
             return queries;
         }
