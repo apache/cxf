@@ -56,10 +56,10 @@ import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.JmsUtils;
 
 /**
- * JMSConduit is instantiated by the JMSTransportfactory which is selected by a client if the transport
- * protocol starts with jms:// JMSConduit converts CXF Messages to JMS Messages and sends the request by using
- * a JMS destination. If the Exchange is not oneway it then recevies the response and converts it to a CXF
- * Message. This is then provided in the Exchange and also sent to the incomingObserver
+ * JMSConduit is instantiated by the JMSTransportFactory which is selected by a client if the transport
+ * protocol starts with jms://. JMSConduit converts CXF Messages to JMS Messages and sends the request by 
+ * using a JMS destination. If the Exchange is not oneway it then recevies the response and converts it to 
+ * a CXF Message. This is then provided in the Exchange and also sent to the incomingObserver.
  */
 public class JMSConduit extends AbstractConduit implements JMSExchangeSender, MessageListener {
 
@@ -91,8 +91,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     }
     
     /**
-     * Prepare the message for send out. The message will be sent after the caller has written the payload to
-     * the OutputStream of the message and calls the close method of the stream. In the JMS case the
+     * Prepare the message to be sent. The message will be sent after the caller has written the payload to
+     * the OutputStream of the message and called the stream's close method. In the JMS case the
      * JMSOutputStream will then call back the sendExchange method of this class. {@inheritDoc}
      */
     public void prepare(Message message) throws IOException {
@@ -131,11 +131,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     }
 
     /**
-     * Send the JMS Request out and if not oneWay receive the response
+     * Send the JMS message and if the MEP is not oneway receive the response.
      * 
-     * @param outMessage
-     * @param request
-     * @return inMessage
+     * @param exchange the Exchange containing the outgoing message
+     * @param request  the payload of the outgoing JMS message
      */
     public void sendExchange(final Exchange exchange, final Object request) {
         LOG.log(Level.FINE, "JMSConduit send message");
@@ -370,7 +369,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     }
 
     /**
-     * Here we just deal with the reply message
+     * Process the reply message
      */
     public void doReplyMessage(Exchange exchange, javax.jms.Message jmsMessage) {
         Message inMessage = new MessageImpl();
