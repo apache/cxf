@@ -333,8 +333,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                                           SignedEncryptedParts signdParts,
                                           TokenWrapper wrapper,
                                           SecurityToken securityTok) throws Exception {
-        Document doc = saaj.getSOAPPart();
-        
         //Get the issued token
         SecurityToken secTok = securityTok;
         if (secTok == null) {
@@ -387,104 +385,124 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
         }
         
-        //check for derived keys
-        AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
         if (token.isDerivedKeys()) {
-            //Do Signature with derived keys
-            WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
-          
-            //Setting the AttachedReference or the UnattachedReference according to the flag
-            Element ref;
-            if (tokenIncluded) {
-                ref = secTok.getAttachedReference();
-            } else {
-                ref = secTok.getUnattachedReference();
-            }
-          
-            if (ref != null) {
-                dkSign.setExternalKey(secTok.getSecret(), cloneElement(ref));
-            } else {
-                dkSign.setExternalKey(secTok.getSecret(), secTok.getId());
-            }
-          
-            // Set the algo info
-            dkSign.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
-            dkSign.setDerivedKeyLength(algorithmSuite.getSignatureDerivedKeyLength() / 8);
-            if (token.getSPConstants() == SP12Constants.INSTANCE) {
-                dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
-            }
-            dkSign.prepare(doc, secHeader);
-          
-            addDerivedKeyElement(dkSign.getdktElement());
-          
-            dkSign.setParts(sigParts);
-            List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
-          
-            //Do signature
-            dkSign.computeSignature(referenceList, false, null);
-          
-            return dkSign.getSignatureValue();
+            return doDerivedKeySignature(tokenIncluded, secTok, token, sigParts);
         } else {
-            WSSecSignature sig = new WSSecSignature(wssConfig);
-            if (secTok.getTokenType() == null) {
+            return doSignature(tokenIncluded, secTok, token, wrapper, sigParts);
+        }
+    }
+    
+    private byte[] doDerivedKeySignature(
+        boolean tokenIncluded,
+        SecurityToken secTok,
+        Token token,
+        List<WSEncryptionPart> sigParts
+    ) throws Exception {
+        //Do Signature with derived keys
+        WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
+
+        //Setting the AttachedReference or the UnattachedReference according to the flag
+        Element ref;
+        if (tokenIncluded) {
+            ref = secTok.getAttachedReference();
+        } else {
+            ref = secTok.getUnattachedReference();
+        }
+
+        if (ref != null) {
+            dkSign.setExternalKey(secTok.getSecret(), cloneElement(ref));
+        } else {
+            dkSign.setExternalKey(secTok.getSecret(), secTok.getId());
+        }
+
+        // Set the algo info
+        dkSign.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
+        dkSign.setDerivedKeyLength(algorithmSuite.getSignatureDerivedKeyLength() / 8);
+        if (token.getSPConstants() == SP12Constants.INSTANCE) {
+            dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        }
+        Document doc = saaj.getSOAPPart();
+        dkSign.prepare(doc, secHeader);
+
+        addDerivedKeyElement(dkSign.getdktElement());
+
+        dkSign.setParts(sigParts);
+        List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
+
+        //Do signature
+        dkSign.computeSignature(referenceList, false, null);
+
+        return dkSign.getSignatureValue();
+    }
+    
+    private byte[] doSignature(
+        boolean tokenIncluded,
+        SecurityToken secTok,
+        Token token,
+        TokenWrapper wrapper,
+        List<WSEncryptionPart> sigParts
+    ) throws Exception {
+        WSSecSignature sig = new WSSecSignature(wssConfig);
+        if (secTok.getTokenType() == null) {
+            sig.setCustomTokenId(secTok.getId());
+            sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+        } else {
+            String id = secTok.getWsuId();
+            if (id == null) {
                 sig.setCustomTokenId(secTok.getId());
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING_DIRECT);
+            } else {
+                sig.setCustomTokenId(secTok.getWsuId());
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+            }
+            String tokenType = secTok.getTokenType();
+            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {
-                String id = secTok.getWsuId();
-                if (id == null) {
-                    sig.setCustomTokenId(secTok.getId());
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING_DIRECT);
-                } else {
-                    sig.setCustomTokenId(secTok.getWsuId());
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-                }
-                String tokenType = secTok.getTokenType();
-                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                } else {
-                    sig.setCustomTokenValueType(tokenType);
-                }
+                sig.setCustomTokenValueType(tokenType);
             }
-            Crypto crypto = null;
-            if (secTok.getSecret() == null) {
-                sig.setX509Certificate(secTok.getX509Certificate());
-                
-                crypto = secTok.getCrypto();
-                String uname = crypto.getX509Identifier(secTok.getX509Certificate());
-                String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
-                if (password == null) {
-                    password = "";
-                }
-                sig.setUserInfo(uname, password);
-                sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
-            } else {
-                crypto = getSignatureCrypto(wrapper);
-                sig.setSecretKey(secTok.getSecret());
-                sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
-            }
-            sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
-
-            sig.prepare(doc, crypto, secHeader);
-
-            sig.setParts(sigParts);
-            List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
-
-            //Do signature
-            if (bottomUpElement == null) {
-                sig.computeSignature(referenceList, false, null);
-            } else {
-                sig.computeSignature(referenceList, true, bottomUpElement);
-            }
-            bottomUpElement = sig.getSignatureElement();
-            mainSigId = sig.getId();
-        
-            return sig.getSignatureValue();
         }
+        Crypto crypto = null;
+        if (secTok.getSecret() == null) {
+            sig.setX509Certificate(secTok.getX509Certificate());
+
+            crypto = secTok.getCrypto();
+            String uname = crypto.getX509Identifier(secTok.getX509Certificate());
+            String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+            if (password == null) {
+                password = "";
+            }
+            sig.setUserInfo(uname, password);
+            sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+        } else {
+            crypto = getSignatureCrypto(wrapper);
+            sig.setSecretKey(secTok.getSecret());
+            sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        }
+        sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
+
+        Document doc = saaj.getSOAPPart();
+        sig.prepare(doc, crypto, secHeader);
+
+        sig.setParts(sigParts);
+        List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
+
+        //Do signature
+        if (bottomUpElement == null) {
+            sig.computeSignature(referenceList, false, null);
+        } else {
+            sig.computeSignature(referenceList, true, bottomUpElement);
+        }
+        bottomUpElement = sig.getSignatureElement();
+        mainSigId = sig.getId();
+
+        return sig.getSignatureValue();
     }
 
 
