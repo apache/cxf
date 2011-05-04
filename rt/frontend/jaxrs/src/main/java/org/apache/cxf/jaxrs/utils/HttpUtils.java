@@ -20,9 +20,8 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -212,8 +211,9 @@ public final class HttpUtils {
     public static String getBaseAddress(Message m) {
         String endpointAddress = getEndpointAddress(m);
         try {
-            return new URL(endpointAddress).getPath();
-        } catch (MalformedURLException ex) {
+            String path = new URI(endpointAddress).getRawPath();
+            return path.length() == 0 ? "/" : path;
+        } catch (URISyntaxException ex) {
             return endpointAddress == null ? "/" : endpointAddress;
         }
     }
@@ -229,7 +229,8 @@ public final class HttpUtils {
                     ? request.getAttribute("org.apache.cxf.transport.endpoint.address") : null;
                 address = property != null ? property.toString() : ei.getAddress();
             } else {
-                address = d.getAddress().getAddress().getValue();
+                address = m.containsKey(Message.BASE_PATH) 
+                    ? (String)m.get(Message.BASE_PATH) : d.getAddress().getAddress().getValue();
             }
         } else {
             address = (String)m.get(Message.ENDPOINT_ADDRESS);
