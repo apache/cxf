@@ -126,7 +126,10 @@ public class LocalTransportFactory extends AbstractTransportFactory
                 if (executor == null) {
                     WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
                     if (manager != null) {
-                        executor =  manager.getAutomaticWorkQueue();
+                        executor =  manager.getNamedWorkQueue("local-transport");
+                        if (executor == null) {
+                            executor = manager.getAutomaticWorkQueue();
+                        }
                     }
                 }
             }

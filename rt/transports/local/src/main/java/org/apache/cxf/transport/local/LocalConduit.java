@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -34,6 +35,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.AbstractConduit;
+import org.apache.cxf.workqueue.SynchronousExecutor;
 
 public class LocalConduit extends AbstractConduit {
 
@@ -137,10 +139,17 @@ public class LocalConduit extends AbstractConduit {
                             destination.getMessageObserver().onMessage(inMsg);
                         }
                     };
-                    if (transportFactory.getExecutor() != null) {
-                        transportFactory.getExecutor().execute(receiver);
+                    Executor ex = message.getExchange() != null
+                        ? message.getExchange().get(Executor.class) : null;
+                    if (ex == null || SynchronousExecutor.isA(ex)) {
+                        ex = transportFactory.getExecutor();
+                        if (ex != null) {
+                            ex.execute(receiver);
+                        } else {
+                            new Thread(receiver).start();
+                        }
                     } else {
-                        new Thread(receiver).start();
+                        ex.execute(receiver);
                     }
                 }
             };

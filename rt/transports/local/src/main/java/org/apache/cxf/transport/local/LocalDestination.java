@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -36,6 +37,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.workqueue.SynchronousExecutor;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class LocalDestination extends AbstractDestination {
@@ -97,10 +99,18 @@ public class LocalDestination extends AbstractDestination {
                                     conduit.getMessageObserver().onMessage(m);
                                 }
                             };
-                            if (localDestinationFactory.getExecutor() != null) {
-                                localDestinationFactory.getExecutor().execute(receiver);
+                            Executor ex = message.getExchange() != null
+                                ? message.getExchange().get(Executor.class) : null;
+                            // Need to avoid to get the SynchronousExecutor
+                            if (ex == null || SynchronousExecutor.isA(ex)) {
+                                ex = localDestinationFactory.getExecutor();
+                                if (ex != null) {
+                                    ex.execute(receiver);
+                                } else {
+                                    new Thread(receiver).start();
+                                }
                             } else {
-                                new Thread(receiver).start();
+                                ex.execute(receiver);
                             }
                         }
                     };
