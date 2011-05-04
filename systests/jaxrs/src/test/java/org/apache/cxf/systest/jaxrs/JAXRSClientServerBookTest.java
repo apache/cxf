@@ -926,7 +926,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
         Response r = wc.type("application/xml").accept("application/json")
             .post(new Books(new Book("CXF", 123L)));
-        assertEquals("{\"Books\":[{\"id\":123,\"name\":\"CXF\"}]}",
+        assertEquals("{\"Book\":[{\"id\":123,\"name\":\"CXF\"}]}",
                      IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
     
