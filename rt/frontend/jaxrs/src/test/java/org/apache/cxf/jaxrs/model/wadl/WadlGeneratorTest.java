@@ -392,9 +392,10 @@ public class WadlGeneratorTest extends Assert {
         
         checkDocs(requestEls.get(0), "", "Request", "");
         
-        verifyParameters(requestEls.get(0), 2, 
+        verifyParameters(requestEls.get(0), 3, 
                          new Param("hid", "header", "xs:int"),
-                         new Param("provider.bar", "query", "xs:int"));
+                         new Param("provider.bar", "query", "xs:int"),
+                         new Param("a", "query", "xs:string", true));
         
         verifyXmlJsonRepresentations(requestEls.get(0), book2El, "InputBook");
         List<Element> responseEls = getElements(methodEls.get(0), "response", 1);
@@ -550,6 +551,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(p.getName(), paramEl.getAttribute("name"));
         assertEquals(p.getType(), paramEl.getAttribute("style"));
         assertEquals(p.getSchemaType(), paramEl.getAttribute("type"));
+        assertEquals(p.isRepeating(), Boolean.valueOf(paramEl.getAttribute("repeating")));
         String docs = p.getDocs();
         if (docs != null) {
             checkDocs(paramEl, "", docs, "");
@@ -599,15 +601,26 @@ public class WadlGeneratorTest extends Assert {
         private String type;
         private String schemaType;
         private String docs;
+        private boolean repeating;
         public Param(String name, String type, String schemaType) {
-            this(name, type, schemaType, null);
+            this(name, type, schemaType, false);
+        }
+        
+        public Param(String name, String type, String schemaType, boolean repeating) {
+            this(name, type, schemaType, repeating, null);
         }
         
         public Param(String name, String type, String schemaType, String docs) {
+            this(name, type, schemaType, false, null);
+        }
+        
+        
+        public Param(String name, String type, String schemaType, boolean repeating, String docs) {
             this.name = name;
             this.type = type;
             this.schemaType = schemaType;
             this.docs = docs;
+            this.repeating = repeating;
         }
         
         public String getName() {
@@ -624,6 +637,10 @@ public class WadlGeneratorTest extends Assert {
         
         public String getDocs() {
             return docs;
+        }
+        
+        public boolean isRepeating() {
+            return repeating;
         }
     }
 }

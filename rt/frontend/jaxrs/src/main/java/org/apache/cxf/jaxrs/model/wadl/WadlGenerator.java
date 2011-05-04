@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -459,7 +460,8 @@ public class WadlGenerator implements RequestHandler {
         Method method = getMethod(ori);
         Class<?> type = method.getParameterTypes()[pm.getIndex()];
         if (!"".equals(pm.getName())) {
-            doWriteParam(sb, pm, type, pm.getName(), method.getParameterAnnotations()[pm.getIndex()]);
+            doWriteParam(sb, pm, type, method.getGenericParameterTypes()[pm.getIndex()],
+                         pm.getName(), method.getParameterAnnotations()[pm.getIndex()]);
         } else {
             doWriteBeanParam(sb, type, pm, null);
         }
@@ -472,16 +474,18 @@ public class WadlGenerator implements RequestHandler {
             if (parentName != null) {
                 name = parentName + "." + name;
             }
-            if (InjectionUtils.isPrimitive(entry.getValue())) {
-                doWriteParam(sb, entry.getKey(), entry.getValue(), name, new Annotation[]{});
+            Class<?> paramCls = entry.getValue();
+            boolean isPrimitive = InjectionUtils.isPrimitive(paramCls);
+            if (isPrimitive || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
+                doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[]{});
             } else {
-                doWriteBeanParam(sb, entry.getValue(), entry.getKey(), name);
+                doWriteBeanParam(sb, paramCls, entry.getKey(), name);
             }
         }
     }
 
-    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName,
-                                Annotation[] anns) {
+    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, 
+                                Type genericType, String paramName, Annotation[] anns) {
         sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template"
                        : ParameterType.FORM == pm.getType() ? "query"
@@ -490,6 +494,10 @@ public class WadlGenerator implements RequestHandler {
         sb.append("style=\"").append(style).append("\"");
         if (pm.getDefaultValue() != null) {
             sb.append(" default=\"").append(pm.getDefaultValue()).append("\"");
+        }
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            type = InjectionUtils.getActualType(genericType);
+            sb.append(" repeating=\"true\"");
         }
         String value = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
         if (value != null) {
@@ -548,7 +556,7 @@ public class WadlGenerator implements RequestHandler {
                 sb.append(">");    
                 Parameter p = inbound ? getRequestBodyParam(ori) 
                     : new Parameter(ParameterType.REQUEST_BODY, 0, "result"); 
-                doWriteParam(sb, p, type, p.getName() == null ? "request" : p.getName(), anns);
+                doWriteParam(sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns);
                 sb.append("</representation>");
             } else  { 
                 type = getActualJaxbType(type, opMethod, inbound);
