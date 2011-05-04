@@ -23,9 +23,12 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.transport.Destination;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -118,5 +121,35 @@ public class HttpUtilsTest extends Assert {
         assertEquals(Response.Status.BAD_REQUEST,
                      HttpUtils.getParameterFailureStatus(ParameterType.COOKIE));
     }
+
+    @Test
+    public void testGetBaseAddressHttpUri() {
+        doTestGetBaseAddress("http://localhost:8080/store?query", "/store");
+    }
     
+    @Test
+    public void testGetBaseAddressHttpEncodedUri() {
+        doTestGetBaseAddress("http://localhost:8080/store%20?query", "/store%20");
+    }
+    
+    @Test
+    public void testGetBaseAddressJmsUri() {
+        doTestGetBaseAddress("jms://topic", "/");
+    }
+    
+    @Test
+    public void testGetBaseAddressWithoutScheme() {
+        doTestGetBaseAddress("/s", "/s");
+    }
+    
+    private void doTestGetBaseAddress(String baseURI, String expected) {
+        Message m = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        m.setExchange(exchange);
+        Destination dest = EasyMock.createMock(Destination.class);
+        exchange.setDestination(dest);
+        m.put(Message.BASE_PATH, baseURI);
+        String address = HttpUtils.getBaseAddress(m);
+        assertEquals(expected, address);
+    }
 }
