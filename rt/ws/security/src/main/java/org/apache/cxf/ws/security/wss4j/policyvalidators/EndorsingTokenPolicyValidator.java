@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.security.cert.Certificate;
 import java.util.Collection;
 import java.util.List;
 
@@ -60,11 +59,11 @@ public class EndorsingTokenPolicyValidator {
                 ai.setAsserted(true);
                 
                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-                Certificate[] tlsCerts = null;
+                boolean transport = false;
                 if (tlsInfo != null) {
-                    tlsCerts = tlsInfo.getPeerCertificates();
+                    transport = true;
                 }
-                if (!checkEndorsed(tlsCerts)) {
+                if (!checkEndorsed(transport)) {
                     ai.setNotAsserted("Message fails endorsing supporting tokens requirements");
                     return false;
                 }
@@ -77,11 +76,11 @@ public class EndorsingTokenPolicyValidator {
     /**
      * Check the endorsing supporting token policy. If we're using the Transport Binding then
      * check that the Timestamp is signed. Otherwise, check that the signature is signed.
-     * @param tlsCerts
+     * @param transport
      * @return true if the endorsed supporting token policy is correct
      */
-    private boolean checkEndorsed(Certificate[] tlsCerts) {
-        if (tlsCerts != null && tlsCerts.length > 0) {
+    private boolean checkEndorsed(boolean transport) {
+        if (transport) {
             return checkTimestampIsSigned();
         }
         return checkSignatureIsSigned();
