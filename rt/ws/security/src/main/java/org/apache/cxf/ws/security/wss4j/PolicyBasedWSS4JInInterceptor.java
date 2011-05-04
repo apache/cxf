@@ -541,6 +541,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         && sl.get(0).getName().equals(new QName(WSConstants.SIG_NS, WSConstants.SIG_LN))) {
                         //endorsing the signature
                         hasEndorsement = true;
+                        break;
                     }
                     for (WSDataRef r : sl) {
                         signed.add(r);
