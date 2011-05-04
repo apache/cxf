@@ -333,7 +333,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
                 qname = el.getName();
                 actualClass = el.getDeclaredType();
             } else {
-                qname = getCollectionWrapperQName(actualClass, genericType, firstObj, true);
+                qname = getCollectionWrapperQName(actualClass, genericType, firstObj, false);
             }
             if (qname.getNamespaceURI().length() > 0) {
                 startTag = "{\"ns1." + qname.getLocalPart() + "\":[";

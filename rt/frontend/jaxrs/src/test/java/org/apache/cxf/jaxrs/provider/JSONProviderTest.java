@@ -391,6 +391,20 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteUnqualifiedCollection() throws Exception {
+        JSONProvider p = new JSONProvider();
+        List<Book> books = new ArrayList<Book>();
+        books.add(new Book("CXF", 123L));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        Method m = CollectionsResource.class.getMethod("getBooks", new Class[0]);
+        p.writeTo(books, m.getReturnType(), m.getGenericReturnType(), new Annotation[0], 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        assertEquals("{\"Book\":[{\"id\":123,\"name\":\"CXF\",\"state\":\"\"}]}",
+                     os.toString());
+        
+    }
+    
+    @Test
     public void testReadUnqualifiedCollection() throws Exception {
         String data = "{\"Book\":[{\"id\":\"123\",\"name\":\"CXF in Action\"}"
             + ",{\"id\":\"124\",\"name\":\"CXF Rocks\"}]}";
