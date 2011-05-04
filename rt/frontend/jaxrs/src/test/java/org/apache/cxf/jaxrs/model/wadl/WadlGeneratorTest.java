@@ -408,9 +408,10 @@ public class WadlGeneratorTest extends Assert {
                                              WadlGenerator.WADL_NS, "request");
         assertEquals(1, requestEls.size());
         
-        verifyParameters(requestEls.get(0), 2, 
+        verifyParameters(requestEls.get(0), 3, 
                          new Param("hid", "header", "xs:int"),
-                         new Param("provider.bar", "query", "xs:int"));
+                         new Param("provider.bar", "query", "xs:int"),
+                         new Param("a", "query", "xs:string"));
         verifyXmlJsonRepresentations(requestEls.get(0), book2El);
         
         // PUT

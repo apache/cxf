@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -75,6 +77,7 @@ public class BookStore {
                         @HeaderParam("hid") int headerId,
                         @CookieParam("cid") int cookieId,
                         @QueryParam("provider.bar") int queryParam,
+                        @QueryParam("a") List<String> queryList,
                         @Context HttpHeaders headers,
                         @XMLName(value = "{http://books}thesuperbook2", prefix = "p1")
                         Book2 b) {
@@ -99,14 +102,14 @@ public class BookStore {
     
     @GET
     @Path("chapter")
-    public Chapter getChaper() {
+    public Chapter getChapter() {
         return new Chapter(1);
     }
     
     @GET
     @Path("chapter2")
     @WadlElement(response = Chapter.class)
-    public Response getChaper2() {
+    public Response getChapter2() {
         return Response.ok().entity(new Chapter(1)).build();
     }
     
