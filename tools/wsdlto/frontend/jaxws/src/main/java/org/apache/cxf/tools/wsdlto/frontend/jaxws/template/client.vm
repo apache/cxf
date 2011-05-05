@@ -61,7 +61,7 @@ public final class ${clientClassName} {
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public static void main(String args[]) throws Exception {
+    public static void main(String args[]) throws java.lang.Exception {
         URL wsdlURL = ${service.Name}.WSDL_LOCATION;
         if (args.length > 0) { 
             File wsdlFile = new File(args[0]);
