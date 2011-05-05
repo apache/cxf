@@ -1177,8 +1177,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     }
     
     @Test
-    public void testCXF3353() throws Exception {
+    public void testCXF3353andCXF3491() throws Exception {
         try {
+            env.put(ToolConstants.CFG_ALL, "all");
             env.put(ToolConstants.CFG_COMPILE, "compile");
             env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");

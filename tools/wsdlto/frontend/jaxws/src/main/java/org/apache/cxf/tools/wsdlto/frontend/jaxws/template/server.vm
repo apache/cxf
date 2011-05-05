@@ -37,7 +37,7 @@ public class ${serverClassName}{
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    protected ${serverClassName}() throws Exception {
+    protected ${serverClassName}() throws java.lang.Exception {
         System.out.println("Starting Server");
         Object implementor = new ${impl}();
         String address = "${address}";
@@ -47,7 +47,7 @@ public class ${serverClassName}{
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public static void main(String args[]) throws Exception { 
+    public static void main(String args[]) throws java.lang.Exception { 
         new ${serverClassName}();
         System.out.println("Server ready..."); 
         
