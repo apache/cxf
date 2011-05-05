@@ -116,7 +116,10 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public void setContentLength(int len) {
-        throw new UnsupportedOperationException();
+        if (!committed) {
+            exchange.getResponseHeaders().put("Content-Length", 
+                Collections.singletonList(String.valueOf(len)));
+        }
     }
 
     public void setContentType(String type) {
