@@ -647,6 +647,10 @@ public class CodeGeneratorProvider implements RequestHandler {
                 : PARAM_ANNOTATIONS.get(paramEl.getAttribute("style"));
             writeAnnotation(sbCode, imports, paramAnnotation, name, false, false);
             String type = getPrimitiveType(paramEl);
+            if (Boolean.valueOf(paramEl.getAttribute("repeating"))) {
+                addImport(imports, List.class.getName());
+                type = "List<" + type + ">";
+            }
             sbCode.append(" ").append(type).append(" ").append(name.replace('.', '_'));
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
