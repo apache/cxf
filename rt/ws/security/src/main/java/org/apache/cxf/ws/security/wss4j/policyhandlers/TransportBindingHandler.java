@@ -458,10 +458,12 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             }
             String tokenType = secTok.getTokenType();
-            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML_NS.equals(tokenType)) {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML2_NS.equals(tokenType)) {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {

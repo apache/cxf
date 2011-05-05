@@ -505,9 +505,11 @@ public abstract class AbstractBindingBuilder {
                     sig.setCustomTokenId(secToken.getId());
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                     String tokenType = secToken.getTokenType();
-                    if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+                    if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                        || WSConstants.SAML_NS.equals(tokenType)) {
                         sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                    } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+                    } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                        || WSConstants.SAML2_NS.equals(tokenType)) {
                         sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
                     } else if (tokenType != null) {
                         sig.setCustomTokenValueType(tokenType);
@@ -1466,10 +1468,12 @@ public abstract class AbstractBindingBuilder {
             
             int type = attached ? WSConstants.CUSTOM_SYMM_SIGNING 
                 : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
-            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML_NS.equals(tokenType)) {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML2_NS.equals(tokenType)) {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {
@@ -1703,9 +1707,11 @@ public abstract class AbstractBindingBuilder {
             
         } else {
             String tokenType = tok.getTokenType();
-            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML_NS.equals(tokenType)) {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML2_NS.equals(tokenType)) {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
             } else if (tokenType != null) {
                 sig.setCustomTokenValueType(tokenType);
