@@ -152,14 +152,23 @@ public final class AttachmentUtil {
         throws IOException {
      
         String id = headers.getHeader("Content-ID", null);
-        if (id != null && id.startsWith("<")) {
-            id = id.substring(1, id.length() - 1);
-        } else {
+        if (id != null) {
+            if (id.startsWith("<")) {
+                // strip <>
+                id = id.substring(1, id.length() - 1);
+            }
+            // strip cid:
+            if (id.startsWith("cid:")) {
+                id = id.substring(4);
+            }
+            // urldecode. Is this bad even without cid:? What does decode do with malformed %-signs, anyhow?
+            id = URLDecoder.decode(id, "UTF-8");
+        }
+        if (id == null) {
             //no Content-ID, set cxf default ID
-            id = "Content-ID: <root.message@cxf.apache.org";
+            id = "root.message@cxf.apache.org";
         }
 
-        id = URLDecoder.decode(id.startsWith("cid:") ? id.substring(4) : id, "UTF-8");
 
         AttachmentImpl att = new AttachmentImpl(id);
         
