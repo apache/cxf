@@ -88,8 +88,18 @@ public interface Message extends StringMap {
     String MTOM_ENABLED = "mtom-enabled";
     String MTOM_THRESHOLD = "mtom-threshold";
     String SCHEMA_VALIDATION_ENABLED = "schema-validation-enabled";
+
+    /**
+     * Boolean property specifying if the Java stack trace is returned as a  
+     * SOAP fault message.
+     */
     String FAULT_STACKTRACE_ENABLED = "faultStackTraceEnabled";
+    /**
+     * Boolean property specifying if the name of the exception that caused 
+     * the Java stack trace is returned.
+     */
     String EXCEPTION_MESSAGE_CAUSE_ENABLED = "exceptionMessageCauseEnabled";
+
     String CONTENT_TYPE = "Content-Type";    
     String ACCEPT_CONTENT_TYPE = "Accept";
     String BASE_PATH = Message.class.getName() + ".BASE_PATH";
