@@ -257,12 +257,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         ) {
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.ST_SIGNED) {
-                    AssertionWrapper assertionWrapper = 
-                        (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                    if (assertionWrapper.getSubjectKeyInfo() != null) {
-                        return wser;
-                    }
+                if (actInt.intValue() == WSConstants.ST_SIGNED
+                    || actInt.intValue() == WSConstants.ST_UNSIGNED) {
+                    return wser;
                 }
             }
             return null;
@@ -273,13 +270,15 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         ) {
             AssertionWrapper assertionWrapper = 
                 (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-            
             SecurityToken token = new SecurityToken(assertionWrapper.getId());
-            token.setSecret(subjectKeyInfo.getSecret());
-            X509Certificate[] certs = subjectKeyInfo.getCerts();
-            if (certs != null && certs.length > 0) {
-                token.setX509Certificate(certs[0], null);
+            
+            SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
+            if (subjectKeyInfo != null) {
+                token.setSecret(subjectKeyInfo.getSecret());
+                X509Certificate[] certs = subjectKeyInfo.getCerts();
+                if (certs != null && certs.length > 0) {
+                    token.setX509Certificate(certs[0], null);
+                }
             }
             if (assertionWrapper.getSaml1() != null) {
                 token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
