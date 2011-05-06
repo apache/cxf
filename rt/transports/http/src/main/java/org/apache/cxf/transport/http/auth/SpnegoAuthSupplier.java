@@ -44,7 +44,7 @@ import org.ietf.jgss.Oid;
 
 public class SpnegoAuthSupplier implements HttpAuthSupplier {
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
-    //private static final String SPNEGO_OID = "1.3.6.1.5.5.2";
+    private static final String SPNEGO_OID = "1.3.6.1.5.5.2";
 
     private static final Logger LOG = LogUtils.getL7dLogger(SpnegoAuthSupplier.class);
 
@@ -122,8 +122,8 @@ public class SpnegoAuthSupplier implements HttpAuthSupplier {
         GSSManager manager = GSSManager.getInstance();
         GSSName serverName = manager.createName(spn, null);
 
-        // TODO Is it correct to use kerberos oid instead of spnego here?
-        Oid oid = new Oid(KERBEROS_OID);
+        // need to use SPNEGO_OID
+        Oid oid = new Oid(SPNEGO_OID);
         
         GSSContext context = manager
                 .createContext(serverName.canonicalize(oid), oid, null, GSSContext.DEFAULT_LIFETIME);
