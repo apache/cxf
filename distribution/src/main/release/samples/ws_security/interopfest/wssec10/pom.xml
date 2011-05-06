@@ -162,7 +162,7 @@
                 </plugins>
             </build>
         </profile>
-   </profiles>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -190,6 +190,11 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
             <version>2.4.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+            <version>1.45</version>
         </dependency>
     </dependencies>
 </project>
