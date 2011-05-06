@@ -57,6 +57,10 @@ public class SpringBus extends ExtensionManagerBus
             }
             ac = ac.getParent();
         }
+        
+        // set the classLoader extension with the application context classLoader
+        setExtension(applicationContext.getClassLoader(), ClassLoader.class);
+        
         setExtension(new ConfigurerImpl(applicationContext), Configurer.class);
         
         ResourceManager m = getExtension(ResourceManager.class);
