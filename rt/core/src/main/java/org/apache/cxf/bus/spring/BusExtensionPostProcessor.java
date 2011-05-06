@@ -54,9 +54,11 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
         if (bean instanceof BusExtension && null != getBus()) {
             Class cls = ((BusExtension)bean).getRegistrationType();
             getBus().setExtension(bean, cls);
+            getBus().setExtension(context.getClassLoader(), ClassLoader.class);
         } else if (bean instanceof Bus && Bus.DEFAULT_BUS_ID.equals(beanId)) {
             bus = (Bus)bean;
             bus.setExtension(context, ApplicationContext.class);
+            bus.setExtension(context.getClassLoader(), ClassLoader.class);
             bus.setExtension(new SpringBeanLocator(context), ConfiguredBeanLocator.class);
         }
         return bean;
