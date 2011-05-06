@@ -175,21 +175,28 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             } catch (IOException e) {
                 throw new ServiceConstructionException(e);
             }
-    
+            
             if (serviceBean != null) {
-                initializeAnnotationInterceptors(server.getEndpoint(),
-                                                 ClassHelper.getRealClass(getServiceBean()));
+                Class<?> cls = ClassHelper.getRealClass(getServiceBean());
+                if (getServiceClass() == null || cls.equals(getServiceClass())) {
+                    initializeAnnotationInterceptors(server.getEndpoint(), cls);
+                } else {
+                    initializeAnnotationInterceptors(server.getEndpoint(), cls, getServiceClass());
+                }
             } else if (getServiceClass() != null) {
                 initializeAnnotationInterceptors(server.getEndpoint(), getServiceClass());
             }
     
             applyFeatures();
-    
+   
             getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED, server, serviceBean,
                                           serviceBean == null 
                                           ? getServiceClass() == null 
-                                              ? getServiceFactory().getServiceClass() : getServiceClass()
-                                              : ClassHelper.getRealClass(getServiceBean()));
+                                              ? getServiceFactory().getServiceClass() 
+                                              : getServiceClass()
+                                          : getServiceClass() == null
+                                              ? ClassHelper.getRealClass(getServiceBean()) 
+                                              : getServiceClass());
             
             if (start) {
                 server.start();

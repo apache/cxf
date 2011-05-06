@@ -94,15 +94,25 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
      * Add annotated Interceptors and Features to the Endpoint
      * @param ep
      */
-    protected void initializeAnnotationInterceptors(Endpoint ep, Class<?> cls) {
+    protected void initializeAnnotationInterceptors(Endpoint ep, Class<?> ... cls) {
         Class<?> seiClass = ((JaxWsServiceFactoryBean)getServiceFactory())
             .getJaxWsImplementorInfo().getSEIClass();
-        AnnotationInterceptors provider;
         if (seiClass != null) {
-            provider = new AnnotationInterceptors(cls, seiClass);
-        } else {
-            provider = new AnnotationInterceptors(cls);
+            boolean found = false;
+            for (Class<?> c : cls) {
+                if (c.equals(seiClass)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                Class<?> cls2[] = new Class<?>[cls.length + 1];
+                System.arraycopy(cls, 0, cls2, 0, cls.length);
+                cls2[cls.length] = seiClass;
+                cls = cls2;
+            }
         }
+        
+        AnnotationInterceptors provider = new AnnotationInterceptors(cls);
         initializeAnnotationInterceptors(provider, ep);
     }      
     

@@ -221,12 +221,18 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
         }
         return false;
     }
-    
+    /**
+     * Add annotated Interceptors and Features to the Endpoint
+     * @param ep
+     */
+    protected void initializeAnnotationInterceptors(Endpoint ep, Class<?> cls) {
+        initializeAnnotationInterceptors(ep, new Class<?>[] {cls});
+    }
     /**
      * Add annotationed Interceptors and Features to the Endpoint
      * @param ep
      */
-    protected void initializeAnnotationInterceptors(Endpoint ep, Class<?> cls) {
+    protected void initializeAnnotationInterceptors(Endpoint ep, Class<?> ... cls) {
         AnnotationInterceptors provider = new AnnotationInterceptors(cls);
         if (initializeAnnotationInterceptors(provider, ep)) {
             LOG.fine("Added annotation based interceptors and features");
