@@ -569,16 +569,14 @@ public final class StaxUtils {
             if (nsPrefix == null) {
                 nsPrefix = "";
             }
-            if (nsURI.length() > 0) {
-                if (nsPrefix.length() == 0) {
-                    writer.writeDefaultNamespace(nsURI);
-                    writer.setDefaultNamespace(nsURI);
-                } else {
-                    writer.writeNamespace(nsPrefix, nsURI);
-                    writer.setPrefix(nsPrefix, nsURI);
-                }
+            if (nsPrefix.length() == 0) {
+                writer.writeDefaultNamespace(nsURI);
+                writer.setDefaultNamespace(nsURI);
+            } else {
+                writer.writeNamespace(nsPrefix, nsURI);
+                writer.setPrefix(nsPrefix, nsURI);
             }
-
+            
             if (nsURI.equals(uri) && nsPrefix.equals(prefix)) {
                 writeElementNS = false;
             }

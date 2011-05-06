@@ -19,7 +19,13 @@
 
 package org.apache.cxf.staxutils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,6 +42,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.XMLUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -309,4 +316,22 @@ public class StaxUtilsTest extends Assert {
         idx = s.indexOf("xmlns:a", idx + 1);
         assertEquals(-1, idx);        
     }        
+    
+    @Test
+    public void testCopyWithEmptyNamespace() throws Exception {
+        StringBuilder in = new StringBuilder();
+        in.append("<foo xmlns=\"http://example.com/\">");
+        in.append("<bar xmlns=\"\"/>");
+        in.append("</foo>");
+        
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(
+             new ByteArrayInputStream(in.toString().getBytes()));
+        
+        Writer out = new StringWriter();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+        StaxUtils.copy(reader, writer);
+        writer.close();
+        
+        assertEquals(in.toString(), out.toString());
+    }
 }
