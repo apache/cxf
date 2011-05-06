@@ -43,6 +43,11 @@ import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
 
 public class SpnegoAuthSupplier implements HttpAuthSupplier {
+    /**
+     * Can be set on the jaxws:properties. If set to true then the kerberos oid is used
+     * instead of the default spnego OID
+     */
+    private static final String PROPERTY_USE_KERBEROS_OID = "auth.spnego.useKerberosOid";
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
     private static final String SPNEGO_OID = "1.3.6.1.5.5.2";
 
@@ -64,7 +69,12 @@ public class SpnegoAuthSupplier implements HttpAuthSupplier {
         try {
             String spn = "HTTP/" + currentURL.getHost();
             LOG.fine("Adding authorization service ticket for service principal name: " + spn);
-            byte[] token = getToken(authPolicy, spn);
+            
+            String userKerbOidSt = (String)message.getContextualProperty(PROPERTY_USE_KERBEROS_OID);
+            boolean useKerberosOid = "true".equals(userKerbOidSt);
+            Oid oid = new Oid(useKerberosOid ? KERBEROS_OID : SPNEGO_OID);
+
+            byte[] token = getToken(authPolicy, spn, oid);
             return HttpAuthHeader.AUTH_TYPE_NEGOTIATE + " " + Base64Utility.encode(token);
         } catch (LoginException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -111,20 +121,17 @@ public class SpnegoAuthSupplier implements HttpAuthSupplier {
      * Create and return a service ticket token for a given service principal
      * name
      * 
-     * @param proxyAuthPolicy
+     * @param authPolicy
      * @param spn
      * @return service ticket token
      * @throws GSSException
      * @throws LoginException
      */
-    private byte[] getToken(AuthorizationPolicy proxyAuthPolicy, String spn) throws GSSException, 
+    private byte[] getToken(AuthorizationPolicy authPolicy, String spn, Oid oid) throws GSSException, 
         LoginException {
         GSSManager manager = GSSManager.getInstance();
         GSSName serverName = manager.createName(spn, null);
 
-        // need to use SPNEGO_OID
-        Oid oid = new Oid(SPNEGO_OID);
-        
         GSSContext context = manager
                 .createContext(serverName.canonicalize(oid), oid, null, GSSContext.DEFAULT_LIFETIME);
         // TODO Do we need mutual auth. Will the code we have really work with
@@ -134,7 +141,7 @@ public class SpnegoAuthSupplier implements HttpAuthSupplier {
         // intended. Both settings should be configurable
         context.requestCredDeleg(true);
 
-        return getToken(proxyAuthPolicy, context);
+        return getToken(authPolicy, context);
     }
 
     private final class CreateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
