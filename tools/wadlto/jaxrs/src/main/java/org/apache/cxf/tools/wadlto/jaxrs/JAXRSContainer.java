@@ -27,11 +27,11 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.codegen.SourceGenerator;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
 import org.apache.cxf.tools.common.ClassUtils;
-import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.common.toolspec.parser.BadUsageException;
 import org.apache.cxf.tools.util.URIParserUtil;
+import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
 public class JAXRSContainer extends AbstractCXFToolContainer {
     
@@ -73,29 +73,37 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
     public void buildToolContext() {
         getContext();
-        if (context.get(ToolConstants.CFG_OUTPUTDIR) == null) {
-            context.put(ToolConstants.CFG_OUTPUTDIR, ".");
+        if (context.get(WadlToolConstants.CFG_OUTPUTDIR) == null) {
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, ".");
         }
     }
 
     private void processWadl() {
-        File outDir = new File((String)context.get(ToolConstants.CFG_OUTPUTDIR));
+        File outDir = new File((String)context.get(WadlToolConstants.CFG_OUTPUTDIR));
         String wadl = readWadl();
 
-        SourceGenerator sg = new SourceGenerator();  
+        SourceGenerator sg = new SourceGenerator();
+        boolean isInterface = context.optionSet(WadlToolConstants.CFG_INTERFACE);
+        boolean isServer = context.optionSet(WadlToolConstants.CFG_SERVER);
+        if (isServer) {
+            sg.setGenerateInterfaces(isInterface);
+            sg.setGenerateImplementation(true);
+        }
         
         // generate
-        sg.generateSource(wadl, outDir, "proxy");
+        String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
+            ? SourceGenerator.CODE_TYPE_GRAMMAR : SourceGenerator.CODE_TYPE_PROXY;
+        sg.generateSource(wadl, outDir, codeType);
         
         // compile 
-        if (context.optionSet(ToolConstants.CFG_COMPILE)) {
+        if (context.optionSet(WadlToolConstants.CFG_COMPILE)) {
             new ClassUtils().compile(context);
         }
 
     }
     
     protected String readWadl() {
-        String wadlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
+        String wadlURL = (String)context.get(WadlToolConstants.CFG_WADLURL);
         wadlURL = URIParserUtil.getAbsoluteURI(wadlURL);
         
         try {

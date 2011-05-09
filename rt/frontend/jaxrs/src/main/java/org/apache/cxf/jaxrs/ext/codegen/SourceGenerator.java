@@ -107,6 +107,7 @@ public class SourceGenerator {
 
     private Comparator<String> importsComparator;
     private boolean generateInterfaces = true;
+    private boolean generateImpl;
     
     private Map<String, String> properties; 
     
@@ -162,7 +163,10 @@ public class SourceGenerator {
         
         GrammarInfo gInfo = getGrammarInfo(appElement, schemaElements);
         for (Element resource : resourceEls) {
-            writeResourceClass(resource, typeClassNames, gInfo, src);
+            writeResourceClass(resource, typeClassNames, gInfo, src, generateInterfaces);
+            if (generateInterfaces && generateImpl) {
+                writeResourceClass(resource, typeClassNames, gInfo, src, false);
+            }
         }
         
         generateMainClass(resourcesEls.get(0), src);
@@ -205,7 +209,7 @@ public class SourceGenerator {
     }
     
     private void writeResourceClass(Element rElement, Set<String> typeClassNames, 
-                                    GrammarInfo gInfo, File src) {
+                                    GrammarInfo gInfo, File src, boolean interfaceIsGenerated) {
         String resourceId = rElement.getAttribute("id");
         String path = rElement.getAttribute("path");
         if (resourceId.length() == 0) {
@@ -228,36 +232,65 @@ public class SourceGenerator {
         sbImports.append("package " + qname.getNamespaceURI())
             .append(";").append(getLineSep()).append(getLineSep());
         
-        writeAnnotation(sbCode, imports, Path.class, path, true, false);
-        sbCode.append("public " + getClassType() + " " + qname.getLocalPart() 
-                                       + " {" + getLineSep() + getLineSep());
+        if (writeAnnotations(interfaceIsGenerated)) {
+            writeAnnotation(sbCode, imports, Path.class, path, true, false);
+        }
+        String className = getClassName(qname.getLocalPart(), interfaceIsGenerated);
+        sbCode.append("public " + getClassType(interfaceIsGenerated) + " " + className);
+        writeImplementsInterface(sbCode, qname.getLocalPart(), interfaceIsGenerated);              
+        sbCode.append(" {" + getLineSep() + getLineSep());
         
-        writeMethods(rElement, imports, sbCode, typeClassNames, gInfo);
+        writeMethods(rElement, imports, sbCode, typeClassNames, gInfo, interfaceIsGenerated);
         
         List<Element> childEls = DOMUtils.getChildrenWithName(rElement, 
             WadlGenerator.WADL_NS, "resource");
         for (Element childEl : childEls) {
             if (childEl.getAttribute("id").length() == 0) {
-                writeMethods(childEl, imports, sbCode, typeClassNames, gInfo);
+                writeMethods(childEl, imports, sbCode, typeClassNames, gInfo, interfaceIsGenerated);
             } else {
-                writeResourceMethod(childEl, childEl, imports, sbCode, typeClassNames, gInfo);
+                writeResourceMethod(childEl, childEl, imports, sbCode, typeClassNames, gInfo, 
+                                    interfaceIsGenerated);
             }
         }
         sbCode.append("}");
         writeImports(sbImports, imports);
         
-        createJavaSourceFile(src, qname, sbCode, sbImports);
+        createJavaSourceFile(src, new QName(qname.getNamespaceURI(), className), sbCode, sbImports);
         
         for (Element subEl : childEls) {
             String id = subEl.getAttribute("id");
             if (id.length() > 0 && !resourceId.equals(id) && !id.startsWith("{java")) {
-                writeResourceClass(subEl, typeClassNames, gInfo, src);
+                writeResourceClass(subEl, typeClassNames, gInfo, src, interfaceIsGenerated);
             }
         }
     }
     
-    private String getClassType() {
-        return generateInterfaces ? "interface" : "class";
+    private String getClassType(boolean interfaceIsGenerated) {
+        return interfaceIsGenerated ? "interface" : "class";
+    }
+    
+    private String getClassName(String clsName, boolean interfaceIsGenerated) {
+        if (interfaceIsGenerated) {
+            return clsName;
+        } else {
+            return generateInterfaces ? clsName + "Impl" : clsName;
+        }
+        
+    }
+    
+    private boolean writeAnnotations(boolean interfaceIsGenerated) {
+        if (interfaceIsGenerated) {
+            return true;
+        } else {
+            return !generateInterfaces && generateImpl;
+        }
+    }
+    
+    private void writeImplementsInterface(StringBuilder sb, String clsName, 
+                                             boolean interfaceIsGenerated) {
+        if (generateInterfaces && !interfaceIsGenerated) {
+            sb.append(" implements " + clsName);
+        }
     }
     
     private String getClassComment() {
@@ -268,12 +301,14 @@ public class SourceGenerator {
     
     private void writeMethods(Element rElement,  
                               Set<String> imports, StringBuilder sbCode, 
-                              Set<String> typeClassNames, GrammarInfo gInfo) {
+                              Set<String> typeClassNames, GrammarInfo gInfo,
+                              boolean interfaceIsGenerated) {
         List<Element> methodEls = DOMUtils.getChildrenWithName(rElement, 
             WadlGenerator.WADL_NS, "method");
        
         for (Element methodEl : methodEls) {
-            writeResourceMethod(rElement, methodEl, imports, sbCode, typeClassNames, gInfo);    
+            writeResourceMethod(rElement, methodEl, imports, sbCode, typeClassNames, gInfo, 
+                                interfaceIsGenerated);    
         }
     }
     
@@ -312,36 +347,42 @@ public class SourceGenerator {
     
     private void writeResourceMethod(Element resourceEl, Element methodEl, 
                                      Set<String> imports, StringBuilder sbCode, 
-                                     Set<String> typeClassNames, GrammarInfo gInfo) {
+                                     Set<String> typeClassNames, GrammarInfo gInfo,
+                                     boolean interfaceIsGenerated) {
         String id = methodEl.getAttribute("id");
         String methodName = methodEl.getAttribute("name");
-        String path = resourceEl.getAttribute("path");
-        if (id.length() == 0) {
-            LOG.warning("Method with path " + path + " can not be mapped to a class method");
-            return;
-        }
-        
-        sbCode.append(TAB);
-        writeAnnotation(sbCode, imports, Path.class, path, true, true);
-        if (methodName.length() > 0) {
-            if (HTTP_METHOD_ANNOTATIONS.containsKey(methodName.toLowerCase())) {
-                writeAnnotation(sbCode, imports, 
-                                HTTP_METHOD_ANNOTATIONS.get(methodName.toLowerCase()), null, true, true);
-            } else {
-                // TODO : write a custom annotation class based on HttpMethod    
-            }
-        }
         
         List<Element> responseEls = DOMUtils.getChildrenWithName(methodEl, 
                                                                  WadlGenerator.WADL_NS, "response");
         List<Element> requestEls = DOMUtils.getChildrenWithName(methodEl, 
                                                                 WadlGenerator.WADL_NS, "request");
         
-        if (methodName.length() > 0) {
-            writeFormatAnnotations(requestEls, sbCode, imports, true);
-            writeFormatAnnotations(responseEls, sbCode, imports, false);
+        
+        if (writeAnnotations(interfaceIsGenerated)) {
+            String path = resourceEl.getAttribute("path");
+            if (id.length() == 0) {
+                LOG.warning("Method with path " + path + " can not be mapped to a class method");
+                return;
+            }
+            sbCode.append(TAB);
+            writeAnnotation(sbCode, imports, Path.class, path, true, true);
+        
+            if (methodName.length() > 0) {
+                if (HTTP_METHOD_ANNOTATIONS.containsKey(methodName.toLowerCase())) {
+                    writeAnnotation(sbCode, imports, 
+                                    HTTP_METHOD_ANNOTATIONS.get(methodName.toLowerCase()), null, true, true);
+                } else {
+                    // TODO : write a custom annotation class name based on HttpMethod    
+                }
+                
+                writeFormatAnnotations(requestEls, sbCode, imports, true);
+                writeFormatAnnotations(responseEls, sbCode, imports, false);
+            }
+        } else {
+            sbCode.append(getLineSep()).append(TAB);
         }
-        if (!generateInterfaces) {
+        
+        if (!interfaceIsGenerated) {
             sbCode.append("public ");
         }
         boolean responseTypeAvailable = true;
@@ -367,17 +408,10 @@ public class SourceGenerator {
         List<Element> inParamElements = new LinkedList<Element>();
         inParamElements.addAll(DOMUtils.getChildrenWithName(resourceEl, 
                                                             WadlGenerator.WADL_NS, "param"));
-        boolean form = false;
-        if (requestEls.size() == 1 && inParamElements.size() == 0) {
-            inParamElements.addAll(DOMUtils.getChildrenWithName(requestEls.get(0), 
-                 WadlGenerator.WADL_NS, "param"));
-            addFormParameters(inParamElements, requestEls.get(0));
-            form = true;
-        }
         writeRequestTypes(requestEls, inParamElements, sbCode, imports, typeClassNames, gInfo,
-                          form);
+                          interfaceIsGenerated);
         sbCode.append(")");
-        if (generateInterfaces) {
+        if (interfaceIsGenerated) {
             sbCode.append(";");
         } else {
             generateEmptyMethodBody(sbCode, responseTypeAvailable);
@@ -442,7 +476,14 @@ public class SourceGenerator {
                                    Set<String> imports, 
                                    Set<String> typeClassNames, 
                                    GrammarInfo gInfo,
-                                   boolean form) {
+                                   boolean interfaceIsGenerated) {
+        boolean form = false;
+        if (requestEls.size() == 1 && inParamEls.size() == 0) {
+            inParamEls.addAll(DOMUtils.getChildrenWithName(requestEls.get(0), 
+                 WadlGenerator.WADL_NS, "param"));
+            addFormParameters(inParamEls, requestEls.get(0));
+            form = true;
+        }
         
         String elementName = null;
         
@@ -468,15 +509,18 @@ public class SourceGenerator {
             Element paramEl = inParamEls.get(i);
 
             String name = paramEl.getAttribute("name");
-            Class<?> paramAnnotation = form ? FormParam.class 
-                : PARAM_ANNOTATIONS.get(paramEl.getAttribute("style"));
-            writeAnnotation(sbCode, imports, paramAnnotation, name, false, false);
+            if (writeAnnotations(interfaceIsGenerated)) {
+                Class<?> paramAnnotation = form ? FormParam.class 
+                    : PARAM_ANNOTATIONS.get(paramEl.getAttribute("style"));
+                writeAnnotation(sbCode, imports, paramAnnotation, name, false, false);
+                sbCode.append(" ");
+            }
             String type = getPrimitiveType(paramEl);
             if (Boolean.valueOf(paramEl.getAttribute("repeating"))) {
                 addImport(imports, List.class.getName());
                 type = "List<" + type + ">";
             }
-            sbCode.append(" ").append(type).append(" ").append(name.replace('.', '_'));
+            sbCode.append(type).append(" ").append(name.replace('.', '_'));
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
                 if (i + 1 >= 4 && ((i + 1) % 4) == 0) {
@@ -678,6 +722,10 @@ public class SourceGenerator {
 
     public void setGenerateInterfaces(boolean generateInterfaces) {
         this.generateInterfaces = generateInterfaces;
+    }
+    
+    public void setGenerateImplementation(boolean generate) {
+        this.generateImpl = generate;
     }
     
     private static class GrammarInfo {
