@@ -32,7 +32,7 @@ import org.apache.header_test.rpc.types.HeaderMessage;
             
 public class TestRPCHeaderImpl implements TestRPCHeader {
 
-    public String testHeader1(String in, HeaderMessage inHeader) {
+    public String testHeader1(HeaderMessage inHeader, String in) {
         if (in == null || inHeader == null) {
             throw new IllegalArgumentException("TestHeader1 part not found.");
         }
