@@ -199,7 +199,13 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     }
     
                     o = dr.read(p, xmlReader);
-                    parameters.put(p, o);
+                    if (Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare")) 
+                        && parameters.isEmpty()) {
+                        // webservice provider does not need to ensure size
+                        parameters.add(o);
+                    } else {
+                        parameters.put(p, o);
+                    }
                     
                     paramNum++;
                     if (message.getContent(XMLStreamReader.class) == null || o == xmlReader) {

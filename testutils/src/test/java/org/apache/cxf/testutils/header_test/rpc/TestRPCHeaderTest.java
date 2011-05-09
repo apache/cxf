@@ -38,9 +38,9 @@ public class TestRPCHeaderTest extends Assert {
             if ("testHeader1".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
-                assertEquals(1, annotations[1].length);
-                assertTrue(annotations[1][0] instanceof WebParam);
-                WebParam parm = (WebParam)annotations[1][0];
+                assertEquals(1, annotations[0].length);
+                assertTrue(annotations[0][0] instanceof WebParam);
+                WebParam parm = (WebParam)annotations[0][0];
                 assertEquals("http://apache.org/header_test/rpc/types", parm.targetNamespace());
                 assertEquals("inHeader", parm.partName());
                 assertEquals("headerMessage", parm.name());

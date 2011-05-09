@@ -259,7 +259,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
             header.setHeaderVal("header");
             
             for (int idx = 0; idx < 2; idx++) {
-                String returnVal = proxy.testHeader1("part", header);
+                String returnVal = proxy.testHeader1(header, "part");
                 assertNotNull(returnVal);
                 assertEquals("part/header", returnVal);
             }

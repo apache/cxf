@@ -30,8 +30,8 @@
         </schema>
     </wsdl:types>
     <wsdl:message name="testHeader1Request">
-        <wsdl:part name="in" type="xsd:string"/>
         <wsdl:part name="inHeader" element="x1:headerMessage"/>
+        <wsdl:part name="in" type="xsd:string"/>       
     </wsdl:message>
     <wsdl:message name="testHeader1Response">
         <wsdl:part name="out" type="xsd:string"/>
