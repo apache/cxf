@@ -43,11 +43,11 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     /**
      * Just a flag to identify whether this holds sign element info or encr elements info
      */
-    private boolean signedElemets;
+    private boolean signedElements;
 
     public SignedEncryptedElements(boolean signedElements, SPConstants version) {
         super(version);
-        this.signedElemets = signedElements;
+        this.signedElements = signedElements;
     }
 
     /**
@@ -76,10 +76,10 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     }
 
     /**
-     * @return Returns the signedElemets.
+     * @return Returns the signedElements.
      */
     public boolean isSignedElemets() {
-        return signedElemets;
+        return signedElements;
     }
 
     public Map<String, String> getDeclaredNamespaces() {
@@ -127,13 +127,13 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     }
 
     public QName getRealName() {
-        if (signedElemets) {
+        if (signedElements) {
             return constants.getSignedElements();
         }
         return constants.getEncryptedElements();
     }
     public QName getName() {
-        if (signedElemets) {
+        if (signedElements) {
             return SP12Constants.INSTANCE.getSignedElements();
         }
         return SP12Constants.INSTANCE.getEncryptedElements();
