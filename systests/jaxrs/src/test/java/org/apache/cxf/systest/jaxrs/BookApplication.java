@@ -21,12 +21,23 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 
 @ApplicationPath("/thebooks")
 public class BookApplication extends Application {
 
+    public BookApplication(@Context ServletContext sc) {
+        if (sc == null) {
+            throw new IllegalArgumentException("ServletContext is null");
+        }
+        if (!"contextParamValue".equals(sc.getInitParameter("contextParam"))) {
+            throw new IllegalStateException("ServletContext is not initialized");
+        }
+    }
+    
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();

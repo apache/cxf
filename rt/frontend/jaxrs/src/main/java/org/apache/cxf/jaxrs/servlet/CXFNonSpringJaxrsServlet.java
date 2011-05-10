@@ -257,18 +257,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     protected void createServerFromApplication(String cName, ServletConfig servletConfig) 
         throws ServletException {
         Class<?> appClass = loadClass(cName, "Application");
-        Application app = null;
-        try {
-            app = (Application)appClass.newInstance();
-        } catch (InstantiationException ex) {
-            ex.printStackTrace();
-            throw new ServletException("Application class " + cName
-                                       + " can not be instantiated"); 
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-            throw new ServletException("Application class " + cName
-                                       + " can not be instantiated due to IllegalAccessException"); 
-        }
+        Application app = (Application)createSingletonInstance(appClass, servletConfig);
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, MessageUtils.isTrue(ignoreParam));
