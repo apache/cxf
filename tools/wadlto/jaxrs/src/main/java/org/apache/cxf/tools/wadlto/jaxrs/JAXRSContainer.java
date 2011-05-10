@@ -89,6 +89,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             sg.setGenerateInterfaces(isInterface);
             sg.setGenerateImplementation(true);
         }
+        sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
+        sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)

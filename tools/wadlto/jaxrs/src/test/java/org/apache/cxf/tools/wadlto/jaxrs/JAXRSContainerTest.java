@@ -36,10 +36,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     public void testCodeGenInterfaces() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
+
             ToolContext context = new ToolContext();
-
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             //context.put(WadlToolConstants.CFG_COMPILE, "true");
 
@@ -48,7 +47,57 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false);
+            verifyFiles("java", false, "org.apache.cxf.jaxrs.model.wadl");
+            //verifyFiles("class");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
+    public void testCodeGenNoIds() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/singleResource.xml"));
+            context.put(WadlToolConstants.CFG_RESOURCENAME, "CustomResource");
+            
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+            assertEquals(1, files.size());
+            assertTrue(checkContains(files, "application.CustomResource.java"));
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
+    public void testCodeGenInterfacesCustomPackage() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+            
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
+            context.put(WadlToolConstants.CFG_PACKAGENAME, "custom.books");
+            //context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", false, "custom.books");
             //verifyFiles("class");
             
         } catch (Exception e) {
@@ -61,10 +110,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     public void testCodeGenImpl() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
+
             ToolContext context = new ToolContext();
-
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_SERVER, "true");
             //context.put(WadlToolConstants.CFG_COMPILE, "true");
@@ -74,7 +122,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false);
+            verifyFiles("java", false, "org.apache.cxf.jaxrs.model.wadl");
             //verifyFiles("classes");
         } catch (Exception e) {
             fail();
@@ -86,10 +134,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     public void testCodeGenInterfaceAndImpl() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
+         
             ToolContext context = new ToolContext();
-
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_INTERFACE, "true");
             context.put(WadlToolConstants.CFG_SERVER, "true");
@@ -100,7 +147,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true);
+            verifyFiles("java", true, "org.apache.cxf.jaxrs.model.wadl");
             //verifyFiles("classes");
         } catch (Exception e) {
             fail();
@@ -112,10 +159,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     public void testCodeGenTypesOnly() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
+
             ToolContext context = new ToolContext();
-
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_TYPES, "true");
 
@@ -132,25 +178,26 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
     
-    private void verifyFiles(String ext, boolean interfacesAndImpl) {
+    private void verifyFiles(String ext, boolean interfacesAndImpl, String resourcePackage) {
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
         assertEquals(interfacesAndImpl ? 9 : 7, files.size());
-        assertTrue(checkContains(files, "superbooks.Book." + ext));
-        assertTrue(checkContains(files, "superbooks.Book2." + ext));
-        assertTrue(checkContains(files, "superbooks.Chapter." + ext));
-        assertTrue(checkContains(files, "superbooks.ObjectFactory." + ext));
-        assertTrue(checkContains(files, "superbooks.package-info." + ext));
-        assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl.FormInterface." + ext));
-        assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl.BookStore." + ext));
+        doVerifyTypes(files, ext);
+        
+        assertTrue(checkContains(files, resourcePackage + ".FormInterface." + ext));
+        assertTrue(checkContains(files, resourcePackage + ".BookStore." + ext));
         if (interfacesAndImpl) {
-            assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl.FormInterfaceImpl." + ext));
-            assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl.BookStoreImpl." + ext));
+            assertTrue(checkContains(files, resourcePackage + ".FormInterfaceImpl." + ext));
+            assertTrue(checkContains(files, resourcePackage + ".BookStoreImpl." + ext));
         }
     }
     
     private void verifyTypes(String ext) {
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
         assertEquals(5, files.size());
+        doVerifyTypes(files, ext);
+    }
+    
+    private void doVerifyTypes(List<File> files, String ext) {
         assertTrue(checkContains(files, "superbooks.Book." + ext));
         assertTrue(checkContains(files, "superbooks.Book2." + ext));
         assertTrue(checkContains(files, "superbooks.Chapter." + ext));

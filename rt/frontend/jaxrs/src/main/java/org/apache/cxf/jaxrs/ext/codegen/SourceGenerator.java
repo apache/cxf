@@ -84,6 +84,8 @@ public class SourceGenerator {
     
     private static final Logger LOG = LogUtils.getL7dLogger(SourceGenerator.class);
     
+    private static final String DEFAULT_PACKAGE_NAME = "application";
+    private static final String DEFAULT_RESOURCE_NAME = "Resource";
     private static final String TAB = "    "; 
     
     private static final Map<String, Class<?>> HTTP_METHOD_ANNOTATIONS;
@@ -108,6 +110,8 @@ public class SourceGenerator {
     private Comparator<String> importsComparator;
     private boolean generateInterfaces = true;
     private boolean generateImpl;
+    private String resourcePackageName;
+    private String resourceName;
     
     private Map<String, String> properties; 
     
@@ -117,6 +121,16 @@ public class SourceGenerator {
     
     public SourceGenerator(Map<String, String> properties) {
         this.properties = properties;
+    }
+    
+    private String getClassPackageName(String wadlPackageName) {
+        if (resourcePackageName != null) {
+            return resourcePackageName;
+        } else if (wadlPackageName != null && wadlPackageName.length() > 0) {
+            return wadlPackageName;
+        } else {
+            return DEFAULT_PACKAGE_NAME;
+        }
     }
     
     private String getLineSep() {
@@ -134,7 +148,7 @@ public class SourceGenerator {
         
         Set<String> typeClassNames = new HashSet<String>();
         List<Element> schemaElements = getSchemaElements(appElement);
-        if (!schemaElements.isEmpty()) {
+        if (schemaElements != null && !schemaElements.isEmpty()) {
             // generate classes from schema
             JCodeModel codeModel = createCodeModel(schemaElements, typeClassNames);
             if (codeModel != null) {
@@ -162,10 +176,14 @@ public class SourceGenerator {
         }
         
         GrammarInfo gInfo = getGrammarInfo(appElement, schemaElements);
-        for (Element resource : resourceEls) {
+        for (int i = 0; i < resourceEls.size(); i++) {
+            Element resource = resourceEls.get(i);
             writeResourceClass(resource, typeClassNames, gInfo, src, generateInterfaces);
             if (generateInterfaces && generateImpl) {
                 writeResourceClass(resource, typeClassNames, gInfo, src, false);
+            }
+            if (resourceName != null) {
+                break;
             }
         }
         
@@ -175,7 +193,7 @@ public class SourceGenerator {
     
     private GrammarInfo getGrammarInfo(Element appElement, List<Element> schemaElements) {
         
-        if (schemaElements.isEmpty()) {
+        if (schemaElements == null || schemaElements.isEmpty()) {
             return null;
         }
         
@@ -210,12 +228,12 @@ public class SourceGenerator {
     
     private void writeResourceClass(Element rElement, Set<String> typeClassNames, 
                                     GrammarInfo gInfo, File src, boolean interfaceIsGenerated) {
-        String resourceId = rElement.getAttribute("id");
-        String path = rElement.getAttribute("path");
+        String resourceId = resourceName != null 
+            ? resourceName : rElement.getAttribute("id");
         if (resourceId.length() == 0) {
-            LOG.warning("Resource with path " + path + " can not be mapped to a class");
-            return;
+            resourceId = DEFAULT_RESOURCE_NAME;
         }
+        String path = rElement.getAttribute("path");
         
         
         QName qname = JAXRSUtils.convertStringToQName(resourceId);
@@ -228,14 +246,17 @@ public class SourceGenerator {
         StringBuilder sbCode = new StringBuilder();
         Set<String> imports = createImports();
         
+        final String classPackage = getClassPackageName(qname.getNamespaceURI());
+        final String className = getClassName(qname.getLocalPart(), interfaceIsGenerated);
+        
         sbImports.append(getClassComment()).append(getLineSep());
-        sbImports.append("package " + qname.getNamespaceURI())
+        sbImports.append("package " + classPackage)
             .append(";").append(getLineSep()).append(getLineSep());
         
         if (writeAnnotations(interfaceIsGenerated)) {
             writeAnnotation(sbCode, imports, Path.class, path, true, false);
         }
-        String className = getClassName(qname.getLocalPart(), interfaceIsGenerated);
+                
         sbCode.append("public " + getClassType(interfaceIsGenerated) + " " + className);
         writeImplementsInterface(sbCode, qname.getLocalPart(), interfaceIsGenerated);              
         sbCode.append(" {" + getLineSep() + getLineSep());
@@ -253,9 +274,9 @@ public class SourceGenerator {
             }
         }
         sbCode.append("}");
-        writeImports(sbImports, imports);
+        writeImports(sbImports, imports, classPackage);
         
-        createJavaSourceFile(src, new QName(qname.getNamespaceURI(), className), sbCode, sbImports);
+        createJavaSourceFile(src, new QName(classPackage, className), sbCode, sbImports);
         
         for (Element subEl : childEls) {
             String id = subEl.getAttribute("id");
@@ -339,8 +360,12 @@ public class SourceGenerator {
         }
     }
     
-    private void writeImports(StringBuilder sbImports, Set<String> imports) {
+    private void writeImports(StringBuilder sbImports, Set<String> imports, String classPackage) {
         for (String clsName : imports) {
+            int index = clsName.lastIndexOf(".");
+            if (index != -1 && clsName.substring(0, index).equals(classPackage)) {
+                continue;
+            }
             sbImports.append("import " + clsName).append(";").append(getLineSep());
         }
     }
@@ -349,8 +374,11 @@ public class SourceGenerator {
                                      Set<String> imports, StringBuilder sbCode, 
                                      Set<String> typeClassNames, GrammarInfo gInfo,
                                      boolean interfaceIsGenerated) {
-        String id = methodEl.getAttribute("id");
         String methodName = methodEl.getAttribute("name");
+        String id = methodEl.getAttribute("id");
+        if (id.length() == 0) {
+            id = methodName.toLowerCase();
+        }
         
         List<Element> responseEls = DOMUtils.getChildrenWithName(methodEl, 
                                                                  WadlGenerator.WADL_NS, "response");
@@ -359,14 +387,8 @@ public class SourceGenerator {
         
         
         if (writeAnnotations(interfaceIsGenerated)) {
-            String path = resourceEl.getAttribute("path");
-            if (id.length() == 0) {
-                LOG.warning("Method with path " + path + " can not be mapped to a class method");
-                return;
-            }
             sbCode.append(TAB);
-            writeAnnotation(sbCode, imports, Path.class, path, true, true);
-        
+            
             if (methodName.length() > 0) {
                 if (HTTP_METHOD_ANNOTATIONS.containsKey(methodName.toLowerCase())) {
                     writeAnnotation(sbCode, imports, 
@@ -378,6 +400,10 @@ public class SourceGenerator {
                 writeFormatAnnotations(requestEls, sbCode, imports, true);
                 writeFormatAnnotations(responseEls, sbCode, imports, false);
             }
+            
+            String path = resourceEl.getAttribute("path");
+            writeAnnotation(sbCode, imports, Path.class, path, true, true);
+            
         } else {
             sbCode.append(getLineSep()).append(TAB);
         }
@@ -396,11 +422,14 @@ public class SourceGenerator {
                                                       typeClassNames);
             String localName = clsSimpleName == null ? qname.getLocalPart() 
                 : clsSimpleName.substring(packageName.length() + 1);
+            String subResponseNs = clsSimpleName == null ? getClassPackageName(qname.getNamespaceURI()) 
+                : clsSimpleName.substring(0, packageName.length());
             String parentId = ((Element)resourceEl.getParentNode()).getAttribute("id");
-            writeSubResponseType(id.equals(parentId), clsSimpleName == null ? qname.getNamespaceURI() 
-                : clsSimpleName.substring(0, packageName.length()), localName, sbCode, imports);
+            writeSubResponseType(id.equals(parentId), subResponseNs, localName, sbCode, imports);
+            
             // TODO : we need to take care of multiple subresource locators with diff @Path
             // returning the same type; also we might have ids like "{org.apache.cxf}Book#getName" 
+            
             sbCode.append("get" + localName);
         }
         
@@ -429,7 +458,7 @@ public class SourceGenerator {
         sbCode.append("}");
     }
     
-    private void addFormParameters(List<Element> inParamElements, Element requestEl) {
+    private boolean addFormParameters(List<Element> inParamElements, Element requestEl) {
         List<Element> repElements = 
             DOMUtils.getChildrenWithName(requestEl, WadlGenerator.WADL_NS, "representation");
  
@@ -438,8 +467,10 @@ public class SourceGenerator {
             if (MediaType.APPLICATION_FORM_URLENCODED.equals(mediaType)) { 
                 inParamElements.addAll(DOMUtils.getChildrenWithName(repElements.get(0), 
                                                                 WadlGenerator.WADL_NS, "param"));
+                return true;
             }
         }
+        return false;
     }
     
     private boolean writeResponseType(List<Element> responseEls, StringBuilder sbCode,
@@ -481,8 +512,7 @@ public class SourceGenerator {
         if (requestEls.size() == 1 && inParamEls.size() == 0) {
             inParamEls.addAll(DOMUtils.getChildrenWithName(requestEls.get(0), 
                  WadlGenerator.WADL_NS, "param"));
-            addFormParameters(inParamEls, requestEls.get(0));
-            form = true;
+            form = addFormParameters(inParamEls, requestEls.get(0));
         }
         
         String elementName = null;
@@ -717,7 +747,8 @@ public class SourceGenerator {
     }
 
     private Set<String> createImports() {
-        return importsComparator == null ? new TreeSet<String>() : new TreeSet<String>(importsComparator);
+        return importsComparator == null ? new TreeSet<String>(new DefaultImportsComparator()) 
+            : new TreeSet<String>(importsComparator);
     }
 
     public void setGenerateInterfaces(boolean generateInterfaces) {
@@ -726,6 +757,14 @@ public class SourceGenerator {
     
     public void setGenerateImplementation(boolean generate) {
         this.generateImpl = generate;
+    }
+    
+    public void setPackageName(String name) {
+        this.resourcePackageName = name;
+    }
+    
+    public void setResourceName(String name) {
+        this.resourceName = name;
     }
     
     private static class GrammarInfo {
@@ -746,6 +785,22 @@ public class SourceGenerator {
         }
     }
 
+    private static class DefaultImportsComparator implements Comparator<String> {
+        private static final String JAVAX_PREFIX = "javax";
+        public int compare(String s1, String s2) {
+            boolean javax1 = s1.startsWith(JAVAX_PREFIX);
+            boolean javax2 = s1.startsWith(JAVAX_PREFIX);
+            if (javax1 && !javax2) {
+                return -1;
+            } else if (!javax1 && javax2) {
+                return 1;
+            } else { 
+                return s1.compareTo(s2);
+            }
+        }
+        
+    }
+    
     static class InnerErrorListener {
 
         public void error(SAXParseException ex) {

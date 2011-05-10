@@ -35,7 +35,7 @@ public final class WadlToolConstants {
     public static final String CFG_TYPES = ToolConstants.CFG_TYPES;
     
     public static final String CFG_PACKAGENAME = ToolConstants.CFG_PACKAGENAME;
-    public static final String CFG_INTERFACENAME = "interfacename";
+    public static final String CFG_RESOURCENAME = "resourcename";
     
     public static final String CFG_WADLURL = "wadl";
     

@@ -1,0 +1,16 @@
+<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
+
+ <resources base="http://localhost:8080/baz">
+   <param name="id" style="template" type="xs:long"/>
+   <resource path="/bookstore/{id}">
+     <method name="GET">
+      <request/>
+      <response>
+       <representation mediaType="text/plain">
+        <param name="result" style="plain" type="xs:string"/>
+       </representation>
+      </response>
+    </method>
+   </resource>
+ </resources>  
+</application>
