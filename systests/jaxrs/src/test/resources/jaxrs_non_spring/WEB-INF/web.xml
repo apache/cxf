@@ -24,6 +24,10 @@
 -->
 <!-- START SNIPPET: webxml -->
 <web-app>
+    <context-param>
+      <param-name>contextParam</param-name>
+      <param-value>contextParamValue</param-value>
+    </context-param>
 	<servlet>
 		<servlet-name>CXFServlet</servlet-name>
 		<display-name>CXF Servlet</display-name>
