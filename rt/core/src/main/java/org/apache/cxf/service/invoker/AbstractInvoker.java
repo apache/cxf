@@ -80,9 +80,7 @@ public abstract class AbstractInvoker implements Invoker {
 
     protected Object invoke(Exchange exchange, final Object serviceObject, Method m, List<Object> params) {
         Object res;
-        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(serviceObject.getClass().getClassLoader());
             Object[] paramArray = new Object[]{};
             if (params != null) {
                 paramArray = params.toArray();
@@ -133,9 +131,7 @@ public abstract class AbstractInvoker implements Invoker {
             checkSuspendedInvocation(exchange, serviceObject, m, params, e);
             exchange.getInMessage().put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
             throw createFault(e, m, params, false);
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
-        }
+        } 
     }
     
     protected void checkSuspendedInvocation(Exchange exchange,
