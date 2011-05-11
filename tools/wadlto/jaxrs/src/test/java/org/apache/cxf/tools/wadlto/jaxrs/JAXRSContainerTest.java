@@ -40,7 +40,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
-            //context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);
             container.execute();
@@ -48,7 +48,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertNotNull(output.list());
             
             verifyFiles("java", false, "org.apache.cxf.jaxrs.model.wadl");
-            //verifyFiles("class");
+            verifyFiles("class", false, "org.apache.cxf.jaxrs.model.wadl");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,7 +90,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_PACKAGENAME, "custom.books");
-            //context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);
             container.execute();
@@ -98,7 +98,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertNotNull(output.list());
             
             verifyFiles("java", false, "custom.books");
-            //verifyFiles("class");
+            verifyFiles("class", false, "custom.books");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,7 +115,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_SERVER, "true");
-            //context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);
             container.execute();
@@ -123,7 +123,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertNotNull(output.list());
             
             verifyFiles("java", false, "org.apache.cxf.jaxrs.model.wadl");
-            //verifyFiles("classes");
+            verifyFiles("class", false, "org.apache.cxf.jaxrs.model.wadl");
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -140,7 +140,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_INTERFACE, "true");
             context.put(WadlToolConstants.CFG_SERVER, "true");
-            //context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);
             container.execute();
@@ -148,7 +148,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertNotNull(output.list());
             
             verifyFiles("java", true, "org.apache.cxf.jaxrs.model.wadl");
-            //verifyFiles("classes");
+            verifyFiles("class", true, "org.apache.cxf.jaxrs.model.wadl");
         } catch (Exception e) {
             fail();
             e.printStackTrace();

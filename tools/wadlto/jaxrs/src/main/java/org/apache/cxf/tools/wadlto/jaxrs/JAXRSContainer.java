@@ -22,6 +22,7 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.codegen.SourceGenerator;
@@ -30,6 +31,7 @@ import org.apache.cxf.tools.common.ClassUtils;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.common.toolspec.parser.BadUsageException;
+import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
@@ -99,6 +101,24 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         
         // compile 
         if (context.optionSet(WadlToolConstants.CFG_COMPILE)) {
+            ClassCollector collector = createClassCollector();
+            List<String> generatedServiceClasses = sg.getGeneratedServiceClasses();
+            for (String className : generatedServiceClasses) {
+                int index = className.lastIndexOf(".");
+                collector.addServiceClassName(className.substring(0, index), 
+                                              className.substring(index + 1), 
+                                              className);
+            }
+            
+            List<String> generatedTypeClasses = sg.getGeneratedTypeClasses();
+            for (String className : generatedTypeClasses) {
+                int index = className.lastIndexOf(".");
+                collector.addTypesClassName(className.substring(0, index), 
+                                              className.substring(index + 1), 
+                                              className);
+            }
+            
+            context.put(ClassCollector.class, collector);
             new ClassUtils().compile(context);
         }
 

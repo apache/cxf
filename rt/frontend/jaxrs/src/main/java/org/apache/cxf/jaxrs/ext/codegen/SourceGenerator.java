@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -75,6 +76,9 @@ import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
+/**
+ * TODO: This will need to be moved into a separate module
+ */
 public class SourceGenerator {
     public static final String CODE_TYPE_GRAMMAR = "grammar";
     public static final String CODE_TYPE_PROXY = "proxy";
@@ -114,6 +118,9 @@ public class SourceGenerator {
     private String resourceName;
     
     private Map<String, String> properties; 
+    
+    private List<String> generatedServiceClasses = new ArrayList<String>(); 
+    private List<String> generatedTypeClasses = new ArrayList<String>();
     
     public SourceGenerator() {
         this(Collections.<String, String>emptyMap());
@@ -234,8 +241,13 @@ public class SourceGenerator {
         if (resourceId.length() == 0) {
             resourceId = DEFAULT_RESOURCE_NAME;
         }
+        //TODO: if it's expanded QName then use PackageUtils.getPackageNameByNameSpaceURI
+        // otherwise assume the last segment after the last dot is the name of the class
+        // and the package name is before the last dot
         QName qname = JAXRSUtils.convertStringToQName(resourceId);
-        if (getSchemaClassName(PackageUtils.getPackageNameByNameSpaceURI(qname.getNamespaceURI()), 
+        String namespaceURI = qname.getNamespaceURI();
+        
+        if (getSchemaClassName(PackageUtils.getPackageNameByNameSpaceURI(namespaceURI), 
                                gInfo, qname.getLocalPart(), typeClassNames) != null) {
             return; 
         }
@@ -244,7 +256,7 @@ public class SourceGenerator {
         StringBuilder sbCode = new StringBuilder();
         Set<String> imports = createImports();
         
-        final String classPackage = getClassPackageName(qname.getNamespaceURI());
+        final String classPackage = getClassPackageName(namespaceURI);
         final String className = getClassName(qname.getLocalPart(), interfaceIsGenerated);
         
         sbImports.append(getClassComment()).append(getLineSep());
@@ -667,6 +679,8 @@ public class SourceGenerator {
         String content = sbImports.toString() + getLineSep() + sbCode.toString();
         
         String namespace = qname.getNamespaceURI();
+        generatedServiceClasses.add(namespace + "." + qname.getLocalPart());
+        
         namespace = namespace.replace(".", getFileSep());
         
         File currentDir = new File(src.getAbsolutePath(), namespace);
@@ -697,6 +711,7 @@ public class SourceGenerator {
         try {
             Object writer = JAXBUtils.createFileCodeWriter(src);
             codeModel.build(writer);
+            generatedTypeClasses = JAXBUtils.getGeneratedClassNames(codeModel);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to write generated Java files for schemas: "
                                             + e.getMessage(), e);
@@ -775,6 +790,14 @@ public class SourceGenerator {
     
     public void setResourceName(String name) {
         this.resourceName = name;
+    }
+    
+    public List<String> getGeneratedServiceClasses() {
+        return generatedServiceClasses;    
+    }
+    
+    public List<String> getGeneratedTypeClasses() {
+        return generatedTypeClasses;    
     }
     
     private static class GrammarInfo {

@@ -37,6 +37,7 @@ import org.apache.cxf.tools.common.toolspec.parser.BadUsageException;
 import org.apache.cxf.tools.common.toolspec.parser.CommandDocument;
 import org.apache.cxf.tools.common.toolspec.parser.CommandLineParser;
 import org.apache.cxf.tools.common.toolspec.parser.ErrorVisitor;
+import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.version.Version;
 
 /**
@@ -282,4 +283,14 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         return map;
     }
 
+    protected ClassCollector createClassCollector() {
+        ClassCollector collector = new ClassCollector();
+        String reserved[] = (String[])context.get(ToolConstants.CFG_RESERVE_NAME);
+        if (reserved != null) {
+            for (String r : reserved) {
+                collector.reserveClass(r);
+            }
+        }
+        return collector;
+    }
 }

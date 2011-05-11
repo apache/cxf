@@ -217,14 +217,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         
         context.put(ToolConstants.PORTTYPE_MAP, interfaces);
         
-        ClassCollector collector = new ClassCollector();
-        String reserved[] = (String[])context.get(ToolConstants.CFG_RESERVE_NAME);
-        if (reserved != null) {
-            for (String r : reserved) {
-                collector.reserveClass(r);
-            }
-        }
-        context.put(ClassCollector.class, collector);
+        context.put(ClassCollector.class, createClassCollector());
         Processor processor = frontend.getProcessor();
         if (processor instanceof ClassNameProcessor) {
             processor.setEnvironment(context);

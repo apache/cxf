@@ -719,6 +719,18 @@ public final class JAXBUtils {
         logger.log(Level.INFO, "Created classes: " + sb.toString());
     }
     
+    public static List<String> getGeneratedClassNames(JCodeModel codeModel) {
+        List<String> classes = new ArrayList<String>();
+        for (Iterator<JPackage> itr = codeModel.packages(); itr.hasNext();) {
+            JPackage package1 = itr.next();
+            
+            for (Iterator<JDefinedClass> citr = package1.classes(); citr.hasNext();) {
+                classes.add(citr.next().fullName());
+            }
+        }
+        return classes;
+    }
+    
     public static Object createFileCodeWriter(File f) throws JAXBException {
         try {
             Class<?> cls;
