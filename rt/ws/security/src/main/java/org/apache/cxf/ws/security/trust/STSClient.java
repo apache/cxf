@@ -486,10 +486,12 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (sptt == null) {
             addTokenType(writer);
         }
-        if (keyTypeTemplate == null) {
-            keyTypeTemplate = keyType;
+        if (isSecureConv) {
+            addLifetime(writer);
         }
-        keyTypeTemplate = writeKeyType(writer, keyTypeTemplate);
+        if (keyTypeTemplate == null) {
+            keyTypeTemplate = writeKeyType(writer, keyType);
+        }
 
         byte[] requestorEntropy = null;
         X509Certificate cert = null;
@@ -831,7 +833,6 @@ public class STSClient implements Configurable, InterceptorProvider {
     private String writeKeyType(W3CDOMStreamWriter writer, String keyTypeToWrite) 
         throws XMLStreamException {
         if (isSecureConv) {
-            addLifetime(writer);
             if (keyTypeToWrite == null) {
                 writer.writeStartElement("wst", "TokenType", namespace);
                 writer.writeCharacters(STSUtils.getTokenTypeSCT(namespace));
