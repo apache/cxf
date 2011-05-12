@@ -1932,6 +1932,16 @@ public class HTTPConduit
             chunking = isChunking;
         }
         
+        // This construction makes extending the HTTPConduit more easier 
+        protected WrappedOutputStream(WrappedOutputStream wos) {
+            super(wos.threshold);
+            this.outMessage = wos.outMessage;
+            this.connection = wos.connection;
+            this.cachingForRetransmission = wos.cachingForRetransmission;
+            this.chunking = wos.chunking;
+            this.conduitName = wos.conduitName;
+        }
+        
         
         @Override
         public void thresholdNotReached() {
