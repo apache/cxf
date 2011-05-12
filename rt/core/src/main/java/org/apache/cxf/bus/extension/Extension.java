@@ -26,9 +26,8 @@ import java.util.Collection;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
 
-
 public class Extension {
-
+   
     private String className;
     private Class<?> clazz;
     private String interfaceName;
@@ -69,7 +68,12 @@ public class Extension {
             try {
                 clazz = cl.loadClass(className);
             } catch (ClassNotFoundException ex) {
-                throw new ExtensionException(ex);
+                try {
+                    // using the extension classloader as a fallback
+                    clazz = this.getClass().getClassLoader().loadClass(className);
+                } catch (ClassNotFoundException nex) {
+                    throw new ExtensionException(nex);
+                }
             }
         }
         return clazz;
@@ -131,7 +135,12 @@ public class Extension {
         try {
             cls = cl.loadClass(interfaceName);
         } catch (ClassNotFoundException ex) {
-            throw new ExtensionException(ex);
+            try {
+                // using the extension classloader as a fallback
+                cls = this.getClass().getClassLoader().loadClass(interfaceName);
+            } catch (ClassNotFoundException nex) {
+                throw new ExtensionException(nex);
+            }
         }
         return cls;
     }
