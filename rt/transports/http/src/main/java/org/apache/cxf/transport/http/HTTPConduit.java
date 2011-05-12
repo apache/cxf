@@ -1939,7 +1939,6 @@ public class HTTPConduit
             this.connection = wos.connection;
             this.cachingForRetransmission = wos.cachingForRetransmission;
             this.chunking = wos.chunking;
-            this.conduitName = wos.conduitName;
         }
         
         
