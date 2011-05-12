@@ -49,13 +49,20 @@ public class EncryptedPartsBuilder implements AssertionBuilder<Element> {
 
         SignedEncryptedParts signedEncryptedParts = new SignedEncryptedParts(false, consts);
 
-
         Node nd = element.getFirstChild();
         while (nd != null) {
             if (nd instanceof Element) {
                 processElement((Element)nd, signedEncryptedParts);                
             }
             nd = nd.getNextSibling();
+        }
+        
+        //
+        // If EncryptedParts is empty then default to encrypting the SOAP Body
+        //
+        if (!signedEncryptedParts.isBody() && !signedEncryptedParts.isAttachments()
+            && signedEncryptedParts.getHeaders().isEmpty()) {
+            signedEncryptedParts.setBody(true);
         }
         
         return signedEncryptedParts;
