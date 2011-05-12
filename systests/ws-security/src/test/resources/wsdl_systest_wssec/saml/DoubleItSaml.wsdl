@@ -455,7 +455,7 @@
                </wsp:Policy>
             </sp:SignedSupportingTokens>
             <sp:SignedElements>
-                <sp:XPath>//saml2:Assertion2</sp:XPath>
+                <sp:XPath>//saml2:Assertion</sp:XPath>
             </sp:SignedElements>
          </wsp:All>
       </wsp:ExactlyOne>
