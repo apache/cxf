@@ -53,6 +53,7 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -367,22 +368,12 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     static String resolveWithCatalogs(OASISCatalogManager catalogs, String start, String base) {
-        if (catalogs == null) {
-            return null;
-        }
-        String resolvedSchemaLocation = null;
         try {
-            resolvedSchemaLocation = catalogs.resolveSystem(start);
-            if (resolvedSchemaLocation == null) {
-                resolvedSchemaLocation = catalogs.resolveURI(start);
-            }
-            if (resolvedSchemaLocation == null) {
-                resolvedSchemaLocation = catalogs.resolvePublic(start, base);
-            }
+            return new OASISCatalogManagerHelper().resolve(catalogs, start, base);
         } catch (Exception ex) {
             //ignore
         }
-        return resolvedSchemaLocation;
+        return null;
     }
     
     protected void updateDefinition(Bus bus,

@@ -45,6 +45,7 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -78,13 +79,8 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         try {
             OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(this.getBus());
 
-            String nw = catalogResolver.resolveSystem(wsdl);
-            if (nw == null) {
-                nw = catalogResolver.resolveURI(wsdl);
-            }
-            if (nw == null) {
-                nw = catalogResolver.resolvePublic(wsdl, null);
-            }
+            String nw = new OASISCatalogManagerHelper().resolve(catalogResolver, 
+                                                                wsdl, null);
             if (nw == null) {
                 nw = wsdl;
             }

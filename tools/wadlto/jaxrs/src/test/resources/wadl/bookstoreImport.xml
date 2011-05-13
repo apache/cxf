@@ -19,27 +19,22 @@
 -->
 <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
 
+ <grammars>
+    <include href="schemas/book.xsd"/>
+ </grammars>
  <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore/{id}">
-     <param name="id" style="template" type="xs:long"/>
-     <method name="GET">
-      <request/>
-      <response>
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-    </method>
-    <resource path="/books">
-     <method name="GET">
-      <response>
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-    </method>
-   </resource>
+   <resource path="/bookstore" id="{org.apache.cxf.jaxrs.model.wadl}BookStore">
     
+    <resource path="/books/{bookid}">
+     <param name="bookid" style="template" type="xs:int"/>
+     
+     <method name="POST" id="addBook">
+      <request>
+       <representation mediaType="application/xml" element="prefix1:thebook2"/>
+      </request>
+     </method>
+    </resource>
    </resource>
- </resources>  
+</resources>
+
 </application>

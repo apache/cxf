@@ -82,9 +82,12 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
     private void processWadl() {
         File outDir = new File((String)context.get(WadlToolConstants.CFG_OUTPUTDIR));
-        String wadl = readWadl();
-
+        String wadlURL = getAbsoluteWadlURL();
+        
+        String wadl = readWadl(wadlURL);
+        
         SourceGenerator sg = new SourceGenerator();
+        sg.setBus(getBus());
         boolean isInterface = context.optionSet(WadlToolConstants.CFG_INTERFACE);
         boolean isServer = context.optionSet(WadlToolConstants.CFG_SERVER);
         if (isServer) {
@@ -93,6 +96,12 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         }
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
+
+        // find the base path
+        int lastSep = wadlURL.lastIndexOf("/");
+        if (lastSep != -1) {
+            sg.setBaseWadlPath(wadlURL.substring(0, lastSep + 1));
+        }
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
@@ -124,15 +133,17 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
     }
     
-    protected String readWadl() {
-        String wadlURL = (String)context.get(WadlToolConstants.CFG_WADLURL);
-        wadlURL = URIParserUtil.getAbsoluteURI(wadlURL);
-        
+    protected String readWadl(String wadlURI) {
         try {
-            URL url = new URL(wadlURL);
+            URL url = new URL(wadlURI);
             return IOUtils.toString(url.openStream());
         } catch (IOException e) {
             throw new ToolException(e);
         }
-    }     
+    }
+    
+    protected String getAbsoluteWadlURL() {
+        String wadlURL = (String)context.get(WadlToolConstants.CFG_WADLURL);
+        return URIParserUtil.getAbsoluteURI(wadlURL);
+    }
 }

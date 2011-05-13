@@ -23,7 +23,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -62,6 +66,9 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
@@ -74,6 +81,8 @@ import org.apache.cxf.jaxb.JAXBUtils.S2JJAXBModel;
 import org.apache.cxf.jaxb.JAXBUtils.SchemaCompiler;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
@@ -116,11 +125,13 @@ public class SourceGenerator {
     private boolean generateImpl;
     private String resourcePackageName;
     private String resourceName;
+    private String baseWadlPath;
     
     private Map<String, String> properties; 
     
     private List<String> generatedServiceClasses = new ArrayList<String>(); 
     private List<String> generatedTypeClasses = new ArrayList<String>();
+    private Bus bus;
     
     public SourceGenerator() {
         this(Collections.<String, String>emptyMap());
@@ -154,7 +165,7 @@ public class SourceGenerator {
         Element appElement = readWadl(wadl);
         
         Set<String> typeClassNames = new HashSet<String>();
-        List<Element> schemaElements = getSchemaElements(appElement);
+        List<SchemaInfo> schemaElements = getSchemaElements(appElement);
         if (schemaElements != null && !schemaElements.isEmpty()) {
             // generate classes from schema
             JCodeModel codeModel = createCodeModel(schemaElements, typeClassNames);
@@ -168,7 +179,7 @@ public class SourceGenerator {
         }
     }
     
-    private void generateResourceClasses(Element appElement, List<Element> schemaElements, 
+    private void generateResourceClasses(Element appElement, List<SchemaInfo> schemaElements, 
                                          Set<String> typeClassNames, File src) {
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(appElement, 
             WadlGenerator.WADL_NS, "resources");
@@ -198,7 +209,7 @@ public class SourceGenerator {
         
     }
     
-    private GrammarInfo getGrammarInfo(Element appElement, List<Element> schemaElements) {
+    private GrammarInfo getGrammarInfo(Element appElement, List<SchemaInfo> schemaElements) {
         
         if (schemaElements == null || schemaElements.isEmpty()) {
             return null;
@@ -215,8 +226,8 @@ public class SourceGenerator {
             }
         }
         Map<String, String> elementTypeMap = new HashMap<String, String>();
-        for (Element schemaEl : schemaElements) {
-            List<Element> elementEls = DOMUtils.getChildrenWithName(schemaEl, 
+        for (SchemaInfo schemaEl : schemaElements) {
+            List<Element> elementEls = DOMUtils.getChildrenWithName(schemaEl.getElement(), 
                  XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
             for (Element el : elementEls) {
                 String type = el.getAttribute("type");
@@ -700,8 +711,12 @@ public class SourceGenerator {
     }
     
     private Element readWadl(String wadl) {
+        return readXmlDocument(new StringReader(wadl));
+    }
+    
+    private Element readXmlDocument(Reader reader) {
         try {
-            return StaxUtils.read(new InputSource(new StringReader(wadl))).getDocumentElement();
+            return StaxUtils.read(new InputSource(reader)).getDocumentElement();
         } catch (Exception ex) {
             throw new IllegalStateException("Unable to read wadl", ex);
         }
@@ -718,20 +733,72 @@ public class SourceGenerator {
         }
     }
 
-    private List<Element> getSchemaElements(Element appElement) {
+    private List<SchemaInfo> getSchemaElements(Element appElement) {
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, 
                                                                 WadlGenerator.WADL_NS, "grammars");
         if (grammarEls.size() != 1) {
             return null;
         }
         
+        List<SchemaInfo> schemas = new ArrayList<SchemaInfo>();
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
              XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
-        //TODO : check remote referencs if size() == 0
-        return schemasEls;
+        for (Element schemaEl : schemasEls) {
+            schemas.add(createSchemaInfo(schemaEl, baseWadlPath));
+        }
+        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+             WadlGenerator.WADL_NS, "include");
+        for (Element includeEl : includeEls) {
+            String href = includeEl.getAttribute("href");
+            
+            String schemaURI = resolveLocationWithCatalog(href);
+            if (schemaURI == null) {
+                schemaURI = baseWadlPath != null ? baseWadlPath + href : href;
+            }
+            schemas.add(createSchemaInfo(readIncludedSchema(schemaURI),
+                                            schemaURI));
+        }
+        return schemas;
     }
     
-    private JCodeModel createCodeModel(List<Element> schemaElements, Set<String> type) {
+    private SchemaInfo createSchemaInfo(Element schemaEl, String systemId) { 
+        SchemaInfo info = new SchemaInfo(schemaEl.getAttribute("targetNamespace"));
+        info.setElement(schemaEl);
+        info.setSystemId(systemId);
+        return info;
+    }
+    
+    private String resolveLocationWithCatalog(String href) {
+        if (bus != null) {
+            OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
+            try {
+                return new OASISCatalogManagerHelper().resolve(catalogResolver, 
+                                                               href, null);
+            } catch (Exception e) {
+                throw new RuntimeException("Catalog resolution failed", e);
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    private Element readIncludedSchema(String href) {
+        
+        try {
+            InputStream is = null;
+            if (!href.startsWith("http")) {
+                is = ResourceUtils.getResourceStream(href, bus);
+            }
+            if (is == null) {
+                is = URI.create(href).toURL().openStream();
+            }
+            return readXmlDocument(new InputStreamReader(is, "UTF-8"));
+        } catch (Exception ex) {
+            throw new RuntimeException("Schema " + href + " can not be read");
+        }
+    }
+    
+    private JCodeModel createCodeModel(List<SchemaInfo> schemaElements, Set<String> type) {
         
 
         SchemaCompiler compiler = createCompiler(type);
@@ -753,17 +820,34 @@ public class SourceGenerator {
         return JAXBUtils.createSchemaCompilerWithDefaultAllocator(typeClassNames);
     }
     
-    private void addSchemas(List<Element> schemaElements, SchemaCompiler compiler) {
+    private void addSchemas(List<SchemaInfo> schemas, SchemaCompiler compiler) {
         
-        for (int i = 0; i < schemaElements.size(); i++) {
-            String key = Integer.toString(i);
-            //For JAXB 2.1.8
+        for (int i = 0; i < schemas.size(); i++) {
+            SchemaInfo schema = schemas.get(i);
+            
+            String key = schema.getSystemId();
+            if (key != null) {
+                // TODO: CXF code should have a better solution somewhere, we'll get back to it
+                // when addressing the issue of retrieving WADLs with included schemas  
+                if (key.startsWith("classpath:")) {
+                    String resource = key.substring(10);
+                    URL url = getClass().getResource(resource);
+                    if (url != null) {
+                        try {
+                            key = url.toURI().toString();
+                        } catch (Exception ex) {
+                            // won't happen
+                        }
+                    }
+                }
+            } else {
+                key = Integer.toString(i);
+            }
             InputSource is = new InputSource((InputStream)null);
             is.setSystemId(key);
             is.setPublicId(key);
             compiler.getOptions().addGrammar(is);
-    
-            compiler.parseSchema(key, schemaElements.get(i));
+            compiler.parseSchema(key, schema.getElement());
         }
     }
     
@@ -790,6 +874,14 @@ public class SourceGenerator {
     
     public void setResourceName(String name) {
         this.resourceName = name;
+    }
+    
+    public void setBaseWadlPath(String name) {
+        this.baseWadlPath = name;
+    }
+    
+    public void setBus(Bus bus) {
+        this.bus = bus;
     }
     
     public List<String> getGeneratedServiceClasses() {

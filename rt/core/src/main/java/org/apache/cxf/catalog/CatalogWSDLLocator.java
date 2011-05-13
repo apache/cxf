@@ -99,19 +99,13 @@ public class CatalogWSDLLocator implements WSDLLocator {
 
     public InputSource getImportInputSource(String parent, String importLocation) {
         String resolvedImportLocation = null;
-        if (manager != null) {
-            try {
-                resolvedImportLocation = this.manager.resolveSystem(importLocation);
-                if (resolvedImportLocation == null) {
-                    resolvedImportLocation = manager.resolveURI(importLocation);
-                }
-                if (resolvedImportLocation == null) {
-                    resolvedImportLocation = manager.resolvePublic(importLocation, parent);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Catalog resolution failed", e);
-            }
+        try {
+            resolvedImportLocation = new OASISCatalogManagerHelper().resolve(manager, 
+                                         importLocation, parent);
+        } catch (IOException e) {
+            throw new RuntimeException("Catalog resolution failed", e);
         }
+        
 
         InputSource in = null;
         if (resolvedImportLocation == null) {

@@ -33,13 +33,19 @@ public final class WadlToolConstants {
     public static final String CFG_INTERFACE = ToolConstants.CFG_INTERFACE;
     public static final String CFG_SERVER = ToolConstants.CFG_SERVER;
     public static final String CFG_TYPES = ToolConstants.CFG_TYPES;
-    
     public static final String CFG_PACKAGENAME = ToolConstants.CFG_PACKAGENAME;
     public static final String CFG_RESOURCENAME = "resourcename";
-    
+    public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;
     public static final String CFG_WADLURL = "wadl";
     
+    //public static final String CFG_NO_TYPES = ToolConstants.CFG_NO_TYPES;
+    //public static final String CFG_XJC_ARGS = ToolConstants.CFG_XJC_ARGS;
+    //public static final String CFG_BINDING = ToolConstants.CFG_BINDING;
         
+    //public static final String CFG_CMD_ARG = ToolConstants.CFG_CMD_ARG;
+    //public static final String CFG_INSTALL_DIR = ToolConstants.CFG_INSTALL_DIR;
+    //public static final String CFG_PLATFORM_VERSION = ToolConstants.CFG_PLATFORM_VERSION;
+    
     private WadlToolConstants() {
         //utility class
     }

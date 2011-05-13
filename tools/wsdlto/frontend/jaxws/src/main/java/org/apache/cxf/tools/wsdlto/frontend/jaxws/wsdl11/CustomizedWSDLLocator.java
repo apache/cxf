@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
 
@@ -59,17 +60,8 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
 
     private InputSource resolve(final String target, final String base) {
         try {
-            String resolvedLocation = null;
-            if (catalogResolver != null) {
-                resolvedLocation  = catalogResolver.resolveSystem(target);
-                
-                if (resolvedLocation == null) {
-                    resolvedLocation = catalogResolver.resolveURI(target);
-                }
-                if (resolvedLocation == null) {
-                    resolvedLocation = catalogResolver.resolvePublic(target, base);
-                }                
-            }
+            String resolvedLocation = 
+                new OASISCatalogManagerHelper().resolve(catalogResolver, target, base);
             if (resolvedLocation == null) {
                 return this.resolver.resolve(target, base);
             } else {

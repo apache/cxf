@@ -44,6 +44,7 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -550,20 +551,14 @@ public final class CustomizationParser {
         }
         Bus bus = (Bus)env.get(Bus.class);
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
-        if (catalogResolver == null) {
-            return null;
-        }
-        String resolvedLocation;
+        
         try {
-            resolvedLocation = catalogResolver.resolveSystem(url);
-            if (resolvedLocation == null) {
-                resolvedLocation = catalogResolver.resolveURI(url);
-            }
+            return new OASISCatalogManagerHelper().resolve(catalogResolver, 
+                                                           url, null);
         } catch (Exception e1) {
             Message msg = new Message("FAILED_RESOLVE_CATALOG", LOG, url);
             throw new ToolException(msg, e1);
         }
-        return resolvedLocation;
     }
 
     private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {

@@ -92,6 +92,7 @@ import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -1165,24 +1166,17 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
     }
     private static String mapSchemaLocation(String target, String base, OASISCatalogManager catalog) {
-        if (catalog != null) {
-            try {
-                String resolvedLocation = catalog.resolveSystem(target);
-
-                if (resolvedLocation == null) {
-                    resolvedLocation = catalog.resolveURI(target);
-                }
-                if (resolvedLocation == null) {
-                    resolvedLocation = catalog.resolvePublic(target, base);
-                }
-                if (resolvedLocation != null) {
-                    return resolvedLocation;
-                }
-
-            } catch (Exception ex) {
-                //ignore
+        try {
+            String resolvedLocation = new OASISCatalogManagerHelper().resolve(catalog, 
+                                                                              target, base);
+            if (resolvedLocation != null) {
+                return resolvedLocation;
             }
+
+        } catch (Exception ex) {
+            //ignore
         }
+        
 
         try {
             URIResolver resolver = new URIResolver(base, target);

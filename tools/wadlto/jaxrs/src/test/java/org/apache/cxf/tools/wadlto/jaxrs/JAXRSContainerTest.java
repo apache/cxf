@@ -47,8 +47,57 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
+    public void testCodeGenWithImportedSchema() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreImport.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
+    public void testCodeGenWithImportedSchemaAndCatalog() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreImportCatalog.xml"));
+            context.put(WadlToolConstants.CFG_CATALOG, getLocation("/wadl/jax-rs-catalog.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", false, false, "org.apache.cxf.jaxrs.model.wadl");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,16 +114,20 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/singleResource.xml"));
             context.put(WadlToolConstants.CFG_RESOURCENAME, "CustomResource");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);
             container.execute();
 
             assertNotNull(output.list());
             
-            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
-            assertEquals(1, files.size());
-            assertTrue(checkContains(files, "application.CustomResource.java"));
+            List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+            assertEquals(1, javaFiles.size());
+            assertTrue(checkContains(javaFiles, "application.CustomResource.java"));
             
+            List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(1, classFiles.size());
+            assertTrue(checkContains(classFiles, "application.CustomResource.class"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -97,8 +150,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, "custom.books");
-            verifyFiles("class", false, "custom.books");
+            verifyFiles("java", true, false, "custom.books");
+            verifyFiles("class", true, false, "custom.books");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,8 +175,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, false, "org.apache.cxf.jaxrs.model.wadl");
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -147,8 +200,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, true, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, true, "org.apache.cxf.jaxrs.model.wadl");
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -178,15 +231,23 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
     
-    private void verifyFiles(String ext, boolean interfacesAndImpl, String resourcePackage) {
+    private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
+                             String resourcePackage) {
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
-        assertEquals(interfacesAndImpl ? 9 : 7, files.size());
+        int size = interfacesAndImpl ? 9 : 7;
+        if (!subresourceExpected) {
+            size--;
+        }
+        assertEquals(size, files.size());
         doVerifyTypes(files, ext);
-        
-        assertTrue(checkContains(files, resourcePackage + ".FormInterface." + ext));
+        if (subresourceExpected) {
+            assertTrue(checkContains(files, resourcePackage + ".FormInterface." + ext));
+        }
         assertTrue(checkContains(files, resourcePackage + ".BookStore." + ext));
         if (interfacesAndImpl) {
-            assertTrue(checkContains(files, resourcePackage + ".FormInterfaceImpl." + ext));
+            if (subresourceExpected) {
+                assertTrue(checkContains(files, resourcePackage + ".FormInterfaceImpl." + ext));
+            }
             assertTrue(checkContains(files, resourcePackage + ".BookStoreImpl." + ext));
         }
     }

@@ -54,20 +54,13 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
     public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
         String resolvedSchemaLocation = null;
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
-        if (catalogResolver != null) {
-            try {
-                resolvedSchemaLocation = catalogResolver.resolveSystem(schemaLocation);
-                
-                if (resolvedSchemaLocation == null) {
-                    resolvedSchemaLocation = catalogResolver.resolveURI(schemaLocation);
-                }
-                if (resolvedSchemaLocation == null) {
-                    resolvedSchemaLocation = catalogResolver.resolvePublic(schemaLocation, baseUri);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Catalog resolution failed", e);
-            }
+        try {
+            resolvedSchemaLocation = new OASISCatalogManagerHelper().resolve(catalogResolver, 
+                                          schemaLocation, baseUri);
+        } catch (Exception e) {
+            throw new RuntimeException("Catalog resolution failed", e);
         }
+        
         InputSource in = null;
         if (resolvedSchemaLocation == null) {
             in = this.resolver.resolve(schemaLocation, baseUri);

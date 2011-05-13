@@ -17,29 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
-
- <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore/{id}">
-     <param name="id" style="template" type="xs:long"/>
-     <method name="GET">
-      <request/>
-      <response>
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-    </method>
-    <resource path="/books">
-     <method name="GET">
-      <response>
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-    </method>
-   </resource>
-    
-   </resource>
- </resources>  
-</application>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:tns="http://superbooks" attributeFormDefault="unqualified" elementFormDefault="unqualified" 
+  targetNamespace="http://superbooks">
+    <xs:element name="thechapter" type="tns:chapter"/>
+    <xs:complexType name="chapter">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+ </xs:schema>
