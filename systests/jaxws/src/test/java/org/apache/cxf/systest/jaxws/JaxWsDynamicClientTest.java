@@ -22,11 +22,14 @@ package org.apache.cxf.systest.jaxws;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.no_body_parts.types.Operation1;
 import org.apache.cxf.no_body_parts.types.Operation1Response;
@@ -38,6 +41,7 @@ import org.junit.Test;
 
 public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
     static final String PORT = TestUtil.getPortNumber(ServerNoBodyParts.class);
+    static final String PORT1 = TestUtil.getPortNumber(ArrayServiceServer.class);
 
     private String md5(byte[] bytes) {
         MessageDigest algorithm;
@@ -61,6 +65,8 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(ServerNoBodyParts.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(ArrayServiceServer.class, true));
     }
     
     @Test
@@ -83,6 +89,20 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         rparts = callback.get();
         r = (Operation1Response)rparts[0];
         assertEquals(md5(bucketOfBytes), r.getStatus());
+    }
+    
+    @Test
+    public void testArrayList() throws Exception {
+        JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
+        Client client = dcf.createClient(new URL("http://localhost:"
+                                                 + PORT1 + "/ArrayService?wsdl"));
+
+        String[] values = new String[] {"foobar", "something" };
+        List<String> list = Arrays.asList(values);
+        
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.invoke("init", list);
     }
     
 }
