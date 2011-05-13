@@ -128,6 +128,19 @@ public class CXFServletTest extends AbstractServletTest {
     }
     
     @Test
+    public void testGetUnformatServiceList() throws Exception {
+        ServletUnitClient client = newClient();
+        client.setExceptionsThrownOnErrorStatus(false);
+
+        WebResponse res = client.getResponse(CONTEXT_URL + "/services?formatted=false");
+        
+        assertTrue(res.getText().contains("http://localhost/mycontext/services/greeter3"));
+        assertTrue(res.getText().contains("http://localhost/mycontext/services/greeter2"));
+        assertTrue(res.getText().contains("http://localhost/mycontext/services/greeter"));
+        
+    }
+    
+    @Test
     public void testGetWSDL() throws Exception {
         ServletUnitClient client = newClient();
         client.setExceptionsThrownOnErrorStatus(true);

@@ -71,7 +71,8 @@ public class FormattedServiceListWriter implements ServiceListWriter {
                                     AbstractDestination[] destinations)
         throws IOException {
         writer.write("<span class=\"heading\">Available SOAP services:</span><br/>");
-        writer.write("<table>");
+        writer.write("<table " + (styleSheetPath.endsWith("stylesheet=1")
+                            ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
         for (AbstractDestination sd : destinations) {
             writerSoapEndpoint(writer, sd);
         }
@@ -105,7 +106,8 @@ public class FormattedServiceListWriter implements ServiceListWriter {
     private void writeRESTfulEndpoints(PrintWriter writer, AbstractDestination[] restfulDests)
         throws IOException {
         writer.write("<span class=\"heading\">Available RESTful services:</span><br/>");
-        writer.write("<table>");
+        writer.write("<table " + (styleSheetPath.endsWith("stylesheet=1")
+            ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
         for (AbstractDestination sd : restfulDests) {
             writeRESTfulEndpoint(writer, sd);
         }

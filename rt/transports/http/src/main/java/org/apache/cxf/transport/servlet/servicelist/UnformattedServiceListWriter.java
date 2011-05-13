@@ -31,13 +31,13 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
     }
 
     public String getContentType() {
-        return "text/plain; charset=UTF-8";
+        return "text/html; charset=UTF-8";
     }
 
     public void writeServiceList(PrintWriter writer, 
                                  AbstractDestination[] soapDestinations,
                                  AbstractDestination[] restDestinations) throws IOException {
-        if (soapDestinations.length > 0 && restDestinations.length > 0) {
+        if (soapDestinations.length > 0 || restDestinations.length > 0) {
             writeUnformattedSOAPEndpoints(writer, soapDestinations);
             writeUnformattedRESTfulEndpoints(writer, restDestinations);
         } else {
