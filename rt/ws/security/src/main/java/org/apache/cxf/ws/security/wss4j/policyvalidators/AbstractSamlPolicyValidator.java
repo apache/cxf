@@ -33,7 +33,7 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 /**
  * Some abstract functionality for validating SAML Assertions
  */
-public abstract class AbstractSamlPolicyValidator {
+public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyValidator {
     
     /**
      * Check the holder-of-key requirements against the received assertion. The subject

@@ -38,7 +38,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
@@ -112,13 +111,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     } else {
                         policyAsserted(initiatorToken);
                         
-                        IncludeTokenType inclusion = initiatorToken.getInclusion();
-                        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == inclusion
-                            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == inclusion
-                            || (isRequestor() 
-                                && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                                    == inclusion)) {
-                            
+                        if (includeToken(initiatorToken.getInclusion())) {
                             Element el = secToken.getToken();
                             this.addEncryptedKeyElement(cloneElement(el));
                             attached = true;
@@ -202,13 +195,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else {
                     policyAsserted(initiatorToken);
                     
-                    IncludeTokenType inclusion = initiatorToken.getInclusion();
-                    if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == inclusion
-                        || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == inclusion
-                        || (isRequestor() 
-                            && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                                == inclusion)) {
-                        
+                    if (includeToken(initiatorToken.getInclusion())) {
                         Element el = secToken.getToken();
                         this.addEncryptedKeyElement(cloneElement(el));
                         attached = true;

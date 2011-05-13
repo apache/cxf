@@ -35,8 +35,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
@@ -94,13 +92,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             } else if (token instanceof IssuedToken) {
                 SecurityToken secTok = getSecurityToken();
                 
-                SPConstants.IncludeTokenType inclusion = token.getInclusion();
-                
-                if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS
-                    || ((inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                        || inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE) 
-                        && isRequestor())) {
-                  
+                if (includeToken(token.getInclusion())) {
                     //Add the token
                     addEncryptedKeyElement(cloneElement(secTok.getToken()));
                 }
@@ -140,13 +132,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         } else {
                             policyAsserted(transportToken);
                         }
-                        
-                        IncludeTokenType inclusion = transportToken.getInclusion();
-                        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == inclusion
-                            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == inclusion
-                            || (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                                == inclusion)) {
-                            
+                        if (includeToken(transportToken.getInclusion())) {
                             Element el = secToken.getToken();
                             addEncryptedKeyElement(cloneElement(el));
                         } 
@@ -339,15 +325,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             secTok = getSecurityToken();
         }
    
-        SPConstants.IncludeTokenType inclusion = token.getInclusion();
         boolean tokenIncluded = false;
         
         List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
-        if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS
-            || ((inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                || inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE) 
-                && isRequestor())) {
-          
+        if (includeToken(token.getInclusion())) {
             //Add the token
             Element el = cloneElement(secTok.getToken());
             if (securityTok != null) {

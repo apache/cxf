@@ -178,12 +178,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     
                 boolean attached = false;
                 
-                if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == encryptionToken.getInclusion()
-                    || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == encryptionToken.getInclusion()
-                    || (isRequestor() 
-                        && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                            == encryptionToken.getInclusion())) {
-                    
+                if (includeToken(encryptionToken.getInclusion())) {
                     Element el = tok.getToken();
                     this.addEncryptedKeyElement(cloneElement(el));
                     attached = true;
@@ -298,21 +293,17 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (sigTok == null) {
                 //REVISIT - no token?
             }
+            
             boolean tokIncluded = true;
-            if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == sigToken.getInclusion()
-                || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == sigToken.getInclusion()
-                || (isRequestor() 
-                    && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                        == sigToken.getInclusion())) {
-                
+            if (includeToken(sigToken.getInclusion())) {
                 Element el = sigTok.getToken();
                 sigTokElem = cloneElement(el);
-                this.addEncryptedKeyElement((Element)sigTokElem);
+                this.addEncryptedKeyElement(sigTokElem);
             } else if (isRequestor() && sigToken instanceof X509Token) {
                 Element el = sigTok.getToken();
                 sigTokElem = (Element)secHeader.getSecurityHeader().getOwnerDocument()
                         .importNode(el, true);
-                this.addEncryptedKeyElement((Element)sigTokElem);
+                this.addEncryptedKeyElement(sigTokElem);
             } else {
                 tokIncluded = false;
             }
@@ -351,11 +342,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 //REVISIT - issued token from trust? 
                 encrTok = tokenStore.getToken(encrTokId);
                 
-                if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == encrToken.getInclusion()
-                    || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == encrToken.getInclusion()
-                    || (isRequestor() 
-                            && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                            == encrToken.getInclusion())) {
+                if (includeToken(encrToken.getInclusion())) {
                     Element encrTokElem = (Element)encrTok.getToken();
                     
                     //Add the encrToken element before the sigToken element
@@ -569,11 +556,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         
         //Check for whether the token is attached in the message or not
         boolean attached = false;
-        
-        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == policyToken.getInclusion()
-            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == policyToken.getInclusion()
-            || (isRequestor() && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                    == policyToken.getInclusion())) {
+        if (includeToken(policyToken.getInclusion())) {
             attached = true;
         }
         

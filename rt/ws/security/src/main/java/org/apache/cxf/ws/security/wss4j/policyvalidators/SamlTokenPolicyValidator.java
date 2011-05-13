@@ -70,6 +70,18 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                     (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SamlToken samlToken = (SamlToken)ai.getAssertion();
                 ai.setAsserted(true);
+                
+                boolean tokenRequired = isTokenRequired(samlToken, message);
+                if ((tokenRequired && assertionWrapper == null) 
+                    || (!tokenRequired && assertionWrapper != null)) {
+                    ai.setNotAsserted(
+                        "The received token does not match the token inclusion requirement"
+                    );
+                    return false;
+                }
+                if (!tokenRequired) {
+                    continue;
+                }
 
                 if (!checkVersion(samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");

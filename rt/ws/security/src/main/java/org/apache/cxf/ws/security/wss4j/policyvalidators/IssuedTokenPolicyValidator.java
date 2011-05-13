@@ -68,6 +68,18 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
                 ai.setAsserted(true);
                 
+                boolean tokenRequired = isTokenRequired(issuedToken, message);
+                if ((tokenRequired && assertionWrapper == null) 
+                    || (!tokenRequired && assertionWrapper != null)) {
+                    ai.setNotAsserted(
+                        "The received token does not match the token inclusion requirement"
+                    );
+                    return false;
+                }
+                if (!tokenRequired) {
+                    continue;
+                }
+                
                 Element template = issuedToken.getRstTemplate();
                 if (template != null && !checkIssuedTokenTemplate(template, assertionWrapper)) {
                     ai.setNotAsserted("Error in validating the IssuedToken policy");

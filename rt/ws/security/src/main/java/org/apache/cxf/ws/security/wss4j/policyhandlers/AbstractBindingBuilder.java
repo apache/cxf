@@ -1615,11 +1615,7 @@ public abstract class AbstractBindingBuilder {
                       
         //Check for whether the token is attached in the message or not
         boolean attached = false;
-        
-        if (SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS == policyToken.getInclusion()
-            || SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE == policyToken.getInclusion()
-            || (isRequestor() && SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                    == policyToken.getInclusion())) {
+        if (includeToken(policyToken.getInclusion())) {
             attached = true;
         }
         
@@ -1937,6 +1933,23 @@ public abstract class AbstractBindingBuilder {
         WSEncryptionPart part = new WSEncryptionPart(id);
         part.setElement(element);
         return part;
+    }
+    
+    protected boolean includeToken(SPConstants.IncludeTokenType inclusion) {
+        if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
+            return true;
+        }
+        if (isRequestor()) {
+            if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
+                || inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ONCE) {
+                return true;
+            }
+        } else {
+            if (inclusion == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR) {
+                return true;
+            }
+        }
+        return false;
     }
     
     

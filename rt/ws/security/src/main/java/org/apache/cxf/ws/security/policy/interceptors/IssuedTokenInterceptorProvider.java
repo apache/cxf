@@ -285,6 +285,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             } else if (assertionWrapper.getSaml2() != null) {
                 token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             }
+            token.setToken(assertionWrapper.getElement());
             return token;
         }
     }
