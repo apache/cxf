@@ -26,7 +26,6 @@ import javax.jws.WebService;
             endpointInterface = "org.apache.cxf.systest.jaxws.ArrayService")
 public class ArrayServiceImpl implements ArrayService {
 
-    @Override
     public void initValueNotNull(String[] values) {
         System.out.println("values length is " + values.length);
         System.out.println("Got values: " + Arrays.asList(values));
