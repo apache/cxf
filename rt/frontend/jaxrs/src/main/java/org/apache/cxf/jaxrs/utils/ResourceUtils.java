@@ -28,7 +28,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -391,7 +390,8 @@ public final class ResourceUtils {
                 return null;
             }
         } else {
-            File f = new File(URI.create(loc).getRawPath());
+            String actualLoc = loc.startsWith("file:") ? loc.substring(5) : loc;
+            File f = new File(actualLoc);
             if (!f.exists()) {
                 LOG.warning("No file resource " + loc + " is available on local disk");
                 return null;
