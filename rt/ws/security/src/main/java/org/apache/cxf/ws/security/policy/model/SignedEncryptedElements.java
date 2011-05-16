@@ -78,7 +78,15 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     /**
      * @return Returns the signedElements.
      */
+    @Deprecated
     public boolean isSignedElemets() {
+        return signedElements;
+    }
+    
+    /**
+     * @return Returns the signedElements.
+     */
+    public boolean isSignedElements() {
         return signedElements;
     }
 
