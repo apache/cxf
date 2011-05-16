@@ -36,7 +36,6 @@
         <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${cxf.jaxb.bundle.version}</bundle>
         <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
     </feature>
-
     <feature name="spring-jms" version="${cxf.spring.version}">
         <feature version="${cxf.spring.version}">spring</feature>
         <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.transaction.version}</bundle>
@@ -44,18 +43,6 @@
         <bundle>mvn:org.springframework/spring-jms/${cxf.spring.version}</bundle>
         <bundle>mvn:org.springframework/spring-tx/${cxf.spring.version}</bundle>
         <bundle>mvn:org.springframework/spring-web/${cxf.spring.version}</bundle>
-    </feature>
-    <feature name='jetty' version='${cxf.jetty.version}'>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/${cxf.geronimo.servlet25.version}</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.asm/${cxf.asm.bundle.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-util/${cxf.jetty.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-io/${cxf.jetty.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-http/${cxf.jetty.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-continuation/${cxf.jetty.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-server/${cxf.jetty.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-security/${cxf.jetty.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-servlet/${cxf.jetty.version}</bundle>
-        <bundle>mvn:org.eclipse.jetty/jetty-xml/${cxf.jetty.version}</bundle>
     </feature>
     <!-- Current the abdera bundle is not working as we expect -->
     <feature name='abdera' version='${cxf.abdera.version}'>
