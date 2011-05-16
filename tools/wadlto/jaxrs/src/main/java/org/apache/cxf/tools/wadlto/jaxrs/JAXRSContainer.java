@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import org.xml.sax.InputSource;
+
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.codegen.SourceGenerator;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
@@ -34,6 +36,7 @@ import org.apache.cxf.tools.common.toolspec.parser.BadUsageException;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
+import org.apache.cxf.tools.wadlto.jaxb.CustomizationParser;
 
 public class JAXRSContainer extends AbstractCXFToolContainer {
     
@@ -98,10 +101,12 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
 
         // find the base path
-        int lastSep = wadlURL.lastIndexOf("/");
-        if (lastSep != -1) {
-            sg.setBaseWadlPath(wadlURL.substring(0, lastSep + 1));
-        }
+        sg.setWadlPath(wadlURL);
+                
+        CustomizationParser parser = new CustomizationParser(context);
+        parser.parse();
+        List<InputSource> bindingFiles = parser.getJaxbBindings();
+        sg.setBindingFiles(bindingFiles);
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
@@ -144,6 +149,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     
     protected String getAbsoluteWadlURL() {
         String wadlURL = (String)context.get(WadlToolConstants.CFG_WADLURL);
-        return URIParserUtil.getAbsoluteURI(wadlURL);
+        String absoluteWadlURL = URIParserUtil.getAbsoluteURI(wadlURL);
+        context.put(WadlToolConstants.CFG_WADLURL, absoluteWadlURL);
+        return absoluteWadlURL;
     }
 }

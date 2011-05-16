@@ -125,12 +125,13 @@ public class SourceGenerator {
     private boolean generateImpl;
     private String resourcePackageName;
     private String resourceName;
-    private String baseWadlPath;
+    private String wadlPath;
     
     private Map<String, String> properties; 
     
     private List<String> generatedServiceClasses = new ArrayList<String>(); 
     private List<String> generatedTypeClasses = new ArrayList<String>();
+    private List<InputSource> bindingFiles = Collections.emptyList();
     private Bus bus;
     
     public SourceGenerator() {
@@ -744,7 +745,7 @@ public class SourceGenerator {
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
              XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
         for (Element schemaEl : schemasEls) {
-            schemas.add(createSchemaInfo(schemaEl, baseWadlPath));
+            schemas.add(createSchemaInfo(schemaEl, wadlPath));
         }
         List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
              WadlGenerator.WADL_NS, "include");
@@ -753,12 +754,17 @@ public class SourceGenerator {
             
             String schemaURI = resolveLocationWithCatalog(href);
             if (schemaURI == null) {
-                schemaURI = baseWadlPath != null ? baseWadlPath + href : href;
+                schemaURI = wadlPath != null ? getBaseWadlPath() + href : href;
             }
             schemas.add(createSchemaInfo(readIncludedSchema(schemaURI),
                                             schemaURI));
         }
         return schemas;
+    }
+    
+    private String getBaseWadlPath() {
+        int lastSep = wadlPath.lastIndexOf("/");
+        return lastSep != -1 ? wadlPath.substring(0, lastSep + 1) : wadlPath;
     }
     
     private SchemaInfo createSchemaInfo(Element schemaEl, String systemId) { 
@@ -803,7 +809,9 @@ public class SourceGenerator {
 
         SchemaCompiler compiler = createCompiler(type);
         addSchemas(schemaElements, compiler);
-        
+        for (InputSource is : bindingFiles) {
+            compiler.getOptions().addBindFile(is);
+        }
         
         Object elForRun = ReflectionInvokationHandler
             .createProxyWrapper(new InnerErrorListener(),
@@ -876,8 +884,12 @@ public class SourceGenerator {
         this.resourceName = name;
     }
     
-    public void setBaseWadlPath(String name) {
-        this.baseWadlPath = name;
+    public void setWadlPath(String name) {
+        this.wadlPath = name;
+    }
+    
+    public void setBindingFiles(List<InputSource> files) {
+        this.bindingFiles = files;
     }
     
     public void setBus(Bus bus) {

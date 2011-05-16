@@ -57,6 +57,31 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
     @Test    
+    public void testCodeGenInterfacesWithBinding() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
+            context.put(WadlToolConstants.CFG_BINDING, getLocation("/wadl/jaxbBinding.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
     public void testCodeGenWithImportedSchema() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
@@ -64,6 +89,31 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreImport.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
+    public void testCodeGenWithImportedSchemaAndBinding() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreImport.xml"));
+            context.put(WadlToolConstants.CFG_BINDING, getLocation("/wadl/jaxbBindingWithSchemaLoc.xml"));
             context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);
