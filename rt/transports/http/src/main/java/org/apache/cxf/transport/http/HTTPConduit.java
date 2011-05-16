@@ -536,15 +536,24 @@ public class HTTPConduit
 
         setHeadersByAuthorizationPolicy(message, currentURL);
         new Headers(message).setFromClientPolicy(getClient(message));
-
         message.setContent(OutputStream.class, 
-                           new WrappedOutputStream(
-                                   message, connection,
-                                   needToCacheRequest, 
-                                   isChunking,
-                                   chunkThreshold,
-                                   getConduitName()));
+                           createOutputStream(message, connection,
+                                              needToCacheRequest, 
+                                              isChunking,
+                                              chunkThreshold));
         // We are now "ready" to "send" the message. 
+    }
+
+    protected OutputStream createOutputStream(Message message, 
+                                              HttpURLConnection connection,
+                                              boolean needToCacheRequest, 
+                                              boolean isChunking,
+                                              int chunkThreshold) {
+        return new WrappedOutputStream(message, connection,
+                                       needToCacheRequest, 
+                                       isChunking,
+                                       chunkThreshold,
+                                       getConduitName());
     }
 
     private HttpAuthSupplier createAuthSupplier(String authType) {
