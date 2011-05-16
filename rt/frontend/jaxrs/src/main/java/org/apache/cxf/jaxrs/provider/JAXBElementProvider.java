@@ -139,8 +139,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             addAttachmentUnmarshaller(unmarshaller);
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type) 
-                || unmarshalAsJaxbElement 
-                || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
+                || !isCollection && (unmarshalAsJaxbElement  
+                || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
                 XMLStreamReader reader = getStreamReader(is, type, mt);
                 response = unmarshaller.unmarshal(
                      TransformUtils.createNewReaderIfNeeded(reader, is), 

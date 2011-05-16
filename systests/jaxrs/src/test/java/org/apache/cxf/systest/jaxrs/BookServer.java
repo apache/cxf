@@ -21,12 +21,15 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
@@ -43,8 +46,13 @@ public class BookServer extends AbstractBusTestServerBase {
         BinaryDataProvider p = new BinaryDataProvider();
         p.setProduceMediaTypes(Collections.singletonList("application/bar"));
         p.setEnableBuffering(true);
-        
         providers.add(p);
+        JAXBElementProvider jaxbProvider = new JAXBElementProvider();
+        Map<String, String> jaxbElementClassMap = new HashMap<String, String>(); 
+        jaxbElementClassMap.put(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement");
+        jaxbProvider.setJaxbElementClassMap(jaxbElementClassMap);
+        providers.add(jaxbProvider);
+        
         providers.add(new GenericHandlerWriter());
         providers.add(new FaultyRequestHandler());
         sf.setProviders(providers);
