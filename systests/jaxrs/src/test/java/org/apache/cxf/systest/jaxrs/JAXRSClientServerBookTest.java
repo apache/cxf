@@ -66,7 +66,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     @Test
@@ -368,6 +368,32 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(123L, b11.getId());
         assertEquals("CXF in Action", b11.getName());
         Book b22 = books.get(1);
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+    }
+    
+    @Test 
+    public void testGetBookCollection2() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setMarshallAsJaxbElement(true);
+        provider.setUnmarshallAsJaxbElement(true);
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
+                                                    BookStore.class,
+                                                    Collections.singletonList(provider));
+        BookNoXmlRootElement b1 = new BookNoXmlRootElement("CXF in Action", 123L);
+        BookNoXmlRootElement b2 = new BookNoXmlRootElement("CXF Rocks", 124L);
+        List<BookNoXmlRootElement> books = new ArrayList<BookNoXmlRootElement>();
+        books.add(b1);
+        books.add(b2);
+        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        List<BookNoXmlRootElement> books2 = store.getBookCollection2(books);
+        assertNotNull(books2);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        BookNoXmlRootElement b11 = books.get(0);
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        BookNoXmlRootElement b22 = books.get(1);
         assertEquals(124L, b22.getId());
         assertEquals("CXF Rocks", b22.getName());
     }

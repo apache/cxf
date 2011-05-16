@@ -265,6 +265,17 @@ public class BookStore {
         return bs;
     }
     
+    @POST
+    @Path("/collections2")
+    @Produces({"application/xml", "application/json" })
+    @Consumes({"application/xml", "application/json" })
+    public List<BookNoXmlRootElement> getBookCollection2(List<BookNoXmlRootElement> bs) throws Exception {
+        if (bs == null || bs.size() != 2) {
+            throw new RuntimeException();
+        }
+        return bs;
+    }
+    
     @GET
     @Path("/collections")
     @Produces({"application/xml", "application/json" })
