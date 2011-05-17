@@ -852,7 +852,50 @@ public class BookStore {
         c.setCD(cds.values());
         return c;
     }
-    
+
+    @GET
+    @Path("quotedheaders")
+    public Response getQuotedHeader() {
+        return Response.
+                ok().
+                header("SomeHeader1", "\"some text, some more text\"").
+                header("SomeHeader2", "\"some text\"").
+                header("SomeHeader2", "\"quoted,text\"").
+                header("SomeHeader2", "\"even more text\"").
+                header("SomeHeader3", "\"some text, some more text with inlined \\\"\"").
+                header("SomeHeader4", "\"\"").
+                build();
+    }
+
+    @GET
+    @Path("badlyquotedheaders")
+    public Response getBadlyQuotedHeader(@QueryParam("type")int t) {
+        Response.ResponseBuilder rb = Response.ok();
+        switch(t) {
+        case 0:
+            // problem: no trailing quote - doesn't trigger AbstractClient.parseQuotedHeaderValue
+            rb.header("SomeHeader0", "\"some text");
+            break;
+        case 1:
+            // problem: text doesn't end with " - triggers AbstractClient.parseQuotedHeaderValue
+            rb.header("SomeHeader1", "\"some text, some more text with inlined \\\"");
+            break;
+        case 2:
+            // problem: no character after \ - doesn't trigger AbstractClient.parseQuotedHeaderValue
+            rb.header("SomeHeader2", "\"some te\\");
+            break;
+        case 3:
+            // problem: mix of plain text and quoted text in same line - doesn't trigger
+            // AbstractClient.parseQuotedHeaderValue
+            rb.header("SomeHeader3", "some text").header("SomeHeader3", "\"other quoted\", text").
+                header("SomeHeader3", "blah");
+            break;
+        default:
+            throw new RuntimeException("Don't know how to handle type: " + t);
+        }
+        return rb.build();
+    }
+
     @Path("/interface")
     public BookSubresource getBookFromSubresource() {
         return new BookSubresourceImpl();
