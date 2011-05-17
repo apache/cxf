@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -716,6 +717,42 @@ public class JAXBElementProviderTest extends Assert {
             + "<thetag><group>B</group><name>A</name></thetag></tagholder>";
         assertEquals(expected, bos.toString());
     }
+    @Test
+    public void testOutAttributesAsElementsForList() throws Exception {
+
+        //Provider
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setCollectionWrapperName("tagholders");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}*", "*");
+        provider.setOutTransformElements(map);
+        provider.setAttributesToElements(true);
+    
+        //data setup
+        TagVO2 tag = new TagVO2("A", "B");
+        TagVO2Holder holder = new TagVO2Holder();
+        holder.setTag(tag);
+        List<TagVO2Holder> list = new ArrayList<JAXBElementProviderTest.TagVO2Holder>();
+        list.add(holder);
+    
+        //ParameterizedType required for Lists of Objects
+        ParameterizedType type = new ParameterizedType() {
+            public Type getRawType() { return List.class; }
+            public Type getOwnerType() { return null; }
+            public Type[] getActualTypeArguments() {
+                return new Type[] {TagVO2Holder.class};
+            }
+        };
+    
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(list, ArrayList.class, type,
+            new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+    
+        String expected = "<tagholders><tagholder><attr>attribute</attr>"
+            + "<thetag><group>B</group><name>A</name></thetag></tagholder></tagholders>";
+        assertEquals(expected, bos.toString());
+    }
+    
     
     @Test
     public void testOutAppendElementsDiffNs() throws Exception {
