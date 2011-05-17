@@ -32,6 +32,8 @@ public class MimeBodyPartInputStream extends InputStream {
     byte[] boundary;
     byte[] boundaryBuffer;
 
+    private boolean closed;
+
     public MimeBodyPartInputStream(PushbackInputStream inStreamParam, 
                                    byte[] boundaryParam,
                                    int pbsize) {
@@ -45,7 +47,7 @@ public class MimeBodyPartInputStream extends InputStream {
         byte b[] = buf;
         int off = origOff;
         int len = origLen;
-        if (boundaryFound) {
+        if (boundaryFound || closed) {
             return -1;
         }
         if ((off < 0) || (off > b.length) || (len < 0) 
@@ -267,5 +269,9 @@ public class MimeBodyPartInputStream extends InputStream {
             value = boundary[0];
         }
         return value;
+    }
+    
+    public void close() throws IOException {
+        this.closed = true;
     }
 }
