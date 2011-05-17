@@ -68,7 +68,7 @@
         <cxf.specs.jaxws.api.version>1.0</cxf.specs.jaxws.api.version>
 
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jetty.version>7.3.1.v20110307</cxf.jetty.version>
+        <cxf.jetty.version>7.4.1.v20110513</cxf.jetty.version>
         <cxf.msv.version>2010.2</cxf.msv.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.saaj.version>1.3</cxf.saaj.version>
