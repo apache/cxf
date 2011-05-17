@@ -29,6 +29,7 @@ import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SP13Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.neethi.Assertion;
@@ -82,6 +83,10 @@ public class UsernameTokenBuilder implements AssertionBuilder<Element> {
                             usernameToken.setExplicitDerivedKeys(true);
                         } else if (SP12Constants.REQUIRE_IMPLIED_DERIVED_KEYS.equals(qname)) {
                             usernameToken.setImpliedDerivedKeys(true);
+                        } else if (SP13Constants.USERNAME_TOKEN_CREATED.equals(qname)) {
+                            usernameToken.setRequireCreated(true);
+                        } else if (SP13Constants.USERNAME_TOKEN_NONCE.equals(qname)) {
+                            usernameToken.setRequireNonce(true);
                         }
                     }
                 }

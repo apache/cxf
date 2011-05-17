@@ -705,39 +705,44 @@ public abstract class AbstractBindingBuilder {
         
         String userName = (String)message.getContextualProperty(SecurityConstants.USERNAME);
         if (!StringUtils.isEmpty(userName)) {
+            WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
             // If NoPassword property is set we don't need to set the password
             if (token.isNoPassword()) {
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
-                info.setAsserted(true);
-                return utBuilder;
-            }
-            
-            String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
-            if (StringUtils.isEmpty(password)) {
-                password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
-            }
-            
-            if (!StringUtils.isEmpty(password)) {
-                //If the password is available then build the token
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
-                if (token.isHashPassword()) {
-                    utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);  
-                } else {
-                    utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
-                }
-                
-                utBuilder.setUserInfo(userName, password);
-                info.setAsserted(true);
-                return utBuilder;
             } else {
-                policyNotAsserted(token, "No username available");
+                String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
+                if (StringUtils.isEmpty(password)) {
+                    password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
+                }
+            
+                if (!StringUtils.isEmpty(password)) {
+                    // If the password is available then build the token
+                    if (token.isHashPassword()) {
+                        utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);  
+                    } else {
+                        utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
+                    }
+                    utBuilder.setUserInfo(userName, password);
+                } else {
+                    policyNotAsserted(token, "No password available");
+                    return null;
+                }
             }
+            
+            if (token.isRequireCreated() && !token.isHashPassword()) {
+                utBuilder.addCreated();
+            }
+            if (token.isRequireNonce() && !token.isHashPassword()) {
+                utBuilder.addNonce();
+            }
+            
+            info.setAsserted(true);
+            return utBuilder;
         } else {
             policyNotAsserted(token, "No username available");
+            return null;
         }
-        return null;
     }
     
     protected AssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {

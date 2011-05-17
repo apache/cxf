@@ -57,6 +57,9 @@
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/saml/DoubleItSaml.wsdl</wsdl>
                                 </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/ut/DoubleItUt.wsdl</wsdl>
+                                </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>

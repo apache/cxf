@@ -69,19 +69,18 @@ import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.policy.model.TransportToken;
-import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
 import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -563,20 +562,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
                 break;
             case WSConstants.UT:
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
-                    }
-                    
-                    if (utWithCallbacks) {
-                        WSUsernameTokenPrincipal princ 
-                            = (WSUsernameTokenPrincipal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+            case WSConstants.UT_NOPASSWORD:
+                if (utWithCallbacks) {
+                    UsernameTokenPolicyValidator utValidator = 
+                        new UsernameTokenPolicyValidator(msg);
+                    utValidator.validatePolicy(aim, wser);
+                } else {
+                    Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
+                    if (ais != null) {
                         for (AssertionInfo ai : ais) {
-                            UsernameToken tok = (UsernameToken)ai.getAssertion();
-                            if (tok.isHashPassword() != princ.isPasswordDigest()) {
-                                ai.setNotAsserted("Password hashing policy not enforced");
-                            }
+                            ai.setAsserted(true);
                         }
                     }
                 }

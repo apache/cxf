@@ -30,6 +30,8 @@ public class UsernameToken extends Token {
     private boolean useUTProfile11;
     private boolean noPassword;
     private boolean hashPassword;
+    private boolean requireCreated;
+    private boolean requireNonce;
 
     public UsernameToken(SPConstants version) {
         super(version);
@@ -55,6 +57,22 @@ public class UsernameToken extends Token {
 
     public void setNoPassword(boolean noPassword) {
         this.noPassword = noPassword;
+    }
+    
+    public boolean isRequireCreated() {
+        return requireCreated;
+    }
+    
+    public void setRequireCreated(boolean requireCreated) {
+        this.requireCreated = requireCreated;
+    }
+    
+    public boolean isRequireNonce() {
+        return requireNonce;
+    }
+    
+    public void setRequireNonce(boolean requireNonce) {
+        this.requireNonce = requireNonce;
     }
 
     public boolean isHashPassword() {
