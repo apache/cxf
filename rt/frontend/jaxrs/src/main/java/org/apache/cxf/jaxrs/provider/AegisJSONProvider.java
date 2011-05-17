@@ -127,7 +127,8 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
     protected XMLStreamWriter createStreamWriter(QName typeQName, OutputStream os) throws Exception {
         
         Configuration config = 
-            JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces, null);
+            JSONUtils.createConfiguration(namespaceMap, 
+                                          writeXsiType && !ignoreNamespaces, false, null);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, 
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement);
         return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);

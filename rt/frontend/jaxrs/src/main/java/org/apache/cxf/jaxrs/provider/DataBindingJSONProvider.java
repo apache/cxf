@@ -95,7 +95,8 @@ public class DataBindingJSONProvider<T> extends DataBindingProvider<T> {
             qname = getQName(InjectionUtils.getActualType(genericType));
         }
         Configuration config = 
-            JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces, null);
+            JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces,
+                                          false, null);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
