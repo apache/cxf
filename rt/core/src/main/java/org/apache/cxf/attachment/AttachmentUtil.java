@@ -285,13 +285,9 @@ public final class AttachmentUtil {
             } catch (UnsupportedEncodingException ue) {
                 contentId = contentId.substring(4);
             }
-            LazyDataSource lazyDS =  new LazyDataSource(contentId, atts);
-            lazyDS.getContentType();
-            return lazyDS;
+            return new LazyDataSource(contentId, atts);
         } else if (contentId.indexOf("://") == -1) {
-            LazyDataSource lazyDS =  new LazyDataSource(contentId, atts);
-            lazyDS.getContentType();
-            return lazyDS;
+            return new LazyDataSource(contentId, atts);
         } else {
             try {
                 return new URLDataSource(new URL(contentId));
