@@ -66,7 +66,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class, true));
+                   launchServer(BookServer.class));
     }
     
     @Test
@@ -164,6 +164,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertTrue(headers.size() > 0);
         Object etag = headers.getFirst("ETag");
         assertNotNull(etag);
+        assertTrue(etag.toString().startsWith("\""));
+        assertTrue(etag.toString().endsWith("\""));
+
     }
     
     
@@ -1348,8 +1351,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "resources/expected_get_cd.txt",
                                "application/xml", 200);
     }
-    
-    
+
     @Test
     public void testGetCDWithMultiContentTypesXML() throws Exception {
         
@@ -1417,8 +1419,67 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       expected,
                       "text/plain", "text/plain", 200);
     }
-    
-    private void getAndCompareAsStrings(String address, 
+
+    @Test
+    public void testQuotedHeaders() throws Exception {
+
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/quotedheaders";
+        Response r = WebClient.create(endpointAddress).get();
+
+        List<Object> header1 = r.getMetadata().get("SomeHeader1");
+        assertEquals(1, header1.size());
+        assertEquals("\"some text, some more text\"", header1.get(0));
+
+        List<Object> header2 = r.getMetadata().get("SomeHeader2");
+        assertEquals(3, header2.size());
+        assertEquals("\"some text\"", header2.get(0));
+        assertEquals("\"quoted,text\"", header2.get(1));
+        assertEquals("\"even more text\"", header2.get(2));
+
+        List<Object> header3 = r.getMetadata().get("SomeHeader3");
+        assertEquals(1, header3.size());
+        assertEquals("\"some text, some more text with inlined \"\"", header3.get(0));
+
+        List<Object> header4 = r.getMetadata().get("SomeHeader4");
+        assertEquals(1, header4.size());
+        assertEquals("\"\"", header4.get(0));
+
+    }
+
+    @Test
+    public void testBadlyQuotedHeaders() throws Exception {
+
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/badlyquotedheaders";
+
+        String[] responses = new String[] {
+            "\"some text",
+            "\"some text, some more text with inlined \"",
+            "\"some te\\",
+        };
+
+        // technically speaking, for these test cases, the client should return an error
+        // however, servers do send bad data from time to time so we try to be forgiving
+        for (int i = 0; i < 3; i++) {
+            Response r = WebClient.create(endpointAddress).query("type", Integer.toString(i)).get();
+            assertEquals(responses[i], r.getMetadata().get("SomeHeader" + i).get(0));
+        }
+
+        // this test currently returns the WRONG result per RFC2616, however it is correct
+        // per the discussion in CXF-3518
+        Response r3 = WebClient.create(endpointAddress).query("type", "3").get();
+        List<Object> r3values = r3.getMetadata().get("SomeHeader3");
+        assertEquals(4, r3values.size());
+        assertEquals("some text", r3values.get(0));
+        assertEquals("\"other quoted\"", r3values.get(1));
+        assertEquals("text", r3values.get(2));
+        assertEquals("blah", r3values.get(3));
+
+    }
+
+
+    private void getAndCompareAsStrings(String address,
                                         String resourcePath,
                                         String acceptType,
                                         int status) throws Exception {

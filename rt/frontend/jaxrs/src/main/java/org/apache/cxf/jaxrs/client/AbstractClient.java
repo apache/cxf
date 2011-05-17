@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -343,9 +344,18 @@ public class AbstractClient implements Client {
                     continue;                    
                 }
                 for (String val : entry.getValue()) {
-                    boolean splitPossible = !(HttpHeaders.SET_COOKIE.equalsIgnoreCase(entry.getKey())
-                        && val.toUpperCase().contains(HttpHeaders.EXPIRES.toUpperCase()));
-                    String[] values = splitPossible ? val.split(",") : new String[]{val};
+                    String[] values;
+                    if (val == null || val.length() == 0) {
+                        values = new String[]{""};
+                    } else if (val.charAt(0) == '"' && val.charAt(val.length() - 1) == '"') {
+                        // if the value starts with a quote and ends with a quote, we do a best
+                        // effort attempt to determine what the individual values are.
+                        values = parseQuotedHeaderValue(val);
+                    } else {
+                        boolean splitPossible = !(HttpHeaders.SET_COOKIE.equalsIgnoreCase(entry.getKey())
+                            && val.toUpperCase().contains(HttpHeaders.EXPIRES.toUpperCase()));
+                        values = splitPossible ? val.split(",") : new String[]{val};
+                    }
                     for (String s : values) {
                         String theValue = s.trim();
                         if (theValue.length() > 0) {
@@ -527,7 +537,58 @@ public class AbstractClient implements Client {
             conn.setRequestProperty(entry.getKey(), b.toString());
         }
     }
-    
+
+    protected String[] parseQuotedHeaderValue(String originalValue) {
+        // this algorithm isn't perfect; see CXF-3518 for further discussion.
+        List<String> results = new ArrayList<String>();
+        char[] chars = originalValue.toCharArray();
+
+        int lastIndex = chars.length - 1;
+
+        boolean quote = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (int pos = 0; pos <= lastIndex; pos++) {
+            char c = chars[pos];
+            if (pos == lastIndex) {
+                sb.append(c);
+                results.add(sb.toString());
+            } else {
+                switch(c) {
+                case '\"':
+                    sb.append(c);
+                    quote = !quote;
+                    break;
+                case '\\':
+                    if (quote) {
+                        pos++;
+                        if (pos <= lastIndex) {
+                            c = chars[pos];
+                            sb.append(c);
+                        }
+                        if (pos == lastIndex) {
+                            results.add(sb.toString());
+                        }
+                    } else {
+                        sb.append(c);
+                    }
+                    break;
+                case ',':
+                    if (quote) {
+                        sb.append(c);
+                    } else {
+                        results.add(sb.toString());
+                        sb = new StringBuilder();
+                    }
+                    break;
+                default:
+                    sb.append(c);
+                }
+            }
+        }
+        return results.toArray(new String[results.size()]);
+    }
+
     protected ClientConfiguration getConfiguration() {
         return cfg;
     }
