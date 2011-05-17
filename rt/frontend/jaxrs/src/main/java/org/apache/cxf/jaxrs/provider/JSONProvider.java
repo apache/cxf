@@ -85,6 +85,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private boolean ignoreNamespaces;
     private String convention = MAPPED_CONVENTION;
     private TypeConverter typeConverter;
+    private boolean attributesToElements;
+    
+    @Override
+    public void setAttributesToElements(boolean value) {
+        this.attributesToElements = value;
+    }
     
     public void setConvention(String value) {
         if (!MAPPED_CONVENTION.equals(value) && !BADGER_FISH_CONVENTION.equals(value)) {
@@ -398,7 +404,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
         QName qname = getQName(actualClass, genericType, actualObject, true);
         
         Configuration config = 
-            JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces, typeConverter);
+            JSONUtils.createConfiguration(namespaceMap, 
+                                          writeXsiType && !ignoreNamespaces,
+                                          attributesToElements,
+                                          typeConverter);
         
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys,

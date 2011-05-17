@@ -100,11 +100,13 @@ public final class JSONUtils {
     
     public static Configuration createConfiguration(ConcurrentHashMap<String, String> namespaceMap,
                                                     boolean writeXsiType,
+                                                    boolean attributesAsElements,
                                                     TypeConverter converter) {
         if (writeXsiType) {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         Configuration c = new Configuration(namespaceMap);
+        c.setSupressAtAttributes(attributesAsElements);
         if (converter != null) {
             c.setTypeConverter(converter);
         }
