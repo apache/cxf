@@ -392,6 +392,7 @@ public final class JAXRSUtils {
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, 
                                                    BUNDLE,
+                                                   message.get(Message.REQUEST_URI),
                                                    path,
                                                    httpMethod,
                                                    requestType.toString(),
