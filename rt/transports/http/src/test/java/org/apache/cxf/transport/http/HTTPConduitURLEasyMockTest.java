@@ -234,6 +234,8 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         EasyMock.expectLastCall().andReturn(true);
         exchange.isSynchronous();
         EasyMock.expectLastCall().andReturn(true);
+        exchange.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
     }
     
     private HTTPConduit setUpConduit(boolean send, boolean autoRedirect) throws Exception {
