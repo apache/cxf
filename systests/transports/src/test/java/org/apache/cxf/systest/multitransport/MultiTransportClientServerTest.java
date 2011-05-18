@@ -101,11 +101,11 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
         URL wsdl = getClass().getResource("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
         String wsdlString = wsdl.toString();
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
-
         MultiTransportService service = new MultiTransportService(wsdl, serviceName);
         assertNotNull(service);
-
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
+        
+        
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
         try {
@@ -130,6 +130,8 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
               
             }
             
+            greeter = null;
+            
             greeter = service.getPort(portName2, Greeter.class);
             for (int idx = 0; idx < 5; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
@@ -149,8 +151,6 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
                 }                
               
             }
-
-            
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }

@@ -71,6 +71,7 @@ public abstract class AbstractSOAPJMSTestSuite extends AbstractBusClientServerTe
         Service service = serviceConstructor.newInstance(new Object[] {
             wsdl, qServiceName
         });
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
         return service.getPort(qPortName, portTypeClass);
     }
 
