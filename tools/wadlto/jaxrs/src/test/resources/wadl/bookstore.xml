@@ -46,7 +46,7 @@
   </xs:schema>
  </grammars>
  <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore/{id}" id="{org.apache.cxf.jaxrs.model.wadl}BookStore">
+   <resource path="/bookstore/{id}" id="org.apache.cxf.jaxrs.model.wadl.BookStore">
      <doc xml:lang="en-us" title="book store resource">super resource</doc>
      <param name="id" style="template" type="xs:long"/>
 
@@ -145,7 +145,7 @@
    </resource>
 
    <!-- Dynamic subresource -->
-   <resource path="/books/{bookid}" id="{java.lang}Object">
+   <resource path="/books/{bookid}" id="java.lang.Object">
     <param name="id" style="template" type="xs:int"/>
     <param name="bookid" style="template" type="xs:int"/>
     <param name="mid" style="matrix" type="xs:int"/>
@@ -207,7 +207,7 @@
    </resource>
  </resource>
  
- <resource path="/form" id="{org.apache.cxf.jaxrs.model.wadl}FormInterface">
+ <resource path="/form" id="org.apache.cxf.jaxrs.model.wadl.FormInterface">
   
   <resource path="/form1">
    <method name="POST" id="form1">
@@ -235,7 +235,7 @@
  </resource>
 
  <!-- Recursive subresource -->
- <resource path="/itself" id="{org.apache.cxf.jaxrs.model.wadl}BookStore">
+ <resource path="/itself" id="org.apache.cxf.jaxrs.model.wadl.BookStore">
  </resource>
  
  </resource>

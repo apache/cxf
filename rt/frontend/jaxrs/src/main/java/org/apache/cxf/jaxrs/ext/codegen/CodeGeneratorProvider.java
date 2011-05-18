@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -67,12 +68,18 @@ public class CodeGeneratorProvider implements RequestHandler {
     
     private Comparator<String> importsComparator;
     private UriInfo ui;
+    private String resourcePackageName;
+    private String resourceName;
     private boolean generateInterfaces = true;
-    
+    private Bus bus;
     
     @Context
     public void setUriInfo(UriInfo uriInfo) {
         this.ui = uriInfo;
+    }
+    
+    public void setBus(Bus bus) {
+        this.bus = bus;
     }
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
@@ -126,6 +133,9 @@ public class CodeGeneratorProvider implements RequestHandler {
                 SourceGenerator sg = new SourceGenerator(properties);
                 sg.setGenerateInterfaces(generateInterfaces);
                 sg.setImportsComparator(importsComparator);
+                sg.setResourceName(resourceName);
+                sg.setPackageName(resourcePackageName);
+                sg.setBus(bus);
                 sg.generateSource(wadl, srcDir, codeType);
                 
                 zipSource(srcDir, zipDir);
@@ -260,4 +270,11 @@ public class CodeGeneratorProvider implements RequestHandler {
         this.generateInterfaces = generateInterfaces;
     }
     
+    public void setPackageName(String name) {
+        this.resourcePackageName = name;
+    }
+    
+    public void setResourceName(String name) {
+        this.resourceName = name;
+    }
 }

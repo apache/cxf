@@ -23,7 +23,7 @@
     <include href="schemas/book.xsd"/>
  </grammars>
  <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore" id="{org.apache.cxf.jaxrs.model.wadl}BookStore">
+   <resource path="/bookstore" id="{wadl.model.jaxrs.cxf.apache.org}BookStore">
     
     <resource path="/books/{bookid}">
      <param name="bookid" style="template" type="xs:int"/>

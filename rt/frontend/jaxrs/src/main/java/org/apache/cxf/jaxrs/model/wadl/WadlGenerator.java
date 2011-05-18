@@ -272,7 +272,8 @@ public class WadlGenerator implements RequestHandler {
                 : jaxbQname.getNamespaceURI();
             String localName = jaxbQname == null ? serviceClass.getSimpleName()
                 : jaxbQname.getLocalPart();
-            sb.append(" id=\"").append("{" + pName + "}" + localName).append("\"");
+            String finalName = jaxbQname == null ? pName + "." : "{" + pName + "}";
+            sb.append(" id=\"").append(finalName + localName).append("\"");
         }
         sb.append(">");
     }

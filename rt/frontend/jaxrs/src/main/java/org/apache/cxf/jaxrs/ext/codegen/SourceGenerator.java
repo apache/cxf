@@ -253,14 +253,11 @@ public class SourceGenerator {
         if (resourceId.length() == 0) {
             resourceId = DEFAULT_RESOURCE_NAME;
         }
-        //TODO: if it's expanded QName then use PackageUtils.getPackageNameByNameSpaceURI
-        // otherwise assume the last segment after the last dot is the name of the class
-        // and the package name is before the last dot
-        QName qname = JAXRSUtils.convertStringToQName(resourceId);
-        String namespaceURI = qname.getNamespaceURI();
+        boolean expandedQName = resourceId.startsWith("{") ? true : false;
+        QName qname = convertToQName(resourceId, expandedQName);
+        String namespaceURI = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
         
-        if (getSchemaClassName(PackageUtils.getPackageNameByNameSpaceURI(namespaceURI), 
-                               gInfo, qname.getLocalPart(), typeClassNames) != null) {
+        if (getSchemaClassName(namespaceURI, gInfo, qname.getLocalPart(), typeClassNames) != null) {
             return; 
         }
         
@@ -303,10 +300,24 @@ public class SourceGenerator {
         
         for (Element subEl : childEls) {
             String id = subEl.getAttribute("id");
-            if (id.length() > 0 && !resourceId.equals(id) && !id.startsWith("{java")) {
+            if (id.length() > 0 && !resourceId.equals(id) && !id.startsWith("{java")
+                && !id.startsWith("java")) {
                 writeResourceClass(subEl, typeClassNames, gInfo, src, false, interfaceIsGenerated);
             }
         }
+    }
+    
+    private QName convertToQName(String resourceId, boolean expandedQName) {
+        QName qname = null;
+        if (expandedQName) {
+            qname = JAXRSUtils.convertStringToQName(resourceId);
+        } else {
+            int lastIndex = resourceId.lastIndexOf(".");
+            qname = lastIndex == -1 ? new QName(resourceId) 
+                                    : new QName(resourceId.substring(0, lastIndex),
+                                                resourceId.substring(lastIndex + 1));
+        }
+        return qname;
     }
     
     private String getClassType(boolean interfaceIsGenerated) {
@@ -444,13 +455,15 @@ public class SourceGenerator {
             responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, typeClassNames, gInfo);
             sbCode.append(id);
         } else {
-            QName qname = JAXRSUtils.convertStringToQName(id);
-            String packageName = PackageUtils.getPackageNameByNameSpaceURI(qname.getNamespaceURI());
+            boolean expandedQName = id.startsWith("{");
+            QName qname = convertToQName(id, expandedQName);
+            String packageName = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
+            
             String clsSimpleName = getSchemaClassName(packageName, gInfo, qname.getLocalPart(), 
                                                       typeClassNames);
             String localName = clsSimpleName == null ? qname.getLocalPart() 
                 : clsSimpleName.substring(packageName.length() + 1);
-            String subResponseNs = clsSimpleName == null ? getClassPackageName(qname.getNamespaceURI()) 
+            String subResponseNs = clsSimpleName == null ? getClassPackageName(packageName) 
                 : clsSimpleName.substring(0, packageName.length());
             String parentId = ((Element)resourceEl.getParentNode()).getAttribute("id");
             writeSubResponseType(id.equals(parentId), subResponseNs, localName, sbCode, imports);
@@ -476,6 +489,10 @@ public class SourceGenerator {
         sbCode.append(getLineSep()).append(getLineSep());
     }
 
+    private String possiblyConvertNamespaceURI(String nsURI, boolean expandedQName) {
+        return expandedQName ? PackageUtils.getPackageNameByNameSpaceURI(nsURI) : nsURI;
+    }
+    
     private void generateEmptyMethodBody(StringBuilder sbCode, boolean responseTypeAvailable) {
         sbCode.append(" {");
         sbCode.append(getLineSep()).append(TAB).append(TAB);
