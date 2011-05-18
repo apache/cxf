@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -581,7 +582,21 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       + "parameter, static valueOf(String) or fromString(String) methods",
                       "*/*", 500);
     }
-    
+
+    @Test
+    public void testWrongContentType() throws Exception {
+        // can't use WebClient here because WebClient plays around with the Content-Type
+        // (and makes sure it's syntactically correct) before sending it to the server
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/unsupportedcontenttype";
+        URL url = new URL(endpointAddress);
+        HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+        urlConnection.setReadTimeout(30000); // 30 seconds tops
+        urlConnection.setConnectTimeout(30000); // 30 second tops
+        urlConnection.addRequestProperty("Content-Type", "MissingSeparator");
+        urlConnection.setRequestMethod("POST");
+        assertEquals(415, urlConnection.getResponseCode());
+    }
+
     @Test
     public void testExceptionDuringConstruction() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/exceptionconstruction?p=1",
