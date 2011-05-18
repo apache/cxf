@@ -285,9 +285,9 @@ public final class AttachmentUtil {
             } catch (UnsupportedEncodingException ue) {
                 contentId = contentId.substring(4);
             }
-            return new LazyDataSource(contentId, atts);
+            return loadDataSource(contentId, atts);
         } else if (contentId.indexOf("://") == -1) {
-            return new LazyDataSource(contentId, atts);
+            return loadDataSource(contentId, atts);
         } else {
             try {
                 return new URLDataSource(new URL(contentId));
@@ -296,6 +296,13 @@ public final class AttachmentUtil {
             }
         }
         
+    }
+
+    private static DataSource loadDataSource(String contentId, Collection<Attachment> atts) {
+        LazyDataSource lazyDS =  new LazyDataSource(contentId, atts);
+        //ensure the attachment DS is loaded to make it also work with SUN's activation lib
+        lazyDS.getContentType();
+        return lazyDS;
     }
     
 }
