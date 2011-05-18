@@ -298,7 +298,7 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
             }
         }
         
-        TemplatesImpl templ =  new TemplatesImpl(templates);
+        TemplatesImpl templ =  new TemplatesImpl(templates, uriResolver);
         MessageContext mc = getContext();
         if (mc != null) {
             UriInfo ui = mc.getUriInfo();
@@ -366,11 +366,13 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     private static class TemplatesImpl implements Templates {
 
         private Templates templates;
+        private URIResolver resolver;
         private Map<String, Object> transformParameters = new HashMap<String, Object>();
         private Map<String, String> outProps = new HashMap<String, String>();
         
-        public TemplatesImpl(Templates templates) {
+        public TemplatesImpl(Templates templates, URIResolver resolver) {
             this.templates = templates;
+            this.resolver = resolver;
         }
         
         public void setTransformerParameter(String name, Object value) {
@@ -387,6 +389,7 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
 
         public Transformer newTransformer() throws TransformerConfigurationException {
             Transformer tr = templates.newTransformer();
+            tr.setURIResolver(resolver);
             for (Map.Entry<String, Object> entry : transformParameters.entrySet()) {
                 tr.setParameter(entry.getKey(), entry.getValue());
             }
