@@ -45,27 +45,27 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
+import org.apache.cxf.tools.util.JAXBUtils;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
 public final class CustomizationParser {
     private static final Logger LOG = LogUtils.getL7dLogger(CustomizationParser.class);
     private final List<InputSource> jaxbBindings = new ArrayList<InputSource>();
+    private final List<InputSource> packageFiles = new ArrayList<InputSource>();
+    
     private Bus bus;
-    private String[] bindingFiles = new String[]{};
     private String wadlPath;
     
     public CustomizationParser(ToolContext env) {
         bus = (Bus)env.get(Bus.class);
-        Object files = env.get(WadlToolConstants.CFG_BINDING);
-        if (files != null) {
-            bindingFiles = files instanceof String ? new String[]{(String)files}
-                                                   : (String[])files;
-        }
         wadlPath = (String)env.get(WadlToolConstants.CFG_WADLURL);
     }
 
-    public void parse() {
+    public void parse(ToolContext env) {
+        // JAXB schema customizations
+        String[] bindingFiles = getBindingFiles(env);
+        
         for (int i = 0; i < bindingFiles.length; i++) {
             try {
                 addBinding(bindingFiles[i]);
@@ -73,6 +73,11 @@ public final class CustomizationParser {
                 Message msg = new Message("STAX_PARSER_ERROR", LOG);
                 throw new ToolException(msg, xse);
             }
+        }
+        // Schema Namespace to Package customizations
+        for (String ns : env.getNamespacePackageMap().keySet()) {
+            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, env.mapPackageName(ns));
+            packageFiles.add(new InputSource(file.toURI().toString()));
         }
     }
 
@@ -145,9 +150,21 @@ public final class CustomizationParser {
         return false;
     }
 
+    private String[] getBindingFiles(ToolContext env) {
+        Object files = env.get(WadlToolConstants.CFG_BINDING);
+        if (files != null) {
+            return files instanceof String ? new String[]{(String)files}
+                                                   : (String[])files;
+        } else {
+            return new String[] {};
+        }
+    }
+    
     public List<InputSource> getJaxbBindings() {
         return this.jaxbBindings;
     }
 
-
+    public List<InputSource> getSchemaPackageFiles() {
+        return this.packageFiles;
+    }
 }

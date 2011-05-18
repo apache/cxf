@@ -47,8 +47,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,8 +72,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,8 +96,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,8 +121,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,8 +146,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -200,8 +200,34 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "custom.books");
-            verifyFiles("class", true, false, "custom.books");
+            verifyFiles("java", true, false, "superbooks", "custom.books");
+            verifyFiles("class", true, false, "superbooks", "custom.books");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
+    public void testCodeGenInterfacesCustomPackageForResourcesAndSchemas() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+            
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
+            context.put(WadlToolConstants.CFG_PACKAGENAME, "custom.books.service");
+            context.put(WadlToolConstants.CFG_TYPES_PACKAGENAME, "http://superbooks=custom.books.schema");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", true, false, "custom.books.schema", "custom.books.service");
+            verifyFiles("class", true, false, "custom.books.schema", "custom.books.service");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -225,8 +251,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, false, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -250,8 +276,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, true, "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, true, "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -273,7 +299,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyTypes("java");
+            verifyTypes("superbooks", "java");
             
         } catch (Exception e) {
             fail();
@@ -282,14 +308,14 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
-                             String resourcePackage) {
+                             String schemaPackage, String resourcePackage) {    
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
         int size = interfacesAndImpl ? 9 : 7;
         if (!subresourceExpected) {
             size--;
         }
         assertEquals(size, files.size());
-        doVerifyTypes(files, ext);
+        doVerifyTypes(files, schemaPackage, ext);
         if (subresourceExpected) {
             assertTrue(checkContains(files, resourcePackage + ".FormInterface." + ext));
         }
@@ -302,18 +328,18 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
     
-    private void verifyTypes(String ext) {
+    private void verifyTypes(String schemaPackage, String ext) {
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
         assertEquals(5, files.size());
-        doVerifyTypes(files, ext);
+        doVerifyTypes(files, schemaPackage, ext);
     }
     
-    private void doVerifyTypes(List<File> files, String ext) {
-        assertTrue(checkContains(files, "superbooks.Book." + ext));
-        assertTrue(checkContains(files, "superbooks.Book2." + ext));
-        assertTrue(checkContains(files, "superbooks.Chapter." + ext));
-        assertTrue(checkContains(files, "superbooks.ObjectFactory." + ext));
-        assertTrue(checkContains(files, "superbooks.package-info." + ext));
+    private void doVerifyTypes(List<File> files, String schemaPackage, String ext) {
+        assertTrue(checkContains(files, schemaPackage + ".Book." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".Book2." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".Chapter." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".ObjectFactory." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".package-info." + ext));
     }
     
     private boolean checkContains(List<File> clsFiles, String name) {

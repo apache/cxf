@@ -81,6 +81,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         if (context.get(WadlToolConstants.CFG_OUTPUTDIR) == null) {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, ".");
         }
+        setPackageAndNamespaces();
     }
 
     private void processWadl() {
@@ -104,9 +105,15 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setWadlPath(wadlURL);
                 
         CustomizationParser parser = new CustomizationParser(context);
-        parser.parse();
+        parser.parse(context);
+        
         List<InputSource> bindingFiles = parser.getJaxbBindings();
         sg.setBindingFiles(bindingFiles);
+        
+        List<InputSource> schemaPackageFiles = parser.getSchemaPackageFiles();
+        sg.setSchemaPackageFiles(schemaPackageFiles);
+        sg.setSchemaPackageMap(context.getNamespacePackageMap());
+        // sg.setSchemaPackageName((String)context.get(WadlToolConstants.CFG_TOOLS_PACKAGENAME)));
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
@@ -153,4 +160,30 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         context.put(WadlToolConstants.CFG_WADLURL, absoluteWadlURL);
         return absoluteWadlURL;
     }
+    
+    //TODO: this belongs to JAXB Databinding, should we just reuse 
+    // org.apache.cxf.tools.wsdlto.databinding.jaxb ?
+    private void setPackageAndNamespaces() {
+        String[] schemaPackageNamespaces = new String[]{};
+        Object value = context.get(WadlToolConstants.CFG_TYPES_PACKAGENAME);
+        if (value != null) {
+            schemaPackageNamespaces = value instanceof String ? new String[]{(String)value}
+                                                   : (String[])value;
+        }
+        for (int i = 0; i < schemaPackageNamespaces.length; i++) {
+            int pos = schemaPackageNamespaces[i].indexOf("=");
+            String packagename = schemaPackageNamespaces[i];
+            if (pos != -1) {
+                String ns = schemaPackageNamespaces[i].substring(0, pos);
+                packagename = schemaPackageNamespaces[i].substring(pos + 1);
+                context.addNamespacePackageMap(ns, packagename);
+            } else {
+                // this is the default schema package name
+                // if CFG_PACKAGENAME is set then it's only used for JAX-RS resource 
+                // classes
+                context.put(WadlToolConstants.CFG_TYPES_PACKAGENAME, packagename);
+            }
+        }
+        
+    }    
 }

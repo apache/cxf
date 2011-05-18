@@ -132,6 +132,8 @@ public class SourceGenerator {
     private List<String> generatedServiceClasses = new ArrayList<String>(); 
     private List<String> generatedTypeClasses = new ArrayList<String>();
     private List<InputSource> bindingFiles = Collections.emptyList();
+    private List<InputSource> schemaPackageFiles = Collections.emptyList();
+    private Map<String, String> schemaPackageMap = Collections.emptyMap();
     private Bus bus;
     
     public SourceGenerator() {
@@ -490,7 +492,12 @@ public class SourceGenerator {
     }
 
     private String possiblyConvertNamespaceURI(String nsURI, boolean expandedQName) {
-        return expandedQName ? PackageUtils.getPackageNameByNameSpaceURI(nsURI) : nsURI;
+        return expandedQName ? getPackageFromNamespace(nsURI) : nsURI;
+    }
+    
+    private String getPackageFromNamespace(String nsURI) {
+        return schemaPackageMap.containsKey(nsURI) ? schemaPackageMap.get(nsURI)
+            : PackageUtils.getPackageNameByNameSpaceURI(nsURI);
     }
     
     private void generateEmptyMethodBody(StringBuilder sbCode, boolean responseTypeAvailable) {
@@ -638,7 +645,7 @@ public class SourceGenerator {
                 if (namespace == null) {
                     return null;
                 }
-                String packageName = PackageUtils.getPackageNameByNameSpaceURI(namespace);
+                String packageName = getPackageFromNamespace(namespace);
                 String clsName = getSchemaClassName(packageName, gInfo, pair[1], typeClassNames);
                 if (clsName != null) {
                     addImport(imports, clsName);
@@ -846,6 +853,10 @@ public class SourceGenerator {
     }
     
     private void addSchemas(List<SchemaInfo> schemas, SchemaCompiler compiler) {
+        // handle package customizations first
+        for (int i = 0; i < schemaPackageFiles.size(); i++) {
+            compiler.parseSchema(schemaPackageFiles.get(i));
+        }
         
         for (int i = 0; i < schemas.size(); i++) {
             SchemaInfo schema = schemas.get(i);
@@ -907,6 +918,14 @@ public class SourceGenerator {
     
     public void setBindingFiles(List<InputSource> files) {
         this.bindingFiles = files;
+    }
+    
+    public void setSchemaPackageFiles(List<InputSource> files) {
+        this.schemaPackageFiles = files;
+    }
+
+    public void setSchemaPackageMap(Map<String, String> map) {
+        this.schemaPackageMap = map;
     }
     
     public void setBus(Bus bus) {
