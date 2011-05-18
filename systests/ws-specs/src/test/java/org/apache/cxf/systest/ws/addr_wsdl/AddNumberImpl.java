@@ -32,6 +32,7 @@ import org.apache.cxf.systest.ws.addr_feature.AddNumbersResponse;
 
 
 @WebService(serviceName = "AddNumbersService",
+            portName = "AddNumbersOnlyAnonPort",
             targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/")
 public class AddNumberImpl implements AddNumbersPortType {
     public int addNumbers(int number1, int number2) throws AddNumbersFault_Exception {

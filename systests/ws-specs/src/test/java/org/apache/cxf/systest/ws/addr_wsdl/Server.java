@@ -87,6 +87,7 @@ public class Server extends AbstractBusTestServerBase {
     
     
     @WebServiceProvider(serviceName = "AddNumbersService",
+                        portName = "AddNumbersOnlyAnonPort",
                         targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/",
                         wsdlLocation = "/wsdl_systest_wsspec/add_numbers.wsdl")
     @ServiceMode(Mode.PAYLOAD)
@@ -116,6 +117,7 @@ public class Server extends AbstractBusTestServerBase {
     }
 
     @WebServiceProvider(serviceName = "AddNumbersService",
+                        portName = "AddNumbersOnlyAnonPort",
                         targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/")
     @ServiceMode(Mode.PAYLOAD)
     @Addressing(enabled = true, required = true)
