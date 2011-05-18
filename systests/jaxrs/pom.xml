@@ -65,6 +65,10 @@
     </profiles>
     <dependencies>
         <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
             <version>${cxf.abdera.version}</version>
@@ -231,10 +235,6 @@
             <artifactId>spring-tx</artifactId>
             <version>${cxf.spring.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
