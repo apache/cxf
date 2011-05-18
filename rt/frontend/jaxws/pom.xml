@@ -120,13 +120,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>
-            <version>${cxf.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <scope>provided</scope>
-            <version>${cxf.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
