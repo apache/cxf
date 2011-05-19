@@ -163,10 +163,12 @@ public class UsernameToken extends Token {
                 
                 if (isRequireCreated()) {
                     writer.writeStartElement(SP13Constants.SP_PREFIX, "Created", SP13Constants.SP_NS);
+                    writer.writeNamespace(SP13Constants.SP_PREFIX, SP13Constants.SP_NS);
                     writer.writeEndElement();
                 }
                 if (isRequireNonce()) {
                     writer.writeStartElement(SP13Constants.SP_PREFIX, "Nonce", SP13Constants.SP_NS);
+                    writer.writeNamespace(SP13Constants.SP_PREFIX, SP13Constants.SP_NS);
                     writer.writeEndElement();
                 }
 
