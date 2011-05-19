@@ -301,8 +301,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 this.addEncryptedKeyElement(sigTokElem);
             } else if (isRequestor() && sigToken instanceof X509Token) {
                 Element el = sigTok.getToken();
-                sigTokElem = (Element)secHeader.getSecurityHeader().getOwnerDocument()
-                        .importNode(el, true);
+                sigTokElem = cloneElement(el);
                 this.addEncryptedKeyElement(sigTokElem);
             } else {
                 tokIncluded = false;
@@ -387,14 +386,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
 
             if (attached && encrTok.getAttachedReference() != null) {
-                dkEncr.setExternalKey(encrTok.getSecret(),
-                                      (Element)saaj.getSOAPPart()
-                                          .importNode((Element) encrTok.getAttachedReference(),
-                                true));
+                dkEncr.setExternalKey(
+                    encrTok.getSecret(), cloneElement(encrTok.getAttachedReference())
+                );
             } else if (encrTok.getUnattachedReference() != null) {
-                dkEncr.setExternalKey(encrTok.getSecret(), (Element)saaj.getSOAPPart()
-                        .importNode((Element) encrTok.getUnattachedReference(),
-                                true));
+                dkEncr.setExternalKey(
+                    encrTok.getSecret(), cloneElement(encrTok.getUnattachedReference())
+                );
             } else if (!isRequestor()) { 
                 // If the Encrypted key used to create the derived key is not
                 // attached use key identifier as defined in WSS1.1 section
@@ -569,8 +567,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         }
         
         if (ref != null) {
-            dkSign.setExternalKey(tok.getSecret(), 
-                                  (Element)saaj.getSOAPPart().importNode(ref, true));
+            dkSign.setExternalKey(tok.getSecret(), cloneElement(ref));
         } else if (!isRequestor() && policyToken.isDerivedKeys()) { 
             // If the Encrypted key used to create the derived key is not
             // attached use key identifier as defined in WSS1.1 section
