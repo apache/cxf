@@ -17,7 +17,6 @@
       limitations under the License.
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-${project.version}">
-    <repository>mvn:org.apache.karaf.assemblies.features/standard/${cxf.karaf.version}/xml/features</repository>
 
     <feature name="cxf-specs" version="${project.version}">
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${cxf.servicemix.specs.version}</bundle>
@@ -83,8 +82,8 @@
         <bundle start-level='20'>mvn:org.codehaus.woodstox/woodstox-core-asl/${cxf.woodstox.core.version}</bundle>
 
         <feature version='${cxf.jaxb.bundle.version}'>cxf-jaxb</feature>
-        <feature version="${cxf.karaf.version}">http</feature>
-        <feature version="${cxf.karaf.version}">war</feature>
+        <feature version="[2,3)">http</feature>
+        <feature version="[2,3)">war</feature>
         <feature version="${cxf.spring.version}">spring</feature>
         <feature version="${cxf.spring.osgi.version}">spring-dm</feature>
         <feature version="${cxf.spring.version}">spring-jms</feature>

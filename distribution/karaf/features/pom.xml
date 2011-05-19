@@ -132,6 +132,8 @@
 
     <profiles>
         <profile>
+            <!-- this profile doesn't work right now. Requires an update to the features plugin. -->
+            <!-- See https://issues.apache.org/jira/browse/KARAF-651 -->
             <id>validate</id>
             <build>
                 <plugins>

@@ -114,7 +114,6 @@
         <!-- various OSGi related versions -->
         <cxf.aries.version>0.3</cxf.aries.version>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
-        <cxf.karaf.version>2.2.1</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
