@@ -124,7 +124,7 @@ public class JMSOldConfigHolder {
      * then be used to configure the JMSConfiguration object 
      * @param target 
      */
-    private JMSEndpoint getExtensorsAndConfig(Bus bus,
+    protected JMSEndpoint getExtensorsAndConfig(Bus bus,
                            EndpointInfo endpointInfo,
                            EndpointReferenceType target,
                            boolean isConduit) throws IOException {
@@ -184,6 +184,10 @@ public class JMSOldConfigHolder {
         throws IOException {
         JMSEndpoint endpoint = getExtensorsAndConfig(bus, endpointInfo, target, isConduit);
 
+        return configureEndpoint(isConduit, endpoint);
+    }
+
+    protected JMSConfiguration configureEndpoint(boolean isConduit, JMSEndpoint endpoint) {
         if (address != null) {
             mapAddressToEndpoint(address, endpoint);
         }
@@ -197,7 +201,7 @@ public class JMSOldConfigHolder {
                 ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT;
             jmsConfig.setDeliveryMode(deliveryMode);
         }
-        
+
         if (endpoint.isSetPriority()) {
             int priority = endpoint.getPriority();
             jmsConfig.setPriority(priority);
@@ -210,10 +214,10 @@ public class JMSOldConfigHolder {
             JNDIConfiguration jndiConfig = new JNDIConfiguration();
             jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
             jmsConfig.setJndiTemplate(jt);
-            
+
             jndiConfig.setConnectionUserName(endpoint.getUsername());
             jndiConfig.setConnectionPassword(endpoint.getPassword());
-            
+
             jmsConfig.setJndiConfig(jndiConfig);
             if (endpoint.isSetReconnectOnException()) {
                 jmsConfig.setReconnectOnException(endpoint.isReconnectOnException());
@@ -281,7 +285,7 @@ public class JMSOldConfigHolder {
                 }
             }
         }
-        
+
         String requestURI = endpoint.getRequestURI();
         jmsConfig.setRequestURI(requestURI);
 
@@ -289,7 +293,7 @@ public class JMSOldConfigHolder {
         jmsConfig.setTargetService(targetService);
         return jmsConfig;
     }
-    
+
     private static void setReplyDestination(JMSConfiguration jmsConfig, JMSEndpoint endpoint) {
         if (endpoint.getReplyToName() != null)  {
             jmsConfig.setReplyDestination(endpoint.getReplyToName());
@@ -314,7 +318,7 @@ public class JMSOldConfigHolder {
             endpoint.setUsername(address.getConnectionUserName());
         }
         if (address.isSetConnectionPassword()) {
-            endpoint.setPassword(address.getConnectionUserName());
+            endpoint.setPassword(address.getConnectionPassword());
         }
         if (address.isSetReconnectOnException()) {
             endpoint.setReconnectOnException(address.isReconnectOnException());
