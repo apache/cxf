@@ -22,7 +22,9 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.xml.sax.InputSource;
 
@@ -78,12 +80,17 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
     public void buildToolContext() {
         getContext();
+        context.addParameters(getParametersMap(getArrayKeys()));
         if (context.get(WadlToolConstants.CFG_OUTPUTDIR) == null) {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, ".");
         }
         setPackageAndNamespaces();
     }
 
+    public Set<String> getArrayKeys() {
+        return new HashSet<String>();
+    }
+    
     private void processWadl() {
         File outDir = new File((String)context.get(WadlToolConstants.CFG_OUTPUTDIR));
         String wadlURL = getAbsoluteWadlURL();
