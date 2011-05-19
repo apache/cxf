@@ -1366,5 +1366,26 @@ public class CodeGenTest extends AbstractCodeGenTest {
         fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
         assertEquals(fault.getName().hashCode(), ObjectStreamClass.lookup(fault).getSerialVersionUID());
     }
+    
+    
+    @Test
+    public void testExtensionWrapper() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL,
+                getLocation("/wsdl2java_wsdl/cxf2193/hello_world_extension_wrapped.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+
+        File infFile = new File(output, "org/apache/cxf/w2j/extension_wrapped/Greeter.java");
+        assertTrue(infFile.exists());
+
+        Class<?> interfaceClass = classLoader.loadClass("org.apache.cxf.w2j.extension_wrapped.Greeter");
+
+        Method method = interfaceClass.getMethod("greetMe", new Class[] {
+            Holder.class, Holder.class, Holder.class, Holder.class, Holder.class
+        });
+        assertTrue("greetMe operation is NOT generated correctly as excepted", method != null);
+        RequestWrapper reqWrapper = method.getAnnotation(RequestWrapper.class);
+        assertNotNull("@RequestWrapper is expected", reqWrapper);
+    }
 
 }

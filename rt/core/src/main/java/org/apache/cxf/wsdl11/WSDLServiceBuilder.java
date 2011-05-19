@@ -83,6 +83,7 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
+import org.apache.ws.commons.schema.XmlSchemaType;
 
 import static org.apache.cxf.helpers.CastUtils.cast;
 
@@ -742,55 +743,76 @@ public class WSDLServiceBuilder {
                                                MessageInfo wrapper, boolean allowRefs) {
         if (type.getParticle() instanceof XmlSchemaSequence) {
             XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
-            List<XmlSchemaSequenceMember> items = seq.getItems();
-            boolean ret = true;
-            for (XmlSchemaSequenceMember seqItem : items) {
-                if (!(seqItem instanceof XmlSchemaElement)) {
-                    return false;
-                }
-                XmlSchemaElement el = (XmlSchemaElement)seqItem;
-
-                if (el.getSchemaTypeName() != null) {
-                    MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
-                    mpi.setTypeQName(el.getSchemaTypeName());
-                    mpi.setElement(true);
-                    mpi.setElementQName(el.getWireName());
-                    mpi.setConcreteName(el.getWireName());
-                    mpi.setXmlSchema(el);
-                } else if (el.getRef().getTargetQName() != null) {
-                    MessagePartInfo mpi = wrapper.addMessagePart(el.getRef().getTargetQName());
-                    mpi.setTypeQName(el.getRef().getTargetQName());
-                    mpi.setElementQName(el.getRef().getTargetQName());
-                    mpi.setElement(true);
-                    mpi.setXmlSchema(el);
-                    mpi.setProperty("isRefElement", true);
-                    // element reference is not permitted for wrapper element
-                    if (!allowRefs) {
-                        ret = false;
-                    }
-                } else {
-                    // anonymous type
-                    MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
-                    mpi.setElementQName(mpi.getName());
-                    mpi.setConcreteName(el.getWireName());
-                    mpi.setElement(true);
-                    mpi.setXmlSchema(el);
-                }
-            }
-
-            return ret;
+            return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
         } else if (type.getParticle() == null) {
             if (type.getContentModel() == null) {
                 return true;
             }
             if (type.getContentModel().getContent() instanceof XmlSchemaComplexContentExtension) {
-                return false;
+                XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)type
+                    .getContentModel().getContent();
+                QName baseTypeName = extension.getBaseTypeName();
+                ServiceInfo serviceInfo = wrapper.getOperation().getInterface().getService();
+                XmlSchemaType schemaType = serviceInfo.getXmlSchemaCollection().getTypeByQName(baseTypeName);
+                if (!(schemaType instanceof XmlSchemaComplexType)
+                    || !isWrappableSequence((XmlSchemaComplexType)schemaType, namespaceURI, wrapper,
+                                            allowRefs)) {
+                    return false;
+                }
+                             
+                if (extension.getParticle() instanceof XmlSchemaSequence) {
+                    XmlSchemaSequence seq = (XmlSchemaSequence)extension.getParticle();
+                    return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
+                }  
+                
             }
             return true;
         }
         return false;
     }
 
+        
+    private static boolean buildMessageParts(XmlSchemaSequence seq, String namespaceURI, MessageInfo wrapper,
+                                             boolean allowRefs) {
+        List<XmlSchemaSequenceMember> items = seq.getItems();
+        boolean ret = true;
+        for (XmlSchemaSequenceMember seqItem : items) {
+            if (!(seqItem instanceof XmlSchemaElement)) {
+                return false;
+            }
+            XmlSchemaElement el = (XmlSchemaElement)seqItem;
+
+            if (el.getSchemaTypeName() != null) {
+                MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
+                mpi.setTypeQName(el.getSchemaTypeName());
+                mpi.setElement(true);
+                mpi.setElementQName(el.getWireName());
+                mpi.setConcreteName(el.getWireName());
+                mpi.setXmlSchema(el);
+            } else if (el.getRef().getTargetQName() != null) {
+                MessagePartInfo mpi = wrapper.addMessagePart(el.getRef().getTargetQName());
+                mpi.setTypeQName(el.getRef().getTargetQName());
+                mpi.setElementQName(el.getRef().getTargetQName());
+                mpi.setElement(true);
+                mpi.setXmlSchema(el);
+                mpi.setProperty("isRefElement", true);
+                // element reference is not permitted for wrapper element
+                if (!allowRefs) {
+                    ret = false;
+                }
+            } else {
+                // anonymous type
+                MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
+                mpi.setElementQName(mpi.getName());
+                mpi.setConcreteName(el.getWireName());
+                mpi.setElement(true);
+                mpi.setXmlSchema(el);
+            }
+        }
+        return ret;
+    }
+        
+        
     private void buildMessage(AbstractMessageContainer minfo, Message msg) {
         SchemaCollection schemas = minfo.getOperation().getInterface().getService()
             .getXmlSchemaCollection();

@@ -176,7 +176,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider
             for (UnknownExtensibilityElement e : extensions) {
                 Policy p = null;
                 if (Constants.isPolicyElement(e.getElementType())) {
-                    p = builder.getPolicy(e.getElement());                    
+                    p = builder.getPolicy(e.getElement());
 
                 } else if (Constants.isPolicyRef(e.getElementType())) {
                     PolicyReference ref = builder.getPolicyReference(e.getElement());
