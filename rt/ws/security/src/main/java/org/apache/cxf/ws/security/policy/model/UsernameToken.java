@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SP13Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 public class UsernameToken extends Token {
@@ -157,6 +158,15 @@ public class UsernameToken extends Token {
                     writer.writeEndElement();
                 } else if (isImpliedDerivedKeys()) {
                     writer.writeStartElement(prefix, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS, namespaceURI);
+                    writer.writeEndElement();
+                }
+                
+                if (isRequireCreated()) {
+                    writer.writeStartElement(SP13Constants.SP_PREFIX, "Created", SP13Constants.SP_NS);
+                    writer.writeEndElement();
+                }
+                if (isRequireNonce()) {
+                    writer.writeStartElement(SP13Constants.SP_PREFIX, "Nonce", SP13Constants.SP_NS);
                     writer.writeEndElement();
                 }
 
