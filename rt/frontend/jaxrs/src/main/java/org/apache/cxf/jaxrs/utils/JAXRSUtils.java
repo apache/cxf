@@ -405,10 +405,15 @@ public final class JAXRSUtils {
         if (!"OPTIONS".equalsIgnoreCase(httpMethod) && logNow) {
             LOG.warning(errorMsg.toString());
         }
-        ResponseBuilder rb = createResponseBuilder(resource, status, methodMatched == 0);
-        throw new WebApplicationException(rb.build());
+        Response response = createResponse(resource, status, methodMatched == 0);
+        throw new WebApplicationException(response);
         
     }    
+    
+    public static boolean noResourceMethodForOptions(Response exResponse, String httpMethod) {
+        return exResponse != null && exResponse.getStatus() == 405 
+            && "OPTIONS".equalsIgnoreCase(httpMethod);
+    }
     
     private static void logNoMatchMessage(OperationResourceInfo ori, 
         String path, String httpMethod, MediaType requestType, List<MediaType> acceptContentTypes) {
@@ -430,7 +435,7 @@ public final class JAXRSUtils {
         LOG.fine(errorMsg.toString());
     }
 
-    public static ResponseBuilder createResponseBuilder(ClassResourceInfo cri, int status, boolean addAllow) {
+    public static Response createResponse(ClassResourceInfo cri, int status, boolean addAllow) {
         ResponseBuilder rb = Response.status(status);
         if (addAllow) {
             Set<String> allowedMethods = cri.getAllowedMethods();
@@ -445,7 +450,7 @@ public final class JAXRSUtils {
                 rb.header("Allow", "HEAD");
             }
         }
-        return rb;
+        return rb.build();
     }
     
     private static boolean matchHttpMethod(String expectedMethod, String httpMethod) {

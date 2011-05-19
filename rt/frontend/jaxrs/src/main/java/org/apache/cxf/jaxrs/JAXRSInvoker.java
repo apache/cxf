@@ -193,7 +193,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 Thread.currentThread().setContextClassLoader(contextLoader);
             }
         }
-
+        ClassResourceInfo subCri = null;
         if (ori.isSubResourceLocator()) {
             try {
                 Message msg = exchange.getInMessage();
@@ -209,7 +209,7 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 result = checkResultObject(result, subResourcePath);
 
-                ClassResourceInfo subCri = cri.getSubResource(
+                subCri = cri.getSubResource(
                      methodToInvoke.getReturnType(),
                      ClassHelper.getRealClass(result));
                 if (subCri == null) {
@@ -241,8 +241,13 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 return this.invoke(exchange, newParams, result);
             } catch (WebApplicationException ex) {
-                Response excResponse = JAXRSUtils.convertFaultToResponse(ex, 
-                                                                         exchange.getInMessage());
+                Response excResponse;
+                if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), 
+                        (String)exchange.getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
+                    excResponse = JAXRSUtils.createResponse(subCri, 200, true);
+                } else {
+                    excResponse = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
+                }
                 return new MessageContentsList(excResponse);
             }
         }

@@ -485,6 +485,38 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testExplicitOptions() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" 
+                             + PORT + "/bookstore/options");
+        Response response = wc.options();
+        List<Object> values = response.getMetadata().get("Allow");
+        assertNotNull(values);
+        assertTrue(values.contains("POST") && values.contains("GET")
+                   && values.contains("DELETE") && values.contains("PUT"));
+        assertEquals(0, ((InputStream)response.getEntity()).available());
+        List<Object> date = response.getMetadata().get("Date");
+        assertNotNull(date);
+        assertEquals(1, date.size());
+    }
+    
+    @Test
+    public void testOptionsOnSubresource() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" 
+                             + PORT + "/bookstore/booksubresource/123");
+        Response response = wc.options();
+        List<Object> values = response.getMetadata().get("Allow");
+        assertNotNull(values);
+        assertTrue(!values.contains("POST") && values.contains("GET")
+                   && !values.contains("DELETE") && values.contains("PUT"));
+        assertEquals(0, ((InputStream)response.getEntity()).available());
+        List<Object> date = response.getMetadata().get("Date");
+        assertNotNull(date);
+        assertEquals(1, date.size());
+    }
+    
+    @Test
     public void testEmptyPost() throws Exception {
         WebClient wc = 
             WebClient.create("http://localhost:" 
