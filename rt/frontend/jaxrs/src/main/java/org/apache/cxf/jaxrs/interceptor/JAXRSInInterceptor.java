@@ -206,9 +206,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                             httpMethod, values, requestContentType, acceptContentTypes, true);
                 setExchangeProperties(message, ori, values, resources.size());
             } catch (WebApplicationException ex) {
-                if (ex.getResponse() != null && ex.getResponse().getStatus() == 405 
-                    && "OPTIONS".equalsIgnoreCase(httpMethod)) {
-                    Response response = JAXRSUtils.createResponseBuilder(resource, 200, true).build();
+                if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), httpMethod)) {
+                    Response response = JAXRSUtils.createResponse(resource, 200, true);
                     message.getExchange().put(Response.class, response);
                     return;
                 } else {
