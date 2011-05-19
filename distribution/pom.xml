@@ -80,7 +80,6 @@
             <artifactId>cxf-tools-wsdlto-frontend-javascript</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-misctools</artifactId>
@@ -101,7 +100,11 @@
             <artifactId>cxf-tools-wsdlto-frontend-jaxws</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-tools-wadlto-jaxrs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-java2ws</artifactId>

@@ -114,9 +114,17 @@ Examples:
                 </associatedArgument>
             </option>
 
+            <option id="interface" maxOccurs="1">
+                <annotation>
+                    Specifies that interface is generated.
+                </annotation>
+                <switch>interface</switch>
+            </option>
+
             <option id="impl" maxOccurs="1">
                 <annotation>
                     Specifies that a dummy service implementation is generated.
+                    
                 </annotation>
                 <switch>impl</switch>
             </option>
