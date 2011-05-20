@@ -319,4 +319,9 @@ public final class HttpUtils {
         }
         return defaultEncoding;
     }
+    
+    public static String getEncoding(MediaType mt, String defaultEncoding) {
+        String charset = mt == null ? "UTF-8" : mt.getParameters().get("charset");
+        return charset == null ? "UTF-8" : charset;
+    }
 }

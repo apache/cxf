@@ -65,15 +65,10 @@ public final class FormUtils {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             IOUtils.copy(is, bos, 1024);
-            return new String(bos.toByteArray(), getCharset(mt));
+            return new String(bos.toByteArray(), HttpUtils.getEncoding(mt, "UTF-8"));
         } catch (Exception ex) {
             throw new WebApplicationException(ex);
         }
-    }
-    
-    private static String getCharset(MediaType mt) {
-        String charset = mt == null ? "UTF-8" : mt.getParameters().get("charset");
-        return charset == null ? "UTF-8" : charset;
     }
     
     public static void populateMapFromString(MultivaluedMap<String, String> params, 

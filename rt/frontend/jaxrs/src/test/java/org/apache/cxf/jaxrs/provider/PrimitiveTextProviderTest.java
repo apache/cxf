@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
@@ -116,10 +117,20 @@ public class PrimitiveTextProviderTest extends Assert {
         byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
         String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
         
-        System.out.println(helloStringISO88591);
-        
         assertEquals(helloStringISO88591, os.toString("ISO-8859-1")); 
     }
     
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadChineeseChars() throws Exception {
+        String s = "中文";
         
+        MessageBodyReader p = new PrimitiveTextProvider();
+        
+        String value = (String)p.readFrom((Class)String.class, null,
+                new Annotation[]{}, 
+                MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null, 
+                new ByteArrayInputStream(s.getBytes("UTF-8")));
+        assertEquals(value, value);
+    }    
 }
