@@ -248,6 +248,21 @@ public class FormEncodingProviderTest extends Assert {
         assertEquals(helloStringISO88591, "name=" + value);
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadChineeseChars() throws Exception {
+        
+        String s = "name=中文";
+        
+        MultivaluedMap<String, String> mvMap = 
+            (MultivaluedMap<String, String>)ferp.readFrom((Class)MultivaluedMap.class, null,
+                new Annotation[]{}, 
+                MediaType.valueOf(MediaType.APPLICATION_FORM_URLENCODED + ";charset=UTF-8"), null, 
+                new ByteArrayInputStream(s.getBytes("UTF-8")));
+        String value = mvMap.getFirst("name");
+        assertEquals(s, "name=" + value);
+    }
+    
     @Test
     public void testReadableMap() {
         assertTrue(ferp.isReadable(MultivaluedMap.class, null, null, null));

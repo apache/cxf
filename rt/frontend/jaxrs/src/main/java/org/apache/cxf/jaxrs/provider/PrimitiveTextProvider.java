@@ -49,7 +49,7 @@ public class PrimitiveTextProvider
                            MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         
         return InjectionUtils.handleParameter(
-                    IOUtils.readStringFromStream(is), 
+                    IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8")), 
                     false,
                     type,
                     anns,
