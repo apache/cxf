@@ -581,6 +581,7 @@
             </sp:EncryptedParts>
             <sp:SignedParts>
                <sp:Body/>
+               <sp:Header Namespace="http://WSSec/saml"/>
             </sp:SignedParts>
          </wsp:All>
       </wsp:ExactlyOne>

@@ -35,8 +35,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
@@ -213,44 +211,26 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         // (in case of a client endpoint) messages
         for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
             EffectivePolicy p = null;
-            if (this.requestor) {
-                p = engine.getEffectiveClientRequestPolicy(ei, boi, 
-                                                           (Conduit)assertor);
-            } else {
+            if (!this.requestor) {
                 p = engine.getEffectiveServerRequestPolicy(ei, boi);
-            }
-            Collection<Assertion> c = engine.getAssertions(p, false);
-            if (c != null) {
-                addAll(vocabulary, c);
-                if (null != faultVocabulary) {
-                    addAll(faultVocabulary, c);
+                Collection<Assertion> c = engine.getAssertions(p, false);
+                if (c != null) {
+                    addAll(vocabulary, c);
                 }
-            }
-            if (this.requestor) {
-                p = engine.getEffectiveClientResponsePolicy(ei, boi);
             } else {
-                p = engine.getEffectiveServerResponsePolicy(ei, boi, 
-                                                            (Destination)assertor);
-            }
-            c = engine.getAssertions(p, false);
-            if (c != null) {
-                addAll(vocabulary, c);
-                if (null != faultVocabulary) {
-                    addAll(faultVocabulary, c);
-                }
-            }
-            if (boi.getFaults() != null) {
-                for (BindingFaultInfo bfi : boi.getFaults()) {
-                    if (this.requestor) {
-                        p = engine.getEffectiveClientFaultPolicy(ei, bfi);
-                    } else {
-                        p = engine.getEffectiveServerFaultPolicy(ei, bfi, 
-                                                                 (Destination)assertor);
+                p = engine.getEffectiveClientResponsePolicy(ei, boi);
+                Collection<Assertion> c = engine.getAssertions(p, false);
+                if (c != null) {
+                    addAll(vocabulary, c);
+                    if (null != faultVocabulary) {
+                        addAll(faultVocabulary, c);
                     }
-                    c = engine.getAssertions(p, false);
-                    if (c != null) {
-                        addAll(vocabulary, c);
-                        if (null != faultVocabulary) {
+                }
+                if (boi.getFaults() != null && null != faultVocabulary) {
+                    for (BindingFaultInfo bfi : boi.getFaults()) {
+                        p = engine.getEffectiveClientFaultPolicy(ei, bfi);
+                        c = engine.getAssertions(p, false);
+                        if (c != null) {
                             addAll(faultVocabulary, c);
                         }
                     }
