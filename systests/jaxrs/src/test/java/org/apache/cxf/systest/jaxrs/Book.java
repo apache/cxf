@@ -68,7 +68,7 @@ public class Book {
     }
     
     @GET
-    public Book getState() {
+    public Book retrieveState() {
         return this;
     }
     
