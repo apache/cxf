@@ -49,11 +49,14 @@ import org.apache.cxf.tools.util.NameUtil;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
+import org.apache.ws.commons.schema.XmlSchemaContent;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaType;
 
 public final class ProcessorUtil {
     private static final String KEYWORDS_PREFIX = "_";
@@ -380,9 +383,41 @@ public final class ProcessorUtil {
         XmlSchemaElement elementByName = schema.getElementByQName(partElement);
         
         XmlSchemaComplexType type = (XmlSchemaComplexType)elementByName.getSchemaType();
-
+        
         XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
        
+        qnames.addAll(createWrappedElements(seq));    
+
+        //If it's extension
+        if (seq == null && type.getContentModel() != null) {
+            
+            XmlSchemaContent xmlSchemaConent = type.getContentModel().getContent();
+            if (xmlSchemaConent instanceof XmlSchemaComplexContentExtension) {
+                XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)type
+                    .getContentModel().getContent();
+                QName baseTypeName = extension.getBaseTypeName();
+                XmlSchemaType schemaType = schema.getTypeByQName(baseTypeName);
+                if (schemaType instanceof XmlSchemaComplexType) {
+                    XmlSchemaComplexType complexType = (XmlSchemaComplexType)schemaType;
+                    if (complexType.getParticle() instanceof XmlSchemaSequence) {
+                        seq = (XmlSchemaSequence)complexType.getParticle();
+                        qnames.addAll(createWrappedElements(seq));
+                    }
+                }
+
+                if (extension.getParticle() instanceof XmlSchemaSequence) {
+                    XmlSchemaSequence xmlSchemaSeq = (XmlSchemaSequence)extension.getParticle();
+                    qnames.addAll(createWrappedElements(xmlSchemaSeq));
+                }
+            }
+
+        }
+        return qnames;
+    }
+
+    private static List<WrapperElement> createWrappedElements(XmlSchemaSequence seq) {
+       
+        List<WrapperElement> qnames = new ArrayList<WrapperElement>();
         if (seq != null) {
 
             XmlSchemaObjectCollection items = seq.getItems();
