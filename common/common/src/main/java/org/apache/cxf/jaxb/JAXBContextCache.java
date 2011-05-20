@@ -258,6 +258,7 @@ public final class JAXBContextCache {
             ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
         } catch (JAXBException ex) {
             if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")
+                && ex.getMessage() != null
                 && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
                 map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
                         map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
