@@ -66,6 +66,14 @@ public class OsgiServletTest extends Assert {
     private static final QName QNAME = new QName(ADDRESS, "foobar");
     private static final String PATH = "/SoapContext/SoapPort";
     private static final String URI = "/cxf" + PATH;
+    private static final String[] REGISTERED_PATHS = {"/soap", "/soap2", "/soappath", "/soap/test",
+                                                      "/test/tst"};
+    private static final String[] REQUEST_PATHS = {"/soap", "/soap/2", "/soap2", "/soap3", 
+                                                   "/soap/test", "/soap/tst", "/soap/", "/test/tst/2", 
+                                                   "/test/2"};
+    private static final int[] MATCHED_PATH_INDEXES = {0, 0, 1, -1, 
+                                                       3, 0, 0, 4, 
+                                                       -1};
     private static final String SERVICES = "/cxf/services";
     private static final String QUERY = "wsdl";
     private static final String VERB = "POST";
@@ -79,6 +87,7 @@ public class OsgiServletTest extends Assert {
     private Bus bus;
     private OsgiDestinationRegistryIntf registry;
     private OsgiDestination destination;
+    private OsgiDestination nodestination;
     private ServletConfig config;
     private ServletContext context;
     private HttpServletRequest request;
@@ -96,6 +105,7 @@ public class OsgiServletTest extends Assert {
         bus = control.createMock(Bus.class);
         registry = control.createMock(OsgiDestinationRegistryIntf.class);
         destination = control.createMock(OsgiDestination.class);
+        nodestination = control.createMock(OsgiDestination.class);
         context = control.createMock(ServletContext.class);
         config = control.createMock(ServletConfig.class);
         request = control.createMock(HttpServletRequest.class);
@@ -119,6 +129,7 @@ public class OsgiServletTest extends Assert {
         bus = null;
         registry = null;
         destination = null;
+        nodestination = null;
         context = null;
         config = null;
         request = null;
@@ -224,6 +235,40 @@ public class OsgiServletTest extends Assert {
         control.verify();
     }
 
+    @Test
+    public void testDestinationDetermination() throws Exception {
+        for (int i = 0; i < REQUEST_PATHS.length; i++) {
+            setUpPathRegistrationAndRequest(i);
+            final int mi = MATCHED_PATH_INDEXES[i];
+            if (mi < 0) {
+                // add the dummy path
+                EasyMock.expect(destination.getAddress())
+                    .andReturn(EndpointReferenceUtils.getEndpointReference(PATH)).anyTimes();
+                setUpResponse(404, TEXT, NO_SERVICE);
+            } else {
+                // add the correct path
+                EasyMock.expect(destination.getAddress())
+                    .andReturn(EndpointReferenceUtils.getEndpointReference(REGISTERED_PATHS[mi])).anyTimes();
+
+                // add the artifacts needed for updateDests() if a fallback occurs 
+                if (!REQUEST_PATHS[i].equals(REGISTERED_PATHS[mi])) {
+                    EasyMock.expect(request.getContextPath()).andReturn("");
+                    EasyMock.expect(request.getServletPath()).andReturn("/cxf");
+                }
+            }
+        
+            control.replay();
+
+            OsgiServlet servlet = setUpServlet();
+
+            servlet.invoke(request, response);
+
+            control.verify();
+
+            control.reset();
+        }
+    }
+    
     private void setUpRequest(String requestURI,
                               String path,
                               int destinationCount) throws Exception {
@@ -363,5 +408,26 @@ public class OsgiServletTest extends Assert {
             // ignore
         }
         return servlet;
+    }
+
+    private void setUpPathRegistrationAndRequest(int index) throws Exception {
+        String requestURI = "/cxf" + REQUEST_PATHS[index];
+        EasyMock.expect(request.getRequestURI()).andReturn(requestURI).anyTimes();
+        StringBuffer url = new StringBuffer(ROOT + requestURI);
+        EasyMock.expect(request.getRequestURL()).andReturn(url).anyTimes();
+        EasyMock.expect(request.getQueryString()).andReturn(QUERY).anyTimes();
+        EasyMock.expect(request.getPathInfo()).andReturn(REQUEST_PATHS[index]).anyTimes();
+        EasyMock.expect(destination.getEndpointInfo()).andReturn(endpoint).anyTimes();
+        EasyMock.expect(nodestination.getEndpointInfo()).andReturn(endpoint).anyTimes();
+        EasyMock.expect(destination.getBus()).andReturn(bus).anyTimes();
+        EasyMock.expect(destination.getMessageObserver()).andReturn(observer).anyTimes();        
+
+        int matched = MATCHED_PATH_INDEXES[index];
+        EasyMock.expect(registry.getDestinationsPaths()).andReturn(paths).anyTimes();
+        for (int i = 0; i < REGISTERED_PATHS.length; i++) {
+            paths.add(REGISTERED_PATHS[i]);
+            EasyMock.expect(registry.getDestinationForPath(REGISTERED_PATHS[i]))
+                .andReturn(matched == i ? destination : nodestination).anyTimes();
+        }
     }
 }

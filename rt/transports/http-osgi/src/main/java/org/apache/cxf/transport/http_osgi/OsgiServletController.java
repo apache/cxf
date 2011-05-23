@@ -166,15 +166,21 @@ public class OsgiServletController extends AbstractServletController {
     }
 
     private OsgiDestination checkRestfulRequest(HttpServletRequest request) throws IOException {
+        int len = -1;
+        OsgiDestination ret = null;
 
         String address = request.getPathInfo() == null ? "" : request.getPathInfo();
 
         for (String path : servlet.getTransport().getDestinationsPaths()) {
-            if (address.startsWith(path)) {
-                return servlet.getTransport().getDestinationForPath(path);
+            if ((address.equals(path) 
+                || (address.length() > path.length() 
+                    && address.startsWith(path) && address.charAt(path.length()) == '/'))
+                && path.length() > len) {
+                ret = servlet.getTransport().getDestinationForPath(path);
+                len = path.length();
             }
         }
-        return null;
+        return ret;
     }
 
     protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
