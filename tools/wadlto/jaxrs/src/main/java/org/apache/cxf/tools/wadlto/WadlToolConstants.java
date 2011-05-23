@@ -31,10 +31,10 @@ public final class WadlToolConstants {
      * Default
      */
     public static final String CFG_INTERFACE = ToolConstants.CFG_INTERFACE;
-    public static final String CFG_SERVER = ToolConstants.CFG_SERVER;
+    public static final String CFG_IMPL = ToolConstants.CFG_IMPL;
     public static final String CFG_TYPES = ToolConstants.CFG_TYPES;
     public static final String CFG_PACKAGENAME = ToolConstants.CFG_PACKAGENAME;
-    public static final String CFG_TYPES_PACKAGENAME = "typesPackagename";
+    public static final String CFG_SCHEMA_PACKAGENAME = "schemaPackagename";
     public static final String CFG_RESOURCENAME = "resourcename";
     
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;

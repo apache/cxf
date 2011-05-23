@@ -35,6 +35,7 @@
         <module>codegen-plugin</module>
         <module>java2ws-plugin</module>
         <module>wsdl-validator-plugin</module>
+        <module>wadl2java-plugin</module> 
         <module>corba</module>
         <module>archetypes</module>
     </modules>

@@ -99,11 +99,11 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         
         SourceGenerator sg = new SourceGenerator();
         sg.setBus(getBus());
-        boolean isInterface = context.optionSet(WadlToolConstants.CFG_INTERFACE);
-        boolean isServer = context.optionSet(WadlToolConstants.CFG_SERVER);
-        if (isServer) {
-            sg.setGenerateInterfaces(isInterface);
-            sg.setGenerateImplementation(true);
+
+        boolean generateImpl = context.optionSet(WadlToolConstants.CFG_IMPL);
+        sg.setGenerateImplementation(generateImpl);
+        if (generateImpl) {
+            sg.setGenerateInterfaces(context.optionSet(WadlToolConstants.CFG_INTERFACE));
         }
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
@@ -172,7 +172,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     // org.apache.cxf.tools.wsdlto.databinding.jaxb ?
     private void setPackageAndNamespaces() {
         String[] schemaPackageNamespaces = new String[]{};
-        Object value = context.get(WadlToolConstants.CFG_TYPES_PACKAGENAME);
+        Object value = context.get(WadlToolConstants.CFG_SCHEMA_PACKAGENAME);
         if (value != null) {
             schemaPackageNamespaces = value instanceof String ? new String[]{(String)value}
                                                    : (String[])value;
@@ -188,7 +188,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                 // this is the default schema package name
                 // if CFG_PACKAGENAME is set then it's only used for JAX-RS resource 
                 // classes
-                context.put(WadlToolConstants.CFG_TYPES_PACKAGENAME, packagename);
+                context.put(WadlToolConstants.CFG_SCHEMA_PACKAGENAME, packagename);
             }
         }
         

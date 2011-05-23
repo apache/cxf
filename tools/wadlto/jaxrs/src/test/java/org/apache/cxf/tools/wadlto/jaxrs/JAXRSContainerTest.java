@@ -218,7 +218,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_PACKAGENAME, "custom.books.service");
-            context.put(WadlToolConstants.CFG_TYPES_PACKAGENAME, "http://superbooks=custom.books.schema");
+            context.put(WadlToolConstants.CFG_SCHEMA_PACKAGENAME, "http://superbooks=custom.books.schema");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);
@@ -243,7 +243,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
-            context.put(WadlToolConstants.CFG_SERVER, "true");
+            context.put(WadlToolConstants.CFG_IMPL, "true");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);
@@ -268,7 +268,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_INTERFACE, "true");
-            context.put(WadlToolConstants.CFG_SERVER, "true");
+            context.put(WadlToolConstants.CFG_IMPL, "true");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);

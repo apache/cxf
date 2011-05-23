@@ -43,7 +43,7 @@ Examples:
                 </associatedArgument>
             </option>
             
-            <option id="typePackagename" maxOccurs="unbounded">
+            <option id="schemaPackagename" maxOccurs="unbounded">
                 <annotation>
                     Specifies the java package name to use for the generated code
                     representing WADL grammar elements.
