@@ -80,6 +80,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
         AbstractHTTPDestination ret = null;
         for (String path : getDestinationsPaths()) {           
             if ((address.equals(path) 
+                || "/".equals(path)
                 || (address.length() > path.length() 
                     && address.startsWith(path) && address.charAt(path.length()) == '/'))
                 && path.length() > len) {
