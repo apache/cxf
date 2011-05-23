@@ -42,6 +42,10 @@ public class DelegatingInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
+        int x = is.read();
+        while (x != -1) {
+            x = is.read();
+        }
         is.close();
         if (!isClosed && deserializer != null) {
             deserializer.markClosed(this);
