@@ -173,6 +173,7 @@ public class OsgiServletController extends AbstractServletController {
 
         for (String path : servlet.getTransport().getDestinationsPaths()) {
             if ((address.equals(path) 
+                || "/".equals(path)
                 || (address.length() > path.length() 
                     && address.startsWith(path) && address.charAt(path.length()) == '/'))
                 && path.length() > len) {
