@@ -145,7 +145,13 @@ public class XmlBeansDataBinding extends AbstractDataBinding implements WrapperC
             try {
                 getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES);
             } catch (NoSuchMethodException ex) {
-                //ignore for now
+                try {
+                    getMethod = valueClass.getMethod(getAccessor + "Array", AbstractWrapperHelper.NO_CLASSES);
+                    getAccessor += "Array";
+                    setAccessor += "Array";
+                } catch (NoSuchMethodException ex2) {
+                    //ignore for now
+                }
             }
                         
             for (Method method : allMethods) {

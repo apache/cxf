@@ -76,5 +76,10 @@ public class GreeterImpl implements Greeter {
         throw new PingMeFault("PingMeFault raised by server", faultDocument);
     }
 
-    
+    public String[] sayHiArray(String requests[]) {
+        String ret[] = new String[requests.length + 1];
+        ret[0] = "Hello";
+        System.arraycopy(requests, 0, ret, 1, requests.length);
+        return ret;
+    }
 }

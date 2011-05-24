@@ -137,6 +137,10 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         
         resp = port.greetMe("Willem");
         assertEquals("We should get the right response", "Hello Willem", resp);
+        
+        String aresp[] = port.sayHiArray(new String[] {"Dan"});
+        assertEquals("Hello", aresp[0]);
+        assertEquals("Dan", aresp[1]);
 
         try {
             port.greetMe("fault");
