@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -56,7 +57,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class));
+                   launchServer(BookServerSpring.class, true));
     }
     
     @Test
@@ -67,6 +68,22 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(new Long(1), id);
         Book book = wc.accept("application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
+    }
+    
+    @Test
+    public void testPostGeneratedBook() throws Exception {
+        String baseAddress = "http://localhost:" + PORT + "/the/generated/bookstore/books/1";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setMarshallAsJaxbElement(true);
+        WebClient wc = WebClient.create(baseAddress,
+                                        Collections.singletonList(provider));
+        wc.type("application/xml");
+        
+        org.apache.cxf.systest.jaxrs.codegen.schema.Book book = 
+            new org.apache.cxf.systest.jaxrs.codegen.schema.Book();
+        book.setId(123);
+        Response r = wc.post(book);
+        assertEquals(204, r.getStatus());
     }
     
     @Test

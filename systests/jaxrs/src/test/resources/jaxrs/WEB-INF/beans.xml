@@ -182,6 +182,19 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
+  <jaxrs:server id="bookserviceGenerated" address="/generated">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.codegen.service.BookStore"/>
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+       <ref bean="jaxbProviderForTypes"/>
+    </jaxrs:providers>
+  </jaxrs:server>
+
+  <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+      <property name="unmarshallAsJaxbElement" value="true"/>
+  </bean>
+
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>
   </bean>

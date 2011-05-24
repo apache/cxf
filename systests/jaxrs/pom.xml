@@ -30,39 +30,11 @@
     <name>Apache CXF JAX-RS System Tests</name>
     <version>2.4.1-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <profiles>
-        <profile>
-            <id>ibmjdk</id>
-            <activation>
-                <property>
-                    <name>java.vendor</name>
-                    <value>IBM Corporation</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-ejb_3.0_spec</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    
+    <properties>
+        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>xalan</groupId>
@@ -342,7 +314,70 @@
           <version>1.2.0</version>
         </dependency>
     </dependencies>
-    <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
-    </properties>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-wadl2java-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                            <wadlOptions>
+                                <wadlOption>
+                                    <wadl>${basedir}/src/test/resources/wadl/bookstoreImport.xml</wadl>
+                                    <impl>true</impl>
+                                    
+                                    <packagename>org.apache.cxf.systest.jaxrs.codegen.service</packagename>
+                                    <schemaPackagenames>
+                                       <schemaPackagename>http://superbooks=org.apache.cxf.systest.jaxrs.codegen.schema</schemaPackagename>
+                                    </schemaPackagenames>
+                                    
+                                </wadlOption>
+                            </wadlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wadl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <profiles>
+        <profile>
+            <id>ibmjdk</id>
+            <activation>
+                <property>
+                    <name>java.vendor</name>
+                    <value>IBM Corporation</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-ejb_3.0_spec</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    
+    
 </project>
