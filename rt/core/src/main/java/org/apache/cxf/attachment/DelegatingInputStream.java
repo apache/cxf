@@ -23,6 +23,8 @@ package org.apache.cxf.attachment;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.helpers.IOUtils;
+
 public class DelegatingInputStream extends InputStream {
     private InputStream is;
     private AttachmentDeserializer deserializer;
@@ -42,10 +44,7 @@ public class DelegatingInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
-        int x = is.read();
-        while (x != -1) {
-            x = is.read();
-        }
+        IOUtils.consume(is);
         is.close();
         if (!isClosed && deserializer != null) {
             deserializer.markClosed(this);
