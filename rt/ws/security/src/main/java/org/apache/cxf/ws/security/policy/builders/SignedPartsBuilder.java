@@ -61,6 +61,14 @@ public class SignedPartsBuilder implements AssertionBuilder {
             nd = nd.getNextSibling();
         }
         
+        //
+        // If SignedParts is empty then default to signing the SOAP Body
+        //
+        if (!signedEncryptedParts.isBody() && !signedEncryptedParts.isAttachments()
+            && signedEncryptedParts.getHeaders().isEmpty()) {
+            signedEncryptedParts.setBody(true);
+        }
+        
         return signedEncryptedParts;
     }
 
