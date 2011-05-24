@@ -235,6 +235,30 @@ public final class IOUtils {
         in.close();
         return bout.createInputStream();
     }
+    
+    public static void consume(InputStream in) throws IOException {
+        int i = in.available();
+        if (i == 0) {
+            //if i is 0, then we MAY have already hit the end of the stream
+            //so try a read and return rather than allocate a buffer and such 
+            int i2 = in.read();
+            if (i2 == -1) {
+                return;
+            }
+            //reading the byte may have caused a buffer to fill
+            i = in.available();
+        }
+        if (i < DEFAULT_BUFFER_SIZE) {
+            i = DEFAULT_BUFFER_SIZE;
+        }
+        if (i > 65536) {
+            i = 65536;
+        }
+        byte bytes[] = new byte[i];
+        while (in.read(bytes) != -1) {
+            //nothing - just discarding
+        }
+    }
 
     public static byte[] readBytesFromStream(InputStream in) throws IOException {
         int i = in.available();
