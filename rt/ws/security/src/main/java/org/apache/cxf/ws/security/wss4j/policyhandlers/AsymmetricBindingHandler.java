@@ -406,6 +406,11 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         sigToken = wrapper.getToken();
         sigParts.addAll(this.getSignedParts());
         if (sigParts.isEmpty()) {
+            // Add the BST to the security header if required
+            if (!attached && includeToken(sigToken.getInclusion())) {
+                WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
+                sig.prependBSTElementToHeader(secHeader);
+            } 
             return;
         }
         if (sigToken.isDerivedKeys()) {
