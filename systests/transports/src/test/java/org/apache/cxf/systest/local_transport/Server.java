@@ -19,10 +19,12 @@
 
 package org.apache.cxf.systest.local_transport;
 
+import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.hello_world_soap_http.GreeterImpl;
+import org.apache.hello_world_soap_http.BaseGreeterImpl;
 
 public class Server extends AbstractBusTestServerBase {
 
@@ -43,6 +45,18 @@ public class Server extends AbstractBusTestServerBase {
         } finally {
             System.out.println("done!");
         }
+    }
+    
+
+    @WebService(serviceName = "SOAPService",
+                portName = "SoapPort",
+                endpointInterface = "org.apache.hello_world_soap_http.Greeter",
+                targetNamespace = "http://apache.org/hello_world_soap_http",
+                wsdlLocation = "testutils/hello_world.wsdl")
+    @GZIP(threshold = 50)            
+    public class GreeterImpl extends BaseGreeterImpl {
+
+
     }
 }
 

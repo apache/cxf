@@ -106,6 +106,11 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.PREPARE_SEND);
         addAfter(MessageSenderInterceptor.class.getName());
     }
+    public GZIPOutInterceptor(int threshold) {
+        super(Phase.PREPARE_SEND);
+        addAfter(MessageSenderInterceptor.class.getName());
+        this.threshold = threshold;
+    }
 
     public void setThreshold(int threshold) {
         this.threshold = threshold;

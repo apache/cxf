@@ -93,9 +93,11 @@ public class LocalConduit extends AbstractConduit {
         
         OutputStream out = message.getContent(OutputStream.class);
         out.flush();
+        out.close();
         
         CachedOutputStream stream = message.get(CachedOutputStream.class);
         copy.setContent(InputStream.class, stream.getInputStream());
+        copy.removeContent(CachedOutputStream.class);
 
         // Create a new incoming exchange and store the original exchange for the response
         ExchangeImpl ex = new ExchangeImpl();

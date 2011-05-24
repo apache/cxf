@@ -30,7 +30,11 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.common.gzip.GZIPInInterceptor;
+import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.hello_world_soap_http.Greeter;
 
@@ -71,6 +75,9 @@ public class DirectDispatchClientTest extends AbstractBusClientServerTestBase {
         Greeter greeter = service.getPort(localPortName, Greeter.class);
         
         if (isDirectDispatch) {
+            Client client = ClientProxy.getClient(greeter);
+            client.getOutInterceptors().add(new GZIPOutInterceptor(50));
+            client.getInInterceptors().add(new GZIPInInterceptor());
             InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
             BindingProvider  bp = null;
             if (handler instanceof BindingProvider) {
