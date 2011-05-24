@@ -76,6 +76,7 @@ import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
 import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
@@ -467,7 +468,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             
             //stuff we can default to asserted and un-assert if a condition isn't met
             assertPolicy(aim, SP12Constants.KEYVALUE_TOKEN);
-            assertPolicy(aim, SP12Constants.X509_TOKEN);
 
             message.put(WSHandlerConstants.ACTION, action.trim());
         }
@@ -624,6 +624,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         assertAsymetricBinding(aim, msg, prots, hasDerivedKeys);
         assertSymetricBinding(aim, msg, prots, hasDerivedKeys);
         assertTransportBinding(aim);
+        
+        X509TokenPolicyValidator x509Validator = new X509TokenPolicyValidator(msg, results);
+        x509Validator.validatePolicy(aim);
         
         //REVISIT - probably can verify some of these like if UT is encrypted and/or signed, etc...
         assertPolicy(aim, SP12Constants.SIGNED_SUPPORTING_TOKENS);
