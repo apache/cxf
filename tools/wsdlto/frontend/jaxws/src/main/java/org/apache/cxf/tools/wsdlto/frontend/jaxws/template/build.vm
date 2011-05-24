@@ -112,16 +112,22 @@
     <target name="$targetName" description="Run $clientClassNamesMap.get($targetName)" depends="compile">
         <property name="param" value=""/>
         <cxfrun classname="$clientClassNamesMap.get($targetName)"
-                   param1="$wsdlLocation"
-                   param2="${op}"
-                   param3="${param}"/>
+#if ($wsdlLocation.startsWith("classpath:"))
+                   />    
+#else
+                   param1="$wsdlLocation"/>
+#end
     </target>
 #end
 
 #foreach ($target in $serverClassNamesMap.keySet())
     <target name="${target}" description="Run $serverClassNamesMap.get($target)" depends="compile">
         <cxfrun classname="$serverClassNamesMap.get($target)"
+#if ($wsdlLocation.startsWith("classpath:"))
+                   />    
+#else
                    param1="$wsdlLocation"/>
+#end
     </target>
 #end
 
