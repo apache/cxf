@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.AbstractDescriptionElement;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -169,9 +170,31 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider
         if (null == ex || null == di) {
             return null;
         }
+        
+        if (di.getProperty("registeredPolicy") == null) {
+            List<UnknownExtensibilityElement> diext = 
+                di.getExtensors(UnknownExtensibilityElement.class);
+            if (diext != null) {
+                for (UnknownExtensibilityElement e : diext) {
+                    String uri = e.getElement().getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                                  PolicyConstants.WSU_ID_ATTR_NAME);
+                    
+                    if (PolicyConstants.isPolicyElem(e.getElementType())
+                        && !StringUtils.isEmpty(uri)) {
+                        Policy policy = builder.getPolicy(e.getElement());
+                        String fragement = "#" + uri;
+                        registry.register(fragement, policy);
+                        registry.register(di.getBaseURI() + fragement, policy);
+                    }
+                }
+            }
+            di.setProperty("registeredPolicy", true);
+        }
+        
         Policy elementPolicy = null;
         List<UnknownExtensibilityElement> extensions = 
             ex.getExtensors(UnknownExtensibilityElement.class);
+        
         if (null != extensions) {
             for (UnknownExtensibilityElement e : extensions) {
                 Policy p = null;
@@ -242,6 +265,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider
         if (null != resolved) {
             return resolved;
         }
+        
         ReferenceResolver resolver = new LocalServiceModelReferenceResolver(di, builder);
         resolved = resolver.resolveReference(uri);
         if (null != resolved) {
