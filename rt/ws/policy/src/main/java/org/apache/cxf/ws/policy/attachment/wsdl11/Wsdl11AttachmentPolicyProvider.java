@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
 import javax.wsdl.extensions.ExtensibilityElement;
@@ -31,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.AbstractDescriptionElement;
@@ -60,6 +62,7 @@ import org.apache.neethi.PolicyReference;
 @NoJSR250Annotations
 public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider 
     implements PolicyProvider {
+    private static final Logger LOG = LogUtils.getL7dLogger(Wsdl11AttachmentPolicyProvider.class);
 
     public Wsdl11AttachmentPolicyProvider() {
         this(null);
@@ -181,10 +184,15 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider
                     
                     if (PolicyConstants.isPolicyElem(e.getElementType())
                         && !StringUtils.isEmpty(uri)) {
-                        Policy policy = builder.getPolicy(e.getElement());
-                        String fragement = "#" + uri;
-                        registry.register(fragement, policy);
-                        registry.register(di.getBaseURI() + fragement, policy);
+                        try {
+                            Policy policy = builder.getPolicy(e.getElement());
+                            String fragement = "#" + uri;
+                            registry.register(fragement, policy);
+                            registry.register(di.getBaseURI() + fragement, policy);
+                        } catch (Exception policyEx) {
+                            //ignore the policy can not be built
+                            LOG.warning("Failed to build the policy '" + uri + "':" + policyEx.getMessage());
+                        }
                     }
                 }
             }
