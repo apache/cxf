@@ -100,4 +100,27 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="Asymmetric"
+       address="http://localhost:9001/DoubleItX509Asymmetric" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricIssuerSerialPort"
+       xmlns:s="http://WSSec/x509"
+       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.encryption.username" value="alice"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>
