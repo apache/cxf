@@ -74,7 +74,10 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testPostGeneratedBook() throws Exception {
         String baseAddress = "http://localhost:" + PORT + "/the/generated/bookstore/books/1";
         JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setMarshallAsJaxbElement(true);
+        provider.setJaxbElementClassMap(Collections.singletonMap(
+                                          "org.apache.cxf.systest.jaxrs.codegen.schema.Book", 
+                                          "{http://superbooks}thebook"));
+        
         WebClient wc = WebClient.create(baseAddress,
                                         Collections.singletonList(provider));
         wc.type("application/xml");

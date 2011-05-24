@@ -30,7 +30,7 @@
      
      <method name="POST" id="addBook">
       <request>
-       <representation mediaType="application/xml" element="prefix1:thebook2"/>
+       <representation mediaType="application/xml" element="prefix1:thebook"/>
       </request>
      </method>
     </resource>

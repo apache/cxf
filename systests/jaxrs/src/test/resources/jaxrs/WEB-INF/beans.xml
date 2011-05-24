@@ -193,7 +193,12 @@ http://cxf.apache.org/schemas/core.xsd">
 
   <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="unmarshallAsJaxbElement" value="true"/>
+      <property name="schemaLocations" ref="theSchemaLocations"/>
   </bean>
+
+  <util:list id="theSchemaLocations">
+    <value>classpath:/wadl/schemas/book.xsd</value>
+  </util:list>
 
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>

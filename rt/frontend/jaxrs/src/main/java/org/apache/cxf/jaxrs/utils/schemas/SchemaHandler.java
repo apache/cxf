@@ -20,9 +20,9 @@
 package org.apache.cxf.jaxrs.utils.schemas;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -68,13 +68,15 @@ public class SchemaHandler {
         try {
             List<Source> sources = new ArrayList<Source>();
             for (String loc : locations) {
-                InputStream is = ResourceUtils.getResourceStream(loc, bus);
-                if (is == null) {
+                URL url = ResourceUtils.getResourceURL(loc, bus);
+                if (url == null) {
                     return null;
                 }
                 Reader r = new BufferedReader(
-                               new InputStreamReader(is, "UTF-8"));
-                sources.add(new StreamSource(r));
+                               new InputStreamReader(url.openStream(), "UTF-8"));
+                StreamSource source = new StreamSource(r);
+                source.setSystemId(url.toString());
+                sources.add(source);
             }
             s = factory.newSchema(sources.toArray(new Source[]{}));
         } catch (Exception ex) {

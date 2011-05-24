@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
@@ -28,6 +27,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -381,11 +381,16 @@ public final class ResourceUtils {
     }
     
     public static InputStream getResourceStream(String loc, Bus bus) throws Exception {
-        InputStream is = null;
+        URL url = getResourceURL(loc, bus);
+        return url == null ? null : url.openStream();
+    }
+    
+    public static URL getResourceURL(String loc, Bus bus) throws Exception {
+        URL url = null;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
-            is = ResourceUtils.getClasspathResourceStream(path, ResourceUtils.class, bus);
-            if (is == null) {
+            url = ResourceUtils.getClasspathResourceURL(path, ResourceUtils.class, bus);
+            if (url == null) {
                 LOG.warning("No classpath resource " + loc + " is available on classpath");
                 return null;
             }
@@ -396,20 +401,29 @@ public final class ResourceUtils {
                 LOG.warning("No file resource " + loc + " is available on local disk");
                 return null;
             }
-            is = new FileInputStream(f);
+            url = f.toURI().toURL();
         }
-        return is;
+        return url;
     }
     
     public static InputStream getClasspathResourceStream(String path, Class<?> callingClass, Bus bus) {
         InputStream is = ClassLoaderUtils.getResourceAsStream(path, callingClass);
-        if (is == null && bus != null) {
+        return is == null ? getResource(path, InputStream.class, bus) : is;
+    }
+    
+    public static URL getClasspathResourceURL(String path, Class<?> callingClass, Bus bus) {
+        URL url = ClassLoaderUtils.getResource(path, callingClass);
+        return url == null ? getResource(path, URL.class, bus) : url;
+    }
+    
+    public static <T> T getResource(String path, Class<T> resourceClass, Bus bus) {
+        if (bus != null) {
             ResourceManager rm = bus.getExtension(ResourceManager.class);
             if (rm != null) {
-                is = rm.getResourceAsStream(path);
+                return rm.resolveResource(path, resourceClass);
             }
         }
-        return is;
+        return null;
     }
     
     public static List<UserResource> getUserResources(String loc) {
