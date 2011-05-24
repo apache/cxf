@@ -669,14 +669,24 @@ public class HTTPConduit
         
 
         message.setContent(OutputStream.class, 
-                           new WrappedOutputStream(
-                                   message, connection,
-                                   needToCacheRequest, 
-                                   isChunking,
-                                   chunkThreshold));
+                           createOutputStream(message, connection,
+                                              needToCacheRequest, 
+                                              isChunking,
+                                              chunkThreshold));
         // We are now "ready" to "send" the message. 
     }
-    
+
+    protected OutputStream createOutputStream(Message message, 
+                                              HttpURLConnection connection,
+                                              boolean needToCacheRequest, 
+                                              boolean isChunking,
+                                              int chunkThreshold) {
+        return new WrappedOutputStream(message, connection,
+                                       needToCacheRequest, 
+                                       isChunking,
+                                       chunkThreshold);
+    }
+
     public void close(Message msg) throws IOException {
 
         InputStream in = msg.getContent(InputStream.class);
