@@ -53,7 +53,6 @@ import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.util.component.Container;
-import org.eclipse.jetty.util.thread.OldQueuedThreadPool;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
@@ -461,21 +460,27 @@ public class JettyHTTPServerEngine
                 pool = new QueuedThreadPool();
                 aconn.setThreadPool(pool);
             }
-            if (pool instanceof OldQueuedThreadPool) {
-                OldQueuedThreadPool pl = (OldQueuedThreadPool)pool;
-                if (getThreadingParameters().isSetMinThreads()) {
-                    pl.setMinThreads(getThreadingParameters().getMinThreads());
-                }
-                if (getThreadingParameters().isSetMaxThreads()) {
-                    pl.setMaxThreads(getThreadingParameters().getMaxThreads());
-                }
-            } else if (pool instanceof QueuedThreadPool) {
+            if (pool instanceof QueuedThreadPool) {
                 QueuedThreadPool pl = (QueuedThreadPool)pool;
                 if (getThreadingParameters().isSetMinThreads()) {
                     pl.setMinThreads(getThreadingParameters().getMinThreads());
                 }
                 if (getThreadingParameters().isSetMaxThreads()) {
                     pl.setMaxThreads(getThreadingParameters().getMaxThreads());
+                }
+            } else {
+                try {
+                    if (getThreadingParameters().isSetMinThreads()) {
+                        pool.getClass().getMethod("setMinThreads", Integer.TYPE)
+                            .invoke(pool, getThreadingParameters().getMinThreads());
+                    }
+                    if (getThreadingParameters().isSetMinThreads()) {
+                        pool.getClass().getMethod("setMaxThreads", Integer.TYPE)
+                            .invoke(pool, getThreadingParameters().getMaxThreads());
+                    }
+                } catch (Throwable t) {
+                    //ignore - this won't happen for Jetty 7.1 - 7.2 and 7.3 and newer 
+                    //will be instanceof QueuedThreadPool above
                 }
             }
         }
