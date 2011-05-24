@@ -167,7 +167,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     }
     
     void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
-        awaitMessages(5, 7, 10000);
+        awaitMessages(5, 8, 10000);
         
         int nDone = 0;
         for (int i = 0; i < 3; i++) {
@@ -188,7 +188,6 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         // mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
         // mf.verifyAcknowledgements(new boolean[] {false, false, true, false}, true);
         
-        Thread.sleep(5000);
         mf.verifyPartialResponses(5);
         mf.purgePartialResponses();
         expectedActions = new String[] {RMConstants.getCreateSequenceResponseAction(),
@@ -240,6 +239,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     void verifyRetransmissionQueue() throws Exception {
         awaitMessages(2, 5, 60000);
         
+        Thread.sleep(5000);
         boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
         assertTrue("Retransmission Queue is not empty", empty);
     }
