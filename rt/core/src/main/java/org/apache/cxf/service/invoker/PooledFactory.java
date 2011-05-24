@@ -46,7 +46,7 @@ public class PooledFactory implements Factory {
         this(new PerRequestFactory(svcClass), max, false);
     }
     /**
-     * Pool of instances contructed from the given factory
+     * Pool of instances constructed from the given factory
      * @param factory
      * @param max the absolute maximum number to create and pool
      */
@@ -55,7 +55,7 @@ public class PooledFactory implements Factory {
     }
 
     /**
-     * Pool of instances contructed from the given factory
+     * Pool of instances constructed from the given factory
      * @param factory
      * @param max the absolute maximum number to create and pool
      * @param createMore If the pool is empty, but max objects have already 
@@ -76,7 +76,7 @@ public class PooledFactory implements Factory {
     
     /**
      * Pool constructed from the give Collection of objects. 
-     * @param objs The collection of objects to pre-polulate the pool
+     * @param objs The collection of objects to pre-populate the pool
      */
     public PooledFactory(Collection<Object> objs) {
         pool = new ArrayBlockingQueue<Object>(objs.size(), true);
