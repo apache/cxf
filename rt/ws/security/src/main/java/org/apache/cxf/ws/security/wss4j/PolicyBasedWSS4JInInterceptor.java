@@ -542,8 +542,18 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
         
-        assertTokens(aim, SP12Constants.SIGNED_PARTS, signed, msg, doc, CoverageType.SIGNED);
-        assertTokens(aim, SP12Constants.ENCRYPTED_PARTS, encrypted, msg, doc, CoverageType.ENCRYPTED);
+        //
+        // SIGNED_PARTS and ENCRYPTED_PARTS only apply to non-Transport bindings
+        //
+        if (!isTransportBinding(aim)) {
+            assertTokens(
+                aim, SP12Constants.SIGNED_PARTS, signed, msg, doc, CoverageType.SIGNED
+            );
+            assertTokens(
+                aim, SP12Constants.ENCRYPTED_PARTS, encrypted, msg, doc, 
+                CoverageType.ENCRYPTED
+            );
+        }
         assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, msg, doc,
                 CoverageType.SIGNED, CoverageScope.ELEMENT);
         assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, doc,
@@ -698,6 +708,22 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
         assertPolicy(aim, SP12Constants.SIGNED_PARTS);
         return !assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
+    }
+    
+    private boolean isTransportBinding(AssertionInfoMap aim) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais != null && ais.size() > 0) {
+            ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+            if (ais != null && ais.size() > 0) {
+                return false;
+            }
+            ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+            if (ais != null && ais.size() > 0) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
 }
