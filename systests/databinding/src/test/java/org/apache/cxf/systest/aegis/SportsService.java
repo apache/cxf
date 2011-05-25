@@ -20,15 +20,27 @@
 package org.apache.cxf.systest.aegis;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jws.WebService;
 
 @WebService(targetNamespace = "http://cxf.apache.org/systest/aegis/sports")
 public interface SportsService {
     Collection<Team> getTeams();
-    
-    String testForMinOccurs0(String a, Integer b, String c);
-    AttributeBean getAttributeBean();
-    BeanWithCharacter getCharBean();
-}
 
+    String testForMinOccurs0(String a, Integer b, String c);
+
+    AttributeBean getAttributeBean();
+
+    BeanWithCharacter getCharBean();
+
+    public class CustomerMap extends HashMap<String, Map<Integer, Integer>> {
+        private static final long serialVersionUID = 6235169270166551322L;
+    }
+
+    public class SimpleMapResult extends HashMap<String, Integer> {
+    }
+
+    Map<String, Map<Integer, Integer>> testComplexMapResult();
+}
