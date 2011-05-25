@@ -39,6 +39,7 @@ import org.junit.Test;
 
 
 public class DigestAuthTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(DigestServer.class);
 
     private final QName serviceName = 
         new QName("http://apache.org/hello_world", "SOAPService");
@@ -63,7 +64,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
         
-        setAddress(mortimer, "http://localhost:9000/digestauth/greeter");
+        setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
         
         Client client = ClientProxy.getClient(mortimer);
         
@@ -92,7 +93,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
         
-        setAddress(mortimer, "http://localhost:9000/digestauth/greeter");
+        setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
 
         try {
             String answer = mortimer.sayHi();

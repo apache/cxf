@@ -39,7 +39,7 @@
         </cxf:features>
     </cxf:bus>
     
-    <http:conduit name="https://localhost:9009/.*">
+    <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>

@@ -28,7 +28,7 @@ import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 
 public class GzipServer extends AbstractBusTestServerBase {
-    public static final String PORT = "9000"; //allocatePort(GzipServer.class);
+    public static final String PORT = allocatePort(GzipServer.class);
    
     protected void run()  {
         Object impleDoc = new GreeterImplDoc();

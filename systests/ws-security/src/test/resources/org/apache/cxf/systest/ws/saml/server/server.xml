@@ -51,7 +51,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="9009">
+        <httpj:engine port="${testutil.ports.Server.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
@@ -73,7 +73,7 @@
     
     <jaxws:endpoint 
        id="Saml1TokenOverTransport"
-       address="https://localhost:9009/DoubleItSaml1Transport" 
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1Transport" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml1TransportPort"
        xmlns:s="http://WSSec/saml"
@@ -88,7 +88,7 @@
     
     <jaxws:endpoint 
        id="Saml2TokenOverSymmetric"
-       address="http://localhost:9001/DoubleItSaml2Symmetric" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Symmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2SymmetricPort"
        xmlns:s="http://WSSec/saml"
@@ -108,7 +108,7 @@
     
     <jaxws:endpoint 
        id="Saml2TokenOverAsymmetric"
-       address="http://localhost:9001/DoubleItSaml2Asymmetric" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Asymmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2AsymmetricPort"
        xmlns:s="http://WSSec/saml"
@@ -132,7 +132,7 @@
     
     <jaxws:endpoint 
        id="Saml1SelfSignedTokenOverTransport"
-       address="https://localhost:9009/DoubleItSaml1SelfSignedTransport" 
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1SelfSignedTransport" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml1SelfSignedTransportPort"
        xmlns:s="http://WSSec/saml"
@@ -150,7 +150,7 @@
     
     <jaxws:endpoint 
        id="Saml2TokenOverSymmetricProtection"
-       address="http://localhost:9001/DoubleItSaml2SymmetricProtection" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItSaml2SymmetricProtection" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2SymmetricProtectionPort"
        xmlns:s="http://WSSec/saml"
@@ -170,7 +170,7 @@
     
     <jaxws:endpoint 
        id="Saml2TokenOverSymmetricSignedElements"
-       address="http://localhost:9001/DoubleItSaml2SymmetricSignedElements" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItSaml2SymmetricSignedElements" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2SymmetricSignedElementsPort"
        xmlns:s="http://WSSec/saml"

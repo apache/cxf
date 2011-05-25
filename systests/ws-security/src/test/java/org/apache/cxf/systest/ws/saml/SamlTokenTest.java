@@ -43,7 +43,9 @@ import wssec.saml.DoubleItService;
  * A set of tests for SAML Tokens.
  */
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
-    
+    static final String PORT = allocatePort(Server.class);
+    static final String PORT2 = allocatePort(Server.class, 2);
+
     private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
     @BeforeClass
@@ -69,6 +71,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml1Port = service.getDoubleItSaml1TransportPort();
+        updateAddressPort(saml1Port, PORT2);
         
         try {
             saml1Port.doubleIt(BigInteger.valueOf(25));
@@ -110,6 +113,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricPort();
+        updateAddressPort(saml2Port, PORT);
        
         try {
             saml2Port.doubleIt(BigInteger.valueOf(25));
@@ -169,7 +173,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricSupportingPort();
-        
+        updateAddressPort(saml2Port, PORT);
+
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
@@ -199,7 +204,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml2Port = service.getDoubleItSaml2AsymmetricPort();
-        
+        updateAddressPort(saml2Port, PORT);
+
         try {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with no SAML Assertion");
@@ -237,6 +243,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml1Port = service.getDoubleItSaml1SelfSignedTransportPort();
+        updateAddressPort(saml1Port, PORT2);
         
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
@@ -262,6 +269,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricProtectionPort();
+        updateAddressPort(saml2Port, PORT);
         
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
@@ -286,6 +294,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricSignedElementsPort();
+        updateAddressPort(saml2Port, PORT);
         
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()

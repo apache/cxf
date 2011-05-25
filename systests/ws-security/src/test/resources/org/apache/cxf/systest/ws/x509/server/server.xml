@@ -48,7 +48,7 @@
 
     <jaxws:endpoint 
        id="KeyIdentifier"
-       address="http://localhost:9001/DoubleItX509KeyIdentifier" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509KeyIdentifier" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKeyIdentifierPort"
        xmlns:s="http://WSSec/x509"
@@ -66,7 +66,7 @@
     
     <jaxws:endpoint 
        id="IssuerSerial"
-       address="http://localhost:9001/DoubleItX509IssuerSerial" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509IssuerSerial" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItIssuerSerialPort"
        xmlns:s="http://WSSec/x509"
@@ -84,7 +84,7 @@
     
     <jaxws:endpoint 
        id="Thumbprint"
-       address="http://localhost:9001/DoubleItX509Thumbprint" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509Thumbprint" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItThumbprintPort"
        xmlns:s="http://WSSec/x509"
@@ -102,7 +102,7 @@
     
     <jaxws:endpoint 
        id="Asymmetric"
-       address="http://localhost:9001/DoubleItX509Asymmetric" 
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509Asymmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItAsymmetricIssuerSerialPort"
        xmlns:s="http://WSSec/x509"

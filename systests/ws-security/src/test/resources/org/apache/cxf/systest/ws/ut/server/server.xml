@@ -51,7 +51,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="9009">
+        <httpj:engine port="${testutil.ports.Server}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
@@ -73,7 +73,7 @@
     
     <jaxws:endpoint 
        id="Plaintext"
-       address="https://localhost:9009/DoubleItUTPlaintext" 
+       address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintext" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItPlaintextPort"
        xmlns:s="http://WSSec/ut"
@@ -90,7 +90,7 @@
     
     <jaxws:endpoint 
        id="PlaintextCreated"
-       address="https://localhost:9009/DoubleItUTPlaintextCreated" 
+       address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintextCreated" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItPlaintextCreatedPort"
        xmlns:s="http://WSSec/ut"
@@ -107,7 +107,7 @@
     
     <jaxws:endpoint 
        id="Hashed"
-       address="https://localhost:9009/DoubleItUTHashed" 
+       address="https://localhost:${testutil.ports.Server}/DoubleItUTHashed" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItHashedPort"
        xmlns:s="http://WSSec/ut"
@@ -124,7 +124,7 @@
     
     <jaxws:endpoint 
        id="NoPassword"
-       address="https://localhost:9009/DoubleItUTNoPassword" 
+       address="https://localhost:${testutil.ports.Server}/DoubleItUTNoPassword" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItNoPasswordPort"
        xmlns:s="http://WSSec/ut"

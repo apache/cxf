@@ -26,11 +26,14 @@
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+
     
     <util:list id="addressList">
-        <value>http://localhost:9051/SoapContext/ReplicatedPortA</value>
-        <value>http://localhost:9052/SoapContext/ReplicatedPortB</value>
-        <value>http://localhost:9053/SoapContext/ReplicatedPortC</value>
+        <value>http://localhost:${testutil.ports.Server.1}/SoapContext/ReplicatedPortA</value>
+        <value>http://localhost:${testutil.ports.Server.2}/SoapContext/ReplicatedPortB</value>
+        <value>http://localhost:${testutil.ports.Server.3}/SoapContext/ReplicatedPortC</value>
     </util:list>
 
     <bean id="SequentialAddresses" class="org.apache.cxf.clustering.SequentialStrategy">
@@ -48,8 +51,8 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
     <bean id="UnreachableAddresses" class="org.apache.cxf.clustering.SequentialStrategy">
         <property name="alternateAddresses">
             <list>        
-                <value>http://localhost:9050/SoapContext/ReplicatedPortA</value>
-                <value>http://localhost:9053/SoapContext/ReplicatedPortC</value>
+                <value>http://localhost:${testutil.ports.Server.99}/SoapContext/ReplicatedPortA</value>
+                <value>http://localhost:${testutil.ports.Server.99}/SoapContext/ReplicatedPortC</value>
             </list>
         </property>
     </bean>
@@ -77,7 +80,7 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
     </jaxws:client>
 
     <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortB"
-                  address="http://localhost:15555/SoapContext/ReplicatedPortB"
+                  address="http://localhost:${testutil.ports.Server.99}/SoapContext/ReplicatedPortB"
                   createdFromAPI="true">
         <jaxws:features>
             <clustering:loadDistributor>

@@ -22,7 +22,13 @@ package org.apache.cxf.systest.clustering;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.wsdl.Definition;
+import javax.wsdl.Port;
+import javax.wsdl.Service;
+import javax.wsdl.extensions.soap.SOAPAddress;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -42,6 +48,7 @@ import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
+import org.apache.cxf.wsdl.WSDLManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -53,19 +60,27 @@ import org.junit.Test;
  * Tests failover within a static cluster.
  */
 public class FailoverTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT_0 = allocatePort(Server.class, 0);
+    public static final String PORT_A = allocatePort(Server.class, 1);
+    public static final String PORT_B = allocatePort(Server.class, 2);
+    public static final String PORT_C = allocatePort(Server.class, 3);
+    public static final String PORT_D = allocatePort(Server.class, 4);
+    public static final String PORT_EXTRA = allocatePort(Server.class, 99);
+    
+    
     protected static final String REPLICA_A =
-        "http://localhost:9051/SoapContext/ReplicatedPortA";
+        "http://localhost:" + PORT_A + "/SoapContext/ReplicatedPortA";
     protected static final String REPLICA_B =
-        "http://localhost:9052/SoapContext/ReplicatedPortB"; 
+        "http://localhost:" + PORT_B + "/SoapContext/ReplicatedPortB"; 
     protected static final String REPLICA_C =
-        "http://localhost:9053/SoapContext/ReplicatedPortC"; 
+        "http://localhost:" + PORT_C + "/SoapContext/ReplicatedPortC"; 
     protected static final String REPLICA_D =
-        "http://localhost:9054/SoapContext/ReplicatedPortD"; 
+        "http://localhost:" + PORT_D + "/SoapContext/ReplicatedPortD"; 
     private static final Logger LOG =
         LogUtils.getLogger(FailoverTest.class);
     private static final String FAILOVER_CONFIG =
         "org/apache/cxf/systest/clustering/failover.xml";
+    private static String wsdlLocation = ClusteredGreeterService.WSDL_LOCATION.toString();
 
     protected Bus bus;
     protected Greeter greeter;
@@ -91,6 +106,10 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         SpringBusFactory bf = new SpringBusFactory();    
         bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);
+        
+        updateWsdlExtensors("9051", PORT_A);
+        updateWsdlExtensors("9052", PORT_B);
+        updateWsdlExtensors("9053", PORT_C);
     }
     
     @After
@@ -148,7 +167,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                        cause instanceof ConnectException);
             
             // similarly the current endpoint referenced by the client 
-            // should also revert back to the origianl replica A
+            // should also revert back to the original replica A
             //
             verifyCurrentEndpoint(REPLICA_A);
         }
@@ -159,7 +178,6 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         startTarget(REPLICA_C);
         setupGreeter();
         String response = null;
-        
         response = greeter.greetMe("fred");
         assertNotNull("expected non-null response", response);
         assertTrue("response from unexpected target: " + response,
@@ -299,21 +317,33 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     public void testRandomStrategy() throws Exception {
         strategyTest(REPLICA_A, REPLICA_B, REPLICA_C, true);
     }
-    
+    protected Greeter getGreeter(String type) throws Exception {
+        if (REPLICA_A.equals(type)) {
+            Greeter g = new ClusteredGreeterService().getReplicatedPortA();
+            updateAddressPort(g, PORT_A);
+            updateWsdlExtensors("9051", PORT_A);
+            return g;
+        } else if (REPLICA_B.equals(type)) {
+            Greeter g = new ClusteredGreeterService().getReplicatedPortB();
+            updateAddressPort(g, PORT_B);
+            updateWsdlExtensors("9052", PORT_B);
+            return g;
+        }
+        Greeter g = new ClusteredGreeterService().getReplicatedPortC();
+        updateAddressPort(g, PORT_C);
+        updateWsdlExtensors("9053", PORT_C);
+        return g;
+    }
     protected void strategyTest(String activeReplica1,
                               String activeReplica2,
                               String inactiveReplica,
-                              boolean expectRandom) {
+                              boolean expectRandom) throws Exception {
         startTarget(activeReplica1);
         startTarget(activeReplica2);
         boolean randomized = false;
         String prevEndpoint = null;
         for (int i = 0; i < 20; i++) {
-            Greeter g = REPLICA_A.equals(inactiveReplica)
-                        ? new ClusteredGreeterService().getReplicatedPortA()
-                        : REPLICA_B.equals(inactiveReplica)
-                          ? new ClusteredGreeterService().getReplicatedPortB()
-                          : new ClusteredGreeterService().getReplicatedPortC();
+            Greeter g = getGreeter(inactiveReplica);
             verifyStrategy(g, expectRandom 
                               ? RandomStrategy.class
                               : SequentialStrategy.class);
@@ -332,9 +362,10 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                      randomized);
     }
 
-    protected void startTarget(String address) {
+    protected void startTarget(String address) throws Exception {
         ControlService cs = new ControlService();
         control = cs.getControlPort();
+        updateAddressPort(control, PORT_0);
 
         LOG.info("starting replicated target: " + address);
         assertTrue("Failed to start greeter", control.startGreeter(address));
@@ -360,15 +391,20 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         return ClientProxy.getClient(proxy).getEndpoint().getEndpointInfo().getAddress();
     }
     
-    protected void setupGreeter() {
+    protected void setupGreeter() throws Exception {
         ClusteredGreeterService cs = new ClusteredGreeterService();
         // REVISIT: why doesn't the generic (i.e. non-Port-specific)
         // Service.getPort() load the <jaxws:client> configuration?
         greeter = cs.getReplicatedPortA();
+        updateAddressPort(greeter, PORT_A);
         assertTrue("unexpected conduit selector: " 
                    + ClientProxy.getClient(greeter).getConduitSelector().getClass().getName(),
                    ClientProxy.getClient(greeter).getConduitSelector()
                    instanceof FailoverTargetSelector);
+        
+        updateWsdlExtensors("9051", PORT_A);
+        updateWsdlExtensors("9052", PORT_B);
+        updateWsdlExtensors("9053", PORT_C);
     }
         
     protected void verifyStrategy(Object proxy, Class clz) {
@@ -414,4 +450,36 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             && provider.getOutFaultInterceptors().contains(mapCodec);
         return enabledIn && enabledOut;
     }
+    
+    
+    private void updateWsdlExtensors(String port1, String port2) {
+        try {
+            Definition def = bus.getExtension(WSDLManager.class)
+                .getDefinition(wsdlLocation);
+            Map map = def.getAllServices();
+            for (Object o : map.values()) {
+                Service service = (Service)o;
+                Map ports = service.getPorts();
+                for (Object p : ports.values()) {
+                    Port port = (Port)p;
+                    List<?> l = port.getExtensibilityElements();
+                    for (Object e : l) {
+                        if (e instanceof SOAPAddress) {
+                            String add = ((SOAPAddress)e).getLocationURI();
+                            int idx = add.indexOf(":" + port1);
+                            if (idx != -1) {
+                                add = add.substring(0, idx) + ":" + port2 
+                                    + add.substring(idx + port1.length() + 1);
+                                ((SOAPAddress)e).setLocationURI(add);
+                            }
+                        }
+                    }                    
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    
 }

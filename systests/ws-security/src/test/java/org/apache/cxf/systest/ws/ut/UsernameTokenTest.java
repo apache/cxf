@@ -36,7 +36,8 @@ import wssec.ut.DoubleItService;
  * A set of tests for Username Tokens over the Transport Binding.
  */
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
-    
+    static final String PORT = allocatePort(Server.class);
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -60,7 +61,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType utPort = service.getDoubleItPlaintextPort();
-        
+        updateAddressPort(utPort, PORT);
         utPort.doubleIt(BigInteger.valueOf(25));
     }
     
@@ -77,6 +78,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType utPort = service.getDoubleItPlaintextCreatedPort();
+        updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(BigInteger.valueOf(25));
     }
@@ -94,6 +96,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType utPort = service.getDoubleItHashedPort();
+        updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(BigInteger.valueOf(25));
     }
@@ -111,6 +114,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         
         DoubleItPortType utPort = service.getDoubleItNoPasswordPort();
+        updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(BigInteger.valueOf(25));
     }

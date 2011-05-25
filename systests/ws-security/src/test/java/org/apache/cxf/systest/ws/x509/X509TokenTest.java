@@ -40,7 +40,8 @@ import wssec.x509.DoubleItService;
  * A set of tests for X.509 Tokens.
  */
 public class X509TokenTest extends AbstractBusClientServerTestBase {
-    
+    static final String PORT = allocatePort(Server.class);
+
     private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
     @BeforeClass
@@ -68,6 +69,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         DoubleItService service = new DoubleItService();
         DoubleItPortType x509Port = service.getDoubleItKeyIdentifierPort();
+        updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(BigInteger.valueOf(25));
     }
     
@@ -86,6 +88,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         DoubleItService service = new DoubleItService();
         DoubleItPortType x509Port = service.getDoubleItIssuerSerialPort();
+        updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(BigInteger.valueOf(25));
     }
     
@@ -104,6 +107,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         DoubleItService service = new DoubleItService();
         DoubleItPortType x509Port = service.getDoubleItThumbprintPort();
+        updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(BigInteger.valueOf(25));
     }
     
@@ -122,6 +126,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         DoubleItService service = new DoubleItService();
         DoubleItPortType x509Port = service.getDoubleItAsymmetricIssuerSerialPort();
+        updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(BigInteger.valueOf(25));
     }
     

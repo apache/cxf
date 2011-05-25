@@ -555,7 +555,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(wsdl);
 
         String bindingId = "http://schemas.xmlsoap.org/wsdl/soap/";
-        String endpointUrl = "http://localhost:9006/SOAPDispatchService/SoapDispatchPort";
+        String endpointUrl = "http://localhost:" + greeterPort + "/SOAPDispatchService/SoapDispatchPort";
         
         Service service = Service.create(wsdl, SERVICE_NAME);
         service.addPort(PORT_NAME, bindingId, endpointUrl);

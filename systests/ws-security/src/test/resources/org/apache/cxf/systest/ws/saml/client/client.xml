@@ -32,6 +32,8 @@
           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd"
 >
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+
     <cxf:bus>
         <cxf:features>
             <p:policies/>
@@ -39,7 +41,7 @@
         </cxf:features>
     </cxf:bus>
     
-    <http:conduit name="https://localhost:9009/.*">
+    <http:conduit name="https://localhost.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>

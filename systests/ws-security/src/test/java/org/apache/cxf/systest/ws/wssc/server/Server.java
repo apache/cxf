@@ -118,7 +118,7 @@ public class Server extends AbstractBusTestServerBase {
     
     public static void main(String args[]) throws Exception {
         new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/server/server.xml");
-        new Server("http://localhost:9001/");
+        new Server("http://localhost:" + PORT + "/");
         System.out.println("Server ready...");
 
         Thread.sleep(60 * 60 * 10000);
