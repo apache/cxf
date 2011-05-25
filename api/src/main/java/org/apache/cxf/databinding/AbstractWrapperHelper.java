@@ -125,6 +125,9 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
             
             return ret;
         } catch (Exception ex) {
+            if (ex.getCause() == null) {
+                throw new Fault(ex);
+            }
             throw new Fault(ex.getCause());
         }
     }

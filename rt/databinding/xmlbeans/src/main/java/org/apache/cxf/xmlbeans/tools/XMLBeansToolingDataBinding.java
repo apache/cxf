@@ -51,6 +51,7 @@ import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.xmlbeans.SchemaGlobalElement;
+import org.apache.xmlbeans.SchemaProperty;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.SchemaTypeLoader;
 import org.apache.xmlbeans.SchemaTypeSystem;
@@ -168,8 +169,13 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
         }
 
         SchemaType st = elem.getType();
-        SchemaType partType = st.getElementProperty(item).getType();        
-        return XMLBeansSchemaTypeUtils.getNaturalJavaClassName(partType);        
+        SchemaProperty prop = st.getElementProperty(item);
+        SchemaType partType = prop.getType();
+        String s = XMLBeansSchemaTypeUtils.getNaturalJavaClassName(partType);
+        if (prop.extendsJavaArray()) {
+            s += "[]";
+        }
+        return s;
     }
 
     public void generate(ToolContext context) throws ToolException {

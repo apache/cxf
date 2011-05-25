@@ -45,6 +45,22 @@
                     </sequence>
                 </complexType>
             </element>
+            
+            <element name="sayHiArray">
+                <complexType>
+                    <sequence>
+                        <element name="requests" minOccurs="0" maxOccurs="unbounded" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="sayHiArrayResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responses" minOccurs="0" maxOccurs="unbounded" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            
             <element name="greetMe">
                 <complexType>
                     <sequence>
@@ -89,6 +105,12 @@
     <wsdl:message name="sayHiResponse">
         <wsdl:part element="x1:sayHiResponse" name="out"/>
     </wsdl:message>
+    <wsdl:message name="sayHiArrayRequest">
+        <wsdl:part element="x1:sayHiArray" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="sayHiArrayResponse">
+        <wsdl:part element="x1:sayHiArrayResponse" name="out"/>
+    </wsdl:message>
     <wsdl:message name="greetMeRequest">
         <wsdl:part element="x1:greetMe" name="in"/>
     </wsdl:message>
@@ -116,6 +138,10 @@
         <wsdl:operation name="sayHi">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
             <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sayHiArray">
+            <wsdl:input message="tns:sayHiArrayRequest" name="sayHiArrayRequest"/>
+            <wsdl:output message="tns:sayHiArrayResponse" name="sayHiArrayResponse"/>
         </wsdl:operation>
         
 
@@ -146,6 +172,16 @@
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output name="sayHiResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="sayHiArray">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="sayHiArrayRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="sayHiArrayResponse">
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>

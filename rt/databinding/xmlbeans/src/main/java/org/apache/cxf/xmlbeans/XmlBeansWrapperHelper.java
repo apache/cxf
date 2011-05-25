@@ -77,13 +77,26 @@ public class XmlBeansWrapperHelper extends AbstractWrapperHelper {
 
     @Override
     protected Object getWrapperObject(Object object) throws Exception {                            
-        Class<?> valueClass = getXMLBeansValueType(wrapperType);
-        // we need get the real Object first
-        Method method = wrapperType.getMethod("get" + valueClass.getSimpleName(), NO_CLASSES);
+        Method m = getXMLBeansValueMethod(wrapperType);
+        Method method = null;
+        if (m == null) {
+            Class<?> valueClass = getXMLBeansValueType(wrapperType);
+            // we need get the real Object first
+            method = wrapperType.getMethod("get" + valueClass.getSimpleName(), NO_CLASSES);
+        } else {
+            method = wrapperType.getMethod("get" + m.getName().substring(6), NO_CLASSES);
+        }
         return method.invoke(object, NO_PARAMS);
-        
     }
-    
+    public static Method getXMLBeansValueMethod(Class<?> wrapperType)  {
+        for (Method method : wrapperType.getMethods()) {
+            if (method.getName().startsWith("addNew")) {                
+                return method;
+            }
+        }
+        return null;
+    }
+
     public static Class<?> getXMLBeansValueType(Class<?> wrapperType)  {
         Class<?> result = wrapperType;
         for (Method method : wrapperType.getMethods()) {
