@@ -22,15 +22,15 @@ package org.apache.cxf.systest.xmlbeans;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument;
-import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.FaultDetail;
-import org.apache.hello_world_soap_http.xmlbeans.GreetMeFault;
-import org.apache.hello_world_soap_http.xmlbeans.Greeter;
-import org.apache.hello_world_soap_http.xmlbeans.PingMeFault;
+import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument;
+import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument.FaultDetail;
+import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.GreetMeFault;
+import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.Greeter;
+import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.PingMeFault;
 
 @javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap_http/xmlbeans", 
-                      endpointInterface = "org.apache.hello_world_soap_http.xmlbeans.Greeter")
+                      targetNamespace = "http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans", 
+                      endpointInterface = "org.apache.hello_world_soap_http_xmlbeans.xmlbeans.Greeter")
 public class GreeterImpl implements Greeter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(GreeterImpl.class);        
@@ -40,8 +40,8 @@ public class GreeterImpl implements Greeter {
      */
     public String greetMe(String me) throws GreetMeFault {
         if ("fault".equals(me)) {
-            org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeFaultDetailDocument detail
-                = org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeFaultDetailDocument.Factory
+            org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.GreetMeFaultDetailDocument detail
+                = org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.GreetMeFaultDetailDocument.Factory
                 .newInstance();
             detail.setGreetMeFaultDetail("Some fault detail");
             throw new GreetMeFault("Fault String", detail);
@@ -68,7 +68,8 @@ public class GreeterImpl implements Greeter {
     public void pingMe() throws PingMeFault {
         // here we need to put the FaultDetail into the FaultDetailDocument
         FaultDetailDocument faultDocument = 
-            org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.Factory.newInstance();        
+            org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument
+                .Factory.newInstance();        
         FaultDetail faultDetail = faultDocument.addNewFaultDetail();
         faultDetail.setMajor((short)2);
         faultDetail.setMinor((short)1);
