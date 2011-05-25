@@ -76,7 +76,7 @@ public class BookStoreWithInterface2 extends BookStoreStorage implements BookInt
     }
     
     private Book doGetBook(Long id) throws BookNotFoundFault {
-        System.out.println("----invoking getBook with id: " + id);
+        //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(id);
         if (book != null) {
             return book;

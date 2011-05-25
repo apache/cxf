@@ -74,7 +74,7 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
                     String surname = continuation.getObject().toString();
                     sb.append(' ').append(surname);
                 }
-                System.out.println("Saying hi to " + sb.toString());
+                //System.out.println("Saying hi to " + sb.toString());
                 return "Hi " + sb.toString();
             }
         }
@@ -92,7 +92,7 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
                 }
             }
         }
-        System.out.println("Invocation for " + name + " has been suspended");
+        //System.out.println("Invocation for " + name + " has been suspended");
         
         return true;
     }
@@ -113,7 +113,7 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
     
     private void suspendInvocation(final String name, Continuation cont) {
         
-        System.out.println("Suspending invocation for " + name);
+        //System.out.println("Suspending invocation for " + name);
         
         try {
             cont.suspend(500000);    
@@ -136,7 +136,7 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
     
     private Continuation getContinuation(String name) {
         
-        System.out.println("Getting continuation for " + name);
+        //System.out.println("Getting continuation for " + name);
         
         synchronized (suspended) {
             Continuation suspendedCont = suspended.remove(name);

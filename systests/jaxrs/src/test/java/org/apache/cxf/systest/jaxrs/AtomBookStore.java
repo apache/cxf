@@ -59,7 +59,7 @@ public class AtomBookStore {
     
     public AtomBookStore() {
         init();
-        System.out.println("----books: " + books.size());
+        //System.out.println("----books: " + books.size());
     }
     
     @Context
@@ -153,7 +153,7 @@ public class AtomBookStore {
     @Path("/books/entries/{bookId}/")
     @Produces({"application/atom+xml", "application/json" })
     public Entry getBookAsEntry(@PathParam("bookId") String id) throws BookNotFoundFault {
-        System.out.println("----invoking getBook with id: " + id);
+        //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             try {
@@ -171,7 +171,7 @@ public class AtomBookStore {
     
     @Path("/books/subresources/{bookId}/")
     public AtomBook getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
-        System.out.println("----invoking getBook with id: " + id);
+        //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             try {
