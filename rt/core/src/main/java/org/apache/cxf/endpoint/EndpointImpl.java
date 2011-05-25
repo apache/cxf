@@ -178,4 +178,13 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     public void initializeActiveFeatures(List<AbstractFeature> features) {
         activeFeatures = features;
     }
+    
+    /**
+     * Returns the hashCode bsed on the EndpointInfo so that this object
+     * can be used as a map key.
+     */
+    @Override
+    public int hashCode() {
+        return endpointInfo.hashCode();
+    }
 }
