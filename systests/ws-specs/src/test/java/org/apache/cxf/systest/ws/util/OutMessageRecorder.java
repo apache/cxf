@@ -81,7 +81,9 @@ public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("outbound: " + bytes);
                 }
-                outbound.add(bytes);
+                synchronized (outbound) {
+                    outbound.add(bytes);    
+                }
             } catch (Exception e) {
                 LOG.fine("Can't record message from output stream class: "
                          + cos.getOut().getClass().getName());
