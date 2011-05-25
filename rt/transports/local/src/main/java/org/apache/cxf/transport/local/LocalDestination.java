@@ -107,6 +107,7 @@ public class LocalDestination extends AbstractDestination {
             } else {
                 CachedOutputStream stream = new CachedOutputStream();
                 message.setContent(OutputStream.class, stream);
+                message.setContent(CachedOutputStream.class, stream);
             }
         }
 
@@ -117,8 +118,10 @@ public class LocalDestination extends AbstractDestination {
                 
                 MessageImpl copy = new MessageImpl();
                 copy.putAll(message);
+                message.getContent(OutputStream.class).close();
+                CachedOutputStream stream = message.getContent(CachedOutputStream.class);
+                message.setContent(OutputStream.class, stream);
                 MessageImpl.copyContent(message, copy);
-                CachedOutputStream stream = (CachedOutputStream)message.getContent(OutputStream.class);
                 copy.setContent(InputStream.class, stream.getInputStream());
                 if (exchange != null && exchange.getInMessage() == null) {
                     exchange.setInMessage(copy);
