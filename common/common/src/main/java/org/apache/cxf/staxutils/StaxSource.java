@@ -182,8 +182,8 @@ public class StaxSource extends SAXSource implements XMLReader {
             }
             // Default namespace
             if (prefix == null || prefix.length() == 0) {
-                attrs.addAttribute(XMLConstants.DEFAULT_NS_PREFIX, 
-                                   null, 
+                attrs.addAttribute("", 
+                                   "", 
                                    XMLConstants.XMLNS_ATTRIBUTE, 
                                    "CDATA", 
                                    uri);
