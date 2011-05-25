@@ -49,12 +49,12 @@ import org.apache.cxf.xmlbeans.docLitBare.types.OutStringDocument;
 import org.apache.cxf.xmlbeans.docLitBare.types.StringRespTypeDocument;
 import org.apache.cxf.xmlbeans.docLitBare.types.TradePriceData;
 import org.apache.cxf.xmlbeans.doc_lit_bare.PutLastTradedPricePortType;
-import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument;
-import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.FaultDetail;
-import org.apache.hello_world_soap_http.xmlbeans.GreetMeFault;
-import org.apache.hello_world_soap_http.xmlbeans.Greeter;
-import org.apache.hello_world_soap_http.xmlbeans.PingMeFault;
-import org.apache.hello_world_soap_http.xmlbeans.SOAPService;
+import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument;
+import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument.FaultDetail;
+import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.GreetMeFault;
+import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.Greeter;
+import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.PingMeFault;
+import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.SOAPService;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
     static final String NOWSDL_PORT = TestUtil.getPortNumber(ServerNoWsdl.class);
 
     private static final QName SERVICE_NAME 
-        = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SOAPService");
+        = new QName("http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans", "SOAPService");
     
     private static final QName DOC_LIT_BARE_SERVICE =
         new QName("http://cxf.apache.org/xmlbeans/doc_lit_bare", "SOAPService");
@@ -179,7 +179,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         assertNotNull("We should have found the WSDL here. " , wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
-        QName soapPort = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SoapPort");
+        QName soapPort = new QName("http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans", "SoapPort");
         ss.addPort(soapPort, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:" 
                    + NOWSDL_PORT + "/SoapContext/SoapPort");
         Greeter port = ss.getPort(soapPort, Greeter.class);
@@ -228,7 +228,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         assertNotNull("We should have found the WSDL here. " , wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
-        QName soapPort = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SoapPort");
+        QName soapPort = new QName("http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans", "SoapPort");
         ss.addPort(soapPort, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:" 
                    + NOWSDL_PORT + "/SoapContext/SoapPort");
         Greeter port = ss.getPort(soapPort, Greeter.class);
@@ -236,14 +236,15 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         Client client = ClientProxy.getClient(port);
         
         List<Header> headers = new ArrayList<Header>();
-        org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument doc 
-            = org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument.Factory.newInstance();
+        org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.GreetMeDocument doc 
+            = org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.GreetMeDocument.Factory.newInstance();
         doc.addNewGreetMe().setRequestType("doc format header");
         Header head = new Header(new QName("", "doc"), doc,
                                  client.getEndpoint().getService().getDataBinding());
         headers.add(head);
-        org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument.GreetMe gm 
-            = org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument.GreetMe.Factory.newInstance();
+        org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.GreetMeDocument.GreetMe gm 
+            = org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types
+                .GreetMeDocument.GreetMe.Factory.newInstance();
         gm.setRequestType("non-doc format header");
         head = new Header(new QName("http://somenamespace.com", "nondocheader"), gm,
                           client.getEndpoint().getService().getDataBinding());

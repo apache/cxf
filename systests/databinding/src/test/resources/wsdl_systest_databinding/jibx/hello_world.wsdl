@@ -17,17 +17,17 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http/jibx"
+<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http_jibx/jibx"
     xmlns="http://schemas.xmlsoap.org/wsdl/"
     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world_soap_http/jibx"
-    xmlns:x1="http://apache.org/hello_world_soap_http/jibx/types"
+    xmlns:tns="http://apache.org/hello_world_soap_http_jibx/jibx"
+    xmlns:x1="http://apache.org/hello_world_soap_http_jibx/jibx/types"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http/jibx/types"
+        <schema targetNamespace="http://apache.org/hello_world_soap_http_jibx/jibx/types"
             xmlns="http://www.w3.org/2001/XMLSchema"
-        xmlns:tns="http://apache.org/hello_world_soap_http/jibx/types"
+        xmlns:tns="http://apache.org/hello_world_soap_http_jibx/jibx/types"
             elementFormDefault="qualified">
             <simpleType name="MyStringType">
                 <restriction base="string">

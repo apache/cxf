@@ -39,11 +39,11 @@ import org.apache.cxf.jibx.doclitbare.types.OutString;
 import org.apache.cxf.jibx.doclitbare.types.StringRespType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.apache.hello_world_soap_http.jibx.GreetMeFault;
-import org.apache.hello_world_soap_http.jibx.Greeter;
-import org.apache.hello_world_soap_http.jibx.PingMeFault;
-import org.apache.hello_world_soap_http.jibx.SOAPService;
-import org.apache.helloworldsoaphttp.jibx.types.FaultDetail;
+import org.apache.hello_world_soap_http_jibx.jibx.GreetMeFault;
+import org.apache.hello_world_soap_http_jibx.jibx.Greeter;
+import org.apache.hello_world_soap_http_jibx.jibx.PingMeFault;
+import org.apache.hello_world_soap_http_jibx.jibx.SOAPService;
+import org.apache.helloworldsoaphttpjibx.jibx.types.FaultDetail;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class ClientServerJibxTest extends AbstractBusClientServerTestBase {
     static final String WSDL_PORT = TestUtil.getPortNumber(Server.class);
 
     private static final QName SERVICE_NAME 
-        = new QName("http://apache.org/hello_world_soap_http/jibx", "SOAPService");
+        = new QName("http://apache.org/hello_world_soap_http_jibx/jibx", "SOAPService");
     
     private static final QName DOC_LIT_BARE_SERVICE =
         new QName("http://cxf.apache.org/jibx/doc_lit_bare", "SOAPService");

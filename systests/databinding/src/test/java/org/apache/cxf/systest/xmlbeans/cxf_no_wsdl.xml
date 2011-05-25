@@ -28,14 +28,14 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
     <!-- comment this bean to disable schema validation in the client -->
 
-    <jaxws:client name="{http://apache.org/hello_world_soap_http/xmlbeans}SoapPort"
+    <jaxws:client name="{http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans}SoapPort"
         createdFromAPI="true">
         <!-- jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />
         </jaxws:properties-->
     </jaxws:client>
 
-    <jaxws:endpoint name="{http://apache.org/hello_world_soap_http/xmlbeans}SoapPort"
+    <jaxws:endpoint name="{http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans}SoapPort"
         createdFromAPI="true">
         <jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />

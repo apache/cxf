@@ -22,14 +22,14 @@ package org.apache.cxf.systest.jibx;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.hello_world_soap_http.jibx.GreetMeFault;
-import org.apache.hello_world_soap_http.jibx.Greeter;
-import org.apache.hello_world_soap_http.jibx.PingMeFault;
-import org.apache.helloworldsoaphttp.jibx.types.FaultDetail;
+import org.apache.hello_world_soap_http_jibx.jibx.GreetMeFault;
+import org.apache.hello_world_soap_http_jibx.jibx.Greeter;
+import org.apache.hello_world_soap_http_jibx.jibx.PingMeFault;
+import org.apache.helloworldsoaphttpjibx.jibx.types.FaultDetail;
 
 @javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap_http/jibx", 
-                      endpointInterface = "org.apache.hello_world_soap_http.jibx.Greeter")
+                      targetNamespace = "http://apache.org/hello_world_soap_http_jibx/jibx", 
+                      endpointInterface = "org.apache.hello_world_soap_http_jibx.jibx.Greeter")
 public class GreeterImpl implements Greeter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(GreeterImpl.class);        
@@ -39,8 +39,8 @@ public class GreeterImpl implements Greeter {
      */
     public String greetMe(String me) throws GreetMeFault {
         if ("fault".equals(me)) {
-            org.apache.helloworldsoaphttp.jibx.types.GreetMeFaultDetail detail
-                = new org.apache.helloworldsoaphttp.jibx.types.GreetMeFaultDetail();
+            org.apache.helloworldsoaphttpjibx.jibx.types.GreetMeFaultDetail detail
+                = new org.apache.helloworldsoaphttpjibx.jibx.types.GreetMeFaultDetail();
             detail.setGreetMeFaultDetail("Some fault detail");
             throw new GreetMeFault("Fault String", detail);
         }

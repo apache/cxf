@@ -27,14 +27,14 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
 
-    <jaxws:client name="{http://apache.org/hello_world_soap_http/jibx}SoapPort"
+    <jaxws:client name="{http://apache.org/hello_world_soap_http_jibx/jibx}SoapPort"
         createdFromAPI="true">
         <!-- jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />
         </jaxws:properties-->
     </jaxws:client>
 
-    <jaxws:endpoint name="{http://apache.org/hello_world_soap_http/jibx}SoapPort"
+    <jaxws:endpoint name="{http://apache.org/hello_world_soap_http_jibx/jibx}SoapPort"
         wsdlLocation="classpath:wsdl_systest_databinding/jibx/hello_world.wsdl"
         createdFromAPI="true">
         <jaxws:properties>
