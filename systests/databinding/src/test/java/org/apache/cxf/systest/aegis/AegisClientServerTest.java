@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -36,6 +37,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -145,6 +148,8 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.setDataBinding(aegisBinding);
         proxyFactory.setServiceClass(SportsService.class);
         proxyFactory.setWsdlLocation("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl");
+        proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
+        proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
         SportsService service = (SportsService) proxyFactory.create();
 
         Collection<Team> teams = service.getTeams();
@@ -156,6 +161,24 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Anullb", s);        
     }
     
+    @Test
+    public void testComplexMapResult() throws Exception {
+        AegisDatabinding aegisBinding = new AegisDatabinding();
+        JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
+        proxyFactory.setDataBinding(aegisBinding);
+        proxyFactory.setServiceClass(SportsService.class);
+        proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegisSports");
+        proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
+        proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
+        SportsService service = (SportsService) proxyFactory.create();
+        Map<String, Map<Integer, Integer>> result = service.testComplexMapResult();
+        assertEquals(result.size(), 1);
+        assertTrue(result.containsKey("key1"));
+        assertNotNull(result.get("key1"));
+        assertEquals(result.toString(), "{key1={1=3}}");
+    }
+    
+          
     @Test
     public void testDynamicClient() throws Exception {
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();

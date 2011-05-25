@@ -21,7 +21,10 @@ package org.apache.cxf.systest.aegis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 /**
  * 
@@ -46,5 +49,16 @@ public class SportsServiceImpl implements SportsService {
     public BeanWithCharacter getCharBean() {
         return new BeanWithCharacter();
     }
+    
+   
+    public Map<String, Map<Integer, Integer>> testComplexMapResult() {
+        CustomerMap result 
+            = new CustomerMap();
+        Map<Integer, Integer> map1 = new HashMap<Integer, Integer>();
+        map1.put(1, 3);
+        result.put("key1", map1);
+        return result;
 
+    }
+      
 }
