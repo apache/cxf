@@ -760,7 +760,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setResourceClass(BookStoreJaxrsJaxws.class);
         TestFeature testFeature = new TestFeature();
         List<AbstractFeature> features = new ArrayList<AbstractFeature>();
-        features.add((AbstractFeature)testFeature);
+        features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
         Book b = proxy.getBook(new Long("123"));

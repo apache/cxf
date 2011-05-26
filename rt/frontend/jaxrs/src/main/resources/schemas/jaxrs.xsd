@@ -65,6 +65,7 @@
           <xsd:attribute name="staticSubresourceResolution" type="xsd:boolean"/>          
           <xsd:attribute name="beanNames" type="xsd:string"/>
           <xsd:attribute name="serviceName" type="xsd:QName"/>
+          <xsd:attribute name="docLocation" type="xsd:string"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

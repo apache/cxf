@@ -182,7 +182,8 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <jaxrs:server id="bookserviceGenerated" address="/generated">
+  <jaxrs:server id="bookserviceGenerated" address="/generated"
+    docLocation="classpath:/wadl/bookstoreImport.xml">
     <jaxrs:serviceBeans>
       <bean class="org.apache.cxf.systest.jaxrs.codegen.service.BookStore"/>
     </jaxrs:serviceBeans>

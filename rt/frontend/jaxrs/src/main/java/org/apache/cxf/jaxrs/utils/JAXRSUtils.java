@@ -109,6 +109,7 @@ public final class JAXRSUtils {
     public static final String IGNORE_MESSAGE_WRITERS = "ignore.message.writers";
     public static final String ROOT_INSTANCE = "service.root.instance";
     public static final String ROOT_PROVIDER = "service.root.provider";
+    public static final String DOC_LOCATION = "wadl.location";
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);

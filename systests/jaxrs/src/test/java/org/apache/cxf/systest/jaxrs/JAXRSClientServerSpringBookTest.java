@@ -28,21 +28,27 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -57,7 +63,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class, true));
+                   launchServer(BookServerSpring.class));
     }
     
     @Test
@@ -87,6 +93,39 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         book.setId(123);
         Response r = wc.post(book);
         assertEquals(204, r.getStatus());
+    }
+    
+    @Test
+    public void testGetWadlFromWadlLocation() throws Exception {
+        String address = "http://localhost:" + PORT + "/the/generated";    
+        checkWadlResourcesInfo(address, address + "/bookstore", 1);
+        
+    }
+    
+    private void checkWadlResourcesInfo(String baseURI, String requestURI, int size) throws Exception {
+        WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Element root = doc.getDocumentElement();
+        assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
+        assertEquals("application", root.getLocalName());
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(root, 
+                                                                  WadlGenerator.WADL_NS, "grammars");
+        assertEquals(1, grammarEls.size());
+        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+                                                                WadlGenerator.WADL_NS, "include");
+        assertEquals(1, includeEls.size());
+        String href = includeEls.get(0).getAttribute("href");
+        assertEquals("schemas/book.xsd", href);
+        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
+                                                                  WadlGenerator.WADL_NS, "resources");
+        assertEquals(1, resourcesEls.size());
+        Element resourcesEl =  resourcesEls.get(0);
+        assertEquals(baseURI, resourcesEl.getAttribute("base"));
+        List<Element> resourceEls = 
+            DOMUtils.getChildrenWithName(resourcesEl, 
+                                         WadlGenerator.WADL_NS, "resource");
+        assertEquals(size, resourceEls.size());
     }
     
     @Test

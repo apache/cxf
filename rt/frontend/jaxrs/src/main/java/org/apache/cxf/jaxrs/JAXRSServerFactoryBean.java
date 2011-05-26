@@ -43,6 +43,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.Invoker;
@@ -75,6 +76,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private Map<Object, Object> extensionMappings;
     private ResourceComparator rc;
     private ProviderInfo<Application> appProvider;
+    private String documentLocation;
     
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -160,9 +162,12 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             ProviderFactory factory = setupFactory(ep);
             ep.put(Application.class.getName(), appProvider);
             factory.setApplicationProvider(appProvider);
-            
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
+            ep.put(Bus.class.getName(), getBus());
+            if (documentLocation != null) {
+                ep.put(JAXRSUtils.DOC_LOCATION, documentLocation);
+            }
             if (rc != null) {
                 ep.put("org.apache.cxf.jaxrs.comparator", rc);
             }
@@ -374,5 +379,21 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
         }
         injectContexts();
+    }
+
+    /**
+     * Set the reference to the document (WADL, etc) describing the endpoint
+     * @param documentLocation document location
+     */
+    public void setDocLocation(String docLocation) {
+        this.documentLocation = docLocation;
+    }
+
+    /**
+     * Get the reference to the document (WADL, etc) describing the endpoint
+     * @return document location
+     */
+    public String getDocLocation() {
+        return documentLocation;
     }
 }
