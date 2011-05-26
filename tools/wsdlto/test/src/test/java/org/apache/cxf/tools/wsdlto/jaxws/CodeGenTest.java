@@ -26,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.jws.HandlerChain;
 import javax.jws.Oneway;
@@ -1386,6 +1387,41 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue("greetMe operation is NOT generated correctly as excepted", method != null);
         RequestWrapper reqWrapper = method.getAnnotation(RequestWrapper.class);
         assertNotNull("@RequestWrapper is expected", reqWrapper);
+    }
+    @Test
+    public void testJavaDoc() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+
+        List<String> results1 = FileUtils.readLines(new File(output.getCanonicalPath(),
+            "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java"));
+
+        System.out.println(results1);
+        assertTrue(results1.contains(" * porttype documentation"));
+        assertTrue(results1.contains("     * porttype op documentation"));
+
+        List<String> results2 = FileUtils.readLines(new File(output.getCanonicalPath(),
+            "org/apache/cxf/w2j/hello_world_soap_http/SOAPServiceTest1.java"));
+
+        boolean match1 = false;
+        boolean match2 = false;
+        boolean match3 = false;
+        for (String str : results2) {
+            if (str.contains("service documentation")) {
+                match1 = true;
+            }
+            if (str.contains("port1 documentation")) {
+                match2 = true;
+            }
+            if (str.contains("port2 documentation")) {
+                match3 = true;
+            }
+        }
+        assertTrue(results2.toString(), match1);
+        assertTrue(results2.toString(), match2);
+        assertTrue(results2.toString(), match3);
+
     }
 
 }

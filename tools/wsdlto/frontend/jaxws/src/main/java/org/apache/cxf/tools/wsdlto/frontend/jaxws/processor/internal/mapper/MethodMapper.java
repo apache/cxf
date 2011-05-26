@@ -47,8 +47,9 @@ public final class MethodMapper {
         if (opBinding != null
             && opBinding.getMethodJavaDoc() != null) {
             method.setJavaDoc(opBinding.getMethodJavaDoc());
+        } else {
+            method.setJavaDoc(operation.getDocumentation());
         }
-
 
         if (operation.isOneWay()) {
             method.setStyle(OperationType.ONE_WAY);

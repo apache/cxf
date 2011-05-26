@@ -167,7 +167,9 @@
         <wsdl:part name="out" element="x1:BareDocumentResponse"/>
     </wsdl:message> 
     <wsdl:portType name="Greeter">
+        <wsdl:documentation>porttype documentation</wsdl:documentation>
         <wsdl:operation name="sayHi">
+            <wsdl:documentation>porttype op documentation</wsdl:documentation>
             <wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
             <wsdl:output name="sayHiResponse" message="tns:sayHiResponse"/>
         </wsdl:operation>
@@ -260,10 +262,13 @@
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="SOAPService_Test1">
+        <wsdl:documentation>service documentation</wsdl:documentation>
         <wsdl:port name="SoapPort_Test1" binding="tns:Greeter_SOAPBinding">
+            <wsdl:documentation>port1 documentation</wsdl:documentation>
             <soap:address location="http://localhost:9100"/>
         </wsdl:port>
         <wsdl:port name="SoapPort_Test2" binding="tns:Greeter_SOAPBinding">
+            <wsdl:documentation>port2 documentation</wsdl:documentation>
             <soap:address location="http://localhost:9101"/>
         </wsdl:port>
     </wsdl:service>

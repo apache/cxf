@@ -46,12 +46,15 @@ import javax.wsdl.Part;
 import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
+import javax.wsdl.WSDLElement;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
+import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -138,6 +141,13 @@ public class WSDLServiceBuilder {
         Map<QName, Object> attrs = CastUtils.cast(ae.getExtensionAttributes());
         if (!attrs.isEmpty()) {
             info.setExtensionAttributes(attrs);
+        }
+    }
+    
+    private void copyDocumentation(AbstractPropertiesHolder info, WSDLElement el) {
+        if (el.getDocumentationElement() != null) {
+            String doc = XMLUtils.getFullTextChildrenFromElement(el.getDocumentationElement());
+            info.setDocumentation(doc);
         }
     }
 
@@ -323,7 +333,7 @@ public class WSDLServiceBuilder {
                     service.setProperty(WSDL_SERVICE, serv);
                 }
                 getSchemas(def, service);
-
+                copyDocumentation(service, serv);
                 service.setProperty(WSDL_SCHEMA_ELEMENT_LIST, this.schemaList);
                 service.setTargetNamespace(def.getTargetNamespace());
                 service.setName(serv.getQName());
@@ -454,7 +464,7 @@ public class WSDLServiceBuilder {
         if (ei == null) {
             ei = new EndpointInfo(service, ns);
         }
-
+        copyDocumentation(ei, port);
         ei.setName(new QName(service.getName().getNamespaceURI(), port.getName()));
         ei.setBinding(bi);
         copyExtensors(ei, port.getExtensibilityElements());
@@ -555,6 +565,7 @@ public class WSDLServiceBuilder {
             inf.setDescription(si.getDescription());
             d.getDescribed().add(inf);
         }
+        copyDocumentation(inf, p);
         this.copyExtensors(inf, p.getExtensibilityElements());
         this.copyExtensionAttributes(inf, p);
         if (recordOriginal) {
@@ -571,6 +582,7 @@ public class WSDLServiceBuilder {
         if (recordOriginal) {
             opInfo.setProperty(WSDL_OPERATION, op);
         }
+        copyDocumentation(opInfo, op);
         List<String> porderList = CastUtils.cast((List)op.getParameterOrdering());
         opInfo.setParameterOrdering(porderList);
         this.copyExtensors(opInfo, op.getExtensibilityElements());
@@ -602,6 +614,7 @@ public class WSDLServiceBuilder {
             Map.Entry<String, Fault> entry = cast(rawentry, String.class, Fault.class);
             FaultInfo finfo = opInfo.addFault(new QName(inf.getName().getNamespaceURI(), entry.getKey()),
                                               entry.getValue().getMessage().getQName());
+            copyDocumentation(finfo, entry.getValue());
             buildMessage(finfo, entry.getValue().getMessage());
             copyExtensors(finfo, entry.getValue().getExtensibilityElements());
             copyExtensionAttributes(finfo, entry.getValue());

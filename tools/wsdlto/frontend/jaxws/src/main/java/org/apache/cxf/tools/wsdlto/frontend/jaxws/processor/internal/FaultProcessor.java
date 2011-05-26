@@ -144,5 +144,6 @@ public class FaultProcessor extends AbstractProcessor {
             expClass.addField(fField);
         }
         model.addExceptionClass(packageName + "." + name, expClass);
+        expClass.setClassJavaDoc(faultMessage.getDocumentation());
     }
 }
