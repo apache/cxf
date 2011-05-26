@@ -54,14 +54,13 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.AbstractPropertiesHolder;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -146,7 +145,7 @@ public class WSDLServiceBuilder {
     
     private void copyDocumentation(AbstractPropertiesHolder info, WSDLElement el) {
         if (el.getDocumentationElement() != null) {
-            String doc = XMLUtils.getFullTextChildrenFromElement(el.getDocumentationElement());
+            String doc = DOMUtils.getContent(el.getDocumentationElement());
             info.setDocumentation(doc);
         }
     }
