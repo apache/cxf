@@ -36,6 +36,7 @@ public class Phase implements Comparable {
     public static final String POST_MARSHAL = "post-marshal";
     public static final String MARSHAL_ENDING = "marshal-ending";
     public static final String PRE_PROTOCOL = "pre-protocol";
+    public static final String PRE_PROTOCOL_FRONTEND = "pre-protocol-frontend";
     public static final String PRE_PROTOCOL_ENDING = "pre-protocol-ending";
     public static final String USER_PROTOCOL = "user-protocol";
     public static final String USER_PROTOCOL_ENDING = "user-protocol-ending";

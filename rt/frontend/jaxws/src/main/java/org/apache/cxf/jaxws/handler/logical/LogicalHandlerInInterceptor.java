@@ -25,8 +25,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Binding;
 
-import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
-import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
@@ -44,9 +42,7 @@ public class LogicalHandlerInInterceptor
     extends AbstractJAXWSHandlerInterceptor<Message> {
 
     public LogicalHandlerInInterceptor(Binding binding) {
-        super(binding, Phase.PRE_PROTOCOL);
-        addAfter(MustUnderstandInterceptor.class.getName());
-        addAfter(SAAJOutInterceptor.class.getName());
+        super(binding, Phase.PRE_PROTOCOL_FRONTEND);
         addAfter(SOAPHandlerInterceptor.class.getName());
     }
 

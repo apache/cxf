@@ -40,12 +40,10 @@ import org.apache.cxf.binding.soap.HeaderUtil;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
-import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxws.handler.AbstractProtocolHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.phase.Phase;
@@ -64,10 +62,7 @@ public class SOAPHandlerFaultOutInterceptor extends
     };
     
     public SOAPHandlerFaultOutInterceptor(Binding binding) {
-        super(binding, Phase.PRE_PROTOCOL);
-        addAfter(MustUnderstandInterceptor.class.getName());
-        addAfter(StaxOutInterceptor.class.getName());
-        addAfter(SAAJOutInterceptor.class.getName());
+        super(binding, Phase.PRE_PROTOCOL_FRONTEND);
     }
 
     public Set<URI> getRoles() {

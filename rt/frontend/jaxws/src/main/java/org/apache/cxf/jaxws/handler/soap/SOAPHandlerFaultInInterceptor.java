@@ -48,7 +48,7 @@ public class SOAPHandlerFaultInInterceptor extends
         SoapInterceptor {
 
     public SOAPHandlerFaultInInterceptor(Binding binding) {
-        super(binding, Phase.PRE_PROTOCOL);
+        super(binding, Phase.PRE_PROTOCOL_FRONTEND);
     }
 
     public Set<URI> getRoles() {

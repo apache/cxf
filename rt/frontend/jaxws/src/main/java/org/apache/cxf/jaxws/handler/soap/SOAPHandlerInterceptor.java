@@ -46,7 +46,6 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import org.apache.cxf.binding.soap.HeaderUtil;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
-import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -83,9 +82,7 @@ public class SOAPHandlerInterceptor extends
     };
 
     public SOAPHandlerInterceptor(Binding binding) {
-        super(binding, Phase.PRE_PROTOCOL);
-        addAfter(MustUnderstandInterceptor.class.getName());
-        addAfter(SAAJOutInterceptor.class.getName());
+        super(binding, Phase.PRE_PROTOCOL_FRONTEND);
     }
 
     public Set<URI> getRoles() {

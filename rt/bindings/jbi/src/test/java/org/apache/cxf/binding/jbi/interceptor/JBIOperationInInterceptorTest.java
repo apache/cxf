@@ -50,7 +50,7 @@ public class JBIOperationInInterceptorTest extends Assert {
     @Test
     public void testPhase() throws Exception {
         PhaseInterceptor<JBIMessage> interceptor = new JBIOperationInInterceptor();
-        assertEquals(Phase.PRE_PROTOCOL, interceptor.getPhase());
+        assertEquals(Phase.PRE_PROTOCOL_FRONTEND, interceptor.getPhase());
     }
     
     @Test

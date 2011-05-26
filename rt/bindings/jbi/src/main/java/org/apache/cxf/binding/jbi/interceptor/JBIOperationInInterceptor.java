@@ -43,7 +43,7 @@ public class JBIOperationInInterceptor extends AbstractPhaseInterceptor<JBIMessa
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
 
     public JBIOperationInInterceptor() {
-        super(Phase.PRE_PROTOCOL);
+        super(Phase.PRE_PROTOCOL_FRONTEND);
     }
 
     public void handleMessage(JBIMessage message) throws Fault {

@@ -96,7 +96,6 @@ public class MAPCodec extends AbstractSoapInterceptor {
      */
     public MAPCodec() {
         super(Phase.PRE_PROTOCOL);
-        addBefore("org.apache.cxf.jaxws.handler.soap.SOAPHandlerInterceptor");
         transformer = new VersionTransformer(this);
     } 
 
