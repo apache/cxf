@@ -1101,18 +1101,16 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             XmlSchema schema = null;
 
             QName qname = (QName)mpi.getProperty(ELEMENT_NAME);
-            if (message.getMessageParts().size() == 1) {
-                qname = qname == null && !isOut ? getInParameterName(opInfo, method, -1) : qname;
-                qname = qname == null && isOut ? getOutParameterName(opInfo, method, -1) : qname;
+            if (message.getMessageParts().size() == 1 && qname == null) {
+                qname = !isOut ? getInParameterName(opInfo, method, -1) 
+                        : getOutParameterName(opInfo, method, -1);
+                
                 if (qname.getLocalPart().startsWith("arg") || qname.getLocalPart().startsWith("return")) {
                     qname = isOut
                         ? new QName(qname.getNamespaceURI(), method.getName() + "Response") : new QName(qname
                             .getNamespaceURI(), method.getName());
                 }
-
-            }
-
-            if (isOut && message.getMessageParts().size() > 1 && qname == null) {
+            } else if (isOut && message.getMessageParts().size() > 1 && qname == null) {
                 while (!isOutParam(method, paraNumber)) {
                     paraNumber++;
                 }

@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.wsdl.Definition;
@@ -65,6 +68,7 @@ import org.junit.Test;
 
 
 public class CodeFirstTest extends AbstractJaxWsTest {
+
     String address = "local://localhost:9000/Hello";
     
     @Test
@@ -469,4 +473,54 @@ public class CodeFirstTest extends AbstractJaxWsTest {
             return message;
         }
     }
+    
+    @Test
+    public void testCXF2766() throws Exception {
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean(); 
+        factory.setServiceClass(CXF2766.class); 
+        factory.setServiceBean(new CXF2766Impl()); 
+        factory.setAddress("local://localhost/testcxf2766"); 
+        Server server = factory.create();
+        server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+        server.getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        Document doc = getWSDLDocument(server);
+        //org.apache.cxf.helpers.XMLUtils.printDOM(doc);
+        assertValid("//wsdl:message[@name='doReturnResponse']/wsdl:part[@name='returnResponse']", doc);
+        
+        QName serviceName = new QName("http://cxf.apache.org/service.wsdl", "BareService");
+        QName portName = new QName("http://cxf.apache.org/service.wsdl", "BarePort");
+
+        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/",
+                        "local://localhost/testcxf2766"); 
+        CXF2766 proxy = service.getPort(portName, CXF2766.class);
+        proxy.doReturn(new ReturnRequestType());
+    }
+    @WebService(targetNamespace = "http://cxf.apache.org/service.wsdl")
+    @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+    public static interface CXF2766 {
+        @WebResult(name = "return-response", 
+                   targetNamespace = "http://cxf.apache.org/service.wsdl/types",
+                   partName = "returnResponse")
+        @WebMethod(action = "http://cxf.apache.org/doReturn")
+        ReturnResponseType 
+        doReturn(@WebParam(partName = "returnTrx",
+                           name = "return-request", 
+                           targetNamespace = "http://cxf.apache.org/service.wsdl/types")
+                           ReturnRequestType returnTrx);
+    }
+    @WebService(targetNamespace = "http://cxf.apache.org/service.wsdl")
+    public static class CXF2766Impl implements CXF2766 {
+        public ReturnResponseType doReturn(ReturnRequestType returnTrx) {
+            return new ReturnResponseType();
+        }
+    }
+    
+    @XmlType(name = "ReturnRequestType", namespace = "http://cxf.apache.org/service.wsdl/types")
+    public static class ReturnRequestType {
+    }
+    @XmlType(name = "ReturnResponseType", namespace = "http://cxf.apache.org/service.wsdl/types")
+    public static class ReturnResponseType {
+    }
+
 }
