@@ -39,11 +39,18 @@ public class JavaPort {
     private String namespace;
     private String portName;
     private String methodName;
+    private String javadoc;
     
     public JavaPort(String pname) {
         this.name = pname;
     }
 
+    public void setJavaDoc(String d) {
+        javadoc = d;
+    }
+    public String getJavaDoc() {
+        return javadoc == null ? "" : javadoc;
+    }
     public void setTransURI(String uri) {
         this.transURI = uri;
     }

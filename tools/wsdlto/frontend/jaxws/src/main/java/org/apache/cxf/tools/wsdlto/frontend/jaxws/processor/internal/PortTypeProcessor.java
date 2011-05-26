@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -84,6 +85,9 @@ public class PortTypeProcessor extends AbstractProcessor {
                 }
 
                 intf.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
+            }
+            if (StringUtils.isEmpty(intf.getClassJavaDoc())) {
+                intf.setClassJavaDoc(interfaceInfo.getDocumentation());
             }
 
             ClassCollector collector = context.get(ClassCollector.class);

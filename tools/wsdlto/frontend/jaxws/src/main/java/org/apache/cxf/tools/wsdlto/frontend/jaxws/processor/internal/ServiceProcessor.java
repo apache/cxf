@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -242,6 +243,9 @@ public class ServiceProcessor extends AbstractProcessor {
         }
         
         sclz.setClassJavaDoc(jaxwsBinding.getClassJavaDoc());
+        if (StringUtils.isEmpty(sclz.getClassJavaDoc())) {
+            sclz.setClassJavaDoc(service.getDocumentation());
+        }
         model.addServiceClass(sclz.getName(), sclz);
     }
 
@@ -281,6 +285,7 @@ public class ServiceProcessor extends AbstractProcessor {
         for (BindingOperationInfo bop : operations) {
             processOperation(model, bop, binding);
         }
+        jport.setJavaDoc(port.getDocumentation());
         return jport;
     }
     private void processBindings(JavaModel model) {
