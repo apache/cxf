@@ -52,6 +52,13 @@ http://cxf.apache.org/schemas/core.xsd">
     <jaxrs:providers>
        <ref bean="jaxbProvider"/>
        <ref bean="jsonProvider"/>
+       <bean class="org.apache.cxf.jaxrs.model.wadl.WadlGenerator">
+           <property name="externalLinks">
+               <list>
+                  <value>classpath:/WEB-INF/schemas/book.xsd</value>
+               </list>
+           </property>
+       </bean>
     </jaxrs:providers>
   </jaxrs:server>
 

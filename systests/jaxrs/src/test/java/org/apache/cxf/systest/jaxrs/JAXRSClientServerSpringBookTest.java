@@ -42,6 +42,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -98,13 +99,43 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetWadlFromWadlLocation() throws Exception {
         String address = "http://localhost:" + PORT + "/the/generated";    
-        checkWadlResourcesInfo(address, address + "/bookstore", 1);
+        checkWadlResourcesInfo(address, address + "/bookstore", "/schemas/book.xsd", 1);
+    
+        checkSchemas(address, "/schemas/book.xsd", "/schemas/chapter.xsd", "include");
+        checkSchemas(address, "/schemas/chapter.xsd", null, null);
+    }
+    
+    @Test
+    public void testGetGeneratedWadlWithExternalSchemas() throws Exception {
+        String address = "http://localhost:" + PORT + "/the/bookstore";    
+        checkWadlResourcesInfo(address, address, "/book.xsd", 1);
+    
+        checkSchemas(address, "/book.xsd", "/bookid.xsd", "import");
+        checkSchemas(address, "/bookid.xsd", null, null);
+    }
+    
+    private void checkSchemas(String address, String schemaSegment, 
+                              String includedSchema,
+                              String refAttrName) throws Exception {
+        WebClient client = WebClient.create(address + schemaSegment);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Element root = doc.getDocumentElement();
+        assertEquals(XmlSchemaConstants.XSD_NAMESPACE_URI, root.getNamespaceURI());
+        assertEquals("schema", root.getLocalName());
+        if (includedSchema != null) {
+            List<Element> includeEls = DOMUtils.getChildrenWithName(root, 
+                         XmlSchemaConstants.XSD_NAMESPACE_URI, refAttrName);
+            assertEquals(1, includeEls.size());
+            String href = includeEls.get(0).getAttribute("schemaLocation");
+            assertEquals(address + includedSchema, href);
+        }
         
     }
     
-    private void checkWadlResourcesInfo(String baseURI, String requestURI, int size) throws Exception {
+    private void checkWadlResourcesInfo(String baseURI, String requestURI, 
+                                        String schemaRef, int size) throws Exception {
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
@@ -116,7 +147,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                                                                 WadlGenerator.WADL_NS, "include");
         assertEquals(1, includeEls.size());
         String href = includeEls.get(0).getAttribute("href");
-        assertEquals("schemas/book.xsd", href);
+        assertEquals(baseURI + schemaRef, href);
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
                                                                   WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());

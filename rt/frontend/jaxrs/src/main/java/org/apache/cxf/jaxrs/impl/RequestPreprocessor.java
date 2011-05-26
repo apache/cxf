@@ -177,20 +177,31 @@ public class RequestPreprocessor {
      * we will need to save the list of ClassResourceInfos on the EndpointInfo though
      */
     public Response checkMetadataRequest(Message m) {
+        String originalRequestURI = (String)m.get(Message.REQUEST_URI);
         String query = (String)m.get(Message.QUERY_STRING);
         if (query != null && query.contains(WadlGenerator.WADL_QUERY)) {
-            String requestURI = getValueWithoutSlash((String)m.get(Message.REQUEST_URI));
+            String requestURI = getValueWithoutSlash(originalRequestURI);
             String baseAddress = getValueWithoutSlash(HttpUtils.getBaseAddress(m));
             if (baseAddress.equals(requestURI)) {
-                List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(m).getRequestHandlers();
-                // this is actually being tested by ProviderFactory unit tests but just in case
-                // WadlGenerator, the custom or default one, must be the first one
-                if (shs.size() > 0 && shs.get(0).getProvider() instanceof WadlGenerator) {
-                    return shs.get(0).getProvider().handleRequest(m, null);
-                }
+                return handleMetadataRequest(m);
             }
+        } else if (originalRequestURI.endsWith(".xsd")) {
+            // trying WADLGenerator which may be caching schema resources won't
+            // interfere with custom schema handlers if any
+            return handleMetadataRequest(m);
         }
         return null;
+    }
+    
+    private Response handleMetadataRequest(Message m) { 
+        List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(m).getRequestHandlers();
+        // this is actually being tested by ProviderFactory unit tests but just in case
+        // WadlGenerator, the custom or default one, must be the first one
+        if (shs.size() > 0 && shs.get(0).getProvider() instanceof WadlGenerator) {
+            return shs.get(0).getProvider().handleRequest(m, null);
+        } else {
+            return null;
+        }
     }
     
     private static String getValueWithoutSlash(String value) {
