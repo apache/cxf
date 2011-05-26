@@ -161,7 +161,6 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         control = cs.getControlPort();
 
         LOG.info("starting replicated target: " + address);
-        System.out.println("starting replicated target: " + address);
         assertTrue("Failed to start greeter", control.startGreeter(address));
         targets.add(address);
     }

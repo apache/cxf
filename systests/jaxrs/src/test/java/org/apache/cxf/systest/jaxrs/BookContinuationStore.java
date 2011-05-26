@@ -106,7 +106,7 @@ public class BookContinuationStore {
     
     private void suspendInvocation(final String name, Continuation cont) {
         
-        System.out.println("Suspending invocation for " + name);
+        //System.out.println("Suspending invocation for " + name);
         
         try {
             cont.suspend(500000);    
@@ -129,7 +129,7 @@ public class BookContinuationStore {
     
     private Continuation getContinuation(String name) {
         
-        System.out.println("Getting continuation for " + name);
+        //System.out.println("Getting continuation for " + name);
         
         synchronized (suspended) {
             Continuation suspendedCont = suspended.remove(name);

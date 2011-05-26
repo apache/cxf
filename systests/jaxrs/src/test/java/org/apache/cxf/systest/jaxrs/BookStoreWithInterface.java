@@ -59,7 +59,7 @@ public class BookStoreWithInterface extends BookStoreStorage
     }
     
     public void preDestroy() {
-        System.out.println("PreDestroy called");
+        //System.out.println("PreDestroy called");
     }
     
     public Book getThatBook(Long id, String s) throws BookNotFoundFault {
@@ -80,7 +80,7 @@ public class BookStoreWithInterface extends BookStoreStorage
     }
     
     private Book doGetBook(Long id) throws BookNotFoundFault {
-        System.out.println("----invoking getBook with id: " + id);
+        //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(id);
         if (book != null) {
             return book;
