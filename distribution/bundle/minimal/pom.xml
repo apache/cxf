@@ -203,6 +203,7 @@
                             org.junit*;resolution:=optional,
                             org.eclipse.jetty*;resolution:=optional;resolution:=optional;version="[7.2,8)",
                             org.mozilla.javascript*;resolution:=optional,
+                            org.objectweb.asm*;version="[2.0,4)";resolution:=optional,
                             org.slf4j*;resolution:=optional;version="[1.5,2)",
                             org.springframework*;resolution:=optional;version="[2.5,4)",
                             javax.activation;version="[0.0,2)",
