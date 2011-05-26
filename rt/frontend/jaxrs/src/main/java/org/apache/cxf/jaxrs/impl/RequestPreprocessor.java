@@ -185,7 +185,7 @@ public class RequestPreprocessor {
             if (baseAddress.equals(requestURI)) {
                 return handleMetadataRequest(m);
             }
-        } else if (originalRequestURI.endsWith(".xsd")) {
+        } else if (originalRequestURI != null && originalRequestURI.endsWith(".xsd")) {
             // trying WADLGenerator which may be caching schema resources won't
             // interfere with custom schema handlers if any
             return handleMetadataRequest(m);
