@@ -22,6 +22,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -103,12 +104,14 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     }
 
     public AegisType createTypeForClass(TypeClassInfo info) {
-
+        
         Class javaClass = TypeUtil.getTypeRelatedClass(info.getType());
         AegisType result = null;
         boolean newType = true;
-
-        if (info.getAegisTypeClass() != null) {
+        if (info.getType() instanceof TypeVariable) {
+            //it's the generic type
+            result = getOrCreateGenericType(info);
+        } else if (info.getAegisTypeClass() != null) {
             result = createUserType(info);
         } else if (isArray(javaClass)) {
             result = createArrayType(info);

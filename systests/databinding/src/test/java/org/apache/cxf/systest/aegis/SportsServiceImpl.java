@@ -22,6 +22,7 @@ package org.apache.cxf.systest.aegis;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +60,17 @@ public class SportsServiceImpl implements SportsService {
         result.put("key1", map1);
         return result;
 
+    }
+
+   
+    public <T> T getGeneric(Collection<T> collection) {
+        Iterator<T> iter = collection.iterator();
+        
+        T ret = null;
+        if (iter.hasNext()) {
+            ret = iter.next();
+        }
+        return ret;
     }
       
 }

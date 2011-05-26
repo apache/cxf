@@ -43,4 +43,6 @@ public interface SportsService {
     }
 
     Map<String, Map<Integer, Integer>> testComplexMapResult();
+    
+    <T> T getGeneric(Collection<T> collection);
 }

@@ -22,6 +22,7 @@ package org.apache.cxf.systest.aegis;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -178,6 +179,21 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals(result.toString(), "{key1={1=3}}");
     }
     
+    @Test
+    public void testGenericCollection() throws Exception {
+        AegisDatabinding aegisBinding = new AegisDatabinding();
+        JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
+        proxyFactory.setDataBinding(aegisBinding);
+        proxyFactory.setServiceClass(SportsService.class);
+        proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegisSports");
+        proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
+        proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
+        SportsService service = (SportsService) proxyFactory.create();
+        List<String> list = new ArrayList<String>();
+        list.add("ffang");
+        String ret = service.getGeneric(list);
+        assertEquals(ret, "ffang");
+    }
           
     @Test
     public void testDynamicClient() throws Exception {
