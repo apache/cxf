@@ -72,5 +72,25 @@ public class SportsServiceImpl implements SportsService {
         }
         return ret;
     }
+
+    
+    public <T1, T2> Pair<T1, T2> getReturnGenericPair(T1 first, T2 second) {
+        return new Pair<T1, T2>(first, second);
+    }
+
+   
+    public Pair<Integer, String> getReturnQualifiedPair(Integer first, String second) {
+        return new Pair<Integer, String>(first, second);
+    }
+
+    
+    public <T1, T2> int getGenericPair(Pair<T1, T2> pair) {
+        return (Integer) pair.getFirst();
+    }
+
+   
+    public int getQualifiedPair(Pair<Integer, String> pair) {
+        return pair.getFirst();
+    }
       
 }

@@ -41,6 +41,7 @@ import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.systest.aegis.SportsService.Pair;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
@@ -194,6 +195,66 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         String ret = service.getGeneric(list);
         assertEquals(ret, "ffang");
     }
+    
+    @Test
+    public void testGenericPair() throws Exception {
+        AegisDatabinding aegisBinding = new AegisDatabinding();
+        JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
+        proxyFactory.setDataBinding(aegisBinding);
+        proxyFactory.setServiceClass(SportsService.class);
+        proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegisSports");
+        proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
+        proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
+        SportsService service = (SportsService) proxyFactory.create();
+        Pair<String, Integer> ret = service.getReturnGenericPair("ffang", 111);
+        assertEquals("ffang", ret.getFirst());
+        assertEquals(new Integer(111), ret.getSecond());
+    }
+    
+    @Test
+    public void testReturnQualifiedPair() throws Exception {
+        AegisDatabinding aegisBinding = new AegisDatabinding();
+        JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
+        proxyFactory.setDataBinding(aegisBinding);
+        proxyFactory.setServiceClass(SportsService.class);
+        proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegisSports");
+        proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
+        proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
+        SportsService service = (SportsService) proxyFactory.create();
+        Pair<Integer, String> ret = service.getReturnQualifiedPair(111, "ffang");
+        assertEquals(new Integer(111), ret.getFirst());
+        assertEquals("ffang", ret.getSecond());
+    }
+
+    
+    @Test
+    public void testReturnGenericPair() throws Exception {
+        AegisDatabinding aegisBinding = new AegisDatabinding();
+        JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
+        proxyFactory.setDataBinding(aegisBinding);
+        proxyFactory.setServiceClass(SportsService.class);
+        proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegisSports");
+        proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
+        proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
+        SportsService service = (SportsService) proxyFactory.create();
+        int ret = service.getGenericPair(new Pair<Integer, String>(111, "String"));
+        assertEquals(111, ret);
+    }
+    
+    @Test
+    public void testQualifiedPair() throws Exception {
+        AegisDatabinding aegisBinding = new AegisDatabinding();
+        JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
+        proxyFactory.setDataBinding(aegisBinding);
+        proxyFactory.setServiceClass(SportsService.class);
+        proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegisSports");
+        proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
+        proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
+        SportsService service = (SportsService) proxyFactory.create();
+        int ret = service.getQualifiedPair(new Pair<Integer, String>(111, "ffang"));
+        assertEquals(111, ret);
+    }
+
           
     @Test
     public void testDynamicClient() throws Exception {
