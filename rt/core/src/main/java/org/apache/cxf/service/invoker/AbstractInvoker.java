@@ -251,7 +251,7 @@ public abstract class AbstractInvoker implements Invoker {
      * enables attributes on that method to be found.
      * 
      * @param method method to be invoked, which may come from an interface
-     * @param targetClass target class for the curren invocation. May be
+     * @param targetClass target class for the current invocation. May be
      *            <code>null</code> or may not even implement the method.
      * @return the more specific method, or the original method if the
      *         targetClass doesn't specialize it or implement it or is null
