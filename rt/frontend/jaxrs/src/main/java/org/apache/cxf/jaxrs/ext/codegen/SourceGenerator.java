@@ -165,10 +165,18 @@ public class SourceGenerator {
     }
     
     public void generateSource(String wadl, File srcDir, String codeType) {
-        Element appElement = readWadl(wadl);
+        Application app = readWadl(wadl, wadlPath);
         
         Set<String> typeClassNames = new HashSet<String>();
-        List<SchemaInfo> schemaElements = getSchemaElements(appElement);
+        GrammarInfo gInfo = generateSchemaCodeAndInfo(app, typeClassNames, srcDir);
+        if (!CODE_TYPE_GRAMMAR.equals(codeType)) {
+            generateResourceClasses(app, gInfo, typeClassNames, srcDir);
+        }
+    }
+    
+    private GrammarInfo generateSchemaCodeAndInfo(Application app, Set<String> typeClassNames, 
+                                                  File srcDir) {
+        List<SchemaInfo> schemaElements = getSchemaElements(app);
         if (schemaElements != null && !schemaElements.isEmpty()) {
             // generate classes from schema
             JCodeModel codeModel = createCodeModel(schemaElements, typeClassNames);
@@ -176,14 +184,12 @@ public class SourceGenerator {
                 generateClassesFromSchema(codeModel, srcDir);
             }
         }
-        
-        if (!CODE_TYPE_GRAMMAR.equals(codeType)) {
-            generateResourceClasses(appElement, schemaElements, typeClassNames, srcDir);
-        }
+        return getGrammarInfo(app.getAppElement(), schemaElements);
     }
     
-    private void generateResourceClasses(Element appElement, List<SchemaInfo> schemaElements, 
+    private void generateResourceClasses(Application app, GrammarInfo gInfo, 
                                          Set<String> typeClassNames, File src) {
+        Element appElement = app.getAppElement();
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(appElement, 
             WadlGenerator.WADL_NS, "resources");
         if (resourcesEls.size() != 1) {
@@ -196,12 +202,12 @@ public class SourceGenerator {
             throw new IllegalStateException("WADL has no resource elements");
         }
         
-        GrammarInfo gInfo = getGrammarInfo(appElement, schemaElements);
         for (int i = 0; i < resourceEls.size(); i++) {
-            Element resource = resourceEls.get(i);
-            writeResourceClass(resource, typeClassNames, gInfo, src, true, generateInterfaces);
+            Element resource = getResourceElement(app, resourceEls.get(i), gInfo, typeClassNames, 
+                                                  resourceEls.get(i).getAttribute("type"), src);
+            writeResourceClass(app, resource, typeClassNames, gInfo, src, true, generateInterfaces);
             if (generateInterfaces && generateImpl) {
-                writeResourceClass(resource, typeClassNames, gInfo, src, true, false);
+                writeResourceClass(app, resource, typeClassNames, gInfo, src, true, false);
             }
             if (resourceName != null) {
                 break;
@@ -212,10 +218,49 @@ public class SourceGenerator {
         
     }
     
+    //TODO: similar procedure should work for representation, method and param
+    // thus some of the code here will need to be moved into a sep function to be
+    // reused by relevant handlers
+    private Element getResourceElement(Application app, Element resElement,
+                                       GrammarInfo gInfo, Set<String> typeClassNames,
+                                       String type, File srcDir) {
+        if (type.length() > 0) {
+            if (type.startsWith("#")) {
+                String refId = type.substring(1);
+                List<Element> resourceTypes = 
+                    DOMUtils.getChildrenWithName(app.getAppElement(), WadlGenerator.WADL_NS, 
+                                                 "resource_type");
+                for (Element resourceType : resourceTypes) {
+                    if (refId.equals(resourceType.getAttribute("id"))) {
+                        Element realElement = (Element)resourceType.cloneNode(true);
+                        DOMUtils.setAttribute(realElement, "id", resElement.getAttribute("id"));
+                        DOMUtils.setAttribute(realElement, "path", resElement.getAttribute("path"));
+                        return realElement;
+                    }
+                }
+            } else {
+                URI wadlRef = URI.create(type);
+                String wadlRefPath = app.getWadlPath() != null 
+                    ? getBaseWadlPath(app.getWadlPath()) + wadlRef.getPath() : wadlRef.getPath();
+                Application refApp = new Application(readIncludedDocument(wadlRefPath),
+                                                     wadlRefPath);
+                GrammarInfo gInfoBase = generateSchemaCodeAndInfo(refApp, typeClassNames, srcDir);
+                if (gInfoBase != null) {
+                    gInfo.getElementTypeMap().putAll(gInfoBase.getElementTypeMap());
+                    gInfo.getNsMap().putAll(gInfo.getNsMap());
+                }
+                return getResourceElement(refApp, resElement, gInfo, typeClassNames, 
+                                          "#" + wadlRef.getFragment(), srcDir);
+            }
+        } 
+        return resElement;     
+        
+    }
+    
     private GrammarInfo getGrammarInfo(Element appElement, List<SchemaInfo> schemaElements) {
         
         if (schemaElements == null || schemaElements.isEmpty()) {
-            return null;
+            return new GrammarInfo();
         }
         
         Map<String, String> nsMap = new HashMap<String, String>();
@@ -247,7 +292,7 @@ public class SourceGenerator {
         
     }
     
-    private void writeResourceClass(Element rElement, Set<String> typeClassNames, 
+    private void writeResourceClass(Application app, Element rElement, Set<String> typeClassNames, 
                                     GrammarInfo gInfo, File src, boolean isRoot,
                                     boolean interfaceIsGenerated) {
         String resourceId = resourceName != null 
@@ -304,7 +349,10 @@ public class SourceGenerator {
             String id = subEl.getAttribute("id");
             if (id.length() > 0 && !resourceId.equals(id) && !id.startsWith("{java")
                 && !id.startsWith("java")) {
-                writeResourceClass(subEl, typeClassNames, gInfo, src, false, interfaceIsGenerated);
+                writeResourceClass(app, 
+                                   getResourceElement(app, subEl, gInfo, typeClassNames, 
+                                                      subEl.getAttribute("type"), src), 
+                                   typeClassNames, gInfo, src, false, interfaceIsGenerated);
             }
         }
     }
@@ -735,8 +783,8 @@ public class SourceGenerator {
         }
     }
     
-    private Element readWadl(String wadl) {
-        return readXmlDocument(new StringReader(wadl));
+    private Application readWadl(String wadl, String docPath) {
+        return new Application(readXmlDocument(new StringReader(wadl)), docPath);
     }
     
     private Element readXmlDocument(Reader reader) {
@@ -758,8 +806,8 @@ public class SourceGenerator {
         }
     }
 
-    private List<SchemaInfo> getSchemaElements(Element appElement) {
-        List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, 
+    private List<SchemaInfo> getSchemaElements(Application app) {
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(app.getAppElement(), 
                                                                 WadlGenerator.WADL_NS, "grammars");
         if (grammarEls.size() != 1) {
             return null;
@@ -769,7 +817,7 @@ public class SourceGenerator {
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
              XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
         for (Element schemaEl : schemasEls) {
-            schemas.add(createSchemaInfo(schemaEl, wadlPath));
+            schemas.add(createSchemaInfo(schemaEl, app.getWadlPath()));
         }
         List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
              WadlGenerator.WADL_NS, "include");
@@ -778,17 +826,17 @@ public class SourceGenerator {
             
             String schemaURI = resolveLocationWithCatalog(href);
             if (schemaURI == null) {
-                schemaURI = wadlPath != null ? getBaseWadlPath() + href : href;
+                schemaURI = app.getWadlPath() != null ? getBaseWadlPath(app.getWadlPath()) + href : href;
             }
-            schemas.add(createSchemaInfo(readIncludedSchema(schemaURI),
+            schemas.add(createSchemaInfo(readIncludedDocument(schemaURI),
                                             schemaURI));
         }
         return schemas;
     }
     
-    private String getBaseWadlPath() {
-        int lastSep = wadlPath.lastIndexOf("/");
-        return lastSep != -1 ? wadlPath.substring(0, lastSep + 1) : wadlPath;
+    private static String getBaseWadlPath(String docPath) {
+        int lastSep = docPath.lastIndexOf("/");
+        return lastSep != -1 ? docPath.substring(0, lastSep + 1) : docPath;
     }
     
     private SchemaInfo createSchemaInfo(Element schemaEl, String systemId) { 
@@ -812,7 +860,7 @@ public class SourceGenerator {
         }
     }
     
-    private Element readIncludedSchema(String href) {
+    private Element readIncludedDocument(String href) {
         
         try {
             InputStream is = null;
@@ -824,7 +872,7 @@ public class SourceGenerator {
             }
             return readXmlDocument(new InputStreamReader(is, "UTF-8"));
         } catch (Exception ex) {
-            throw new RuntimeException("Schema " + href + " can not be read");
+            throw new RuntimeException("Resource " + href + " can not be read");
         }
     }
     
@@ -941,8 +989,12 @@ public class SourceGenerator {
     }
     
     private static class GrammarInfo {
-        private Map<String, String> nsMap;
-        private Map<String, String> elementTypeMap;
+        private Map<String, String> nsMap = new HashMap<String, String>();
+        private Map<String, String> elementTypeMap = new HashMap<String, String>();
+        
+        public GrammarInfo() {
+            
+        }
         
         public GrammarInfo(Map<String, String> nsMap, Map<String, String> elementTypeMap) {
             this.nsMap = nsMap;
@@ -992,6 +1044,23 @@ public class SourceGenerator {
 
         public void warning(SAXParseException ex) {
             // ignore
+        }
+    }
+    
+    private class Application {
+        private Element appElement;
+        private String wadlPath;
+        public Application(Element appElement, String wadlPath) {
+            this.appElement = appElement;
+            this.wadlPath = wadlPath;
+        }
+        
+        public Element getAppElement() {
+            return appElement;
+        }
+        
+        public String getWadlPath() {
+            return wadlPath;
         }
     }
 }

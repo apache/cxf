@@ -106,6 +106,30 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
     @Test    
+    public void testCodeGenWithImportedSchemaAndResourceSet() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreResourceRef.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
     public void testCodeGenWithImportedSchemaAndBinding() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
@@ -163,6 +187,35 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/singleResource.xml"));
+            context.put(WadlToolConstants.CFG_RESOURCENAME, "CustomResource");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+            
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+            assertEquals(1, javaFiles.size());
+            assertTrue(checkContains(javaFiles, "application.CustomResource.java"));
+            
+            List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(1, classFiles.size());
+            assertTrue(checkContains(classFiles, "application.CustomResource.class"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test    
+    public void testCodeGenWithResourceSet() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/singleResourceWithRefs.xml"));
             context.put(WadlToolConstants.CFG_RESOURCENAME, "CustomResource");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
             
