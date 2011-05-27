@@ -19,6 +19,9 @@
 
 package org.apache.cxf.tools.common.model;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import javax.jws.soap.SOAPBinding;
 
@@ -48,11 +51,48 @@ public class JavaInterface implements JavaAnnotatable {
       
     public JavaInterface() {
     }
-    
     public JavaInterface(JavaModel m) {
         this.model = m;
     }
 
+    
+    static String formatJavaDoc(String d, String spaces) {
+        if (d != null) {
+            StringBuilder d2 = new StringBuilder(d.length());
+            StringReader r = new StringReader(d);
+            BufferedReader r2 = new BufferedReader(r);
+            try {
+                String s2 = r2.readLine();
+                String pfx = null;
+                while (s2 != null) {
+                    if (pfx == null && s2.length() > 0) {
+                        pfx = "";
+                        while (s2.length() > 0 && Character.isWhitespace(s2.charAt(0))) {
+                            pfx += " ";
+                            s2 = s2.substring(1);
+                        }
+                    }
+                    if (pfx != null) {
+                        if (d2.length() > 0) {
+                            d2.append("\n");
+                        }
+                        d2.append(spaces).append("* ");
+                        if (s2.startsWith(pfx)) {
+                            d2.append(s2.substring(pfx.length()));
+                        } else {
+                            d2.append(s2);
+                        }
+                    }
+                    s2 = r2.readLine();
+                }
+                d = d2.toString();
+            } catch (IOException ex) {
+                //ignore, use the raw value
+            }
+        }
+        return d;
+    }
+    
     public void setWebServiceName(String wsn) {
         this.webserviceName = wsn;
     }
@@ -171,7 +211,7 @@ public class JavaInterface implements JavaAnnotatable {
     }
     
     public void setPackageJavaDoc(String doc) {
-        packageJavaDoc = doc;
+        packageJavaDoc = formatJavaDoc(doc, " ");
     }
     
     public String getPackageJavaDoc() {   
@@ -179,7 +219,7 @@ public class JavaInterface implements JavaAnnotatable {
     }
     
     public void setClassJavaDoc(String doc) {
-        classJavaDoc = doc;
+        classJavaDoc = formatJavaDoc(doc, " ");
     }
     
     public String getClassJavaDoc() {   
