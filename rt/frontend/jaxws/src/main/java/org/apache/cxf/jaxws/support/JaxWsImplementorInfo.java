@@ -19,11 +19,13 @@
 
 package org.apache.cxf.jaxws.support;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jws.WebService;
@@ -253,6 +255,18 @@ public class JaxWsImplementorInfo {
         }
         return null;
     }
+    
+    protected static boolean ifAnnotationLoadedByOtherClassLoader(Class<?> cls,
+        Class<? extends Annotation> annotationClass) {
+        for (Annotation an : cls.getAnnotations()) {
+            if (an.annotationType() != null 
+                && annotationClass.getName().equals(an.annotationType().getName())) {
+                return true;
+            }
+        }
+        return false;
+        
+    }
     private void initialize() {
         Class<?> cls = implementorClass;
         while (cls != null) {
@@ -261,6 +275,13 @@ public class JaxWsImplementorInfo {
                 wsAnnotations.add(annotation);
                 if (cls.isInterface()) {
                     cls = null;
+                }
+            } else {
+                // check if there are annotations has the same name with WebServices
+                if (ifAnnotationLoadedByOtherClassLoader(cls, WebService.class)) {
+                    LOG.log(Level.WARNING,
+                            "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
+                            WebService.class.getName());
                 }
             }
             if (cls != null) {
@@ -312,10 +333,22 @@ public class JaxWsImplementorInfo {
         WebServiceProvider ann = cls.getAnnotation(WebServiceProvider.class);
         if (null != ann) {
             return ann;
+        } else {
+            if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
+                LOG.log(Level.WARNING, 
+                    "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
+                    WebServiceProvider.class.getName());
+            }
         }
         for (Class<?> inf : cls.getInterfaces()) {
             if (null != inf.getAnnotation(WebServiceProvider.class)) {
                 return inf.getAnnotation(WebServiceProvider.class);
+            } else {
+                if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
+                    LOG.log(Level.WARNING, 
+                            "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
+                            WebServiceProvider.class.getName());
+                }
             }
         }
         return getWebServiceProviderAnnotation(cls.getSuperclass());
