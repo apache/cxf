@@ -21,10 +21,9 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl"
-		class="org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl"
-		lazy-init="true">
-		<constructor-arg ref="cxf"/>
-	</bean>
-
+    <bean id="org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl"
+        class="org.apache.cxf.bus.spring.OldSpringSupport" lazy-init="true">
+        <constructor-arg ref="cxf"/>
+        <constructor-arg value="org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl"/>
+    </bean>
 </beans>
