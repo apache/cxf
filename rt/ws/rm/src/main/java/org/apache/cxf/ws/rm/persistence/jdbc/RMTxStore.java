@@ -23,7 +23,6 @@ package org.apache.cxf.ws.rm.persistence.jdbc;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -64,23 +63,23 @@ public class RMTxStore implements RMStore {
         "CREATE TABLE CXF_RM_DEST_SEQUENCES " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
         + "ACKS_TO VARCHAR(1024) NOT NULL, "
-        + "LAST_MSG_NO BIGINT, "
+        + "LAST_MSG_NO DECIMAL(19, 0), "
         + "ENDPOINT_ID VARCHAR(1024), "
         + "ACKNOWLEDGED BLOB, "
         + "PRIMARY KEY (SEQ_ID))";
     private static final String CREATE_SRC_SEQUENCES_TABLE_STMT =
         "CREATE TABLE CXF_RM_SRC_SEQUENCES " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "CUR_MSG_NO BIGINT DEFAULT 1 NOT NULL, "
+        + "CUR_MSG_NO DECIMAL(19, 0) DEFAULT 1 NOT NULL, "
         + "LAST_MSG CHAR(1), "
-        + "EXPIRY BIGINT, "
+        + "EXPIRY DECIMAL(19, 0), "
         + "OFFERING_SEQ_ID VARCHAR(256), "
         + "ENDPOINT_ID VARCHAR(1024), "            
         + "PRIMARY KEY (SEQ_ID))";
     private static final String CREATE_MESSAGES_TABLE_STMT =
         "CREATE TABLE {0} " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "MSG_NO BIGINT NOT NULL, "
+        + "MSG_NO DECIMAL(19, 0) NOT NULL, "
         + "SEND_TO VARCHAR(256), "
         + "CONTENT BLOB, "
         + "PRIMARY KEY (SEQ_ID, MSG_NO))";
@@ -561,7 +560,7 @@ public class RMTxStore implements RMStore {
         }
         int i = 1;
         stmt.setString(i++, id);  
-        stmt.setBigDecimal(i++, new BigDecimal(nr));
+        stmt.setLong(i++, nr);
         stmt.setString(i++, to); 
         stmt.setBinaryStream(i++, msg.getInputStream(), msg.getSize());
         stmt.execute();
@@ -575,7 +574,7 @@ public class RMTxStore implements RMStore {
         if (null == updateSrcSequenceStmt) {
             updateSrcSequenceStmt = connection.prepareStatement(UPDATE_SRC_SEQUENCE_STMT_STR);
         }
-        updateSrcSequenceStmt.setBigDecimal(1, new BigDecimal(seq.getCurrentMessageNr())); 
+        updateSrcSequenceStmt.setLong(1, seq.getCurrentMessageNr()); 
         updateSrcSequenceStmt.setBoolean(2, seq.isLastMessage()); 
         updateSrcSequenceStmt.setString(3, seq.getIdentifier().getValue());
         updateSrcSequenceStmt.execute();
