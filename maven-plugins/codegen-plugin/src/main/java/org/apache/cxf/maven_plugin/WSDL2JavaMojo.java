@@ -51,6 +51,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectUtils;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.Manifest.Attribute;
@@ -380,6 +381,26 @@ public class WSDL2JavaMojo extends AbstractMojo {
         }
     }
 
+    private void configureProxyServerSettings() throws MojoExecutionException {
+
+        Proxy proxy = mavenSession.getSettings().getActiveProxy();
+
+        if (proxy != null) {
+
+            getLog().info("Using proxy server configured in maven.");
+
+            if (proxy.getHost() == null) {
+                throw new MojoExecutionException("Proxy in settings.xml has no host");
+            } else {
+                System.setProperty("proxySet", "true");
+                System.setProperty("proxyHost", proxy.getHost());
+                System.setProperty("proxyPort", String.valueOf(proxy.getPort()));
+            }
+
+
+        }
+    }
+
     public void execute() throws MojoExecutionException {
         if (includes == null) {
             includes = new String[] {
@@ -390,6 +411,8 @@ public class WSDL2JavaMojo extends AbstractMojo {
         File classesDir = new File(classesDirectory);
         classesDir.mkdirs();
         markerDirectory.mkdirs();
+
+        configureProxyServerSettings();
 
         List<WsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
 
