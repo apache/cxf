@@ -98,7 +98,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -122,7 +121,8 @@ public class WadlGenerator implements RequestHandler {
     private boolean useSingleSlashResource;
     private boolean ignoreForwardSlash;
     private boolean addResourceAndMethodIds;
-
+    private boolean ignoreRequests;
+    
     private boolean useJaxbContextForQnames = true;
 
     private List<String> externalSchemasCache;
@@ -175,8 +175,8 @@ public class WadlGenerator implements RequestHandler {
             return null;
         }
 
-        if (isPrivate(m)) {
-            return Response.status(401).build();
+        if (ignoreRequests) {
+            return Response.status(404).build();
         }
 
         HttpHeaders headers = new HttpHeadersImpl(m);
@@ -1322,10 +1322,6 @@ public class WadlGenerator implements RequestHandler {
         return privateAddresses;
     }
 
-    private boolean isPrivate(Message m) {
-        return MessageUtils.isTrue(m.getContextualProperty("org.apache.cxf.endpoint.private"));
-    }
-
     public void setAddResourceAndMethodIds(boolean addResourceAndMethodIds) {
         this.addResourceAndMethodIds = addResourceAndMethodIds;
     }
@@ -1345,6 +1341,10 @@ public class WadlGenerator implements RequestHandler {
 
     public void setIgnoreForwardSlash(boolean ignoreForwardSlash) {
         this.ignoreForwardSlash = ignoreForwardSlash;
+    }
+
+    public void setIgnoreRequests(boolean ignoreRequests) {
+        this.ignoreRequests = ignoreRequests;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {

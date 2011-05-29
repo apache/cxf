@@ -749,7 +749,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         WebClient webClient = 
             WebClient.create("http://localhost:" + PORT + "/test/services/rest3?_wadl&type=xml");
         WebClient.getConfig(webClient).getHttpConduit().getClient().setReceiveTimeout(1000000);
-        assertEquals(401, webClient.get().getStatus());
+        assertEquals(404, webClient.get().getStatus());
     }
     
     @Test

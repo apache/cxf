@@ -129,6 +129,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     
     <jaxrs:providers>
        <ref bean="jaxbProviderFI" />
+       <bean class="org.apache.cxf.jaxrs.model.wadl.WadlGenerator">
+           <property name="ignoreRequests" value="true"/>
+       </bean>
     </jaxrs:providers>
 
     <jaxrs:properties>
