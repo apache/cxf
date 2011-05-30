@@ -152,7 +152,7 @@ public class AnyTest extends JavascriptRhinoTest {
             testUtilities.rhinoCallConvert("testAny1ToClientChalk", Notifier.class, 
                                            testUtilities.javaToJS(getAddress()));
         
-        boolean notified = notifier.waitForJavascript(1000 * 10);
+        boolean notified = notifier.waitForJavascript(1000 * 20);
         assertTrue(notified);
         Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
         assertNull(errorStatus);
