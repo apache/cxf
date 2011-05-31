@@ -208,8 +208,11 @@ public class ServletController extends AbstractServletController {
         
         int len = -1;
         ServletDestination ret = null;
-        for (String path : transport.getDestinationsPaths()) {           
-            if (address.startsWith(path)
+        for (String path : transport.getDestinationsPaths()) {
+            if ((address.equals(path) 
+                || "/".equals(path) 
+                || (address.length() > path.length()
+                   && address.startsWith(path) && address.charAt(path.length()) == '/'))
                 && path.length() > len) {
                 ret = transport.getDestinationForPath(path);
                 len = path.length();
