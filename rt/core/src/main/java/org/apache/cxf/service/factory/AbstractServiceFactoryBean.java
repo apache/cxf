@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -35,6 +34,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.helpers.DOMUtils;
@@ -54,7 +54,7 @@ public abstract class AbstractServiceFactoryBean {
     private Bus bus;
     private DataBinding dataBinding;
     private Service service;
-    private List<FactoryBeanListener> listeners = new LinkedList<FactoryBeanListener>();
+    private List<FactoryBeanListener> listeners = new ModCountCopyOnWriteArrayList<FactoryBeanListener>();
     private Map<String, Object> sessionState = new HashMap<String, Object>();
     
     public abstract Service create();
