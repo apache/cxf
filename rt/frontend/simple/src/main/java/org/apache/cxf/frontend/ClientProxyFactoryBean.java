@@ -116,7 +116,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
      *
      * @return the proxy. You must cast the returned object to the appropriate class before using it.
      */
-    public Object create() {
+    public synchronized Object create() {
         configureObject();
         
         if (properties == null) {
