@@ -105,6 +105,8 @@ public final class SecurityConstants {
     public static final String STS_TOKEN_DO_CANCEL = "ws-security.sts.token.do.cancel";
     
     public static final String STS_TOKEN_ACT_AS = "ws-security.sts.token.act-as";
+    
+    public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
 
     public static final Set<String> ALL_PROPERTIES;
     
@@ -118,7 +120,7 @@ public final class SecurityConstants {
             STS_TOKEN_ACT_AS, STS_TOKEN_USERNAME, STS_TOKEN_USE_CERT_FOR_KEYINFO,
             SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
             SIGNATURE_TOKEN_VALIDATOR, IS_BSP_COMPLIANT, TIMESTAMP_FUTURE_TTL,
-            BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER
+            BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER, STS_TOKEN_ON_BEHALF_OF
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

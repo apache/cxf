@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -94,6 +95,7 @@ import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
@@ -141,7 +143,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     AlgorithmSuite algorithmSuite;
     String namespace = STSUtils.WST_NS_05_12;
     String addressingNamespace;
-    Element onBehalfOfElement;
+    Object onBehalfOf;
 
     boolean useCertificateForConfirmationKeyInfo;
     boolean isSecureConv;
@@ -151,6 +153,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     String tokenType;
     String keyType;
     boolean sendKeyType = true;
+    Message message;
 
     Map<String, Object> ctx = new HashMap<String, Object>();
     
@@ -178,6 +181,10 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+    
+    public void setMessage(Message message) {
+        this.message = message;
     }
 
     /**
@@ -320,10 +327,15 @@ public class STSClient implements Configurable, InterceptorProvider {
         this.keyType = keyType;
     }
     
+    @Deprecated
     public void setOnBehalfOfElement(Element onBehalfOfElement) {
-        this.onBehalfOfElement = onBehalfOfElement;
+        this.onBehalfOf = onBehalfOfElement;
     }
 
+    public void setOnBehalfOf(Object onBehalfOf) {
+        this.onBehalfOf = onBehalfOf;
+    }
+    
     /**
      * Indicate whether to use the signer's public X509 certificate for the subject confirmation key info 
      * when creating a RequestsSecurityToken message. If the property is set to 'false', only the public key 
@@ -609,11 +621,32 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeEndElement();
     }
     
-    private void addOnBehalfOf(W3CDOMStreamWriter writer) throws XMLStreamException  {
-        if (onBehalfOfElement != null) {
-            writer.writeStartElement("wst", "OnBehalfOf", namespace);
-            StaxUtils.copy(onBehalfOfElement, writer);
-            writer.writeEndElement();
+    private void addOnBehalfOf(W3CDOMStreamWriter writer) throws Exception {
+        if (this.onBehalfOf != null) {
+            final boolean isString = this.onBehalfOf instanceof String;
+            final boolean isElement = this.onBehalfOf instanceof Element; 
+            final boolean isCallbackHandler = this.onBehalfOf instanceof CallbackHandler;
+            if (isString || isElement || isCallbackHandler) {
+                final Element tokenElement;
+                
+                if (isString) {
+                    final Document acAsDoc =
+                        DOMUtils.readXml(new StringReader((String) this.onBehalfOf));
+                    tokenElement = acAsDoc.getDocumentElement();
+                } else if (isElement) {
+                    tokenElement = (Element)this.onBehalfOf;
+                } else {
+                    DelegationCallback callback = new DelegationCallback(message);
+                    ((CallbackHandler)onBehalfOf).handle(new Callback[]{callback});
+                    tokenElement = callback.getToken();
+                }
+                
+                if (tokenElement != null) {
+                    writer.writeStartElement("wst", "OnBehalfOf", namespace);
+                    StaxUtils.copy(tokenElement, writer);
+                    writer.writeEndElement();
+                }
+            }
         }
     }
     
@@ -914,27 +947,27 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (this.actAs != null) {
             final boolean isString = this.actAs instanceof String;
             final boolean isElement = this.actAs instanceof Element; 
-            if (isString || isElement) {
-                final Element actAsEl;
+            final boolean isCallbackHandler = this.actAs instanceof CallbackHandler;
+            if (isString || isElement || isCallbackHandler) {
+                final Element tokenElement;
                 
                 if (isString) {
                     final Document acAsDoc =
                         DOMUtils.readXml(new StringReader((String) this.actAs));
-                    actAsEl = acAsDoc.getDocumentElement();
+                    tokenElement = acAsDoc.getDocumentElement();
+                } else if (isElement) {
+                    tokenElement = (Element) this.actAs;
                 } else {
-                    actAsEl = (Element) this.actAs;
+                    DelegationCallback callback = new DelegationCallback(message);
+                    ((CallbackHandler)actAs).handle(new Callback[]{callback});
+                    tokenElement = callback.getToken();
                 }
                 
-                writer.writeStartElement(STSUtils.WST_NS_08_02, "ActAs");
-                
-                // Unlikely to ever be otherwise, but still prudent to check.
-                if (actAsEl.getOwnerDocument() != writer.getDocument()) {
-                    writer.getDocument().adoptNode(actAsEl);
+                if (tokenElement != null) {
+                    writer.writeStartElement(STSUtils.WST_NS_08_02, "ActAs");
+                    StaxUtils.copy(tokenElement, writer);
+                    writer.writeEndElement();
                 }
-                
-                writer.getCurrentNode().appendChild(actAsEl);
-                
-                writer.writeEndElement();
             }
         }
     }

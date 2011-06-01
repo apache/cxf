@@ -123,10 +123,19 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         }
                         synchronized (client) {
                             try {
-                                // Transpose ActAs info from original request to the STS client.
-                                client.setActAs(
-                                    message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS));
+                                // Transpose ActAs/OnBehalfOf info from original request to the STS client.
+                                Object token = 
+                                    message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS);
+                                if (token != null) {
+                                    client.setActAs(token);
+                                }
+                                token = 
+                                    message.getContextualProperty(SecurityConstants.STS_TOKEN_ON_BEHALF_OF);
+                                if (token != null) {
+                                    client.setOnBehalfOf(token);
+                                }
 
+                                client.setMessage(message);
                                 client.setTrust(getTrust10(aim));
                                 client.setTrust(getTrust13(aim));
                                 client.setTemplate(itok.getRstTemplate());
@@ -188,6 +197,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
             return (Trust13)ais.iterator().next().getAssertion();
         }
+        
     }
     
     static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
