@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.ws.rm;
 
-import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Endpoint;
@@ -32,6 +32,7 @@ import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -113,22 +114,30 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
         
         bus.getOutFaultInterceptors().add(out);
         
+        bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
+        .setMilliseconds(new Long(5000));
+        
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, DecoupledClientServerTest.PORT);
         LOG.fine("Created greeter client.");
        
         ConnectionHelper.setKeepAliveConnection(greeter, true);
+        RMManager manager = bus.getExtension(RMManager.class);
         
         try {
             greeter.greetMeOneWay("oneway");            
         } catch (Exception e) {
-            fail("fault thrown after queued for retransmission");
+            // no exception shall be thrown when the message is queued for retransmission
+            fail("fault thrown after queued for retransmission: " + e);
         }
+        
+        // the message shall be in the queue
+        assertFalse("RetransmissionQueue empty", manager.getRetransmissionQueue().isEmpty());
         
         tes.setWorking(true);
 
-        long wait = 3000;
+        long wait = 10000;
         while (wait > 0) {
             long start = System.currentTimeMillis();
             try {
@@ -138,14 +147,14 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
             }
             wait -= System.currentTimeMillis() - start;
         }
-        
-        RMManager manager = bus.getExtension(RMManager.class);
-        boolean empty = manager.getRetransmissionQueue().isEmpty();
-        
-        assertTrue("RetransmissionQueue not cleared", empty);
+
+        // the message shall no longer be in the queue
+        assertTrue("RetransmissionQueue not empty", manager.getRetransmissionQueue().isEmpty());
     }
 
-    
+    /*
+     * an interceptor to trigger an error occuring at the sending phase.
+     */
     static class TransmissionErrorSimulator extends AbstractPhaseInterceptor<Message> {
         private boolean working;
         
@@ -153,7 +162,8 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
          * @param phase
          */
         public TransmissionErrorSimulator() {
-            super(Phase.WRITE);
+            super(Phase.PREPARE_SEND);
+            addAfter(MessageSenderInterceptor.class.getName());
         }
 
         /* (non-Javadoc)
@@ -169,10 +179,14 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
                 // spare the message
             } else if (!working) {
                 // triggers a simulated error
-                throw new Fault(new IOException("simulated transmission error"));
+                try {
+                    message.getContent(OutputStream.class).close();
+                } catch (Exception e) {
+                    //
+                }
             }
         }
-
+        
         /**
          * @return the working
          */
