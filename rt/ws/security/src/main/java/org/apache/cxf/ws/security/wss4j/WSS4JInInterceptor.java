@@ -60,6 +60,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSPasswordCallback;
@@ -422,11 +423,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      */
     protected boolean isSecurityContextPrincipal(Principal p, List<WSSecurityEngineResult> wsResult) {
         boolean derivedKeyPrincipal = p instanceof WSDerivedKeyTokenPrincipal;
-        if (derivedKeyPrincipal) {
-            // If it is a derived key principal then let it be a SecurityContext
-            // principal only if no other principals are available.
-            // The derived key principal will still be visible to
-            // custom interceptors as part of the WSHandlerConstants.RECV_RESULTS value
+        if (derivedKeyPrincipal || p instanceof CustomTokenPrincipal) {
+            // If it is a derived key principal or a Custom Token Principal then let it 
+            // be a SecurityContext principal only if no other principals are available.
+            // The principal will still be visible to custom interceptors as part of the 
+            // WSHandlerConstants.RECV_RESULTS value
             return wsResult.size() > 1 ? false : true;
         } else {
             return true;
