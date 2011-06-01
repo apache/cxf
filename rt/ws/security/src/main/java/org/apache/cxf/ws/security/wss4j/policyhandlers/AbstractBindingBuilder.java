@@ -1471,19 +1471,33 @@ public abstract class AbstractBindingBuilder {
             SecurityToken securityToken = getSecurityToken();
             String tokenType = securityToken.getTokenType();
             
-            int type = attached ? WSConstants.CUSTOM_SYMM_SIGNING 
-                : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
-            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML_NS.equals(tokenType)) {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML2_NS.equals(tokenType)) {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            Element ref;
+            if (attached) {
+                ref = securityToken.getAttachedReference();
+            } else {
+                ref = securityToken.getUnattachedReference();
+            }
+            
+            if (ref != null) {
+                SecurityTokenReference secRef = 
+                    new SecurityTokenReference(cloneElement(ref), false);
+                sig.setSecurityTokenReference(secRef);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {
-                sig.setCustomTokenValueType(tokenType);
-                sig.setKeyIdentifierType(type);
+                int type = attached ? WSConstants.CUSTOM_SYMM_SIGNING 
+                    : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
+                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                    || WSConstants.SAML_NS.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                    || WSConstants.SAML2_NS.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                } else {
+                    sig.setCustomTokenValueType(tokenType);
+                    sig.setKeyIdentifierType(type);
+                }
             }
             
             String sigTokId;

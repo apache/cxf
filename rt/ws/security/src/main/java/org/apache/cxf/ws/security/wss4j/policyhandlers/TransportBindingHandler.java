@@ -62,6 +62,7 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
@@ -425,7 +426,21 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         WSSecSignature sig = new WSSecSignature(wssConfig);
-        if (secTok.getTokenType() == null) {
+        
+        //Setting the AttachedReference or the UnattachedReference according to the flag
+        Element ref;
+        if (tokenIncluded) {
+            ref = secTok.getAttachedReference();
+        } else {
+            ref = secTok.getUnattachedReference();
+        }
+        
+        if (ref != null) {
+            SecurityTokenReference secRef = 
+                new SecurityTokenReference(cloneElement(ref), false);
+            sig.setSecurityTokenReference(secRef);
+            sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+        } else if (secTok.getTokenType() == null) {
             sig.setCustomTokenId(secTok.getId());
             sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
             sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
