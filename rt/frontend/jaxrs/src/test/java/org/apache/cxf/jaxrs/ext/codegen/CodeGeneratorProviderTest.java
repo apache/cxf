@@ -197,24 +197,13 @@ public class CodeGeneratorProviderTest extends Assert {
     }
     
     protected boolean compileJavaSrc(String classPath, List<File> srcList, String dest) {
-        String[] javacCommand = new String[srcList.size() + 7];
-        
-        javacCommand[0] = "javac";
-        javacCommand[1] = "-classpath";
-        javacCommand[2] = classPath;        
-        javacCommand[3] = "-d";
-        javacCommand[4] = dest;
-        javacCommand[5] = "-target";
-        javacCommand[6] = "1.5";
-        
-        int i = 7;
-        for (File f : srcList) {
-            javacCommand[i++] = f.getAbsolutePath();            
-        }
+
         org.apache.cxf.common.util.Compiler javaCompiler 
             = new org.apache.cxf.common.util.Compiler();
-        
-        return javaCompiler.internalCompile(javacCommand, 7); 
+        javaCompiler.setTarget("1.5");
+        javaCompiler.setClassPath(classPath);
+        javaCompiler.setOutputDir(dest);
+        return javaCompiler.compileFiles(srcList); 
     }
     
     static void setupClasspath(StringBuilder classPath, ClassLoader classLoader)
