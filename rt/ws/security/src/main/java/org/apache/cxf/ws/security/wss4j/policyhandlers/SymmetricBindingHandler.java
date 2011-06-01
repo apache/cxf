@@ -393,15 +393,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 dkEncr.setExternalKey(
                     encrTok.getSecret(), cloneElement(encrTok.getUnattachedReference())
                 );
-            } else if (!isRequestor()) { 
+            } else if (!isRequestor() && encrTok.getSHA1() != null) {
                 // If the Encrypted key used to create the derived key is not
                 // attached use key identifier as defined in WSS1.1 section
                 // 7.7 Encrypted Key reference
                 SecurityTokenReference tokenRef = new SecurityTokenReference(saaj.getSOAPPart());
-                if (encrTok.getSHA1() != null) {
-                    tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
-                    tokenRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                }
+                tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
+                tokenRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 dkEncr.setExternalKey(encrTok.getSecret(), tokenRef.getElement());
             } else {
                 if (attached) {
@@ -426,7 +424,18 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                         + WSConstants.ENC_KEY_VALUE_TYPE);
             } else {
-                dkEncr.setCustomValueType(encrTok.getTokenType());
+                String tokenType = encrTok.getTokenType();
+                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                    || WSConstants.SAML_NS.equals(tokenType)) {
+                    dkEncr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                    dkEncr.setCustomValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                    || WSConstants.SAML2_NS.equals(tokenType)) {
+                    dkEncr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                    dkEncr.setCustomValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                } else {
+                    dkEncr.setCustomValueType(tokenType);
+                }
             }
             
             dkEncr.setSymmetricEncAlgorithm(sbinding.getAlgorithmSuite().getEncryption());
@@ -568,7 +577,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         
         if (ref != null) {
             dkSign.setExternalKey(tok.getSecret(), cloneElement(ref));
-        } else if (!isRequestor() && policyToken.isDerivedKeys()) { 
+        } else if (!isRequestor() && policyToken.isDerivedKeys() && tok.getSHA1() != null) {            
             // If the Encrypted key used to create the derived key is not
             // attached use key identifier as defined in WSS1.1 section
             // 7.7 Encrypted Key reference
@@ -592,7 +601,18 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             //Set the value type of the reference
             dkSign.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         } else {
-            dkSign.setCustomValueType(tok.getTokenType());
+            String tokenType = tok.getTokenType();
+            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML_NS.equals(tokenType)) {
+                dkSign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                dkSign.setCustomValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSConstants.SAML2_NS.equals(tokenType)) {
+                dkSign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                dkSign.setCustomValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            } else {
+                dkSign.setCustomValueType(tokenType);
+            }
         }
         
         try {

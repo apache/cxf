@@ -19,12 +19,14 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -109,12 +111,33 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
             if (publicKey != null && publicKey.equals(subjectPublicKey)) {
                 return true;
             }
-            if (secretKey != null && subjectSecretKey != null
-                && Arrays.equals(secretKey, subjectSecretKey)) {
+            if (checkSecretKey(secretKey, subjectSecretKey, signedResult)) {
                 return true;
             }
         }
         return false;
     }
     
+    private boolean checkSecretKey(
+        byte[] secretKey,
+        byte[] subjectSecretKey,
+        WSSecurityEngineResult signedResult
+    ) {
+        if (secretKey != null && subjectSecretKey != null) {
+            if (Arrays.equals(secretKey, subjectSecretKey)) {
+                return true;
+            } else {
+                Principal principal =
+                    (Principal)signedResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                if (principal instanceof WSDerivedKeyTokenPrincipal) {
+                    secretKey = ((WSDerivedKeyTokenPrincipal)principal).getSecret();
+                    if (Arrays.equals(secretKey, subjectSecretKey)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 }
