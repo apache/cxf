@@ -20,20 +20,22 @@
 package org.apache.cxf.transport.jms.continuations;
 
 import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.JMSConfiguration;
+import org.apache.cxf.workqueue.WorkQueue;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 public class JMSContinuation implements Continuation {
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(JMSContinuation.class);
     private Bus bus;
     private Message inMessage;
     private MessageObserver incomingObserver;
@@ -46,7 +48,8 @@ public class JMSContinuation implements Continuation {
     private volatile boolean isNew = true;
     private volatile boolean isPending;
     private volatile boolean isResumed;
-    private Timer timer;
+    private volatile boolean isCanceled;
+    private WorkQueue workQueue;
     
     public JMSContinuation(Bus b, Message m, MessageObserver observer,
                            Collection<JMSContinuation> cList, 
@@ -58,7 +61,16 @@ public class JMSContinuation implements Continuation {
         continuations = cList;
         this.jmsListener = jmsListener;
         this.jmsConfig = jmsConfig;
-    }    
+        WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
+        if (manager != null) {
+            workQueue =  manager.getNamedWorkQueue("jms-continuation");
+            if (workQueue == null) {
+                workQueue = manager.getAutomaticWorkQueue();
+            }
+        } else {
+            LOG.warning("ERROR_GETTING_WORK_QUEUE");
+        }
+    }
     
     public Object getObject() {
         return userObject;
@@ -134,12 +146,10 @@ public class JMSContinuation implements Continuation {
     }
 
     protected void createTimerTask(long timeout) {
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
+        workQueue.schedule(new Runnable() {
             public void run() {
                 synchronized (JMSContinuation.this) { 
-                    if (isPending) {
-                        cancelTimerTask();
+                    if (isPending && !isCanceled) {
                         doResume();
                     }
                 }
@@ -147,11 +157,8 @@ public class JMSContinuation implements Continuation {
         }, timeout);
     }
     
-    protected void cancelTimerTask() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
+    protected synchronized void cancelTimerTask() {
+        isCanceled = true;
     }
     
     protected void updateContinuations(boolean remove) {
