@@ -19,16 +19,26 @@
 
 package org.apache.cxf.transport.jms.continuations;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
 
 public class JMSContinuationProviderTest extends Assert {
+    private static Bus bus = BusFactory.getDefaultBus();
+    
+    @AfterClass
+    public static void cleanUpBus() {
+        BusFactory.setDefaultBus(null);
+    }
 
     @Test
     public void testNoContinuationForOneWay() {
@@ -46,7 +56,7 @@ public class JMSContinuationProviderTest extends Assert {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         JMSContinuationProvider provider = 
-            new JMSContinuationProvider(null, m, null, null, null, null);
+            new JMSContinuationProvider(bus, m, null, null, null, null);
         Continuation cw = provider.getContinuation(); 
         assertTrue(cw.isNew());
         assertSame(cw, m.get(JMSContinuation.class));
@@ -56,7 +66,7 @@ public class JMSContinuationProviderTest extends Assert {
     public void testGetExistingContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
-        JMSContinuation cw = new JMSContinuation(null, m, null, null, null, null);
+        JMSContinuation cw = new JMSContinuation(bus, m, null, null, null, null);
         m.put(JMSContinuation.class, cw);
         JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null, null, null);
         assertSame(cw, provider.getContinuation());
