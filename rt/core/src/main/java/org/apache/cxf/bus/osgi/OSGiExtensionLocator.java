@@ -107,7 +107,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         }
     }
     protected void unregister(final long bundleId) {
-        List<Extension> list = extensions.get(bundleId);
+        List<Extension> list = extensions.remove(bundleId);
         if (list != null) {
             ExtensionRegistry.removeExtensions(list);
         }
