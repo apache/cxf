@@ -101,6 +101,12 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         } catch (IOException ex) {
             throw new ExtensionException(ex);
         }
+        
+        for (Map.Entry<String, Extension> ext : ExtensionRegistry.getRegisteredExtensions().entrySet()) {
+            if (all.containsKey(ext.getKey())) {
+                all.put(ext.getKey(), ext.getValue());
+            }
+        }
     }
     public void add(Extension ex) {
         all.put(ex.getName(), ex);
@@ -140,16 +146,24 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             InputStream is = url.openStream();
-            List<Extension> exts;
-            if (resource.endsWith("xml")) {
-                LOG.log(Level.WARNING, "DEPRECATED_EXTENSIONS", 
-                        new Object[] {resource, url, BUS_EXTENSION_RESOURCE});
-                exts = new ExtensionFragmentParser().getExtensionsFromXML(is);
-            } else {
-                exts = new ExtensionFragmentParser().getExtensionsFromText(is);
-            }
-            for (Extension e : exts) {
-                all.put(e.getName(), e);
+            try {
+                List<Extension> exts;
+                if (resource.endsWith("xml")) {
+                    LOG.log(Level.WARNING, "DEPRECATED_EXTENSIONS", 
+                            new Object[] {resource, url, BUS_EXTENSION_RESOURCE});
+                    exts = new ExtensionFragmentParser().getExtensionsFromXML(is);
+                } else {
+                    exts = new ExtensionFragmentParser().getExtensionsFromText(is);
+                }
+                for (Extension e : exts) {
+                    all.put(e.getName(), e);
+                }
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException ex) {
+                    //ignore
+                }
             }
         }
     }

@@ -42,7 +42,7 @@ public class ExtensionFragmentParser {
     private static final String INTERFACE_ATTR_NAME = "interface";
     private static final String DEFERRED_ATTR_NAME = "deferred";
     
-    List<Extension> getExtensionsFromXML(InputStream is) {
+    public List<Extension> getExtensionsFromXML(InputStream is) {
         Document document = null;
         try {
             document = StaxUtils.read(is);
@@ -62,7 +62,7 @@ public class ExtensionFragmentParser {
      * @return list of Extensions
      * @throws IOException
      */
-    List<Extension> getExtensionsFromText(InputStream is) throws IOException {
+    public List<Extension> getExtensionsFromText(InputStream is) throws IOException {
         List<Extension> extensions = new ArrayList<Extension>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         String line = reader.readLine();

@@ -28,18 +28,38 @@ import org.apache.cxf.common.util.StringUtils;
 
 public class Extension {
    
-    private String className;
-    private Class<?> clazz;
-    private String interfaceName;
-    private boolean deferred;
-    private Collection<String> namespaces = new ArrayList<String>();
-    private Object obj;
+    protected String className;
+    protected ClassLoader classloader;
+    protected Class<?> clazz;
+    protected String interfaceName;
+    protected boolean deferred;
+    protected Collection<String> namespaces = new ArrayList<String>();
+    protected Object obj;
+    
+    public Extension() {
+    }
+    public Extension(Extension ext) {
+        className = ext.className;
+        interfaceName = ext.interfaceName;
+        deferred = ext.deferred;
+        namespaces = ext.namespaces;
+        obj = ext.obj;
+        clazz = ext.clazz;
+        classloader = ext.classloader;
+    }
     
     public String getName() {
         return StringUtils.isEmpty(interfaceName) ? className : interfaceName;
     }
     public Object getLoadedObject() {
         return obj;
+    }
+    
+    public Extension cloneNoObject() {
+        Extension ext = new Extension(this);
+        ext.obj = null;
+        ext.clazz = null;
+        return ext;
     }
     
     public String toString() {
@@ -63,8 +83,48 @@ public class Extension {
         return buf.toString();        
     }
     
-    Class<?> getClassObject(ClassLoader cl) {
+    public String getClassname() {
+        return className;
+    }
+    
+    public void setClassname(String i) {
+        clazz = null;
+        className = i;
+    }
+       
+    public String getInterfaceName() {
+        return interfaceName;
+    }
+
+    public void setInterfaceName(String i) {
+        interfaceName = i;
+    }
+
+    public boolean isDeferred() {
+        return deferred;
+    }
+    
+    public void setDeferred(boolean d) {
+        deferred = d;
+    }
+    
+    public Collection<String> getNamespaces() {
+        return namespaces;
+    }
+    
+    
+    
+    
+    public Class<?> getClassObject(ClassLoader cl) {
         if (clazz == null) {
+            if (classloader != null) {
+                try {
+                    clazz = classloader.loadClass(className);
+                    return clazz;
+                } catch (ClassNotFoundException nex) {
+                    //ignore, fall into the stuff below
+                }
+            }                
             try {
                 clazz = cl.loadClass(className);
             } catch (ClassNotFoundException ex) {
@@ -78,36 +138,7 @@ public class Extension {
         }
         return clazz;
     }
-    String getClassname() {
-        return className;
-    }
-    
-    void setClassname(String i) {
-        clazz = null;
-        className = i;
-    }
-       
-    public String getInterfaceName() {
-        return interfaceName;
-    }
-
-    public void setInterfaceName(String i) {
-        interfaceName = i;
-    }
-
-    boolean isDeferred() {
-        return deferred;
-    }
-    
-    void setDeferred(boolean d) {
-        deferred = d;
-    }
-    
-    Collection<String> getNamespaces() {
-        return namespaces;
-    }
-    
-    Object load(ClassLoader cl, Bus b) {
+    public Object load(ClassLoader cl, Bus b) {
         try {
             Class<?> cls = getClassObject(cl);
             try {
@@ -130,8 +161,16 @@ public class Extension {
         return obj;
     }
     
-    Class loadInterface(ClassLoader cl) {
+    public Class loadInterface(ClassLoader cl) {
         Class<?> cls = null;
+        if (classloader != null) {
+            try {
+                return classloader.loadClass(interfaceName);
+            } catch (ClassNotFoundException nex) {
+                //ignore, fall into the stuff below
+            }
+        }                
+
         try {
             cls = cl.loadClass(interfaceName);
         } catch (ClassNotFoundException ex) {
