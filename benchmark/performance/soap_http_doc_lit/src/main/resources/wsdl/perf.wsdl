@@ -238,6 +238,38 @@
     </binding>
 
     <binding name="SoapBindingDocLit" type="tns:DocPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <operation name="echoStringDoc">
+            <soap:operation style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="echoBase64Doc">
+            <soap:operation style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+        <operation name="echoComplexTypeDoc">
+            <soap:operation style="document"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+
+    <binding name="SoapBindingDocLitSec" type="tns:DocPortType">
         <wsp:PolicyReference URI="#SymD_policy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 
@@ -305,6 +337,9 @@
     <service name="PerfService">
         <port name="SoapHttpDocLitPort" binding="tns:SoapBindingDocLit">
             <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitPort"/>
+        </port>
+        <port name="SoapHttpDocLitPortSec" binding="tns:SoapBindingDocLitSec">
+            <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitPortSec"/>
         </port>
         <port name="SoapHttpRPCLitPort" binding="tns:SoapBindingRPCLit">
             <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpRPCLitPort"/>
