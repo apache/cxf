@@ -19,12 +19,15 @@
 
 package org.apache.cxf.ws.security.trust;
 
-
 import java.util.List;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -60,15 +63,30 @@ public class STSTokenValidator implements Validator {
     
     public Credential validateWithSTS(Credential credential, Message message) throws WSSecurityException {
         
-        SecurityToken token = new SecurityToken();
-        
         try {
+            SecurityToken token = new SecurityToken();
+            Element tokenElement = null;
+            int hash = 0;
             if (credential.getAssertion() != null) {
-                token.setToken(credential.getAssertion().getElement());
+                tokenElement = credential.getAssertion().getElement();
+                hash = credential.getAssertion().hashCode();
             } else if (credential.getUsernametoken() != null) {
-                token.setToken(credential.getUsernametoken().getElement());
+                tokenElement = credential.getUsernametoken().getElement();
+                hash = credential.getUsernametoken().hashCode();
             } else if (credential.getBinarySecurityToken() != null) {
-                token.setToken(credential.getBinarySecurityToken().getElement());
+                tokenElement = credential.getBinarySecurityToken().getElement();
+                hash = credential.getBinarySecurityToken().hashCode();
+            }
+            token.setToken(tokenElement);
+            
+            TokenStore tokenStore = getTokenStore(message);
+            if (tokenStore != null && hash != 0) {
+                SecurityToken recoveredToken = tokenStore.getTokenByAssociatedHash(hash);
+                if (recoveredToken != null) {
+                    AssertionWrapper assertion = new AssertionWrapper(recoveredToken.getToken());
+                    credential.setTransformedToken(assertion);
+                    return credential;
+                }
             }
             
             STSClient c = STSUtils.getClient(message, "sts");
@@ -79,6 +97,10 @@ public class STSTokenValidator implements Validator {
                 if (returnedToken != token) {
                     AssertionWrapper assertion = new AssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
+                    if (hash != 0) {
+                        returnedToken.setAssociatedHash(hash);
+                        tokenStore.add(returnedToken);
+                    }
                 }
                 return credential;
             }
@@ -87,6 +109,16 @@ public class STSTokenValidator implements Validator {
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e);
         }
+    }
+    
+    static final TokenStore getTokenStore(Message message) {
+        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+        if (tokenStore == null) {
+            tokenStore = new MemoryTokenStore();
+            message.getExchange().get(Endpoint.class).getEndpointInfo()
+                .setProperty(TokenStore.class.getName(), tokenStore);
+        }
+        return tokenStore;
     }
     
     protected boolean isValidatedLocally(Credential credential, RequestData data) 

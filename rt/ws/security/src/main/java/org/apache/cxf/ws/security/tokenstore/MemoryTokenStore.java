@@ -95,6 +95,18 @@ public class MemoryTokenStore implements TokenStore {
         }
         return token;
     }
+    
+    public SecurityToken getTokenByAssociatedHash(int hashCode) {
+        processTokenExpiry();
+        
+        for (String id : tokens.keySet()) {
+            SecurityToken securityToken = tokens.get(id);
+            if (hashCode == securityToken.getAssociatedHash()) {
+                return securityToken;
+            }
+        }
+        return null;
+    }
 
     
     protected Collection<SecurityToken> getTokens(SecurityToken.State state) {

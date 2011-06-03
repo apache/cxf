@@ -123,6 +123,12 @@ public class SecurityToken {
      */
     private String encrKeySha1Value;
     
+    /**
+     * A hash code associated with this token. Note that it is not the hashcode of this 
+     * token, but a hash corresponding to an association with this token. It could refer
+     * to the hash of another SecurityToken which maps to this token. 
+     */
+    private int associatedHash;
     
     /**
      * The tokenType
@@ -421,6 +427,23 @@ public class SecurityToken {
     
     public Crypto getCrypto() {
         return crypto;
+    }
+    
+    /**
+     * Set a hash code associated with this token. Note that it is not the hashcode of this 
+     * token, but a hash corresponding to an association with this token.
+     * @param hash a hash code associated with this token
+     */
+    public void setAssociatedHash(int hash) {
+        associatedHash = hash;
+    }
+    
+    /**
+     * Get a hash code associated with this token.
+     * @return a hash code associated with this token.
+     */
+    public int getAssociatedHash() {
+        return associatedHash;
     }
 
 } 

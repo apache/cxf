@@ -82,7 +82,12 @@ public interface TokenStore {
      */
     SecurityToken getToken(String id);
     
-    
+    /**
+     * Returns the <code>Token</code> by the associated hash. 
+     * @param hashCode
+     * @return the <code>Token</code> by the associated hash. 
+     */
+    SecurityToken getTokenByAssociatedHash(int hashCode);
     
     /**
      * Removes all expired tokens.  
