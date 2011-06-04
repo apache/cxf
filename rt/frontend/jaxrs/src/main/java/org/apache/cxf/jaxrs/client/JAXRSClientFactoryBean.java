@@ -37,6 +37,7 @@ import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.FactoryBeanListener;
 
 public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     
@@ -186,6 +187,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             WebClient client = actualState == null ? new WebClient(getAddress())
                 : new WebClient(actualState);
             initClient(client, ep, actualState == null);
+    
+            this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, client, ep);
             
             return client;
         } catch (Exception ex) {
@@ -267,17 +270,20 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             }
             initClient(proxyImpl, ep, actualState == null);    
             
+            Client actualClient = null;
             try {
-                return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
+                actualClient = (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
                                         new Class[]{cri.getServiceClass(), Client.class, 
                                                     InvocationHandlerAware.class}, 
                                         proxyImpl);
             } catch (Exception ex) {
-                return (Client)ProxyHelper.getProxy(Thread.currentThread().getContextClassLoader(),
+                actualClient = (Client)ProxyHelper.getProxy(Thread.currentThread().getContextClassLoader(),
                                                     new Class[]{cri.getServiceClass(), Client.class, 
                                                                 InvocationHandlerAware.class}, 
                                      proxyImpl);
             }
+            this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, actualClient, ep);
+            return actualClient;
         } catch (IllegalArgumentException ex) {
             String message = ex.getLocalizedMessage();
             if (cri != null) {
@@ -312,7 +318,6 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             ep.getEndpointInfo().addExtensor(authPolicy);
         }
         
-        applyFeatures(client);
         client.getConfiguration().setConduitSelector(getConduitSelector(ep));
         client.getConfiguration().setBus(getBus());
         client.getConfiguration().getOutInterceptors().addAll(getOutInterceptors());
@@ -320,6 +325,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         client.getConfiguration().getInInterceptors().addAll(getInInterceptors());
         client.getConfiguration().getInInterceptors().addAll(ep.getInInterceptors());
 
+        applyFeatures(client);
+        
         if (headers != null && addHeaders) {
             client.headers(headers);
         }

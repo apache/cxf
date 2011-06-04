@@ -207,9 +207,11 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             failover = curr instanceof java.io.IOException;
             curr = curr.getCause();
         }
-        getLogger().log(Level.INFO,
-                        "CHECK_FAILURE_IN_TRANSPORT",
-                        new Object[] {ex, failover});
+        if (ex != null) {
+            getLogger().log(Level.INFO,
+                            "CHECK_FAILURE_IN_TRANSPORT",
+                            new Object[] {ex, failover});
+        }
         return failover;
     }
     

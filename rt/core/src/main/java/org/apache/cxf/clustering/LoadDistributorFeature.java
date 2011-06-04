@@ -18,9 +18,7 @@
  */
 package org.apache.cxf.clustering;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.Client;
 
 /**
  * This feature may be applied to a Client so as to enable
@@ -32,12 +30,7 @@ import org.apache.cxf.endpoint.Client;
 public class LoadDistributorFeature extends FailoverFeature {
 
     @Override
-    public void initialize(Client client, Bus bus) {
-        LoadDistributorTargetSelector selector =
-            new LoadDistributorTargetSelector();
-        selector.setEndpoint(client.getEndpoint());
-        selector.setStrategy(getStrategy());
-        client.setConduitSelector(selector);
+    protected FailoverTargetSelector getTargetSelector() {
+        return new LoadDistributorTargetSelector();
     }
-
 }

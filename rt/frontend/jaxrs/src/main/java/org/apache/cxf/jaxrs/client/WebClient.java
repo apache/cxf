@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,10 +52,10 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.transport.http.HTTPConduit;
 
 
 /**
@@ -64,6 +63,9 @@ import org.apache.cxf.transport.http.HTTPConduit;
  *
  */
 public class WebClient extends AbstractClient {
+    
+    private static final String RESPONSE_CLASS = "response.class";
+    private static final String RESPONSE_TYPE = "response.type";
     
     protected WebClient(String baseAddress) {
         this(URI.create(baseAddress));
@@ -629,46 +631,80 @@ public class WebClient extends AbstractClient {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
         resetResponse();
-        return doChainedInvocation(httpMethod, headers, body, responseClass, genericType);
+        return doChainedInvocation(httpMethod, headers, body, responseClass, genericType, null, null);
     }
 
+    @Override
+    protected Object retryInvoke(URI newRequestURI, 
+                                 MultivaluedMap<String, String> headers,
+                                 Object body,
+                                 Exchange exchange, 
+                                 Map<String, Object> invContext) throws Throwable {
+        
+        Map<String, Object> reqContext = CastUtils.cast((Map)invContext.get(REQUEST_CONTEXT));
+        String httpMethod = (String)reqContext.get(Message.HTTP_REQUEST_METHOD);
+        Class<?> respClass = (Class)reqContext.get(RESPONSE_CLASS);
+        Type type = (Type)reqContext.get(RESPONSE_TYPE);
+        return doChainedInvocation(httpMethod, headers, body, respClass, type, exchange, invContext);
+    }
+    
     protected Response doChainedInvocation(String httpMethod, 
-        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass, Type genericType) {
-        Throwable primaryError = null;
+                                           MultivaluedMap<String, String> headers, 
+                                           Object body, 
+                                           Class<?> responseClass, 
+                                           Type genericType,
+                                           Exchange exchange,
+                                           Map<String, Object> invContext) {
         
         URI uri = getCurrentURI();
-        Message m = createMessage(httpMethod, headers, uri);
-        m.put(URITemplate.TEMPLATE_PARAMETERS, getState().getTemplates());
+        Message m = createMessage(body, httpMethod, headers, uri, exchange, invContext);
+        
+        Map<String, Object> reqContext = getRequestContext(m);
+        reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+        reqContext.put(RESPONSE_CLASS, responseClass);
+        reqContext.put(RESPONSE_TYPE, genericType);
+        
         if (body != null) {
-            MessageContentsList contents = new MessageContentsList(body);
-            m.setContent(List.class, contents);
             m.getInterceptorChain().add(new BodyWriter());
-        } else {
-            setEmptyRequestProperty(m, httpMethod);
         }
         setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
         
         try {
             m.getInterceptorChain().doIntercept(m);
-            primaryError = m.getExchange().get(Exception.class);
-        } catch (Throwable ex) {
-            primaryError = ex;
+        } catch (Exception ex) {
+            m.setContent(Exception.class, ex);
         }
-
+        try {
+            Object[] results = preProcessResult(m);
+            if (results != null && results.length == 1) {
+                // this can happen if a connection exception has occurred and
+                // failover feature used this client to invoke on a different address  
+                return (Response)results[0];
+            }
+        } catch (Exception ex) {
+            throw ex instanceof ServerWebApplicationException 
+                ? (ServerWebApplicationException)ex 
+                : ex instanceof ClientWebApplicationException 
+                ? new ClientWebApplicationException(ex) : new RuntimeException(ex); 
+        }
         
-        // TODO : this needs to be done in an inbound chain instead
-        HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        if (connect == null && primaryError != null) {
-            /** do we have a pre-connect error ? */
-            throw new ClientWebApplicationException(primaryError);
+        Response response = null;
+        Object entity = null;
+        try {
+            response = handleResponse(m, responseClass, genericType);
+            entity = response.getEntity();
+            return response;
+        } catch (RuntimeException ex) {
+            entity = ex;
+            throw ex;
+        } finally {
+            completeExchange(entity, m.getExchange());
         }
-        return handleResponse(connect, m, responseClass, genericType);
     }
     
-    protected Response handleResponse(HttpURLConnection conn, Message outMessage, 
-                                      Class<?> responseClass, Type genericType) {
+    protected Response handleResponse(Message outMessage, Class<?> responseClass, Type genericType) {
         try {
-            ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange());
+            ResponseBuilder rb = setResponseBuilder(outMessage, outMessage.getExchange());
             Response currentResponse = rb.clone().build();
             
             Object entity = readBody(currentResponse, outMessage, responseClass, genericType,
@@ -678,13 +714,11 @@ public class WebClient extends AbstractClient {
             
             return rb.build();
         } catch (Throwable ex) {
-            throw new ClientWebApplicationException(ex);
+            throw (ex instanceof ClientWebApplicationException) ? (ClientWebApplicationException)ex
+                                                              : new ClientWebApplicationException(ex);
         }
     }
     
-    protected HttpURLConnection getConnection(String methodName) {
-        return createHttpConnection(getCurrentBuilder().clone().buildFromEncoded(), methodName);
-    }
     
     private class BodyWriter extends AbstractOutDatabindingInterceptor {
 
@@ -725,7 +759,7 @@ public class WebClient extends AbstractClient {
         newClient.setConfiguration(oldClient.getConfiguration());
     }
     
-    private static AbstractClient toAbstractClient(Client client) {
+    private static AbstractClient toAbstractClient(Object client) {
         if (client instanceof AbstractClient) {
             return (AbstractClient)client;
         } else {

@@ -47,6 +47,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ResponseReader;
@@ -68,6 +69,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServer.class));
+    }
+    
+    @Test
+    public void testProxyWrongAddress() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:8080/wrongaddress", 
+                                                    BookStore.class);
+        try {
+            store.getBook("123");
+            fail("ClientWebApplicationException expected");
+        } catch (ClientWebApplicationException ex) {
+            // expected
+        }
     }
     
     @Test

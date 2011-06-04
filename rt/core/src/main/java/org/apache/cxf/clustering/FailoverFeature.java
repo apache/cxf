@@ -21,6 +21,8 @@ package org.apache.cxf.clustering;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ConduitSelector;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.AbstractFeature;
 
 /**
@@ -35,13 +37,22 @@ public class FailoverFeature extends AbstractFeature {
     
     @Override
     public void initialize(Client client, Bus bus) {
-        FailoverTargetSelector selector =
-            new FailoverTargetSelector();
-        selector.setEndpoint(client.getEndpoint());
-        selector.setStrategy(getStrategy());
+        ConduitSelector selector = initTargetSelector(client.getConduitSelector().getEndpoint());
         client.setConduitSelector(selector);
     }
 
+    protected ConduitSelector initTargetSelector(Endpoint endpoint) {
+        FailoverTargetSelector selector = getTargetSelector();
+        selector.setEndpoint(endpoint);
+        selector.setStrategy(getStrategy());
+        return selector;
+    }
+    
+    protected FailoverTargetSelector getTargetSelector() {
+        return new FailoverTargetSelector();
+    }
+    
+    
     public void setStrategy(FailoverStrategy strategy) {
         failoverStrategy = strategy;
     }

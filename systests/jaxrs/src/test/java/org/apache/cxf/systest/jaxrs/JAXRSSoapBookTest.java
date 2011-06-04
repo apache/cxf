@@ -89,7 +89,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class, true));
+                   launchServer(BookServerRestSoap.class));
     }
     
     @Test
@@ -285,7 +285,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         Book b = new Book("CXF", 1L);
         
         // Just to make sure it is enforced
-        Map<String, Object> props = WebClient.getConfig(client).getResponseContext();
+        Map<String, Object> props = WebClient.getConfig(client).getRequestContext();
         props.put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
         
         Book b2 = client.addFastinfoBook(b);
@@ -800,7 +800,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         } catch (Exception e) {
             assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());
             assertTrue("In Interceptor not invoked", !testFeature.handleMessageOnInInterceptorCalled());
-            assertTrue("Wrong exception caught", "fault from bad interceptor".equals(e.getMessage()));
+            assertTrue("Wrong exception caught", 
+                       "fault from bad interceptor".equals(e.getCause().getMessage()));
             assertTrue("Client In Fault In Interceptor was invoked", 
                     !testFeature.faultInInterceptorCalled());
         }

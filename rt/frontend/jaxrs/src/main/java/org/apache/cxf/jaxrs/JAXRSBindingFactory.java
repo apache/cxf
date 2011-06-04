@@ -19,6 +19,8 @@
 package org.apache.cxf.jaxrs;
 
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBaseBindingFactory;
 import org.apache.cxf.binding.Binding;
@@ -65,7 +67,7 @@ public class JAXRSBindingFactory extends AbstractBaseBindingFactory {
      */
     public BindingInfo createBindingInfo(Service service, String namespace, Object obj) {
         BindingInfo info = new BindingInfo(null, JAXRSBindingFactory.JAXRS_BINDING_ID);
-
+        info.setName(new QName(JAXRSBindingFactory.JAXRS_BINDING_ID, "binding"));
         return info;
     }
 

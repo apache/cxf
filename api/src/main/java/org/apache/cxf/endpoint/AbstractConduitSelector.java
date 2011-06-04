@@ -27,6 +27,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
@@ -41,7 +42,8 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * that retreives a Conduit from the ConduitInitiator.
  */
 public abstract class AbstractConduitSelector implements ConduitSelector {
-
+    protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
+    
     protected Conduit selectedConduit;
     protected Endpoint endpoint;
 
@@ -126,6 +128,13 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
      * @param exchange represents the completed MEP
      */
     public void complete(Exchange exchange) {
+        // Clients expecting explicit InputStream responses
+        // will need to keep low level conduits operating on InputStreams open
+        // and will be responsible for closing the streams
+        
+        if (MessageUtils.isTrue(exchange.get(KEEP_CONDUIT_ALIVE))) {
+            return;
+        }
         try {
             if (exchange.getInMessage() != null) {
                 getSelectedConduit(exchange.getInMessage()).close(exchange.getInMessage());

@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +44,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -53,20 +53,20 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
-import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.transport.http.HTTPConduit;
 
 /**
  * Proxy-based client implementation
  *
  */
-public class ClientProxyImpl extends AbstractClient implements InvocationHandlerAware, InvocationHandler {
+public class ClientProxyImpl extends AbstractClient implements 
+    InvocationHandlerAware, InvocationHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClientProxyImpl.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ClientProxyImpl.class);
@@ -174,7 +174,14 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
             bodyIndex == -1 ? null : params[bodyIndex].getClass(), m.getReturnType());
         
-        return doChainedInvocation(uri, headers, ori, params, bodyIndex, types, pathParams);
+        getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
+        
+        Object body = null;
+        boolean isForm = types.containsKey(ParameterType.FORM);
+        if (bodyIndex != -1 || isForm) {
+            body = isForm ? handleForm(types, params) : params[bodyIndex];
+        }
+        return doChainedInvocation(uri, headers, ori, body, bodyIndex, null, null);
         
     }
 
@@ -409,47 +416,77 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
     }
     
-    private Object doChainedInvocation(URI uri, MultivaluedMap<String, String> headers, 
-                          OperationResourceInfo ori, Object[] params, int bodyIndex, 
-                          MultivaluedMap<ParameterType, Parameter> types,
-                          List<Object> pathParams) throws Throwable {
-        Message outMessage = createMessage(ori.getHttpMethod(), headers, uri);
+    private Object doChainedInvocation(URI uri, 
+                                       MultivaluedMap<String, String> headers, 
+                                       OperationResourceInfo ori, 
+                                       Object body, 
+                                       int bodyIndex,
+                                       Exchange exchange,
+                                       Map<String, Object> invocationContext) throws Throwable {
+        
+        Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
+                                           exchange, invocationContext);
+        
         outMessage.getExchange().setOneWay(ori.isOneway());
-        
-        getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
-        outMessage.put(URITemplate.TEMPLATE_PARAMETERS, getState().getTemplates());
-        
         outMessage.setContent(OperationResourceInfo.class, ori);
         setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
         outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
-        boolean isForm = types.containsKey(ParameterType.FORM);
-        if (bodyIndex != -1 || isForm) {
+        
+        if (body != null) {
             outMessage.put("BODY_INDEX", bodyIndex);
-            Object body = isForm ? handleForm(types, params) : params[bodyIndex];
-            MessageContentsList contents = new MessageContentsList(new Object[]{body});
-            outMessage.setContent(List.class, contents);
             outMessage.getInterceptorChain().add(new BodyWriter());
-        } else {
-            setEmptyRequestProperty(outMessage, ori.getHttpMethod());
         }
+
+        Map<String, Object> reqContext = getRequestContext(outMessage);
+        reqContext.put(OperationResourceInfo.class.getName(), ori);
+        reqContext.put("BODY_INDEX", bodyIndex);
         
         // execute chain    
         try {
             outMessage.getInterceptorChain().doIntercept(outMessage);
-        } catch (Throwable ex) {
-            // we'd like a user to get the whole Response anyway if needed
+        } catch (Exception ex) {
+            outMessage.setContent(Exception.class, ex);
         }
         
-        // TODO : this needs to be done in an inbound chain instead
-        HttpURLConnection connect = (HttpURLConnection)outMessage.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        return handleResponse(connect, outMessage, ori);
+        Object[] results = preProcessResult(outMessage);
+        if (results != null && results.length == 1) {
+            // this can happen if a connection exception has occurred and
+            // failover feature used this client to invoke on a different address  
+            return results[0];
+        }
+        
+        Object response = null;
+        try {
+            response = handleResponse(outMessage);
+            return response;
+        } catch (Exception ex) {
+            response = ex;
+            throw ex;
+        } finally {
+            completeExchange(response, outMessage.getExchange());
+        }
         
     }
     
-    protected Object handleResponse(HttpURLConnection connect, Message outMessage, OperationResourceInfo ori) 
+    @Override
+    protected Object retryInvoke(URI newRequestURI, 
+                                 MultivaluedMap<String, String> headers,
+                                 Object body,
+                                 Exchange exchange, 
+                                 Map<String, Object> invContext) throws Throwable {
+        
+        Map<String, Object> reqContext = CastUtils.cast((Map)invContext.get(REQUEST_CONTEXT));
+        int bodyIndex = body != null ? (Integer)reqContext.get("BODY_INDEX") : -1;
+        OperationResourceInfo ori = 
+            (OperationResourceInfo)reqContext.get(OperationResourceInfo.class.getName());
+        return doChainedInvocation(newRequestURI, headers, ori, 
+                                   body, bodyIndex, exchange, invContext);
+    }
+    
+    protected Object handleResponse(Message outMessage) 
         throws Throwable {
-        Response r = setResponseBuilder(connect, outMessage.getExchange()).build();
-        Method method = ori.getMethodToInvoke();
+        Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
+        Method method = outMessage.getExchange().get(Method.class);
         checkResponse(method, r, outMessage);
         if (method.getReturnType() == Void.class) { 
             return null;
@@ -526,6 +563,5 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         
     }
-
     
 }
