@@ -91,7 +91,7 @@ public class SecurityToken {
     /**
      * A bag to hold any other properties
      */
-    private Properties  properties;
+    private Properties properties;
 
     /**
      * A flag to assist the TokenStorage
@@ -145,12 +145,16 @@ public class SecurityToken {
     
     public SecurityToken(String id) {
         this.id = id;
+        createDefaultExpires();
     }
 
     public SecurityToken(String id, Date created, Date expires) {
         this.id = id;
         this.created = created;
         this.expires = expires;
+        if (expires == null) {
+            createDefaultExpires();
+        }
     }
     
     public SecurityToken(String id,
@@ -161,6 +165,9 @@ public class SecurityToken {
         this.token = cloneElement(tokenElem);
         this.created = created;
         this.expires = expires;
+        if (expires == null) {
+            createDefaultExpires();
+        }
     }
 
     public SecurityToken(String id,
@@ -171,7 +178,11 @@ public class SecurityToken {
         if (lifetimeElem != null) {
             processLifeTime(lifetimeElem);
         }
+        if (expires == null) {
+            createDefaultExpires();
+        }
     }
+    
     private static Element cloneElement(Element el) {
         try {
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
@@ -444,6 +455,15 @@ public class SecurityToken {
      */
     public int getAssociatedHash() {
         return associatedHash;
+    }
+    
+    /**
+     * Create a default Expires date 5 minutes in the future
+     */
+    private void createDefaultExpires() {
+        expires = new Date();
+        long currentTime = expires.getTime();
+        expires.setTime(currentTime + 300 * 1000);
     }
 
 } 
