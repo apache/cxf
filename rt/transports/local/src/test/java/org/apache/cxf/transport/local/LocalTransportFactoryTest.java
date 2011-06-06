@@ -33,7 +33,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.wsdl.http.AddressType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,9 +53,7 @@ public class LocalTransportFactoryTest extends Assert {
         LocalTransportFactory factory = new LocalTransportFactory(bus);
         
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
-        AddressType a = new AddressType();
-        a.setLocation("http://localhost/test");
-        ei.addExtensor(a);
+        ei.setAddress("http://localhost/test");
 
         LocalDestination d = (LocalDestination) factory.getDestination(ei);
         d.setMessageObserver(new EchoObserver());

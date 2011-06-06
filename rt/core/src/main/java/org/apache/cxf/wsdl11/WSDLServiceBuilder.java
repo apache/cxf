@@ -173,7 +173,7 @@ public class WSDLServiceBuilder {
         return buildServices(d, name, null, null);
     }
     public List<ServiceInfo> buildServices(Definition d, QName name, QName endpointName) {
-        return buildServices(d, name, endpointName);
+        return buildServices(d, name, endpointName, null);
     }
 
     private List<ServiceInfo> buildServices(Definition d,
