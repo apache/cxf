@@ -29,11 +29,13 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 
 public class Destination extends AbstractEndpoint {
@@ -131,6 +133,17 @@ public class Destination extends AbstractEndpoint {
             SequenceFaultFactory sff = new SequenceFaultFactory();
             throw sff.createUnknownSequenceFault(sequenceType.getIdentifier());
         }
+
+        RMStore store = getReliableEndpoint().getManager().getStore();
+        if (null != store) {
+            CachedOutputStream saved = 
+                (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            RMMessage msg = new RMMessage();
+            msg.setMessageNumber(sequenceType.getMessageNumber());
+            msg.setContent(saved);
+            store.persistIncoming(seq, msg);
+        }
+
     }
     
     void ackRequested(Message message) throws SequenceFault, RMException {
@@ -180,6 +193,7 @@ public class Destination extends AbstractEndpoint {
 
         if (null != seq) {
             seq.processingComplete(sequenceType.getMessageNumber());
+            seq.purgeAcknowledged(sequenceType.getMessageNumber());
         }
     }
     

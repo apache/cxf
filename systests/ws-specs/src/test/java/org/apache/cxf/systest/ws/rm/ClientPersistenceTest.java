@@ -145,6 +145,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         verifyStorePopulation();
         stopClient();
         startClient();
+        populateStoreAfterRestart();
         recover();
         verifyRecovery();
     }
@@ -177,12 +178,12 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMeOneWay("two");
         greeter.greetMeOneWay("three");
         greeter.greetMeOneWay("four");
+
+        awaitMessages(5, 3);
         
         MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
 
-        assertNotNull(mf);
-        awaitMessages(5, 3);
-        
+        // sent create seq + 4 app messages and losing 2 app messages
         mf.verifyMessages(5, true);
         String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
                                                  GREETMEONEWAY_ACTION,
@@ -193,13 +194,13 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3", "4"}, true);
         mf.verifyAcknowledgements(new boolean[5], true);
 
-
+        // as 2 messages being lost, received seq ack and 2 ack messages 
         mf.verifyMessages(3, false);
         expectedActions = new String[] {RMConstants.getCreateSequenceResponseAction(),
                                         RMConstants.getSequenceAcknowledgmentAction(),
                                         RMConstants.getSequenceAcknowledgmentAction()};
         mf.verifyActions(expectedActions, false);
-        mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);        
+        mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
     
     void verifyStorePopulation() {
@@ -235,6 +236,38 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
       
+    void populateStoreAfterRestart() throws Exception {
+        
+        bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
+        .setMilliseconds(new Long(60000));
+
+        greeter.greetMeOneWay("five");
+
+        awaitMessages(1, 3);
+        
+        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
+        
+        // sent 1 app message and no create seq messag this time
+        mf.verifyMessages(1, true);
+        String[] expectedActions = new String[] {GREETMEONEWAY_ACTION};
+
+        mf.verifyActions(expectedActions, true);
+        mf.verifyMessageNumbers(new String[] {"5"}, true);
+        mf.verifyAcknowledgements(new boolean[1], true);
+
+        mf.verifyMessages(3, false);
+
+        expectedActions = new String[] {RMConstants.getSequenceAcknowledgmentAction(),
+                                        RMConstants.getSequenceAcknowledgmentAction(),
+                                        null};
+        // we can't reliably predict how the three remaining messages are acknowledged
+//        mf.verifyActions(expectedActions, false);
+//        mf.verifyAcknowledgements(new boolean[]{true, true, false}, false);
+        
+        // verify the final ack range to be complete 
+        mf.verifyAcknowledgementRange(1, 5);
+    }
+
     void recover() throws Exception {
         
         // do nothing - resends should happen in the background  

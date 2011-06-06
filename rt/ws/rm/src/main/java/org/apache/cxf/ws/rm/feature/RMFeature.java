@@ -23,6 +23,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.ws.rm.RMCaptureInInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
 import org.apache.cxf.ws.rm.RMManager;
@@ -50,6 +51,7 @@ public class RMFeature extends AbstractFeature {
     private RMOutInterceptor rmLogicalOut = new RMOutInterceptor();
     private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
     private RMSoapInterceptor rmCodec = new RMSoapInterceptor();
+    private RMCaptureInInterceptor rmCaptureIn = new RMCaptureInInterceptor(); 
 
     public void setDeliveryAssurance(DeliveryAssuranceType da) {
         deliveryAssurance = da;
@@ -94,17 +96,21 @@ public class RMFeature extends AbstractFeature {
         rmLogicalIn.setBus(bus);
         rmLogicalOut.setBus(bus);
         rmDelivery.setBus(bus);
+        rmCaptureIn.setBus(bus);
 
         provider.getInInterceptors().add(rmLogicalIn);
         provider.getInInterceptors().add(rmCodec);
         provider.getInInterceptors().add(rmDelivery);
+        if (null != store) {
+            provider.getInInterceptors().add(rmCaptureIn);
+        }
 
         provider.getOutInterceptors().add(rmLogicalOut);
         provider.getOutInterceptors().add(rmCodec);
 
         provider.getInFaultInterceptors().add(rmLogicalIn);
         provider.getInFaultInterceptors().add(rmCodec);
-        provider.getInInterceptors().add(rmDelivery);
+        provider.getInFaultInterceptors().add(rmDelivery);
 
         provider.getOutFaultInterceptors().add(rmLogicalOut);
         provider.getOutFaultInterceptors().add(rmCodec);

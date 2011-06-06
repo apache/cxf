@@ -215,6 +215,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyActions(expectedActions, false);
         mf.verifyMessageNumbers(new String[] {null, null, null, null}, false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
+        mf.verifyAcknowledgementRange(1, 3);
     }
     
     @Test
@@ -302,7 +303,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessages(0, true);
         mf.verifyMessages(1, false);
         mf.verifyAcknowledgements(new boolean[] {true}, false);
-
+        mf.verifyAcknowledgementRange(1, 2);
     }
     
     @Test
@@ -397,7 +398,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // in the course of retransmission - this is harmless but pollutes test output
         
         awaitMessages(3, 0, 7500);
-        
     }
     
     @Test
@@ -489,6 +489,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[4], false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
+        mf.verifyAcknowledgementRange(1, 3);
     }
 
     // the same as above but using endpoint specific interceptor configuration
@@ -537,6 +538,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[4], false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
+        mf.verifyAcknowledgementRange(1, 3);
     }
 
     @Test
@@ -588,7 +590,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[1], true);
         mf.verifyLastMessage(new boolean[1], true);
         mf.verifyAcknowledgements(new boolean[] {true}, true);
-
+        mf.verifyAcknowledgementRange(1, 2);
     }
     
     // A maximum sequence length of 2 is configured for the client only (server allows 10).

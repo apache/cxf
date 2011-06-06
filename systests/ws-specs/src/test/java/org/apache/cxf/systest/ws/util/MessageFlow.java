@@ -420,6 +420,37 @@ public class MessageFlow extends Assert {
         }
     }
     
+    public void verifyAcknowledgementRange(long lower, long upper) throws Exception {
+        long currentLower = 0;
+        long currentUpper = 0;
+        // get the final ack range
+        for (Document doc : inboundMessages) {
+            Element e = getRMHeaderElement(doc, RMConstants.getSequenceAckName());
+            // let the newer messages take precedence over the older messages in getting the final range
+            if (null != e) {
+                e = getAcknowledgementRange(e);
+                if (null != e) {
+                    currentLower = Long.parseLong(e.getAttribute("Lower"));
+                    currentUpper = Long.parseLong(e.getAttribute("Upper"));
+                }
+            }
+        }
+        assertEquals("Unexpected acknowledgement lower range", 
+                     lower, currentLower);
+        assertEquals("Unexpected acknowledgement upper range", 
+                     upper, currentUpper);
+    }
+    
+    // note that this method onsiders only the first range element 
+    private Element getAcknowledgementRange(Element element) throws Exception {
+        for (Node nd = element.getFirstChild(); nd != null; nd = nd.getNextSibling()) { 
+            if (Node.ELEMENT_NODE == nd.getNodeType() && "AcknowledgementRange".equals(nd.getLocalName())) {
+                return (Element)nd;
+            }
+        } 
+        return null;
+    }
+
     public void purgePartialResponses() throws Exception {
         for (int i = inboundMessages.size() - 1; i >= 0; i--) {
             if (isPartialResponse(inboundMessages.get(i))) {

@@ -148,9 +148,7 @@ public class DestinationSequence extends AbstractSequence {
             mergeRanges();
             wakeupAll();
         }
-        
-        purgeAcknowledged(messageNumber);
-        
+                
         RMAssertion rma = PolicyUtils.getRMAssertion(destination.getManager().getRMAssertion(), message);
         long acknowledgementInterval = 0;
         AcknowledgementInterval ai = rma.getAcknowledgementInterval();

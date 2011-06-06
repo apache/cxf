@@ -142,6 +142,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         responses[2] = greeter.greetMeAsync("three");
         
         verifyMissingResponse(responses);
+
         control.stopGreeter(SERVER_LOSS_CFG);
         LOG.fine("Stopped greeter server");
        
@@ -156,6 +157,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         responses[3] = greeter.greetMeAsync("four");
         
         verifyRetransmissionQueue();
+        verifyAcknowledgementRange(1, 4);
         
         out.getOutboundMessages().clear();
         in.getInboundMessages().clear();
@@ -242,6 +244,11 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         Thread.sleep(5000);
         boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
         assertTrue("Retransmission Queue is not empty", empty);
+    }
+    
+    void verifyAcknowledgementRange(long lower, long higher) throws Exception {
+        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
+        mf.verifyAcknowledgementRange(lower, higher);
     }
 
     protected void awaitMessages(int nExpectedOut, int nExpectedIn) {

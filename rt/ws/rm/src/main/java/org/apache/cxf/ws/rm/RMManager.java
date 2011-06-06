@@ -410,6 +410,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         RMEndpoint rme = createReliableEndpoint(endpoint);
         rme.initialise(conduit, null, null);
         reliableEndpoints.put(endpoint, rme);
+        SourceSequence css = null;
         for (SourceSequence ss : sss) {            
  
             Collection<RMMessage> ms = store.getMessages(ss.getIdentifier(), true);
@@ -419,7 +420,11 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             LOG.log(Level.FINE, "Number of messages in sequence: {0}", ms.size());
             
             rme.getSource().addSequence(ss, false);
-            
+            // choosing an arbitrary valid source sequence as the current source sequence
+            if (css == null && !ss.isExpired() && !ss.isLastMessage()) {
+                css = ss;
+                rme.getSource().setCurrent(css);
+            }
             for (RMMessage m : ms) {                
                 
                 Message message = new MessageImpl();

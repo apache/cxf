@@ -172,7 +172,7 @@ public class DestinationTest extends Assert {
         Identifier id = control.createMock(Identifier.class);
         EasyMock.expect(st.getIdentifier()).andReturn(id); 
         long nr = 10;
-        EasyMock.expect(st.getMessageNumber()).andReturn(nr).times(2);
+        EasyMock.expect(st.getMessageNumber()).andReturn(nr).times(3);
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         EasyMock.expect(destination.getSequence(id)).andReturn(ds);
         
@@ -203,7 +203,11 @@ public class DestinationTest extends Assert {
         String acksToAddress = "acksTo";
         EasyMock.expect(acksToURI.getValue()).andReturn(acksToAddress);
         EasyMock.expect(ds.canPiggybackAckOnPartialResponse()).andReturn(false);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme);
+        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme).times(2);
+        RMManager manager = control.createMock(RMManager.class);
+        EasyMock.expect(rme.getManager()).andReturn(manager);
+        RMStore store = control.createMock(RMStore.class);
+        EasyMock.expect(manager.getStore()).andReturn(store);
         Proxy proxy = control.createMock(Proxy.class);
         EasyMock.expect(rme.getProxy()).andReturn(proxy);
         proxy.acknowledge(ds);
