@@ -77,6 +77,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
                         String add = (String)message.get(Message.ENDPOINT_ADDRESS);
                         if (StringUtils.isEmpty(add)
                             || add.equals(ei.getAddress())) {
+                            replaceEndpointAddressPropertyIfNeeded(message, add);
                             selectedConduit = conduitInitiator.getConduit(ei);
                         } else {
                             EndpointReferenceType epr = new EndpointReferenceType();
@@ -108,6 +109,28 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
         return selectedConduit;
     }
 
+    // Some conduits may replace the endpoint address after it has already been prepared
+    // but before the invocation has been done (ex, org.apache.cxf.clustering.LoadDistributorTargetSelector)
+    // which may affect JAX-RS clients where actual endpoint address property may include additional path 
+    // segments.  
+    protected void replaceEndpointAddressPropertyIfNeeded(Message message, String endpointAddress) {
+        String requestURI = (String)message.get(Message.REQUEST_URI);
+        if (requestURI != null && !requestURI.startsWith(endpointAddress)) {
+            String basePath = (String)message.get(Message.BASE_PATH);
+            if (basePath != null && requestURI.startsWith(basePath)) {
+                String pathInfo = requestURI.substring(basePath.length());
+                final String slash = "/";
+                boolean startsWithSlash = pathInfo.startsWith(slash);
+                if (endpointAddress.endsWith(slash)) {
+                    endpointAddress = endpointAddress + (startsWithSlash ? pathInfo.substring(1) : pathInfo);
+                } else {
+                    endpointAddress = endpointAddress + (startsWithSlash ? pathInfo : (slash + pathInfo));
+                }
+                message.put(Message.ENDPOINT_ADDRESS, endpointAddress);
+            }
+        }
+    }
+    
     /**
      * @return the encapsulated Endpoint
      */

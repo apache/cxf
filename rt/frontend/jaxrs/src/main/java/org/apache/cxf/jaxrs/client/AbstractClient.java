@@ -67,7 +67,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseChainCache;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
@@ -671,6 +670,11 @@ public abstract class AbstractClient implements Client, Retryable {
         cfg = config;
     }
     
+    // Note that some conduit selectors may update Message.ENDPOINT_ADDRESS
+    // after the conduit selector has been prepared but before the actual 
+    // invocation thus it is also important to have baseURI and currentURI 
+    // synched up with the latest endpoint address, after a successful proxy 
+    // or web client invocation has returned
     protected void prepareConduitSelector(Message message, URI currentURI) {
         try {
             cfg.prepareConduitSelector(message);
@@ -688,6 +692,7 @@ public abstract class AbstractClient implements Client, Retryable {
             message.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
             message.put(Message.REQUEST_URI, currentURI.toString());
         }
+        message.put(Message.BASE_PATH, getBaseURI().toString());
     }
     
     protected static PhaseInterceptorChain setupOutInterceptorChain(ClientConfiguration cfg) { 
@@ -705,12 +710,6 @@ public abstract class AbstractClient implements Client, Retryable {
         List<Interceptor<? extends Message>> i3 = cfg.getConduitSelector().getEndpoint().getInInterceptors();
         
         return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
-    }
-    
-    protected Message createSimpleMessage() {
-        Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, getHeaders());
-        return m;
     }
     
     protected Message createMessage(Object body,
@@ -749,7 +748,6 @@ public abstract class AbstractClient implements Client, Retryable {
         
         //setup conduit selector
         prepareConduitSelector(m, currentURI);
-        
         return m;
     }
     
