@@ -34,6 +34,9 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.features.clustering.FailoverFeature;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -78,46 +81,60 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     @Test    
     public void testSequentialStrategy() throws Exception {
         FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS2, Server.ADDRESS3); 
+            getFeature(false, false, Server.ADDRESS2, Server.ADDRESS3); 
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, null, false, false);
+    }
+    
+    @Test    
+    public void testSequentialStrategyWithCustomTargetSelector() throws Exception {
+        FailoverFeature feature = 
+            getFeature(true, false, Server.ADDRESS2, Server.ADDRESS3); 
+        strategyTest("resolver://info", feature, Server.ADDRESS3, null, false, false);
     }
     
     @Test
     public void testSequentialStrategyWebClient() throws Exception {
         FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS3, Server.ADDRESS2); 
-        strategyTestWebClient(Server.ADDRESS1, feature, Server.ADDRESS3, null, false, false);
+            getFeature(false, false, Server.ADDRESS2, Server.ADDRESS3); 
+        strategyTestWebClient(Server.ADDRESS1, feature, Server.ADDRESS2, null, false, false);
+    }
+    
+    @Test
+    public void testRandomStrategyWebClient() throws Exception {
+        FailoverFeature feature = 
+            getFeature(false, true, Server.ADDRESS3, Server.ADDRESS2); 
+        strategyTestWebClient(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, true);
     }
     
     @Test    
     public void testRandomStrategy() throws Exception {
         FailoverFeature feature = 
-            getFeature(true, Server.ADDRESS2, Server.ADDRESS3); 
+            getFeature(false, true, Server.ADDRESS2, Server.ADDRESS3); 
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, false, true);
     }
     
     @Test    
     public void testSequentialStrategyWithDiffBaseAddresses() throws Exception {
         FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS3, null); 
+            getFeature(false, false, Server.ADDRESS3, null); 
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false);
     }
     
     @Test(expected = ServerWebApplicationException.class)
     public void testSequentialStrategyWithServerException() throws Exception {
         FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS2, Server.ADDRESS3); 
+            getFeature(false, false, Server.ADDRESS2, Server.ADDRESS3); 
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, true, false);
     }
     
     @Test(expected = ClientWebApplicationException.class)    
     public void testSequentialStrategyFailure() throws Exception {
         FailoverFeature feature = 
-            getFeature(false, "http://localhost:8080/non-existent"); 
+            getFeature(false, false, "http://localhost:8080/non-existent"); 
         strategyTest(Server.ADDRESS1, feature, null, null, false, false);
     }
 
-    private FailoverFeature getFeature(boolean random, String ...address) {
+    private FailoverFeature getFeature(boolean custom, boolean random, String ...address) {
         FailoverFeature feature = new FailoverFeature();
         List<String> alternateAddresses = new ArrayList<String>();
         for (String s : address) {
@@ -132,6 +149,11 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             strategy.setAlternateAddresses(alternateAddresses);
             feature.setStrategy(strategy);
         }
+        if (custom) {
+            FailoverTargetSelector selector = new ReplaceInitialAddressSelector(); 
+            feature.setTargetSelector(selector);
+        }
+        
         return feature;
     }
     
@@ -275,4 +297,18 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         }
     }
     
+    private static class ReplaceInitialAddressSelector extends FailoverTargetSelector {
+        @Override
+        public synchronized void prepare(Message message) {
+            EndpointInfo ei = getEndpoint().getEndpointInfo();
+            ei.setAddress(Server.ADDRESS3); 
+            message.put(Message.ENDPOINT_ADDRESS, Server.ADDRESS3);
+            super.prepare(message);
+        }
+        
+        @Override
+        protected boolean requiresFailover(Exchange exchange) {
+            return false;
+        }
+    }
 }

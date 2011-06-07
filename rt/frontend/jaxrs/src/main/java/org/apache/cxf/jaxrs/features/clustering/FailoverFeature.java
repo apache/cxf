@@ -56,6 +56,10 @@ public class FailoverFeature extends org.apache.cxf.clustering.FailoverFeature {
         }
     }
     
+    public void setTargetSelector(FailoverTargetSelector selector) {
+        customSelector = selector;
+    }
+    
     @Override
     public FailoverStrategy getStrategy()  {
         FailoverStrategy strategy = super.getStrategy();

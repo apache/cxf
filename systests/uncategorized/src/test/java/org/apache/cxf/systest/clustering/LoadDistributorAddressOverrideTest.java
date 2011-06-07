@@ -125,6 +125,7 @@ public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverride
         for (int i = 0; i < 12; ++i) {
             try {
                 String response = greeter.greetMe("fred");
+                System.out.println(getCurrentEndpoint(greeter));
                 assertNotNull("expected non-null response", response);
                 incrementResponseCount(responseCounts, response);
             } catch (WebServiceException ex) {

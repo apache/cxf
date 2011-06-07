@@ -488,9 +488,12 @@ public abstract class AbstractClient implements Client, Retryable {
     
     protected URI calculateNewRequestURI(Map<String, Object> reqContext) {
         URI newBaseURI = URI.create(reqContext.get(Message.ENDPOINT_ADDRESS).toString());
-        String baseURIPath = newBaseURI.getRawPath();
-        
         URI requestURI = URI.create(reqContext.get(Message.REQUEST_URI).toString());
+        return calculateNewRequestURI(newBaseURI, requestURI);
+    }
+    
+    private URI calculateNewRequestURI(URI newBaseURI, URI requestURI) {
+        String baseURIPath = newBaseURI.getRawPath();
         String reqURIPath = requestURI.getRawPath();
         
         UriBuilder builder = UriBuilder.fromUri(newBaseURI);
@@ -515,7 +518,11 @@ public abstract class AbstractClient implements Client, Retryable {
                 (MultivaluedMap<String, String>)reqContext.get(Message.PROTOCOL_HEADERS);
                         
             URI newRequestURI = calculateNewRequestURI(reqContext);
-            
+            // TODO: if failover conduit selector fails to find a failover target
+            // then it will revert to the previous endpoint; that is not very likely
+            // but possible - thus ideally we need to resert base and current URI only
+            // if we get the same ConduitInitiatior endpoint instance before and after
+            // retryInvoke.
             Object response = retryInvoke(newRequestURI, headers, body, exchange, context);
             exchange.put(List.class, getContentsList(response));
             return new Object[]{response};
@@ -664,14 +671,23 @@ public abstract class AbstractClient implements Client, Retryable {
         cfg = config;
     }
     
-    protected void prepareConduitSelector(Message message) {
+    protected void prepareConduitSelector(Message message, URI currentURI) {
         try {
             cfg.prepareConduitSelector(message);
+            
         } catch (Fault ex) {
             LOG.warning("Failure to prepare a message from conduit selector");
         }
         message.getExchange().put(ConduitSelector.class, cfg.getConduitSelector());
         message.getExchange().put(Service.class, cfg.getConduitSelector().getEndpoint().getService());
+        
+        String address = (String)message.get(Message.ENDPOINT_ADDRESS);
+        // custom conduits may override the initial/current address
+        if (!address.equals(currentURI.toString())) {
+            currentURI = calculateNewRequestURI(URI.create(address), currentURI);
+            message.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
+            message.put(Message.REQUEST_URI, currentURI.toString());
+        }
     }
     
     protected static PhaseInterceptorChain setupOutInterceptorChain(ClientConfiguration cfg) { 
@@ -732,7 +748,7 @@ public abstract class AbstractClient implements Client, Retryable {
         setContexts(m, exchange, invocationContext);
         
         //setup conduit selector
-        prepareConduitSelector(m);
+        prepareConduitSelector(m, currentURI);
         
         return m;
     }
