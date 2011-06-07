@@ -130,11 +130,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     url = ClassLoaderUtils.getResource((String)o, AbstractWSS4JInterceptor.class);
                 }
                 if (url == null) {
-                    try {
-                        url = new URL((String)o);
-                    } catch (Exception ex) {
-                        //ignore
-                    }
+                    url = new URL((String)o);
                 }
                 if (url != null) {
                     properties = new Properties();

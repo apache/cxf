@@ -463,7 +463,7 @@ public class SecurityToken {
     private void createDefaultExpires() {
         expires = new Date();
         long currentTime = expires.getTime();
-        expires.setTime(currentTime + 300 * 1000);
+        expires.setTime(currentTime + 300L * 1000L);
     }
 
 } 

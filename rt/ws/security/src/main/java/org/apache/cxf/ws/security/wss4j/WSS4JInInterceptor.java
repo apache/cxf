@@ -554,7 +554,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                         TokenStore store = (TokenStore)ep.getEndpointInfo()
                             .getProperty(TokenStore.class.getName());
                         if (store != null) {
-                            return new TokenStoreCallbackHandler(cbHandler, store);
+                            return new TokenStoreCallbackHandler(null, store);
                         }
                     }                    
                     throw sec;
@@ -617,7 +617,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             } else if (val instanceof Validator) {
                 config.setValidator(key, (Validator)val);
             } else if (val == null) {
-                config.setProcessor(key, (Class<?>)val);
+                config.setProcessor(key, (Class<?>)null);
             }
         }
         final WSSecurityEngine ret = new WSSecurityEngine();
