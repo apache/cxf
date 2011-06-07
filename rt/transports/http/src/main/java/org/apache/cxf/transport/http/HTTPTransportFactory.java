@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.wsdl.extensions.http.HTTPAddress;
@@ -35,6 +37,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -58,7 +61,7 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 public class HTTPTransportFactory 
     extends AbstractTransportFactory 
     implements WSDLEndpointFactory, ConduitInitiator, DestinationFactory {
-
+    
     public static final List<String> DEFAULT_NAMESPACES 
         = Arrays.asList(
             "http://cxf.apache.org/transports/http",
@@ -67,6 +70,7 @@ public class HTTPTransportFactory
             "http://schemas.xmlsoap.org/wsdl/http/"
         );
         
+    private static final Logger LOG = LogUtils.getL7dLogger(HTTPTransportFactory.class);
     
     /**
      * This constant holds the prefixes served by this factory.
@@ -254,12 +258,20 @@ public class HTTPTransportFactory
         AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
         if (d == null) {
             HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
-            HttpDestinationFactory servletFactory = new ServletDestinationFactory();
             String addr = endpointInfo.getAddress();
+            if (jettyFactory == null && addr != null && addr.startsWith("http")) {
+                String m = 
+                    new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND"
+                                                           , LOG).toString();
+                LOG.log(Level.SEVERE, m);
+                throw new IOException(m);
+            }
+            HttpDestinationFactory servletFactory = new ServletDestinationFactory();
             HttpDestinationFactory factory = servletFactory;
             if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
                 factory = jettyFactory;
             }
+            
             d = factory.createDestination(endpointInfo, getBus(), registry);
             registry.addDestination(d);
             configure(d);
