@@ -34,12 +34,14 @@ public class HTTPTransportFactoryTest extends Assert {
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPTransportFactory factory = bus.getExtension(HTTPTransportFactory.class);
-        try {
-            factory.getDestination(ei);
-            fail("Expect exception here.");
-        } catch (IOException ex) {
-            assertTrue("We should find some exception related to the HttpDestination"
+        if (factory != null) {
+            try {
+                factory.getDestination(ei);
+                fail("Expect exception here.");
+            } catch (IOException ex) {
+                assertTrue("We should find some exception related to the HttpDestination"
                        , ex.getMessage().indexOf("HttpDestinationFactory") > 0);
+            }
         }
     }
 
