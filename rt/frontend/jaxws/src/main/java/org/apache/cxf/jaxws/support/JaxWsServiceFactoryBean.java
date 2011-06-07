@@ -544,10 +544,12 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                                                        inputAction);
             operation.getInput().addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME,
                                                        inputAction);
-            operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
-                                                       computeAction(operation, "Response"));
-            operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME,
-                                                        computeAction(operation, "Response"));
+            if (operation.getOutput() != null) {
+                operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
+                                                            computeAction(operation, "Response"));
+                operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME,
+                                                            computeAction(operation, "Response"));
+            }
 
         } else {
             MessageInfo input = operation.getInput();
