@@ -21,11 +21,13 @@ package org.apache.cxf.transport.local;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -42,6 +44,7 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.wsdl.http.AddressType;
 
 public class LocalTransportFactory extends AbstractTransportFactory
     implements DestinationFactory, ConduitInitiator {
@@ -54,12 +57,15 @@ public class LocalTransportFactory extends AbstractTransportFactory
 
     private static final Logger LOG = LogUtils.getL7dLogger(LocalTransportFactory.class);
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final String NULL_ADDRESS 
+        = LocalTransportFactory.class.getName() + ".nulladdress";
 
     static {
         URI_PREFIXES.add("local://");
     }
     
-    private Map<String, Destination> destinations = new HashMap<String, Destination>();
+    private ConcurrentMap<String, Destination> destinations 
+        = new ConcurrentHashMap<String, Destination>();
 
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;
@@ -94,10 +100,21 @@ public class LocalTransportFactory extends AbstractTransportFactory
     protected Destination getDestination(EndpointInfo ei,
                                          EndpointReferenceType reference)
         throws IOException {
-        Destination d = destinations.get(reference.getAddress().getValue());
+        Destination d = null;
+        String addr = reference.getAddress().getValue();
+        if (addr == null) {
+            AddressType tp = ei.getExtensor(AddressType.class);
+            if (tp != null) {
+                addr = tp.getLocation();
+            }
+        }
+        if (addr == null) {
+            addr = NULL_ADDRESS;
+        }
+        d = destinations.get(addr);
         if (d == null) {
             d = createDestination(ei, reference);
-            destinations.put(reference.getAddress().getValue(), d);
+            destinations.put(addr, d);
         }
         return d;
     }
@@ -108,7 +125,11 @@ public class LocalTransportFactory extends AbstractTransportFactory
     }
 
     void remove(LocalDestination destination) {
-        destinations.remove(destination);
+        for (Map.Entry<String, Destination> e : destinations.entrySet())  {
+            if (e.getValue() == destination) {
+                destinations.remove(e.getKey());
+            }
+        }
     }
 
     public Conduit getConduit(EndpointInfo ei) throws IOException {
