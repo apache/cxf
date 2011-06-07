@@ -72,6 +72,7 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferen
 import org.apache.cxf.ws.security.sts.provider.model.xmldsig.KeyInfoType;
 import org.apache.cxf.ws.security.sts.provider.model.xmldsig.X509DataType;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
+import org.apache.ws.security.WSConstants;
 import org.apache.xml.security.utils.Constants;
 import org.opensaml.common.xml.SAMLConstants;
 
@@ -88,6 +89,8 @@ public class SAMLTokenIssueOperation implements IssueOperation {
     private static final String SIGN_FACTORY_TYPE = "DOM";
     private static final String JKS_INSTANCE = "JKS";
     private static final String X_509 = "X.509";
+    private static final QName TOKEN_TYPE = 
+        new QName(WSConstants.WSSE11_NS, WSConstants.TOKEN_TYPE, WSConstants.WSSE11_PREFIX);
 
     private static final QName QNAME_WST_TOKEN_TYPE = WS_TRUST_FACTORY
             .createTokenType("").getName();
@@ -234,6 +237,21 @@ public class SAMLTokenIssueOperation implements IssueOperation {
         keyIdentifierType.setValue(tokenId);
         JAXBElement<KeyIdentifierType> keyIdentifier = WSSE_FACTORY
                 .createKeyIdentifier(keyIdentifierType);
+        
+        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) ||
+            WSConstants.SAML_NS.equals(tokenType)) {
+            securityTokenReferenceType.getOtherAttributes().put(
+                TOKEN_TYPE, WSConstants.WSS_SAML_TOKEN_TYPE
+            );
+            keyIdentifierType.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSConstants.SAML2_NS.equals(tokenType)) {
+            securityTokenReferenceType.getOtherAttributes().put(
+                TOKEN_TYPE, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+            keyIdentifierType.setValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        }
+        
         securityTokenReferenceType.getAny().add(keyIdentifier);
         requestedReferenceType
                 .setSecurityTokenReference(securityTokenReferenceType);
