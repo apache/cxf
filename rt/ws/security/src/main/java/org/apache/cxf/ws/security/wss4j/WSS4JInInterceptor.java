@@ -158,7 +158,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
         // handle the special case of the SEND_SIGV
         if (result == null 
-            && key == WSHandlerConstants.SEND_SIGV
+            && WSHandlerConstants.SEND_SIGV.equals(key)
             && this.isRequestor((SoapMessage)msgContext)) {
             result = ((SoapMessage)msgContext).getExchange().getOutMessage().get(key);
         }               

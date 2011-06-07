@@ -105,7 +105,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         
         // handle the special case of the RECV_RESULTS
         if (result == null 
-            && key == WSHandlerConstants.RECV_RESULTS
+            && WSHandlerConstants.RECV_RESULTS.equals(key)
             && !this.isRequestor((SoapMessage)msgContext)) {
             result = ((SoapMessage)msgContext).getExchange().getInMessage().get(key);
         }               
