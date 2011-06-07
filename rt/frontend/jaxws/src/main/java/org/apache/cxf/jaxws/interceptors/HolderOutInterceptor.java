@@ -72,11 +72,15 @@ public class HolderOutInterceptor extends AbstractPhaseInterceptor<Message> {
             List<MessagePartInfo> parts = op.getOutput().getMessageParts();
             MessageContentsList inObjects = MessageContentsList.getContentsList(exchange.getInMessage());
             if (inObjects != null) {
-                for (int x = 0; x < inObjects.size(); x++) {
-                    Object o = inObjects.get(x);
-                    if (o instanceof Holder) {
-                        outObjects.set(x + 1, o);
+                if (!inObjects.equals(outObjects)) {
+                    for (int x = 0; x < inObjects.size(); x++) {
+                        Object o = inObjects.get(x);
+                        if (o instanceof Holder) {
+                            outObjects.set(x + 1, o);
+                        }
                     }
+                } else {
+                    LOG.severe("CANNOT_SET_HOLDER_OBJECTS");
                 }
             }
             for (MessagePartInfo part : parts) {
