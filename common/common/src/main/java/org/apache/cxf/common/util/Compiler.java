@@ -100,7 +100,20 @@ public class Compiler {
         }
 
     }
-    
+    public boolean compileFiles(File[] files) {
+        List<String> f = new ArrayList<String>(files.length);
+        for (File file : files) {
+            f.add(file.getAbsolutePath());
+        }
+        return compileFiles(f.toArray(new String[files.length]));
+    }
+    public boolean compileFiles(List<File> files) {
+        List<String> f = new ArrayList<String>(files.size());
+        for (File file : files) {
+            f.add(file.getAbsolutePath());
+        }
+        return compileFiles(f.toArray(new String[files.size()]));
+    }
     public boolean compileFiles(String[] files) {
         String endorsed = System.getProperty("java.endorsed.dirs");
         if (!forceFork) {
