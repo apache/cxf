@@ -151,11 +151,11 @@ public class WsdlOption extends Option {
         addIfTrue(list, isNoTypes(), "-noTypes");
         addIfTrue(list, isAllowElementRefs(), "-allowElementRefs");
         addIfTrue(list, isValidateWsdl(), "-validate");
-        addIfTrue(list, isUseFQCNForFaultSerialVersionUID(), "-useFQCNForFaultSerialVersionUID");
         addIfTrue(list, isMarkGenerated() != null && isMarkGenerated(), "-mark-generated");
         addIfNotNull(list, getDefaultExcludesNamespace(), "-dex");
         addIfNotNull(list, getDefaultNamespacePackageMapping(), "-dns");
         addIfNotNull(list, getServiceName(), "-sn");
+        addIfNotNull(list, getFaultSerialVersionUID(), "-faultSerialVersionUID");
         addIfTrue(list, isAutoNameResolution(), "-autoNameResolution");
         addIfTrue(list, isNoAddressBinding(), "-noAddressBinding");
         addList(list, "-xjc", false, getXJCargs());

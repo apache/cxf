@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wsdlto.jaxws;
 import java.io.File;
 import java.io.ObjectStreamClass;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -46,6 +47,7 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.FaultSerialVersionUID;
 
 import org.junit.Test;
 
@@ -1338,7 +1340,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testCXFNotType() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
-        env.put(ToolConstants.CFG_USE_FQCN_FAULT_SERIAL_VERSION_UID, Boolean.TRUE);
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.FQCN);
         processor.setContext(env);
         processor.execute();
         
@@ -1351,9 +1353,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
-    public void testCXF2808() throws Exception {
+    public void testFaultSerialVersionUIDNONEFQCN() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
-        env.put(ToolConstants.CFG_USE_FQCN_FAULT_SERIAL_VERSION_UID, Boolean.TRUE);
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.FQCN);
         processor.setContext(env);
         processor.execute();
 
@@ -1363,11 +1365,91 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue(faultFile.exists());
 
         Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        Field serialVersionUID = fault.getDeclaredField("serialVersionUID");
+        assertNotNull(serialVersionUID);
         assertEquals(fault.getName().hashCode(), ObjectStreamClass.lookup(fault).getSerialVersionUID());
         fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
         assertEquals(fault.getName().hashCode(), ObjectStreamClass.lookup(fault).getSerialVersionUID());
     }
     
+    
+    @Test
+    public void testNoFaultSerialVersionUID() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+
+        File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
+        assertTrue(faultFile.exists());
+        faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
+        assertTrue(faultFile.exists());
+
+        Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        try {
+            fault.getDeclaredField("serialVersionUID");
+            fail("shouldn't have serialVersionUID field");
+        } catch (NoSuchFieldException e) {
+            //
+        }
+        fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
+        try {
+            fault.getDeclaredField("serialVersionUID");
+            fail("shouldn't have serialVersionUID field");
+        } catch (NoSuchFieldException e) {
+            //
+        }
+                
+    }
+    
+    @Test
+    public void testFaultSerialVersionUIDNONE() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.NONE);
+        processor.setContext(env);
+        processor.execute();
+
+        File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
+        assertTrue(faultFile.exists());
+        faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
+        assertTrue(faultFile.exists());
+
+        Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        try {
+            fault.getDeclaredField("serialVersionUID");
+            fail("shouldn't have serialVersionUID field");
+        } catch (NoSuchFieldException e) {
+            //
+        }
+        fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
+        try {
+            fault.getDeclaredField("serialVersionUID");
+            fail("shouldn't have serialVersionUID field");
+        } catch (NoSuchFieldException e) {
+            //
+        }
+            
+    }
+    
+    @Test
+    public void testFaultSerialVersionUIDNONETIMESTAMP() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.TIMESTAMP);
+        processor.setContext(env);
+        processor.execute();
+
+        File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
+        assertTrue(faultFile.exists());
+        faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
+        assertTrue(faultFile.exists());
+
+        Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        Field serialVersionUID = fault.getDeclaredField("serialVersionUID");
+        assertNotNull(serialVersionUID);
+        
+        fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
+        serialVersionUID = fault.getDeclaredField("serialVersionUID");
+        assertNotNull(serialVersionUID);
+    }
     
     @Test
     public void testExtensionWrapper() throws Exception {

@@ -196,12 +196,11 @@ under the License.
                 </associatedArgument>
             </option>
 
-            <option id="useFQCNForFaultSerialVersionUID" maxOccurs="1">
+            <option id="faultSerialVersionUID" maxOccurs="1">
                 <annotation>
-                    Enable generation of Serial Version UID in fault Exception(s) based on hashcode
-                    of the fully qualified class name of the Exception.
+                    specify how to generate fault Exception's SUID, can use NONE|TIMESTAMP|FQCN, the default is NONE
                 </annotation>
-                <switch>useFQCNForFaultSerialVersionUID</switch>
+                <switch>faultSerialVersionUID</switch>
             </option>
 
         </optionGroup>
