@@ -41,7 +41,9 @@ public final class URITemplate {
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
     private static final String CHARACTERS_TO_ESCAPE = ".*+";
-
+    private static final String SLASH = "/";
+    private static final String SLASH_QUOTE = "/;";
+    
     private final String template;
     private final List<String> variables = new ArrayList<String>();
     private final List<String> customVariables = new ArrayList<String>();
@@ -141,7 +143,7 @@ public final class URITemplate {
         }
 
         Matcher m = templateRegexPattern.matcher(uri);
-        if (!m.matches()) {
+        if (!m.matches() || template.equals(SLASH) && uri.startsWith(SLASH_QUOTE)) {
             if (uri.contains(";")) {
                 // we might be trying to match one or few path segments
                 // containing matrix
@@ -150,14 +152,21 @@ public final class URITemplate {
                 List<PathSegment> uList = JAXRSUtils.getPathSegments(uri, false);
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < uList.size(); i++) {
-                    sb.append('/');
+                    String segment = null;
                     if (pList.size() > i && pList.get(i).getPath().indexOf('{') == -1) {
-                        sb.append(uList.get(i).getPath());
+                        segment = uList.get(i).getPath();
                     } else {
-                        sb.append(HttpUtils.fromPathSegment(uList.get(i)));
+                        segment = HttpUtils.fromPathSegment(uList.get(i));
                     }
+                    if (segment.length() > 0) {
+                        sb.append(SLASH);    
+                    }
+                    sb.append(segment);
                 }
                 uri = sb.toString();
+                if (uri.length() == 0) {
+                    uri = SLASH;
+                }
                 m = templateRegexPattern.matcher(uri);
                 if (!m.matches()) {
                     return false;
@@ -184,8 +193,11 @@ public final class URITemplate {
         // The right hand side value, might be used to further resolve
         // sub-resources.
         
-        String finalGroup = i > groupCount ? "/" : m.group(groupCount);
-        templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup == null ? "/" : finalGroup);
+        String finalGroup = i > groupCount ? SLASH : m.group(groupCount);
+        if (finalGroup == null) {
+            finalGroup = SLASH;
+        }
+        templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup);
 
         return true;
     }
