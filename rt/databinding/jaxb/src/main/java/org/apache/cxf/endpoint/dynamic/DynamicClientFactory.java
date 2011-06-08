@@ -76,6 +76,7 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.wsdl11.WSDLServiceFactory;
 /**
  * This class reads a WSDL and creates a dynamic client from it.
  * 
@@ -98,6 +99,7 @@ public class DynamicClientFactory {
     private String tmpdir = System.getProperty("java.io.tmpdir");
 
     private boolean simpleBindingEnabled = true;
+    private boolean allowRefs;
     
     private Map<String, Object> jaxbContextProperties;
     
@@ -111,6 +113,10 @@ public class DynamicClientFactory {
 
     public void setTemporaryDirectory(String dir) {
         tmpdir = dir;
+    }
+    
+    public void setAllowElementReferences(boolean b) {
+        allowRefs = b;
     }
 
     /**
@@ -252,10 +258,15 @@ public class DynamicClientFactory {
         }
         URL u = composeUrl(wsdlUrl);
         LOG.log(Level.FINE, "Creating client from URL " + u.toString());
-        ClientImpl client = new ClientImpl(bus, u, service, port,
+
+        WSDLServiceFactory sf = (service == null)
+            ? (new WSDLServiceFactory(bus, wsdlUrl)) : (new WSDLServiceFactory(bus, wsdlUrl, service));
+        sf.setAllowElementRefs(allowRefs);
+        Service svc = sf.create();
+
+        ClientImpl client = new ClientImpl(bus, u, svc, port,
                                            getEndpointImplFactory());
 
-        Service svc = client.getEndpoint().getService();
         //all SI's should have the same schemas
         Collection<SchemaInfo> schemas = svc.getServiceInfos().get(0).getSchemas();
 

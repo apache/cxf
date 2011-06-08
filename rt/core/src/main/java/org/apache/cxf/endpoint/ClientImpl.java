@@ -118,11 +118,13 @@ public class ClientImpl
     }
 
     public ClientImpl(URL wsdlUrl) {
-        this(BusFactory.getThreadDefaultBus(), wsdlUrl, null, null, SimpleEndpointImplFactory.getSingleton());
+        this(BusFactory.getThreadDefaultBus(), wsdlUrl, (QName)null, 
+             null, SimpleEndpointImplFactory.getSingleton());
     }
 
     public ClientImpl(URL wsdlUrl, QName port) {
-        this(BusFactory.getThreadDefaultBus(), wsdlUrl, null, port, SimpleEndpointImplFactory.getSingleton());
+        this(BusFactory.getThreadDefaultBus(), wsdlUrl, (QName)null, 
+             port, SimpleEndpointImplFactory.getSingleton());
     }
 
     /**
@@ -152,7 +154,31 @@ public class ClientImpl
         WSDLServiceFactory sf = (service == null)
             ? (new WSDLServiceFactory(bus, wsdlUrl)) : (new WSDLServiceFactory(bus, wsdlUrl, service));
         Service svc = sf.create();
+        EndpointInfo epfo = findEndpoint(svc, port);
 
+        try {
+            if (endpointImplFactory != null) {
+                getConduitSelector().setEndpoint(endpointImplFactory.newEndpointImpl(bus, svc, epfo));
+            } else {
+                getConduitSelector().setEndpoint(new EndpointImpl(bus, svc, epfo));
+            }
+        } catch (EndpointException epex) {
+            throw new IllegalStateException("Unable to create endpoint: " + epex.getMessage(), epex);
+        }
+        notifyLifecycleManager();        
+    }
+    /**
+     * Create a Client that uses a specific EndpointImpl.
+     * @param bus
+     * @param wsdlUrl
+     * @param service
+     * @param port
+     * @param endpointImplFactory
+     */
+    public ClientImpl(Bus bus, URL wsdlUrl, Service svc, QName port,
+                      EndpointImplFactory endpointImplFactory) {
+        this.bus = bus;
+        outFaultObserver = new ClientOutFaultObserver(bus);
         EndpointInfo epfo = findEndpoint(svc, port);
 
         try {

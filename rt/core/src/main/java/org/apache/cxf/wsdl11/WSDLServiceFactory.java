@@ -47,6 +47,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     private QName serviceName;
     private QName endpointName;
     private Definition definition;
+    private boolean allowRefs;
 
     public WSDLServiceFactory(Bus b, Definition d) {
         setBus(b);
@@ -95,6 +96,11 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
 
         serviceName = sn;
     }
+    
+    public void setAllowElementRefs(boolean b) {
+        allowRefs = b;
+    }
+
     public void setEndpointName(QName qn) {
         endpointName = qn;
     }
@@ -108,7 +114,9 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
         List<ServiceInfo> services;
         if (serviceName == null) {
             try {
-                services = new WSDLServiceBuilder(getBus()).buildServices(definition);
+                WSDLServiceBuilder builder = new WSDLServiceBuilder(getBus());
+                builder.setAllowElementRefs(allowRefs);
+                services = builder.buildServices(definition);
             } catch (XmlSchemaException ex) {
                 throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
             }
