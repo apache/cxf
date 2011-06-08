@@ -85,9 +85,11 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                     Object faultSerialVersionUID 
                         = penv.get(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID);
                     setAttributes("faultSerialVersionUID", faultSerialVersionUID);
-                    if (faultSerialVersionUID.equals(FaultSerialVersionUID.FQCN)) {
+                    if (faultSerialVersionUID.equals(FaultSerialVersionUID.FQCN) 
+                        || "FQCN".equals(faultSerialVersionUID)) {
                         setAttributes("suid", generateHashSUID(expClz.getFullClassName()));
-                    } else if (faultSerialVersionUID.equals(FaultSerialVersionUID.TIMESTAMP)) {
+                    } else if (faultSerialVersionUID.equals(FaultSerialVersionUID.TIMESTAMP)
+                        || "TIMESTAMP".equals(faultSerialVersionUID)) {
                         setAttributes("suid", generateTimestampSUID());
                     }
                 }
