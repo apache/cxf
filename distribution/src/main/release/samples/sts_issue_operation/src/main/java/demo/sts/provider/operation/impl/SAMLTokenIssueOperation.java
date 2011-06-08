@@ -240,8 +240,8 @@ public class SAMLTokenIssueOperation implements IssueOperation {
         JAXBElement<KeyIdentifierType> keyIdentifier = WSSE_FACTORY
                 .createKeyIdentifier(keyIdentifierType);
         
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) ||
-            WSConstants.SAML_NS.equals(tokenType)) {
+        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) 
+            || WSConstants.SAML_NS.equals(tokenType)) {
             securityTokenReferenceType.getOtherAttributes().put(
                 TOKEN_TYPE, WSConstants.WSS_SAML_TOKEN_TYPE
             );
