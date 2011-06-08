@@ -518,6 +518,11 @@ public final class InjectionUtils {
                                                             pType, message);
                             paramValue = InjectionUtils.mergeCollectionsOrArrays(paramValue, appendValue,
                                                             genericType);
+                        } else if (isSupportedMap(genericType)) {
+                            Object appendValue = InjectionUtils.injectIntoMap(
+                                type, genericType, paramAnns, processedValues, true, pType, message);
+                            paramValue = InjectionUtils.mergeMap(paramValue, appendValue, genericType);
+
                         } else if (isbean) {
                             paramValue = InjectionUtils.handleBean(type, paramAnns, processedValues,
                                                             pType, message, decoded);
@@ -542,6 +547,65 @@ public final class InjectionUtils {
         return bean;
     }
 
+    @SuppressWarnings("unchecked")
+    private static Object mergeMap(Object first, Object second, Type genericType) {
+        if (first == null) {
+            return second;
+        } else if (first instanceof Map) {
+            Map.class.cast(first).putAll((Map) second);
+            return first;
+        }
+        return null;
+    }
+    
+    // CHECKSTYLE:OFF
+    private static Object injectIntoMap(Class<?> rawType, Type genericType,
+                                        Annotation[] paramAnns,
+                                        MultivaluedMap<String, String> processedValues, 
+                                        boolean decoded,
+                                        ParameterType pathParam, Message message) {
+    // CHECKSTYLE:ON
+        ParameterizedType paramType = (ParameterizedType) genericType;
+        ParameterizedType valueParamType = (ParameterizedType) InjectionUtils
+                                   .getType(paramType.getActualTypeArguments(), 1);
+        Class<?> valueType = (Class<?>) InjectionUtils.getType(valueParamType
+                           .getActualTypeArguments(), 0);
+
+        MultivaluedMap<String, Object> theValues = new MetadataMap<String, Object>();
+           
+        Set<Map.Entry<String, List<String>>> processedValuesEntrySet = processedValues.entrySet();
+        for (Map.Entry<String, List<String>> processedValuesEntry : processedValuesEntrySet) {
+            List<String> valuesList = processedValuesEntry.getValue();
+            for (String value : valuesList) {
+                Object o = InjectionUtils.handleParameter(value,
+                                   decoded, valueType, paramAnns, pathParam, message);
+                theValues.add(processedValuesEntry.getKey(), o);
+            }
+        }
+        return theValues;
+    }    
+
+    
+    private static boolean isSupportedMap(Type genericType) {
+        Class<?> rawType = getRawType(genericType);
+        if (Map.class.isAssignableFrom(rawType) && genericType instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType) genericType;
+            if (paramType.getActualTypeArguments().length == 2) {
+                Class<?> firstType = getRawType(getType(paramType.getActualTypeArguments(), 0));
+                Type secondType = getType(paramType.getActualTypeArguments(), 1);
+                if (secondType instanceof ParameterizedType) {
+                    Class<?> secondRawType = getRawType(secondType);
+                    if (String.class == firstType && List.class.isAssignableFrom(secondRawType)) {
+                        Class<?> listtype = getRawType(
+                            getType(((ParameterizedType)secondType).getActualTypeArguments(), 0));
+                        return InjectionUtils.isPrimitive(listtype);
+                    }
+                }
+            } 
+        }
+        return false;
+    }
+    
     private static List<MultivaluedMap<String, String>> processValues(Class<?> type, Type genericType,
                                         MultivaluedMap<String, String> values,
                                         boolean isbean) {

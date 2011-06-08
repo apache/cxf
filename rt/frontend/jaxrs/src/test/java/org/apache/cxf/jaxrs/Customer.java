@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -72,9 +73,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         private Long b;
         private List<String> c;
         private CustomerBean d;
+        private Map<String, List<String>> g;
         //CHECKSTYLE:OFF
         public List<CustomerBean> e;
         //CHECKSTYLE:ON
+        
         public void setA(String aString) {
             this.a = aString;
         }
@@ -98,6 +101,12 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         }
         public CustomerBean getD() {
             return d;
+        }
+        public void setG(Map<String, List<String>> g) {
+            this.g = g;
+        }
+        public Map<String, List<String>> getG() {
+            return g;
         }
         
     }
