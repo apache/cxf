@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -50,7 +51,7 @@ import org.apache.cxf.transport.ChainInitiationObserver;
 public class ColocMessageObserver extends ChainInitiationObserver {
     private static final Logger LOG = LogUtils.getL7dLogger(ColocMessageObserver.class);
     private static final String COLOCATED = Message.class.getName() + ".COLOCATED";
-    
+
     public ColocMessageObserver(Endpoint endpoint, Bus bus) {
         super(endpoint, bus);
     }
@@ -98,8 +99,33 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             chain.add(addColocInterceptors());
             inMsg.setInterceptorChain(chain);
     
+            //Convert the coloc object type if necessary
+            OperationInfo soi = m.getExchange().get(OperationInfo.class);
+            if (soi != null && oi != null) {
+                if (ColocUtil.isAssignableOperationInfo(soi, Source.class) 
+                    && !ColocUtil.isAssignableOperationInfo(oi, Source.class)) {
+                    // converting source -> pojo
+                    ColocUtil.convertSourceToObject(inMsg);
+                } else if (ColocUtil.isAssignableOperationInfo(oi, Source.class) 
+                    && !ColocUtil.isAssignableOperationInfo(soi, Source.class)) {
+                    // converting pojo -> source
+                    ColocUtil.convertObjectToSource(inMsg);
+                }
+            }
             chain.doIntercept(inMsg);
-    
+            if (soi != null && oi != null) {
+                if (ColocUtil.isAssignableOperationInfo(soi, Source.class) 
+                    && !ColocUtil.isAssignableOperationInfo(oi, Source.class)
+                    && ex.getOutMessage() != null) {
+                    // converting pojo -> source                
+                    ColocUtil.convertObjectToSource(ex.getOutMessage());
+                } else if (ColocUtil.isAssignableOperationInfo(oi, Source.class) 
+                    && !ColocUtil.isAssignableOperationInfo(soi, Source.class)
+                    && ex.getOutMessage() != null) {
+                    // converting pojo -> source
+                    ColocUtil.convertSourceToObject(ex.getOutMessage());
+                }
+            }
             //Set Server OutBound Message onto InBound Exchange.
             setOutBoundMessage(ex, m.getExchange());
         } finally {

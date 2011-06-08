@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -45,6 +46,9 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -153,6 +157,7 @@ public class ColocOutInterceptorTest extends Assert {
         verifyIsColocatedWithDifferentEndpoint();
         verifyIsColocatedWithDifferentOperation();
         verifyIsColocatedWithSameOperation();
+        verifyIsColocatedWithCompatibleOperation();
     }
 
     @Test
@@ -169,9 +174,19 @@ public class ColocOutInterceptorTest extends Assert {
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         ex.put(Endpoint.class, sep);
+        QName op = new QName("E", "F");
+        QName intf = new QName("G", "H");
         BindingInfo sbi = control.createMock(BindingInfo.class);
-        InterfaceInfo sii = control.createMock(InterfaceInfo.class);
+        ServiceInfo ssi = new ServiceInfo();
+        InterfaceInfo sii = new InterfaceInfo(ssi, intf);
+        sii.addOperation(op);
+        OperationInfo soi = sii.getOperation(op);
+        ServiceInfo rsi = new ServiceInfo();
+        InterfaceInfo rii = new InterfaceInfo(rsi, intf);
+        rii.addOperation(op);
+        OperationInfo roi = rii.getOperation(op);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
+        BindingOperationInfo rboi = control.createMock(BindingOperationInfo.class);
         
         ex.put(BindingOperationInfo.class, sboi);
         //Local var
@@ -182,7 +197,7 @@ public class ColocOutInterceptorTest extends Assert {
         Service res = control.createMock(Service.class);
         BindingInfo rbi = control.createMock(BindingInfo.class);
         EndpointInfo rei = control.createMock(EndpointInfo.class);
-
+        
         EasyMock.expect(sr.getServers()).andReturn(list);
         EasyMock.expect(sep.getService()).andReturn(ses);
         EasyMock.expect(sep.getEndpointInfo()).andReturn(sei);
@@ -195,16 +210,16 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(sei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(rei.getBinding()).andReturn(rbi);
 
-        QName intf = new QName("G", "H");
-        QName op = new QName("E", "F");
         EasyMock.expect(sboi.getName()).andReturn(op).anyTimes();
-        EasyMock.expect(rbi.getOperation(op)).andReturn(sboi);
-        
+        EasyMock.expect(sboi.getOperationInfo()).andReturn(soi);
+        EasyMock.expect(rboi.getName()).andReturn(op).anyTimes();
+        EasyMock.expect(rboi.getOperationInfo()).andReturn(roi);
+        EasyMock.expect(rbi.getOperation(op)).andReturn(rboi);
+
         InterceptorChain chain = control.createMock(InterceptorChain.class);
         msg.setInterceptorChain(chain);
         EasyMock.expect(sboi.getBinding()).andReturn(sbi);
         EasyMock.expect(sbi.getInterface()).andReturn(sii);
-        EasyMock.expect(sii.getName()).andReturn(intf);
         
         control.replay();
         colocOut.handleMessage(msg);
@@ -394,6 +409,7 @@ public class ColocOutInterceptorTest extends Assert {
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
+
         //Local var
         Service ses = control.createMock(Service.class);
         EndpointInfo sei = control.createMock(EndpointInfo.class);
@@ -401,7 +417,28 @@ public class ColocOutInterceptorTest extends Assert {
         Endpoint rep = control.createMock(Endpoint.class);
         Service res = control.createMock(Service.class);
         EndpointInfo rei = control.createMock(EndpointInfo.class);
-
+        BindingOperationInfo rboi = control.createMock(BindingOperationInfo.class);
+        
+        QName op = new QName("E", "F");
+        QName intf = new QName("G", "H");
+        QName inmi = new QName("M", "in");
+        QName outmi = new QName("M", "out");
+        ServiceInfo ssi = new ServiceInfo();
+        InterfaceInfo sii = new InterfaceInfo(ssi, intf);
+        sii.addOperation(op);
+        OperationInfo soi = sii.getOperation(op);
+        MessageInfo mii = new MessageInfo(soi, MessageInfo.Type.INPUT, inmi);
+        MessageInfo mio = new MessageInfo(soi, MessageInfo.Type.OUTPUT, outmi);
+        soi.setInput("in", mii);
+        soi.setOutput("out", mio);
+        
+        ServiceInfo rsi = new ServiceInfo();
+        InterfaceInfo rii = new InterfaceInfo(rsi, intf);
+        rii.addOperation(op);
+        OperationInfo roi = rii.getOperation(op);
+        roi.setInput("in", mii);
+        roi.setOutput("out", mio);
+        
         EasyMock.expect(sep.getService()).andReturn(ses);
         EasyMock.expect(sep.getEndpointInfo()).andReturn(sei);
         EasyMock.expect(s1.getEndpoint()).andReturn(rep);
@@ -412,9 +449,85 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(rei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(sei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(rei.getBinding()).andReturn(rbi);
-        QName op = new QName("E", "F");
+        
         EasyMock.expect(sboi.getName()).andReturn(op);
-        EasyMock.expect(rbi.getOperation(op)).andReturn(sboi);
+        EasyMock.expect(sboi.getOperationInfo()).andReturn(soi);
+        EasyMock.expect(rboi.getName()).andReturn(op);
+        EasyMock.expect(rboi.getOperationInfo()).andReturn(roi);
+        EasyMock.expect(rbi.getOperation(op)).andReturn(rboi);
+        
+        control.replay();
+        Server val = colocOut.isColocated(list, sep, sboi);
+        assertEquals("Expecting a colocated call",
+                     s1,
+                     val);
+        control.reset();
+    }
+
+    private void verifyIsColocatedWithCompatibleOperation() {
+        colocOut = new TestColocOutInterceptor1();
+        //Funtion Param
+        Server s1 = control.createMock(Server.class);
+        List<Server> list = new ArrayList<Server>();
+        list.add(s1);        
+        Endpoint sep = control.createMock(Endpoint.class);
+        BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
+
+        //Local var
+        Service ses = control.createMock(Service.class);
+        EndpointInfo sei = control.createMock(EndpointInfo.class);
+        BindingInfo rbi = control.createMock(BindingInfo.class);
+        Endpoint rep = control.createMock(Endpoint.class);
+        Service res = control.createMock(Service.class);
+        EndpointInfo rei = control.createMock(EndpointInfo.class);
+        BindingOperationInfo rboi = control.createMock(BindingOperationInfo.class);
+        
+        QName op = new QName("E", "F");
+        QName intf = new QName("G", "H");
+        QName inmi = new QName("M", "in");
+        QName outmi = new QName("M", "out");
+        ServiceInfo ssi = new ServiceInfo();
+        InterfaceInfo sii = new InterfaceInfo(ssi, intf);
+        sii.addOperation(op);
+        OperationInfo soi = sii.getOperation(op);
+        MessageInfo mii = new MessageInfo(soi, MessageInfo.Type.INPUT, inmi);
+        MessagePartInfo mpi = mii.addMessagePart("parameters");
+        mpi.setTypeClass(Source.class);
+        MessageInfo mio = new MessageInfo(soi, MessageInfo.Type.OUTPUT, outmi);
+        mpi = mio.addMessagePart("parameters");
+        mpi.setTypeClass(Source.class);
+        soi.setInput("in", mii);
+        soi.setOutput("out", mio);
+        
+        ServiceInfo rsi = new ServiceInfo();
+        InterfaceInfo rii = new InterfaceInfo(rsi, intf);
+        rii.addOperation(op);
+        OperationInfo roi = rii.getOperation(op);
+        mii = new MessageInfo(roi, MessageInfo.Type.INPUT, inmi);
+        mpi = mii.addMessagePart("parameters");
+        mpi.setTypeClass(Object.class);
+        mio = new MessageInfo(roi, MessageInfo.Type.OUTPUT, outmi);
+        mpi = mio.addMessagePart("parameters");
+        mpi.setTypeClass(Object.class);
+        roi.setInput("in", mii);
+        roi.setOutput("out", mio);
+        
+        EasyMock.expect(sep.getService()).andReturn(ses);
+        EasyMock.expect(sep.getEndpointInfo()).andReturn(sei);
+        EasyMock.expect(s1.getEndpoint()).andReturn(rep);
+        EasyMock.expect(rep.getService()).andReturn(res);
+        EasyMock.expect(rep.getEndpointInfo()).andReturn(rei);
+        EasyMock.expect(ses.getName()).andReturn(new QName("A", "B"));
+        EasyMock.expect(res.getName()).andReturn(new QName("A", "B"));
+        EasyMock.expect(rei.getName()).andReturn(new QName("C", "D"));
+        EasyMock.expect(sei.getName()).andReturn(new QName("C", "D"));
+        EasyMock.expect(rei.getBinding()).andReturn(rbi);
+        
+        EasyMock.expect(sboi.getName()).andReturn(op);
+        EasyMock.expect(sboi.getOperationInfo()).andReturn(soi);
+        EasyMock.expect(rboi.getName()).andReturn(op);
+        EasyMock.expect(rboi.getOperationInfo()).andReturn(roi);
+        EasyMock.expect(rbi.getOperation(op)).andReturn(rboi);
         
         control.replay();
         Server val = colocOut.isColocated(list, sep, sboi);
@@ -439,9 +552,6 @@ public class ColocOutInterceptorTest extends Assert {
             //No Op
         }
         
-        protected boolean isSameOperationInfo(BindingOperationInfo s, BindingOperationInfo r) {
-            return true;
-        }
     }
     
     class TestBindingInfo extends BindingInfo {

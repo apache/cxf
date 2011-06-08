@@ -92,6 +92,8 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     private static final String DISPATCH_NS = "http://cxf.apache.org/jaxws/dispatch";
     private static final String INVOKE_NAME = "Invoke";
     private static final String INVOKE_ONEWAY_NAME = "InvokeOneWay";
+    private static final QName INVOKE_QNAME = new QName(DISPATCH_NS, INVOKE_NAME);
+    private static final QName INVOKE_ONEWAY_QNAME = new QName(DISPATCH_NS, INVOKE_ONEWAY_NAME);
     
     private final Binding binding;
     private final EndpointReferenceBuilder builder;
@@ -157,7 +159,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             
         ServiceInfo info = client.getEndpoint().getEndpointInfo().getService();
         OperationInfo opInfo = info.getInterface()
-            .addOperation(new QName(DISPATCH_NS, name));
+            .addOperation(oneWay ? INVOKE_ONEWAY_QNAME : INVOKE_QNAME);
         MessageInfo mInfo = opInfo.createMessage(new QName(DISPATCH_NS, name + "Request"), Type.INPUT);
         opInfo.setInput(name + "Request", mInfo);
         MessagePartInfo mpi = mInfo.addMessagePart("parameters");
@@ -174,6 +176,25 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             if (context == null) {
                 mpi.setTypeClass(cl);
             }
+        }
+        
+        for (BindingInfo bind : client.getEndpoint().getEndpointInfo().getService().getBindings()) {
+            BindingOperationInfo bo = new BindingOperationInfo(bind, opInfo);
+            bind.addOperation(bo);
+        }
+    }
+    
+    private void addInvokeOperation(QName operationName, boolean oneWay) {
+        ServiceInfo info = client.getEndpoint().getEndpointInfo().getService();
+        
+        OperationInfo invokeOpInfo = info.getInterface()
+                       .getOperation(oneWay ? INVOKE_ONEWAY_QNAME : INVOKE_QNAME);
+        
+        OperationInfo opInfo = info.getInterface().addOperation(operationName);
+        opInfo.setInput(invokeOpInfo.getInputName(), invokeOpInfo.getInput());
+
+        if (!oneWay) {
+            opInfo.setOutput(invokeOpInfo.getOutputName(), invokeOpInfo.getOutput());
         }
         
         for (BindingInfo bind : client.getEndpoint().getEndpointInfo().getService().getBindings()) {
@@ -283,8 +304,13 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
                        
             if (opName == null) {
-                opName = new QName(DISPATCH_NS,
-                                   isOneWay ? INVOKE_ONEWAY_NAME : INVOKE_NAME);
+                opName = isOneWay ? INVOKE_ONEWAY_QNAME : INVOKE_QNAME;
+            } else {
+                BindingOperationInfo bop = client.getEndpoint().getBinding()
+                                            .getBindingInfo().getOperation(opName);
+                if (bop == null) {
+                    addInvokeOperation(opName, isOneWay);
+                }
             }
             
             //CXF-2836 : find the operation for the dispatched object 
@@ -351,7 +377,13 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
         try {
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
             if (opName == null) {
-                opName = new QName(DISPATCH_NS, INVOKE_NAME);
+                opName = INVOKE_QNAME;
+            } else {
+                BindingOperationInfo bop = client.getEndpoint().getBinding()
+                    .getBindingInfo().getOperation(opName);
+                if (bop == null) {
+                    addInvokeOperation(opName, false);
+                }
             }
 
             client.invokeWrapped(callback, 

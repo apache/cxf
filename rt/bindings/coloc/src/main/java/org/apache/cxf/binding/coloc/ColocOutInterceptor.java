@@ -192,7 +192,7 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     //Check For Operation Match.
                     BindingOperationInfo receiverOI = receiverEI.getBinding().getOperation(boi.getName());
                     if (receiverOI != null 
-                        && isSameOperationInfo(boi, receiverOI)) {
+                        && isCompatibleOperationInfo(boi, receiverOI)) {
                         return s;
                     }
                 }
@@ -207,7 +207,13 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return ColocUtil.isSameOperationInfo(sender.getOperationInfo(), 
                                              receiver.getOperationInfo());
     }
-    
+
+    protected boolean isCompatibleOperationInfo(BindingOperationInfo sender,
+                                                BindingOperationInfo receiver) {
+        return ColocUtil.isCompatibleOperationInfo(sender.getOperationInfo(), 
+                                                   receiver.getOperationInfo());
+    }
+
     public void setExchangeProperties(Exchange exchange, Endpoint ep) {
         exchange.put(Endpoint.class, ep);
         exchange.put(Service.class, ep.getService());

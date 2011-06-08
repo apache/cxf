@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.binding.coloc;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -25,8 +28,15 @@ import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.soap.SOAPMessage;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.databinding.DataReader;
+import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
@@ -34,12 +44,15 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public final class ColocUtil {
     private static final Logger LOG = LogUtils.getL7dLogger(ColocUtil.class);
@@ -165,6 +178,20 @@ public final class ColocUtil {
                 && isSameFaultInfo(oi1.getFaults(), oi2.getFaults());
     }
     
+    public static boolean isCompatibleOperationInfo(OperationInfo oi1, OperationInfo oi2) {
+        return isSameOperationInfo(oi1, oi2)
+               || isAssignableOperationInfo(oi1, Source.class) 
+               || isAssignableOperationInfo(oi2, Source.class)
+               || isAssignableOperationInfo(oi1, SOAPMessage.class) 
+               || isAssignableOperationInfo(oi2, SOAPMessage.class);
+    }
+    
+    public static boolean isAssignableOperationInfo(OperationInfo oi, Class<?> cls) {
+        MessageInfo mi = oi.getInput();
+        List<MessagePartInfo> mpis = mi.getMessageParts();
+        return mpis.size() == 1 && cls.isAssignableFrom(mpis.get(0).getTypeClass());
+    }
+    
     public static boolean isSameMessageInfo(MessageInfo mi1, MessageInfo mi2) {
         if ((mi1 == null && mi2 != null)
             || (mi1 != null && mi2 == null)) {
@@ -222,5 +249,49 @@ public final class ColocUtil {
             }
         }
         return true;
+    }
+    
+    public static void convertSourceToObject(Message message) {
+        List<Object> content = CastUtils.cast(message.getContent(List.class));
+        if (content == null || content.size() < 1) {
+            // nothing to convert
+            return;
+        }
+        // only supporting the wrapped style for now  (one pojo <-> one source)
+        Source source = (Source)content.get(0);
+        DataReader<XMLStreamReader> reader =
+            message.getExchange().getService().getDataBinding().createReader(XMLStreamReader.class);
+        MessagePartInfo mpi = getMessageInfo(message).getMessagePart(0);
+        Object wrappedObject = reader.read(mpi, StaxUtils.createXMLStreamReader(source));
+        MessageContentsList parameters = new MessageContentsList();
+        parameters.put(mpi, wrappedObject);
+
+        message.setContent(List.class, parameters);
+    }
+
+    public static void convertObjectToSource(Message message) {
+        List<Object> content = CastUtils.cast(message.getContent(List.class));
+        if (content == null || content.size() < 1) {
+            // nothing to convert
+            return;
+        }
+        // only supporting the wrapped style for now  (one pojo <-> one source)
+        Object object = content.get(0);
+        DataWriter<OutputStream> writer = 
+            message.getExchange().getService().getDataBinding().createWriter(OutputStream.class);
+        //TODO use a better conversion method to get a Source from a pojo.
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writer.write(object, bos);
+
+        content.set(0, new StreamSource(new ByteArrayInputStream(bos.toByteArray())));
+    }
+    
+    private static MessageInfo getMessageInfo(Message message) {
+        OperationInfo oi = message.getExchange().get(OperationInfo.class);
+        if (MessageUtils.isOutbound(message)) {
+            return oi.getOutput();
+        } else {
+            return oi.getInput();
+        }
     }
 }
