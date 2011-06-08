@@ -520,8 +520,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     protected static Object checkAdapter(Object obj, Class<?> cls, Annotation[] anns, boolean marshal) {
-        return org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(obj, getAdapter(obj.getClass(), anns), 
-                                                               marshal); 
+        XmlJavaTypeAdapter adapter = getAdapter(cls, anns);
+        return org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(obj, adapter, marshal); 
     }
     
     protected static XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {

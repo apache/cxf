@@ -180,8 +180,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
         
         try {
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
-            Class<?> theType = isCollection ? InjectionUtils.getActualType(genericType) : type;
-            theType = getActualType(theType, genericType, anns);
+            Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
+            Class<?> theType = getActualType(theGenericType, genericType, anns);
             
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             
@@ -201,7 +201,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(theType, type, 
-                                                         getAdapter(theType, anns)); 
+                                                         getAdapter(theGenericType, anns)); 
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
