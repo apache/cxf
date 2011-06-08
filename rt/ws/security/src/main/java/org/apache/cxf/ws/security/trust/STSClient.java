@@ -906,7 +906,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
         Date creationTime = new Date();
         Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (ttl * 1000));
+        expirationTime.setTime(creationTime.getTime() + (ttl * 1000L));
 
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         writer.writeStartElement("wst", "Lifetime", namespace);
@@ -1130,7 +1130,7 @@ public class STSClient implements Configurable, InterceptorProvider {
                 properties.load(ins);
                 ins.close();
             } else {
-                throw new Fault("Could not find properties file " + url, LOG);
+                throw new Fault("Could not find properties file " + (String)o, LOG);
             }
         } else if (o instanceof URL) {
             properties = new Properties();
