@@ -28,7 +28,6 @@ import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -181,9 +180,7 @@ public final class ColocUtil {
     public static boolean isCompatibleOperationInfo(OperationInfo oi1, OperationInfo oi2) {
         return isSameOperationInfo(oi1, oi2)
                || isAssignableOperationInfo(oi1, Source.class) 
-               || isAssignableOperationInfo(oi2, Source.class)
-               || isAssignableOperationInfo(oi1, SOAPMessage.class) 
-               || isAssignableOperationInfo(oi2, SOAPMessage.class);
+               || isAssignableOperationInfo(oi2, Source.class);
     }
     
     public static boolean isAssignableOperationInfo(OperationInfo oi, Class<?> cls) {
