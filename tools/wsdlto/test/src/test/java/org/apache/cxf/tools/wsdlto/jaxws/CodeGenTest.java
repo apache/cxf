@@ -47,7 +47,6 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.FaultSerialVersionUID;
 
 import org.junit.Test;
 
@@ -1340,7 +1339,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testCXFNotType() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
-        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.FQCN);
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, "FQCN");
         processor.setContext(env);
         processor.execute();
         
@@ -1355,7 +1354,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testFaultSerialVersionUIDNONEFQCN() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
-        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.FQCN);
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, "FQCN");
         processor.setContext(env);
         processor.execute();
 
@@ -1404,7 +1403,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testFaultSerialVersionUIDNONE() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
-        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.NONE);
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, "NONE");
         processor.setContext(env);
         processor.execute();
 
@@ -1433,7 +1432,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testFaultSerialVersionUIDNONETIMESTAMP() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
-        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, FaultSerialVersionUID.TIMESTAMP);
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, "TIMESTAMP");
         processor.setContext(env);
         processor.execute();
 
@@ -1450,7 +1449,29 @@ public class CodeGenTest extends AbstractCodeGenTest {
         serialVersionUID = fault.getDeclaredField("serialVersionUID");
         assertNotNull(serialVersionUID);
     }
-    
+    @Test
+    public void testFaultSerialVersionUIDNumber() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, "123456789");
+        processor.setContext(env);
+        processor.execute();
+
+        File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
+        assertTrue(faultFile.exists());
+        faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
+        assertTrue(faultFile.exists());
+
+        Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        Field serialVersionUID = fault.getDeclaredField("serialVersionUID");
+        assertNotNull(serialVersionUID);
+        Long l = (Long)serialVersionUID.get(null);
+        assertEquals(123456789L, l.longValue());
+        
+        fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
+        serialVersionUID = fault.getDeclaredField("serialVersionUID");
+        assertNotNull(serialVersionUID);
+        assertEquals(123456789L, l.longValue());
+    }
     @Test
     public void testExtensionWrapper() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL,
@@ -1479,7 +1500,6 @@ public class CodeGenTest extends AbstractCodeGenTest {
         List<String> results1 = FileUtils.readLines(new File(output.getCanonicalPath(),
             "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java"));
 
-        System.out.println(results1);
         assertTrue(results1.contains(" * porttype documentation"));
         assertTrue(results1.contains("     * porttype op documentation"));
 

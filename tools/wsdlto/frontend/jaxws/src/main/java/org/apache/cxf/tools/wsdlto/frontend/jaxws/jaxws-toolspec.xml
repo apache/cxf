@@ -313,7 +313,9 @@ Examples:
 
             <option id="faultSerialVersionUID" maxOccurs="1">
                 <annotation>
-                    specify how to generate fault Exception's SUID, can use NONE|TIMESTAMP|FQCN, the default is NONE
+                    Specifies how to generate fault Exception's SUID, can use NONE|TIMESTAMP|FQCN|####", the default is NONE.
+                    FQCN uses a hash of the fully qualified class name.   #### would be any valid Long to
+                    use as the SUID. 
                 </annotation>
                 <switch>faultSerialVersionUID</switch>
                 <associatedArgument placement="afterSpace">

@@ -43,7 +43,7 @@ public class $expClass.Name extends $exceptionSuperclass {
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-#if ($faultSerialVersionUID == "TIMESTAMP" || $faultSerialVersionUID == "FQCN")
+#if (${suid} != "")
     public static final long serialVersionUID = ${suid}L;
 #end
 #foreach ($field in $expClass.Fields)

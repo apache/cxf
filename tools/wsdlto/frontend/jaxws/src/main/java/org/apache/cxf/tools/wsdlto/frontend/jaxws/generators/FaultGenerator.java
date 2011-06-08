@@ -82,16 +82,27 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                 clearAttributes();
                 
                 if (penv.containsKey(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID)) {
-                    Object faultSerialVersionUID 
-                        = penv.get(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID);
+                    String faultSerialVersionUID 
+                        = penv.get(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID).toString();
                     setAttributes("faultSerialVersionUID", faultSerialVersionUID);
-                    if (faultSerialVersionUID.equals(FaultSerialVersionUID.FQCN) 
-                        || "FQCN".equals(faultSerialVersionUID)) {
+                    if ("FQCN".equalsIgnoreCase(faultSerialVersionUID)) {
                         setAttributes("suid", generateHashSUID(expClz.getFullClassName()));
-                    } else if (faultSerialVersionUID.equals(FaultSerialVersionUID.TIMESTAMP)
-                        || "TIMESTAMP".equals(faultSerialVersionUID)) {
+                    } else if ("TIMESTAMP".equalsIgnoreCase(faultSerialVersionUID)) {
                         setAttributes("suid", generateTimestampSUID());
+                    } else if ("NONE".equalsIgnoreCase(faultSerialVersionUID)) {
+                        //nothing
+                        setAttributes("suid", "");
+                    } else {
+                        //do a quick Parse to make sure it looks like a Long
+                        try {
+                            Long.parseLong(faultSerialVersionUID);
+                        } catch (NumberFormatException nfe) {
+                            throw new ToolException(nfe);
+                        }
+                        setAttributes("suid", faultSerialVersionUID);
                     }
+                } else {
+                    setAttributes("suid", "");
                 }
                 setAttributes("expClass", expClz);
                 String exceptionSuperclass = "Exception";

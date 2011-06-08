@@ -23,8 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.FaultSerialVersionUID;
-
 
 public class Option {
     static final String DEFAULT_BINDING_FILE_PATH = "src" + File.separator + "main"
@@ -146,7 +144,7 @@ public class Option {
     /**
      * specify how to generate fault Exception's SUID, default is NONE
      */
-    FaultSerialVersionUID faultSerialVersionUID;
+    String faultSerialVersionUID;
 
     /**
      * Uses @Generated annotation in all generated java classes if the flag is set to true.
@@ -331,11 +329,11 @@ public class Option {
         this.noTypes = noTypes;
     }
 
-    public FaultSerialVersionUID getFaultSerialVersionUID() {
-        return faultSerialVersionUID == null ? FaultSerialVersionUID.NONE : faultSerialVersionUID;
+    public String getFaultSerialVersionUID() {
+        return faultSerialVersionUID == null ? "none" : faultSerialVersionUID;
     }
 
-    public void setFaultSerialVersionUID(FaultSerialVersionUID faultSerialVersionUID) {
+    public void setFaultSerialVersionUID(String faultSerialVersionUID) {
         this.faultSerialVersionUID = faultSerialVersionUID;
     }
 
