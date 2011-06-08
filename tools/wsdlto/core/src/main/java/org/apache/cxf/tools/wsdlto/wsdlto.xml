@@ -201,6 +201,9 @@ under the License.
                     specify how to generate fault Exception's SUID, can use NONE|TIMESTAMP|FQCN, the default is NONE
                 </annotation>
                 <switch>faultSerialVersionUID</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>fault-serialVersionUID</annotation>
+                </associatedArgument>
             </option>
 
         </optionGroup>
