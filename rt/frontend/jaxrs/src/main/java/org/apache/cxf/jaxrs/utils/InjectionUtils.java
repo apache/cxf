@@ -426,6 +426,11 @@ public final class InjectionUtils {
                                     ParameterType pType, Message message, boolean decoded) {
         Object bean = null;
         try {
+            if (paramType.isInterface()) {
+                paramType = org.apache.cxf.jaxrs.utils.JAXBUtils.getValueTypeFromAdapter(paramType,
+                                                                                         paramType, 
+                                                                                         paramAnns);
+            }
             bean = paramType.newInstance();
         } catch (IllegalAccessException ex) {
             reportServerError("CLASS_ACCESS_FAILURE", paramType.getName());

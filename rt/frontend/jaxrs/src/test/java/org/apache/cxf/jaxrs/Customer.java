@@ -62,8 +62,12 @@ import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
 public class Customer extends AbstractCustomer implements CustomerInfo {
     
+    public static interface CustomerBeanInterface {
+        
+    }
+    
     @XmlRootElement(name = "CustomerBean")
-    public static class CustomerBean {
+    public static class CustomerBean implements CustomerBeanInterface {
         private String a;
         private Long b;
         private List<String> c;
@@ -184,6 +188,12 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                @XmlJavaTypeAdapter(CustomerBeanAdapter2.class) 
                                CustomerBean cb) {
         
+    }
+    
+    public void testXmlAdapter3(@QueryParam("") 
+                                @XmlJavaTypeAdapter(CustomerBeanAdapter3.class) 
+                                CustomerBeanInterface cb) {
+         
     }
     
     public void testPathBean(@PathParam("") CustomerBean cb) {
@@ -475,4 +485,15 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         }
         
     }
+    
+    public class CustomerBeanAdapter3 extends XmlAdapter<CustomerBean, CustomerBeanInterface> {
+        public CustomerBean marshal(CustomerBeanInterface v) throws Exception {
+            return null;
+        }
+
+        public CustomerBeanInterface unmarshal(CustomerBean v) throws Exception {
+            return v;
+        }
+    }
+    
 };
