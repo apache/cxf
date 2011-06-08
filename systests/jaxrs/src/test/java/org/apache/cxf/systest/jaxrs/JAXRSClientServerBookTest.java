@@ -56,6 +56,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
+import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
+import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -1024,6 +1026,39 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/interface/adapter",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+    }
+    
+    @Test
+    public void testGetBookAdapterInterfaceList() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        List<? extends BookInfoInterface> list =  store.getBookAdapterInterfaceList();
+        assertEquals(1, list.size());
+        BookInfoInterface info = list.get(0);
+        assertEquals(123L, info.getId());
+    }
+    
+    @Test
+    public void testGetBookAdapterInterfaceProxy() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        BookInfoInterface info = store.getBookAdapterInterface();
+        assertEquals(123L, info.getId());
+    }
+    
+    @Test
+    public void testGetBookAdapterInfoList() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        List<? extends BookInfo> list =  store.getBookAdapterList();
+        assertEquals(1, list.size());
+        BookInfo info = list.get(0);
+        assertEquals(123L, info.getId());
+    }
+    
+    @Test
+    public void testGetBookAdapterInfoProxy() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        BookInfo info = store.getBookAdapter();
+        assertEquals(123L, info.getId());
     }
     
     @Test

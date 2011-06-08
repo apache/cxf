@@ -588,6 +588,23 @@ public class BookStore {
         return new BookInfo2(doGetBook("123"));
     }
     
+    @GET
+    @Path("/books/interface/adapter-list")
+    public List<? extends BookInfoInterface> getBookAdapterInterfaceList() throws Exception {
+        List<BookInfoInterface> list = new ArrayList<BookInfoInterface>();
+        list.add(new BookInfo2(doGetBook("123")));
+        return list;
+    }
+    
+    @GET
+    @Path("/books/adapter-list")
+    @XmlJavaTypeAdapter(BookInfoAdapter.class)
+    public List<? extends BookInfo> getBookAdapterList() throws Exception {
+        List<BookInfo> list = new ArrayList<BookInfo>();
+        list.add(new BookInfo(doGetBook("123")));
+        return list;
+    }
+    
     @PathParam("bookId")
     public void setBookId(String id) {
         currentBookId = id;
@@ -928,8 +945,8 @@ public class BookStore {
         cds.put(cd1.getId(), cd1);
     }
     
-    @XmlJavaTypeAdapter(BookInfoAdapter.class)
-    private static interface BookInfoInterface {
+    @XmlJavaTypeAdapter(BookInfoAdapter2.class)
+    static interface BookInfoInterface {
         String getName();
         
         long getId();
@@ -977,6 +994,18 @@ public class BookStore {
         }
     }
         
+    public static class BookInfoAdapter2 extends XmlAdapter<Book, BookInfo2> {
+        @Override
+        public Book marshal(BookInfo2 v) throws Exception {
+            return new Book(v.getName(), v.getId());
+        }
+
+        @Override
+        public BookInfo2 unmarshal(Book b) throws Exception {
+            return new BookInfo2(b);
+        }
+    }
+    
     public static class BookInfoAdapter extends XmlAdapter<Book, BookInfo> {
 
         @Override
