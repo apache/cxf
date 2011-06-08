@@ -32,7 +32,7 @@ public final class JAXBUtils {
     public static Object convertWithAdapter(Object obj, 
                                             Annotation[] anns) {
         return useAdapter(obj, 
-                          AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class),
+                          getAdapter(obj.getClass(), anns),
                           false, 
                           obj);
     }
@@ -41,7 +41,7 @@ public final class JAXBUtils {
                                                    Class<?> defaultClass,
                                                    Annotation[] anns) {
         try {
-            XmlJavaTypeAdapter adapter = AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class);
+            XmlJavaTypeAdapter adapter = getAdapter(expectedBoundType, anns);
             if (adapter != null) {
                 Class<?> boundType = JAXBUtils.getTypeFromAdapter(adapter, null, true);
                 if (boundType != null && boundType.isAssignableFrom(expectedBoundType)) {
@@ -52,6 +52,20 @@ public final class JAXBUtils {
             // ignore
         }
         return defaultClass; 
+    }
+
+    public static XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {
+        XmlJavaTypeAdapter typeAdapter = AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class);
+        if (typeAdapter == null) {
+            typeAdapter = objectClass.getAnnotation(XmlJavaTypeAdapter.class);
+            if (typeAdapter == null) {
+                // lets just try the 1st interface for now
+                Class<?>[] interfaces = objectClass.getInterfaces();
+                typeAdapter = interfaces.length > 0 
+                    ? interfaces[0].getAnnotation(XmlJavaTypeAdapter.class) : null;
+            }
+        }
+        return typeAdapter;
     }
     
     public static Class<?> getTypeFromAdapter(XmlJavaTypeAdapter adapter, Class<?> theType,

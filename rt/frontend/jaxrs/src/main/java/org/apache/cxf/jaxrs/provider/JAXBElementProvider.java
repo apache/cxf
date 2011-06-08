@@ -150,7 +150,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(theType, type, 
-                                                         getAdapter(theGenericType, anns)); 
+                                 org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(theGenericType, anns)); 
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
@@ -281,7 +281,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         os.write(startTag.getBytes());
         if (firstObj != null) {
-            XmlJavaTypeAdapter adapter = getAdapter(firstObj.getClass(), anns);
+            XmlJavaTypeAdapter adapter = 
+                org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(firstObj.getClass(), anns);
             marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true), 
                                     actualClass, genericType, encoding, os, m, 
                                     qname.getNamespaceURI());
