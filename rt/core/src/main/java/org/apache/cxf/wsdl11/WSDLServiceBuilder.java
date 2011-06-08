@@ -145,7 +145,7 @@ public class WSDLServiceBuilder {
     
     private void copyDocumentation(AbstractPropertiesHolder info, WSDLElement el) {
         if (el.getDocumentationElement() != null) {
-            String doc = DOMUtils.getContent(el.getDocumentationElement());
+            String doc = DOMUtils.getRawContent(el.getDocumentationElement());
             info.setDocumentation(doc);
         }
     }

@@ -46,7 +46,7 @@ public class JavaPort {
     }
 
     public void setJavaDoc(String d) {
-        javadoc = d;
+        javadoc = JavaInterface.formatJavaDoc(d, "     ");
     }
     public String getJavaDoc() {
         return javadoc == null ? "" : javadoc;

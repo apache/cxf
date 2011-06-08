@@ -385,7 +385,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
     
     public void setJavaDoc(String doc) {
-        javaDoc = doc;
+        javaDoc = JavaInterface.formatJavaDoc(doc, "     ");
     }
     
     public String getJavaDoc() {
