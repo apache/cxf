@@ -62,6 +62,28 @@ public class URITemplateTest extends Assert {
     }
 
     @Test
+    public void testMatchWithMatrixWithEmptyPath() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        boolean match = uriTemplate.match("/;a=b", values);
+        assertTrue(match);
+        String finalGroup = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalGroup);
+    }
+    
+    @Test
+    public void testMatchWithMatrixWithEmptyPath2() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        boolean match = uriTemplate.match("/;a=b/b/c", values);
+        assertTrue(match);
+        String finalGroup = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/b/c", finalGroup);
+    }
+    
+    @Test
     public void testMatchWithMatrixOnClearPath1() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{id}");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
@@ -122,6 +144,16 @@ public class URITemplateTest extends Assert {
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
         assertTrue(uriTemplate.match("/customers;123456/123/orders;456/3", values));
+    }
+    
+    @Test
+    public void testMatchWithMatrixOnClearPath5() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/customers");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/customers;a=b", values));
+        String finalGroup = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalGroup);
     }
 
     @Test
@@ -187,6 +219,17 @@ public class URITemplateTest extends Assert {
         assertTrue(match);
         String subResourcePath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/chapter/1", subResourcePath);
+    }
+    
+    @Test
+    public void testURITemplateWithSubResourceVariation4() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        boolean match = uriTemplate.match("/books/123/chapter/1", values);
+        assertTrue(match);
+        String subResourcePath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/books/123/chapter/1", subResourcePath);
     }
 
     @Test
