@@ -40,6 +40,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Binding;
@@ -151,6 +152,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     if (config == null) {
                         config = WSSConfig.getNewInstance();
                     }
+                    translateProperties(message, config);
 
                     if (transport instanceof TransportBinding) {
                         new TransportBindingHandler(config, (TransportBinding)transport, saaj,
@@ -208,6 +210,15 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> 
         getAdditionalInterceptors() {
             return null;
+        }
+        
+        private void translateProperties(SoapMessage msg, WSSConfig config) {
+            String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
+            if ("1".equals(bspCompliant) || "true".equals(bspCompliant)) {
+                config.setWsiBSPCompliant(true);
+            } else if ("0".equals(bspCompliant) || "false".equals(bspCompliant)) {
+                config.setWsiBSPCompliant(false);
+            }
         }
     }
 }
