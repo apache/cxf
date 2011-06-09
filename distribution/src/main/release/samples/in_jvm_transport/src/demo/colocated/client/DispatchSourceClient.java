@@ -20,9 +20,7 @@
 package demo.colocated.client;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -39,36 +37,28 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.jaxws.DispatchImpl;
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.InterfaceInfo;
-import org.apache.cxf.service.model.OperationInfo;
-import org.apache.hello_world_soap_http.Greeter;
-import org.apache.hello_world_soap_http.PingMeFault;
-import org.apache.hello_world_soap_http.SOAPService;
-import org.apache.hello_world_soap_http.types.FaultDetail;
-
 import demo.colocated.server.Server;
 
 public final class DispatchSourceClient {
+    private static final String ADDRESS = "http://localhost:9000/SoapContext/GreeterPort";
+
     private static final String SERVICE_NS = "http://apache.org/hello_world_soap_http"; 
     private static final QName SERVICE_NAME = new QName(SERVICE_NS, "SOAPService");
     private static final QName PORT_NAME = new QName(SERVICE_NS, "SoapPort");
     private static final String PAYLOAD_NAMESPACE_URI = "http://apache.org/hello_world_soap_http/types";
 
-    private static final String SAYHI_REQUEST_TEMPLATE = "<ns1:sayHi xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\" />";
-    private static final String GREETME_REQUEST_TEMPLATE = "<ns1:greetMe xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\"><ns1:requestType>%s</ns1:requestType></ns1:greetMe>";
-    private static final String PINGME_REQUEST_TEMPLATE = "<ns1:pingMe xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\" />";
+    private static final String SAYHI_REQUEST_TEMPLATE 
+        = "<ns1:sayHi xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\" />";
+    private static final String GREETME_REQUEST_TEMPLATE 
+        = "<ns1:greetMe xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\">"
+            + "<ns1:requestType>%s</ns1:requestType></ns1:greetMe>";
+    private static final String PINGME_REQUEST_TEMPLATE 
+        = "<ns1:pingMe xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\" />";
 
     private static final QName SAYHI_OPERATION_NAME = new QName(SERVICE_NS, "sayHi");
     private static final QName GREETME_OPERATION_NAME = new QName(SERVICE_NS, "greetMe");
     private static final QName PINGME_OPERATION_NAME = new QName(SERVICE_NS, "pingMe");
         
-    final static String ADDRESS = "http://localhost:9000/SoapContext/GreeterPort";
 
 
     private DispatchSourceClient() {
@@ -139,7 +129,8 @@ public final class DispatchSourceClient {
         }
         
         /* (non-Javadoc)
-         * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+         * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, 
+         *             java.lang.String, java.lang.String, org.xml.sax.Attributes)
          */
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)
@@ -151,7 +142,8 @@ public final class DispatchSourceClient {
 
 
         /* (non-Javadoc)
-         * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+         * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, 
+         *                            java.lang.String, java.lang.String)
          */
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
