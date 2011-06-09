@@ -26,7 +26,7 @@
     <url>http://cxf.apache.org</url>
 
     <properties>
-        <cxf.version>2.4.1-SNAPSHOT</cxf.version>
+        <cxf.version>2.5.0-SNAPSHOT</cxf.version>
     </properties>
     <dependencies>
         <dependency>
