@@ -30,11 +30,6 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <properties>
-        <cxf.version>${project.version}</cxf.version>
-    </properties>
-
-
     <profiles>
         <profile>
             <id>server</id>
@@ -84,13 +79,13 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-management-web</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         
         <dependency>
