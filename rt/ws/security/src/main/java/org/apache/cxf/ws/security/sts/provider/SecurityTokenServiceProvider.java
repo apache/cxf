@@ -227,10 +227,12 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
         } catch (Exception e) {
             try {
                 SOAPFault fault = soapFactory.createFault();
-                if (e.getMessage() == null) {
+                if (e.getMessage() != null) {
+                    fault.setFaultString(e.getMessage());
+                } else if (e.getCause() != null && e.getCause().getMessage() != null) {
                     fault.setFaultString(e.getCause().getMessage());
                 } else {
-                    fault.setFaultString(e.getMessage());
+                    fault.setFaultString("Internal STS error");
                 }
                 Detail detail = fault.addDetail();
                 detail = fault.getDetail();
