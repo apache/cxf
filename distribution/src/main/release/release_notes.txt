@@ -173,6 +173,7 @@ for caveats when upgrading from CXF 2.3.x to 2.4.x.
     * [CXF-3551] - Log warning message when cxf find the @WebServices which is loaded by the other classloader
     * [CXF-3553] - Provide ability to disable WADL generation/display for a REST endpoint
     * [CXF-3567] - Do not use timer for JMSContinuation timeout task
+    * [CXF-3566] - not put serialVersionUID in generated faults by default
     * [CXF-3568] - Add the ability to cache returned tokens in the STSTokenValidator
     * [CXF-3571] - CXF HTTPTransportFactory should throw exception when it can't find a HTTPDestinationFactory
     * [CXF-3572] - Add a check of the message content list to avoid the OoM error from the HolderOutInterceptor
