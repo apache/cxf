@@ -22,12 +22,12 @@
     <artifactId>jms_spring_config</artifactId>
     <packaging>jar</packaging>
     <name>WSDL first demo using the jms transport and jmsConfigFeature</name>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.4.1</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.4.1-SNAPSHOT</version>
+        <version>2.4.1</version>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
@@ -181,12 +181,12 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>2.4.1-SNAPSHOT</version>
+            <version>2.4.1</version>
         </dependency>
                 <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
-            <version>2.4.1-SNAPSHOT</version>
+            <version>2.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>

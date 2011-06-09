@@ -21,12 +21,12 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>logbrowser</artifactId>
     <name>LogBrowser</name>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.4.1</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.4.1-SNAPSHOT</version>
+        <version>2.4.1</version>
         <relativePath>..</relativePath>
     </parent>
 
