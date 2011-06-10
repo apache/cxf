@@ -1,0 +1,40 @@
+POST /jaxws-mtom/hello HTTP/1.1
+Content-Type: multipart/related; type="application/xop+xml"; boundary="uuid:906fa67b-85f9-4ef5-8e3d-52416022d463"; start="<root.message@cxf.apache.org>"; start-info="text/xml"
+Accept: */*
+SOAPAction: ""
+User-Agent: Apache CXF ${project.version}
+Cache-Control: no-cache
+Pragma: no-cache
+Host: localhost:9091
+Connection: keep-alive
+Content-Length: 2815
+
+
+
+--uuid:906fa67b-85f9-4ef5-8e3d-52416022d463
+Content-Type: application/xop+xml; charset=UTF-8; type="text/xml";
+Content-Transfer-Encoding: binary
+Content-ID: <root.message@cxf.apache.org>
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><Detail xmlns="http://apache.org/camel/cxf/mtom_feature/types"><photo><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="cid:1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org"/></photo><image><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="cid:1a66bb35-67fc-4e89-9f33-48af417bf9fe-2@apache.org"/></image></Detail></soap:Body></soap:Envelope>
+--uuid:906fa67b-85f9-4ef5-8e3d-52416022d463
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: binary
+Content-ID: <1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org>
+
+0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abc
+--uuid:906fa67b-85f9-4ef5-8e3d-52416022d463
+Content-Type: image/jpeg
+Content-Transfer-Encoding: binary
+Content-ID: <1a66bb35-67fc-4e89-9f33-48af417bf9fe-2@apache.org>
+
+......JFIF.............C..............
+................... $.' ",#..(7),01444.'9=82<.342...C.........2!.!22222222222222222222222222222222222222222222222222......'.).."......................................
+.....................}........!1A..Qa."q.2....#B...R..$3br..
+.....%&'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz........................................................................................................
+.....................w.......!1..AQ.aq."2...B.....#3R..br.
+.$4.%.....&'()*56789:CDEFGHIJSTUVWXYZcdefghi
+jstuvwxyz....................................................................................?.....U......;YV.b.w".$r.<.K..
+........@}?...S.(.?.!.........j...v..q*.....m#..A4..d.)...;o.C.C.i.a".....5 ...K..(..l`s...hg.`......W;oe...owi x.... ...J.1;T.."....;WMo.Eswwh."MlWx`0C....9.....FE...iUA$...>.ek.....ze.V.B..XP".........QX>2...Z...C...R............._....!..w7P.Q..5.....]r...I........?.!........k..WR..:t..>....$'.........<.c..
+NJ:.....K.y.F}.2..n..<.D..f.L.S.39U#.B....l........,|.....{..}+....A.1,wO..;...,R.m.U.X...s..i.J.P.......H.I..+m(..B 8b...1.Z.V..i<<..mi...Y.....?.......X>3...Z...C...R..L.;.;Q......Ye.M..J>.......R6.'7?k.tO?......ns...3.(....b|...G...r..tg...G........w.....j....qh.....H......+...P...
+--uuid:906fa67b-85f9-4ef5-8e3d-52416022d463--

@@ -179,7 +179,7 @@ public class MimeBodyPartInputStream extends InputStream {
 
                 //boundary matched (may or may not be last mime boundary)
                 int processed = initialI - off;
-                if ((len - (i + 2)) > 0) {
+                if ((len - ((i - off) + 2)) > 0) {
                     inStream.unread(buffer, i + 2, len - (i + 2) + off);
                 }
                 return processed;
