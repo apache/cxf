@@ -60,12 +60,10 @@ public final class BaseUrlHelper {
     }
 
     public static void setAddress(AbstractDestination dest, String absAddress) {
-        synchronized (dest) {
-            dest.getEndpointInfo().setAddress(absAddress);
-            if (WSDLLibrary.isAvailable() 
-                && dest.getEndpointInfo().getExtensor(AddressType.class) != null) {
-                dest.getEndpointInfo().getExtensor(AddressType.class).setLocation(absAddress);
-            }
+        dest.getEndpointInfo().setAddress(absAddress);
+        if (WSDLLibrary.isAvailable() 
+            && dest.getEndpointInfo().getExtensor(AddressType.class) != null) {
+            dest.getEndpointInfo().getExtensor(AddressType.class).setLocation(absAddress);
         }
     }
 }

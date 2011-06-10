@@ -21,7 +21,7 @@ package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Set;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +44,7 @@ import org.apache.cxf.transports.http.QueryHandlerRegistry;
 public class ServletController {
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
     private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
+    private static final String HTTP_PREFIX = "http";
     
     protected boolean isHideServiceList;
     protected boolean disableAddressUpdates;
@@ -75,41 +76,41 @@ public class ServletController {
         title = t;
     }
     
-    protected synchronized void updateDests(HttpServletRequest request) {
-        updateDests(request, false);
-    }
-    
-    protected void updateDests(HttpServletRequest request, boolean force) {
+    protected void updateDests(HttpServletRequest request, AbstractHTTPDestination d) {
         
         String base = forcedBaseAddress == null ? BaseUrlHelper.getBaseURL(request) : forcedBaseAddress;
                 
-        String pathInfo = request.getPathInfo();
-        if (pathInfo == null) {
-            pathInfo = "/";
-        }
-        
-        Set<String> paths = destinationRegistry.getDestinationsPaths();
-        for (String path : paths) {
-            if (!force && pathInfo != null && !pathInfo.startsWith(path)) {
-                continue;
+        if (d == null) {    
+            Collection<AbstractHTTPDestination> dests = destinationRegistry.getDestinations();
+            for (AbstractHTTPDestination dest : dests) {
+                updateDestination(dest, request, base);
             }
-            AbstractHTTPDestination d2 = destinationRegistry.getDestinationForPath(path);
-            String ad = d2.getEndpointInfo().getAddress();
+        } else {
+            updateDestination(d, request, base);
+        }
+    }
+    
+    protected void updateDestination(AbstractHTTPDestination d,
+                                     HttpServletRequest request,
+                                     String base) {
+        synchronized (d) {
+            String ad = d.getEndpointInfo().getAddress();
             if (ad == null 
-                && d2.getAddress() != null
-                && d2.getAddress().getAddress() != null) {
-                ad = d2.getAddress().getAddress().getValue();
+                && d.getAddress() != null
+                && d.getAddress().getAddress() != null) {
+                ad = d.getAddress().getAddress().getValue();
                 if (ad == null) {
                     ad = "/";
                 }
             }
-            if (ad != null 
-                && (ad.equals(path))) {
+            // Using HTTP_PREFIX check is safe for ServletController
+            // URI.create(ad).isRelative() can be used - a bit more expensive though
+            if (ad != null && !ad.startsWith(HTTP_PREFIX)) {
                 if (disableAddressUpdates) {
                     request.setAttribute("org.apache.cxf.transport.endpoint.address", 
-                                         base + path);
+                                         base + ad);
                 } else {
-                    BaseUrlHelper.setAddress(d2, base + path);
+                    BaseUrlHelper.setAddress(d, base + ad);
                 }
             }
         }
@@ -153,7 +154,7 @@ public class ServletController {
                     || request.getRequestURI().endsWith(serviceListRelativePath + "/")
                     || StringUtils.isEmpty(pathInfo)
                     || "/".equals(pathInfo))) {
-                    updateDests(request, true);
+                    updateDests(request, null);
                     serviceListGenerator.service(request, res);
                 } else {
                     d = destinationRegistry.checkRestfulRequest(pathInfo);
@@ -162,7 +163,7 @@ public class ServletController {
                                     + request.getRequestURL() + "'s Observer ");
                         generateNotFound(request, res);
                     }  else { // the request should be a restful service request
-                        updateDests(request);
+                        updateDests(request, d);
                         invokeDestination(request, res, d);
                     }
                 }
@@ -185,7 +186,7 @@ public class ServletController {
                         
                         // update the EndPoint Address with request url
                         if ("GET".equals(request.getMethod())) {
-                            updateDests(request);
+                            updateDests(request, d);
                         }
                         
                         String ctxUri = request.getPathInfo();
@@ -200,7 +201,7 @@ public class ServletController {
                             return;
                         }
                     } else {
-                        updateDests(request);
+                        updateDests(request, d);
                     }
                     invokeDestination(request, res, d);
                 } finally {

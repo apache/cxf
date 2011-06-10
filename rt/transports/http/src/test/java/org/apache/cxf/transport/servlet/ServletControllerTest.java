@@ -170,7 +170,7 @@ public class ServletControllerTest extends Assert {
         }
 
         @Override
-        protected void updateDests(HttpServletRequest request) { 
+        protected void updateDests(HttpServletRequest request, AbstractHTTPDestination d) { 
         }
         
         @Override
