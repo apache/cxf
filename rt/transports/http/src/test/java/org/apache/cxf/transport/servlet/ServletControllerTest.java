@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
@@ -57,7 +58,7 @@ public class ServletControllerTest extends Assert {
         EasyMock.expectLastCall().andReturn("");
         req.getServletPath();
         EasyMock.expectLastCall().andReturn("");
-        req.setAttribute("org.apache.cxf.transport.endpoint.address", "http://localhost:8080");
+        req.setAttribute(Message.BASE_PATH, "http://localhost:8080");
         EasyMock.expectLastCall().anyTimes();
         req.getRequestURI();
         EasyMock.expectLastCall().andReturn(requestUri).times(2);
@@ -109,7 +110,7 @@ public class ServletControllerTest extends Assert {
         EasyMock.expectLastCall().andReturn("false");
         req.getRequestURL();
         EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost:8080/services"));
-        req.setAttribute("org.apache.cxf.transport.endpoint.address", "http://localhost:8080");
+        req.setAttribute(Message.BASE_PATH, "http://localhost:8080");
         EasyMock.expectLastCall().anyTimes();
         registry.getDestinationsPaths();
         EasyMock.expectLastCall().andReturn(Collections.emptySet()).atLeastOnce();
@@ -170,7 +171,7 @@ public class ServletControllerTest extends Assert {
         }
 
         @Override
-        protected void updateDests(HttpServletRequest request, AbstractHTTPDestination d) { 
+        protected void updateDestination(HttpServletRequest request, AbstractHTTPDestination d) { 
         }
         
         @Override

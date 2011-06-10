@@ -25,7 +25,8 @@ import org.apache.cxf.transport.AbstractDestination;
 
 public interface ServiceListWriter {
     String getContentType();
-    void writeServiceList(PrintWriter writer, 
+    void writeServiceList(PrintWriter writer,
+                          String baseAddress,
                           AbstractDestination[] soapDestinations,
                           AbstractDestination[] restDestinations) throws IOException;
     
