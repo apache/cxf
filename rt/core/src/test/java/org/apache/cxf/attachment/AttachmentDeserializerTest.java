@@ -495,4 +495,142 @@ public class AttachmentDeserializerTest extends Assert {
         }
     }
 
+    
+    @Test
+    public void testCXF3582() throws Exception {
+        String contentType = "multipart/related; type=\"application/xop+xml\"; "
+            + "boundary=\"uuid:906fa67b-85f9-4ef5-8e3d-52416022d463\"; "
+            + "start=\"<root.message@cxf.apache.org>\"; start-info=\"text/xml\"";
+            
+            
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, contentType);
+        message.setContent(InputStream.class, getClass().getResourceAsStream("cxf3582.data"));
+        message.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, System
+                .getProperty("java.io.tmpdir"));
+        message.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, String
+                .valueOf(AttachmentDeserializer.THRESHOLD));
+
+
+        AttachmentDeserializer ad 
+            = new AttachmentDeserializer(message, 
+                                         Collections.singletonList("multipart/related"));
+        
+        ad.initializeAttachments();
+        
+        String cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org";
+        DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
+        byte bts[] = new byte[1024];
+        InputStream ins = ds.getInputStream();
+        int count = ins.read(bts, 0, bts.length);
+        assertEquals(500, count);
+        assertEquals(-1, ins.read(new byte[1000], 500, 500));
+
+        cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-2@apache.org";
+        ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
+        bts = new byte[1024];
+        ins = ds.getInputStream();
+        count = ins.read(bts, 0, bts.length);
+        assertEquals(1024, count);
+        assertEquals(225, ins.read(new byte[1000], 500, 500));
+        assertEquals(-1, ins.read(new byte[1000], 500, 500));
+    }
+
+    @Test
+    public void testCXF3582b() throws Exception {
+        String contentType = "multipart/related; type=\"application/xop+xml\"; "
+            + "boundary=\"uuid:906fa67b-85f9-4ef5-8e3d-52416022d463\"; "
+            + "start=\"<root.message@cxf.apache.org>\"; start-info=\"text/xml\"";
+            
+            
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, contentType);
+        message.setContent(InputStream.class, getClass().getResourceAsStream("cxf3582.data"));
+        message.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, System
+                .getProperty("java.io.tmpdir"));
+        message.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, String
+                .valueOf(AttachmentDeserializer.THRESHOLD));
+
+
+        AttachmentDeserializer ad 
+            = new AttachmentDeserializer(message, 
+                                         Collections.singletonList("multipart/related"));
+        
+        ad.initializeAttachments();
+        
+        String cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org";
+        DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
+        byte bts[] = new byte[1024];
+        InputStream ins = ds.getInputStream();
+        int count = 0;
+        int x = ins.read(bts, 500, 200);
+        while (x != -1) {
+            count += x;
+            x = ins.read(bts, 500, 200);
+        }
+        assertEquals(500, count);
+        assertEquals(-1, ins.read(new byte[1000], 500, 500));
+
+        cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-2@apache.org";
+        ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
+        bts = new byte[1024];
+        ins = ds.getInputStream();
+        count = 0;
+        x = ins.read(bts, 500, 200);
+        while (x != -1) {
+            count += x;
+            x = ins.read(bts, 500, 200);
+        }
+        assertEquals(1249, count);
+        assertEquals(-1, ins.read(new byte[1000], 500, 500));
+    }
+    @Test
+    public void testCXF3582c() throws Exception {
+        String contentType = "multipart/related; type=\"application/xop+xml\"; "
+            + "boundary=\"uuid:906fa67b-85f9-4ef5-8e3d-52416022d463\"; "
+            + "start=\"<root.message@cxf.apache.org>\"; start-info=\"text/xml\"";
+            
+            
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, contentType);
+        message.setContent(InputStream.class, getClass().getResourceAsStream("cxf3582.data"));
+        message.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, System
+                .getProperty("java.io.tmpdir"));
+        message.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, String
+                .valueOf(AttachmentDeserializer.THRESHOLD));
+
+
+        AttachmentDeserializer ad 
+            = new AttachmentDeserializer(message, 
+                                         Collections.singletonList("multipart/related"));
+        
+        ad.initializeAttachments();
+        
+        String cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org";
+        DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
+        byte bts[] = new byte[1024];
+        InputStream ins = ds.getInputStream();
+        int count = 0;
+        int x = ins.read(bts, 100, 600);
+        while (x != -1) {
+            count += x;
+            x = ins.read(bts, 100, 600);
+        }
+        assertEquals(500, count);
+        assertEquals(-1, ins.read(new byte[1000], 100, 600));
+
+        cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-2@apache.org";
+        ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
+        bts = new byte[1024];
+        ins = ds.getInputStream();
+        count = 0;
+        x = ins.read(bts, 100, 600);
+        while (x != -1) {
+            count += x;
+            x = ins.read(bts, 100, 600);
+        }
+        assertEquals(1249, count);
+        assertEquals(-1, ins.read(new byte[1000], 100, 600));
+    }
 }
+
