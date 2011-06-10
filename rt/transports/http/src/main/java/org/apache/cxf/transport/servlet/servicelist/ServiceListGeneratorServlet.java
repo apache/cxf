@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
@@ -101,7 +102,10 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             
         }
         response.setContentType(serviceListWriter.getContentType());
-        serviceListWriter.writeServiceList(writer, soapEndpoints, restEndpoints);
+        Object basePath = request.getAttribute(Message.BASE_PATH);
+        serviceListWriter.writeServiceList(writer,
+                                           basePath == null ? null : basePath.toString(),
+                                           soapEndpoints, restEndpoints);
     }
     
 

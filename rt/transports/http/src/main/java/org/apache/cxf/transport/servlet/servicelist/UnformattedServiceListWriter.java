@@ -34,21 +34,23 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
         return "text/html; charset=UTF-8";
     }
 
-    public void writeServiceList(PrintWriter writer, 
+    public void writeServiceList(PrintWriter writer,
+                                 String baseAddress,
                                  AbstractDestination[] soapDestinations,
                                  AbstractDestination[] restDestinations) throws IOException {
         if (soapDestinations.length > 0 || restDestinations.length > 0) {
-            writeUnformattedSOAPEndpoints(writer, soapDestinations);
-            writeUnformattedRESTfulEndpoints(writer, restDestinations);
+            writeUnformattedSOAPEndpoints(writer, baseAddress, soapDestinations);
+            writeUnformattedRESTfulEndpoints(writer, baseAddress, restDestinations);
         } else {
             writer.write("No services have been found.");
         }
     }
     
     private void writeUnformattedSOAPEndpoints(PrintWriter writer,
+                                               String baseAddress,
                                                AbstractDestination[] destinations) throws IOException {
         for (AbstractDestination sd : destinations) {
-            String address = sd.getEndpointInfo().getAddress();
+            String address = getAbsoluteAddress(baseAddress, sd);
             writer.write(address);
 
             if (renderWsdlList) {
@@ -60,11 +62,20 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
     }
 
     private void writeUnformattedRESTfulEndpoints(PrintWriter writer,
+                                                  String baseAddress,
                                                   AbstractDestination[] destinations) throws IOException {
         for (AbstractDestination sd : destinations) {
-            String address = sd.getEndpointInfo().getAddress();
+            String address = getAbsoluteAddress(baseAddress, sd);
             writer.write(address + "?_wadl&_type=xml\n");
         }
     }
 
+    private String getAbsoluteAddress(String basePath, AbstractDestination d) {
+        String endpointAddress = d.getEndpointInfo().getAddress();
+        if (basePath == null || endpointAddress.startsWith(basePath)) {
+            return endpointAddress;
+        } else {
+            return basePath + endpointAddress;
+        }
+    }
 }

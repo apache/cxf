@@ -43,6 +43,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
     }
 
     public void writeServiceList(PrintWriter writer,
+                                 String basePath,
                                  AbstractDestination[] soapDestinations,
                                  AbstractDestination[] restDestinations) throws IOException {
         writer.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" "
@@ -58,8 +59,8 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("</head><body>");
 
         if (soapDestinations.length > 0 || restDestinations.length > 0) {
-            writeSOAPEndpoints(writer, soapDestinations);
-            writeRESTfulEndpoints(writer, restDestinations);
+            writeSOAPEndpoints(writer, basePath, soapDestinations);
+            writeRESTfulEndpoints(writer, basePath, restDestinations);
         } else {
             writer.write("<span class=\"heading\">No services have been found.</span>");
         }
@@ -67,19 +68,22 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("</body></html>");
     }
 
-    private void writeSOAPEndpoints(PrintWriter writer, 
+    private void writeSOAPEndpoints(PrintWriter writer,
+                                    String basePath,
                                     AbstractDestination[] destinations)
         throws IOException {
         writer.write("<span class=\"heading\">Available SOAP services:</span><br/>");
         writer.write("<table " + (styleSheetPath.endsWith("stylesheet=1")
                             ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
         for (AbstractDestination sd : destinations) {
-            writerSoapEndpoint(writer, sd);
+            writerSoapEndpoint(writer, basePath, sd);
         }
         writer.write("</table><br/><br/>");
     }
 
-    private void writerSoapEndpoint(PrintWriter writer, AbstractDestination sd) {
+    private void writerSoapEndpoint(PrintWriter writer,
+                                    String basePath,
+                                    AbstractDestination sd) {
         writer.write("<tr><td>");
         writer.write("<span class=\"porttypename\">"
                      + sd.getEndpointInfo().getInterface().getName().getLocalPart() + "</span>");
@@ -91,37 +95,52 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         }
         writer.write("</ul>");
         writer.write("</td><td>");
-        String address = sd.getEndpointInfo().getAddress();
+        
+        String absoluteURL = getAbsoluteAddress(basePath, sd);
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
-                     + address + "</span>");
-        writer.write("<br/><span class=\"field\">WSDL :</span> " + "<a href=\"" + address
+                     + absoluteURL + "</span>");
+        writer.write("<br/><span class=\"field\">WSDL :</span> " + "<a href=\"" + absoluteURL
                      + "?wsdl\">" + sd.getEndpointInfo().getService().getName() + "</a>");
         writer.write("<br/><span class=\"field\">Target namespace:</span> "
                      + "<span class=\"value\">"
                      + sd.getEndpointInfo().getService().getTargetNamespace() + "</span>");
-        addAtomLinkIfNeeded(address, atomMap, writer);
+        addAtomLinkIfNeeded(absoluteURL, atomMap, writer);
         writer.write("</td></tr>");
     }
 
-    private void writeRESTfulEndpoints(PrintWriter writer, AbstractDestination[] restfulDests)
+    private String getAbsoluteAddress(String basePath, AbstractDestination d) {
+        String endpointAddress = d.getEndpointInfo().getAddress();
+        if (basePath == null || endpointAddress.startsWith(basePath)) {
+            return endpointAddress;
+        } else {
+            return basePath + endpointAddress;
+        }
+    }
+    
+    private void writeRESTfulEndpoints(PrintWriter writer, 
+                                       String basePath, 
+                                       AbstractDestination[] restfulDests)
         throws IOException {
         writer.write("<span class=\"heading\">Available RESTful services:</span><br/>");
         writer.write("<table " + (styleSheetPath.endsWith("stylesheet=1")
             ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
         for (AbstractDestination sd : restfulDests) {
-            writeRESTfulEndpoint(writer, sd);
+            writeRESTfulEndpoint(writer, basePath, sd);
         }
         writer.write("</table>");
     }
 
-    private void writeRESTfulEndpoint(PrintWriter writer, AbstractDestination sd) {
+    private void writeRESTfulEndpoint(PrintWriter writer,
+                                      String basePath,
+                                      AbstractDestination sd) {
+        String absoluteURL = getAbsoluteAddress(basePath, sd);
+        
         writer.write("<tr><td>");
-        String address = sd.getEndpointInfo().getAddress();
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
-                     + address + "</span>");
-        writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + address
-                     + "?_wadl&_type=xml\">" + address + "?_wadl&type=xml" + "</a>");
-        addAtomLinkIfNeeded(address, atomMap, writer);
+                     + absoluteURL + "</span>");
+        writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + absoluteURL
+                     + "?_wadl&_type=xml\">" + absoluteURL + "?_wadl&type=xml" + "</a>");
+        addAtomLinkIfNeeded(absoluteURL, atomMap, writer);
         writer.write("</td></tr>");
     }
 
