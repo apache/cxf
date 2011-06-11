@@ -349,12 +349,8 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
                         if (name.equals(message.getExchange().getEndpoint().getEndpointInfo()
                                             .getName().getLocalPart())) {
                             
-                            List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el,
-                                                                 "http://schemas.xmlsoap.org/wsdl/soap/",
-                                                                 "address");
-                            for (Element soapAddress : sadEls) {
-                                soapAddress.setAttribute("location", base);
-                            }
+                            rewriteAddress(base, el, "http://schemas.xmlsoap.org/wsdl/soap/");
+                            rewriteAddress(base, el, "http://schemas.xmlsoap.org/wsdl/soap12/");
                         }
                     }
                 }
@@ -364,6 +360,15 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
             doc.setXmlStandalone(true);
         } catch (Exception ex) {
             //likely not DOM level 3
+        }
+    }
+
+    private void rewriteAddress(String base, Element el, String soapNS) {
+        List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el,
+                                             soapNS,
+                                             "address");
+        for (Element soapAddress : sadEls) {
+            soapAddress.setAttribute("location", base);
         }
     }
 
