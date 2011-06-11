@@ -312,11 +312,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     for (Element el : elementList) {
                         String name = el.getAttribute("name");
                         if (name.equals(ei.getName().getLocalPart())) {
-                            Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
-                                                                 "http://schemas.xmlsoap.org/wsdl/soap/",
-                                                                 "address")
-                                                                       .iterator().next();
-                            soapAddress.setAttribute("location", base);
+                            rewriteAddress(base, el, "http://schemas.xmlsoap.org/wsdl/soap/");
+                            rewriteAddress(base, el, "http://schemas.xmlsoap.org/wsdl/soap12/");
                         }
                     }
                 }
@@ -563,4 +560,14 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
     public void setBus(Bus bus) {
         this.bus = bus;
     }
+    
+    private void rewriteAddress(String base, Element el, String soapNS) {
+        List<Element> sadEls = DOMUtils.findAllElementsByTagNameNS(el,
+                                             soapNS,
+                                             "address");
+        for (Element soapAddress : sadEls) {
+            soapAddress.setAttribute("location", base);
+        }
+    }
+
 }
