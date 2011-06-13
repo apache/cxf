@@ -40,17 +40,14 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class InitiatorTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.INITIATOR_TOKEN, SP12Constants.INITIATOR_TOKEN};
     
     PolicyBuilder builder;
     public InitiatorTokenBuilder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.INITIATOR_TOKEN, SP12Constants.INITIATOR_TOKEN};
     }
-    
     
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {

@@ -63,7 +63,9 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
                             message.get(PhaseInterceptorChain.PREVIOUS_MESSAGE);
                     SoapMessage previousSoapMessage = wr.get();
                     Element token = getTokenFromMessage(previousSoapMessage);
-                    callback.setToken(token);
+                    if (token != null) {
+                        callback.setToken(token);
+                    }
                 }
                 
             } else {

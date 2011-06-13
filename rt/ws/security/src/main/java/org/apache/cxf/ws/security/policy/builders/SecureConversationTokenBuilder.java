@@ -37,15 +37,13 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SecureConversationTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.SECURE_CONVERSATION_TOKEN, SP12Constants.SECURE_CONVERSATION_TOKEN};
     
     PolicyBuilder builder;
     public SecureConversationTokenBuilder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.SECURE_CONVERSATION_TOKEN, SP12Constants.SECURE_CONVERSATION_TOKEN};
     }
 
     public Assertion build(Element element, AssertionBuilderFactory factory)

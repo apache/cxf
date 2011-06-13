@@ -41,22 +41,20 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SupportingTokens12Builder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP12Constants.SUPPORTING_TOKENS,
-           SP12Constants.SIGNED_SUPPORTING_TOKENS,
-           SP12Constants.ENDORSING_SUPPORTING_TOKENS,
-           SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS,
-           SP12Constants.ENCRYPTED_SUPPORTING_TOKENS,
-           SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS,
-           SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS,
-           SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS};  
 
     PolicyBuilder builder;
     public SupportingTokens12Builder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP12Constants.SUPPORTING_TOKENS,
+                           SP12Constants.SIGNED_SUPPORTING_TOKENS,
+                           SP12Constants.ENDORSING_SUPPORTING_TOKENS,
+                           SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS,
+                           SP12Constants.ENCRYPTED_SUPPORTING_TOKENS,
+                           SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS,
+                           SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS,
+                           SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS};
     }
     
     

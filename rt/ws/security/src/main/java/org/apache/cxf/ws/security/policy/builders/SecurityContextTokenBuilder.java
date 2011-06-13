@@ -34,11 +34,9 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SecurityContextTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.SECURITY_CONTEXT_TOKEN, SP12Constants.SECURITY_CONTEXT_TOKEN};
     
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.SECURITY_CONTEXT_TOKEN, SP12Constants.SECURITY_CONTEXT_TOKEN};
     }
     
     public Assertion build(Element element, AssertionBuilderFactory factory)

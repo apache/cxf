@@ -39,10 +39,6 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class TransportTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.TRANSPORT_TOKEN, SP12Constants.TRANSPORT_TOKEN};
-
-    
     
     PolicyBuilder builder;
     public TransportTokenBuilder(PolicyBuilder b) {
@@ -70,6 +66,6 @@ public class TransportTokenBuilder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.TRANSPORT_TOKEN, SP12Constants.TRANSPORT_TOKEN};
     }
 }

@@ -38,8 +38,6 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
 
 public class X509TokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] = {SP11Constants.X509_TOKEN, SP12Constants.X509_TOKEN};
-    
     
     PolicyBuilder builder;
     public X509TokenBuilder(PolicyBuilder b) {
@@ -146,7 +144,7 @@ public class X509TokenBuilder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.X509_TOKEN, SP12Constants.X509_TOKEN};
     }
 
 }

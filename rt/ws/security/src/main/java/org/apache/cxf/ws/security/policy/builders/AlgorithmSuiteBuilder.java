@@ -36,9 +36,6 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.ALGORITHM_SUITE, SP12Constants.ALGORITHM_SUITE};
-    
     
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
@@ -59,7 +56,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.ALGORITHM_SUITE, SP12Constants.ALGORITHM_SUITE};
     }
 
 }

@@ -215,9 +215,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             throw new Fault(ex);
         }
         
-        if (encryptionToken == null && encrParts.size() > 0) {
+        //if (encryptionToken == null && encrParts.size() > 0) {
             //REVISIT - no token to encrypt with  
-        }
+        //}
         
         if (encryptionToken != null && encrParts.size() > 0) {
             WSSecBase encrBase = doEncryption(wrapper, encrParts, true);

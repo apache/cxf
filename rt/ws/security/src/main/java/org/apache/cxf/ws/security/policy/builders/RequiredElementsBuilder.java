@@ -36,11 +36,9 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class RequiredElementsBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.REQUIRED_ELEMENTS, SP12Constants.REQUIRED_ELEMENTS};
     
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.REQUIRED_ELEMENTS, SP12Constants.REQUIRED_ELEMENTS};
     }
 
     public Assertion build(Element element, AssertionBuilderFactory factory)

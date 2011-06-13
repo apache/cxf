@@ -38,9 +38,6 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.builders.AssertionBuilder;
 
 public class TransportBindingBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.TRANSPORT_BINDING, SP12Constants.TRANSPORT_BINDING};
-
     
     PolicyBuilder builder;
     public TransportBindingBuilder(PolicyBuilder b) {
@@ -60,7 +57,7 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.TRANSPORT_BINDING, SP12Constants.TRANSPORT_BINDING};
     }
 
     private void processAlternative(Element element, 

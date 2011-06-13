@@ -38,8 +38,6 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SamlTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[]  
-        = {SP11Constants.SAML_TOKEN, SP12Constants.SAML_TOKEN};
 
     PolicyBuilder builder;
     public SamlTokenBuilder(PolicyBuilder b) {
@@ -88,6 +86,6 @@ public class SamlTokenBuilder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.SAML_TOKEN, SP12Constants.SAML_TOKEN};
     }
 }

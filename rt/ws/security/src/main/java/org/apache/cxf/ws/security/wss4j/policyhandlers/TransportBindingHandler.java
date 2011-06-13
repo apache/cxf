@@ -332,11 +332,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         if (includeToken(token.getInclusion())) {
             //Add the token
             Element el = cloneElement(secTok.getToken());
-            if (securityTok != null) {
+            //if (securityTok != null) {
                 //do we need to sign this as well?
                 //String id = addWsuIdToElement(el);
                 //sigParts.add(new WSEncryptionPart(id));                          
-            }
+            //}
             
             addEncryptedKeyElement(el);
             tokenIncluded = true;

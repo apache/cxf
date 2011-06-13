@@ -36,11 +36,9 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SignedElementsBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.SIGNED_ELEMENTS, SP12Constants.SIGNED_ELEMENTS};
     
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.SIGNED_ELEMENTS, SP12Constants.SIGNED_ELEMENTS};
     }
      
     public Assertion build(Element element, AssertionBuilderFactory factory)

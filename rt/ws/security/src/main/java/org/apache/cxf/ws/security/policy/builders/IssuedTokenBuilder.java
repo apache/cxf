@@ -42,17 +42,13 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
     private static final String WSA_NAMESPACE_SUB = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
     private static final String WSA_NAMESPACE = "http://www.w3.org/2005/08/addressing";
     
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN};
-    
     PolicyBuilder builder;
     public IssuedTokenBuilder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN};
     }
-    
 
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {

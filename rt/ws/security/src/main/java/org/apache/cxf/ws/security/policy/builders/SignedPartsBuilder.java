@@ -34,13 +34,10 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SignedPartsBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.SIGNED_PARTS, SP12Constants.SIGNED_PARTS};
     
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.SIGNED_PARTS, SP12Constants.SIGNED_PARTS};
     }
-    
     
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {

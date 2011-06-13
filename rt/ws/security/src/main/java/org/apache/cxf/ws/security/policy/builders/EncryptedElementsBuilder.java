@@ -36,11 +36,9 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class EncryptedElementsBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.ENCRYPTED_ELEMENTS, SP12Constants.ENCRYPTED_ELEMENTS};
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.ENCRYPTED_ELEMENTS, SP12Constants.ENCRYPTED_ELEMENTS};
     }
      
     public Assertion build(Element element, AssertionBuilderFactory factory)
