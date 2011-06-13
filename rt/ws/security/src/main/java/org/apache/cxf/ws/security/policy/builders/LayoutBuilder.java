@@ -34,15 +34,12 @@ import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.builders.AssertionBuilder;
 
 public class LayoutBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.LAYOUT, SP12Constants.LAYOUT};
     
     public LayoutBuilder() {
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.LAYOUT, SP12Constants.LAYOUT};
     }
-    
     
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {

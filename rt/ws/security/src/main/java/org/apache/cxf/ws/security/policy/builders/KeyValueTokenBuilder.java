@@ -35,8 +35,6 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
     private static final String MS_NS = "http://schemas.microsoft.com/ws/2005/07/securitypolicy";
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP12Constants.KEYVALUE_TOKEN, new QName(MS_NS, "RsaToken")};
 
     public KeyValueTokenBuilder() {
     }
@@ -76,7 +74,7 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP12Constants.KEYVALUE_TOKEN, new QName(MS_NS, "RsaToken")};
     }
 
 }

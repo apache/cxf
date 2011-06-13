@@ -48,9 +48,6 @@ import org.apache.neethi.builders.AssertionBuilder;
  * 
  */
 public class HttpsTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN};
-
     
     PolicyBuilder builder;
     public HttpsTokenBuilder(PolicyBuilder b) {
@@ -101,7 +98,7 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
      * {@inheritDoc}
      */
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN};
     }
     
 }

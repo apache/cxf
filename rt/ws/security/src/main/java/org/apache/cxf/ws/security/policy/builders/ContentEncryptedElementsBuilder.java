@@ -35,8 +35,6 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class ContentEncryptedElementsBuilder implements AssertionBuilder<Element> {
-    public static final QName KNOWN_ELEMENTS[] 
-        = {SP12Constants.CONTENT_ENCRYPTED_ELEMENTS};
     
     public Assertion build(Element element, AssertionBuilderFactory factory) {
         
@@ -58,7 +56,7 @@ public class ContentEncryptedElementsBuilder implements AssertionBuilder<Element
         return contentEncryptedElements;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP12Constants.CONTENT_ENCRYPTED_ELEMENTS};
     }
     private void processElement(Element element, ContentEncryptedElements parent) {
         if (SPConstants.XPATH_EXPR.equals(element.getLocalName())) {

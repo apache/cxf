@@ -123,6 +123,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     
     private void initializeTokens()  {
         //Setting up encryption token and signature token
+        /*
         Token sigTok = getSignatureToken().getToken();
         //Token encrTok = getEncryptionToken().getToken();
         
@@ -133,6 +134,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         } else if (sigTok instanceof SecureConversationToken) {
             //REVISIT - SecureConversation token retrieval
         }
+        */
     }
     
     private void doEncryptBeforeSign() {
@@ -142,9 +144,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             List<WSEncryptionPart> encrParts = getEncryptedParts();
             List<WSEncryptionPart> sigParts = getSignedParts();
             
-            if (encryptionToken == null && encrParts.size() > 0) {
+            //if (encryptionToken == null && encrParts.size() > 0) {
                 //REVISIT - nothing to encrypt?
-            }
+            //}
             
             if (encryptionToken != null && encrParts.size() > 0) {
                 //The encryption token can be an IssuedToken or a 
@@ -163,10 +165,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                 }
                 if (tok == null) {
-                    if (tokenId == null || tokenId.length() == 0) {
+                    //if (tokenId == null || tokenId.length() == 0) {
                         //REVISIT - no tokenId?   Exception?
-                    }
-                    if (tokenId.startsWith("#")) {
+                    //}
+                    if (tokenId != null && tokenId.startsWith("#")) {
                         tokenId = tokenId.substring(1);
                     }
                     
@@ -290,9 +292,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (sigTok == null) {
                 sigTok = tokenStore.getToken(sigTokId);
             }
-            if (sigTok == null) {
+            //if (sigTok == null) {
                 //REVISIT - no token?
-            }
+            //}
             
             boolean tokIncluded = true;
             if (includeToken(sigToken.getInclusion())) {

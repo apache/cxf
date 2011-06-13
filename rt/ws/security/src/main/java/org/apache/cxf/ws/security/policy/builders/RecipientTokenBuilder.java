@@ -39,15 +39,13 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class RecipientTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.RECIPIENT_TOKEN, SP12Constants.RECIPIENT_TOKEN};
 
     PolicyBuilder builder;
     public RecipientTokenBuilder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.RECIPIENT_TOKEN, SP12Constants.RECIPIENT_TOKEN};
     }
     
     public Assertion build(Element element, AssertionBuilderFactory factory)

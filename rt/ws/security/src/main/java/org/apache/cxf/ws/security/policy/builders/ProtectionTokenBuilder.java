@@ -39,17 +39,14 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class ProtectionTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.PROTECTION_TOKEN, SP12Constants.PROTECTION_TOKEN};
     
     PolicyBuilder builder;
     public ProtectionTokenBuilder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.PROTECTION_TOKEN, SP12Constants.PROTECTION_TOKEN};
     }
-    
     
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {

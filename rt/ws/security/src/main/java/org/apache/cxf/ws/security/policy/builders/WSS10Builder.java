@@ -34,13 +34,11 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class WSS10Builder implements AssertionBuilder<Element> {
-    private static final QName[] KNOWN_ELEMENTS 
-        = {SP11Constants.WSS10, SP12Constants.WSS10};
     
     public WSS10Builder() {
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.WSS10, SP12Constants.WSS10};
     }
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {

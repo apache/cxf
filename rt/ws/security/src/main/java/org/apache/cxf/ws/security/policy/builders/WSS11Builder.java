@@ -35,13 +35,10 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class WSS11Builder implements AssertionBuilder<Element> {
-    private static final QName[] KNOWN_ELEMENTS 
-        = {SP11Constants.WSS11, SP12Constants.WSS11};
 
     public WSS11Builder() {
     }
 
-    
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
@@ -52,7 +49,7 @@ public class WSS11Builder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.WSS11, SP12Constants.WSS11};
     }
     private void processAlternative(Element element, Wss11 parent, SPConstants consts) {
         Element polEl = PolicyConstants.findPolicyElement(element);

@@ -54,11 +54,14 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
     
     public void handleMessage(Message message) throws Fault {
 
-        String name = null;
-        String password = null;
-        
         AuthorizationPolicy policy = (AuthorizationPolicy)message.get(AuthorizationPolicy.class);
         if (policy == null || policy.getUserName() == null || policy.getPassword() == null) {
+            String name = null;
+            String password = null;
+            if (policy != null) {
+                name = policy.getUserName();
+                password = policy.getPassword();
+            }
             org.apache.cxf.common.i18n.Message errorMsg = 
                 new org.apache.cxf.common.i18n.Message("NO_USER_PASSWORD", 
                                                        BUNDLE, 

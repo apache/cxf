@@ -38,8 +38,6 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class UsernameTokenBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[]  
-        = {SP11Constants.USERNAME_TOKEN, SP12Constants.USERNAME_TOKEN};
 
     PolicyBuilder builder;
     public UsernameTokenBuilder(PolicyBuilder b) {
@@ -96,6 +94,6 @@ public class UsernameTokenBuilder implements AssertionBuilder<Element> {
     }
 
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.USERNAME_TOKEN, SP12Constants.USERNAME_TOKEN};
     }
 }

@@ -334,9 +334,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         store.update(cancelToken);
                         writer.writeEmptyElement(prefix, "RequestedTokenCancelled", namespace);
                         exchange.put(SecurityConstants.TOKEN, cancelToken);
-                    } else if (requestType.endsWith("/Renew")) {
+                    } //else if (requestType.endsWith("/Renew")) {
                         //REVISIT - implement
-                    }
+                    //}
                     writer.writeEndElement();
                     if (STSUtils.WST_NS_05_12.equals(namespace)) {
                         writer.writeEndElement();

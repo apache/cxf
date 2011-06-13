@@ -41,15 +41,13 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
 
 public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.ASYMMETRIC_BINDING, SP12Constants.ASYMMETRIC_BINDING};
 
     PolicyBuilder builder;
     public AsymmetricBindingBuilder(PolicyBuilder b) {
         builder = b;
     }    
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.ASYMMETRIC_BINDING, SP12Constants.ASYMMETRIC_BINDING};
     }
     
     public Assertion build(Element element, AssertionBuilderFactory factory)

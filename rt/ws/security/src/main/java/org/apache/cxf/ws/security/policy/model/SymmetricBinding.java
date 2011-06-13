@@ -55,10 +55,10 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
      * @param encryptionToken The encryptionToken to set.
      */
     public void setEncryptionToken(EncryptionToken encryptionToken) {
-        if (this.protectionToken != null) {
+        //if (this.protectionToken != null) {
             // throw new WSSPolicyException("Cannot use an EncryptionToken in a " +
             // "SymmetricBinding when there is a ProtectionToken");
-        }
+        //}
         this.encryptionToken = encryptionToken;
     }
 
@@ -73,11 +73,11 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
      * @param protectionToken The protectionToken to set.
      */
     public void setProtectionToken(ProtectionToken protectionToken) {
-        if (this.encryptionToken != null || this.signatureToken != null) {
+        //if (this.encryptionToken != null || this.signatureToken != null) {
             // throw new WSSPolicyException("Cannot use a ProtectionToken in a " +
             // "SymmetricBinding when there is a SignatureToken or an" +
             // "EncryptionToken");
-        }
+        //}
         this.protectionToken = protectionToken;
     }
 
@@ -92,10 +92,10 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
      * @param signatureToken The signatureToken to set.
      */
     public void setSignatureToken(SignatureToken signatureToken) {
-        if (this.protectionToken != null) {
+        //if (this.protectionToken != null) {
             // throw new WSSPolicyException("Cannot use a SignatureToken in a " +
             // "SymmetricBinding when there is a ProtectionToken");
-        }
+        //}
         this.signatureToken = signatureToken;
     }
 

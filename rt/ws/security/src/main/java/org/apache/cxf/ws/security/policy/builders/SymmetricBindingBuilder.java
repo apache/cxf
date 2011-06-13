@@ -41,15 +41,13 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.SYMMETRIC_BINDING, SP12Constants.SYMMETRIC_BINDING};
     
     PolicyBuilder builder;
     public SymmetricBindingBuilder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.SYMMETRIC_BINDING, SP12Constants.SYMMETRIC_BINDING};
     }
     
     public Assertion build(Element element, AssertionBuilderFactory factory)

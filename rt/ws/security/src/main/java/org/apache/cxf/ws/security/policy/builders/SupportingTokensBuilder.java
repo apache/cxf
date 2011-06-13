@@ -42,19 +42,16 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class SupportingTokensBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[] 
-        = {SP11Constants.SUPPORTING_TOKENS, 
-           SP11Constants.SIGNED_SUPPORTING_TOKENS,
-           SP11Constants.ENDORSING_SUPPORTING_TOKENS,
-           SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS};
-
     
     PolicyBuilder builder;
     public SupportingTokensBuilder(PolicyBuilder b) {
         builder = b;
     }
     public QName[] getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return new QName[]{SP11Constants.SUPPORTING_TOKENS, 
+                           SP11Constants.SIGNED_SUPPORTING_TOKENS,
+                           SP11Constants.ENDORSING_SUPPORTING_TOKENS,
+                           SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS};
     }
     
     public Assertion build(Element element, AssertionBuilderFactory factory)
