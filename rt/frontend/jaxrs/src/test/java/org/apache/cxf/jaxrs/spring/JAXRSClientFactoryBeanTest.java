@@ -51,8 +51,9 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         assertEquals("Get a wrong map size", cfb.getHeaders().size(), 1);
         assertEquals("Get a wrong username", cfb.getUsername(), "username");
         assertEquals("Get a wrong password", cfb.getPassword(), "password");
-        assertEquals(new QName("http://books.com", "BookService"), 
-                     cfb.getServiceName());
+        QName serviceQName = new QName("http://books.com", "BookService");
+        assertEquals(serviceQName, cfb.getServiceName());
+        assertEquals(serviceQName, cfb.getServiceFactory().getServiceName());
         
         bean = ctx.getBean("ModelClient.proxyFactory");
         assertNotNull(bean);
