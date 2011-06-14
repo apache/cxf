@@ -52,6 +52,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.interceptor.EndpointSelectionInterceptor;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.logging.LogUtils;
@@ -89,6 +90,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public WSDLGetInterceptor() {
         super(Phase.READ);
+        getAfter().add(EndpointSelectionInterceptor.class.getName());
     }
 
     public void handleMessage(Message message) throws Fault {
