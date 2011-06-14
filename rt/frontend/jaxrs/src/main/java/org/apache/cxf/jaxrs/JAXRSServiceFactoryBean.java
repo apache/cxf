@@ -64,6 +64,10 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         this.serviceName = name;
     }
     
+    public QName getServiceName() {
+        return serviceName;
+    }
+    
     public void setEnableStaticResolution(boolean staticResolution) {
         this.enableStatic = staticResolution;
     }

@@ -115,7 +115,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             serviceFactory.setBus(getBus());
             checkResources(true);
             if (serviceFactory.getService() == null) {
-                serviceFactory.setServiceName(getServiceName());
                 serviceFactory.create();
                 updateClassResourceProviders();
             }

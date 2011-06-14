@@ -57,8 +57,9 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         assertEquals("Get a wrong address", "http://localhost:9090/rs", sfb.getAddress());
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
         assertEquals("Get a wrong resource class", BookStore.class, sfb.getResourceClasses().get(0));
-        assertEquals(new QName("http://books.com", "BookService"), 
-                     sfb.getServiceName());
+        QName serviceQName = new QName("http://books.com", "BookService");
+        assertEquals(serviceQName, sfb.getServiceName());
+        assertEquals(serviceQName, sfb.getServiceFactory().getServiceName());
         
         sfb = (JAXRSServerFactoryBean)ctx.getBean("inlineServiceBeans");
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
