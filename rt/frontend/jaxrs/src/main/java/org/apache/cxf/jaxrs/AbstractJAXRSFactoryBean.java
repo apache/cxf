@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -90,6 +91,14 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         return b;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setServiceName(QName name) {
+        super.setServiceName(name);
+        serviceFactory.setServiceName(name);
+    }
+    
     private void checkBindingFactory(Bus bus) {
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         try {
