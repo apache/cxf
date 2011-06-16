@@ -40,10 +40,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-
 /**
- *
- */
+*
+* This class will be removed in CXF 2.5.0.
+* Please use the LoggingOutInterceptor by setting the attribute of prettyLogging to be true.
+*/
+@Deprecated
+
 public class PrettyLoggingOutInterceptor extends AbstractPhaseInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(PrettyLoggingOutInterceptor.class);
