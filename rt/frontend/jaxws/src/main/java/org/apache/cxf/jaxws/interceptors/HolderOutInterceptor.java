@@ -72,7 +72,7 @@ public class HolderOutInterceptor extends AbstractPhaseInterceptor<Message> {
             List<MessagePartInfo> parts = op.getOutput().getMessageParts();
             MessageContentsList inObjects = MessageContentsList.getContentsList(exchange.getInMessage());
             if (inObjects != null) {
-                if (!inObjects.equals(outObjects)) {
+                if (!(inObjects == outObjects)) {
                     for (int x = 0; x < inObjects.size(); x++) {
                         Object o = inObjects.get(x);
                         if (o instanceof Holder) {
@@ -81,6 +81,7 @@ public class HolderOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     }
                 } else {
                     LOG.severe("CANNOT_SET_HOLDER_OBJECTS");
+                    throw new Fault(new org.apache.cxf.common.i18n.Message("CANNOT_SET_HOLDER_OBJECTS", LOG));
                 }
             }
             for (MessagePartInfo part : parts) {
