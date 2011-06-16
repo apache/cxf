@@ -145,7 +145,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         message = transform(message);
         if (writer != null) {
             writer.println(message);
-            // Flush the writer to make sure the message is wrote
+            // Flushing the writer to make sure the message is written
             writer.flush();
         } else if (getLogger().isLoggable(Level.INFO)) {
             getLogger().info(message);
