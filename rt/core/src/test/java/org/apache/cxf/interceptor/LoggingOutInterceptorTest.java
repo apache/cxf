@@ -23,25 +23,31 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class PrettyLoggingOutInterceptorTest extends Assert {
+public class LoggingOutInterceptorTest extends Assert {
     
     @Test
     public void testFormatting() throws Exception { 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(baos);
         
-        PrettyLoggingOutInterceptor p = new PrettyLoggingOutInterceptor(pw);
-        PrettyLoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback();
+        LoggingOutInterceptor p = new LoggingOutInterceptor(pw);
+        //p.setPrettyLogging(true);
         CachedOutputStream cos = new CachedOutputStream();
-
         String s = "<today><is><the><twenty> <second> <of> <january> <two> <thousand> <and> <nine></nine> " 
             + "</and></thousand></two></january></of></second></twenty></the></is></today>";
-        cos.getOut().write(s.getBytes());
-        l.onClose(cos); 
+        cos.write(s.getBytes());
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.CONTENT_TYPE, "application/xml");
+        LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(message, cos);
+        l.onClose(cos);
         String str = baos.toString();
         //format has changed
         assertFalse(str.matches(s));
