@@ -742,7 +742,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             return;
         } catch (IOException e) {
             Message msg = new Message("FAIL_TO_GENERATE_TYPES", LOG);
-            throw new ToolException(msg);
+            throw new ToolException(msg, e);
         }
     }
 
