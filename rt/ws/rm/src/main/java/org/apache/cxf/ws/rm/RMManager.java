@@ -303,7 +303,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
 
         Source source = getSource(message);
         SourceSequence seq = source.getCurrent(inSeqId);
-        if (null == seq) {
+        if (null == seq || seq.isExpired()) {
             // TODO: better error handling
             org.apache.cxf.ws.addressing.EndpointReferenceType to = null;
             boolean isServer = RMContextUtils.isServerSide(message);

@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import junit.framework.Assert;
 
@@ -404,17 +405,18 @@ public class MessageFlow extends Assert {
     public void verifyMessages(int nExpected, boolean outbound, boolean exact) {
         if (outbound) {
             if (exact) {
-                assertEquals("Unexpected number of outbound messages" + outboundDump(),
+                assertEquals("Unexpected number of outbound messages" + dump(outStreams),
                              nExpected, outboundMessages.size());
             } else {
-                assertTrue("Unexpected number of outbound messages: " + outboundDump(),
+                assertTrue("Unexpected number of outbound messages: " + dump(outStreams),
                            nExpected <= outboundMessages.size());
             }
         } else {
             if (exact) {
-                assertEquals("Unexpected number of inbound messages", nExpected, inboundMessages.size());
+                assertEquals("Unexpected number of inbound messages" + dump(inStreams), 
+                             nExpected, inboundMessages.size());
             } else {
-                assertTrue("Unexpected number of inbound messages: " + inboundMessages.size(),
+                assertTrue("Unexpected number of inbound messages: " + dump(inStreams),
                            nExpected <= inboundMessages.size());                
             }
         }
@@ -428,7 +430,7 @@ public class MessageFlow extends Assert {
             Element e = getRMHeaderElement(doc, RMConstants.getSequenceAckName());
             // let the newer messages take precedence over the older messages in getting the final range
             if (null != e) {
-                e = getAcknowledgementRange(e);
+                e = getNamedElement(e, "AcknowledgementRange");
                 if (null != e) {
                     currentLower = Long.parseLong(e.getAttribute("Lower"));
                     currentUpper = Long.parseLong(e.getAttribute("Upper"));
@@ -441,16 +443,40 @@ public class MessageFlow extends Assert {
                      upper, currentUpper);
     }
     
-    // note that this method onsiders only the first range element 
-    private Element getAcknowledgementRange(Element element) throws Exception {
+
+    // note that this method picks the first match and returns
+    private Element getNamedElement(Element element, String lcname) throws Exception {
         for (Node nd = element.getFirstChild(); nd != null; nd = nd.getNextSibling()) { 
-            if (Node.ELEMENT_NODE == nd.getNodeType() && "AcknowledgementRange".equals(nd.getLocalName())) {
+            if (Node.ELEMENT_NODE == nd.getNodeType() && lcname.equals(nd.getLocalName())) {
                 return (Element)nd;
             }
         } 
         return null;
     }
 
+    public void verifyCreateSequenceAction(int index, String expiration, boolean outbound) throws Exception {
+        Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
+
+        String expires = getCreateSequenceExpires(d);
+
+        assertEquals("Unexpected expires-value", expiration, expires);
+    }
+    
+    private String getCreateSequenceExpires(Document document) throws Exception {
+        Element envelopeElement = document.getDocumentElement();
+        QName qname = RMConstants.getCreateSequenceOperationName(); 
+        NodeList nodes = 
+            envelopeElement.getElementsByTagNameNS(qname.getNamespaceURI(), qname.getLocalPart());
+        
+        if (nodes.getLength() == 1) {
+            Element element = getNamedElement((Element)nodes.item(0), "Expires");
+            if (element != null) {
+                return getText(element);
+            }
+        }
+        return null;
+    }
+    
     public void purgePartialResponses() throws Exception {
         for (int i = inboundMessages.size() - 1; i >= 0; i--) {
             if (isPartialResponse(inboundMessages.get(i))) {
@@ -507,17 +533,16 @@ public class MessageFlow extends Assert {
         }
         return true;
     }
-   
-   
-    private String outboundDump() {
+    
+    private String dump(List<byte[]> streams) {
         StringBuffer buf = new StringBuffer();
         try {
             buf.append(System.getProperty("line.separator"));
-            for (int i = 0; i < outStreams.size(); i++) {
+            for (int i = 0; i < streams.size(); i++) {
                 buf.append("[");
                 buf.append(i);
                 buf.append("] : ");
-                buf.append(new String(outStreams.get(i)));
+                buf.append(new String(streams.get(i)));
                 buf.append(System.getProperty("line.separator"));
             }
         } catch (Exception ex) {
@@ -526,7 +551,7 @@ public class MessageFlow extends Assert {
         
         return buf.toString();
     }
-
+    
     private String getText(Node node) {
         for (Node nd = node.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.TEXT_NODE == nd.getNodeType()) {

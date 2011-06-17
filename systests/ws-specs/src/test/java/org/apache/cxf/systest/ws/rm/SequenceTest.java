@@ -60,6 +60,7 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -1242,7 +1243,73 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyLastMessage(new boolean[3], false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
-     
+
+    @Test
+    public void testCreateSequenceAfterSequenceExpiration() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/expire-fast-seq.xml", true);
+        
+        RMManager manager = greeterBus.getExtension(RMManager.class);
+        
+        assertEquals("Unexpected expiration", DatatypeFactory.createDuration("PT5S"), 
+                     manager.getSourcePolicy().getSequenceExpiration());
+        
+        // phase one
+        greeter.greetMeOneWay("one");
+        greeter.greetMeOneWay("two");
+        
+        // let the first sequence expire
+        Thread.sleep(8000);
+        
+        // expecting 3 outbounds and 5 or 6 inbounds
+        awaitMessages(3, 5, 5000);
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
+        
+        // CS, GA, GA
+        mf.verifyMessages(3, true);
+        mf.verifyCreateSequenceAction(0, "PT5S", true);
+        
+        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
+                                                 GREETMEONEWAY_ACTION,
+                                                 GREETMEONEWAY_ACTION};
+        mf.verifyActions(expectedActions, true);
+        mf.verifyMessageNumbers(new String[] {null, "1", "2"}, true);
+
+        mf.verifyAcknowledgementRange(1, 2);
+
+        // phase two
+        
+        outRecorder.getOutboundMessages().clear();
+        inRecorder.getInboundMessages().clear();
+
+        greeter.greetMeOneWay("three");
+
+        // expecting 2 outbounds and 4 inbounds
+        awaitMessages(2, 4, 5000);
+        
+        mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
+        
+        // CS, GA
+        mf.verifyMessages(2, true);
+        mf.verifyCreateSequenceAction(0, "PT5S", true);
+        
+        expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
+                                        GREETMEONEWAY_ACTION};
+        mf.verifyActions(expectedActions, true);
+        mf.verifyMessageNumbers(new String[] {null, "1"}, true);
+
+        // PR, CSR, PR, ACK
+        mf.verifyMessages(4, false);
+        mf.purgePartialResponses();
+        
+        expectedActions = new String[] {RMConstants.getCreateSequenceResponseAction(),
+                                        RMConstants.getSequenceAcknowledgmentAction()};
+        mf.verifyActions(expectedActions, false);
+        
+        mf.purge();
+        assertEquals(0, outRecorder.getOutboundMessages().size());
+        assertEquals(0, inRecorder.getInboundMessages().size());
+    }
+    
     @Test
     public void testTerminateOnShutdown() throws Exception {
         init("org/apache/cxf/systest/ws/rm/terminate-on-shutdown.xml", true);
