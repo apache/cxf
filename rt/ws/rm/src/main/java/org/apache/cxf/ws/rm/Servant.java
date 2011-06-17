@@ -137,9 +137,12 @@ public class Servant implements Invoker {
         }
         Expires ex = create.getExpires();
         
-        if (null != ex || supportedDuration.isShorterThan(DatatypeFactory.PT0S)) {
-            Duration effectiveDuration = supportedDuration;
-            if (null != ex && supportedDuration.isLongerThan(ex.getValue()))  {
+        if (null != ex) {
+            Duration effectiveDuration = ex.getValue();
+            // PT0S represents 0 second and the shortest duration but in ws-rm, considered the longest 
+            if (DatatypeFactory.PT0S.equals(effectiveDuration) 
+                || (!DatatypeFactory.PT0S.equals(supportedDuration) 
+                    &&  supportedDuration.isShorterThan(effectiveDuration)))  {
                 effectiveDuration = supportedDuration;
             }
             ex = RMUtils.getWSRMFactory().createExpires();
