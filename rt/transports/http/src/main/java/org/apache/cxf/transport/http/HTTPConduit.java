@@ -956,7 +956,7 @@ public class HTTPConduit
         switch(responseCode) {
         case HttpURLConnection.HTTP_MOVED_PERM:
         case HttpURLConnection.HTTP_MOVED_TEMP:
-        case HttpURLConnection.307:
+        case 307:
             connection = redirectRetransmit(origConnection, message, cachedStream);
             break;
         case HttpURLConnection.HTTP_UNAUTHORIZED:
