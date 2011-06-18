@@ -23,6 +23,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
+import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RMCaptureInInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
@@ -32,8 +34,8 @@ import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RMAssertion;
 import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
 /**
  * 
@@ -51,7 +53,9 @@ public class RMFeature extends AbstractFeature {
     private RMOutInterceptor rmLogicalOut = new RMOutInterceptor();
     private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
     private RMSoapInterceptor rmCodec = new RMSoapInterceptor();
-    private RMCaptureInInterceptor rmCaptureIn = new RMCaptureInInterceptor(); 
+    private RMCaptureInInterceptor rmCaptureIn = new RMCaptureInInterceptor();
+    private String rmNamespace = RM10Constants.NAMESPACE_URI;
+    private String rm10AddressingNamespace = Names200408.WSA_NAMESPACE_NAME;
 
     public void setDeliveryAssurance(DeliveryAssuranceType da) {
         deliveryAssurance = da;
@@ -71,6 +75,22 @@ public class RMFeature extends AbstractFeature {
 
     public void setStore(RMStore store) {
         this.store = store;
+    }
+
+    public String getRMNamespace() {
+        return rmNamespace;
+    }
+
+    public void setRMNamespace(String uri) {
+        rmNamespace = uri;
+    }
+
+    public String getRM10AddressingNamespace() {
+        return rm10AddressingNamespace;
+    }
+
+    public void setRM10AddressingNamespace(String uri) {
+        rm10AddressingNamespace = uri;
     }
 
     @Override

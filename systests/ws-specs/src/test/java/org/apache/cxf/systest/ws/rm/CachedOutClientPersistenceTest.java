@@ -21,7 +21,6 @@ package org.apache.cxf.systest.ws.rm;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * A simulated-large message version of ClientPersistenceTest.
@@ -46,9 +45,9 @@ public class CachedOutClientPersistenceTest extends ClientPersistenceTest {
         }
     }
     
-    @Test 
+/*    @Test 
     public void testRecovery() throws Exception {
         super.testRecovery();
-    }
+    }   */
 
 }

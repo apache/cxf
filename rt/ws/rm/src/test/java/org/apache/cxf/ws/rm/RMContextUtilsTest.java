@@ -79,7 +79,7 @@ public class RMContextUtilsTest extends Assert {
         assertTrue(!RMContextUtils.isRMProtocolMessage(action));
         action = "greetMe";
         assertTrue(!RMContextUtils.isRMProtocolMessage(action));
-        action = RMConstants.getCreateSequenceAction();
+        action = RM10Constants.CREATE_SEQUENCE_ACTION;
         assertTrue(RMContextUtils.isRMProtocolMessage(action));        
     }
     

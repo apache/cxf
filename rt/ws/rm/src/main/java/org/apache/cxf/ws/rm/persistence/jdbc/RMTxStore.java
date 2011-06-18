@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,22 +42,29 @@ import javax.annotation.PostConstruct;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
-import org.apache.cxf.ws.rm.Identifier;
 import org.apache.cxf.ws.rm.RMUtils;
-import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.PersistenceUtils;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
-
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 public class RMTxStore implements RMStore {
     
     public static final String DEFAULT_DATABASE_NAME = "rmdb";
     
+    private static final String CREATE_ENDPOINTS_TABLE_STMT =
+        "CREATE TABLE CXF_ENDPOINTS " 
+        + "(QNAME_URI VARCHAR(1024), "
+        + "QNAME_LOCAL VARCHAR(1024), "
+        + "ENDPOINT_ID VARCHAR(1024), "
+        + "WSRM_URI VARCHAR(256) NOT NULL, "
+        + "WSA_URI VARCHAR(256) NOT NULL, "
+        + "PRIMARY KEY (QNAME_URI, QNAME_LOCAL))";
     private static final String CREATE_DEST_SEQUENCES_TABLE_STMT =
         "CREATE TABLE CXF_RM_DEST_SEQUENCES " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
@@ -85,7 +91,6 @@ public class RMTxStore implements RMStore {
         + "PRIMARY KEY (SEQ_ID, MSG_NO))";
     private static final String INBOUND_MSGS_TABLE_NAME = "CXF_RM_INBOUND_MESSAGES";
     private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";    
-    
     
     private static final String CREATE_DEST_SEQUENCE_STMT_STR 
         = "INSERT INTO CXF_RM_DEST_SEQUENCES (SEQ_ID, ACKS_TO, ENDPOINT_ID) VALUES(?, ?, ?)";
@@ -117,7 +122,7 @@ public class RMTxStore implements RMStore {
         + "WHERE ENDPOINT_ID = ?";
     private static final String SELECT_MESSAGES_STMT_STR =
         "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
-
+    
     private static final String DERBY_TABLE_EXISTS_STATE = "X0Y32";
     private static final int ORACLE_TABLE_EXISTS_CODE = 955;
     
@@ -125,7 +130,7 @@ public class RMTxStore implements RMStore {
     
     private Connection connection;
     private Lock writeLock = new ReentrantLock();
-
+    
     private PreparedStatement createDestSequenceStmt;
     private PreparedStatement createSrcSequenceStmt;
     private PreparedStatement deleteDestSequenceStmt;
@@ -157,7 +162,7 @@ public class RMTxStore implements RMStore {
     public String getDriverClassName() {
         return driverClassName;
     }
-
+    
     public void setPassword(String p) {
         password = p;
     }
@@ -173,7 +178,7 @@ public class RMTxStore implements RMStore {
     public String getUrl() {
         return url;
     }
-
+    
     public void setUserName(String un) {
         userName = un;
     }
@@ -181,7 +186,7 @@ public class RMTxStore implements RMStore {
     public String getUserName() {
         return userName;
     }    
-   
+    
     public void setConnection(Connection c) {
         connection = c;
     }
@@ -260,7 +265,7 @@ public class RMTxStore implements RMStore {
             
             ResultSet res = selectDestSequenceStmt.executeQuery(); 
             if (res.next()) {
-                EndpointReferenceType acksTo = RMUtils.createReference2004(res.getString(1));  
+                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(1));  
                 long lm = res.getLong(2);
                 InputStream is = res.getBinaryStream(3); 
                 SequenceAcknowledgement ack = null;
@@ -308,7 +313,7 @@ public class RMTxStore implements RMStore {
         }
         return null;
     }
-
+    
     public void removeDestinationSequence(Identifier sid) {
         try {
             beginTransaction();
@@ -326,8 +331,8 @@ public class RMTxStore implements RMStore {
             throw new RMStoreException(ex);
         }        
     }
-
-
+    
+    
     public void removeSourceSequence(Identifier sid) {
         try {
             beginTransaction();
@@ -362,7 +367,7 @@ public class RMTxStore implements RMStore {
             while (res.next()) {
                 Identifier sid = RMUtils.getWSRMFactory().createIdentifier();                
                 sid.setValue(res.getString(1));
-                EndpointReferenceType acksTo = RMUtils.createReference2004(res.getString(2));  
+                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(2));  
                 long lm = res.getLong(3);
                 InputStream is = res.getBinaryStream(4); 
                 SequenceAcknowledgement ack = null;
@@ -446,7 +451,7 @@ public class RMTxStore implements RMStore {
         }
         return msgs;
     }
-
+    
     public void persistIncoming(DestinationSequence seq, RMMessage msg) {        
         try {
             beginTransaction();
@@ -483,7 +488,7 @@ public class RMTxStore implements RMStore {
             throw new RMStoreException(ex);        
         }        
     }
-
+    
     public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
         try {
             beginTransaction();
@@ -497,7 +502,7 @@ public class RMTxStore implements RMStore {
                     deleteInboundMessageStmt = stmt;
                 }
             }
-
+    
             stmt.setString(1, sid.getValue());
                         
             for (Long messageNr : messageNrs) {
@@ -512,7 +517,7 @@ public class RMTxStore implements RMStore {
             throw new RMStoreException(ex);
         }        
     }
-
+    
     // transaction demarcation
     // 
     
@@ -599,6 +604,17 @@ public class RMTxStore implements RMStore {
         Statement stmt = null;
         stmt = connection.createStatement();
         try {
+            stmt.executeUpdate(CREATE_ENDPOINTS_TABLE_STMT);
+        } catch (SQLException ex) {
+            if (!isTableExistsError(ex)) {
+                throw ex;
+            } else {
+                LOG.fine("Table CXF_ENDPOINTS already exists.");
+            }
+        }
+        stmt.close();
+        stmt = connection.createStatement();
+        try {
             stmt.executeUpdate(CREATE_SRC_SEQUENCES_TABLE_STMT);
         } catch (SQLException ex) {
             if (!isTableExistsError(ex)) {
@@ -651,11 +667,11 @@ public class RMTxStore implements RMStore {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
                 return;
             }
-
+    
             try {
                 LOG.log(Level.FINE, "Using url: " + url);
                 connection = DriverManager.getConnection(url, userName, password);
-
+    
             } catch (SQLException ex) {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
                 return;
@@ -715,9 +731,9 @@ public class RMTxStore implements RMStore {
             LOG.log(Level.FINE, "Trying to delete directory {0}", root);
             recursiveDelete(root, now);
         }
-
+    
     }
-
+    
     private static void recursiveDelete(File dir, boolean now) {
         for (File f : dir.listFiles()) {
             if (f.isDirectory()) {
@@ -736,11 +752,9 @@ public class RMTxStore implements RMStore {
             dir.deleteOnExit();
         }
     }
-
+    
     private static boolean isTableExistsError(SQLException ex) {
         return DERBY_TABLE_EXISTS_STATE.equals(ex.getSQLState())
                 || ORACLE_TABLE_EXISTS_CODE == ex.getErrorCode();
     }
-
-
 }

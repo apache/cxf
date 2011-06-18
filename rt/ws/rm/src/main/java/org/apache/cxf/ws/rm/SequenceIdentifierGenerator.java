@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.rm;
 
+import org.apache.cxf.ws.rm.v200702.Identifier;
+
 /**
  * 
  */

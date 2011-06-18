@@ -27,7 +27,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
-import org.apache.cxf.ws.rm.RMConstants;
+import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
@@ -37,10 +38,10 @@ import org.apache.neethi.PolicyComponent;
  */
 public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
     public static final List<QName> KNOWN_ELEMENTS 
-        = Collections.singletonList(RMConstants.getRMAssertionQName());
+        = Collections.singletonList(RM10Constants.WSRMP_RMASSERTION_QNAME);
 
     public RMAssertionBuilder() throws JAXBException {
-        super(RMAssertion.class, RMConstants.getRMAssertionQName());     
+        super(RMAssertion.class, RM10Constants.WSRMP_RMASSERTION_QNAME);     
     }
 
     @Override
@@ -50,13 +51,13 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
     
     class RMPolicyAssertion extends JaxbAssertion<RMAssertion> {
         RMPolicyAssertion() {
-            super(RMConstants.getRMAssertionQName(), false);
+            super(RM10Constants.WSRMP_RMASSERTION_QNAME, false);
         }
         RMPolicyAssertion(boolean opt) {
-            super(RMConstants.getRMAssertionQName(), opt);
+            super(RM10Constants.WSRMP_RMASSERTION_QNAME, opt);
         }
         RMPolicyAssertion(boolean opt, boolean ignore) {
-            super(RMConstants.getRMAssertionQName(), opt, ignore);
+            super(RM10Constants.WSRMP_RMASSERTION_QNAME, opt, ignore);
         }
 
         @Override
@@ -67,7 +68,7 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
             }
             JaxbAssertion<RMAssertion> other = 
                     JaxbAssertion.cast((Assertion)policyComponent);            
-            return PolicyUtils.equals(this.getData(), other.getData());  
+            return RM10PolicyUtils.equals(this.getData(), other.getData());  
         }
         
         @Override
@@ -77,9 +78,4 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
             return a;        
         }
     }
-    
-    
-
-        
 }
-

@@ -26,6 +26,8 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

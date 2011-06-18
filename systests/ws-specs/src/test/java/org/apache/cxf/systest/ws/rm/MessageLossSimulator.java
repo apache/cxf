@@ -53,9 +53,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) throws Fault {
-        AddressingProperties maps =
-            RMContextUtils.retrieveMAPs(message, false, true);
-        RMContextUtils.ensureExposedVersion(maps);
+        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
         String action = null;
         if (maps != null && null != maps.getAction()) {
             action = maps.getAction().getValue();
@@ -66,11 +64,9 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (MessageUtils.isPartialResponse(message)) {
             return;
         }
-        synchronized (this) {
-            appMessageCount++;
-            if (0 != (appMessageCount % 2)) {
-                return;
-            }
+        appMessageCount++;
+        if (0 != (appMessageCount % 2)) {
+            return;
         }
         
         InterceptorChain chain = message.getInterceptorChain();

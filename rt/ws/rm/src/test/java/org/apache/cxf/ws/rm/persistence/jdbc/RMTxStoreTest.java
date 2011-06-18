@@ -28,17 +28,18 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.DestinationSequence;
-import org.apache.cxf.ws.rm.Identifier;
-import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMUtils;
-import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -178,7 +179,7 @@ public class RMTxStoreTest extends Assert {
         DestinationSequence seq = control.createMock(DestinationSequence.class);
         Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
         sid1.setValue("sequence1");
-        EndpointReferenceType epr = RMUtils.createAnonymousReference2004();
+        EndpointReferenceType epr = RMUtils.createAnonymousReference();
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
@@ -207,7 +208,7 @@ public class RMTxStoreTest extends Assert {
         Identifier sid2 = RMUtils.getWSRMFactory().createIdentifier();
         sid2.setValue("sequence2");
         EasyMock.expect(seq.getIdentifier()).andReturn(sid2); 
-        epr = RMUtils.createReference2004(NON_ANON_ACKS_TO);
+        epr = RMUtils.createReference(NON_ANON_ACKS_TO);
         EasyMock.expect(seq.getAcksTo()).andReturn(epr);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
         
@@ -285,7 +286,7 @@ public class RMTxStoreTest extends Assert {
         DestinationSequence seq = control.createMock(DestinationSequence.class);
         Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
         sid1.setValue("sequence1");
-        EndpointReferenceType epr = RMUtils.createAnonymousReference2004();
+        EndpointReferenceType epr = RMUtils.createAnonymousReference();
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
@@ -386,7 +387,7 @@ public class RMTxStoreTest extends Assert {
     }
 
     @Test
-    public void testGetSourceSequences() throws SQLException, IOException {
+    public void testGetSourceSequences() throws SQLException {
         
         Identifier sid1 = null;
         Identifier sid2 = null;
@@ -444,7 +445,7 @@ public class RMTxStoreTest extends Assert {
     }
 
     @Test
-    public void testGetSourceSequence() throws SQLException, IOException {
+    public void testGetSourceSequence() throws SQLException {
         
         Identifier sid1 = null;
         Identifier sid2 = null;
@@ -521,7 +522,7 @@ public class RMTxStoreTest extends Assert {
         
         Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
         sid.setValue(s);
-        EndpointReferenceType epr = RMUtils.createAnonymousReference2004();
+        EndpointReferenceType epr = RMUtils.createAnonymousReference();
         
         SequenceAcknowledgement ack = ack1;
         Long lmn = ZERO;
@@ -548,7 +549,7 @@ public class RMTxStoreTest extends Assert {
         return sid;
     }
     
-    private Identifier setupSourceSequence(String s) throws IOException, SQLException {
+    private Identifier setupSourceSequence(String s) throws SQLException {
         SourceSequence seq = control.createMock(SourceSequence.class);        
         Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
         sid.setValue(s);      
@@ -605,7 +606,7 @@ public class RMTxStoreTest extends Assert {
         for (DestinationSequence recovered : seqs) {
             assertTrue("sequence1".equals(recovered.getIdentifier().getValue())
                                           || "sequence2".equals(recovered.getIdentifier().getValue()));
-            assertEquals(RMConstants.getAnonymousAddress(), recovered.getAcksTo().getAddress().getValue());
+            assertEquals(Names.WSA_ANONYMOUS_ADDRESS, recovered.getAcksTo().getAddress().getValue());
             if ("sequence1".equals(recovered.getIdentifier().getValue())) {                      
                 assertEquals(0, recovered.getLastMessageNumber());                
                 assertEquals(1, recovered.getAcknowledgment().getAcknowledgementRange().size());
@@ -663,7 +664,4 @@ public class RMTxStoreTest extends Assert {
             }
         }
     }
-    
-    
-
 }

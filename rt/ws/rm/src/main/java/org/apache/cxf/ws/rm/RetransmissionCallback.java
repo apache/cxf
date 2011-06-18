@@ -28,6 +28,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
+import org.apache.cxf.ws.rm.v200702.Identifier;
 
 /**
  * 

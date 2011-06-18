@@ -22,8 +22,8 @@ package org.apache.cxf.ws.rm.persistence;
 import java.util.Collection;
 
 import org.apache.cxf.ws.rm.DestinationSequence;
-import org.apache.cxf.ws.rm.Identifier;
 import org.apache.cxf.ws.rm.SourceSequence;
+import org.apache.cxf.ws.rm.v200702.Identifier;
 
 public interface RMStore {
  

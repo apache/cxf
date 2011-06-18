@@ -26,6 +26,10 @@ import javax.xml.datatype.Duration;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
+import org.apache.cxf.ws.rm.v200702.Expires;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.ObjectFactory;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
@@ -195,7 +199,7 @@ public class SourceSequenceTest extends Assert {
     } 
 
     @Test
-    public void testAllAcknowledged() throws SequenceFault, RMException {
+    public void testAllAcknowledged() throws RMException {
         
         SourceSequence seq = new SourceSequence(id, null, null, 4, false);        
         setUpSource();

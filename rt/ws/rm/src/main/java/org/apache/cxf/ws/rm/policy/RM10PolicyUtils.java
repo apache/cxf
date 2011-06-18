@@ -19,27 +19,51 @@
 
 package org.apache.cxf.ws.rm.policy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
-import org.apache.cxf.ws.rm.RMConstants;
-import org.apache.cxf.ws.rm.policy.RMAssertion.AcknowledgementInterval;
-import org.apache.cxf.ws.rm.policy.RMAssertion.BaseRetransmissionInterval;
-import org.apache.cxf.ws.rm.policy.RMAssertion.InactivityTimeout;
+import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rm.RM11Constants;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout;
 
 /**
  * 
  */
-public final class PolicyUtils {
+public final class RM10PolicyUtils {
     
     /**
      * Prevents instantiation.
      *
      */
-    private PolicyUtils() {        
+    private RM10PolicyUtils() {        
+    }
+
+    /**
+     * Collect RMAssertions from map. This checks both namespaces defined for WS-RM policy assertions.
+     * 
+     * @param aim map, may be <code>null</code>
+     * @return merged collection, never <code>null</code>
+     */
+    public static Collection<AssertionInfo> collectRMAssertions(AssertionInfoMap aim) {
+        Collection<AssertionInfo> mergedAsserts = new ArrayList<AssertionInfo>();
+        if (aim != null) {
+            Collection<AssertionInfo> ais = aim.get(RM10Constants.WSRMP_RMASSERTION_QNAME);
+            if (ais != null) {
+                mergedAsserts.addAll(ais);
+            }
+            ais = aim.get(RM11Constants.WSRMP_RMASSERTION_QNAME);
+            if (ais != null) {
+                mergedAsserts.addAll(ais);
+            }
+        }
+        return mergedAsserts;
     }
 
     /**
@@ -52,18 +76,11 @@ public final class PolicyUtils {
      */
     public static RMAssertion getRMAssertion(RMAssertion defaultValue, Message message) {        
         RMAssertion compatible = defaultValue;
-        AssertionInfoMap amap =  message.get(AssertionInfoMap.class);
-        if (null != amap) {
-            Collection<AssertionInfo> ais = amap.get(RMConstants.getRMAssertionQName());
-            if (null != ais) {
-                
-                for (AssertionInfo ai : ais) {
-                    JaxbAssertion<RMAssertion> ja = getAssertion(ai);
-                    RMAssertion rma = ja.getData();
-                    compatible = null == defaultValue ? rma
-                        : intersect(compatible, rma);
-                }
-            }
+        Collection<AssertionInfo> ais = collectRMAssertions(message.get(AssertionInfoMap.class));
+        for (AssertionInfo ai : ais) {
+            JaxbAssertion<RMAssertion> ja = getAssertion(ai);
+            RMAssertion rma = ja.getData();
+            compatible = null == defaultValue ? rma : intersect(compatible, rma);
         }
         return compatible;
     }

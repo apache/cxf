@@ -28,6 +28,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 /**
  * 
@@ -89,7 +91,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         if (isApplicationMessage) {                        
             if (null != rmps) {
-                processAcknowledgments(rme.getSource(), rmps);
+                processAcknowledgments(rme, rmps);
                 processAcknowledgmentRequests(destination, message);
                 processSequence(destination, message);
                 processDeliveryAssurance(rmps);
@@ -102,14 +104,17 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             }
         } else {
             rme.receivedControlMessage();
-            if (RMConstants.getSequenceAckAction().equals(action)) {
-                processAcknowledgments(rme.getSource(), rmps);
-            } else if (RMConstants.getLastMessageAction().equals(action)) {
+            if (RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)
+                || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
+                processAcknowledgments(rme, rmps);
+            } else if (RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action)
+                || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
                 processSequence(destination, message);
-            } else if (RMConstants.getCreateSequenceAction().equals(action) && !isServer) {
+            } else if ((RM10Constants.CREATE_SEQUENCE_ACTION.equals(action)
+                || RM11Constants.CREATE_SEQUENCE_ACTION.equals(action)) && !isServer) {
                 LOG.fine("Processing inbound CreateSequence on client side.");
                 Servant servant = rme.getServant();
-                CreateSequenceResponseType csr = servant.createSequence(message);
+                Object csr = servant.createSequence(message);
                 Proxy proxy = rme.getProxy();
                 proxy.createSequenceResponse(csr);
                 return;
@@ -119,9 +124,10 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         assertReliability(message);
     }
     
-    void processAcknowledgments(Source source, RMProperties rmps) throws SequenceFault, RMException {
+    void processAcknowledgments(RMEndpoint rme, RMProperties rmps) throws SequenceFault, RMException {
         
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();
+        Source source = rme.getSource();
         if (null != acks) {
             for (SequenceAcknowledgement ack : acks) {
                 Identifier id = ack.getIdentifier();
@@ -129,7 +135,9 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 if (null != ss) {
                     ss.setAcknowledged(ack);
                 } else {
-                    throw (new SequenceFaultFactory()).createUnknownSequenceFault(id);
+                    RMConstants consts = rme.getEncoderDecoder().getConstants();
+                    SequenceFaultFactory sff = new SequenceFaultFactory(consts);
+                    throw sff.createUnknownSequenceFault(id);
                 }
             }
         }

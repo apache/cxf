@@ -20,56 +20,83 @@
 package org.apache.cxf.ws.rm;
 
 import java.io.OutputStream;
-import java.text.MessageFormat;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingConstants;
 import org.apache.cxf.ws.addressing.AddressingConstantsImpl;
-import org.apache.cxf.ws.addressing.VersionTransformer;
 
 public final class RMUtils {
    
-    private static final org.apache.cxf.ws.addressing.v200408.ObjectFactory WSA_FACTORY;
-    private static final org.apache.cxf.ws.rm.ObjectFactory WSRM_FACTORY;
+    private static final org.apache.cxf.ws.rm.v200702.ObjectFactory WSRM_FACTORY;
+    private static final org.apache.cxf.ws.rm.v200502.ObjectFactory WSRM200502_FACTORY;
+    private static final org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory WSRM200502_WSA200508_FACTORY;
     private static final AddressingConstants WSA_CONSTANTS; 
     
     static {
-        WSA_FACTORY = new org.apache.cxf.ws.addressing.v200408.ObjectFactory();
-        WSRM_FACTORY = new org.apache.cxf.ws.rm.ObjectFactory();        
-        WSA_CONSTANTS = new AddressingConstantsImpl();      
+        WSRM_FACTORY = new org.apache.cxf.ws.rm.v200702.ObjectFactory();        
+        WSRM200502_FACTORY = new org.apache.cxf.ws.rm.v200502.ObjectFactory();
+        WSRM200502_WSA200508_FACTORY = new org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory();
+        WSA_CONSTANTS = new AddressingConstantsImpl();
     }
     
-    protected RMUtils() {        
+    private RMUtils() {        
     }
     
-    public static org.apache.cxf.ws.addressing.v200408.ObjectFactory getWSAFactory() {
-        return WSA_FACTORY;
-    }
-    
-    public static org.apache.cxf.ws.rm.ObjectFactory getWSRMFactory() {
+    /**
+     * Get the factory for the internal representation of WS-RM data (WS-ReliableMessaging 1.1).
+     * 
+     * @return factory
+     */
+    public static org.apache.cxf.ws.rm.v200702.ObjectFactory getWSRMFactory() {
         return WSRM_FACTORY;
+    }
+    
+    /**
+     * Get the factory for WS-ReliableMessaging 1.0 using the standard 200408 WS-Addressing namespace.
+     * 
+     * @return factory
+     */
+    public static org.apache.cxf.ws.rm.v200502.ObjectFactory getWSRM200502Factory() {
+        return WSRM200502_FACTORY;
+    }
+    
+    /**
+     * Get the factory for WS-ReliableMessaging 1.0 using the current 200508 WS-Addressing namespace.
+     * 
+     * @return factory
+     */
+    public static org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory getWSRM200502WSA200508Factory() {
+        return WSRM200502_WSA200508_FACTORY;
+    }
+    
+    /**
+     * Get the constants for a particular WS-ReliableMessaging namespace.
+     * 
+     * @param uri
+     * @return constants
+     */
+    public static RMConstants getConstants(String uri) {
+        if (RM10Constants.NAMESPACE_URI.equals(uri)) {
+            return RM10Constants.INSTANCE;
+        } else if (RM11Constants.NAMESPACE_URI.equals(uri)) {
+            return RM11Constants.INSTANCE;
+        } else {
+            return null;
+        }
     }
     
     public static AddressingConstants getAddressingConstants() {
         return WSA_CONSTANTS;
     }
-    
+
     public static org.apache.cxf.ws.addressing.EndpointReferenceType createAnonymousReference() {
         return createReference(org.apache.cxf.ws.addressing.Names.WSA_ANONYMOUS_ADDRESS);
     }
     
-    public static org.apache.cxf.ws.addressing.v200408.EndpointReferenceType createAnonymousReference2004() {
-        return VersionTransformer.convert(createAnonymousReference());
-    }
-    
     public static org.apache.cxf.ws.addressing.EndpointReferenceType createNoneReference() {
         return createReference(org.apache.cxf.ws.addressing.Names.WSA_NONE_ADDRESS);
-    }
-    
-    public static org.apache.cxf.ws.addressing.v200408.EndpointReferenceType createNoneReference2004() {
-        return VersionTransformer.convert(createNoneReference());
     }
     
     public static org.apache.cxf.ws.addressing.EndpointReferenceType createReference(String address) {
@@ -82,23 +109,9 @@ public final class RMUtils {
         return epr;        
     }
     
-    public static org.apache.cxf.ws.addressing.v200408.EndpointReferenceType 
-    createReference2004(String address) {
-        org.apache.cxf.ws.addressing.v200408.ObjectFactory factory = 
-            new org.apache.cxf.ws.addressing.v200408.ObjectFactory();
-        org.apache.cxf.ws.addressing.v200408.EndpointReferenceType epr = 
-            factory.createEndpointReferenceType();
-        org.apache.cxf.ws.addressing.v200408.AttributedURI uri = factory.createAttributedURI();
-        uri.setValue(address);
-        epr.setAddress(uri);
-        return epr;
-    } 
-    
     public static String getEndpointIdentifier(Endpoint endpoint) {
-        return MessageFormat.format("{0}.{1}", new Object[] {
-            endpoint.getEndpointInfo().getService().getName(),
-            endpoint.getEndpointInfo().getName()
-        });
+        return endpoint.getEndpointInfo().getService().getName() + "."
+            + endpoint.getEndpointInfo().getName();
     }
     
     public static WriteOnCloseOutputStream createCachedStream(Message message, OutputStream os) {

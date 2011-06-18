@@ -25,13 +25,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.extensions.ExtensibilityElement;
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
@@ -54,6 +50,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
@@ -69,34 +66,50 @@ import org.apache.neethi.Policy;
 public class RMEndpoint {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMEndpoint.class);
-
-    private static final QName SERVICE_NAME = new QName(RMConstants.getWsdlNamespace(),
-                                                        "SequenceAbstractService");
-    private static final QName INTERFACE_NAME = new QName(RMConstants.getWsdlNamespace(),
-                                                          "SequenceAbstractPortType");
-    private static final QName BINDING_NAME = new QName(RMConstants.getWsdlNamespace(),
-                                                        "SequenceAbstractSoapBinding");
-
-    private static final QName CREATE_PART_NAME = new QName(RMConstants.getWsdlNamespace(), "create");
-    private static final QName CREATE_RESPONSE_PART_NAME = new QName(RMConstants.getWsdlNamespace(),
-                                                                     "createResponse");
-    private static final QName TERMINATE_PART_NAME = new QName(RMConstants.getWsdlNamespace(), "terminate");
     
-    private static Schema rmSchema;
+    private static final String SERVICE_NAME = "SequenceAbstractService";
+    private static final String INTERFACE_NAME = "SequenceAbstractPortType";
+    private static final String BINDING_NAME = "SequenceAbstractSoapBinding";
+
+    private static final String CREATE_PART_NAME = "create";
+    private static final String CREATE_RESPONSE_PART_NAME = "createResponse";
+    private static final String TERMINATE_PART_NAME = "terminate";
 
     private RMManager manager;
     private Endpoint applicationEndpoint;
     private Conduit conduit;
-    private org.apache.cxf.ws.addressing.EndpointReferenceType replyTo;
+    private EncoderDecoder encoderDecoder;
+    private EndpointReferenceType replyTo;
     private Source source;
     private Destination destination;
     private WrappedService service;
     private Endpoint endpoint;
     private Proxy proxy;
     private Servant servant;
+    private QName serviceQName;
+    private QName bindingQName;
+    private QName interfaceQName;
     private long lastApplicationMessage;
     private long lastControlMessage;
 
+    /**
+     * Constructor when WS-ReliableMessaging version to be used is already known.
+     * 
+     * @param m
+     * @param ae
+     * @param codec
+     */
+    public RMEndpoint(RMManager m, Endpoint ae, EncoderDecoder codec) {
+        this(m, ae);
+        encoderDecoder = codec;
+    }
+
+    /**
+     * Constructor when WS-ReliableMessaging version to be used is not yet known.
+     * 
+     * @param m
+     * @param ae
+     */
     public RMEndpoint(RMManager m, Endpoint ae) {
         manager = m;
         applicationEndpoint = ae;
@@ -128,6 +141,26 @@ public class RMEndpoint {
     }
 
     /**
+     * Get the encoder/decoder used by this endpoint.
+     * 
+     * @return URI
+     */
+    public EncoderDecoder getEncoderDecoder() {
+        return encoderDecoder;
+    }
+
+    /**
+     * Set the encoder/decoder used by this endpoint. This should only be used if the encoder/decoder was not
+     * set by the constructor, and only used once in that case - once set the encoder/decoder should never be
+     * changed.
+     * 
+     * @param codec
+     */
+    public void setEncoderDecoder(EncoderDecoder codec) {
+        encoderDecoder = codec;
+    }
+
+    /**
      * @return Returns the RM protocol service.
      */
     public Service getService() {
@@ -138,7 +171,7 @@ public class RMEndpoint {
      * @return Returns the RM protocol binding info.
      */
     public BindingInfo getBindingInfo() {
-        return service.getServiceInfo().getBinding(BINDING_NAME);
+        return service.getServiceInfo().getBinding(bindingQName);
     }
 
     /**
@@ -225,12 +258,12 @@ public class RMEndpoint {
      * 
      * @return the replyTo address
      */
-    org.apache.cxf.ws.addressing.EndpointReferenceType getReplyTo() {
+    EndpointReferenceType getReplyTo() {
         return replyTo;
     }
 
     void initialise(Conduit c, 
-                    org.apache.cxf.ws.addressing.EndpointReferenceType r,
+                    EndpointReferenceType r,
                     org.apache.cxf.transport.Destination d) {
         conduit = c;
         replyTo = r;
@@ -241,47 +274,24 @@ public class RMEndpoint {
 
     void createService() {
         ServiceInfo si = new ServiceInfo();
-        si.setProperty(Schema.class.getName(), getSchema());
-        
-        si.setName(SERVICE_NAME);
+        serviceQName = new QName(encoderDecoder.getWSRMNamespace(), SERVICE_NAME);
+        si.setName(serviceQName);
         
         buildInterfaceInfo(si);
 
-        service = new WrappedService(applicationEndpoint.getService(), SERVICE_NAME, si);
+        service = new WrappedService(applicationEndpoint.getService(), serviceQName, si);
 
         DataBinding dataBinding = null;
+        Class create = encoderDecoder.getCreateSequenceType();
         try {
             JAXBContext ctx =
-                JAXBContext.newInstance(
-                    PackageUtils.getPackageName(CreateSequenceType.class),
-                    CreateSequenceType.class.getClassLoader());
+                JAXBContext.newInstance(PackageUtils.getPackageName(create), create.getClassLoader());
             dataBinding = new JAXBDataBinding(ctx);
         } catch (JAXBException e) {
             throw new ServiceConstructionException(e);
         }
         service.setDataBinding(dataBinding);
         service.setInvoker(servant);
-    }
-
-    private static synchronized Schema getSchema() {
-        if (rmSchema == null) {
-            try {
-                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                javax.xml.transform.Source ad = new StreamSource(RMEndpoint.class
-                                             .getResource("/schemas/wsdl/addressing.xsd")
-                                             .openStream(),
-                                             "http://schemas.xmlsoap.org/ws/2004/08/addressing");
-                javax.xml.transform.Source rm = new StreamSource(RMEndpoint.class
-                                                                 .getResource("/schemas/wsdl/wsrm.xsd")
-                                                                 .openStream());
-                
-                javax.xml.transform.Source schemas[] = new javax.xml.transform.Source[] {ad, rm};
-                rmSchema = factory.newSchema(schemas);
-            } catch (Exception ex) {
-                //ignore
-            }
-        }
-        return rmSchema;
     }
 
     void createEndpoint(org.apache.cxf.transport.Destination d) {
@@ -295,9 +305,9 @@ public class RMEndpoint {
         }
 
         ei.setAddress(aei.getAddress());
-
-        ei.setName(RMConstants.getPortName());
-        ei.setBinding(si.getBinding(BINDING_NAME));
+        
+        ei.setName(RMUtils.getConstants(encoderDecoder.getWSRMNamespace()).getPortName());
+        ei.setBinding(si.getBinding(bindingQName));
 
         // if addressing was enabled on the application endpoint by means
         // of the UsingAddressing element extensor, use this for the
@@ -352,7 +362,8 @@ public class RMEndpoint {
     }
 
     void buildInterfaceInfo(ServiceInfo si) {
-        InterfaceInfo ii = new InterfaceInfo(si, INTERFACE_NAME);
+        interfaceQName = new QName(encoderDecoder.getWSRMNamespace(), INTERFACE_NAME);
+        InterfaceInfo ii = new InterfaceInfo(si, interfaceQName);
         buildOperationInfo(ii);
     }
 
@@ -360,7 +371,7 @@ public class RMEndpoint {
         buildCreateSequenceOperationInfo(ii);
         buildTerminateSequenceOperationInfo(ii);
         buildSequenceAckOperationInfo(ii);
-        buildLastMessageOperationInfo(ii);
+        buildCloseSequenceOperationInfo(ii);
         buildAckRequestedOperationInfo(ii);
 
         // TODO: FaultInfo (SequenceFault)
@@ -371,42 +382,42 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessagePartInfo partInfo = null;
         MessageInfo messageInfo = null;
-
-        operationInfo = ii.addOperation(RMConstants.getCreateSequenceOperationName());
-        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceOperationName(),
+        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        operationInfo = ii.addOperation(consts.getCreateSequenceOperationName());
+        messageInfo = operationInfo.createMessage(consts.getCreateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_PART_NAME);
-        partInfo.setElementQName(RMConstants.getCreateSequenceOperationName());
+        partInfo.setElementQName(consts.getCreateSequenceOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(CreateSequenceType.class);
+        partInfo.setTypeClass(encoderDecoder.getCreateSequenceType());
 
-        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceResponseOperationName(),
+        messageInfo = operationInfo.createMessage(consts.getCreateSequenceResponseOperationName(),
                                                   MessageInfo.Type.OUTPUT);
         operationInfo.setOutput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_RESPONSE_PART_NAME);
-        partInfo.setElementQName(RMConstants.getCreateSequenceResponseOperationName());
+        partInfo.setElementQName(consts.getCreateSequenceResponseOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(CreateSequenceResponseType.class);
+        partInfo.setTypeClass(encoderDecoder.getCreateSequenceResponseType());
         partInfo.setIndex(0);
 
-        operationInfo = ii.addOperation(RMConstants.getCreateSequenceOnewayOperationName());
-        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceOperationName(),
+        operationInfo = ii.addOperation(consts.getCreateSequenceOnewayOperationName());
+        messageInfo = operationInfo.createMessage(consts.getCreateSequenceOnewayOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_PART_NAME);
-        partInfo.setElementQName(RMConstants.getCreateSequenceOperationName());
+        partInfo.setElementQName(consts.getCreateSequenceOnewayOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(CreateSequenceType.class);
+        partInfo.setTypeClass(encoderDecoder.getCreateSequenceType());
 
-        operationInfo = ii.addOperation(RMConstants.getCreateSequenceResponseOnewayOperationName());
-        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceResponseOperationName(),
+        operationInfo = ii.addOperation(consts.getCreateSequenceResponseOnewayOperationName());
+        messageInfo = operationInfo.createMessage(consts.getCreateSequenceResponseOnewayOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_RESPONSE_PART_NAME);
-        partInfo.setElementQName(RMConstants.getCreateSequenceResponseOperationName());
+        partInfo.setElementQName(consts.getCreateSequenceResponseOnewayOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(CreateSequenceResponseType.class);
+        partInfo.setTypeClass(encoderDecoder.getCreateSequenceResponseType());
     }
 
     void buildTerminateSequenceOperationInfo(InterfaceInfo ii) {
@@ -415,14 +426,15 @@ public class RMEndpoint {
         MessagePartInfo partInfo = null;
         MessageInfo messageInfo = null;
 
-        operationInfo = ii.addOperation(RMConstants.getTerminateSequenceOperationName());
-        messageInfo = operationInfo.createMessage(RMConstants.getTerminateSequenceOperationName(),
+        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        operationInfo = ii.addOperation(consts.getTerminateSequenceOperationName());
+        messageInfo = operationInfo.createMessage(consts.getTerminateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(TERMINATE_PART_NAME);
-        partInfo.setElementQName(RMConstants.getTerminateSequenceOperationName());
+        partInfo.setElementQName(consts.getTerminateSequenceOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(TerminateSequenceType.class);
+        partInfo.setTypeClass(encoderDecoder.getTerminateSequenceType());
     }
 
     void buildSequenceAckOperationInfo(InterfaceInfo ii) {
@@ -430,19 +442,21 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        operationInfo = ii.addOperation(RMConstants.getSequenceAckOperationName());
-        messageInfo = operationInfo.createMessage(RMConstants.getSequenceAckOperationName(),
+        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        operationInfo = ii.addOperation(consts.getSequenceAckOperationName());
+        messageInfo = operationInfo.createMessage(consts.getSequenceAckOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
 
-    void buildLastMessageOperationInfo(InterfaceInfo ii) {
+    void buildCloseSequenceOperationInfo(InterfaceInfo ii) {
 
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        operationInfo = ii.addOperation(RMConstants.getLastMessageOperationName());
-        messageInfo = operationInfo.createMessage(RMConstants.getLastMessageOperationName(),
+        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        operationInfo = ii.addOperation(consts.getCloseSequenceOperationName());
+        messageInfo = operationInfo.createMessage(consts.getCloseSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
@@ -452,8 +466,9 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        operationInfo = ii.addOperation(RMConstants.getAckRequestedOperationName());
-        messageInfo = operationInfo.createMessage(RMConstants.getAckRequestedOperationName(),
+        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        operationInfo = ii.addOperation(consts.getAckRequestedOperationName());
+        messageInfo = operationInfo.createMessage(consts.getAckRequestedOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
@@ -468,41 +483,43 @@ public class RMEndpoint {
             SoapVersion sv = sbi.getSoapVersion();
             String bindingId = sbi.getBindingId();
             SoapBindingInfo bi = new SoapBindingInfo(si, bindingId, sv);
-            bi.setName(BINDING_NAME);
+            bindingQName = new QName(encoderDecoder.getWSRMNamespace(), BINDING_NAME);
+            bi.setName(bindingQName);
             BindingOperationInfo boi = null;
 
-            boi = bi.buildOperation(RMConstants.getCreateSequenceOperationName(), RMConstants
-                .getCreateSequenceOperationName().getLocalPart(), null);
-            addAction(boi,
-                      RMConstants.getCreateSequenceAction(),
-                      RMConstants.getCreateSequenceResponseAction());
+            RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+            
+            boi = bi.buildOperation(consts.getCreateSequenceOperationName(),
+                                    consts.getCreateSequenceOperationName().getLocalPart(), null);
+            addAction(boi, consts.getCreateSequenceAction(), consts.getCreateSequenceResponseAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(RMConstants.getTerminateSequenceOperationName(), RMConstants
-                .getTerminateSequenceOperationName().getLocalPart(), null);
-            addAction(boi, RMConstants.getTerminateSequenceAction());
+            boi = bi.buildOperation(consts.getTerminateSequenceOperationName(),
+                                    consts.getTerminateSequenceOperationName().getLocalPart(), null);
+            addAction(boi, consts.getTerminateSequenceAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(RMConstants.getSequenceAckOperationName(), null, null);
-            addAction(boi, RMConstants.getSequenceAckAction());
+            boi = bi.buildOperation(consts.getSequenceAckOperationName(), null, null);
+            addAction(boi, consts.getSequenceAckAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(RMConstants.getLastMessageOperationName(), null, null);
-            addAction(boi, RMConstants.getLastMessageAction());
+            boi = bi.buildOperation(consts.getCloseSequenceOperationName(), null, null);
+            addAction(boi, consts.getCloseSequenceAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(RMConstants.getAckRequestedOperationName(), null, null);
-            addAction(boi, RMConstants.getAckRequestedAction());
+            boi = bi.buildOperation(consts.getAckRequestedOperationName(), null, null);
+            addAction(boi, consts.getAckRequestedAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(RMConstants.getCreateSequenceOnewayOperationName(), RMConstants
-                .getCreateSequenceOperationName().getLocalPart(), null);
-            addAction(boi, RMConstants.getCreateSequenceAction());
+            boi = bi.buildOperation(consts.getCreateSequenceOnewayOperationName(),
+                                    consts.getCreateSequenceOnewayOperationName().getLocalPart(), null);
+            addAction(boi, consts.getCreateSequenceAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(RMConstants.getCreateSequenceResponseOnewayOperationName(), RMConstants
-                .getCreateSequenceResponseOperationName().getLocalPart(), null);
-            addAction(boi, RMConstants.getCreateSequenceResponseAction());
+            boi = bi.buildOperation(consts.getCreateSequenceResponseOnewayOperationName(),
+                                    consts.getCreateSequenceResponseOnewayOperationName().getLocalPart(),
+                                    null);
+            addAction(boi, consts.getCreateSequenceResponseAction());
             bi.addOperation(boi);
 
             si.addBinding(bi);

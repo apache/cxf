@@ -23,10 +23,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.cxf.ws.rm.v200702.AckRequestedType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.v200702.SequenceType;
+
 public class RMProperties {
     private SequenceType sequence;
     private Collection<SequenceAcknowledgement> acks;
     private Collection<AckRequestedType> acksRequested;
+    private CloseSequenceType closeSequence;
+    private String namespaceURI;
     
     public Collection<SequenceAcknowledgement> getAcks() {
         return acks;
@@ -34,6 +41,10 @@ public class RMProperties {
     
     public Collection<AckRequestedType> getAcksRequested() {
         return acksRequested;
+    }
+    
+    public CloseSequenceType getCloseSequence() {
+        return closeSequence;
     }
     
     public SequenceType getSequence() {
@@ -50,6 +61,10 @@ public class RMProperties {
         acksRequested = new CopyOnWriteArrayList<AckRequestedType>(ar);       
     }
     
+    public void setCloseSequence(CloseSequenceType cs) {
+        closeSequence = cs;
+    }
+    
     public void setSequence(SequenceType s) {
         sequence = s;
     }
@@ -58,9 +73,6 @@ public class RMProperties {
         SequenceType s = RMUtils.getWSRMFactory().createSequenceType();
         s.setIdentifier(seq.getIdentifier());
         s.setMessageNumber(seq.getCurrentMessageNr());   
-        if (seq.isLastMessage()) {
-            s.setLastMessage(new SequenceType.LastMessage());
-        }
         setSequence(s);
     }
     
@@ -72,5 +84,22 @@ public class RMProperties {
         acks.add(ack);
         seq.acknowledgmentSent();
     }
-  
+    
+    /**
+     * Get the WS-ReliableMessaging namespace to be used for encoding and decoding messages.
+     * 
+     * @return
+     */
+    public String getNamespaceURI() {
+        return namespaceURI;
+    }
+    
+    /**
+     * Set the WS-ReliableMessaging namespace to be used for encoding and decoding messages.
+     * 
+     * @return namespace URI
+     */
+    public void exposeAs(String uri) {
+        namespaceURI = uri;
+    }
 }

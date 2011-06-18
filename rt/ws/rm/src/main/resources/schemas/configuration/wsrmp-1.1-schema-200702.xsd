@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright(C) OASIS(R) 1993-2007. All Rights Reserved.
+     OASIS trademark, IPR and other policies apply.  -->
+<xs:schema xmlns:tns="http://docs.oasis-open.org/ws-rx/wsrmp/200702" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://docs.oasis-open.org/ws-rx/wsrmp/200702" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:element name="RMAssertion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:anyAttribute namespace="##any" processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SequenceSTR">
+    <xs:complexType>
+      <xs:sequence/>
+      <xs:anyAttribute namespace="##any" processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SequenceTransportSecurity">
+    <xs:complexType>
+      <xs:sequence/>
+      <xs:anyAttribute namespace="##any" processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeliveryAssurance">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ExactlyOnce">
+    <xs:complexType>
+      <xs:sequence/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AtLeastOnce">
+    <xs:complexType>
+      <xs:sequence/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AtMostOnce">
+    <xs:complexType>
+      <xs:sequence/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InOrder">
+    <xs:complexType>
+      <xs:sequence/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

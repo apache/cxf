@@ -22,13 +22,13 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
   jaxb:extensionBindingPrefixes="xjc">
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd" node="/xs:schema">
+    <jaxb:bindings schemaLocation="wsrm-policy.xsd" node="/xs:schema">
         <jaxb:schemaBindings>
-            <jaxb:package name="org.apache.cxf.ws.rm.policy"/>
+            <jaxb:package name="org.apache.cxf.ws.rmp.v200502"/>
         </jaxb:schemaBindings>
         <jaxb:globalBindings generateIsSetMethod="true"/>
     </jaxb:bindings>
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd"
+    <jaxb:bindings schemaLocation="wsrm-policy.xsd"
          node="//xs:element[@name='AcknowledgementInterval']//xs:attribute[@name='Milliseconds']">
         <jaxb:property>
             <jaxb:baseType>
@@ -36,7 +36,7 @@
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd"
+    <jaxb:bindings schemaLocation="wsrm-policy.xsd"
          node="//xs:element[@name='BaseRetransmissionInterval']//xs:attribute[@name='Milliseconds']">
         <jaxb:property>
             <jaxb:baseType>
@@ -44,7 +44,7 @@
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd"
+    <jaxb:bindings schemaLocation="wsrm-policy.xsd"
          node="//xs:element[@name='InactivityTimeout']//xs:attribute[@name='Milliseconds']">
         <jaxb:property>
             <jaxb:baseType>

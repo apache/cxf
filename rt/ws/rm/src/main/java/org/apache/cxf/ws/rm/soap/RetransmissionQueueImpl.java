@@ -51,9 +51,9 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
-import org.apache.cxf.ws.rm.Identifier;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
@@ -61,11 +61,12 @@ import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.RetransmissionCallback;
 import org.apache.cxf.ws.rm.RetransmissionQueue;
-import org.apache.cxf.ws.rm.SequenceType;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.PolicyUtils;
-import org.apache.cxf.ws.rm.policy.RMAssertion;
+import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceType;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
 /**
  * 
@@ -282,8 +283,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             public synchronized Conduit selectConduit(Message message) {
                 Conduit conduit = null;
                 EndpointInfo endpointInfo = reliableEndpoint.getEndpointInfo();
-                org.apache.cxf.ws.addressing.EndpointReferenceType original = 
-                    endpointInfo.getTarget();
+                EndpointReferenceType original =  endpointInfo.getTarget();
                 try {
                     if (null != address) {
                         endpointInfo.setAddress(address);
@@ -390,7 +390,8 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             message = m;
             resends = 0;
             out = m.getContent(OutputStream.class);
-            RMAssertion rma = PolicyUtils.getRMAssertion(manager.getRMAssertion(), message);
+            org.apache.cxf.ws.rmp.v200502.RMAssertion rma = 
+                RM10PolicyUtils.getRMAssertion(manager.getRMAssertion(), message);
             long baseRetransmissionInterval = 
                 rma.getBaseRetransmissionInterval().getMilliseconds().longValue();
             backoff = null != rma.getExponentialBackoff() 

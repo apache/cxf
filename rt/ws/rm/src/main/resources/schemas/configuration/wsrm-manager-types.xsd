@@ -33,7 +33,7 @@
       </xs:documentation>
     </xs:annotation>
 
-    <xs:import namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd"/>
+    <xs:import namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" schemaLocation="wsrm-policy.xsd"/>
 
     <xs:complexType name="SourcePolicyType">
         <xs:annotation>
@@ -204,11 +204,27 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+    
+<!--    <xs:simpleType name="RM10AddressingNamespaceType">
+      <xs:annotation>
+        <xs:documentation>
+            The WS-Addressing namespace to be used for WS-ReliableMessaging 1.0.
+            For the client, this determines the addressing namespace used when sending
+            requests to the server. Both client and server will accept either namespace
+            in incoming messages.
+        </xs:documentation>          
+      </xs:annotation>
+       <xs:restriction base="xs:anyURI">
+       	<xs:enumeration value="http://schemas.xmlsoap.org/ws/2004/08/addressing"/>
+       	<xs:enumeration value="http://www.w3.org/2005/08/addressing"/>
+       </xs:restriction>
+    </xs:simpleType>  -->
 
  
     <xs:element name="deliveryAssurance" type="tns:DeliveryAssuranceType"/>
     <xs:element name="sourcePolicy" type="tns:SourcePolicyType"/>
     <xs:element name="destinationPolicy" type="tns:DestinationPolicyType"/>
+<!--    <xs:element name="rm10AddressingNamespace" type="tns:RM10AddressingNamespaceType"/> -->
 
     <!--
     <xs:complexType name="RMManagerConfigBean">

@@ -21,6 +21,8 @@ package org.apache.cxf.ws.rm;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
+
 /**
  * 
  */
@@ -56,7 +58,7 @@ public class SequenceFault extends Exception {
     }
     
     public QName getSubCode() {
-        return sequenceFault.faultCode;
+        return sequenceFault.getFaultCode();
     }
     
     public String getReason() {

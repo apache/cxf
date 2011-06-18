@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;

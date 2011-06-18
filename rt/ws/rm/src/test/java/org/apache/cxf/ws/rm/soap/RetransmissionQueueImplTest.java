@@ -27,21 +27,21 @@ import java.util.concurrent.Executor;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.rm.Identifier;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
-import org.apache.cxf.ws.rm.SequenceType;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RMAssertion;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceType;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 
 /**
  * Test resend logic.
@@ -55,16 +55,11 @@ public class RetransmissionQueueImplTest extends Assert {
     private Executor executor;
     private RetransmissionQueueImpl queue;
     private TestResender resender;
-    private List<Message> messages =
-        new ArrayList<Message>();
-    private List<RMProperties> properties =
-        new ArrayList<RMProperties>();
-    private List<SequenceType> sequences =
-        new ArrayList<SequenceType>();
-    private List<Identifier> identifiers =
-        new ArrayList<Identifier>();
-    private List<Object> mocks =
-        new ArrayList<Object>();
+    private List<Message> messages = new ArrayList<Message>();
+    private List<RMProperties> properties = new ArrayList<RMProperties>();
+    private List<SequenceType> sequences = new ArrayList<SequenceType>();
+    private List<Identifier> identifiers = new ArrayList<Identifier>();
+    private List<Object> mocks = new ArrayList<Object>();
     private RMAssertion rma;
     
     @Before

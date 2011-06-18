@@ -28,9 +28,14 @@ import javax.xml.datatype.Duration;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.ws.addressing.ContextUtils;
-import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
+import org.apache.cxf.ws.rm.v200702.Expires;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
+// TODO: handle lastMessage
 public class SourceSequence extends AbstractSequence {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SourceSequence.class);
@@ -40,7 +45,7 @@ public class SourceSequence extends AbstractSequence {
     private long currentMessageNumber;
     private boolean lastMessage;
     private Identifier offeringId;
-    private org.apache.cxf.ws.addressing.EndpointReferenceType target;
+    private EndpointReferenceType target;
 
     public SourceSequence(Identifier i) {
         this(i, null, null);
@@ -235,13 +240,13 @@ public class SourceSequence extends AbstractSequence {
      * 
      * @param to
      */
-    synchronized void setTarget(org.apache.cxf.ws.addressing.EndpointReferenceType to) {
+    synchronized void setTarget(EndpointReferenceType to) {
         if (target == null && !ContextUtils.isGenericAddress(to)) {
             target = to;
         }
     }
 
-    synchronized org.apache.cxf.ws.addressing.EndpointReferenceType getTarget() {
+    synchronized EndpointReferenceType getTarget() {
         return target;
     }
 

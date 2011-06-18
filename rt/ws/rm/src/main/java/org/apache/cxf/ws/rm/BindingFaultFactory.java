@@ -20,13 +20,14 @@
 package org.apache.cxf.ws.rm;
 
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
 
 /**
  * 
  */
 public interface BindingFaultFactory {
       
-    Fault createFault(SequenceFault sf);
+    Fault createFault(SequenceFault sf, Message msg);
     
     String toString(Fault f);
     

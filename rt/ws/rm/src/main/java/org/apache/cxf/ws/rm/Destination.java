@@ -37,6 +37,9 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
+import org.apache.cxf.ws.rm.v200702.AckRequestedType;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 public class Destination extends AbstractEndpoint {
     
@@ -95,7 +98,8 @@ public class Destination extends AbstractEndpoint {
      *             <code>sequenceType</code> does not exist
      */
     public void acknowledge(Message message) throws SequenceFault, RMException {
-        SequenceType sequenceType = RMContextUtils.retrieveRMProperties(message, false).getSequence();
+        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+        SequenceType sequenceType = rmps.getSequence();
         if (null == sequenceType) {
             return;
         }
@@ -106,7 +110,7 @@ public class Destination extends AbstractEndpoint {
             if (seq.applyDeliveryAssurance(sequenceType.getMessageNumber(), message)) {
                 seq.acknowledge(message);
     
-                if (null != sequenceType.getLastMessage()) {
+                if (null != rmps.getCloseSequence()) {
                     seq.setLastMessageNumber(sequenceType.getMessageNumber());
                     ackImmediately(seq, message);
                 }
@@ -130,7 +134,8 @@ public class Destination extends AbstractEndpoint {
                 }
             }
         } else {
-            SequenceFaultFactory sff = new SequenceFaultFactory();
+            RMConstants consts = getReliableEndpoint().getEncoderDecoder().getConstants();
+            SequenceFaultFactory sff = new SequenceFaultFactory(consts);
             throw sff.createUnknownSequenceFault(sequenceType.getIdentifier());
         }
 

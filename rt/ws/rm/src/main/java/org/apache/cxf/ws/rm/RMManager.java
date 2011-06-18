@@ -53,26 +53,43 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
+import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.VersionTransformer;
-import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RMAssertion;
-import org.apache.cxf.ws.rm.policy.RMAssertion.BaseRetransmissionInterval;
 import org.apache.cxf.ws.rm.soap.RetransmissionQueueImpl;
 import org.apache.cxf.ws.rm.soap.SoapFaultFactory;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
+import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceType;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion.ExponentialBackoff;
 
 /**
  * 
  */
 public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListener {
+    
+    /**
+     * Message contextual property giving WS-ReliableMessaging namespace.
+     */
+    public static final String WSRM_VERSION_PROPERTY = "org.apache.cxf.ws.rm.namespace";
+    
+    /**
+     * Message contextual property giving addressing namespace to be used by WS-RM implementation.
+     */
+    public static final String WSRM10_WSA_VERSION_PROPERTY = "org.apache.cxf.ws.rm.wsa-namespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMManager.class);
+
 
     private Bus bus;
     private RMStore store;
@@ -84,6 +101,8 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     private DeliveryAssuranceType deliveryAssurance;
     private SourcePolicyType sourcePolicy;
     private DestinationPolicyType destinationPolicy;
+    private String rmNamespace = RM10Constants.NAMESPACE_URI;
+    private String rmAddressingNamespace = Names200408.WSA_NAMESPACE_NAME;
     
     // ServerLifeCycleListener
     
@@ -117,6 +136,22 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     }
 
     // Configuration
+
+    public String getRMNamespace() {
+        return rmNamespace;
+    }
+
+    public void setRMNamespace(String uri) {
+        rmNamespace = uri;
+    }
+
+    public String getRMAddressingNamespace() {
+        return rmAddressingNamespace;
+    }
+
+    public void setRMAddressingNamespace(String uri) {
+        rmAddressingNamespace = uri;
+    }
     
     public Bus getBus() {
         return bus;
@@ -211,14 +246,13 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
      * @param rma The rmAssertion to set.
      */
     public void setRMAssertion(RMAssertion rma) {
-        org.apache.cxf.ws.rm.policy.ObjectFactory factory = new org.apache.cxf.ws.rm.policy.ObjectFactory();
         if (null == rma) {
-            rma = factory.createRMAssertion();
-            rma.setExponentialBackoff(factory.createRMAssertionExponentialBackoff());
+            rma = new RMAssertion();
+            rma.setExponentialBackoff(new ExponentialBackoff());
         }
         BaseRetransmissionInterval bri = rma.getBaseRetransmissionInterval();
         if (null == bri) {
-            bri = factory.createRMAssertionBaseRetransmissionInterval();
+            bri = new BaseRetransmissionInterval();
             rma.setBaseRetransmissionInterval(bri);
         }
         if (null == bri.getMilliseconds()) {
@@ -243,7 +277,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         if (null == sp) {
             sp = factory.createSourcePolicyType();
         }
-        if (!sp.isSetSequenceTerminationPolicy()) {
+        if (sp.getSequenceTerminationPolicy() == null) {
             sp.setSequenceTerminationPolicy(factory.createSequenceTerminationPolicyType());
         }
         sourcePolicy = sp;
@@ -257,15 +291,35 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Getting RMEndpoint for endpoint with info: " + name);
         }
-        if (name.equals(RMConstants.getPortName())) {
+        if (name.equals(RM10Constants.PORT_NAME) || name.equals(RM11Constants.PORT_NAME)) {
             WrappedEndpoint wrappedEndpoint = (WrappedEndpoint)endpoint;
             endpoint = wrappedEndpoint.getWrappedEndpoint();
         }
         RMEndpoint rme = reliableEndpoints.get(endpoint);
         if (null == rme) {
-            rme = createReliableEndpoint(endpoint);
+            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+            String rmUri = null;
+            if (rmps != null) {
+                rmUri = rmps.getNamespaceURI();
+            }
+            if (rmUri == null) {
+                rmUri = getRMNamespace();
+            }
+            String addrUri = null;
+            if (RM10Constants.NAMESPACE_URI.equals(rmUri)) {
+                AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
+                if (maps != null) {
+                    addrUri = maps.getNamespaceURI();
+                }
+                if (addrUri == null) {
+                    addrUri = getRMAddressingNamespace();
+                }
+            } else {
+                addrUri = Names.WSA_ADDRESS_NAME;
+            }
+            rme = createReliableEndpoint(endpoint, VersionTransformer.getEncoderDecoder(rmUri, addrUri));
             org.apache.cxf.transport.Destination destination = message.getExchange().getDestination();
-            org.apache.cxf.ws.addressing.EndpointReferenceType replyTo = null;
+            EndpointReferenceType replyTo = null;
             if (null != destination) {
                 AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
                 replyTo = maps.getReplyTo();
@@ -299,21 +353,21 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     }
 
     public SourceSequence getSequence(Identifier inSeqId, Message message, AddressingProperties maps)
-        throws SequenceFault, RMException {
+        throws RMException {
 
         Source source = getSource(message);
         SourceSequence seq = source.getCurrent(inSeqId);
         if (null == seq || seq.isExpired()) {
             // TODO: better error handling
-            org.apache.cxf.ws.addressing.EndpointReferenceType to = null;
+            EndpointReferenceType to = null;
             boolean isServer = RMContextUtils.isServerSide(message);
             EndpointReferenceType acksTo = null;
             RelatesToType relatesTo = null;
             if (isServer) {
 
                 AddressingPropertiesImpl inMaps = RMContextUtils.retrieveMAPs(message, false, false);
-                inMaps.exposeAs(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
-                acksTo = RMUtils.createReference2004(inMaps.getTo().getValue());
+                inMaps.exposeAs(getRMAddressingNamespace());
+                acksTo = RMUtils.createReference(inMaps.getTo().getValue());
                 to = inMaps.getReplyTo();
                 source.getReliableEndpoint().getServant().setUnattachedIdentifier(inSeqId);
                 relatesTo = (new org.apache.cxf.ws.addressing.ObjectFactory()).createRelatesToType();
@@ -323,17 +377,17 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
 
             } else {
                 to = RMUtils.createReference(maps.getTo().getValue());
-                acksTo = VersionTransformer.convert(maps.getReplyTo());
-                if (RMConstants.getNoneAddress().equals(acksTo.getAddress().getValue())) {
+                acksTo = maps.getReplyTo();
+                if (RMUtils.getAddressingConstants().getNoneURI().equals(acksTo.getAddress().getValue())) {
                     Endpoint ei = message.getExchange().get(Endpoint.class);
                     org.apache.cxf.transport.Destination dest 
                         = ei == null ? null : ei.getEndpointInfo()
                                 .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
                                          org.apache.cxf.transport.Destination.class);
                     if (null == dest) {
-                        acksTo = RMUtils.createAnonymousReference2004();
+                        acksTo = RMUtils.createAnonymousReference();
                     } else {
-                        acksTo = VersionTransformer.convert(dest.getAddress());
+                        acksTo = dest.getAddress();
                     }
                 }
             }
@@ -350,7 +404,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         }
 
         return seq;
-    }    
+    }
 
     @PreDestroy
     public void shutdown() {
@@ -407,7 +461,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         
         LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
                 new Object[] {null == conduit ? "client" : "server", id});
-        RMEndpoint rme = createReliableEndpoint(endpoint);
+        RMEndpoint rme = createReliableEndpoint(endpoint, null);
         rme.initialise(conduit, null, null);
         reliableEndpoints.put(endpoint, rme);
         SourceSequence css = null;
@@ -447,11 +501,13 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                 SequenceType st = RMUtils.getWSRMFactory().createSequenceType();
                 st.setIdentifier(ss.getIdentifier());
                 st.setMessageNumber(m.getMessageNumber());
-                if (ss.isLastMessage() && ss.getCurrentMessageNr() == m.getMessageNumber()) {
-                    st.setLastMessage(RMUtils.getWSRMFactory().createSequenceTypeLastMessage());
-                }
                 RMProperties rmps = new RMProperties();
                 rmps.setSequence(st);
+                if (ss.isLastMessage() && ss.getCurrentMessageNr() == m.getMessageNumber()) {
+                    CloseSequenceType close = RMUtils.getWSRMFactory().createCloseSequenceType();
+                    close.setIdentifier(ss.getIdentifier());
+                    rmps.setCloseSequence(close);
+                }
                 RMContextUtils.storeRMProperties(message, rmps, true);                
                 if (null == conduit) {
                     String to = m.getTo();
@@ -473,8 +529,8 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         
     }
     
-    RMEndpoint createReliableEndpoint(Endpoint endpoint) {
-        return new RMEndpoint(this, endpoint);
+    RMEndpoint createReliableEndpoint(Endpoint endpoint, EncoderDecoder codec) {
+        return new RMEndpoint(this, endpoint, codec);
     }  
     
     public void init(Bus b) {
@@ -493,14 +549,12 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         if (null == deliveryAssurance) {
             da.setAtLeastOnce(factory.createDeliveryAssuranceTypeAtLeastOnce());
             setDeliveryAssurance(da);
-        } else if (deliveryAssurance.isSetExactlyOnce()) {
-            if (!deliveryAssurance.isSetAtMostOnce()) {
-                deliveryAssurance.setAtMostOnce(
-                    factory.createDeliveryAssuranceTypeAtMostOnce());
+        } else if (deliveryAssurance.getExactlyOnce() != null) {
+            if (deliveryAssurance.getAtMostOnce() == null) {
+                deliveryAssurance.setAtMostOnce(factory.createDeliveryAssuranceTypeAtMostOnce());
             }
-            if (!deliveryAssurance.isSetAtLeastOnce()) {
-                deliveryAssurance.setAtLeastOnce(
-                    factory.createDeliveryAssuranceTypeAtLeastOnce());
+            if (deliveryAssurance.getAtLeastOnce() == null) {
+                deliveryAssurance.setAtLeastOnce(factory.createDeliveryAssuranceTypeAtLeastOnce());
             }
         }
         if (null == sourcePolicy) {
@@ -553,7 +607,4 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             return sid;
         }
     }
-
-    
-
 }

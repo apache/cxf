@@ -23,7 +23,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
-import org.apache.cxf.ws.addressing.VersionTransformer;
 
 /**
  * Holder for utility methods relating to contexts.
@@ -61,12 +60,7 @@ public final class RMContextUtils {
      * @return true iff the action is not one of the RM protocol actions.
      */
     public static boolean isRMProtocolMessage(String action) {
-        return RMConstants.getCreateSequenceAction().equals(action)
-            || RMConstants.getCreateSequenceResponseAction().equals(action)
-            || RMConstants.getTerminateSequenceAction().equals(action)
-            || RMConstants.getLastMessageAction().equals(action)
-            || RMConstants.getSequenceAcknowledgmentAction().equals(action)
-            || RMConstants.getSequenceInfoAction().equals(action);
+        return RM10Constants.ACTIONS.contains(action) || RM11Constants.ACTIONS.contains(action);
     }
 
     /**
@@ -138,15 +132,6 @@ public final class RMContextUtils {
     public static void storeMAPs(AddressingProperties maps, Message message, boolean isOutbound,
                                  boolean isRequestor) {
         org.apache.cxf.ws.addressing.ContextUtils.storeMAPs(maps, message, isOutbound, isRequestor);
-    }
-
-    /**
-     * Ensures the appropriate version of WS-Addressing is used.
-     * 
-     * @param maps the addressing properties
-     */
-    public static void ensureExposedVersion(AddressingProperties maps) {
-        ((AddressingPropertiesImpl)maps).exposeAs(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
     }
 
     public static String getRMPropertiesKey(boolean outbound) {

@@ -112,8 +112,24 @@
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <xsdOptions>
                                 <xsdOption>
-                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/wsrm.xsd</xsd>
-                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/wsrm.xjb</bindingFile>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/wsrm-1.0.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/wsrm-1.0.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <deleteDirs>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/ws/addressing</deleteDir>
+                                    </deleteDirs>
+                                </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/wsrm-1.0-wsa15.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/wsrm-1.0-wsa15.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <deleteDirs>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/ws/addressing</deleteDir>
+                                    </deleteDirs>
+                                </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/wsrm-1.1.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/wsrm-1.1.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/ws/addressing</deleteDir>
@@ -127,7 +143,16 @@
                                     <extensionArgs>
                                         <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
-                                    `</xsdOption>
+                                 </xsdOption>
+                                 <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/configuration/wsrmp-1.1-schema-200702.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/configuration/wsrmp-1.1-schema-200702.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <extension>true</extension>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
+                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
                         <goals>

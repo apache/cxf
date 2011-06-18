@@ -19,8 +19,9 @@
 
 package org.apache.cxf.ws.rm;
 
-import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
-
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
 public abstract class AbstractSequence {
     
@@ -37,7 +38,7 @@ public abstract class AbstractSequence {
     public Identifier getIdentifier() {
         return id;
     }
-    
+
     public String toString() {
         return id.getValue();
     }

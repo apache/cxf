@@ -20,5 +20,9 @@
 
 
 SYSTEM "http://schemas.xmlsoap.org/ws/2004/08/addressing" "../../../../../../api/src/main/resources/schemas/wsdl/addressing.xsd"
+SYSTEM "http://www.w3.org/2006/03/addressing/ws-addr.xsd" "../../../../../../api/src/main/resources/schemas/wsdl/ws-addr.xsd"
 
-SYSTEM "http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd" "../resources/schemas/configuration/wsrm-policy.xsd" 
+SYSTEM "http://docs.oasis-open.org/ws-rx/wsrm/200702" "../resources/schemas/wsdl/wsrm-1.1.xsd"
+
+SYSTEM "http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd" "../resources/schemas/configuration/wsrm-policy.xsd"
+SYSTEM "http://docs.oasis-open.org/ws-rx/wsrmp/200702" "../resources/schemas/configuration/wsrmp-1.1-schema-200702.xsd"

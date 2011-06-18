@@ -35,6 +35,10 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
+import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
+import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
+import org.apache.cxf.ws.rm.v200702.Expires;
+import org.apache.cxf.ws.rm.v200702.OfferType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
@@ -79,6 +83,7 @@ public class ServantTest extends Assert {
 
         EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
         EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
+        EasyMock.expect(rme.getEncoderDecoder()).andReturn(EncoderDecoder11Impl.INSTANCE).anyTimes();
 
         control.replay();
 
@@ -105,7 +110,7 @@ public class ServantTest extends Assert {
         expires.setValue(DatatypeFactory.createDuration("P0Y0M0DT0H0M0.0S"));
         Message message = createTestCreateSequenceMessage(expires, null);
 
-        CreateSequenceResponseType csr = servant.createSequence(message);
+        CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
         
         Expires expires2 = csr.getExpires();
         
@@ -125,7 +130,7 @@ public class ServantTest extends Assert {
         expires.setValue(DURATION_DEFAULT);
         Message message = createTestCreateSequenceMessage(expires, null);
 
-        CreateSequenceResponseType csr = servant.createSequence(message);
+        CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
         
         Expires expires2 = csr.getExpires();
         
@@ -145,7 +150,7 @@ public class ServantTest extends Assert {
     
         Message message = createTestCreateSequenceMessage(expires, null);        
 
-        CreateSequenceResponseType csr = servant.createSequence(message);
+        CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
         
         Expires expires2 = csr.getExpires();
         
@@ -166,7 +171,7 @@ public class ServantTest extends Assert {
         
         Message message = createTestCreateSequenceMessage(expires, null);        
         
-        CreateSequenceResponseType csr = servant.createSequence(message);
+        CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
         
         Expires expires2 = csr.getExpires();
         
@@ -187,7 +192,7 @@ public class ServantTest extends Assert {
         AttributedURIType id = ContextUtils.getAttributedURI(msgId);
         maps.setMessageID(id);
 
-        maps.setAction(ContextUtils.getAttributedURI(RMConstants.getCreateSequenceAction()));
+        maps.setAction(ContextUtils.getAttributedURI(RM10Constants.INSTANCE.getCreateSequenceAction()));
         maps.setTo(ContextUtils.getAttributedURI(SERVICE_URL));
 
         maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
@@ -195,7 +200,7 @@ public class ServantTest extends Assert {
         message.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
         
         CreateSequenceType cs = RMUtils.getWSRMFactory().createCreateSequenceType();
-        cs.setAcksTo(RMUtils.createReference2004(DECOUPLED_URL));
+        cs.setAcksTo(RMUtils.createReference(DECOUPLED_URL));
 
         cs.setExpires(expires);
         cs.setOffer(offer);

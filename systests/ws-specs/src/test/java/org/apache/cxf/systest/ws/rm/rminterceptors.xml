@@ -47,7 +47,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
                 <ref bean="rmLogicalIn"/>
                 <ref bean="rmCodec"/>
                 <ref bean="rmDelivery"/>
-                <!-- bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /-->
+                <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
         </cxf:inInterceptors>
         <cxf:inFaultInterceptors>
                 <ref bean="mapAggregator"/>
@@ -55,14 +55,14 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
                 <ref bean="rmLogicalIn"/>
                 <ref bean="rmCodec"/>
                 <ref bean="rmDelivery"/>
-                <!--bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /-->
+                <!-- bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /-->
         </cxf:inFaultInterceptors>
         <cxf:outInterceptors>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
                 <ref bean="rmLogicalOut"/>
                 <ref bean="rmCodec"/>
-                <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+                <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
         </cxf:outInterceptors>
         <cxf:outFaultInterceptors>
                 <ref bean="mapAggregator"/>
