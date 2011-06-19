@@ -193,15 +193,12 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
     }
     
     /**
-     * Encode the SeuqnceFault in protocol-specific header.
+     * Encode the SequenceFault in protocol-specific header.
      *
      * @param message the SOAP message.
      * @param sf the SequenceFault.
      */
     public static void encodeFault(SoapMessage message, SequenceFault sf) {
-        if (null == sf.getSequenceFault()) {
-            return;
-        }
         LOG.log(Level.FINE, "Encoding SequenceFault in SOAP header");
         try {
             List<Header> headers = message.getHeaders();
@@ -277,11 +274,16 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                     }
                     if (rmUri != null && rmUri.equals(ns)) {
                         if (codec == null) {
-                            AddressingProperties maps =
-                                RMContextUtils.retrieveMAPs(message, false, false);
-                            codec = VersionTransformer.getEncoderDecoder(rmUri, maps.getNamespaceURI());
+                            String wsauri = null;
+                            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+                            if (maps == null) {
+                                wsauri = getManager(message).getRMAddressingNamespace();
+                            } else {
+                                wsauri = maps.getNamespaceURI();
+                            }
+                            codec = VersionTransformer.getEncoderDecoder(rmUri, wsauri);
                             if (codec == null) {
-                                LOG.log(Level.WARNING, "NAMESPACE_ERROR_MSG", maps.getNamespaceURI()); 
+                                LOG.log(Level.WARNING, "NAMESPACE_ERROR_MSG", wsauri); 
                                 break;
                             }
                         }

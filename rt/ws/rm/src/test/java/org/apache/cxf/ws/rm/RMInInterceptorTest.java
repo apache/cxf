@@ -252,7 +252,7 @@ public class RMInInterceptorTest extends Assert {
             interceptor.processAcknowledgments(rme, rmps);
             fail("Expected SequenceFault not thrown");
         } catch (SequenceFault sf) {
-            assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, sf.getSequenceFault().getFaultCode());
+            assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, sf.getFaultCode());
         }
     }
     

@@ -106,7 +106,9 @@
   </xs:complexType>
   <xs:complexType name="DetailType">
     <xs:sequence>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      <!-- modified schema to more-closely match the specification, changing the
+        namespace to ##any -->
+      <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>

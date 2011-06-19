@@ -71,7 +71,7 @@ public class SoapFaultFactory implements BindingFaultFactory {
     Fault createSoap11Fault(SequenceFault sf) {
         SoapFault fault = new SoapFault(sf.getReason(),
             sf.isSender() ? version.getSender() : version.getReceiver());
-        fault.setSubCode(sf.getSubCode());
+        fault.setSubCode(sf.getFaultCode());
         return fault;
     }
     

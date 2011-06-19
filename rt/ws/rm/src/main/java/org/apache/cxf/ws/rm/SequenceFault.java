@@ -21,32 +21,23 @@ package org.apache.cxf.ws.rm;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.ws.rm.v200702.Identifier;
+import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 /**
- * 
+ * Holder for SequenceFault information.
  */
-
 public class SequenceFault extends Exception {
     
-    private SequenceFaultType sequenceFault;
     private boolean sender;
+    private QName faultCode;
     private Object detail;
+    private Element extraDetail;
 
     public SequenceFault(String message) {
         super(message);
-    }
-
-    public SequenceFault(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public SequenceFaultType getSequenceFault() {
-        return sequenceFault;
-    }
-    
-    public void setSequenceFault(SequenceFaultType sf) {
-        sequenceFault = sf;
     }
     
     public boolean isSender() {
@@ -57,19 +48,70 @@ public class SequenceFault extends Exception {
         sender = s;
     }
     
-    public QName getSubCode() {
-        return sequenceFault.getFaultCode();
-    }
-    
     public String getReason() {
         return getMessage();
     }
     
-    public void setDetail(Object d) {
+    public QName getFaultCode() {
+        return faultCode;
+    }
+
+    public void setFaultCode(QName faultCode) {
+        this.faultCode = faultCode;
+    }
+
+    /**
+     * Set detail content as arbitrary element.
+     * 
+     * @param d (<code>null</code> if none)
+     */
+    public void setDetail(Element d) {
+        detail = d;
+    }
+
+    /**
+     * Set detail content as Identifier.
+     * 
+     * @param d (<code>null</code> if none)
+     */
+    public void setDetail(Identifier d) {
+        detail = d;
+    }
+
+    /**
+     * Set detail content as SequenceAcknowledgement.
+     * 
+     * @param d (<code>null</code> if none)
+     */
+    public void setDetail(SequenceAcknowledgement d) {
         detail = d;
     }
     
+    /**
+     * Get Fault detail object, which may be an {@link Element}, an {@link Identifier}, or a
+     * {@link SequenceAcknowledgement}.
+     * 
+     * @return detail object (<code>null</code> if none)
+     */
     public Object getDetail() {
         return detail;
+    }
+
+    /**
+     * Get extra element appended to main fault detail.
+     * 
+     * @return element (<code>null</code> if none)
+     */
+    public Element getExtraDetail() {
+        return extraDetail;
+    }
+
+    /**
+     * Set extra element appended to main fault detail.
+     * 
+     * @param ex (<code>null</code> if none)
+     */
+    public void setExtraDetail(Element ex) {
+        extraDetail = ex;
     }
 }

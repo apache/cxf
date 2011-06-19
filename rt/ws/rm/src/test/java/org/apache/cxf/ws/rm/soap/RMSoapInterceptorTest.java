@@ -58,7 +58,6 @@ import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -234,17 +233,15 @@ public class RMSoapInterceptorTest extends Assert {
         // fault is a SoapFault and has a SequenceFault cause
         
         message = setupOutboundFaultMessage();
-        SequenceFaultType sft = RMUtils.getWSRMFactory().createSequenceFaultType();
-        sft.setFaultCode(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME);
         SequenceFault sf = new SequenceFault("REASON");
-        sf.setSequenceFault(sft);
+        sf.setFaultCode(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME);
         Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
         sid.setValue("SID");
         sf.setSender(true);
         f.initCause(sf);
         message.setContent(Exception.class, f);      
         codec.encode(message);
-//        verifyHeaders(message, new String[] {RMConstants.SEQUENCE_FAULT_NAME});
+        verifyHeaders(message, new String[] {RMConstants.SEQUENCE_FAULT_NAME});
 
     }
 

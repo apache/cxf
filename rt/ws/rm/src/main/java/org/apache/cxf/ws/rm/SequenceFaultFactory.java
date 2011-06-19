@@ -25,11 +25,10 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
+
 /**
  * Utility class to construct SequenceFaults.
  */
-
 class SequenceFaultFactory {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SequenceFaultFactory.class);
@@ -41,58 +40,46 @@ class SequenceFaultFactory {
     }
     
     SequenceFault createUnknownSequenceFault(Identifier sid) {
-        SequenceFaultType sf = RMUtils.getWSRMFactory().createSequenceFaultType();
-        sf.setFaultCode(constants.getUnknownSequenceFaultCode());
         Message msg = new Message("UNKNOWN_SEQ_EXC", BUNDLE);
         SequenceFault fault = new SequenceFault(msg.toString());
-        fault.setSequenceFault(sf);
         fault.setDetail(sid);
         fault.setSender(true);
+        fault.setFaultCode(constants.getUnknownSequenceFaultCode());
         return fault;
     } 
     
     SequenceFault createSequenceTerminatedFault(Identifier sid, boolean sender) {
-        SequenceFaultType sf = RMUtils.getWSRMFactory().createSequenceFaultType();
-        sf.setFaultCode(constants.getSequenceTerminatedFaultCode());
         Message msg = new Message("SEQ_TERMINATED_EXC", BUNDLE);
         SequenceFault fault = new SequenceFault(msg.toString());
-        fault.setSequenceFault(sf);
         fault.setDetail(sid);
         fault.setSender(sender);
+        fault.setFaultCode(constants.getSequenceTerminatedFaultCode());
         return fault;
     }
     
     SequenceFault createInvalidAcknowledgementFault(SequenceAcknowledgement ack) {
-        SequenceFaultType sf = RMUtils.getWSRMFactory().createSequenceFaultType();
-        sf.setFaultCode(constants.getInvalidAcknowledgmentFaultCode());
         Message msg = new Message("INVALID_ACK_EXC", BUNDLE);
         SequenceFault fault = new SequenceFault(msg.toString());
-        fault.setSequenceFault(sf);
         fault.setDetail(ack);
         fault.setSender(true);
+        fault.setFaultCode(constants.getInvalidAcknowledgmentFaultCode());
         return fault;
     }
     
     SequenceFault createMessageNumberRolloverFault(Identifier sid) {
-        SequenceFaultType sf = RMUtils.getWSRMFactory().createSequenceFaultType();
-        sf.setFaultCode(constants.getMessageNumberRolloverFaultCode());
         Message msg = new Message("MESSAGE_NR_ROLLOVER_EXC", BUNDLE);
         SequenceFault fault = new SequenceFault(msg.toString());
-        fault.setSequenceFault(sf);
         fault.setDetail(sid);
         fault.setSender(true);
+        fault.setFaultCode(constants.getMessageNumberRolloverFaultCode());
         return fault;
     }
     
     SequenceFault createCreateSequenceRefusedFault() {
-        SequenceFaultType sf = RMUtils.getWSRMFactory().createSequenceFaultType();
-        sf.setFaultCode(constants.getCreateSequenceRefusedFaultCode());
         Message msg = new Message("CREATE_SEQ_REFUSED", BUNDLE);
         SequenceFault fault = new SequenceFault(msg.toString());
-        fault.setSequenceFault(sf);
         fault.setSender(true);
+        fault.setFaultCode(constants.getCreateSequenceRefusedFaultCode());
         return fault;
     }
-    
-    
 }

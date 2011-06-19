@@ -149,8 +149,25 @@ public final class EncoderDecoder11Impl implements EncoderDecoder {
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         QName fqname = RM11Constants.SEQUENCE_FAULT_QNAME;
-        marshaller.marshal(new JAXBElement<SequenceFaultType>(fqname, SequenceFaultType.class,
-            sf.getSequenceFault()), header);
+        SequenceFaultType flt = new SequenceFaultType();
+        flt.setFaultCode(sf.getFaultCode());
+        Object detail = sf.getDetail();
+        if (detail instanceof Element) {
+            flt.getAny().add(detail);
+        } else if (detail instanceof Identifier) {
+            marshaller.marshal(detail, doc);
+        } else if (detail instanceof SequenceAcknowledgement) {
+            marshaller.marshal(detail, doc);
+        }
+        Element data = doc.getDocumentElement();
+        if (data != null) {
+            flt.getDetail().getAny().add(data);
+        }
+        data = sf.getExtraDetail();
+        if (data != null) {
+            flt.getDetail().getAny().add(data);
+        }
+        marshaller.marshal(new JAXBElement<SequenceFaultType>(fqname, SequenceFaultType.class, flt), header);
         return header;
     }
 

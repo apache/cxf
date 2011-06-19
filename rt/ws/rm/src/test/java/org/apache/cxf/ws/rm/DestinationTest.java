@@ -122,7 +122,7 @@ public class DestinationTest extends Assert {
             destination.acknowledge(message);   
             fail("Expected SequenceFault not thrown.");
         } catch (SequenceFault ex) {
-            assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, ex.getSequenceFault().getFaultCode());
+            assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, ex.getFaultCode());
         }
     }
     

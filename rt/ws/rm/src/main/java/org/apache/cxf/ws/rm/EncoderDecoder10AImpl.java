@@ -43,7 +43,6 @@ import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
@@ -151,8 +150,24 @@ public final class EncoderDecoder10AImpl implements EncoderDecoder {
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         QName fqname = RM10Constants.SEQUENCE_FAULT_QNAME;
-        marshaller.marshal(new JAXBElement<SequenceFaultType>(fqname, SequenceFaultType.class,
-            sf.getSequenceFault()), header);
+        org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType flt =
+            new org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType();
+        flt.setFaultCode(sf.getFaultCode());
+        Object detail = sf.getDetail();
+        if (detail instanceof Element) {
+            flt.getAny().add(detail);
+        } else if (detail instanceof Identifier) {
+            marshaller.marshal(VersionTransformer.convert200502wsa15((Identifier)detail), doc);
+        } else if (detail instanceof SequenceAcknowledgement) {
+            marshaller.marshal(VersionTransformer.convert200502wsa15((SequenceAcknowledgement)detail),
+                doc);
+        }
+        Element data = doc.getDocumentElement();
+        if (data != null) {
+            flt.getAny().add(data);
+        }
+        marshaller.marshal(new JAXBElement<org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType>(fqname,
+            org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType.class, flt), header);
         return header;
     }
 
