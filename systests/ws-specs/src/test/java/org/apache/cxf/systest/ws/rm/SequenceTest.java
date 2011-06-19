@@ -617,7 +617,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         RMManager manager = greeterBus.getExtension(RMManager.class);
         assertEquals("Unexpected maximum sequence length.", 10, 
             manager.getSourcePolicy().getSequenceTerminationPolicy().getMaxLength());
-        manager.getSourcePolicy().getSequenceTerminationPolicy().setMaxLength(new Long(2));
+        manager.getSourcePolicy().getSequenceTerminationPolicy().setMaxLength(2);
         
         greeter.greetMe("one");
         greeter.greetMe("two");
@@ -774,9 +774,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }   
         
         // the third inbound message has a SequenceFault header
-/*        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
-        mf.verifySequenceFault(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, false, 1);   */
+        mf.verifySequenceFault(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, false, 1);
     }
     
     @Test
@@ -835,9 +835,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyAcknowledgements(new boolean[] {false, true, false} , false);
         
         // the third inbound message has a SequenceFault header
-        
-//        mf.verifySequenceFault(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, false, 2);
-     
+        mf.verifySequenceFault(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, false, 2);
     }
 
     @Test    
@@ -1108,7 +1106,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }        
     }
     
-/*    @Test
+    @Test
     public void testMultiClientTwoway() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         String cfgResource = "org/apache/cxf/systest/ws/rm/rminterceptors.xml";            
@@ -1207,7 +1205,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             }
             greeter = null;
         }        
-    }   */
+    }
     
     @Test
     public void testServerSideMessageLoss() throws Exception {
