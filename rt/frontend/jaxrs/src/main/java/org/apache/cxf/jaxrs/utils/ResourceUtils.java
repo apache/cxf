@@ -55,6 +55,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -83,6 +84,7 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.model.wadl.ElementClass;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
@@ -456,24 +458,38 @@ public final class ResourceUtils {
         return types;
     }
 
+    public static Class<?> getActualJaxbType(Class<?> type, Method resourceMethod, boolean inbound) {
+        ElementClass element = resourceMethod.getAnnotation(ElementClass.class);
+        if  (element != null) {
+            Class<?> cls = inbound ? element.request() : element.response();
+            if (cls != Object.class) {
+                return cls;
+            }
+        }
+        return type;
+    }
+    
     private static void getAllTypesForResource(ClassResourceInfo resource, Map<Class<?>, Type> types,
                                                boolean jaxbOnly) {
         for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
             Class<?> cls = ori.getMethodToInvoke().getReturnType();
-            Type type = ori.getMethodToInvoke().getGenericReturnType();
+            if (cls == Response.class) {
+                cls = getActualJaxbType(cls, ori.getMethodToInvoke(), false);
+            }
             if (jaxbOnly) {
                 checkJaxbType(cls, types);
             } else {
+                Type type = ori.getMethodToInvoke().getGenericReturnType();
                 types.put(cls, type);
             }
             for (Parameter pm : ori.getParameters()) {
                 if (pm.getType() == ParameterType.REQUEST_BODY) {
                     Class<?> inType = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
-                    Type type2 = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
                     if (jaxbOnly) {
                         checkJaxbType(inType, types);
                     } else {
-                        types.put(inType, type2);
+                        Type type = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
+                        types.put(inType, type);
                     }
                 }
             }
