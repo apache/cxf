@@ -166,7 +166,11 @@ public class WsdlOption extends Option {
         }
         addIfTrue(list, isWsdlList(), "-wsdlList");
         addIfTrue(list, debug && !list.contains("-verbose"), "-verbose");
+        addEqualsArray(list, "-asyncMethods", getAsyncMethods());
+        addEqualsArray(list, "-bareMethods", getBareMethods());
+        addEqualsArray(list, "-mimeMethods", getMimeMethods());
         list.add(wsdlURI.toString());
+        
         return list;
     }
 
@@ -198,6 +202,26 @@ public class WsdlOption extends Option {
                 destList.add(key + ((value == null) ? "" : value));
             }
         }
+    }
+    private static void addEqualsArray(List<String> destList, 
+                                      String key, 
+                                      String[] sourceList) {
+        if (sourceList == null) {
+            return;
+        }
+        StringBuilder b = new StringBuilder(key);
+        if (sourceList.length > 0) {
+            b.append('=');
+            boolean first = true;
+            for (String value : sourceList) {
+                if (!first) {
+                    b.append(',');
+                }
+                b.append(value);
+                first = false;
+            }
+        }
+        destList.add(b.toString());
     }
 
 }

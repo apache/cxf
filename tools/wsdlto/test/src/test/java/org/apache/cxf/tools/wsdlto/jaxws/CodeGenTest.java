@@ -324,6 +324,45 @@ public class CodeGenTest extends AbstractCodeGenTest {
                      webMethodAnno2.operationName());
 
     }
+    @Test
+    public void testAsyncMethodFromCommandLine() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_ASYNCMETHODS, new String[0]);
+        processor.setContext(env);
+        processor.execute();
+
+        assertNotNull(output);
+
+        File org = new File(output, "org");
+        assertTrue(org.exists());
+        File apache = new File(org, "apache");
+        assertTrue(apache.exists());
+        File cxf = new File(apache, "cxf");
+        assertTrue(cxf.exists());
+        File w2j = new File(cxf, "w2j");
+        assertTrue(w2j.exists());
+        File async = new File(w2j, "hello_world_soap_http");
+        assertTrue(async.exists());
+
+        File[] files = async.listFiles();
+        assertEquals(9, files.length);
+
+        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter");
+
+        Method method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
+                                                                            javax.xml.ws.AsyncHandler.class});
+        WebMethod webMethodAnno1 = AnnotationUtil.getPrivMethodAnnotation(method1, WebMethod.class);
+
+        assertEquals(method1.getName() + "()" + " Annotation : WebMethod.operationName ", "greetMeSometime",
+                     webMethodAnno1.operationName());
+
+        java.lang.reflect.Method method2 = clz.getMethod("greetMeSometimeAsync",
+                                                         new Class[] {java.lang.String.class});
+        WebMethod webMethodAnno2 = AnnotationUtil.getPrivMethodAnnotation(method2, WebMethod.class);
+        assertEquals(method2.getName() + "()" + " Annotation : WebMethod.operationName ", "greetMeSometime",
+                     webMethodAnno2.operationName());
+
+    }
 
     @Test
     public void testAsyncMethodNoService() throws Exception {
@@ -1229,7 +1268,37 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue(contents.indexOf("SOAPBinding.ParameterStyle.BARE") != -1);
         assertTrue(contents.indexOf("@ResponseWrapper") == -1);
     }
+    @Test
+    public void testBareFromCommandLine() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_BAREMETHODS, new String[0]);
 
+        processor.setContext(env);
+        processor.execute();
+
+        File greeter = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
+        assertTrue(output.exists());
+        String contents = FileUtils.getStringFromFile(greeter);
+        assertTrue(contents.indexOf("SOAPBinding.ParameterStyle.BARE") != -1);
+        assertTrue(contents.indexOf("@ResponseWrapper") == -1);
+    }
+    @Test
+    public void testMimeFromCommandLine() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello-mime.wsdl"));
+        env.put(ToolConstants.CFG_MIMEMETHODS, new String[0]);
+
+        processor.setContext(env);
+        processor.execute();
+
+        String str1 = "javax.xml.ws.Holder<java.awt.Image>";
+        String str2 = "javax.xml.transform.Source";
+
+        String file = getStringFromFile(new File(output.getCanonicalPath()
+                                        + "/org/apache/cxf/w2j/hello_world_mime/Hello.java"));
+
+        assertTrue(file.contains(str1));
+        assertTrue(file.contains(str2));
+    }
     @Test
     public void testXmlSeeAlso() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cardealer.wsdl"));

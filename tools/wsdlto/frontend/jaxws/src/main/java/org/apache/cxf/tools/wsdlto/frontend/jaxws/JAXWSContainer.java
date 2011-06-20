@@ -20,7 +20,10 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.resource.URIResolver;
@@ -42,6 +45,9 @@ public class JAXWSContainer extends WSDLToJavaContainer {
         Set<String> set = super.getArrayKeys();
         set.add(ToolConstants.CFG_BINDING);
         set.add(ToolConstants.CFG_RESERVE_NAME);
+        set.add(ToolConstants.CFG_ASYNCMETHODS);
+        set.add(ToolConstants.CFG_BAREMETHODS);
+        set.add(ToolConstants.CFG_MIMEMETHODS);
         return set;
     }
 
@@ -62,6 +68,24 @@ public class JAXWSContainer extends WSDLToJavaContainer {
                 }
             }
             env.put(ToolConstants.CFG_BINDING, bindings);
-        }        
+        }
+        cleanArrays(env, ToolConstants.CFG_ASYNCMETHODS);
+        cleanArrays(env, ToolConstants.CFG_BAREMETHODS);
+        cleanArrays(env, ToolConstants.CFG_MIMEMETHODS);
+    }
+
+    private void cleanArrays(ToolContext env, String key) {
+        String s[] = env.getArray(key);
+        if (s != null) {
+            List<String> n = new ArrayList<String>();
+            for (String s2 : s) {
+                StringTokenizer tokenizer = new StringTokenizer(s2, ",=", false);
+                while (tokenizer.hasMoreTokens()) {
+                    String arg = tokenizer.nextToken();
+                    n.add(arg);
+                }
+            }
+            env.put(key, n.toArray(new String[n.size()]));
+        }
     }
 }

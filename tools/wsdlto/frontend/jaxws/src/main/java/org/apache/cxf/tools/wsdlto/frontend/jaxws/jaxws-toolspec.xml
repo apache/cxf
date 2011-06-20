@@ -302,7 +302,38 @@ Examples:
                 </associatedArgument>
                 <switch>xjc</switch>
             </option>
-            
+            <option id="asyncMethods" maxOccurs="unbounded">
+                <annotation>
+                    Specifies a comma separated list of methods that should have asynchronous
+                    version generated in addition to the normal synchronous versions.  If no
+                    methods are listed, all methods are generated with asynchronous versions.
+                </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation>[=method1,method2,...]</annotation>
+                </associatedArgument>
+                <switch>asyncMethods</switch>
+            </option>
+            <option id="bareMethods" maxOccurs="unbounded">
+                <annotation>
+                    Specifies a comma separated list of methods that should not be
+                    unwrapped into individual parameters and instead be left in
+                    their "bare" form.
+                </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation>[=method1,method2,...]</annotation>
+                </associatedArgument>
+                <switch>bareMethods</switch>
+            </option>
+            <option id="mimeMethods" maxOccurs="unbounded">
+                <annotation>
+                    Specifies a comma separated list of methods where the 
+                    mime:content information is used to generate the type.
+                </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation>[=method1,method2,...]</annotation>
+                </associatedArgument>
+                <switch>mimeMethods</switch>
+            </option>
            <option id="noAddressBinding" maxOccurs="1">
                 <annotation>
                     Specifies that the generator should not use the address jaxb binding file to map wsa:EndpointReferenceType 

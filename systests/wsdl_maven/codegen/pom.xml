@@ -53,6 +53,7 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
+                                <asyncMethods/>
                             </defaultOptions>
                         </configuration>
                     </execution>

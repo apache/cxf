@@ -51,6 +51,10 @@ public class Option {
      * For compatibility as well as to specify any extra flags not addressed by other parameters
      */
     protected List<String> xjcargs = new ArrayList<String>();
+    
+    protected String[] asyncMethods;
+    protected String[] bareMethods;
+    protected String[] mimeMethods;
 
     /**
      * Directory where generated java classes will be created. Defaults to plugin 'sourceRoot' parameter
@@ -193,6 +197,25 @@ public class Option {
         this.xjcargs.clear();
         this.xjcargs.addAll(ea);
     }
+    public void setMimeMethods(String[] methods) {
+        mimeMethods = methods;
+    }
+    public String[] getMimeMethods() {
+        return mimeMethods;
+    }
+    public void setAsyncMethods(String[] methods) {
+        asyncMethods = methods;
+    }
+    public String[] getAsyncMethods() {
+        return asyncMethods;
+    }
+    public void setBareMethods(String[] methods) {
+        bareMethods = methods;
+    }
+    public String[] getBareMethods() {
+        return bareMethods;
+    }
+    
 
     public List<String> getPackagenames() {
         return packagenames;
@@ -330,7 +353,7 @@ public class Option {
     }
 
     public String getFaultSerialVersionUID() {
-        return faultSerialVersionUID == null ? "none" : faultSerialVersionUID;
+        return faultSerialVersionUID;
     }
 
     public void setFaultSerialVersionUID(String faultSerialVersionUID) {
@@ -420,6 +443,9 @@ public class Option {
             destination.setWsdlLocation(getWsdlLocation());
         }
         destination.setWsdlVersion(getWsdlVersion());
+        destination.setMimeMethods(getMimeMethods());
+        destination.setAsyncMethods(getAsyncMethods());
+        destination.setBareMethods(getBareMethods());
     }
     
     private <T> T setIfNull(T dest, T source) {
@@ -457,6 +483,9 @@ public class Option {
         redundantDirs = mergeList(redundantDirs, defaultOptions.redundantDirs, File.class);
         packagenames.addAll(defaultOptions.packagenames);
         namespaceExcludes.addAll(defaultOptions.namespaceExcludes);
+        bareMethods = mergeList(bareMethods, defaultOptions.bareMethods, String.class);
+        asyncMethods = mergeList(asyncMethods, defaultOptions.asyncMethods, String.class);
+        mimeMethods = mergeList(mimeMethods, defaultOptions.mimeMethods, String.class);
     }
     
     @SuppressWarnings("unchecked")
