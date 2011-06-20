@@ -359,7 +359,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             throws Exception {
             byte clientEntropy[] = null;
             int keySize = 256;
-            int ttl = 300000;
+            long ttl = 300000;
             String tokenType = null;
             Element el = DOMUtils.getFirstElement(requestEl);
             while (el != null) {
@@ -387,7 +387,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             
             Date created = new Date();
             Date expires = new Date();
-            expires.setTime(created.getTime() + (ttl * 1000));
+            expires.setTime(created.getTime() + ttl);
             
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());

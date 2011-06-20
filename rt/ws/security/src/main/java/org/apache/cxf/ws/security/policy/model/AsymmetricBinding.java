@@ -31,10 +31,8 @@ import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
-import org.apache.neethi.PolicyContainingAssertion;
 
-public class AsymmetricBinding extends SymmetricAsymmetricBindingBase 
-    implements PolicyContainingAssertion {
+public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
 
     private InitiatorToken initiatorToken;
 
