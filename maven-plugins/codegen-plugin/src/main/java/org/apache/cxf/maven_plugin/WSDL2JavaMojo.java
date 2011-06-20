@@ -636,6 +636,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
 
     private void runForked(Set<URI> classPath, Class cls, String[] args) throws MojoExecutionException {
         getLog().info("Running wsdl2java in fork mode...");
+        getLog().debug("Running wsdl2java in fork mode with args " + Arrays.asList(args));
 
         Commandline cmd = new Commandline();
         cmd.getShell().setQuotedArgumentsEnabled(false); // for JVM args

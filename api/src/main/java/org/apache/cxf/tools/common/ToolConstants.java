@@ -66,6 +66,9 @@ public final class ToolConstants {
     public static final String CFG_NO_TYPES = "notypes";
     public static final String CFG_XJC_ARGS = "xjc";
     public static final String CFG_CATALOG = "catalog";
+    public static final String CFG_BAREMETHODS = "bareMethods";
+    public static final String CFG_ASYNCMETHODS = "asyncMethods";
+    public static final String CFG_MIMEMETHODS = "mimeMethods";
     public static final String CFG_DEFAULT_VALUES = "defaultValues";
     public static final String CFG_JAVASCRIPT_UTILS =  "javascriptUtils";
 

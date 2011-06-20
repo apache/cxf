@@ -97,6 +97,13 @@ public class ToolContext {
     public Object get(String key) {
         return (paramMap == null) ? null : paramMap.get(key);
     }
+    public String[] getArray(String key) {
+        Object o = get(key);
+        if (o instanceof String) {
+            return new String[] {(String)o};
+        }
+        return (String[])o;
+    }
     
     public Object get(String key, Object defaultValue) {
         if (!optionSet(key)) {

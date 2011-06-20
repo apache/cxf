@@ -130,6 +130,11 @@ public class OperationProcessor  extends AbstractProcessor {
                 enableWrapper = opBinding.isEnableWrapperStyle();
             }
         }
+        
+        enableWrapper = checkEnableWrapper(enableWrapper, method);
+        enableAsync = checkEnableAsync(enableAsync, method);
+        enableMime = checkEnableMime(enableMime, method);
+        
         method.setWrapperStyle(enableWrapper && method.isWrapperStyle());
         
         
@@ -158,6 +163,43 @@ public class OperationProcessor  extends AbstractProcessor {
         }
     }
 
+    private boolean checkArray(String[] ar, String n) {
+        if (ar != null) {
+            if (ar.length == 0) {
+                return true;
+            }
+            for (String s : ar) {
+                if (s.equals(n)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkEnableMime(boolean enableMime, JavaMethod method) {
+        String o[] = context.getArray(ToolConstants.CFG_MIMEMETHODS);
+        if (checkArray(o, method.getName())) {
+            return true;
+        }
+        return enableMime;
+    }
+
+    private boolean checkEnableAsync(boolean enableAsync, JavaMethod method) {
+        String o[] = context.getArray(ToolConstants.CFG_ASYNCMETHODS);
+        if (checkArray(o, method.getName())) {
+            return true;
+        }
+        return enableAsync;
+    }
+
+    private boolean checkEnableWrapper(boolean enableWrapper, JavaMethod method) {
+        String o[] = context.getArray(ToolConstants.CFG_BAREMETHODS);
+        if (checkArray(o, method.getName())) {
+            return false;
+        }
+        return enableWrapper;
+    }
 
     private void setWrapper(OperationInfo operation) {
         MessagePartInfo inputPart = null;
