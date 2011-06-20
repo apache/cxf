@@ -86,33 +86,32 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
                                                               WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_ISSUE, m);
             
-            m = IssueOperation.class.getDeclaredMethod("cancel", 
+            m = CancelOperation.class.getDeclaredMethod("cancel", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_CANCEL, m);
             
-            m = IssueOperation.class.getDeclaredMethod("renew", 
+            m = RenewOperation.class.getDeclaredMethod("renew", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_RENEW, m);
             
-            m = IssueOperation.class.getDeclaredMethod("validate", 
+            m = ValidateOperation.class.getDeclaredMethod("validate", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_VALIDATE, m);
             
-            m = IssueOperation.class.getDeclaredMethod("keyExchangeToken", 
+            m = KeyExchangeTokenOperation.class.getDeclaredMethod("keyExchangeToken", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_KEYEXCHANGETOKEN, m);
             
-            m = IssueOperation.class.getDeclaredMethod("requestCollection", 
+            m = RequestCollectionOperation.class.getDeclaredMethod("requestCollection", 
                                                        RequestSecurityTokenCollectionType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_REQUESTCOLLECTION, m);
         } catch (Exception ex) {
-            //Should not happen as nothing will work.  All operations will
-            //end up throwing UnsupportedOpertation
+            ex.printStackTrace();
         }
     }
     
