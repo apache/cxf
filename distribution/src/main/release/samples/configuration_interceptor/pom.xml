@@ -130,7 +130,7 @@
                                 <configuration>
                                     <executable>java</executable>
                                     <arguments>
-                                        <argument>-Dcxf.config.file=${basedir}/src/demo/stream/client/client.xml</argument>
+                                        <argument>-Dcxf.config.file=${project.build.directory}/classes/demo/stream/client/client.xml</argument>
                                         <argument>-classpath</argument>
                                         <classpath />
                                         <argument>demo.stream.client.Client</argument>
