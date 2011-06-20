@@ -20,13 +20,19 @@ package org.apache.cxf.jaxrs.model.wadl;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+
+import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 
 @Path("/")
 public class BookStoreWithSingleSlash {
 
     @GET
     @Path("book")
-    public String getBookName() {
-        return "book";
+    @ElementClass(response = Book.class)
+    @Produces("application/xml")
+    public Response getBookName() {
+        return null;
     }
 }

@@ -227,6 +227,7 @@ public class WadlGeneratorTest extends Assert {
                                                                  WadlGenerator.WADL_NS, "resource");
         assertEquals(1, resourceEls.size());        
         assertEquals("book", resourceEls.get(0).getAttribute("path"));
+        checkGrammars(doc.getDocumentElement(), "thebook", null, "thechapter");
     }
     
     private void checkResponse(Response r) throws Exception {
@@ -274,17 +275,24 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("http://superbooks", schemasEls.get(0).getAttribute("targetNamespace"));
         List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
                             XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
-        assertEquals(3, elementEls.size());
+        
+        int size = book2El == null ? 2 : 3;
+        
+        assertEquals(size, elementEls.size());
         assertTrue(checkElement(elementEls, bookEl, "tns:book"));
-        assertTrue(checkElement(elementEls, book2El, "tns:book2"));
+        if (book2El != null) {
+            assertTrue(checkElement(elementEls, book2El, "tns:book2"));
+        }
         assertTrue(checkElement(elementEls, chapterEl, "tns:chapter"));
         
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
                                         XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
-        assertEquals(3, complexTypesEls.size());
+        assertEquals(size, complexTypesEls.size());
         
         assertTrue(checkComplexType(complexTypesEls, "book"));
-        assertTrue(checkComplexType(complexTypesEls, "book2"));
+        if (book2El != null) {
+            assertTrue(checkComplexType(complexTypesEls, "book2"));
+        }
         assertTrue(checkComplexType(complexTypesEls, "chapter"));
     }
     

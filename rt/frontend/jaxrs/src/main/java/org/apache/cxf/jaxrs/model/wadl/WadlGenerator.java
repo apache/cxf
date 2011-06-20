@@ -586,7 +586,7 @@ public class WadlGenerator implements RequestHandler {
                 doWriteParam(sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns);
                 sb.append("</representation>");
             } else  { 
-                type = getActualJaxbType(type, opMethod, inbound);
+                type = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
                 if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
                     generateQName(sb, qnameResolver, clsMap, type,
                                   getBodyAnnotations(ori, inbound));
@@ -627,18 +627,6 @@ public class WadlGenerator implements RequestHandler {
             }
             sb.append("</representation>");
         }
-    }
-
-    protected Class<?> getActualJaxbType(Class<?> type, Method resourceMethod, boolean inbound) {
-        ElementClass element = resourceMethod.getAnnotation(ElementClass.class);
-        if  (element != null) {
-            Class<?> cls = inbound ? element.request() : element.response();
-            if (cls != Object.class) {
-                return cls;
-            }
-        }
-        return type;
-        
     }
 
     protected List<OperationResourceInfo> sortOperationsByPath(Set<OperationResourceInfo> ops) {
