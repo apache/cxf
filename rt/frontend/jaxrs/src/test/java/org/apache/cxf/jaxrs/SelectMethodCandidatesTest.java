@@ -211,6 +211,25 @@ public class SelectMethodCandidatesTest extends Assert {
     
     @Test
     public void testFindTargetSubResource() throws Exception {
+        doTestFindTargetSubResource("/1/2/3/d/resource", "resourceMethod");
+    }
+    
+    @Test
+    public void testFindTargetSubResource2() throws Exception {
+        doTestFindTargetSubResource("/1/2/3/d/resource/sub", "subresource");
+    }
+    
+    @Test
+    public void testFindTargetSubResource3() throws Exception {
+        doTestFindTargetSubResource("/1/2/3/d/resource2/2/2", "resourceMethod2");
+    }
+    
+    @Test
+    public void testFindTargetSubResource4() throws Exception {
+        doTestFindTargetSubResource("/1/2/3/d/resource2/1/2", "subresource2");
+    }
+    
+    public void doTestFindTargetSubResource(String path, String method) throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
         sf.create();
@@ -219,14 +238,14 @@ public class SelectMethodCandidatesTest extends Assert {
         String acceptContentTypes = "text/xml,*/*";
         
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/resource", values,
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, path, values,
                                                                     new MessageImpl());
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
                                     null, 
                                     "GET", values, contentTypes, 
                                     JAXRSUtils.sortMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
-        assertEquals("resourceMethod needs to be selected", "resourceMethod",
+        assertEquals("resourceMethod needs to be selected", method,
                      ori.getMethodToInvoke().getName());
     }
     

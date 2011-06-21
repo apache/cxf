@@ -42,6 +42,18 @@ public class TestResource {
         return "";
     }
     
+    @Path("/resource2/1/{b}")
+    public TestResource subresource2() {
+        return this;
+    }
+    
+    @Path("/resource2/{a}/{b}")
+    @GET
+    @Produces("application/json")
+    public String resourceMethod2() {
+        return "";
+    }
+    
     @GET
     @Produces("application/xml")
     @Path("/resource1")
