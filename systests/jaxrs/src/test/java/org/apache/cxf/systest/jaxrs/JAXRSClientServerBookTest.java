@@ -168,6 +168,49 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testPostCollectionGetBooksWebClient() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections3"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(b1);
+        books.add(b2);
+        Book book = wc.postCollection(books, Book.class, Book.class);
+        assertEquals(200, wc.getResponse().getStatus());
+        assertNotSame(b1, book);
+        assertEquals(b1.getName(), book.getName());
+    }
+    
+    @Test
+    public void testPostCollectionOfBooksWebClient() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(b1);
+        books.add(b2);
+        List<Book> books2 = new ArrayList<Book>(wc.postAndGetCollection(books, Book.class, Book.class));
+        assertNotNull(books2);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books.get(0);
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books.get(1);
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+        assertEquals(200, wc.getResponse().getStatus());
+    }
+    
+    @Test
     public void testGetBookResponseAndETag() throws Exception {
         
         String endpointAddress =
@@ -299,6 +342,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             assertEquals(500, ex.getStatus());
             assertEquals("This is a WebApplicationException", ex.getMessage());
             assertTrue(ex.toString().contains("This is a WebApplicationException"));
+        }
+    }
+    
+    @Test
+    public void testServerWebApplicationExceptionResponse() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/webappexception");
+        wc.accept("application/xml");
+        try {
+            Response r = wc.get(Response.class);
+            assertEquals(500, r.getStatus());
+        } catch (ServerWebApplicationException ex) {
+            fail("Unexpected exception");
         }
     }
     

@@ -63,7 +63,7 @@ import org.apache.cxf.phase.Phase;
  *
  */
 public class WebClient extends AbstractClient {
-    
+    private static final String REQUEST_TYPE = "request.type";
     private static final String RESPONSE_CLASS = "response.class";
     private static final String RESPONSE_TYPE = "response.type";
     
@@ -239,7 +239,7 @@ public class WebClient extends AbstractClient {
      *         error message if client or server error occured
      */
     public Response invoke(String httpMethod, Object body) {
-        return doInvoke(httpMethod, body, Response.class, Response.class);
+        return doInvoke(httpMethod, body, null, Response.class, Response.class);
     }
     
     /**
@@ -299,7 +299,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Map<String, List<Object>> values) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-        return doInvoke("POST", values, InputStream.class, InputStream.class);
+        return doInvoke("POST", values, null, InputStream.class, InputStream.class);
     }
     
     /**
@@ -309,7 +309,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Form form) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-        return doInvoke("POST", form.getData(), InputStream.class, InputStream.class);
+        return doInvoke("POST", form.getData(), null, InputStream.class, InputStream.class);
     }
     
     /**
@@ -321,33 +321,8 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
-        
-        Response r = doInvoke(httpMethod, body, responseClass, responseClass);
-        
-        if (r.getStatus() >= 400 && responseClass != null) {
-            throw new ServerWebApplicationException(r);
-        }
-        
-        return responseClass.cast(r.getEntity());
-    }
-    
-    /**
-     * Does HTTP invocation and returns a collection of typed objects 
-     * @param httpMethod HTTP method 
-     * @param body request body, can be null
-     * @param memberClass expected type of collection member class
-     * @return typed collection
-     */
-    public <T> Collection<? extends T> invokeAndGetCollection(String httpMethod, Object body, 
-                                                    Class<T> memberClass) {
-        Response r = doInvoke(httpMethod, body, Collection.class,
-                              new ParameterizedCollectionType<T>(memberClass));
-        
-        if (r.getStatus() >= 400) {
-            throw new ServerWebApplicationException(r);
-        }
-        
-        return CastUtils.cast((Collection)r.getEntity(), memberClass);
+        Response r = doInvoke(httpMethod, body, null, responseClass, responseClass);
+        return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
     }
     
     /**
@@ -362,7 +337,61 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Does HTTP POST invocation and returns a collection of typed objects 
+     * Does HTTP invocation and returns a collection of typed objects 
+     * @param httpMethod HTTP method 
+     * @param body request body, can be null
+     * @param memberClass expected type of collection member class
+     * @return typed collection
+     */
+    public <T> Collection<? extends T> invokeAndGetCollection(String httpMethod, Object body, 
+                                                    Class<T> memberClass) {
+        Response r = doInvoke(httpMethod, body, null, 
+                              Collection.class, new ParameterizedCollectionType<T>(memberClass));
+        return CastUtils.cast((Collection)r.getEntity(), memberClass);
+    }
+    
+    /**
+     * Posts a collection of typed objects 
+     * @param collection request body
+     * @param memberClass type of collection member class
+     * @return JAX-RS Response
+     */
+    public <T> Response postCollection(Object collection, Class<T> memberClass) {
+        return doInvoke("POST", collection, new ParameterizedCollectionType<T>(memberClass),
+                        Response.class, Response.class);
+    }
+    
+    /**
+     * Posts a collection of typed objects 
+     * @param collection request body
+     * @param memberClass type of collection member class
+     * @param responseClass expected type of response object
+     * @return JAX-RS Response
+     */
+    public <T1, T2> T2 postCollection(Object collection, Class<T1> memberClass, 
+                                            Class<T2> responseClass) {
+        Response r = doInvoke("POST", collection, new ParameterizedCollectionType<T1>(memberClass),
+                              responseClass, responseClass);
+        return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
+    }
+    
+    /**
+     * Posts collection of typed objects and returns a collection of typed objects
+     * @param collection request body
+     * @param memberClass type of collection member class
+     * @param responseClass expected type of response object
+     * @return JAX-RS Response
+     */
+    public <T1, T2> Collection<? extends T2> postAndGetCollection(Object collection, 
+                                                                  Class<T1> memberClass, 
+                                                                  Class<T2> responseClass) {
+        Response r = doInvoke("POST", collection, new ParameterizedCollectionType<T1>(memberClass), 
+                              Collection.class, new ParameterizedCollectionType<T2>(responseClass));
+        return CastUtils.cast((Collection)r.getEntity(), responseClass);
+    }
+        
+    /**
+     * Posts request body and returns a collection of typed objects 
      * @param body request body, can be null
      * @param memberClass expected type of collection member class
      * @return typed collection
@@ -617,7 +646,8 @@ public class WebClient extends AbstractClient {
         return (WebClient)super.reset();
     }
     
-    protected Response doInvoke(String httpMethod, Object body, Class<?> responseClass, Type genericType) {
+    protected Response doInvoke(String httpMethod, Object body, Type inGenericType,
+                                Class<?> responseClass, Type outGenericType) {
         
         MultivaluedMap<String, String> headers = getHeaders();
         if (body != null) {
@@ -631,7 +661,12 @@ public class WebClient extends AbstractClient {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
         resetResponse();
-        return doChainedInvocation(httpMethod, headers, body, responseClass, genericType, null, null);
+        Response r = doChainedInvocation(httpMethod, headers, body, inGenericType, 
+                                         responseClass, outGenericType, null, null);
+        if (r.getStatus() >= 400 && responseClass != Response.class) {
+            throw new ServerWebApplicationException(r);
+        }
+        return r;
     }
 
     @Override
@@ -643,26 +678,30 @@ public class WebClient extends AbstractClient {
         
         Map<String, Object> reqContext = CastUtils.cast((Map)invContext.get(REQUEST_CONTEXT));
         String httpMethod = (String)reqContext.get(Message.HTTP_REQUEST_METHOD);
+        Type inType = (Type)reqContext.get(REQUEST_TYPE);
         Class<?> respClass = (Class)reqContext.get(RESPONSE_CLASS);
-        Type type = (Type)reqContext.get(RESPONSE_TYPE);
-        return doChainedInvocation(httpMethod, headers, body, respClass, type, exchange, invContext);
+        Type outType = (Type)reqContext.get(RESPONSE_TYPE);
+        return doChainedInvocation(httpMethod, headers, body, inType, 
+                                   respClass, outType, exchange, invContext);
     }
-    
+    //CHECKSTYLE:OFF
     protected Response doChainedInvocation(String httpMethod, 
                                            MultivaluedMap<String, String> headers, 
                                            Object body, 
+                                           Type inGenericType,
                                            Class<?> responseClass, 
-                                           Type genericType,
+                                           Type outGenericType,
                                            Exchange exchange,
                                            Map<String, Object> invContext) {
-        
+    //CHECKSTYLE:ON    
         URI uri = getCurrentURI();
         Message m = createMessage(body, httpMethod, headers, uri, exchange, invContext);
         
         Map<String, Object> reqContext = getRequestContext(m);
         reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+        reqContext.put(REQUEST_TYPE, inGenericType);
         reqContext.put(RESPONSE_CLASS, responseClass);
-        reqContext.put(RESPONSE_TYPE, genericType);
+        reqContext.put(RESPONSE_TYPE, outGenericType);
         
         if (body != null) {
             m.getInterceptorChain().add(new BodyWriter());
@@ -691,7 +730,7 @@ public class WebClient extends AbstractClient {
         Response response = null;
         Object entity = null;
         try {
-            response = handleResponse(m, responseClass, genericType);
+            response = handleResponse(m, responseClass, outGenericType);
             entity = response.getEntity();
             return response;
         } catch (RuntimeException ex) {
@@ -741,9 +780,15 @@ public class WebClient extends AbstractClient {
             MultivaluedMap<String, String> headers = 
                 (MultivaluedMap)outMessage.get(Message.PROTOCOL_HEADERS);
             Object body = objs.get(0);
+            
+            Map<String, Object> requestContext = WebClient.this.getRequestContext(outMessage);
+            Type type = null;
+            if (requestContext != null) {
+                type = (Type)requestContext.get(REQUEST_TYPE);
+            }
             try {
-                writeBody(body, outMessage, body.getClass(), body.getClass(), new Annotation[]{}, 
-                          headers, os);
+                writeBody(body, outMessage, body.getClass(), type == null ? body.getClass() : type, 
+                          new Annotation[]{}, headers, os);
                 if (os != null) {
                     os.flush();
                 }
