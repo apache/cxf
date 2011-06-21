@@ -277,6 +277,17 @@ public class BookStore {
     }
     
     @POST
+    @Path("/collections3")
+    @Produces({"application/xml", "application/json" })
+    @Consumes({"application/xml", "application/json" })
+    public Book postCollectionGetBook(List<Book> bs) throws Exception {
+        if (bs == null || bs.size() != 2) {
+            throw new RuntimeException();
+        }
+        return bs.get(0);
+    }
+    
+    @POST
     @Path("/collections2")
     @Produces({"application/xml", "application/json" })
     @Consumes({"application/xml", "application/json" })
