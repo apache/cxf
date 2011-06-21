@@ -53,25 +53,23 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             }
         }
         
-        if (e1.getHttpMethod() != null && e2.getHttpMethod() == null
-            || e1.getHttpMethod() == null && e2.getHttpMethod() != null) {
-            // subresource method takes precedence over a subresource locator
-            return e1.getHttpMethod() != null ? -1 : 1;
-        }
-        
         if (headMethod) {
             if (HEAD_METHOD.equals(e1.getHttpMethod())) {
                 return -1;
             } else if (HEAD_METHOD.equals(e2.getHttpMethod())) {
                 return 1;
             }
-                
         }
-
             
         int result = URITemplate.compareTemplates(
                           e1.getURITemplate(),
                           e2.getURITemplate());
+        
+        if (result == 0 && (e1.getHttpMethod() != null && e2.getHttpMethod() == null
+                || e1.getHttpMethod() == null && e2.getHttpMethod() != null)) {
+            // resource method takes precedence over a subresource locator
+            return e1.getHttpMethod() != null ? -1 : 1;
+        }
         
         if (result == 0) {
         
