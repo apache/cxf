@@ -77,7 +77,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml1Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("No SAML CallbackHandler available");
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
@@ -87,7 +87,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml1Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with a SAML2 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("Wrong SAML Version");
+            assertTrue(ex.getMessage().contains("Wrong SAML Version"));
         }
 
         ((BindingProvider)saml1Port).getRequestContext().put(
@@ -119,7 +119,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("No SAML CallbackHandler available");
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -129,14 +129,14 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("Wrong SAML Version");
+            assertTrue(ex.getMessage().contains("Wrong SAML Version"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assert result.equals(BigInteger.valueOf(50));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
         
         try {
             SamlCallbackHandler callbackHandler = 
@@ -148,7 +148,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with a invalid SAML2 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("SAML token security failure");
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
     
@@ -183,7 +183,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("Assertion fails sender-vouches requirements");
+            assertTrue(ex.getMessage().contains("Assertion fails sender-vouches requirements"));
         }
     }
 
@@ -210,7 +210,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("No SAML CallbackHandler available");
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -220,14 +220,14 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assert ex.getMessage().contains("Wrong SAML Version");
+            assertTrue(ex.getMessage().contains("Wrong SAML Version"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assert result.equals(BigInteger.valueOf(50));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     @org.junit.Test
@@ -249,7 +249,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
-        assert result.equals(BigInteger.valueOf(50));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     @org.junit.Test
@@ -275,7 +275,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assert result.equals(BigInteger.valueOf(50));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     @org.junit.Test
@@ -300,7 +300,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assert result.equals(BigInteger.valueOf(50));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     
