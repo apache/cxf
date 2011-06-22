@@ -34,8 +34,6 @@ public class ServletDestination extends AbstractHTTPDestination {
     
     static final Logger LOG = LogUtils.getL7dLogger(ServletDestination.class);
         
-    private static final long serialVersionUID = 1L;
-    
     /**
      * Constructor, allowing subsititution of configuration.
      * 
@@ -53,7 +51,6 @@ public class ServletDestination extends AbstractHTTPDestination {
         // would add the default port to the address
         super(b, registry, ei, path, false);
     }
-    
     
     protected Logger getLogger() {
         return LOG;

@@ -22,7 +22,6 @@ package org.apache.cxf.aegis.type.java5;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 public class BeanWithGregorianDate {
-    private static final long serialVersionUID = 1481418882118674796L;
 
     private int id;
     private String name;

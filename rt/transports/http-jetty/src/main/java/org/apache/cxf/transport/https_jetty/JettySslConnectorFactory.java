@@ -28,7 +28,6 @@ import org.eclipse.jetty.server.AbstractConnector;
  * TLS enabled acceptors.
  */
 public final class JettySslConnectorFactory implements JettyConnectorFactory {
-    private static final long serialVersionUID = 1L;
     
     TLSServerParameters tlsServerParameters;
     
