@@ -104,7 +104,7 @@
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/${cxf.bcel.bundle.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/${cxf.xalan.bundle.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.oro/${cxf.oro.bundle.version}</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.velocity/${cxf.velocity.bundle.version}</bundle>
+        <bundle>mvn:org.apache.velocity/velocity/${cxf.velocity.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/${cxf.jdom.bundle.version}</bundle>
 
         <bundle>mvn:org.apache.cxf/cxf-bundle/${project.version}</bundle>
