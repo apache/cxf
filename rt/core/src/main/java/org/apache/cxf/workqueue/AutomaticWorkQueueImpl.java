@@ -199,6 +199,8 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         
         public void shutdown() {
             shutdown.set(true);
+            // to exit the waiting thread
+            interrupt();
         }
         
         public void run() {
