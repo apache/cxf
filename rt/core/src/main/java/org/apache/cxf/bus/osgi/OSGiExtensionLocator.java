@@ -27,10 +27,12 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionFragmentParser;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -41,6 +43,7 @@ import org.osgi.framework.SynchronousBundleListener;
  * 
  */
 public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleListener {
+    private static final Logger LOG = LogUtils.getL7dLogger(OSGiExtensionLocator.class);
     private ConcurrentMap<Long, List<Extension>> extensions 
         = new ConcurrentHashMap<Long, List<Extension>>();
     private long id;
@@ -92,7 +95,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                 List<Extension> orig = new ExtensionFragmentParser()
                     .getExtensionsFromText(ins);
                 ins.close();
-
+                LOG.info("Loading the extension from bundle " + bundle.getBundleId());
                 if (orig != null && !orig.isEmpty()) {
                     if (list == null) {
                         list = new CopyOnWriteArrayList<Extension>();
@@ -109,6 +112,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     protected void unregister(final long bundleId) {
         List<Extension> list = extensions.remove(bundleId);
         if (list != null) {
+            LOG.info("Removed the extensions for bundle " + bundleId);
             ExtensionRegistry.removeExtensions(list);
         }
     }
@@ -136,6 +140,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             }
             return super.loadInterface(cl);
         }
+       
     }
 
 }

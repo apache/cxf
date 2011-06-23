@@ -36,6 +36,8 @@ public class BlueprintBus extends ExtensionManagerBus {
     BlueprintContainer container;
     
     public BlueprintBus() {
+        // Using the BlueprintBus Classloader to load the extensions
+        super(null, null, BlueprintBus.class.getClassLoader());
     }
     
     public void setBundleContext(BundleContext c) {
