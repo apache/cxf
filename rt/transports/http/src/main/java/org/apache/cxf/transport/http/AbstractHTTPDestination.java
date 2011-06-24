@@ -633,7 +633,7 @@ public abstract class AbstractHTTPDestination
                 return;
             }
             Message m = msg.getExchange().getInMessage();
-            if (m == null || msg.getExchange().isOneWay()) {
+            if (m == null) {
                 return;
             }
             InputStream is = m.getContent(InputStream.class);
