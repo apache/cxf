@@ -64,7 +64,6 @@ import org.eclipse.jetty.util.thread.ThreadPool;
  */
 public class JettyHTTPServerEngine
     implements ServerEngine {
-    private static final long serialVersionUID = 1L;
     
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPServerEngine.class);

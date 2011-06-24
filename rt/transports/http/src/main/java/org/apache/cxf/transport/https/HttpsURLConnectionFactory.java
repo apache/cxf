@@ -56,7 +56,6 @@ public final class HttpsURLConnectionFactory
      */
     public static final String HTTPS_URL_PROTOCOL_ID = "https";
 
-    private static final long serialVersionUID = 1L;
     private static final Logger LOG =
         LogUtils.getL7dLogger(HttpsURLConnectionFactory.class);
 

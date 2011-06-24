@@ -43,8 +43,6 @@ public class ServletDestination extends AbstractHTTPDestination {
     
     static final Logger LOG = LogUtils.getL7dLogger(ServletDestination.class);
         
-    private static final long serialVersionUID = 1L;        
-    
     final ServletTransportFactory factory;
     final String path;
     
@@ -67,7 +65,6 @@ public class ServletDestination extends AbstractHTTPDestination {
         factory = fact;
         path = p;
     }
-    
     
     protected Logger getLogger() {
         return LOG;

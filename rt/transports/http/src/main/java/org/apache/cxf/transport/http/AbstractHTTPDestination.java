@@ -101,8 +101,6 @@ public abstract class AbstractHTTPDestination
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
-    private static final long serialVersionUID = 1L;
-
     protected final Bus bus;
 
     // Configuration values

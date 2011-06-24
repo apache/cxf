@@ -432,7 +432,7 @@ public final class WSDLTypes {
             anonymous = true;
         } else {                                                  
             StringTokenizer strtok = new StringTokenizer(typeName, ".");
-            for (int i = 0; strtok.hasMoreTokens(); ++i) {
+            while (strtok.hasMoreTokens()) {
                 String token = strtok.nextToken();
                 if (token.startsWith("_")
                     && Character.isDigit(token.charAt(1))) {
