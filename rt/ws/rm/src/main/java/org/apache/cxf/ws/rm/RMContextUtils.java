@@ -47,7 +47,7 @@ public final class RMContextUtils {
      * Determine if message is currently being processed on server side.
      * 
      * @param message the current Message
-     * @return true iff message is currently being processed on server side
+     * @return true if message is currently being processed on server side
      */
     public static boolean isServerSide(Message message) {
         return message.getExchange().getDestination() != null;
@@ -57,7 +57,7 @@ public final class RMContextUtils {
      * Checks if the action String belongs to an RM protocol message.
      * 
      * @param action the action
-     * @return true iff the action is not one of the RM protocol actions.
+     * @return true if the action is not one of the RM protocol actions.
      */
     public static boolean isRMProtocolMessage(String action) {
         return RM10Constants.ACTIONS.contains(action) || RM11Constants.ACTIONS.contains(action);
@@ -67,7 +67,7 @@ public final class RMContextUtils {
      * Retrieve the RM properties from the current message.
      * 
      * @param message the current message
-     * @param outbound true iff the message direction is outbound
+     * @param outbound true if the message direction is outbound
      * @return the RM properties
      */
     public static RMProperties retrieveRMProperties(Message message, boolean outbound) {
@@ -97,7 +97,7 @@ public final class RMContextUtils {
      * 
      * @param message the current message
      * @param rmps the RM properties
-     * @param outbound iff the message direction is outbound
+     * @param outbound if the message direction is outbound
      */
     public static void storeRMProperties(Message message, RMProperties rmps, boolean outbound) {
         String key = getRMPropertiesKey(outbound);
@@ -111,7 +111,7 @@ public final class RMContextUtils {
      * @param isProviderContext true if the binding provider request context
      *            available to the client application as opposed to the message
      *            context visible to handlers
-     * @param isOutbound true iff the message is outbound
+     * @param isOutbound true if the message is outbound
      * @return the current addressing properties
      */
     public static AddressingPropertiesImpl retrieveMAPs(Message message, boolean isProviderContext,
@@ -124,8 +124,8 @@ public final class RMContextUtils {
      * 
      * @param maps the MAPs to store
      * @param message the current message
-     * @param isOutbound true iff the message is outbound
-     * @param isRequestor true iff the current messaging role is that of
+     * @param isOutbound true if the message is outbound
+     * @param isRequestor true if the current messaging role is that of
      *            requestor
      * @param handler true if HANDLER scope, APPLICATION scope otherwise
      */
