@@ -77,8 +77,6 @@ import org.jdom.UncheckedJDOMFactory;
  * Builds a JDOM {@link org.jdom.Document org.jdom.Document} using a
  * {@link javax.xml.stream.XMLStreamReader}.
  * 
- * @version $Revision$, $Date: 2006-02-15 15:21:25 -0500 (Wed, 15 Feb
- *          2006) $
  * @author Tatu Saloranta
  * @author Bradley S. Huffman
  * @author Benson I. Margulies, mods for CXF to allow reading a portion of a stream.
