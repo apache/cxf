@@ -69,6 +69,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -179,6 +180,9 @@ public class HTTPConduit
      */
     private static final String SC_HTTP_CONDUIT_SUFFIX = ".http-conduit";
 
+    private static final String HTTP_POST_METHOD = "POST"; 
+    private static final String HTTP_PUT_METHOD = "PUT";
+    
     /**
      * JVM/System property name holding the hostname of the http proxy.
      */
@@ -631,8 +635,8 @@ public class HTTPConduit
         // DELETE does not work and empty PUTs cause misleading exceptions
         // if chunking is enabled
         // TODO : ensure chunking can be enabled for non-empty PUTs - if requested
-        if (connection.getRequestMethod().equals("POST")
-            && csPolicy.isAllowChunking()) {
+        if (csPolicy.isAllowChunking() 
+            && isChunkingSupported(message, connection.getRequestMethod())) {
             //TODO: The chunking mode be configured or at least some
             // documented client constant.
             //use -1 and allow the URL connection to pick a default value
@@ -676,6 +680,19 @@ public class HTTPConduit
         // We are now "ready" to "send" the message. 
     }
 
+    protected boolean isChunkingSupported(Message message, String httpMethod) {
+        if (HTTP_POST_METHOD.equals(httpMethod)) { 
+            return true;
+        }
+        if (HTTP_PUT_METHOD.equals(httpMethod)) {
+            MessageContentsList objs = MessageContentsList.getContentsList(message);
+            if (objs != null && objs.size() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     protected OutputStream createOutputStream(Message message, 
                                               HttpURLConnection connection,
                                               boolean needToCacheRequest, 
