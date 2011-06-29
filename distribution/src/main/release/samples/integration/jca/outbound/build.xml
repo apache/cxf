@@ -105,16 +105,13 @@
                 <include name="*.jar"/>
                 <exclude name="cxf*.jar"/>
                 <exclude name="*manifest*.jar"/>
-                <exclude name="*-jbi-*.jar"/>
             </fileset>
             <fileset dir="${module.jar.dir}">
                 <include name="cxf*.jar"/>
                 <exclude name="*manifest*.jar"/>
-                <exclude name="*-jbi-*.jar"/>
             </fileset>
             <fileset dir="${integration.jar.dir}">
                 <include name="*-jca-*.jar"/>
-                <exclude name="*-jbi-*.jar"/>
             </fileset>
         </copy>
         <jar destfile="${build.classes.dir}/lib/cxf.rar"

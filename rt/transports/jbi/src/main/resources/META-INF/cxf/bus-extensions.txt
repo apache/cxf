@@ -1,4 +1,0 @@
-org.apache.cxf.transport.jbi.JBITransportFactory::true
-org.apache.cxf.transport.jbi.wsdl11.JBIWSDLExtensionLoader::true
-
-

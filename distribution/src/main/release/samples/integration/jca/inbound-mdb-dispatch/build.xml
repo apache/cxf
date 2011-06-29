@@ -65,7 +65,6 @@
             </fileset>
             <fileset dir="${cxf.home}/modules/integration">
                 <include name="*.jar"/>
-                <exclude name="*-jbi-*.jar"/>
             </fileset>
         </copy>
         <jar destfile="${build.classes.dir}/lib/cxf.rar"

@@ -375,25 +375,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>cxf-integration-jbi</artifactId>
-                                    <version>${project.version}</version>
-                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
                                     <artifactId>cxf-integration-jca</artifactId>
-                                    <version>${project.version}</version>
-                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>cxf-rt-bindings-jbi</artifactId>
-                                    <version>${project.version}</version>
-                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>cxf-rt-transports-jbi</artifactId>
                                     <version>${project.version}</version>
                                     <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
@@ -456,11 +438,6 @@
                                 <echo file="${basedir}/target/srcbuild_env${output.ext}" message="${output.cp}" />
                                 <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}" />
                                 <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}" />
-                                <copy file="${basedir}/src/main/assembly/jbi.xml" tofile="${basedir}/target/jbi.xml" overwrite="yes">
-                                    <filterset>
-                                        <filter token="CXF_VERSION" value="${project.version}" />
-                                    </filterset>
-                                </copy>
                                 <delete file="build.xml" />
                             </tasks>
                         </configuration>

@@ -33,7 +33,6 @@
 
 
     <modules>
-        <module>jbi</module>
         <module>jca</module>
     </modules>
 

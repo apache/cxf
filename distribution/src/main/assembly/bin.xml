@@ -133,13 +133,6 @@
                 <include>ra.xml</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>target</directory>
-            <outputDirectory>apache-cxf-${cxf.version}/samples/integration/JBI/service-engine/etc</outputDirectory>
-            <includes>
-                <include>jbi.xml</include>
-            </includes>
-        </fileSet>
         <!-- include the JavaScript client utilities for users who don't want to use ?js. -->
         <fileSet>
             <directory>../rt/javascript/src/main/resources/org/apache/cxf/javascript</directory>

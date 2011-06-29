@@ -539,13 +539,6 @@
                 <version>2.7.7</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.servicemix.specs</groupId>
-                <artifactId>org.apache.servicemix.specs.jbi-api-1.0</artifactId>
-                <version>1.7.0</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.neethi</groupId>
                 <artifactId>neethi</artifactId>
                 <version>${cxf.neethi.version}</version>
