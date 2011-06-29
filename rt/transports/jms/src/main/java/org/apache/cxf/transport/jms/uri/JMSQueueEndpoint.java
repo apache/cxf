@@ -23,7 +23,6 @@ package org.apache.cxf.transport.jms.uri;
 /**
  * An endpoint for a JMS Queue which is also browsable
  *
- * @version $Revision$
  */
 public class JMSQueueEndpoint extends JMSEndpoint {
     /**
