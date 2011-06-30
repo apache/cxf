@@ -52,6 +52,7 @@ import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.SequenceFault;
 import org.apache.cxf.ws.rm.SequenceFaultType;
 import org.apache.cxf.ws.rm.SequenceType;
@@ -275,8 +276,42 @@ public class RMSoapInterceptorTest extends Assert {
         assertNotNull(ack);
         assertEquals(ack.getIdentifier().getValue(), SEQ_IDENTIFIER);
         assertEquals(2, ack.getAcknowledgementRange().size());
+        AcknowledgementRange r1 = ack.getAcknowledgementRange().get(0);
+        AcknowledgementRange r2 = ack.getAcknowledgementRange().get(1);
+        verifyRange(r1, 1, 1);
+        verifyRange(r2, 3, 3);
         assertNull(rmps.getSequence());
         assertNull(rmps.getAcksRequested());
+    }
+
+    @Test
+    public void testDecodeAcknowledgements2() throws XMLStreamException {
+        SoapMessage message = setUpInboundMessage("resources/Acknowledgment2.xml");
+        RMSoapInterceptor codec = new RMSoapInterceptor();
+        codec.handleMessage(message);
+        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+        Collection<SequenceAcknowledgement> acks = rmps.getAcks();
+        assertNotNull(acks);
+        assertEquals(1, acks.size());
+        SequenceAcknowledgement ack = acks.iterator().next();
+        assertNotNull(ack);
+        assertEquals(1, ack.getAcknowledgementRange().size());
+        AcknowledgementRange r1 = ack.getAcknowledgementRange().get(0);
+        verifyRange(r1, 1, 3);
+        assertNull(rmps.getSequence());
+        assertNull(rmps.getAcksRequested());
+    }
+
+    private void verifyRange(AcknowledgementRange r, int i, int j) {
+        assertNotNull(r);
+        if (i > 0) {
+            assertNotNull(r.getLower());
+            assertEquals(i, r.getLower().longValue());
+        }
+        if (j > 0) {
+            assertNotNull(r.getUpper());
+            assertEquals(j, r.getUpper().longValue());
+        }
     }
 
     @Test
