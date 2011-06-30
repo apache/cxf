@@ -36,42 +36,54 @@
     <jaxb:bindings schemaLocation="wsrm-1.1.xsd" node="//xs:element[@name='Nack']">
         <jaxb:property>
             <jaxb:baseType>
-                <jaxb:javaType name="java.lang.Long"/>
+                <jaxb:javaType name="java.lang.Long"
+                    parseMethod="javax.xml.bind.DatatypeConverter.parseLong" 
+                    printMethod="javax.xml.bind.DatatypeConverter.printLong"/>
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings schemaLocation="wsrm-1.1.xsd" node="//xs:element[@name='MessageNumber']">
         <jaxb:property>
             <jaxb:baseType>
-                <jaxb:javaType name="java.lang.Long"/>
+                <jaxb:javaType name="java.lang.Long"
+                    parseMethod="javax.xml.bind.DatatypeConverter.parseLong" 
+                    printMethod="javax.xml.bind.DatatypeConverter.printLong"/>
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings schemaLocation="wsrm-1.1.xsd" node="//xs:attribute[@name='Upper']">
         <jaxb:property>
             <jaxb:baseType>
-                <jaxb:javaType name="java.lang.Long"/>
+                <jaxb:javaType name="java.lang.Long"
+                    parseMethod="javax.xml.bind.DatatypeConverter.parseLong" 
+                    printMethod="javax.xml.bind.DatatypeConverter.printLong"/>
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings schemaLocation="wsrm-1.1.xsd" node="//xs:attribute[@name='Lower']">
         <jaxb:property>
             <jaxb:baseType>
-                <jaxb:javaType name="java.lang.Long"/>
+                <jaxb:javaType name="java.lang.Long"
+                    parseMethod="javax.xml.bind.DatatypeConverter.parseLong" 
+                    printMethod="javax.xml.bind.DatatypeConverter.printLong"/>
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings schemaLocation="wsrm-1.1.xsd" node="//xs:complexType[@name='CloseSequenceType']//xs:element[@name='LastMsgNumber']">
         <jaxb:property>
             <jaxb:baseType>
-                <jaxb:javaType name="java.lang.Long"/>
+                <jaxb:javaType name="java.lang.Long"
+                    parseMethod="javax.xml.bind.DatatypeConverter.parseLong" 
+                    printMethod="javax.xml.bind.DatatypeConverter.printLong"/>
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
     <jaxb:bindings schemaLocation="wsrm-1.1.xsd" node="//xs:complexType[@name='TerminateSequenceType']//xs:element[@name='LastMsgNumber']">
         <jaxb:property>
             <jaxb:baseType>
-                <jaxb:javaType name="java.lang.Long"/>
+                <jaxb:javaType name="java.lang.Long"
+                    parseMethod="javax.xml.bind.DatatypeConverter.parseLong" 
+                    printMethod="javax.xml.bind.DatatypeConverter.printLong"/>
             </jaxb:baseType>
         </jaxb:property>
     </jaxb:bindings>
