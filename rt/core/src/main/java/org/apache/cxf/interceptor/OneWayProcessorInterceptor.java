@@ -22,8 +22,10 @@ package org.apache.cxf.interceptor;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Exchange;
@@ -41,6 +43,7 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String USE_ORIGINAL_THREAD 
         = OneWayProcessorInterceptor.class.getName() + ".USE_ORIGINAL_THREAD"; 
+    private static final Logger LOG = LogUtils.getL7dLogger(OneWayProcessorInterceptor.class);
     
     public OneWayProcessorInterceptor() {
         super(Phase.PRE_LOGICAL);
@@ -116,6 +119,9 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                     }
                 } catch (RejectedExecutionException e) {
                     //the executor queue is full, so run the task in the caller thread
+                    LOG.warning(
+                        "the executor queue is full, run the oneway invocation task in caller thread." 
+                        + "Users can specify a larger executor queue to avoid this.");
                     chain.resume();
                 } catch (InterruptedException e) {
                     //ignore - likely a busy work queue so we'll just let the one-way go
