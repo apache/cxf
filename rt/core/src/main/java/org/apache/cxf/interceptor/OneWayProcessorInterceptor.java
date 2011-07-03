@@ -120,8 +120,8 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 } catch (RejectedExecutionException e) {
                     //the executor queue is full, so run the task in the caller thread
                     LOG.warning(
-                        "the executor queue is full, run the oneway invocation task in caller thread." 
-                        + "Users can specify a larger executor queue to avoid this.");
+                        "Executor queue is full, run the oneway invocation task in caller thread." 
+                        + "  Users can specify a larger executor queue to avoid this.");
                     chain.resume();
                 } catch (InterruptedException e) {
                     //ignore - likely a busy work queue so we'll just let the one-way go
