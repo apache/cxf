@@ -120,7 +120,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtilities.setKeepAliveSystemProperty(false);
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(Server.class));
     }
     
     @AfterClass
@@ -144,7 +144,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     @Test
     public void testOnewayAnonymousAcks() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
-        System.setProperty("java.util.logging.ConsoleHandler.level", "FINE");
         greeter.greetMeOneWay("once");
         greeter.greetMeOneWay("twice");
         greeter.greetMeOneWay("thrice");
@@ -311,7 +310,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     }
     
-/*    @Test
+    @Test
     public void testOnewayAnonymousAcksSequenceLength1() throws Exception {
         init("org/apache/cxf/systest/ws/rm/seqlength1.xml");
 
@@ -327,15 +326,16 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
         mf.verifyMessages(6, true);
-        String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
+        String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION, 
                                                  GREETMEONEWAY_ACTION,
                                                  RM10Constants.TERMINATE_SEQUENCE_ACTION,
-                                                 RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
+                                                 RM10Constants.CREATE_SEQUENCE_ACTION, 
                                                  GREETMEONEWAY_ACTION,
                                                  RM10Constants.TERMINATE_SEQUENCE_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", null, null, "1", null}, true);
-        mf.verifyLastMessage(new boolean[] {false, true, false, false, true, false}, true);
+        // TODO: temporarily commented-out until WS-RM last message support added back in
+//        mf.verifyLastMessage(new boolean[] {false, true, false, false, true, false}, true);
 
         // createSequenceResponse message plus partial responses to
         // greetMeOneWay and terminateSequence ||: 2
@@ -350,7 +350,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, null, null, null, null, null}, false);
         mf.verifyLastMessage(new boolean[] {false, false, false, false, false, false}, false);
         mf.verifyAcknowledgements(new boolean[] {false, true, false, false, true, false}, false);
-    }   */
+    }
    
     @Test
     public void testOnewayAnonymousAcksSuppressed() throws Exception {
@@ -607,10 +607,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     // for inbound sequence offers and correlate offered sequences that are
     // included in a CreateSequence request and accepted with those that are
     // created on behalf of such a request, the server also tries terminate its
-    // sequences. Note that as part of the sequence termination exchange a
-    // standalone sequence acknowledgment needs to be sent regardless of whether
-    // or nor acknowledgments are delivered steadily with every response.
-/*    @Test
+    // sequences.
+    @Test
     public void testTwowayNonAnonymousMaximumSequenceLength2() throws Exception {
         init("org/apache/cxf/systest/ws/rm/seqlength10.xml", true);
         
@@ -633,7 +631,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
                                                  GREETME_ACTION, 
                                                  RM10Constants.TERMINATE_SEQUENCE_ACTION,
                                                  RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION,
-                                                 RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
+                                                 RM10Constants.CREATE_SEQUENCE_ACTION,
                                                  GREETME_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", null, null, null, "1"}, true);
@@ -664,7 +662,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         expected[1] = true;
         expected[5] = true;
         mf.verifyAcknowledgements(expected, false);
-    }   */
+    }
     
     @Test
     public void testTwowayAtMostOnce() throws Exception {
@@ -1279,13 +1277,14 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         
         // expecting 3 outbounds and 5 or 6 inbounds
         awaitMessages(3, 5, 5000);
-        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages(),
+            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
         // CS, GA, GA
         mf.verifyMessages(3, true);
         verifyCreateSequenceAction(0, "PT5S", mf, true);
         
-/*        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(),
+        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(),
                                                  GREETMEONEWAY_ACTION,
                                                  GREETMEONEWAY_ACTION};
         mf.verifyActions(expectedActions, true);
@@ -1303,7 +1302,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // expecting 2 outbounds and 4 inbounds
         awaitMessages(2, 4, 5000);
         
-        mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
+        mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages(),
+            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
         // CS, GA
         mf.verifyMessages(2, true);
@@ -1324,7 +1324,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         
         mf.purge();
         assertEquals(0, outRecorder.getOutboundMessages().size());
-        assertEquals(0, inRecorder.getInboundMessages().size());        */
+        assertEquals(0, inRecorder.getInboundMessages().size());
     }
     
     @Test

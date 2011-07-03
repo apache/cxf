@@ -278,7 +278,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         }
     }
 
-/*    @Test    
+    @Test    
     public void testExactlyOnceInOrder() throws Exception {
         testOnewayExactlyOnceInOrder(null);
     }
@@ -309,7 +309,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             }
             assertTrue("Message out of order", argNum < callArgs.length);
         }
-    }   */
+    }
 
     // --- test utilities ---
 

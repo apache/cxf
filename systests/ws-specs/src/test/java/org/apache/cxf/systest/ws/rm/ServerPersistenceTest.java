@@ -143,7 +143,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         responses[1] = greeter.greetMeAsync("two");
         responses[2] = greeter.greetMeAsync("three");
         
-/*        verifyMissingResponse(responses);
+        verifyMissingResponse(responses);
         control.stopGreeter(SERVER_LOSS_CFG);
         LOG.fine("Stopped greeter server");
        
@@ -155,29 +155,24 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         LOG.fine("Restarted greeter server" + nl + nl);
         
         verifyServerRecovery(responses);
+        responses[3] = greeter.greetMeAsync("four");
+        
+        verifyRetransmissionQueue();
+        verifyAcknowledgementRange(1, 4);
         
         out.getOutboundMessages().clear();
         in.getInboundMessages().clear();
-            
-        responses[3] = greeter.greetMeAsync("four");
-        verifyRetransmissionQueue();
-        
+
         greeterBus.shutdown(true);
         
         control.stopGreeter(CFG);
-        bus.shutdown(true); */
+        bus.shutdown(true);
     }
     
     void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
-        awaitMessages(5, 7, 30000);
+        awaitMessages(5, 8, 10000);
 
         int nDone = 0;
-        for (int i = 0; i < 3; i++) {
-            // wait another while to prove that response to second request is indeed lost
-            if (!responses[i].isDone()) {
-                Thread.sleep(4000);
-            }
-        }
         for (int i = 0; i < 3; i++) {
             if (responses[i].isDone()) {
                 nDone++;
@@ -188,7 +183,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
-        String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
+        String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION,
                                                  GREETME_ACTION,
                                                  GREETME_ACTION,
                                                  GREETME_ACTION,
@@ -247,10 +242,17 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
   
     
     void verifyRetransmissionQueue() throws Exception {
-        awaitMessages(3, 5, 60000);
+        awaitMessages(2, 5, 60000);
         
+        Thread.sleep(5000);
         boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
         assertTrue("Retransmission Queue is not empty", empty);
+    }
+    
+    void verifyAcknowledgementRange(long lower, long higher) throws Exception {
+        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
+            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
+        mf.verifyAcknowledgementRange(lower, higher);
     }
 
     protected void awaitMessages(int nExpectedOut, int nExpectedIn) {

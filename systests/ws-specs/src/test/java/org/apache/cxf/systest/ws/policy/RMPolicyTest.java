@@ -40,6 +40,7 @@ import org.apache.cxf.systest.ws.util.MessageRecorder;
 import org.apache.cxf.systest.ws.util.OutMessageRecorder;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.RM10Constants;
 
 import org.junit.BeforeClass;
@@ -60,13 +61,13 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     private static final String GREETME_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
-/*    private static final String GREETME_RESPONSE_ACTION
-        = "http://cxf.apache.org/greeter_control/Greeter/greetMeResponse";      */
+    private static final String GREETME_RESPONSE_ACTION
+        = "http://cxf.apache.org/greeter_control/Greeter/greetMeResponse";
     private static final String PINGME_ACTION = "http://cxf.apache.org/greeter_control/Greeter/pingMeRequest";
-/*    private static final String PINGME_RESPONSE_ACTION
+    private static final String PINGME_RESPONSE_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/pingMeResponse";
     private static final String GREETER_FAULT_ACTION 
-        = "http://cxf.apache.org/greeter_control/Greeter/pingMe/Fault/faultDetail";     */
+        = "http://cxf.apache.org/greeter_control/Greeter/pingMe/Fault/faultDetail";
 
     public static class Server extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
@@ -161,7 +162,8 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(5, 9, 5000);
 
-        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages(),
+            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
         
         mf.verifyMessages(5, true);
@@ -170,7 +172,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
                                                  GREETME_ACTION, 
                                                  PINGME_ACTION,
                                                  PINGME_ACTION};
-/*        mf.verifyActions(expectedActions, true);
+        mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3", "4"}, true);
         mf.verifyLastMessage(new boolean[] {false, false, false, false, false}, true);
         mf.verifyAcknowledgements(new boolean[] {false, false, false, true, true}, true);
@@ -188,7 +190,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         mf.verifyActions(expectedActions, false);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[] {false, false, false, false}, false);
-        mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);  */
+        mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
          
     }
 }
