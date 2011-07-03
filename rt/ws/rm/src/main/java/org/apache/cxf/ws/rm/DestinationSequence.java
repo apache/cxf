@@ -20,7 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimerTask;
@@ -144,14 +144,21 @@ public class DestinationSequence extends AbstractSequence {
             }
 
             if (!done) {
+                
+                // need new acknowledgement range
                 AcknowledgementRange range = RMUtils.getWSRMFactory()
                     .createSequenceAcknowledgementAcknowledgementRange();
                 range.setLower(messageNumber);
                 range.setUpper(messageNumber);
                 acknowledgement.getAcknowledgementRange().add(i, range);
+                if (acknowledgement.getAcknowledgementRange().size() > 1) {
+                    
+                    // acknowledge out-of-order at first opportunity
+                    scheduleImmediateAcknowledgement();
+                    
+                }
             }
             mergeRanges();
-            wakeupAll();
         }
         
         RMAssertion rma = RM10PolicyUtils.getRMAssertion(destination.getManager().getRMAssertion(), message);
@@ -231,19 +238,22 @@ public class DestinationSequence extends AbstractSequence {
     boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
         Continuation cont = getContinuation(message);
         DeliveryAssuranceType da = destination.getManager().getDeliveryAssurance();
+        boolean canSkip = !da.isSetAtLeastOnce() && !da.isSetExactlyOnce();
         if (cont != null && da.isSetInOrder() && !cont.isNew()) {
-            return waitInQueue(mn, da.isSetAtLeastOnce() && da.isSetExactlyOnce(),
-                               message, cont);
+            return waitInQueue(mn, canSkip, message, cont);
         }
         if ((da.isSetExactlyOnce() || da.isSetAtMostOnce()) && isAcknowledged(mn)) {            
+            
+            // acknowledge at first opportunity following duplicate message
+            scheduleImmediateAcknowledgement();
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "MESSAGE_ALREADY_DELIVERED_EXC", LOG, mn, getIdentifier().getValue());
             LOG.log(Level.INFO, msg.toString());
             throw new RMException(msg);
+            
         } 
         if (da.isSetInOrder()) {
-            return waitInQueue(mn, !(da.isSetAtLeastOnce() || da.isSetExactlyOnce()),
-                               message, cont);
+            return waitInQueue(mn, canSkip, message, cont);
         }
         return true;
     }
@@ -262,7 +272,7 @@ public class DestinationSequence extends AbstractSequence {
             // can process now if no other in process and this one is next
             if (inProcessNumber == 0) {
                 long diff = mn - highNumberCompleted;
-                if (diff == 1 || canSkip && diff > 0) {
+                if (diff == 1 || (canSkip && diff > 0)) {
                     inProcessNumber = mn;
                     return true;
                 }
@@ -318,9 +328,7 @@ public class DestinationSequence extends AbstractSequence {
         if (null == store) {
             return;
         }
-        Collection<Long> messageNrs = new ArrayList<Long>();
-        messageNrs.add(messageNr);
-        store.removeMessages(getIdentifier(), messageNrs, false);
+        store.removeMessages(getIdentifier(), Collections.singleton(new Long(messageNr)), false);
     }
 
     /**

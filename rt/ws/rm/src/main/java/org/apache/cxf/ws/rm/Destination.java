@@ -197,8 +197,9 @@ public class Destination extends AbstractEndpoint {
         DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
         if (null != seq) {
-            seq.processingComplete(sequenceType.getMessageNumber());
-            seq.purgeAcknowledged(sequenceType.getMessageNumber());
+            long mn = sequenceType.getMessageNumber().longValue();
+            seq.processingComplete(mn);
+            seq.purgeAcknowledged(mn);
         }
     }
     

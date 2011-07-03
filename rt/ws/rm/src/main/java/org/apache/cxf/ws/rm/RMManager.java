@@ -461,7 +461,8 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         
         LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
                 new Object[] {null == conduit ? "client" : "server", id});
-        RMEndpoint rme = createReliableEndpoint(endpoint, null);
+        EncoderDecoder codec = VersionTransformer.getEncoderDecoder(rmNamespace, rmAddressingNamespace);
+        RMEndpoint rme = createReliableEndpoint(endpoint, codec);
         rme.initialise(conduit, null, null);
         reliableEndpoints.put(endpoint, rme);
         SourceSequence css = null;

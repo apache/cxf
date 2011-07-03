@@ -55,8 +55,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return;
         }
        
-        AddressingPropertiesImpl maps =
-            RMContextUtils.retrieveMAPs(msg, false, true);
+        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(msg, false, true);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;
@@ -149,7 +148,6 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
 
                 // increase message number and store a sequence type object in
                 // context
-
                 seq.nextMessageNumber(inSeqId, inMessageNumber, isLastMessage);
                 
                 rmpsOut.setSequence(seq);

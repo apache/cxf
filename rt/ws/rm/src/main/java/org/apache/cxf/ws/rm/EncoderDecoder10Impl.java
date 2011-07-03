@@ -39,6 +39,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -114,6 +115,9 @@ public final class EncoderDecoder10Impl implements EncoderDecoder {
         if (null != seq) {
             LOG.log(Level.FINE, "encoding sequence into RM header");
             org.apache.cxf.ws.rm.v200502.SequenceType toseq = VersionTransformer.convert200502(seq);
+            if (rmps.isLastMessage()) {
+                toseq.setLastMessage(new org.apache.cxf.ws.rm.v200502.SequenceType.LastMessage());
+            }
             JAXBElement element = RMUtils.getWSRM200502Factory().createSequence(toseq);
             marshaller.marshal(element, header);
         } 
@@ -189,6 +193,21 @@ public final class EncoderDecoder10Impl implements EncoderDecoder {
         JAXBElement<org.apache.cxf.ws.rm.v200502.SequenceType> jaxbElement
             = unmarshaller.unmarshal(elem, org.apache.cxf.ws.rm.v200502.SequenceType.class);
         return VersionTransformer.convert(jaxbElement.getValue());
+    }
+    
+    public CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException {
+        Unmarshaller unmarshaller = getContext().createUnmarshaller();
+        JAXBElement<org.apache.cxf.ws.rm.v200502.SequenceType> jaxbElement
+            = unmarshaller.unmarshal(elem, org.apache.cxf.ws.rm.v200502.SequenceType.class);
+        org.apache.cxf.ws.rm.v200502.SequenceType seq = jaxbElement.getValue();
+        if (seq.isSetLastMessage()) {
+            CloseSequenceType close = new CloseSequenceType();
+            close.setIdentifier(VersionTransformer.convert(seq.getIdentifier()));
+            close.setLastMsgNumber(seq.getMessageNumber());
+            return close;
+        } else {
+            return null;
+        }
     }
 
     public SequenceAcknowledgement decodeSequenceAcknowledgement(Element elem) throws JAXBException {

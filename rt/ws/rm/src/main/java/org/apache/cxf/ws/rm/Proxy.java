@@ -90,7 +90,7 @@ public class Proxy {
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
             .getOperation(constants.getTerminateSequenceOperationName());
         
-        TerminateSequenceType ts = RMUtils.getWSRMFactory().createTerminateSequenceType();
+        TerminateSequenceType ts = new TerminateSequenceType();
         ts.setIdentifier(ss.getIdentifier());
         EncoderDecoder codec = reliableEndpoint.getEncoderDecoder();
         invoke(oi, new Object[] {codec.convertToSend(ts)}, null);

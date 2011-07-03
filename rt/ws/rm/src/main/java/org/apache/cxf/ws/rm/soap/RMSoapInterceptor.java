@@ -291,6 +291,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                         LOG.log(Level.FINE, "decoding RM header {0}", localName);
                         if (RMConstants.SEQUENCE_NAME.equals(localName)) {
                             rmps.setSequence(codec.decodeSequenceType(elem));
+                            rmps.setCloseSequence(codec.decodeSequenceTypeCloseSequence(elem));
                         } else if (RMConstants.SEQUENCE_ACK_NAME.equals(localName)) {
                             acks.add(codec.decodeSequenceAcknowledgement(elem));
                         } else if (RMConstants.ACK_REQUESTED_NAME.equals(localName)) {

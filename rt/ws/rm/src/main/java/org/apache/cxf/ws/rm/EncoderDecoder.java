@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -127,6 +128,15 @@ public interface EncoderDecoder {
      * @throws JAXBException
      */
     SequenceType decodeSequenceType(Element elem) throws JAXBException;
+    
+    /**
+     * Generates a CloseSequenceType if a SequenceType represents a last message state.
+     * 
+     * @param elem
+     * @return CloseSequenceType if last message state, else <code>null</code>
+     * @throws JAXBException
+     */
+    CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException;
     
     /**
      * Unmarshals a SequenceAcknowledgement, converting it if necessary to the internal form.

@@ -57,6 +57,7 @@ public class Servant implements Invoker {
         reliableEndpoint = rme;
     }
     
+    
     public Object invoke(Exchange exchange, Object o) {
         LOG.fine("Invoking on RM Endpoint");
         OperationInfo oi = exchange.get(OperationInfo.class);
@@ -197,9 +198,7 @@ public class Servant implements Invoker {
         LOG.fine("Terminating sequence");
         
         EncoderDecoder codec = reliableEndpoint.getEncoderDecoder();
-        org.apache.cxf.ws.rm.v200502.TerminateSequenceType external =
-            (org.apache.cxf.ws.rm.v200502.TerminateSequenceType)getParameter(message);
-        TerminateSequenceType terminate = codec.convertReceivedTerminateSequence(external);
+        TerminateSequenceType terminate = codec.convertReceivedTerminateSequence(getParameter(message));
         
         // check if the terminated sequence was created in response to a a createSequence
         // request

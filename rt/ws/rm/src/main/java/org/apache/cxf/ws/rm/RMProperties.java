@@ -34,6 +34,7 @@ public class RMProperties {
     private Collection<AckRequestedType> acksRequested;
     private CloseSequenceType closeSequence;
     private String namespaceURI;
+    private boolean lastMessage;
     
     public Collection<SequenceAcknowledgement> getAcks() {
         return acks;
@@ -49,6 +50,10 @@ public class RMProperties {
     
     public SequenceType getSequence() {
         return sequence;
+    }
+    
+    public boolean isLastMessage() {
+        return lastMessage;
     }
     
     public void setAcks(Collection<SequenceAcknowledgement> a) {
@@ -70,10 +75,11 @@ public class RMProperties {
     }
     
     public void setSequence(SourceSequence seq) {
-        SequenceType s = RMUtils.getWSRMFactory().createSequenceType();
+        SequenceType s = new SequenceType();
         s.setIdentifier(seq.getIdentifier());
-        s.setMessageNumber(seq.getCurrentMessageNr());   
+        s.setMessageNumber(seq.getCurrentMessageNr());
         setSequence(s);
+        lastMessage = seq.isLastMessage();
     }
     
     public void addAck(DestinationSequence seq) {

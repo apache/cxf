@@ -39,6 +39,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -189,6 +190,10 @@ public final class EncoderDecoder11Impl implements EncoderDecoder {
         Unmarshaller unmarshaller = getContext().createUnmarshaller();
         JAXBElement<SequenceType> jaxbElement = unmarshaller.unmarshal(elem, SequenceType.class);
         return jaxbElement.getValue();
+    }
+    
+    public CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException {
+        return null;
     }
 
     public SequenceAcknowledgement decodeSequenceAcknowledgement(Element elem) throws JAXBException {

@@ -25,9 +25,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.extensions.ExtensibilityElement;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
@@ -74,6 +78,8 @@ public class RMEndpoint {
     private static final String CREATE_PART_NAME = "create";
     private static final String CREATE_RESPONSE_PART_NAME = "createResponse";
     private static final String TERMINATE_PART_NAME = "terminate";
+    
+    private static Schema rmSchema;
 
     private RMManager manager;
     private Endpoint applicationEndpoint;
@@ -274,6 +280,7 @@ public class RMEndpoint {
 
     void createService() {
         ServiceInfo si = new ServiceInfo();
+        si.setProperty(Schema.class.getName(), getSchema());
         serviceQName = new QName(encoderDecoder.getWSRMNamespace(), SERVICE_NAME);
         si.setName(serviceQName);
         
@@ -292,6 +299,27 @@ public class RMEndpoint {
         }
         service.setDataBinding(dataBinding);
         service.setInvoker(servant);
+    }
+
+    private static synchronized Schema getSchema() {
+        if (rmSchema == null) {
+            try {
+                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                javax.xml.transform.Source ad = new StreamSource(RMEndpoint.class
+                                             .getResource("/schemas/wsdl/addressing.xsd")
+                                             .openStream(),
+                                             "http://schemas.xmlsoap.org/ws/2004/08/addressing");
+                javax.xml.transform.Source rm = new StreamSource(RMEndpoint.class
+                                                                 .getResource("/schemas/wsdl/wsrm.xsd")
+                                                                 .openStream());
+                
+                javax.xml.transform.Source schemas[] = new javax.xml.transform.Source[] {ad, rm};
+                rmSchema = factory.newSchema(schemas);
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+        return rmSchema;
     }
 
     void createEndpoint(org.apache.cxf.transport.Destination d) {
