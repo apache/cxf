@@ -38,30 +38,10 @@ on using wsdl2java, javac, and java to build and run the demos, you must
 set the environment by running the script.
 
 
-Building and running the demo using ant
----------------------------------------
+Building and running the demo using Maven
+-----------------------------------------
 
-From the samples/ws_policy directory, the ant build script can be used to
-build and run the demo.  The server and client targets automatically build
-the demo.
-
-Using either UNIX or Windows:
-
-  ant server
-  ant client
-
-Although not explicitly instructed to use these interceptors, 
-both client and server will use the MAPAggregator and MAPCodec
-interceptors to aggregate and encode the WS-Addressing MAPs.
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".
-
-
-Building and running the demo using maven
----------------------------------------
-
-From the samples/ws_policy directory, the maven pom.xml can be used to
+From the samples/ws_policy directory, the Maven pom.xml can be used to
 build and run the demo.  
 
 Using either UNIX or Windows:

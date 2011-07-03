@@ -36,26 +36,6 @@ key lengths, the Unlimited Strength files are not installed.
 [3] http://java.sun.com/javase/downloads/index.jsp
 
 
-Building and running the demo using Ant
----------------------------------------
-
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo.
-The server and client targets automatically build the demo.
-
-Using either UNIX or Windows:
-
-  ant server  (from one command line window)
-  ant client  (from a second command line window)
-
-On startup, the client makes one invocation.
-
-You can use the target client.unauthenticated to show that the policy UsernameToken is enforced by the server.
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".
-
-
 Building and running the demo using Maven
 ---------------------------------------
 
