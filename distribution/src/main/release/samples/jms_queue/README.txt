@@ -13,13 +13,11 @@ illustration purposes only.
 
 
 
-Building and running the demo using maven
+Building and running the demo using Maven
 ---------------------------------------
   
 From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo. 
-  
-Using either UNIX or Windows:
+located), using either UNIX or Windows:
 
     mvn install (this will build the demo)
     In separate command windows/shells:
