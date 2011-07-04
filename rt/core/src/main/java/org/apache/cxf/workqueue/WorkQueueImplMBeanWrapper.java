@@ -52,6 +52,21 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
         return aWorkQueue.getSize();
     }
 
+    @ManagedAttribute(description = "The largest number of threads")
+    public int getLargestPoolSize() { 
+        return aWorkQueue.getLargestPoolSize(); 
+    }
+
+    @ManagedAttribute(description = "The current number of threads")
+    public int getPoolSize() { 
+        return aWorkQueue.getPoolSize(); 
+    }
+
+    @ManagedAttribute(description = "The number of threads currently busy")
+    public int getActiveCount() { 
+        return aWorkQueue.getActiveCount(); 
+    }
+    
     @ManagedAttribute(description = "The WorkQueue has nothing to do",
                       persistPolicy = "OnUpdate")
     public boolean isEmpty() {
