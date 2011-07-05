@@ -461,6 +461,42 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         assertEquals(certificates.length, 2);
     }
     
+    @Test
+    public void testUsernameTokenSignature() throws Exception {
+        Map<String, String> outProperties = new HashMap<String, String>();
+        outProperties.put(
+            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.SIGNATURE);
+        outProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProperties.put(WSHandlerConstants.USER, "alice");
+        
+        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(WSHandlerConstants.SIGNATURE_USER, "myalias");
+        outProperties.put(
+            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
+        );
+        
+        Map<String, String> inProperties = new HashMap<String, String>();
+        inProperties.put(
+            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.SIGNATURE
+        );
+        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        inProperties.put(
+            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
+        );
+        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/ds:Signature");
+        xpaths.add("//wsse:Security/wsse:UsernameToken");
+
+        makeInvocation(outProperties, xpaths, inProperties);
+    }
+    
     
     private byte[] getMessageBytes(Document doc) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
