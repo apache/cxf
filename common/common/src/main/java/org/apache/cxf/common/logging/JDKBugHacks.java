@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.logging;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
@@ -64,7 +65,12 @@ final class JDKBugHacks {
                     // Doesn't matter that this JAR doesn't exist - just as long as
                     // the URL is well-formed
                     URL url = new URL("jar:file://dummy.jar!/");
-                    URLConnection uConn = url.openConnection();
+                    URLConnection uConn = new URLConnection(url) {
+                        @Override
+                        public void connect() throws IOException {
+                            // NOOP
+                        }
+                    };
                     uConn.setDefaultUseCaches(false);
                 } catch (Throwable e) {
                     //ignore
