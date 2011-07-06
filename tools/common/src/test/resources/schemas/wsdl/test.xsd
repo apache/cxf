@@ -17,23 +17,25 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jbi="http://cxf.apache.org/bindings/jbi"
-  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-  targetNamespace="http://cxf.apache.org/bindings/jbi"
-  elementFormDefault="qualified"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0">
-  
-  <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" schemaLocation="http://schemas.xmlsoap.org/wsdl/" />
-  
-  <xs:complexType name="JBIFormatBinding">
-    <xs:complexContent>
-      <xs:extension base="wsdl:tExtensibilityElement">
-        <xs:sequence />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  
-  <xs:element name="binding" type="jbi:JBIFormatBinding"/>
-  
-</xs:schema>
+<schema xmlns:tns="http://cxf.apache.org/person/"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+  targetNamespace="http://cxf.apache.org/person/"
+  elementFormDefault="qualified">
+  <element name="Person">
+    <complexType>
+      <sequence>
+        <element name="Name" type="string" />
+        <element name="Photo" type="base64Binary"
+          xmime:expectedContentTypes="application/octet-stream" />
+      </sequence>
+    </complexType>
+  </element>
+  <element name="People">
+    <complexType>
+      <sequence>
+        <element ref="tns:Person" maxOccurs="unbounded" />
+      </sequence>
+    </complexType>
+  </element>
+</schema>

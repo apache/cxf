@@ -182,11 +182,6 @@ public final class ToolConstants {
     public static final String NS_JMS_ADDRESS = "http://cxf.apache.org/transports/jms";
     public static final QName  JMS_ADDRESS = new QName(NS_JMS_ADDRESS, "address");
 
-    // JBI address
-    public static final String NS_JBI_ADDRESS = "http://cxf.apache.org/transports/jbi";
-    public static final QName  JBI_ADDRESS = new QName(NS_JBI_ADDRESS, "address");
-
-
     public static final String JMS_ADDR_DEST_STYLE = "destinationStyle";
     public static final String JMS_ADDR_JNDI_URL = "jndiProviderURL";
     public static final String JMS_ADDR_JNDI_FAC = "jndiConnectionFactoryName";

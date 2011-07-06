@@ -78,7 +78,6 @@
                 <exclude>**/target</exclude>
                 <exclude>**/build/**/*</exclude>
                 <exclude>**/target/**/*</exclude>
-                <exclude>integration/JBI/**/build.properties</exclude>
             </excludes>
         </fileSet>
         <fileSet>
