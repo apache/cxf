@@ -155,6 +155,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     String keyType;
     boolean sendKeyType = true;
     Message message;
+    String context;
 
     Map<String, Object> ctx = new HashMap<String, Object>();
     
@@ -265,6 +266,14 @@ public class STSClient implements Configurable, InterceptorProvider {
     
     public void setEnableAppliesTo(boolean enableAppliesTo) {
         this.enableAppliesTo = enableAppliesTo;
+    }
+    
+    public String getContext() {
+        return context;
+    }
+    
+    public void setContext(String context) {
+        this.context = context;
     }
 
     public void setAlgorithmSuite(AlgorithmSuite ag) {
@@ -472,8 +481,11 @@ public class STSClient implements Configurable, InterceptorProvider {
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         writer.writeNamespace("wst", namespace);
-        boolean wroteKeySize = false;
+        if (context != null) {
+            writer.writeAttribute(null, "Context", context);
+        }
         
+        boolean wroteKeySize = false;
         String keyTypeTemplate = null;
         String sptt = null;
         
