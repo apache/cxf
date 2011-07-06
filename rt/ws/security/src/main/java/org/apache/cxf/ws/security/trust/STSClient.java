@@ -144,6 +144,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     String namespace = STSUtils.WST_NS_05_12;
     String addressingNamespace;
     Object onBehalfOf;
+    boolean enableAppliesTo = true;
 
     boolean useCertificateForConfirmationKeyInfo;
     boolean isSecureConv;
@@ -256,6 +257,14 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     public void setSecureConv(boolean secureConv) {
         this.isSecureConv = secureConv;
+    }
+    
+    public boolean isEnableAppliesTo() {
+        return enableAppliesTo;
+    }
+    
+    public void setEnableAppliesTo(boolean enableAppliesTo) {
+        this.enableAppliesTo = enableAppliesTo;
     }
 
     public void setAlgorithmSuite(AlgorithmSuite ag) {
@@ -493,7 +502,9 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
 
         addRequestType(requestType, writer);
-        addAppliesTo(writer, appliesTo);
+        if (enableAppliesTo) {
+            addAppliesTo(writer, appliesTo);
+        }
         addOnBehalfOf(writer);
         if (sptt == null) {
             addTokenType(writer);
