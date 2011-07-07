@@ -483,9 +483,6 @@ public final class URITemplate {
      * expressions e.g. "/foo/{zipcode:[0-9]{5}}/". Nested expressions with closed sections, like open-closed
      * brackets causes expression to be out of regular grammar (is context-free grammar) which are not
      * supported by Java regexp version.
-     * 
-     * @author amichalec
-     * @version $Rev$
      */
     static class CurlyBraceTokenizer {
 
