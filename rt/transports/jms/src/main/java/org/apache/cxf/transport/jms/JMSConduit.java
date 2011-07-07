@@ -47,7 +47,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
-import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -74,7 +73,6 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private DefaultMessageListenerContainer allListener;
     private String conduitId;
     private AtomicLong messageCount;
-    private int outstandingAsync;
     private JMSBusLifeCycleListener listener;
     private Bus bus;
 
@@ -114,7 +112,6 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                                        false);
             addBusListener();
         }
-        ++outstandingAsync;
         return jmsListener;
     }
     private synchronized AbstractMessageListenerContainer getAllListener() {
@@ -126,7 +123,6 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                                        true);
             addBusListener();
         }
-        ++outstandingAsync;
         return allListener;
     }
 
@@ -348,24 +344,6 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             return;
         }
         doReplyMessage(exchange, jmsMessage);
-        maybeShutdownListeners();
-    }
-    private synchronized void maybeShutdownListenersInternal() {
-        if (outstandingAsync == 0) {
-            shutdownListeners();
-        }        
-    }
-    private synchronized void maybeShutdownListeners() {
-        if (outstandingAsync > 0) {
-            --outstandingAsync;
-        }
-        if (outstandingAsync == 0) {
-            bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue().execute(new Runnable() {
-                public void run() {
-                    maybeShutdownListenersInternal();
-                }
-            });
-        }
     }
 
     /**
