@@ -76,7 +76,7 @@ For Windows:
 
 Now compile the server applications with the commands:
 
-For UNIX:  
+For UNIX: 
   
   export CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar:./build/classes
   javac -d build/classes src/demo/hw/server/*.java
@@ -126,4 +126,26 @@ Once the server is running, browse to:
 On the web page you see, click on the 'invoke' button to invoke the
 very simple sayHi service, which takes no input and returns a single
 string.
+
+Schema Validateion Exception
+----------------------------
+When run the client with mvn -Pclient, we can get some exception like
+Marshalling Error: cvc-maxLength-valid: Value 'Invoking greetMe with 
+invalid length string, expecting exception...' with length = '67' is 
+not facet-valid with respect to maxLength '30' for type 'MyStringType'. 
+This is expected, as in the wsdl we have restriction like
+            <simpleType name="MyStringType">
+                <restriction base="string">
+                    <maxLength value="30" />
+                </restriction>
+            </simpleType>
+for greetMe request message,
+and we also enable the schema validation in cxf.xml
+            <jaxws:properties>
+                <entry key="schema-validation-enabled" value="true" />
+            </jaxws:properties>
+so if the greetMe request length is bigger than 30 character, we will see
+this exception.
+
+
 
