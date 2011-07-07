@@ -30,11 +30,11 @@ located), the maven pom.xml file can be used to build and run the demo.
 
 In separate windows:
   mvn -Pserver (starts the server)
-  mvn -Psecure.client (runs the client in secure mode, Scenario 2)
   mvn -Pinsecure.client (runs the client in insecure mode, Scenario 1)
-  mvn -Pinsecure.client.non.secure (runs the client in secure mode, Scenario 3)
-  mvn -Psecure.client.non.secure (runs the client in secure mode, Scenario 4)
-  mvn clean (removes all generated and compiled classes)
+  mvn -Psecure.client (runs the client in secure mode, Scenario 2)
+  mvn -Pinsecure.client.non.spring (runs the client in insecure mode without spring configuration, Scenario 3)
+  mvn -Psecure.client.non.spring (runs the client in secure mode without spring configuration, Scenario 4)
+  mvn clean (removes all generated and compiled classes)"
 
 
 Building and running the demo using Ant
