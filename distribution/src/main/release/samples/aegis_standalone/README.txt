@@ -38,7 +38,8 @@ located), the pom.xml file is used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install   (builds the demo)
-  mvn -Prun  (from one command line window)
+  mvn -Pwrite  (from one command line window)
+  mvn -Pread  (from one command line window)
 
 
 To remove the generated code, run "mvn clean".
