@@ -54,6 +54,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -237,51 +238,69 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         ) {
             if (results != null) {
                 for (WSHandlerResult rResult : results) {
-                    WSSecurityEngineResult wser = 
-                        findSecurityResult(rResult.getResults());
-                    if (wser != null) {
-                        List<WSSecurityEngineResult> signedResults = 
-                            new ArrayList<WSSecurityEngineResult>();
-                        WSSecurityUtil.fetchAllActionResults(
-                            rResult.getResults(), WSConstants.SIGN, signedResults
-                        );
-                        
-                        //
-                        // Validate the Issued Token policy
-                        //
-                        IssuedTokenPolicyValidator issuedValidator = 
-                            new IssuedTokenPolicyValidator(signedResults, message);
-                        if (!issuedValidator.validatePolicy(aim, wser)) {
-                            break;
+                    List<WSSecurityEngineResult> signedResults = 
+                        new ArrayList<WSSecurityEngineResult>();
+                    WSSecurityUtil.fetchAllActionResults(
+                        rResult.getResults(), WSConstants.SIGN, signedResults
+                    );
+                    IssuedTokenPolicyValidator issuedValidator = 
+                        new IssuedTokenPolicyValidator(signedResults, message);
+                    Collection<AssertionInfo> issuedAis = aim.get(SP12Constants.ISSUED_TOKEN);
+                    
+                    for (AssertionWrapper assertionWrapper 
+                        : findSamlTokenResults(rResult.getResults())) {
+                        boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
+                        if (valid) {
+                            SecurityToken token = createSecurityToken(assertionWrapper);
+                            message.getExchange().put(SecurityConstants.TOKEN, token);
+                            return;
                         }
-                        
-                        SecurityToken token = createSecurityToken(wser);
-                        message.getExchange().put(SecurityConstants.TOKEN, token);
+                    }
+                    for (BinarySecurity binarySecurityToken 
+                        : findBinarySecurityTokenResults(rResult.getResults())) {
+                        boolean valid = issuedValidator.validatePolicy(issuedAis, binarySecurityToken);
+                        if (valid) {
+                            SecurityToken token = createSecurityToken(binarySecurityToken);
+                            message.getExchange().put(SecurityConstants.TOKEN, token);
+                            return;
+                        }
                     }
                 }
             }
         }
         
-        private WSSecurityEngineResult findSecurityResult(
+        private List<AssertionWrapper> findSamlTokenResults(
             List<WSSecurityEngineResult> wsSecEngineResults
         ) {
+            List<AssertionWrapper> results = new ArrayList<AssertionWrapper>();
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
                 if (actInt.intValue() == WSConstants.ST_SIGNED
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                    return wser;
+                    results.add((AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION));
                 }
             }
-            return null;
+            return results;
+        }
+        
+        private List<BinarySecurity> findBinarySecurityTokenResults(
+            List<WSSecurityEngineResult> wsSecEngineResults
+        ) {
+            List<BinarySecurity> results = new ArrayList<BinarySecurity>();
+            for (WSSecurityEngineResult wser : wsSecEngineResults) {
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                if (actInt.intValue() == WSConstants.BST) {
+                    results.add((BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN));
+                }
+            }
+            return results;
         }
         
         private SecurityToken createSecurityToken(
-            WSSecurityEngineResult wser
+            AssertionWrapper assertionWrapper
         ) {
-            AssertionWrapper assertionWrapper = 
-                (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             SecurityToken token = new SecurityToken(assertionWrapper.getId());
-            
+
             SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
             if (subjectKeyInfo != null) {
                 token.setSecret(subjectKeyInfo.getSecret());
@@ -296,7 +315,19 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             }
             token.setToken(assertionWrapper.getElement());
+
             return token;
         }
+    
+        private SecurityToken createSecurityToken(BinarySecurity binarySecurityToken) {
+            SecurityToken token = new SecurityToken(binarySecurityToken.getID());
+            token.setToken(binarySecurityToken.getElement());
+            token.setSecret(binarySecurityToken.getToken());
+            token.setTokenType(binarySecurityToken.getValueType());
+    
+            return token;
+        }
+        
     }
+        
 }

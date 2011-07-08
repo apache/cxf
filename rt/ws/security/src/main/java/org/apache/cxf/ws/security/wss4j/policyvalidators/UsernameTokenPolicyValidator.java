@@ -56,8 +56,7 @@ public class UsernameTokenPolicyValidator extends AbstractTokenPolicyValidator {
                 ai.setAsserted(true);
                 
                 boolean tokenRequired = isTokenRequired(usernameTokenPolicy, message);
-                if ((tokenRequired && usernameToken == null) 
-                    || (!tokenRequired && usernameToken != null)) {
+                if (tokenRequired && usernameToken == null) {
                     ai.setNotAsserted(
                         "The received token does not match the token inclusion requirement"
                     );
