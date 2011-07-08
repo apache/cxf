@@ -1,8 +1,7 @@
 JavaScript Client Demo using Document/Literal Style
-=============================================
-
+===================================================
 This demo illustrates the use of the JavaScript client generator. This
-demo deploys the a service based on the wsdl_first demo, and then
+demo deploys a service based on the wsdl_first demo, and then
 provides a browser-compatible client that communicates with it. Please
 read the README.txt for the wsdl_first sample for more information on
 the service.
@@ -17,34 +16,17 @@ JavaScript client feature.
 
 Prerequisite
 ------------
-
 If your environment already includes cxf-manifest.jar on the
-CLASSPATH, and the JDK and ant bin directories on the PATH
-it is not necessary to set the environment as described in
+CLASSPATH, and the JDK directories on the PATH it is not 
+necessary to set the environment variables as described in
 the samples directory README.  If your environment is not
 properly configured, or if you are planning on using wsdl2java,
 javac, and java to build and run the demos, you must set the
-environment.
+environment variables.
 
 
-Building and running the demo using Ant
----------------------------------------
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the
-server for the demo. 
-
-Using either UNIX or Windows:
-
-  ant server  (from one command line window)
-    
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".
-
-
-Building and running the demo using maven
----------------------------------------
-
+Building and running the demo using Maven
+-----------------------------------------
 From the base directory of this sample (i.e., where this README file is
 located)
 
@@ -109,14 +91,11 @@ On Windows, a new command windows opens for the server process.  After running t
 client, terminate the server process by issuing Ctrl-C in its command window.
 
 To remove the code generated from the WSDL file and the .class
-files, either delete the build directory and its contents or run:
-
-  ant clean
+files, just delete the build directory and its contents.
 
 
 Running the client in a browser
 -------------------------------
-
 Once the server is running, browse to:
 
   http://HOSTNAME:9000/HelloWorld.html
@@ -127,24 +106,24 @@ On the web page you see, click on the 'invoke' button to invoke the
 very simple sayHi service, which takes no input and returns a single
 string.
 
-Schema Validateion Exception
+Schema Validation Exception
 ----------------------------
-When run the client with mvn -Pclient, we can get some exception like
+When running the client with mvn -Pclient, you may see exceptions like
 Marshalling Error: cvc-maxLength-valid: Value 'Invoking greetMe with 
 invalid length string, expecting exception...' with length = '67' is 
 not facet-valid with respect to maxLength '30' for type 'MyStringType'. 
-This is expected, as in the wsdl we have restriction like
+This is to be expected because in the wsdl we include restrictions such as
             <simpleType name="MyStringType">
                 <restriction base="string">
                     <maxLength value="30" />
                 </restriction>
             </simpleType>
-for greetMe request message,
-and we also enable the schema validation in cxf.xml
+for the greetMe request message,
+and we're also enabling schema validation in our cxf.xml
             <jaxws:properties>
                 <entry key="schema-validation-enabled" value="true" />
             </jaxws:properties>
-so if the greetMe request length is bigger than 30 character, we will see
+so if the greetMe request length is bigger than 30 characters, we will see
 this exception.
 
 
