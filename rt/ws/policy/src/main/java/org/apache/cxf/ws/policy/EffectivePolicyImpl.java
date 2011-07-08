@@ -98,10 +98,11 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     }
     
     void initialise(EndpointInfo ei, 
+                    BindingOperationInfo boi, 
                     BindingFaultInfo bfi, 
                     PolicyEngineImpl engine, 
                     Assertor assertor) {
-        initialisePolicy(ei, bfi, engine);
+        initialisePolicy(ei, boi, bfi, engine);
         chooseAlternative(engine, assertor);
         initialiseInterceptors(engine, false);  
     }
@@ -136,11 +137,13 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         return assertor;
     }
     
-    void initialisePolicy(EndpointInfo ei, BindingFaultInfo bfi, PolicyEngineImpl engine) {
-        BindingOperationInfo boi = bfi.getBindingOperation();
+    void initialisePolicy(EndpointInfo ei, BindingOperationInfo boi,
+                          BindingFaultInfo bfi, PolicyEngineImpl engine) {
         policy = engine.getServerEndpointPolicy(ei, (Destination)null).getPolicy();         
         policy = policy.merge(engine.getAggregatedOperationPolicy(boi));
-        policy = policy.merge(engine.getAggregatedFaultPolicy(bfi));
+        if (bfi != null) {
+            policy = policy.merge(engine.getAggregatedFaultPolicy(bfi));
+        }
         policy = (Policy)policy.normalize(engine.getRegistry(), true);
     }
 

@@ -92,16 +92,16 @@ public class PolicyVerificationInFaultInterceptor extends AbstractPolicyIntercep
         }
         
         BindingFaultInfo bfi = getBindingFaultInfo(message, ex, boi);
-        if (null == bfi) {
-            LOG.fine("No binding fault info.");
+        if (bfi == null) {
             return;
         }
-        
         getTransportAssertions(message);
         
-        EffectivePolicy effectivePolicy = pe.getEffectiveClientFaultPolicy(ei, bfi);
-        aim.checkEffectivePolicy(effectivePolicy.getPolicy());
-        LOG.fine("Verified policies for inbound message.");
+        EffectivePolicy effectivePolicy = pe.getEffectiveClientFaultPolicy(ei, boi, bfi);
+        if (effectivePolicy != null) {
+            aim.checkEffectivePolicy(effectivePolicy.getPolicy());
+            LOG.fine("Verified policies for inbound message.");
+        }
     }
 
 }

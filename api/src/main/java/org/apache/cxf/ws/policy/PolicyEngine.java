@@ -63,7 +63,8 @@ public interface PolicyEngine {
     
     void setEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
     
-    EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, Destination d);
+    EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei, BindingOperationInfo boi,
+                                                  BindingFaultInfo bfi, Destination d);
     
     void setEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep); 
     
@@ -85,7 +86,9 @@ public interface PolicyEngine {
     
     void setEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
     
-    EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi);
+    EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, 
+                                                  BindingOperationInfo boi,
+                                                  BindingFaultInfo bfi);
     
     void setEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep);
     

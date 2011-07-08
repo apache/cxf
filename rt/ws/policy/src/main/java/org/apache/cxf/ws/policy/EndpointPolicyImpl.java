@@ -228,7 +228,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                 }
                 if (boi.getFaults() != null && null != faultVocabulary) {
                     for (BindingFaultInfo bfi : boi.getFaults()) {
-                        p = engine.getEffectiveClientFaultPolicy(ei, bfi);
+                        p = engine.getEffectiveClientFaultPolicy(ei, boi, bfi);
                         c = engine.getAssertions(p, false);
                         if (c != null) {
                             addAll(faultVocabulary, c);

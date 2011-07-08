@@ -29,6 +29,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
@@ -83,12 +84,18 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         assert null != ex;
         
         BindingFaultInfo bfi = getBindingFaultInfo(msg, ex, boi);
-        if (null == bfi) {
-            LOG.fine("No binding fault info.");
+
+        if (bfi == null 
+            && msg.get(FaultMode.class) != FaultMode.UNCHECKED_APPLICATION_FAULT
+            && msg.get(FaultMode.class) != FaultMode.CHECKED_APPLICATION_FAULT) {
             return;
-        }  
+        }
         
-        EffectivePolicy effectivePolicy = pe.getEffectiveServerFaultPolicy(ei, bfi, destination);
+        
+        EffectivePolicy effectivePolicy = pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination);
+        if (effectivePolicy == null) {
+            return;
+        }
         
         List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
         for (Interceptor<? extends Message> oi : interceptors) {
