@@ -26,8 +26,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests</groupId>
-    <artifactId>cxf-systests-jaxrs</artifactId>
-    <name>Apache CXF JAX-RS System Tests</name>
+    <artifactId>cxf-systests-rs-security</artifactId>
+    <name>Apache CXF JAX-RS System Advanced Security Tests</name>
     <version>2.5.0-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
     
