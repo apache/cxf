@@ -68,7 +68,6 @@ public class SamlInRequestHandler implements RequestHandler {
         samlValidator = validator;
     }
     
-    @Override
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
         
         List<String> values = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
