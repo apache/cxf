@@ -72,8 +72,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 ai.setAsserted(true);
                 
                 boolean tokenRequired = isTokenRequired(samlToken, message);
-                if ((tokenRequired && assertionWrapper == null) 
-                    || (!tokenRequired && assertionWrapper != null)) {
+                if (tokenRequired && assertionWrapper == null) {
                     ai.setNotAsserted(
                         "The received token does not match the token inclusion requirement"
                     );

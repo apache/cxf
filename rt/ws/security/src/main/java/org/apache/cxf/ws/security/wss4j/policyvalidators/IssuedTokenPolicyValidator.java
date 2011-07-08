@@ -29,11 +29,10 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 
@@ -57,20 +56,16 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     }
     
     public boolean validatePolicy(
-        AssertionInfoMap aim,
-        WSSecurityEngineResult wser
+        Collection<AssertionInfo> issuedAis,
+        AssertionWrapper assertionWrapper
     ) {
-        Collection<AssertionInfo> issuedAis = aim.get(SP12Constants.ISSUED_TOKEN);
-        if (issuedAis != null && !issuedAis.isEmpty()) {
+        if (issuedAis != null) {
             for (AssertionInfo ai : issuedAis) {
-                AssertionWrapper assertionWrapper = 
-                    (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
                 ai.setAsserted(true);
                 
                 boolean tokenRequired = isTokenRequired(issuedToken, message);
-                if ((tokenRequired && assertionWrapper == null) 
-                    || (!tokenRequired && assertionWrapper != null)) {
+                if (tokenRequired && assertionWrapper == null) {
                     ai.setNotAsserted(
                         "The received token does not match the token inclusion requirement"
                     );
@@ -93,6 +88,36 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 }
                 if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
                     ai.setNotAsserted("Assertion fails holder-of-key requirements");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    public boolean validatePolicy(
+        Collection<AssertionInfo> issuedAis,
+        BinarySecurity binarySecurityToken
+    ) {
+        if (issuedAis != null) {
+            for (AssertionInfo ai : issuedAis) {
+                IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
+                ai.setAsserted(true);
+
+                boolean tokenRequired = isTokenRequired(issuedToken, message);
+                if (tokenRequired && binarySecurityToken == null) {
+                    ai.setNotAsserted(
+                        "The received token does not match the token inclusion requirement"
+                    );
+                    return false;
+                }
+                if (!tokenRequired) {
+                    continue;
+                }
+
+                Element template = issuedToken.getRstTemplate();
+                if (template != null && !checkIssuedTokenTemplate(template, binarySecurityToken)) {
+                    ai.setNotAsserted("Error in validating the IssuedToken policy");
                     return false;
                 }
             }
@@ -128,6 +153,24 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                         && subjectKeyInfo.getCerts() == null)) {
                         return false;
                     }
+                }
+            }
+            child = DOMUtils.getNextElement(child);
+        }
+        return true;
+    }
+    
+    /**
+     * Check the issued token template against the received BinarySecurityToken
+     */
+    private boolean checkIssuedTokenTemplate(Element template, BinarySecurity binarySecurityToken) {
+        Element child = DOMUtils.getFirstElement(template);
+        while (child != null) {
+            if ("TokenType".equals(child.getLocalName())) {
+                String content = child.getTextContent();
+                String valueType = binarySecurityToken.getValueType();
+                if (!content.equals(valueType)) {
+                    return false;
                 }
             }
             child = DOMUtils.getNextElement(child);
