@@ -32,8 +32,8 @@ In separate windows:
   mvn -Pserver (starts the server)
   mvn -Pinsecure.client (runs the client in insecure mode, Scenario 1)
   mvn -Psecure.client (runs the client in secure mode, Scenario 2)
-  mvn -Pinsecure.client.non.spring (runs the client in insecure mode without spring configuration, Scenario 3)
-  mvn -Psecure.client.non.spring (runs the client in secure mode without spring configuration, Scenario 4)
+  mvn -Pinsecure.client.non.spring (runs the client in insecure mode without Spring configuration, Scenario 3)
+  mvn -Psecure.client.non.spring (runs the client in secure mode without Spring configuration, Scenario 4)
   mvn clean (removes all generated and compiled classes)"
 
 
