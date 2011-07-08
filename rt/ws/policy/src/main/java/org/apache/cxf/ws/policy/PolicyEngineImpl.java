@@ -227,11 +227,21 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         boi.setProperty(POLICY_INFO_RESPONSE_SERVER, ep);
     }
   
-    public EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, 
+    public EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei,
+                                                         BindingOperationInfo boi,
+                                                         BindingFaultInfo bfi, 
                                                          Destination d) {
 
+        if (bfi == null) {
+            EffectivePolicyImpl epi = createOutPolicyInfo();
+            Assertor assertor = null;
+            if (d instanceof Assertor) {
+                assertor = (Assertor)d;
+            }
+            epi.initialise(ei, boi, bfi, this, assertor);
+            return epi;
+        }
         bfi = mapToWrappedBindingFaultInfo(bfi);
-
         EffectivePolicy effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
@@ -239,7 +249,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             if (d instanceof Assertor) {
                 assertor = (Assertor)d;
             }
-            epi.initialise(ei, bfi, this, assertor);
+            epi.initialise(ei, boi, bfi, this, assertor);
             bfi.setProperty(POLICY_INFO_FAULT_SERVER, epi);
             effectivePolicy = epi;
         }
@@ -326,12 +336,18 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, ep);
     }
 
-    public EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi) {
-        EffectivePolicy effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_CLIENT);
+    public EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, BindingOperationInfo boi,
+                                                         BindingFaultInfo bfi) {
+        EffectivePolicy effectivePolicy = null;
+        if (bfi != null) {
+            effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_CLIENT);
+        }
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialisePolicy(ei, bfi, this);
-            bfi.setProperty(POLICY_INFO_FAULT_CLIENT, epi);
+            epi.initialisePolicy(ei, boi, bfi, this);
+            if (bfi != null) {
+                bfi.setProperty(POLICY_INFO_FAULT_CLIENT, epi);
+            }
             effectivePolicy = epi;
         }
         return effectivePolicy;

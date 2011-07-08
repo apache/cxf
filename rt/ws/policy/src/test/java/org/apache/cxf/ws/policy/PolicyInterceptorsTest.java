@@ -233,7 +233,7 @@ public class PolicyInterceptorsTest extends Assert {
         BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
         EasyMock.expect(interceptor.getBindingFaultInfo(message, ex, boi)).andReturn(bfi);
         EffectivePolicy effectivePolicy = control.createMock(EffectivePolicyImpl.class);
-        EasyMock.expect(pe.getEffectiveServerFaultPolicy(ei, bfi, destination))
+        EasyMock.expect(pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination))
             .andReturn(effectivePolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         EasyMock.expect(effectivePolicy.getInterceptors())
