@@ -92,11 +92,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
         	<groupId>org.springframework</groupId>
         	<artifactId>spring-jms</artifactId>
         </dependency>
