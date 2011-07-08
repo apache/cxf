@@ -39,6 +39,26 @@ import java.util.*;
    What is more productive: Taking 30 minutes to bang this out in Java or
    spending a couple days learning another language that would allow me to
    bang it out in 15 minutes?
+
+   Explanation of commands: 
+
+   [B]lock will permanently block the particular commit from being merged.  
+   It won't ask again on subsequent runs of DoMerge.
+
+   [I]gnore ignores the commit for the current DoMerges run, but will ask 
+   again the next time you DoMerges.  If you're not certain for a particular
+   commit use this option for someone else to determine on a later run.
+
+   [R]ecord formally records that a merge occurred, but it does *not* 
+   actually merge the commit.  This is useful if you another tool to do
+   the merging (such as Git) but still wish to record a merge did occur.
+
+   [F]lush will permanently save all the [B]'s and [R]'s you've earlier made, 
+   useful when you need to stop DoMerges (due to a missed commit or other 
+   problem) before it's complete.  That way subsequent runs of DoMerges 
+   won't go through the blocked/recorded items again.  (Flushes occur
+   automatically when DoMerges is finished running.)
+
 */
 
 public class DoMerges {
