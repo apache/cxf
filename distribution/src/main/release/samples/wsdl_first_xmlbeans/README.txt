@@ -190,3 +190,24 @@ you can use
 
 to invoke the service with simple HttpURLConnection, or you can even
 use your favorite browser to get the results back.
+
+Schema Validation Exception
+----------------------------
+When running the client with mvn -Pclient, you may see exceptions like
+org.apache.xmlbeans.impl.values.XmlValueOutOfRangeException: string length (67) 
+is greater than maxLength facet (30) for MyStringType in namespace 
+http://apache.org/hello_world_soap_http/types
+This is to be expected because in the wsdl we include restrictions such as
+            <simpleType name="MyStringType">
+                <restriction base="string">
+                    <maxLength value="30" />
+                </restriction>
+            </simpleType>
+for the greetMe request message,
+and we're also enabling schema validation in our cxf.xml
+            <jaxws:properties>
+                <entry key="schema-validation-enabled" value="true" />
+            </jaxws:properties>
+so if the greetMe request length is bigger than 30 characters, we will see
+this exception.
+
