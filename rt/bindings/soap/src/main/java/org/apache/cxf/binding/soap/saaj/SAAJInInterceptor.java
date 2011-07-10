@@ -72,6 +72,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 @NoJSR250Annotations
 public class SAAJInInterceptor extends AbstractSoapInterceptor {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJInInterceptor.class);
+    private static final String BODY_FILLED_IN = SAAJInInterceptor.class.getName() + ".BODY_DONE";
     
     private MessageFactory factory11;
     private MessageFactory factory12;
@@ -104,6 +105,12 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
         if (isGET(message)) {
             return;
         }
+        
+        Boolean bodySet = (Boolean)message.get(BODY_FILLED_IN);
+        if (bodySet != null && bodySet == Boolean.TRUE) {
+            return;
+        }
+        message.put(BODY_FILLED_IN, Boolean.TRUE);
 
         try {
             MessageFactory factory = getFactory(message);
