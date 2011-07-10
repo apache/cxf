@@ -99,30 +99,20 @@ public class RMEndpoint {
     private long lastControlMessage;
 
     /**
-     * Constructor when WS-ReliableMessaging version to be used is already known.
+     * Constructor.
      * 
      * @param m
      * @param ae
      * @param codec
      */
     public RMEndpoint(RMManager m, Endpoint ae, EncoderDecoder codec) {
-        this(m, ae);
-        encoderDecoder = codec;
-    }
-
-    /**
-     * Constructor when WS-ReliableMessaging version to be used is not yet known.
-     * 
-     * @param m
-     * @param ae
-     */
-    public RMEndpoint(RMManager m, Endpoint ae) {
         manager = m;
         applicationEndpoint = ae;
         source = new Source(this);
         destination = new Destination(this);
         proxy = new Proxy(this);
         servant = new Servant(this);
+        encoderDecoder = codec;
     }
 
     /**
