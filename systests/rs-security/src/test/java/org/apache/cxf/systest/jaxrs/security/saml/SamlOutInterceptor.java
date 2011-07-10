@@ -20,6 +20,7 @@ package org.apache.cxf.systest.jaxrs.security.saml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Collections;
@@ -28,12 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 import java.util.zip.Deflater;
 
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -54,6 +57,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
 
 public class SamlOutInterceptor extends AbstractPhaseInterceptor<Message> {
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(SamlOutInterceptor.class);
     private static final String CRYPTO_CACHE = "ws-security.crypto.cache";
     
     public SamlOutInterceptor() {
@@ -120,7 +125,10 @@ public class SamlOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     CastUtils.cast(Collections.singletonList(builder.toString()), String.class));
             }
         } catch (Exception ex) {
-            throw new Fault(ex);
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            LOG.warning(sw.toString());
+            throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
         }
         
     }
