@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.List;
+
 
 
 public class BookSubresourceImpl implements BookSubresource {
@@ -55,11 +57,15 @@ public class BookSubresourceImpl implements BookSubresource {
         return b;
     }
     
-    public Book getTheBook3(String sid, String name, Integer nameid) throws BookNotFoundFault {
+    public Book getTheBook3(String sid, List<String> nameParts) throws BookNotFoundFault {
+        if (nameParts.size() != 2) {
+            throw new RuntimeException("Wrong number of name parts");
+        }
+        
         Book b = new Book();
         
         b.setId(Long.valueOf(sid)); 
-        b.setName(name + nameid.toString());
+        b.setName(nameParts.get(0) + nameParts.get(1));
         return b;
     }
     

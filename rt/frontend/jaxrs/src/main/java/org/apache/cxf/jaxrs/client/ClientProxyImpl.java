@@ -25,6 +25,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -388,8 +390,18 @@ public class ClientProxyImpl extends AbstractClient implements
         
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
-            if (params[p.getIndex()] != null) {
-                FormUtils.addPropertyToForm(form, p.getName(), params[p.getIndex()]);
+            Object pValue = params[p.getIndex()];
+            if (pValue != null) {
+                if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
+                    Collection<?> c = pValue.getClass().isArray() 
+                        ? Arrays.asList((Object[]) pValue) : (Collection) pValue;
+                    for (Iterator<?> it = c.iterator(); it.hasNext();) {
+                        FormUtils.addPropertyToForm(form, p.getName(), it.next());
+                    }
+                } else { 
+                    FormUtils.addPropertyToForm(form, p.getName(), pValue); 
+                }
+                
             }
         }
         

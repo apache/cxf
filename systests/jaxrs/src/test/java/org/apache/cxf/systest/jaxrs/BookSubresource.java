@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
@@ -58,8 +60,7 @@ public interface BookSubresource {
     @POST
     @Path("/subresource3")
     Book getTheBook3(@FormParam("id") String id,
-                     @FormParam("name") String name,
-                     @FormParam("nameid") Integer nameid) throws BookNotFoundFault;
+                     @FormParam("name") List<String> nameParts) throws BookNotFoundFault;
     
     @POST
     @Path("/subresource4/{id}/{name}")
