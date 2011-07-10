@@ -20,15 +20,19 @@
 package org.apache.cxf.systest.jaxrs.security.saml;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
+import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -36,6 +40,8 @@ import javax.ws.rs.core.Response;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -46,6 +52,7 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
@@ -57,6 +64,8 @@ import org.apache.ws.security.validate.Validator;
 
 public class SamlInRequestHandler implements RequestHandler {
 
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(SamlInRequestHandler.class);
     private static final String SAML_AUTH = "SAML";
     
     @Context
@@ -72,12 +81,12 @@ public class SamlInRequestHandler implements RequestHandler {
         
         List<String> values = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (values == null || values.size() != 1 || !values.get(0).startsWith(SAML_AUTH)) {
-            return Response.status(401).build();    
+            throwFault("Authorization header must be available and use SAML profile", null);    
         }
         
         String[] parts = values.get(0).split(" ");
         if (parts.length != 2) {
-            return Response.status(401).build();
+            throwFault("Authorization header is malformed", null);
         }
         
         Document doc = null;
@@ -90,8 +99,12 @@ public class SamlInRequestHandler implements RequestHandler {
             
             ByteArrayInputStream bis = new ByteArrayInputStream(input, 0, length); 
             doc = DOMUtils.readXml(new InputStreamReader(bis, "UTF-8"));
+        } catch (Base64Exception ex) {
+            throwFault("Base64 decoding has failed", ex);
+        } catch (DataFormatException ex) {
+            throwFault("Encoded assertion can not be inflated", ex);
         } catch (Exception ex) {
-            return Response.status(401).build();
+            throwFault("Assertion can not be read as XML document", ex);
         }
         
         try {
@@ -101,8 +114,12 @@ public class SamlInRequestHandler implements RequestHandler {
                 WSSConfig cfg = new WSSConfig(); 
                 data.setWssConfig(cfg);
                 data.setCallbackHandler(getCallbackHandler(message));
-                data.setSigCrypto(getCrypto(message, 
-                                            SecurityConstants.SIGNATURE_PROPERTIES));
+                try {
+                    data.setSigCrypto(getCrypto(message, 
+                                                SecurityConstants.SIGNATURE_PROPERTIES));
+                } catch (IOException ex) {
+                    throwFault("Crypto can not be loaded", ex);
+                }
                 data.setEnableRevocation(MessageUtils.isTrue(
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
                 assertion.verifySignature(data, null);
@@ -128,14 +145,22 @@ public class SamlInRequestHandler implements RequestHandler {
                 
             }
         } catch (Exception ex) {
-            return Response.status(401).build();
+            throwFault("Assertion can not be validated", ex);
         }
         
         return null;
     }
 
+    private void throwFault(String error, Exception ex) {
+        // TODO: get bundle resource message once this filter is moved 
+        // to rt/rs/security
+        LOG.warning(error);
+        Response response = Response.status(401).entity(error).build();
+        throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
+    }
     
-    protected Crypto getCrypto(Message message, String propKey) throws Exception {
+    protected Crypto getCrypto(Message message, String propKey) 
+        throws IOException, WSSecurityException {
         
         Object o = message.getContextualProperty(propKey);
         if (o == null) {
@@ -144,28 +169,25 @@ public class SamlInRequestHandler implements RequestHandler {
         
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
-            try {
-                URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
-                if (url == null) {
-                    ResourceManager manager = message.getExchange()
-                            .getBus().getExtension(ResourceManager.class);
-                    ClassLoader loader = manager.resolveResource("", ClassLoader.class);
-                    if (loader != null) {
-                        Thread.currentThread().setContextClassLoader(loader);
-                    }
-                    url = manager.resolveResource((String)o, URL.class);
+            URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
+            if (url == null) {
+                ResourceManager manager = message.getExchange()
+                        .getBus().getExtension(ResourceManager.class);
+                ClassLoader loader = manager.resolveResource("", ClassLoader.class);
+                if (loader != null) {
+                    Thread.currentThread().setContextClassLoader(loader);
                 }
-                if (url != null) {
-                    Properties props = new Properties();
-                    InputStream in = url.openStream(); 
-                    props.load(in);
-                    in.close();
-                    return CryptoFactory.getInstance(props);
-                }
-            } catch (Exception e) {
-                //ignore
-            } 
-            return CryptoFactory.getInstance((String)o);
+                url = manager.resolveResource((String)o, URL.class);
+            }
+            if (url != null) {
+                Properties props = new Properties();
+                InputStream in = url.openStream(); 
+                props.load(in);
+                in.close();
+                return CryptoFactory.getInstance(props);
+            } else {
+                return CryptoFactory.getInstance((String)o);
+            }
         } finally {
             Thread.currentThread().setContextClassLoader(orig);
         }

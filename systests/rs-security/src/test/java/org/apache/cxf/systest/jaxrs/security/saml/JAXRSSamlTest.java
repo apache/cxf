@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -64,8 +65,12 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         bean.getOutInterceptors().add(new SamlOutInterceptor());
         
         WebClient wc = bean.createWebClient();
-        Book book = wc.get(Book.class);
-        assertEquals(123L, book.getId());
+        try {
+            Book book = wc.get(Book.class);
+            assertEquals(123L, book.getId());
+        } catch (ServerWebApplicationException ex) {
+            fail(ex.getMessage());
+        }
     }
     
     
