@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -70,7 +71,14 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             assertEquals(123L, book.getId());
         } catch (ServerWebApplicationException ex) {
             fail(ex.getMessage());
+        } catch (ClientWebApplicationException ex) {
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                fail(ex.getCause().getMessage());
+            } else {
+                fail(ex.getMessage());
+            }
         }
+        
     }
     
     

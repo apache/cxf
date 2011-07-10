@@ -61,9 +61,9 @@ public class SamlOutInterceptor extends AbstractPhaseInterceptor<Message> {
     } 
 
     public void handleMessage(Message message) throws Fault {
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(new SamlCallbackHandler());
         try {
-            SAMLParms samlParms = new SAMLParms();
-            samlParms.setCallbackHandler(new SamlCallbackHandler());
             AssertionWrapper assertion = new AssertionWrapper(samlParms);
             boolean selfSignAssertion = 
                 MessageUtils.getContextualBoolean(
@@ -120,8 +120,9 @@ public class SamlOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     CastUtils.cast(Collections.singletonList(builder.toString()), String.class));
             }
         } catch (Exception ex) {
-            // ignore
+            throw new Fault(ex);
         }
+        
     }
         
     private String getPassword(CallbackHandler handler, String userName, int type) {
