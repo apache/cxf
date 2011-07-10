@@ -525,8 +525,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(baseAddress);
         MultivaluedMap<String, Object> map = new MetadataMap<String, Object>();
         map.putSingle("id", "679");
-        map.putSingle("name", "CXF in Action - ");
-        map.putSingle("nameid", "679");
+        map.add("name", "CXF in Action - ");
+        map.add("name", "679");
         Book b = readBook((InputStream)wc.accept("application/xml")
                           .form((Map<String, List<Object>>)map).getEntity());
         assertEquals(679, b.getId());
@@ -541,7 +541,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(baseAddress);
         Form f = new Form();
         f.set("id", "679").set("name", "CXF in Action - ")
-            .set("nameid", "679");
+            .set("name", "679");
         Book b = readBook((InputStream)wc.accept("application/xml")
                           .form(f).getEntity());
         assertEquals(679, b.getId());
@@ -555,7 +555,10 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                                   BookStoreJaxrsJaxws.class);
         BookSubresource bs = proxy.getBookSubresource("679");
-        Book b = bs.getTheBook3("679", "CXF in Action - ", new Integer(679));
+        List<String> parts = new ArrayList<String>();
+        parts.add("CXF in Action - ");
+        parts.add(Integer.toString(679));
+        Book b = bs.getTheBook3("679", parts);
         assertEquals(679, b.getId());
         assertEquals("CXF in Action - 679", b.getName());
     }
