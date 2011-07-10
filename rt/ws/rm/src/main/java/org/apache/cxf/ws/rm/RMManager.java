@@ -499,13 +499,13 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                 exchange.put(BindingInfo.class, endpoint.getEndpointInfo().getBinding());
                 exchange.put(Bus.class, bus);
                 
-                SequenceType st = RMUtils.getWSRMFactory().createSequenceType();
+                SequenceType st = new SequenceType();
                 st.setIdentifier(ss.getIdentifier());
                 st.setMessageNumber(m.getMessageNumber());
                 RMProperties rmps = new RMProperties();
                 rmps.setSequence(st);
                 if (ss.isLastMessage() && ss.getCurrentMessageNr() == m.getMessageNumber()) {
-                    CloseSequenceType close = RMUtils.getWSRMFactory().createCloseSequenceType();
+                    CloseSequenceType close = new CloseSequenceType();
                     close.setIdentifier(ss.getIdentifier());
                     rmps.setCloseSequence(close);
                 }
@@ -603,7 +603,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
 
         public Identifier generateSequenceIdentifier() {
             String sequenceID = RMContextUtils.generateUUID();
-            Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
+            Identifier sid = new Identifier();
             sid.setValue(sequenceID);
             return sid;
         }

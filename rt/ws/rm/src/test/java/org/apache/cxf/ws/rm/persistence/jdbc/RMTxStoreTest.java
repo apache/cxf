@@ -124,7 +124,7 @@ public class RMTxStoreTest extends Assert {
     @Test
     public void testCreateDeleteSrcSequences() {
         SourceSequence seq = control.createMock(SourceSequence.class);
-        Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getExpires()).andReturn(null);
@@ -153,11 +153,11 @@ public class RMTxStoreTest extends Assert {
         control.verify();
         
         control.reset();
-        Identifier sid2 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid2 = new Identifier();
         sid2.setValue("sequence2");
         EasyMock.expect(seq.getIdentifier()).andReturn(sid2);  
         EasyMock.expect(seq.getExpires()).andReturn(new Date());
-        Identifier sid3 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid3 = new Identifier();
         sid3.setValue("offeringSequence3");
         EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(sid3);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
@@ -177,7 +177,7 @@ public class RMTxStoreTest extends Assert {
     @Test
     public void testCreateDeleteDestSequences() {
         DestinationSequence seq = control.createMock(DestinationSequence.class);
-        Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
         EndpointReferenceType epr = RMUtils.createAnonymousReference();
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
@@ -205,7 +205,7 @@ public class RMTxStoreTest extends Assert {
         control.verify();
         
         control.reset();
-        Identifier sid2 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid2 = new Identifier();
         sid2.setValue("sequence2");
         EasyMock.expect(seq.getIdentifier()).andReturn(sid2); 
         epr = RMUtils.createReference(NON_ANON_ACKS_TO);
@@ -226,7 +226,7 @@ public class RMTxStoreTest extends Assert {
     @Test
     public void testCreateDeleteMessages() throws IOException, SQLException  {
         RMMessage msg = control.createMock(RMMessage.class);
-        Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
         EasyMock.expect(msg.getMessageNumber()).andReturn(ONE).times(2); 
         byte[] bytes = new byte[89];
@@ -276,7 +276,7 @@ public class RMTxStoreTest extends Assert {
         store.removeMessages(sid1, messageNrs, true);
         store.removeMessages(sid1, messageNrs, false);
         
-        Identifier sid2 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid2 = new Identifier();
         sid1.setValue("sequence2");
         store.removeMessages(sid2, messageNrs, true);
     }
@@ -284,7 +284,7 @@ public class RMTxStoreTest extends Assert {
     @Test
     public void testUpdateDestinationSequence() throws SQLException, IOException {
         DestinationSequence seq = control.createMock(DestinationSequence.class);
-        Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
         EndpointReferenceType epr = RMUtils.createAnonymousReference();
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
@@ -321,7 +321,7 @@ public class RMTxStoreTest extends Assert {
     @Test
     public void testUpdateSourceSequence() throws SQLException {
         SourceSequence seq = control.createMock(SourceSequence.class);
-        Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getExpires()).andReturn(null);
@@ -422,7 +422,7 @@ public class RMTxStoreTest extends Assert {
         Identifier sid1 = null;
         Identifier sid2 = null;
         
-        DestinationSequence seq = store.getDestinationSequence(RMUtils.getWSRMFactory().createIdentifier());
+        DestinationSequence seq = store.getDestinationSequence(new Identifier());
         assertNull(seq);
 
         try {
@@ -450,7 +450,7 @@ public class RMTxStoreTest extends Assert {
         Identifier sid1 = null;
         Identifier sid2 = null;
         
-        SourceSequence seq = store.getSourceSequence(RMUtils.getWSRMFactory().createIdentifier());
+        SourceSequence seq = store.getSourceSequence(new Identifier());
         assertNull(seq);
         
         try {
@@ -475,9 +475,9 @@ public class RMTxStoreTest extends Assert {
     @Test
     public void testGetMessages() throws SQLException, IOException {
         
-        Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
-        Identifier sid2 = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid2 = new Identifier();
         sid2.setValue("sequence2");
         
         Collection<RMMessage> out = store.getMessages(sid1, true);
@@ -520,7 +520,7 @@ public class RMTxStoreTest extends Assert {
     private Identifier setupDestinationSequence(String s) throws IOException, SQLException {
         DestinationSequence seq = control.createMock(DestinationSequence.class);
         
-        Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid = new Identifier();
         sid.setValue(s);
         EndpointReferenceType epr = RMUtils.createAnonymousReference();
         
@@ -551,7 +551,7 @@ public class RMTxStoreTest extends Assert {
     
     private Identifier setupSourceSequence(String s) throws SQLException {
         SourceSequence seq = control.createMock(SourceSequence.class);        
-        Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid = new Identifier();
         sid.setValue(s);      
             
         Date expiry = null;
@@ -561,7 +561,7 @@ public class RMTxStoreTest extends Assert {
         
         if ("sequence2".equals(s)) {
             expiry = new Date(System.currentTimeMillis() + 3600 * 1000);
-            osid = RMUtils.getWSRMFactory().createIdentifier();
+            osid = new Identifier();
             osid.setValue("offeringSequence");
             cmn = TEN;
             lm = true;            

@@ -52,7 +52,6 @@ import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMProperties;
-import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.SequenceFault;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -62,6 +61,7 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -236,7 +236,7 @@ public class RMSoapInterceptorTest extends Assert {
         message = setupOutboundFaultMessage();
         SequenceFault sf = new SequenceFault("REASON");
         sf.setFaultCode(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME);
-        Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier sid = new Identifier();
         sid.setValue("SID");
         sf.setSender(true);
         f.initCause(sf);

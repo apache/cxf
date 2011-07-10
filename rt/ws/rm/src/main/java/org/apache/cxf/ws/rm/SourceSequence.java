@@ -63,7 +63,7 @@ public class SourceSequence extends AbstractSequence {
 
         currentMessageNumber = cmn;
         lastMessage = lm;
-        acknowledgement = RMUtils.getWSRMFactory().createSequenceAcknowledgement();
+        acknowledgement = new SequenceAcknowledgement();
         acknowledgement.setIdentifier(id);
     }
 

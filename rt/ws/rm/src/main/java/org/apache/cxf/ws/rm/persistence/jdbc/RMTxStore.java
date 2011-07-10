@@ -301,7 +301,7 @@ public class RMTxStore implements RMStore {
                 String oidValue = res.getString(4);
                 Identifier oi = null;
                 if (null != oidValue) {
-                    oi = RMUtils.getWSRMFactory().createIdentifier();
+                    oi = new Identifier();
                     oi.setValue(oidValue);
                 }                            
                 return new SourceSequence(sid, expiry, oi, cmn, lm);
@@ -365,7 +365,7 @@ public class RMTxStore implements RMStore {
             
             ResultSet res = selectDestSequencesStmt.executeQuery(); 
             while (res.next()) {
-                Identifier sid = RMUtils.getWSRMFactory().createIdentifier();                
+                Identifier sid = new Identifier();                
                 sid.setValue(res.getString(1));
                 EndpointReferenceType acksTo = RMUtils.createReference(res.getString(2));  
                 long lm = res.getLong(3);
@@ -398,7 +398,7 @@ public class RMTxStore implements RMStore {
             ResultSet res = selectSrcSequencesStmt.executeQuery();
             
             while (res.next()) {
-                Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
+                Identifier sid = new Identifier();
                 sid.setValue(res.getString(1));
                 long cmn = res.getLong(2);
                 boolean lm = res.getBoolean(3);
@@ -407,7 +407,7 @@ public class RMTxStore implements RMStore {
                 String oidValue = res.getString(5);
                 Identifier oi = null;
                 if (null != oidValue) {
-                    oi = RMUtils.getWSRMFactory().createIdentifier();
+                    oi = new Identifier();
                     oi.setValue(oidValue);
                 }                            
                 SourceSequence seq = new SourceSequence(sid, expiry, oi, cmn, lm);

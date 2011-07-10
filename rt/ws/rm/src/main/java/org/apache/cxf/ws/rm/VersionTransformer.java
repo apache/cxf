@@ -204,7 +204,7 @@ public final class VersionTransformer {
         if (exposed == null) {
             return null;
         }
-        Identifier internal = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier internal = new Identifier();
         internal.setValue(exposed.getValue());
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
@@ -220,7 +220,7 @@ public final class VersionTransformer {
         if (exposed == null) {
             return null;
         }
-        Identifier internal = RMUtils.getWSRMFactory().createIdentifier();
+        Identifier internal = new Identifier();
         internal.setValue(exposed.getValue());
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
@@ -435,7 +435,7 @@ public final class VersionTransformer {
      * @return converted
      */
     public static SequenceType convert(org.apache.cxf.ws.rm.v200502.SequenceType exposed) {
-        SequenceType internal = RMUtils.getWSRMFactory().createSequenceType();
+        SequenceType internal = new SequenceType();
         internal.setIdentifier(convert(exposed.getIdentifier()));
         internal.setMessageNumber(exposed.getMessageNumber());
         addAll(exposed.getAny(), internal.getAny());
@@ -450,7 +450,7 @@ public final class VersionTransformer {
      * @return converted
      */
     public static SequenceType convert(org.apache.cxf.ws.rm.v200502wsa15.SequenceType exposed) {
-        SequenceType internal = RMUtils.getWSRMFactory().createSequenceType();
+        SequenceType internal = new SequenceType();
         internal.setIdentifier(convert(exposed.getIdentifier()));
         internal.setMessageNumber(exposed.getMessageNumber());
         addAll(exposed.getAny(), internal.getAny());
@@ -658,7 +658,7 @@ public final class VersionTransformer {
      */
     public static SequenceAcknowledgement
     convert(org.apache.cxf.ws.rm.v200502wsa15.SequenceAcknowledgement exposed) {
-        SequenceAcknowledgement internal = RMUtils.getWSRMFactory().createSequenceAcknowledgement();
+        SequenceAcknowledgement internal = new SequenceAcknowledgement();
         internal.setIdentifier(convert(exposed.getIdentifier()));
         List<SequenceAcknowledgement.AcknowledgementRange> internalRanges
             = internal.getAcknowledgementRange();
@@ -684,7 +684,7 @@ public final class VersionTransformer {
      */
     public static SequenceAcknowledgement
     convert(org.apache.cxf.ws.rm.v200502.SequenceAcknowledgement exposed) {
-        SequenceAcknowledgement internal = RMUtils.getWSRMFactory().createSequenceAcknowledgement();
+        SequenceAcknowledgement internal = new SequenceAcknowledgement();
         internal.setIdentifier(convert(exposed.getIdentifier()));
         List<SequenceAcknowledgement.AcknowledgementRange> internalRanges
             = internal.getAcknowledgementRange();
@@ -742,7 +742,7 @@ public final class VersionTransformer {
      */
     public static AckRequestedType
     convert(org.apache.cxf.ws.rm.v200502wsa15.AckRequestedType exposed) {
-        AckRequestedType internal = RMUtils.getWSRMFactory().createAckRequestedType();
+        AckRequestedType internal = new AckRequestedType();
         internal.setIdentifier(convert(exposed.getIdentifier()));
         addAll(exposed.getAny(), internal.getAny());
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
@@ -757,7 +757,7 @@ public final class VersionTransformer {
      */
     public static AckRequestedType
     convert(org.apache.cxf.ws.rm.v200502.AckRequestedType exposed) {
-        AckRequestedType internal = RMUtils.getWSRMFactory().createAckRequestedType();
+        AckRequestedType internal = new AckRequestedType();
         internal.setIdentifier(convert(exposed.getIdentifier()));
         addAll(exposed.getAny(), internal.getAny());
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());

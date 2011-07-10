@@ -95,7 +95,7 @@ public class DestinationSequenceTest extends Assert {
         assertNotNull(seq.getAcknowledgment());
         assertNotNull(seq.getMonitor());   
         
-        SequenceAcknowledgement ack = RMUtils.getWSRMFactory().createSequenceAcknowledgement();        
+        SequenceAcknowledgement ack = new SequenceAcknowledgement();        
         seq = new DestinationSequence(id, ref, 10, ack);
         assertEquals(id, seq.getIdentifier());
         assertEquals(10, seq.getLastMessageNumber());

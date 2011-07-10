@@ -103,8 +103,7 @@ public class Servant implements Invoker {
         CreateSequenceType create = codec.convertReceivedCreateSequence(getParameter(message));
         Destination destination = reliableEndpoint.getDestination();
         
-        CreateSequenceResponseType createResponse = 
-            RMUtils.getWSRMFactory().createCreateSequenceResponseType();        
+        CreateSequenceResponseType createResponse = new CreateSequenceResponseType();        
         createResponse.setIdentifier(destination.generateSequenceIdentifier());
         
         DestinationPolicyType dp = reliableEndpoint.getManager().getDestinationPolicy();
@@ -122,14 +121,14 @@ public class Servant implements Invoker {
                     &&  supportedDuration.isShorterThan(effectiveDuration)))  {
                 effectiveDuration = supportedDuration;
             }
-            ex = RMUtils.getWSRMFactory().createExpires();
+            ex = new Expires();
             ex.setValue(effectiveDuration);
             createResponse.setExpires(ex);
         }
         
         OfferType offer = create.getOffer();
         if (null != offer) {
-            AcceptType accept = RMUtils.getWSRMFactory().createAcceptType();
+            AcceptType accept = new AcceptType();
             if (dp.isAcceptOffers()) {
                 Source source = reliableEndpoint.getSource();
                 LOG.fine("Accepting inbound sequence offer");

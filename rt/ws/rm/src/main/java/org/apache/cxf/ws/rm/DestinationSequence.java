@@ -146,8 +146,7 @@ public class DestinationSequence extends AbstractSequence {
             if (!done) {
                 
                 // need new acknowledgement range
-                AcknowledgementRange range = RMUtils.getWSRMFactory()
-                    .createSequenceAcknowledgementAcknowledgementRange();
+                AcknowledgementRange range = new AcknowledgementRange();
                 range.setLower(messageNumber);
                 range.setUpper(messageNumber);
                 acknowledgement.getAcknowledgementRange().add(i, range);

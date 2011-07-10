@@ -106,7 +106,7 @@ public class ServantTest extends Assert {
         
         manager.setDestinationPolicy(dp);
         
-        Expires expires = RMUtils.getWSRMFactory().createExpires();
+        Expires expires = new Expires();
         expires.setValue(DatatypeFactory.createDuration("P0Y0M0DT0H0M0.0S"));
         Message message = createTestCreateSequenceMessage(expires, null);
 
@@ -126,7 +126,7 @@ public class ServantTest extends Assert {
         dp.setSequenceExpiration(DURATION_SHORT);
         manager.setDestinationPolicy(dp);
         
-        Expires expires = RMUtils.getWSRMFactory().createExpires();
+        Expires expires = new Expires();
         expires.setValue(DURATION_DEFAULT);
         Message message = createTestCreateSequenceMessage(expires, null);
 
@@ -145,7 +145,7 @@ public class ServantTest extends Assert {
         dp.setAcksPolicy(ap);
         manager.setDestinationPolicy(dp);
         
-        Expires expires = RMUtils.getWSRMFactory().createExpires();
+        Expires expires = new Expires();
         expires.setValue(DURATION_SHORT);
     
         Message message = createTestCreateSequenceMessage(expires, null);        
@@ -166,7 +166,7 @@ public class ServantTest extends Assert {
         dp.setSequenceExpiration(DURATION_SHORT);
         manager.setDestinationPolicy(dp);
         
-        Expires expires = RMUtils.getWSRMFactory().createExpires();
+        Expires expires = new Expires();
         expires.setValue(DURATION_VERY_SHORT);
         
         Message message = createTestCreateSequenceMessage(expires, null);        
@@ -199,7 +199,7 @@ public class ServantTest extends Assert {
         
         message.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
         
-        CreateSequenceType cs = RMUtils.getWSRMFactory().createCreateSequenceType();
+        CreateSequenceType cs = new CreateSequenceType();
         cs.setAcksTo(RMUtils.createReference(DECOUPLED_URL));
 
         cs.setExpires(expires);
