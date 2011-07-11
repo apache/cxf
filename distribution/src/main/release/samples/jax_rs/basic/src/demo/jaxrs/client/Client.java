@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.resource.URIResolver;
 
 public final class Client {
 
@@ -64,7 +65,8 @@ public final class Client {
         System.out.println("Sent HTTP PUT request to update customer info");
         Client client = new Client();
         String inputFile = client.getClass().getResource("update_customer.xml").getFile();
-        File input = new File(inputFile);
+        URIResolver resolver = new URIResolver(inputFile);
+        File input = new File(resolver.getURI());
         PutMethod put = new PutMethod("http://localhost:9000/customerservice/customers");
         RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         put.setRequestEntity(entity);
@@ -85,7 +87,8 @@ public final class Client {
         System.out.println("\n");
         System.out.println("Sent HTTP POST request to add customer");
         inputFile = client.getClass().getResource("add_customer.xml").getFile();
-        input = new File(inputFile);
+        resolver = new URIResolver(inputFile);
+        input = new File(resolver.getURI());
         PostMethod post = new PostMethod("http://localhost:9000/customerservice/customers");
         post.addRequestHeader("Accept" , "text/xml");
         entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
