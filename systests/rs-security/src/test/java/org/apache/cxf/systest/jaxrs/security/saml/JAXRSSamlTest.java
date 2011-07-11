@@ -63,7 +63,8 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         properties.put("ws-security.self-sign-saml-assertion", "true");
         bean.setProperties(properties);
-        bean.getOutInterceptors().add(new SamlOutInterceptor());
+        bean.getOutInterceptors().add(new SamlHeaderOutInterceptor());
+        
         
         WebClient wc = bean.createWebClient();
         try {

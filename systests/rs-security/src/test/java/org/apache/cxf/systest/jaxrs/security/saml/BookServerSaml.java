@@ -45,7 +45,7 @@ public class BookServerSaml extends AbstractBusTestServerBase {
         
         sf.setResourceClasses(BookStore.class);
         
-        sf.setProvider(new SamlInRequestHandler());
+        sf.setProvider(new SamlHeaderInHandler());
         
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));

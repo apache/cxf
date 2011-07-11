@@ -19,33 +19,24 @@
 
 package org.apache.cxf.systest.jaxrs.security.saml;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.cert.Certificate;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
@@ -62,14 +53,10 @@ import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.ws.security.validate.Validator;
 
-public class SamlInRequestHandler implements RequestHandler {
+public abstract class AbstractSamlInHandler implements RequestHandler {
 
     private static final Logger LOG = 
-        LogUtils.getL7dLogger(SamlInRequestHandler.class);
-    private static final String SAML_AUTH = "SAML";
-    
-    @Context
-    private HttpHeaders headers;
+        LogUtils.getL7dLogger(AbstractSamlInHandler.class);
     
     private Validator samlValidator = new SamlAssertionValidator();
     
@@ -77,32 +64,11 @@ public class SamlInRequestHandler implements RequestHandler {
         samlValidator = validator;
     }
     
-    public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
-        
-        List<String> values = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
-        if (values == null || values.size() != 1 || !values.get(0).startsWith(SAML_AUTH)) {
-            throwFault("Authorization header must be available and use SAML profile", null);    
-        }
-        
-        String[] parts = values.get(0).split(" ");
-        if (parts.length != 2) {
-            throwFault("Authorization header is malformed", null);
-        }
+    public void validateToken(Message message, InputStream tokenStream) {
         
         Document doc = null;
         try {
-            byte[] deflatedToken = Base64Utility.decode(parts[1]);
-            Inflater inflater = new Inflater();
-            inflater.setInput(deflatedToken);
-            byte[] input = new byte[4096];
-            int length = inflater.inflate(input);
-            
-            ByteArrayInputStream bis = new ByteArrayInputStream(input, 0, length); 
-            doc = DOMUtils.readXml(new InputStreamReader(bis, "UTF-8"));
-        } catch (Base64Exception ex) {
-            throwFault("Base64 decoding has failed", ex);
-        } catch (DataFormatException ex) {
-            throwFault("Encoded assertion can not be inflated", ex);
+            doc = DOMUtils.readXml(new InputStreamReader(tokenStream, "UTF-8"));
         } catch (Exception ex) {
             throwFault("Assertion can not be read as XML document", ex);
         }
@@ -140,18 +106,16 @@ public class SamlInRequestHandler implements RequestHandler {
                 //    return Response.status(401).build();
                 //}
                 if (!checkSenderVouches(assertion, tlsCerts)) {
-                    return Response.status(401).build();
+                    throwFault("Sender vouchers claim fails", null);
                 }
                 
             }
         } catch (Exception ex) {
             throwFault("Assertion can not be validated", ex);
         }
-        
-        return null;
     }
 
-    private void throwFault(String error, Exception ex) {
+    protected void throwFault(String error, Exception ex) {
         // TODO: get bundle resource message once this filter is moved 
         // to rt/rs/security
         LOG.warning(error);
@@ -241,4 +205,5 @@ public class SamlInRequestHandler implements RequestHandler {
 //        }
 //        return true;
     }
+    
 }
