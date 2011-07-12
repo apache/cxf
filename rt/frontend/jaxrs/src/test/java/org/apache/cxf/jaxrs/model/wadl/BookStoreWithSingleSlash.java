@@ -20,19 +20,29 @@ package org.apache.cxf.jaxrs.model.wadl;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 
 @Path("/")
 public class BookStoreWithSingleSlash {
-
+    
+    @QueryParam("name")
+    private String name;
+    
+    @PathParam("id")
+    public void setId(int id) {
+    }
+    
+    
     @GET
     @Path("book")
     @ElementClass(response = Book.class)
     @Produces("application/xml")
     public Response getBookName() {
-        return null;
+        return Response.ok().entity(name).build();
     }
 }

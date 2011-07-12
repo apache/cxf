@@ -227,6 +227,9 @@ public class WadlGeneratorTest extends Assert {
                                                                  WadlGenerator.WADL_NS, "resource");
         assertEquals(1, resourceEls.size());        
         assertEquals("book", resourceEls.get(0).getAttribute("path"));
+        
+        verifyParameters(resourceEls.get(0), 1, new Param("id", "template", "xs:int"));
+        
         checkGrammars(doc.getDocumentElement(), "thebook", null, "thechapter");
     }
     

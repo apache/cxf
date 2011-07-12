@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -259,6 +260,8 @@ public class WadlGenerator implements RequestHandler {
                                 Map<Class<?>, QName> clsMap, ClassResourceInfo cri,
                                 Set<ClassResourceInfo> visitedResources) {
         visitedResources.add(cri);
+        Map<Parameter, Object> classParams = getClassParameters(cri);
+        
         List<OperationResourceInfo> sortedOps = sortOperationsByPath(
             cri.getMethodDispatcher().getOperationResourceInfos());
 
@@ -282,11 +285,24 @@ public class WadlGenerator implements RequestHandler {
                 continue;
             }
             OperationResourceInfo nextOp = i + 1 < sortedOps.size() ? sortedOps.get(i + 1) : null;
-            resourceTagOpened = handleOperation(sb, jaxbTypes, qnameResolver, clsMap, ori, nextOp,
-                                                resourceTagOpened, i);
+            resourceTagOpened = handleOperation(sb, jaxbTypes, qnameResolver, clsMap, ori, 
+                                                classParams, nextOp, resourceTagOpened, i);
         }
     }
 
+    private Map<Parameter, Object> getClassParameters(ClassResourceInfo cri) {
+        Map<Parameter, Object> classParams = new HashMap<Parameter, Object>();
+        List<Method> paramMethods = cri.getParameterMethods();
+        for (Method m : paramMethods) {
+            classParams.put(ResourceUtils.getParameter(0, m.getAnnotations()), m);
+        }
+        List<Field> fieldParams = cri.getParameterFields();
+        for (Field f : fieldParams) {
+            classParams.put(ResourceUtils.getParameter(0, f.getAnnotations()), f);
+        }
+        return classParams;
+    }
+    
     private void startResourceTag(StringBuilder sb, Class<?> serviceClass, String path) {
         sb.append("<resource path=\"").append(getPath(path)).append("\"");
         if (addResourceAndMethodIds) {
@@ -325,11 +341,11 @@ public class WadlGenerator implements RequestHandler {
                                  ElementQNameResolver qnameResolver,
                                  Map<Class<?>, QName> clsMap,
                                  OperationResourceInfo ori,
+                                 Map<Parameter, Object> classParams,
                                  OperationResourceInfo nextOp,
                                  boolean resourceTagOpened,
                                  int index) {
         Annotation[] anns = getMethod(ori).getAnnotations();
-        
     //CHECKSTYLE:ON
         boolean samePathOperationFollows = singleResourceMultipleMethods && compareOperations(ori, nextOp);
 
@@ -345,19 +361,22 @@ public class WadlGenerator implements RequestHandler {
             }
             sb.append("<resource path=\"").append(getPath(path)).append("\">");
             handleDocs(anns, sb, DocTarget.RESOURCE, false);
+            handlePathAndMatrixClassParams(sb, classParams);
             handlePathAndMatrixParams(sb, ori);
         } else if (index == 0) {
+            handlePathAndMatrixClassParams(sb, classParams);
             handlePathAndMatrixParams(sb, ori);
         }
 
         startMethodTag(sb, ori);
         handleDocs(anns, sb, DocTarget.METHOD, true);
-        if (getMethod(ori).getParameterTypes().length != 0) {
+        if (getMethod(ori).getParameterTypes().length != 0 || classParams.size() != 0) {
             sb.append("<request>");
             handleDocs(anns, sb, DocTarget.REQUEST, false);
             if (isFormRequest(ori)) {
                 handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori));
             } else {
+                doHandleClassParams(sb, classParams, ParameterType.QUERY, ParameterType.HEADER);
                 for (Parameter p : ori.getParameters()) {
                     handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p);
                 }
@@ -438,6 +457,29 @@ public class WadlGenerator implements RequestHandler {
         sb.append("</resource>");
     }
 
+    private void handlePathAndMatrixClassParams(StringBuilder sb, Map<Parameter, Object> params) {
+        doHandleClassParams(sb, params, ParameterType.PATH);
+        doHandleClassParams(sb, params, ParameterType.MATRIX);
+    }
+    
+    private void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params,
+                                                  ParameterType... pType) {
+        Set<ParameterType> pTypes = new HashSet<ParameterType>(Arrays.asList(pType));
+        for (Map.Entry<Parameter, Object> entry : params.entrySet()) {
+            Parameter pm = entry.getKey();
+            Object obj = entry.getValue();
+            if (pTypes.contains(pm.getType())) {
+                Class<?> cls = obj instanceof Method 
+                    ? ((Method)obj).getParameterTypes()[0] : ((Field)obj).getType();
+                Type type = obj instanceof Method 
+                    ? ((Method)obj).getGenericParameterTypes()[0] : ((Field)obj).getGenericType();    
+                Annotation[] ann = obj instanceof Method 
+                    ? ((Method)obj).getParameterAnnotations()[0] : ((Field)obj).getAnnotations();
+                doWriteParam(sb, pm, cls, type, pm.getName(), ann);        
+            }
+        }
+    }
+    
     private void handlePathAndMatrixParams(StringBuilder sb, OperationResourceInfo ori) {
         handleParams(sb, ori, ParameterType.PATH);
         handleParams(sb, ori, ParameterType.MATRIX);
