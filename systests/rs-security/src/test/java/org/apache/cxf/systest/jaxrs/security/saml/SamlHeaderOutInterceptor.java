@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.zip.Deflater;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
@@ -40,13 +39,20 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(SamlHeaderOutInterceptor.class);
     
+    private boolean useDeflateEncoding = true;
+    
     public SamlHeaderOutInterceptor() {
     } 
 
+    public void setUseDeflateEncoding(boolean deflate) {
+        useDeflateEncoding = deflate;
+    }
+    
     public void handleMessage(Message message) throws Fault {
-        AssertionWrapper assertion = createAssertion(message);
+        AssertionWrapper assertionWrapper = createAssertion(message);
         try {
-            String encodedToken = deflateAndEncodeToken(assertion.assertionToString());
+            
+            String encodedToken = encodeToken(assertionWrapper.assertionToString());
             
             Map<String, List<String>> headers = 
                 CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
@@ -68,25 +74,18 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         
     }
         
-    
-    private String deflateAndEncodeToken(String token) throws Base64Exception {
-        Deflater compresser = new Deflater();
+    private String encodeToken(String assertion) throws Base64Exception {
         byte[] tokenBytes = null;
         try {
-            tokenBytes = token.getBytes("UTF-8");
-            compresser.setInput(tokenBytes);
+            tokenBytes = assertion.getBytes("UTF-8");
         } catch (UnsupportedEncodingException ex) {
             // won't happen
         }
-        compresser.finish();
-        
-        byte[] output = new byte[tokenBytes.length];
-        
-        int compressedDataLength = compresser.deflate(output);
-        
+        if (useDeflateEncoding) {
+            tokenBytes = new DeflateEncoderDecoder().deflateToken(tokenBytes);
+        }
         StringWriter writer = new StringWriter();
-        Base64Utility.encode(output, 0, compressedDataLength, writer);
+        Base64Utility.encode(tokenBytes, 0, tokenBytes.length, writer);
         return writer.toString();
     }
-    
 }
