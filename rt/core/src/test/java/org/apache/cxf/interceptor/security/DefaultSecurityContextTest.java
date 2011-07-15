@@ -100,5 +100,18 @@ public class DefaultSecurityContextTest extends Assert {
         s.getPrincipals().add(group);
         assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
     }
+
+    @Test
+    public void testUserInImplicitRoles() {
+        Subject s = new Subject();
+        Principal p = new SimplePrincipal("Barry");
+        s.getPrincipals().add(p);
+        Principal role = new SimplePrincipal("friend");
+        s.getPrincipals().add(role);
+        LoginSecurityContext context = new DefaultSecurityContext(p, s); 
+        assertTrue(context.isUserInRole("friend"));
+        assertFalse(context.isUserInRole("family"));
+        assertFalse(context.isUserInRole("Barry"));
+    }
     
 }

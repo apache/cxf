@@ -68,7 +68,10 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     public boolean isUserInRole(String role) {
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (principal instanceof Group && checkGroup((Group)principal, role)) { 
+                if (principal instanceof Group && checkGroup((Group)principal, role)) {
+                    return true;
+                } else if (p != principal
+                           && role.equals(principal.getName())) {
                     return true;
                 }
             }
