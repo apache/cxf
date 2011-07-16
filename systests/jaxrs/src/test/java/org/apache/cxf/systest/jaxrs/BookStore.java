@@ -65,6 +65,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -95,6 +96,8 @@ public class BookStore {
     private HttpHeaders httpHeaders;
     @Context 
     private SecurityContext securityContext;
+    @Context 
+    private UriInfo ui;
     
     public BookStore() {
         init();
@@ -122,7 +125,16 @@ public class BookStore {
     @POST
     @Path("emptypost")
     public void emptypost() {
-        System.out.println("empty post");
+        String uri = ui.getAbsolutePath().toString();
+        System.out.println(uri);
+        if (uri.endsWith("/")) {
+            throw new WebApplicationException(400);
+        }
+    }
+    
+    @POST
+    public void emptypostNoPath() {
+        emptypost();
     }
     
     @GET
