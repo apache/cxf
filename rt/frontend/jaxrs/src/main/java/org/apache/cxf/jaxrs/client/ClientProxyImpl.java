@@ -72,6 +72,7 @@ public class ClientProxyImpl extends AbstractClient implements
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClientProxyImpl.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ClientProxyImpl.class);
+    private static final String SLASH = "/";
     
     private ClassResourceInfo cri;
     private boolean inheritHeaders;
@@ -141,9 +142,10 @@ public class ClientProxyImpl extends AbstractClient implements
         
         UriBuilder builder = getCurrentBuilder().clone(); 
         if (isRoot) {
-            builder.path(ori.getClassResourceInfo().getURITemplate().getValue());
+            addNonEmptyPath(builder, ori.getClassResourceInfo().getURITemplate().getValue());
         }
-        builder.path(ori.getURITemplate().getValue());
+        addNonEmptyPath(builder, ori.getURITemplate().getValue());
+        
         handleMatrixes(types, params, builder);
         handleQueries(types, params, builder);
         
@@ -187,6 +189,12 @@ public class ClientProxyImpl extends AbstractClient implements
         
     }
 
+    private void addNonEmptyPath(UriBuilder builder, String pathValue) {
+        if (!SLASH.equals(pathValue)) {
+            builder.path(pathValue);
+        }
+    }
+    
     private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(OperationResourceInfo ori) {
         MultivaluedMap<ParameterType, Parameter> map = 
             new MetadataMap<ParameterType, Parameter>();
