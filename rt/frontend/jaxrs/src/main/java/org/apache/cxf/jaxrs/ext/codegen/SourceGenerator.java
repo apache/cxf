@@ -576,9 +576,29 @@ public class SourceGenerator {
     private boolean writeResponseType(List<Element> responseEls, StringBuilder sbCode,
                                    Set<String> imports, Set<String> typeClassNames, 
                                    GrammarInfo gInfo) {
-        List<Element> repElements = responseEls.size() == 1 
-            ? DOMUtils.getChildrenWithName(responseEls.get(0), WadlGenerator.WADL_NS, "representation")
-            : CastUtils.cast(Collections.emptyList(), Element.class);
+        List<Element> repElements = null;
+        if (responseEls.size() >= 1) {
+            Element okResponse = null;
+            if (responseEls.size() > 1) {
+                for (int i = 0; i < responseEls.size(); i++) {
+                    String statusValue = responseEls.get(0).getAttribute("status");
+                    try {
+                        int status = statusValue.isEmpty() ? 200 : Integer.valueOf(statusValue);
+                        if (status == 200) {
+                            okResponse = responseEls.get(i);
+                            break;
+                        }
+                    } catch (NumberFormatException ex) {
+                        // ignore
+                    }
+                }
+            } else {
+                okResponse = responseEls.get(0);
+            }
+            repElements = DOMUtils.getChildrenWithName(okResponse, WadlGenerator.WADL_NS, "representation");
+        } else {
+            repElements = CastUtils.cast(Collections.emptyList(), Element.class);
+        }
         if (repElements.size() == 0) {    
             sbCode.append("void ");
             return false;
