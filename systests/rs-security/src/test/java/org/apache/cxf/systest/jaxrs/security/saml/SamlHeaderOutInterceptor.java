@@ -34,10 +34,15 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 
 public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(SamlHeaderOutInterceptor.class);
+    
+    static {
+        OpenSAMLUtil.initSamlEngine();
+    }
     
     private boolean useDeflateEncoding = true;
     

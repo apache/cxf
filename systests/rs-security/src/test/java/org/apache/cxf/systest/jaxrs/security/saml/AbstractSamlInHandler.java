@@ -136,58 +136,6 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
     }
     
-    protected Crypto getCrypto(Message message, String propKey) 
-        throws IOException, WSSecurityException {
-        
-        Object o = message.getContextualProperty(propKey);
-        if (o == null) {
-            return null;
-        }
-        
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
-        try {
-            URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
-            if (url == null) {
-                ResourceManager manager = message.getExchange()
-                        .getBus().getExtension(ResourceManager.class);
-                ClassLoader loader = manager.resolveResource("", ClassLoader.class);
-                if (loader != null) {
-                    Thread.currentThread().setContextClassLoader(loader);
-                }
-                url = manager.resolveResource((String)o, URL.class);
-            }
-            if (url != null) {
-                Properties props = new Properties();
-                InputStream in = url.openStream(); 
-                props.load(in);
-                in.close();
-                return CryptoFactory.getInstance(props);
-            } else {
-                return CryptoFactory.getInstance((String)o);
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(orig);
-        }
-    }
-    
-    private CallbackHandler getCallbackHandler(Message message) {
-        //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
-    }
-    
     // TODO: Most of this code can make it into rt/security to minimize the duplication
     //       between ws/security and rs/security
     
@@ -344,5 +292,58 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
 //            }
         }
         return false;
+    }
+    
+ // this code will be moved to a common utility class
+    protected Crypto getCrypto(Message message, String propKey) 
+        throws IOException, WSSecurityException {
+        
+        Object o = message.getContextualProperty(propKey);
+        if (o == null) {
+            return null;
+        }
+        
+        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        try {
+            URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
+            if (url == null) {
+                ResourceManager manager = message.getExchange()
+                        .getBus().getExtension(ResourceManager.class);
+                ClassLoader loader = manager.resolveResource("", ClassLoader.class);
+                if (loader != null) {
+                    Thread.currentThread().setContextClassLoader(loader);
+                }
+                url = manager.resolveResource((String)o, URL.class);
+            }
+            if (url != null) {
+                Properties props = new Properties();
+                InputStream in = url.openStream(); 
+                props.load(in);
+                in.close();
+                return CryptoFactory.getInstance(props);
+            } else {
+                return CryptoFactory.getInstance((String)o);
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(orig);
+        }
+    }
+    
+    private CallbackHandler getCallbackHandler(Message message) {
+        //Then try to get the password from the given callback handler
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+    
+        CallbackHandler handler = null;
+        if (o instanceof CallbackHandler) {
+            handler = (CallbackHandler)o;
+        } else if (o instanceof String) {
+            try {
+                handler = (CallbackHandler)ClassLoaderUtils
+                    .loadClass((String)o, this.getClass()).newInstance();
+            } catch (Exception e) {
+                handler = null;
+            }
+        }
+        return handler;
     }
 }

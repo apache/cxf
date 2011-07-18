@@ -20,15 +20,15 @@
 package org.apache.cxf.systest.jaxrs.security;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 @Path("/bookstore")
 public class BookStore {
-
-    private Book book = new Book();
     
     public BookStore() {
     }
@@ -37,6 +37,14 @@ public class BookStore {
     @Path("/books/{bookId}/")
     @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) {
+        return new Book();
+    }
+    
+    @POST
+    @Path("/books")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book addBook(Book book) {
         return book;
     }
 }
