@@ -33,6 +33,7 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 
@@ -41,6 +42,7 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         LogUtils.getL7dLogger(SamlHeaderOutInterceptor.class);
     
     static {
+        WSSConfig.init();
         OpenSAMLUtil.initSamlEngine();
     }
     
