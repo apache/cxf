@@ -75,5 +75,9 @@ public class Book implements FormInterface {
     public String form2(String f1, String f2) {
         return "";
     }
+
+    public String form3(String identificator, String f1, String f2) {
+        return "";
+    }
     
 }

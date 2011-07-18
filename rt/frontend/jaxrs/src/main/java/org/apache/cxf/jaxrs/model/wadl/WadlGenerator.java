@@ -665,7 +665,9 @@ public class WadlGenerator implements RequestHandler {
             sb.append("<representation");
             sb.append(" mediaType=\"").append(formType).append("\">");
             for (Parameter pm : ori.getParameters()) {
-                writeParam(sb, pm, ori);
+                if (pm.getType() == ParameterType.FORM) {
+                    writeParam(sb, pm, ori);
+                }
             }
             sb.append("</representation>");
         }
@@ -888,11 +890,12 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private Class<?> getFormClass(OperationResourceInfo ori) {
-        if (ori.getParameters().get(0).getType() == ParameterType.FORM) {
-            return null;
-        } else {
-            return MultivaluedMap.class;
-        }
+        for (Parameter p : ori.getParameters()) {
+            if (p.getType() == ParameterType.FORM) {
+                return null;
+            }
+        } 
+        return MultivaluedMap.class;
     }
 
     // TODO : can we reuse this block with JAXBBinding somehow ?
