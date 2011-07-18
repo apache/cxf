@@ -22,6 +22,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -36,4 +37,11 @@ public interface FormInterface {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     String form2(@FormParam("field1") String f1, @FormParam("field2") String f2);
+    
+    @Path("/form3/{id}")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
+    String form3(@PathParam("id") String id, 
+                 @FormParam("field1") String f1, @FormParam("field2") String f2);
 }
