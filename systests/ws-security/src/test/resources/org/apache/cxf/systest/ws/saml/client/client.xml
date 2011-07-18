@@ -42,7 +42,6 @@
     </cxf:bus>
     
     <http:conduit name="https://localhost.*">
-        <http:client ConnectionTimeout="6000000" ReceiveTimeout="6000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>
