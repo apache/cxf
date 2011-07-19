@@ -30,6 +30,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
@@ -117,4 +118,15 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         }
     }
 
+    public void destroy() {
+        for (String path : destinationRegistry.getDestinationsPaths()) {
+            // clean up the destination in case the destination itself can no longer access the registry later
+            AbstractHTTPDestination dest = destinationRegistry.getDestinationForPath(path);
+            synchronized (dest) {
+                destinationRegistry.removeDestination(path);
+                dest.releaseRegistry();
+            }
+        }
+        destinationRegistry = null;
+    }
 }

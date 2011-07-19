@@ -100,7 +100,7 @@ public abstract class AbstractHTTPDestination
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     protected final Bus bus;
-    protected final DestinationRegistry registry;
+    protected DestinationRegistry registry;
     protected final String path;
 
     // Configuration values
@@ -732,10 +732,20 @@ public abstract class AbstractHTTPDestination
     public boolean canAssert(QName type) {
         return PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME.equals(type); 
     }
+    
+    public void releaseRegistry() {
+        registry = null;
+    }
+    
 
     @Override
     public void shutdown() {
-        registry.removeDestination(path);
+        synchronized (this) {
+            if (registry != null) {
+                registry.removeDestination(path);
+                releaseRegistry();
+            }
+        }
         super.shutdown();
     }
 }
