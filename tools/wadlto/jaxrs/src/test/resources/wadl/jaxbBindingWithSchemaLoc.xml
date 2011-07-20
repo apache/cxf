@@ -20,7 +20,7 @@
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	schemaLocation="schemas/book.xsd"
-	node="//xs:complexType[@name='book2']/xs:sequence/xs:element[@name='id']">
+	node="//xs:complexType[@name='theBook2']/xs:sequence/xs:element[@name='id']">
 	<jaxb:property name="book2Id"/>
 </jaxb:bindings>
 
