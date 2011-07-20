@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
@@ -80,6 +81,34 @@ public class ResponseBuilderImplTest extends Assert {
         checkBuild(Response.ok().cookie(new NewCookie("a", "b"))
                                 .cookie(new NewCookie("c", "d")).build(), 
                   200, null, m);
+    }
+    
+    @Test
+    public void testTagString() {
+        Response r = Response.ok().tag("foo").build();
+        String eTag = r.getMetadata().getFirst("ETag").toString();
+        assertEquals("\"foo\"", eTag);
+    }
+    
+    @Test
+    public void testTagStringWithQuotes() {
+        Response r = Response.ok().tag("\"foo\"").build();
+        String eTag = r.getMetadata().getFirst("ETag").toString();
+        assertEquals("\"foo\"", eTag);
+    }
+    
+    @Test
+    public void testEntityTag() {
+        Response r = Response.ok().tag(new EntityTag("foo")).build();
+        String eTag = r.getMetadata().getFirst("ETag").toString();
+        assertEquals("\"foo\"", eTag);
+    }
+    
+    @Test
+    public void testEntityTag2() {
+        Response r = Response.ok().tag(new EntityTag("\"foo\"")).build();
+        String eTag = r.getMetadata().getFirst("ETag").toString();
+        assertEquals("\"foo\"", eTag);
     }
     
     @Test
