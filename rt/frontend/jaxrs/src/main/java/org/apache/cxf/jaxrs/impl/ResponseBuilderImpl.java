@@ -113,11 +113,13 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     public ResponseBuilder tag(EntityTag tag) {
-        return tag(tag == null ? null : tag.toString());
+        return setHeader(HttpHeaders.ETAG, tag == null ? null : tag.toString());
     }
 
     public ResponseBuilder tag(String tag) {
-        return setHeader(HttpHeaders.ETAG, tag);
+        // String tag value needs to be parsed as it may 
+        // contain parameters indicating it's a weak tag, etc
+        return tag(tag == null ? null : EntityTag.valueOf(tag));
     }
 
     public ResponseBuilder lastModified(Date date) {

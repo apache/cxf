@@ -50,6 +50,9 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
         }  else {
             tag = header;
         }
+        if (tag.length() > 0 && !tag.startsWith("\"") && !tag.endsWith("\"")) {
+            return new EntityTag(tag, weak);
+        }
         if (tag.length() < 2 || !tag.startsWith("\"") || !tag.endsWith("\"")) {
             throw new IllegalArgumentException("Misformatted ETag : " + header);
         }
@@ -62,7 +65,12 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
         if (tag.isWeak()) {
             sb.append(WEAK_PREFIX);
         }
-        sb.append("\"").append(tag.getValue()).append("\"");
+        String tagValue = tag.getValue();
+        if (!tagValue.startsWith("\"")) {
+            sb.append("\"").append(tagValue).append("\"");
+        } else {
+            sb.append(tagValue);
+        }
         return sb.toString();
     }
 
