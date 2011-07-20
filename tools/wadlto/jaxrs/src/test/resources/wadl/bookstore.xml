@@ -24,7 +24,7 @@
         xmlns:tns="http://superbooks" attributeFormDefault="unqualified" elementFormDefault="unqualified" 
         targetNamespace="http://superbooks">
     <xs:element name="thebook" type="tns:book"/>
-    <xs:element name="thebook2" type="tns:book2"/>
+    <xs:element name="theBook2" type="tns:theBook2"/>
     <xs:element name="thechapter" type="tns:chapter"/>
     <xs:complexType name="book">
         <xs:sequence>
@@ -37,7 +37,7 @@
             <xs:element name="id" type="xs:int"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="book2">
+    <xs:complexType name="theBook2">
         <xs:sequence>
             <xs:element name="id" type="xs:int"/>
             <xs:element minOccurs="0" name="name" type="xs:string"/>
@@ -76,7 +76,7 @@
     <resource path="/book2">
      <method name="GET" id="getBook2">
       <response>
-       <representation mediaType="application/xml" element="prefix1:thebook2"/>
+       <representation mediaType="application/xml" element="prefix1:theBook2"/>
        <representation mediaType="application/json"/>
       </response>
      </method>
@@ -100,7 +100,7 @@
        <param name="provider.bar" style="query" type="xs:int"/>
        <param name="a" style="query" repeating="true" type="xs:string"/>
 
-       <representation mediaType="application/xml" element="prefix1:thebook2">
+       <representation mediaType="application/xml" element="prefix1:theBook2">
         <doc>InputBook</doc>
        </representation>
        <representation mediaType="application/json">

@@ -738,7 +738,7 @@ public class SourceGenerator {
         if (localName == null) {
             return null;
         }
-        String clsName = packageName + "." + localName;
+        String clsName = packageName + "." + localName.toLowerCase();
         for (String type : typeClassNames) {
             if (type.toLowerCase().equals(clsName)) {
                 return type;
