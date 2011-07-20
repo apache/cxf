@@ -70,6 +70,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private static final String MAPPED_CONVENTION = "mapped";
     private static final String BADGER_FISH_CONVENTION = "badgerfish";
     
+    static {
+        new SimpleConverter();
+    }
+    
     private ConcurrentHashMap<String, String> namespaceMap = 
         new ConcurrentHashMap<String, String>();
     private boolean serializeAsArray;
