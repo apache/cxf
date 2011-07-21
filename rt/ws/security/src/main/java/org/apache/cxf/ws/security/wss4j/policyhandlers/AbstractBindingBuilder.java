@@ -79,6 +79,7 @@ import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.Header;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
+import org.apache.cxf.ws.security.policy.model.KerberosToken;
 import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
@@ -118,6 +119,7 @@ import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
@@ -567,6 +569,10 @@ public abstract class AbstractBindingBuilder {
                     addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                     ret.put(token, assertionWrapper);
                 }
+            } else if (token instanceof KerberosToken) {
+                BinarySecurity binarySecurity = addKerberosToken((KerberosToken)token);
+                addSupportingElement(cloneElement(binarySecurity.getElement()));
+                ret.put(token, binarySecurity);
             }
         }
         return ret;
@@ -618,6 +624,10 @@ public abstract class AbstractBindingBuilder {
                 WSSecUsernameToken unt = (WSSecUsernameToken)tempTok;
                 part = new WSEncryptionPart(unt.getId());
                 part.setElement(unt.getUsernameTokenElement());
+            } else if (tempTok instanceof BinarySecurity) {
+                BinarySecurity bst = (BinarySecurity)tempTok;
+                part = new WSEncryptionPart(bst.getID());
+                part.setElement(bst.getElement());
             } else if (tempTok instanceof AssertionWrapper) {
                 boolean selfSignAssertion = 
                     MessageUtils.getContextualBoolean(
@@ -844,6 +854,42 @@ public abstract class AbstractBindingBuilder {
         }
         
         return assertion;
+    }
+    
+    protected BinarySecurity addKerberosToken(KerberosToken token) throws WSSecurityException {
+        AssertionInfo info = null;
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
+        for (AssertionInfo ai : ais) {
+            if (ai.getAssertion() == token) {
+                info = ai;
+                if (!isRequestor()) {
+                    info.setAsserted(true);
+                    return null;
+                }
+            }
+        }
+        
+        //
+        // Get the BST (Kerberos) CallbackHandler
+        //
+        Object o = message.getContextualProperty(SecurityConstants.BST_CALLBACK_HANDLER);
+    
+        CallbackHandler handler = null;
+        if (o instanceof CallbackHandler) {
+            handler = (CallbackHandler)o;
+        } else if (o instanceof String) {
+            try {
+                handler = (CallbackHandler)ClassLoaderUtils
+                    .loadClass((String)o, this.getClass()).newInstance();
+            } catch (Exception e) {
+                handler = null;
+            }
+        }
+        if (handler == null) {
+            policyNotAsserted(token, "No BST CallbackHandler available");
+            return null;
+        }
+        return new BinarySecurity(handler);
     }
     
     public String getPassword(String userName, Assertion info, int type) {
