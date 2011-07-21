@@ -43,6 +43,7 @@ import org.codehaus.plexus.util.cli.Commandline;
  * @goal java2ws
  * @description CXF Java To Webservice Tool
  * @requiresDependencyResolution test
+ * @threadSafe
 */
 public class Java2WSMojo extends AbstractMojo {
     /**

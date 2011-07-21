@@ -65,6 +65,7 @@ import org.codehaus.plexus.util.cli.Commandline;
  * @phase generate-sources
  * @description CXF WSDL To Java Tool
  * @requiresDependencyResolution test
+ * @threadSafe
  */
 public class WSDL2JavaMojo extends AbstractMojo {
 

@@ -32,6 +32,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * @goal idl2wsdl
  * @description CXF IDL To WSDL Tool
+ * @threadSafe
  */
 public class IDLToWSDLPlugin extends AbstractMojo {
 

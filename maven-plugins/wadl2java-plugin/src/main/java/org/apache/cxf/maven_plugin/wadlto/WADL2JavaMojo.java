@@ -35,6 +35,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @phase generate-sources
  * @description CXF WADL To Java Tool
  * @requiresDependencyResolution test
+ * @threadSafe
  */
 public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     /**

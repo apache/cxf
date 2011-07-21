@@ -42,8 +42,8 @@
 
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-        <cxf.build-utils.version>2.3.2</cxf.build-utils.version>
-        <cxf.xjc-utils.version>2.3.2</cxf.xjc-utils.version>
+        <cxf.build-utils.version>2.3.3-SNAPSHOT</cxf.build-utils.version>
+        <cxf.xjc-utils.version>2.3.3-SNAPSHOT</cxf.xjc-utils.version>
         <cxf.jdk.version>1.6</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -656,7 +656,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
             </plugin>
         </plugins>
     </reporting>
