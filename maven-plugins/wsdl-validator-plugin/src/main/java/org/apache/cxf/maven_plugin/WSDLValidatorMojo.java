@@ -35,6 +35,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * @goal wsdlvalidator
  * @description CXF WSDL Validation
+ * @threadSafe
  */
 public class WSDLValidatorMojo extends AbstractMojo {
     /**

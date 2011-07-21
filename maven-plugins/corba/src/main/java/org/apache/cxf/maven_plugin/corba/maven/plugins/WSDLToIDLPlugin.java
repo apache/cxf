@@ -42,6 +42,7 @@ import org.apache.maven.project.MavenProject;
  * @goal wsdl2idl
  * @requiresDependencyResolution test
  * @description CXF WSDL To IDL Tool
+ * @threadSafe
  */
 public class WSDLToIDLPlugin extends AbstractMojo {
 
