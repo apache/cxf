@@ -102,9 +102,9 @@ public class XmlEncInHandler implements RequestHandler {
             throwFault("CipherValue element is not available", null);
         }
         
-        byte[] decrypedPayload = null;
+        byte[] decryptedPayload = null;
         try {
-            decrypedPayload = decryptPayload(symmetricKeyBytes, cipherValue.getTextContent().trim(),
+            decryptedPayload = decryptPayload(symmetricKeyBytes, cipherValue.getTextContent().trim(),
                                                 algorithm);
         } catch (Exception ex) {
             throwFault("Payload can not be decrypted", ex);
@@ -112,7 +112,7 @@ public class XmlEncInHandler implements RequestHandler {
         
         Document payloadDoc = null;
         try {
-            payloadDoc = DOMUtils.readXml(new InputStreamReader(new ByteArrayInputStream(decrypedPayload),
+            payloadDoc = DOMUtils.readXml(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
                                                "UTF-8"));
         } catch (Exception ex) {
             throwFault("Payload document can not be created", ex);
