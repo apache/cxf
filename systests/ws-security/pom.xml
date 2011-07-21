@@ -63,6 +63,9 @@
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/x509/DoubleItX509.wsdl</wsdl>
                                 </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl</wsdl>
+                                </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
