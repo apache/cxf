@@ -20,7 +20,6 @@ package org.apache.cxf.systest.ws.kerberos.server;
 
 import java.security.Principal;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
