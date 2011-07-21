@@ -60,19 +60,9 @@ import org.apache.cxf.common.util.StringUtils;
  * @author Costin Manolache
  */
 public final class DOMUtils {
-    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
-    private static DocumentBuilder builder;
     private static final String XMLNAMESPACE = "xmlns";
 
     private DOMUtils() {
-    }
-
-    private static synchronized DocumentBuilder getBuilder() throws ParserConfigurationException {
-        if (builder == null) {
-            FACTORY.setNamespaceAware(true);
-            builder = FACTORY.newDocumentBuilder();
-        }
-        return builder;
     }
 
     /**
@@ -494,7 +484,7 @@ public final class DOMUtils {
 
     public static DocumentBuilder createDocumentBuilder() {
         try {
-            return FACTORY.newDocumentBuilder();
+            return XMLUtils.getParser();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException("Couldn't find a DOM parser.", e);
         }
@@ -502,7 +492,7 @@ public final class DOMUtils {
 
     public static Document createDocument() {
         try {
-            return getBuilder().newDocument();
+            return XMLUtils.getParser().newDocument();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException("Couldn't find a DOM parser.", e);
         }
