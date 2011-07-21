@@ -79,7 +79,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
     
     private void doVerifyTypes(List<File> files, String schemaPackage, String ext) {
         assertTrue(checkContains(files, schemaPackage + ".Book." + ext));
-        assertTrue(checkContains(files, schemaPackage + ".Book2." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".TheBook2." + ext));
         assertTrue(checkContains(files, schemaPackage + ".Chapter." + ext));
         assertTrue(checkContains(files, schemaPackage + ".ObjectFactory." + ext));
         assertTrue(checkContains(files, schemaPackage + ".package-info." + ext));
