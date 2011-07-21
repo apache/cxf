@@ -23,7 +23,9 @@ under the License.
        xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
        xmlns:sec="http://cxf.apache.org/configuration/security"
        xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xsi:schemaLocation="
+        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
@@ -40,7 +42,7 @@ under the License.
     </cxf:bus>
 
     <httpj:engine-factory id="port-9095-tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-xmlsig}">
+        <httpj:engine port="${testutil.ports.jaxrs-xmlsec}">
             <httpj:tlsServerParameters>
                <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 
@@ -61,5 +63,61 @@ under the License.
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
+    
+    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
+    <bean id="xmlSigHandler" class="org.apache.cxf.systest.jaxrs.security.xml.XmlSigInHandler"/>
+    <bean id="xmlEncHandler" class="org.apache.cxf.systest.jaxrs.security.xml.XmlEncInHandler"/>
+    
+    <jaxrs:server 
+       address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsig"> 
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="xmlSigHandler"/>
+       </jaxrs:providers> 
+       <jaxrs:properties>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+       </jaxrs:properties> 
+     
+    </jaxrs:server>
+    
+    <jaxrs:server 
+       address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlenc"> 
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="xmlEncHandler"/>
+       </jaxrs:providers> 
+       <jaxrs:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+       </jaxrs:properties> 
+     
+    </jaxrs:server>
+    
+    <jaxrs:server 
+       address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsec"> 
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="xmlEncHandler"/>
+          <ref bean="xmlSigHandler"/>
+       </jaxrs:providers> 
+       <jaxrs:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>       
+       </jaxrs:properties> 
+     
+    </jaxrs:server>
 
 </beans>

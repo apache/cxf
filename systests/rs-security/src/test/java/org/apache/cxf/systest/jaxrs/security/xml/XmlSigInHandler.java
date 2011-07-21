@@ -44,6 +44,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -63,7 +64,7 @@ public class XmlSigInHandler implements RequestHandler {
         LogUtils.getL7dLogger(XmlSigInHandler.class);
     
     static {
-        org.apache.xml.security.Init.init();
+        WSSConfig.init();
     }
     
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
@@ -73,14 +74,23 @@ public class XmlSigInHandler implements RequestHandler {
             return null;
         }
         
-        InputStream is = message.getContent(InputStream.class);
         Document doc = null;
-        try {
-            doc = DOMUtils.readXml(is);
-        } catch (Exception ex) {
-            throwFault("Invalid XML payload", ex);
+        InputStream is = message.getContent(InputStream.class);
+        if (is != null) {
+            try {
+                doc = DOMUtils.readXml(is);
+            } catch (Exception ex) {
+                throwFault("Invalid XML payload", ex);
+            }
+        } else {
+            XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+            if (reader instanceof W3CDOMStreamReader) {
+                doc = ((W3CDOMStreamReader)reader).getDocument();
+            }
         }
-        
+        if (doc == null) {
+            throwFault("No payload is available", null);
+        }
 
         Element root = doc.getDocumentElement();
         Element sigElement = getSignatureElement(root);

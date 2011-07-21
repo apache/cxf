@@ -65,6 +65,10 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractSamlInHandler.class);
     
+    static {
+        WSSConfig.init();
+    }
+    
     private Validator samlValidator = new SamlAssertionValidator();
     
     public void setValidator(Validator validator) {
@@ -84,7 +88,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
             AssertionWrapper assertion = new AssertionWrapper(doc.getDocumentElement());
             if (assertion.isSigned()) {
                 RequestData data = new RequestData();
-                WSSConfig cfg = new WSSConfig(); 
+                WSSConfig cfg = WSSConfig.getNewInstance(); 
                 data.setWssConfig(cfg);
                 data.setCallbackHandler(getCallbackHandler(message));
                 try {

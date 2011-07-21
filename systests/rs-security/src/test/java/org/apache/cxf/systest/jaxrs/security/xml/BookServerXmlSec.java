@@ -19,20 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs.security.xml;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.systest.jaxrs.security.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
     
 public class BookServerXmlSec extends AbstractBusTestServerBase {
-    public static final String PORT = TestUtil.getPortNumber("jaxrs-xmlsig");
+    public static final String PORT = TestUtil.getPortNumber("jaxrs-xmlsec");
     private static final String SERVER_CONFIG_FILE =
         "org/apache/cxf/systest/jaxrs/security/xml/server.xml";
     
@@ -40,25 +34,13 @@ public class BookServerXmlSec extends AbstractBusTestServerBase {
         SpringBusFactory bf = new SpringBusFactory();
         Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
         BusFactory.setDefaultBus(springBus);
+        setBus(springBus);
         
-        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        
-        sf.setResourceClasses(BookStore.class);
-        
-        sf.setProvider(new XmlSigInHandler());
-        
-        sf.setResourceProvider(BookStore.class,
-                               new SingletonResourceProvider(new BookStore(), true));
-        sf.setAddress("https://localhost:" + PORT + "/");
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.signature.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/alice.properties");
-        sf.setProperties(properties);
-        
-        sf.create();        
+        try {
+            new BookServerXmlSec();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void main(String[] args) {

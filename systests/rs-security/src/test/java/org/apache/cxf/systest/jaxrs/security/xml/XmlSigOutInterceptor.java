@@ -59,6 +59,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -75,7 +76,7 @@ public class XmlSigOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final String CRYPTO_CACHE = "ws-security.crypto.cache";
     
     static {
-        org.apache.xml.security.Init.init();
+        WSSConfig.init();
     }
     
     private boolean createReferenceId = true;
@@ -181,6 +182,10 @@ public class XmlSigOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     @SuppressWarnings("unchecked")
     private Document getDomDocument(Object body, Message m) throws Exception {
+        
+        if (body instanceof Document) {
+            return (Document)body;
+        }
         
         ProviderFactory pf = ProviderFactory.getInstance(m);
         
