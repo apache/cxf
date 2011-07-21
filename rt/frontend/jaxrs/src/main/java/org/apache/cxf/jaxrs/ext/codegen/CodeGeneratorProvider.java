@@ -63,7 +63,7 @@ public class CodeGeneratorProvider implements RequestHandler {
     private static final Set<String> SUPPORTED_LANGUAGES = new HashSet<String>(
         Arrays.asList(new String[]{"java"}));
     
-    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
+    private static final File TMPDIR = FileUtils.getDefaultTempDir();
     
     
     private Comparator<String> importsComparator;
