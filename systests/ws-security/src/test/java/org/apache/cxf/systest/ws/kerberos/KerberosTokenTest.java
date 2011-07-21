@@ -83,9 +83,9 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         try {
             KerberosCallbackHandler handler = new KerberosCallbackHandler();
             handler.setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
-                ((BindingProvider)kerberosPort).getRequestContext().put(
-                    "ws-security.bst-callback-handler", handler
-                );
+            ((BindingProvider)kerberosPort).getRequestContext().put(
+                "ws-security.bst-callback-handler", handler
+            );
             kerberosPort.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with the wrong Kerberos Token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
@@ -129,9 +129,9 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         try {
             KerberosCallbackHandler handler = new KerberosCallbackHandler();
             handler.setToken("123456566");
-                ((BindingProvider)kerberosPort).getRequestContext().put(
-                    "ws-security.bst-callback-handler", handler
-                );
+            ((BindingProvider)kerberosPort).getRequestContext().put(
+                "ws-security.bst-callback-handler", handler
+            );
             kerberosPort.doubleIt(BigInteger.valueOf(25));
             fail("Expected failure on an invocation with the wrong Kerberos Token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
