@@ -125,6 +125,8 @@ public abstract class SPConstants {
     public static final String USERNAME_TOKEN = "UsernameToken";
     
     public static final String SAML_TOKEN = "SamlToken";
+    
+    public static final String KERBEROS_TOKEN = "KerberosToken";
 
     public static final String KEYVALUE_TOKEN = "KeyValueToken";
     
@@ -137,6 +139,10 @@ public abstract class SPConstants {
     public static final String SAML_11_TOKEN_11 = "WssSamlV11Token11";
     
     public static final String SAML_20_TOKEN_11 = "WssSamlV20Token11";
+    
+    public static final String KERBEROS_V5_AP_REQ_TOKEN_11 = "WssKerberosV5ApReqToken11";
+    
+    public static final String KERBEROS_GSS_V5_AP_REQ_TOKEN_11 = "WssGssKerberosV5ApReqToken11";
     
     public static final String TRANSPORT_TOKEN = "TransportToken";
     
@@ -449,6 +455,7 @@ public abstract class SPConstants {
     public abstract QName getTransportToken();
     public abstract QName getUserNameToken();
     public abstract QName getSamlToken();
+    public abstract QName getKerberosToken();
     public abstract QName getX509Token();
     
     public abstract QName getSupportingTokens();
