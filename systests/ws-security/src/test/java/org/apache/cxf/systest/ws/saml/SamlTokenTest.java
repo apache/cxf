@@ -94,7 +94,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
-        assert result.equals(BigInteger.valueOf(50));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     @org.junit.Test
