@@ -48,6 +48,7 @@ import org.apache.cxf.wsdl11.WSDLRuntimeException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -486,6 +487,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     }
 
     @Test
+    @Ignore
     public void testHelloWorldExternalBindingFile() throws Exception {
         Server server = new Server(8585);
 
