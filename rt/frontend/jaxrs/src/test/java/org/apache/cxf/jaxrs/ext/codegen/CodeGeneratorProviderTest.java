@@ -99,7 +99,7 @@ public class CodeGeneratorProviderTest extends Assert {
             cgp.setUriInfo(new UriInfoImpl(m, null));
             cgp.handleRequest(m, cri);
             
-            String tmpdir = System.getProperty("java.io.tmpdir");
+            File tmpdir = FileUtils.getDefaultTempDir();
             File classes = new File(tmpdir, cgp.getStem(cri, "classes"));
             if (!classes.mkdir()) {
                 fail();
