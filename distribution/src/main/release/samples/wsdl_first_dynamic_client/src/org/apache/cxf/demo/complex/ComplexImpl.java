@@ -30,6 +30,14 @@ import agentwsresponse.agent.legacysystemservices.schemas.hitum.esb.company.Agen
  * This is a trivial implementation of a service contributed in a bug report.  It's useful
  * as an example of a hard case of using dynamic client.
  */
+@javax.jws.WebService(
+    serviceName = "Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt",
+    portName = "Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap",
+    targetNamespace = "http://Company.com/Application",
+    wsdlLocation = "/wsdl/complex.wsdl",
+    endpointInterface = 
+        "com.company.application.CompanyESBApplicationBiztalkAgentDetails4405AgentDetailsPrtSoap")
+
 public class ComplexImpl implements CompanyESBApplicationBiztalkAgentDetails4405AgentDetailsPrtSoap {
 
     /** {@inheritDoc}*/
