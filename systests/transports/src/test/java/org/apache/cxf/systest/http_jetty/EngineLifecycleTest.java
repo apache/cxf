@@ -127,15 +127,25 @@ public class EngineLifecycleTest extends Assert {
     }
     
     private void getTestHtml() throws Exception {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:" + PORT2 + "/test.html");    
-        httpConnection.connect();
-        InputStream in = httpConnection.getInputStream();        
-        assertNotNull(in);
-        CachedOutputStream response = new CachedOutputStream();
-        IOUtils.copy(in, response);
-        in.close();
-        response.close();
+        CachedOutputStream response = null;
+        for (int i = 0; i < 10; i++) {
+            try {
+                HttpURLConnection httpConnection = 
+                    getHttpConnection("http://localhost:" + PORT2 + "/test.html");    
+                httpConnection.connect();
+                InputStream in = httpConnection.getInputStream();        
+                assertNotNull(in);
+                response = new CachedOutputStream();
+                IOUtils.copy(in, response);
+                in.close();
+                response.close();
+                break;
+            } catch (Exception ex) {
+                response = null;
+                Thread.sleep(1000);
+            }
+        }
+        assertNotNull("Test doc can not be read", response);
               
         FileInputStream htmlFile = 
             new FileInputStream("target/test-classes/org/apache/cxf/systest/http_jetty/test.html");    
