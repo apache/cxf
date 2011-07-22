@@ -86,8 +86,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         
         setSchemasLocations(bean, servletConfig);
-        setInterceptors(bean, servletConfig, OUT_INTERCEPTORS_PARAM);
-        setInterceptors(bean, servletConfig, IN_INTERCEPTORS_PARAM);
+        setAllInterceptors(bean, servletConfig);
         
         List<Class> resourceClasses = getServiceClasses(servletConfig, modelRef != null);
         Map<Class, ResourceProvider> resourceProviders = 
@@ -103,6 +102,11 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         bean.create();
     }
 
+    protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
+        setInterceptors(bean, servletConfig, OUT_INTERCEPTORS_PARAM);
+        setInterceptors(bean, servletConfig, IN_INTERCEPTORS_PARAM);
+    }
+    
     protected void setSchemasLocations(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
         String schemas = servletConfig.getInitParameter(SCHEMAS_PARAM);
         if (schemas == null) {
@@ -261,6 +265,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, MessageUtils.isTrue(ignoreParam));
+        setAllInterceptors(bean, servletConfig);
         bean.setBus(getBus());
         bean.create();
     }
