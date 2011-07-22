@@ -25,12 +25,14 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.aries.blueprint.ExtendedBlueprintContainer;
 import org.apache.aries.blueprint.container.BeanRecipe;
 import org.apache.aries.blueprint.di.ExecutionContext;
 import org.apache.aries.blueprint.di.Recipe;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -40,6 +42,7 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
  * 
  */
 public class BlueprintBeanLocator implements ConfiguredBeanLocator {
+    private static final Logger LOG = LogUtils.getL7dLogger(BlueprintBeanLocator.class);
     ConfiguredBeanLocator orig;
     ExtendedBlueprintContainer container;
     BundleContext context;
@@ -65,7 +68,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         try {
             for (String s : container.getComponentIds()) {
                 Recipe r = container.getRepository().getRecipe(s);
-                if (r instanceof BeanRecipe 
+                if (r instanceof BeanRecipe && ((BeanRecipe)r).getType() != null
                     && type.isAssignableFrom(((BeanRecipe)r).getType())) {
                     names.add(s);
                 }
@@ -86,11 +89,11 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         try {
             for (String s : container.getComponentIds()) {
                 Recipe r = container.getRepository().getRecipe(s);
-                if (r instanceof BeanRecipe 
+                if (r instanceof BeanRecipe && ((BeanRecipe)r).getType() != null
                     && type.isAssignableFrom(((BeanRecipe)r).getType())) {
                     
                     list.add(type.cast(container.getComponentInstance(s)));
-                }
+                } 
             }
         } finally {
             ExecutionContext.Holder.setContext(origContext);
@@ -106,6 +109,8 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
                 }
             } catch (Exception ex) {
                 //ignore, just don't support the OSGi services
+                LOG.info("Try to find the Bean with type:" + type 
+                    + " from OSGi services and get error: " + ex);  
             }
         }
         
@@ -121,7 +126,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         try {
             for (String s : container.getComponentIds()) {
                 Recipe r = container.getRepository().getRecipe(s);
-                if (r instanceof BeanRecipe 
+                if (r instanceof BeanRecipe && ((BeanRecipe)r).getType() != null
                     && type.isAssignableFrom(((BeanRecipe)r).getType())) {
                     names.add(s);
                 }
