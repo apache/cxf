@@ -53,12 +53,12 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
             throw (Fault) message.getContent(Exception.class);
         }
         
-        message.put(org.apache.cxf.message.Message.RESPONSE_CODE, new Integer(500));
+        Fault f = (Fault) message.getContent(Exception.class);
+        message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
         NSStack nsStack = new NSStack();
         nsStack.push();
 
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
-        Fault f = (Fault) message.getContent(Exception.class);
         XMLFault xmlFault = XMLFault.createFault(f);
         try {
             nsStack.add(XMLConstants.NS_XML_FORMAT);
