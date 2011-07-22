@@ -42,7 +42,8 @@ import org.apache.cxf.service.model.ServiceInfo;
 public final class ComplexClient {
     
     private static final QName SERVICE_NAME 
-        = new QName("http://complex.demo.cxf.apache.org/", "ComplexImplService");
+        = new QName("http://Company.com/Application", 
+                     "Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt");
     
     private ComplexClient() {
     }
@@ -71,7 +72,8 @@ public final class ComplexClient {
         ClientImpl clientImpl = (ClientImpl) client;
         Endpoint endpoint = clientImpl.getEndpoint();
         ServiceInfo serviceInfo = endpoint.getService().getServiceInfos().get(0);
-        QName bindingName = new QName("http://complex.demo.cxf.apache.org/", "ComplexImplServiceSoapBinding");
+        QName bindingName = new QName("http://Company.com/Application", 
+            "Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap");
         BindingInfo binding = serviceInfo.getBinding(bindingName);
         //{
         QName opName = new QName("http://Company.com/Application", "GetAgentDetails");
