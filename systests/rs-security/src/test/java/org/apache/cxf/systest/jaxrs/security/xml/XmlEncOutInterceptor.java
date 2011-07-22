@@ -103,6 +103,14 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
         addAfter(XmlSigOutInterceptor.class.getName());
     } 
 
+    public void setSymmetricEncAlgorithm(String algo) {
+        symEncAlgo = algo;
+    }
+    
+    public void setKeyEncAlgorithm(String algo) {
+        keyEncAlgo = algo;
+    }
+    
     public void handleMessage(Message message) throws Fault {
         try {
             Object body = getRequestBody(message);

@@ -31,6 +31,7 @@ import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.xml.security.encryption.XMLCipher;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -99,9 +100,10 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         bean.setProperties(properties);
-        bean.getOutInterceptors().add(new XmlEncOutInterceptor());
-        
-        
+        XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
+        encInterceptor.setSymmetricEncAlgorithm(XMLCipher.AES_128);
+        bean.getOutInterceptors().add(encInterceptor);
+                
         WebClient wc = bean.createWebClient();
         try {
             Book book = wc.post(new Book("CXF", 126L), Book.class);
@@ -140,7 +142,9 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         bean.getOutInterceptors().add(new XmlSigOutInterceptor());
-        bean.getOutInterceptors().add(new XmlEncOutInterceptor());
+        XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
+        encInterceptor.setSymmetricEncAlgorithm(XMLCipher.AES_128);
+        bean.getOutInterceptors().add(encInterceptor);
         
         
         WebClient wc = bean.createWebClient();
