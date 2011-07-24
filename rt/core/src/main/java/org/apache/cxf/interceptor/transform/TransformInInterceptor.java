@@ -46,7 +46,11 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     private String contextPropertyName;
     
     public TransformInInterceptor() {
-        super(Phase.POST_STREAM);
+        this(Phase.POST_STREAM);
+    }
+    
+    public TransformInInterceptor(String phase) {
+        super(phase);
         addBefore(StaxInInterceptor.class.getName());
     }
     
