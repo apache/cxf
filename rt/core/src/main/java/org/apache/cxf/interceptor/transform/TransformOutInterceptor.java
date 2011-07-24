@@ -52,7 +52,11 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private String contextPropertyName;
     
     public TransformOutInterceptor() {
-        super(Phase.PRE_STREAM);
+        this(Phase.PRE_STREAM);
+    }
+    
+    public TransformOutInterceptor(String phase) {
+        super(phase);
         addBefore(StaxOutInterceptor.class.getName());
     }
     
