@@ -38,9 +38,15 @@ public class Fault extends UncheckedException {
     public static final QName FAULT_CODE_SERVER = new QName("http://cxf.apache.org/faultcode", "server");
     public static final String STACKTRACE_NAMESPACE = "http://cxf.apache.org/fault";
     public static final String STACKTRACE = "stackTrace";
+    private static final int DEFAULT_HTTP_RESPONSE_CODE = 500;
+
     private Element detail;
     private String message;
     private QName code;
+    /**
+     * response http header status code
+     */
+    private int statusCode = DEFAULT_HTTP_RESPONSE_CODE;
     
     public Fault(Message message, Throwable throwable) {
         super(message, throwable);
@@ -160,5 +166,22 @@ public class Fault extends UncheckedException {
             detail = DOMUtils.createDocument().createElement("detail");
         }
         return detail;
+    }
+    
+    /**
+     * Returns  http header status code.
+     * @return status code.
+     */
+    public int getStatusCode() {
+        return this.statusCode;
+    }
+    
+    /**
+     * Set http header status code on this fault.
+     * 
+     * @param status code.
+     */
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 }

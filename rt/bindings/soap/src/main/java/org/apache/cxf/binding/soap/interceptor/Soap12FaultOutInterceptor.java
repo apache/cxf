@@ -44,7 +44,8 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
         super(Phase.PREPARE_SEND);
     }
     public void handleMessage(SoapMessage message) throws Fault {
-        message.put(org.apache.cxf.message.Message.RESPONSE_CODE, new Integer(500));
+        Fault f = (Fault) message.getContent(Exception.class);
+        message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
         if (message.getVersion().getVersion() == 1.1) {
             message.getInterceptorChain().add(Soap11FaultOutInterceptorInternal.INSTANCE);
         } else {
@@ -60,10 +61,10 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
         }
         public void handleMessage(SoapMessage message) throws Fault {
             LOG.info(getClass() + (String) message.get(SoapMessage.CONTENT_TYPE));
-            message.put(org.apache.cxf.message.Message.RESPONSE_CODE, new Integer(500));
             
             XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
             Fault f = (Fault)message.getContent(Exception.class);
+            message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
     
             SoapFault fault = SoapFault.createFault(f, message.getVersion());       
 

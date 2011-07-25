@@ -42,7 +42,8 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
         super(Phase.PREPARE_SEND);
     }
     public void handleMessage(SoapMessage message) throws Fault {
-        message.put(org.apache.cxf.message.Message.RESPONSE_CODE, new Integer(500));
+        Fault f = (Fault) message.getContent(Exception.class);
+        message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
         message.getInterceptorChain().add(Soap11FaultOutInterceptorInternal.INSTANCE);
     }
     
