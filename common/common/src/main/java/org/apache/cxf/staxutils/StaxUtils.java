@@ -955,10 +955,13 @@ public final class StaxUtils {
             switch (event) {
             case XMLStreamConstants.START_ELEMENT: {
                 elementCount++;
-                Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
+                Element e;
                 if (!StringUtils.isEmpty(reader.getPrefix())) {
-                    e.setPrefix(reader.getPrefix());
-                }       
+                    e = doc.createElementNS(reader.getNamespaceURI(), 
+                                            reader.getPrefix() + ":" + reader.getLocalName());
+                } else {
+                    e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
+                }
                 e = (Element)parent.appendChild(e);
                 recordLoc = addLocation(doc, e, reader, recordLoc);
 
