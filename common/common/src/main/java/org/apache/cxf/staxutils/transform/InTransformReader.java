@@ -42,6 +42,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     private int previousDepth = -1;
     private boolean blockOriginalReader = true;
     private DelegatingNamespaceContext namespaceContext;
+    private boolean appendInProgress;
     
     public InTransformReader(XMLStreamReader reader, 
                              Map<String, String> inMap,
@@ -64,7 +65,8 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
     
     public int next() throws XMLStreamException {
-        if (currentQName != null) {
+        if (currentQName != null && appendInProgress) {
+            appendInProgress = false;
             return XMLStreamConstants.START_ELEMENT;
         } else if (previousDepth != -1 && previousDepth == getDepth() + 1) {
             previousDepth = -1;
@@ -140,6 +142,7 @@ public class InTransformReader extends DepthXMLStreamReader {
         QName theName = readCurrentElement();
         QName appendQName = inAppendMap.remove(theName);
         if (appendQName != null) {
+            appendInProgress = true;
             previousDepth = getDepth();
             previousQName = theName;
             currentQName = appendQName;
