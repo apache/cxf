@@ -21,6 +21,8 @@ package org.apache.cxf.common.logging;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import org.slf4j.spi.LocationAwareLogger;
+
 /**
  * <p>
  * java.util.logging.Logger implementation delegating to SLF4J.
@@ -46,11 +48,17 @@ import java.util.logging.LogRecord;
  */
 public class Slf4jLogger extends AbstractDelegatingLogger {
 
+    private static final String FQCN = AbstractDelegatingLogger.class.getName();
+
     private final org.slf4j.Logger logger;
+    private LocationAwareLogger locationAwareLogger;
 
     public Slf4jLogger(String name, String resourceBundleName) {
         super(name, resourceBundleName);
         logger = org.slf4j.LoggerFactory.getLogger(name);
+        if (logger instanceof LocationAwareLogger) {
+            locationAwareLogger = (LocationAwareLogger) logger;
+        }
     }
 
     @Override
@@ -85,23 +93,55 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
          * comparisons is important. We first try log level FINE then INFO, WARN, FINER, etc
          */
         if (Level.FINE.equals(level)) {
-            logger.debug(msg, t);
+            if (locationAwareLogger == null) {
+                logger.debug(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.DEBUG_INT, msg, null, t);
+            }
         } else if (Level.INFO.equals(level)) {
-            logger.info(msg, t);
+            if (locationAwareLogger == null) {
+                logger.info(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.INFO_INT, msg, null, t);
+            }
         } else if (Level.WARNING.equals(level)) {
-            logger.warn(msg, t);
+            if (locationAwareLogger == null) {
+                logger.warn(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.WARN_INT, msg, null, t);
+            }
         } else if (Level.FINER.equals(level)) {
-            logger.trace(msg, t);
+            if (locationAwareLogger == null) {
+                logger.trace(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.TRACE_INT, msg, null, t);
+            }
         } else if (Level.FINEST.equals(level)) {
-            logger.trace(msg, t);
+            if (locationAwareLogger == null) {
+                logger.trace(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.TRACE_INT, msg, null, t);
+            }
         } else if (Level.ALL.equals(level)) {
             // should never occur, all is used to configure java.util.logging
             // but not accessible by the API Logger.xxx() API
-            logger.error(msg, t);
+            if (locationAwareLogger == null) {
+                logger.error(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.ERROR_INT, msg, null, t);
+            }
         } else if (Level.SEVERE.equals(level)) {
-            logger.error(msg, t);
+            if (locationAwareLogger == null) {
+                logger.error(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.ERROR_INT, msg, null, t);
+            }
         } else if (Level.CONFIG.equals(level)) {
-            logger.debug(msg, t);
+            if (locationAwareLogger == null) {
+                logger.debug(msg, t);
+            } else {
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.DEBUG_INT, msg, null, t);
+            }
         } else if (Level.OFF.equals(level)) {
             // don't log
         }
