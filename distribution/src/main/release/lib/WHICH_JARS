@@ -95,7 +95,6 @@ For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
 - spring-jms.jar
 - spring-tx.jar
-- commons-pool.jar
 
 For CORBA support:
 - antlr.jar
