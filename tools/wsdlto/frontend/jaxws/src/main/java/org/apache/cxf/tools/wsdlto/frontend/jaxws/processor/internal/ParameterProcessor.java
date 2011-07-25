@@ -103,14 +103,16 @@ public class ParameterProcessor extends AbstractProcessor {
                                                  MessagePartInfo part,
                                                  JavaType.Style style)
         throws ToolException {
-        return addParameter(method, getParameterFromPart(method, part, style));
+        return addParameter(part, method, getParameterFromPart(method, part, style));
     }
 
     private JavaParameter getParameterFromPart(JavaMethod jm, MessagePartInfo part, JavaType.Style style) {
         return ParameterMapper.map(jm, part, style, context);
     }
 
-    protected JavaParameter addParameter(JavaMethod method, JavaParameter parameter) throws ToolException {
+    protected JavaParameter addParameter(MessagePartInfo mpart,
+                                         JavaMethod method,
+                                         JavaParameter parameter) throws ToolException {
         if (parameter == null) {
             return null;
         }
@@ -123,7 +125,7 @@ public class ParameterProcessor extends AbstractProcessor {
         }
         
         parameter.setMethod(method);
-        parameter.annotate(new WebParamAnnotator());
+        parameter.annotate(new WebParamAnnotator(isOutOfBandHeader(mpart)));
         method.addParameter(parameter);
 
         return parameter;
@@ -171,6 +173,9 @@ public class ParameterProcessor extends AbstractProcessor {
     }
 
     private boolean isOutOfBandHeader(final MessagePartInfo part) {
+        if (part == null) {
+            return false;
+        }
         return Boolean.TRUE.equals(part.getProperty(OUT_OF_BAND_HEADER));
     }
 
@@ -219,7 +224,7 @@ public class ParameterProcessor extends AbstractProcessor {
                     }
                 }
             }
-            addParameter(method, param);
+            addParameter(part, method, param);
         }
     }
 
@@ -249,7 +254,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 jp.setTargetNamespace("");
             }
 
-            addParameter(method, jp);
+            addParameter(part, method, jp);
         }
 
         // Adding out of band headers
@@ -258,7 +263,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 if (!isOutOfBandHeader(hpart)) {
                     continue;
                 }
-                addParameter(method, getParameterFromPart(method, hpart, JavaType.Style.IN));
+                addParameter(hpart, method, getParameterFromPart(method, hpart, JavaType.Style.IN));
             }
         }
     }
@@ -303,12 +308,13 @@ public class ParameterProcessor extends AbstractProcessor {
                             p.setClassName(holderClass);
                             p.getAnnotations().clear();
                             p.setStyle(JavaType.Style.INOUT);
-                            p.annotate(new WebParamAnnotator());
+                            p.annotate(new WebParamAnnotator(isOutOfBandHeader(outpart)));
                             found = true;
                         }
                     }
                     if (!found) {
-                        addParameter(method, getParameterFromPart(method, outpart, JavaType.Style.INOUT));
+                        addParameter(outpart, method,
+                                     getParameterFromPart(method, outpart, JavaType.Style.INOUT));
                     }
                     continue;
                 } else if (!isSamePart(inpart, outpart)) {
@@ -341,7 +347,7 @@ public class ParameterProcessor extends AbstractProcessor {
                     }
                 }
 
-                addParameter(method, param);
+                addParameter(part, method, param);
             }
         } else {
             processReturn(method, null);
@@ -360,7 +366,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 if (!isOutOfBandHeader(hpart) || !requireOutOfBandHeader()) {
                     continue;
                 }
-                addParameter(method, getParameterFromPart(method, hpart, JavaType.Style.OUT));
+                addParameter(hpart, method, getParameterFromPart(method, hpart, JavaType.Style.OUT));
             }
         }
     }
@@ -422,7 +428,7 @@ public class ParameterProcessor extends AbstractProcessor {
                     if (!jpIn.getClassName().equals(jp.getClassName())) {
                         jp.setStyle(JavaType.Style.OUT);
                     } 
-                    addParameter(method, jp);
+                    addParameter(outputPart, method, jp);
                     sameWrapperChild = true;
 
                     if (method.getReturn() == null) {
@@ -476,7 +482,7 @@ public class ParameterProcessor extends AbstractProcessor {
                             checkPartName(outputMessage, outElement, jp);
                         }
 
-                        addParameter(method, jp);
+                        addParameter(outputPart, method, jp);
                         sameWrapperChild = true;
                         break;
                     }
@@ -490,7 +496,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 }
                 checkPartName(outputMessage, outElement, jp);
     
-                addParameter(method, jp);
+                addParameter(outputPart, method, jp);
             }
         }
         if (method.getReturn() == null) {
@@ -727,17 +733,17 @@ public class ParameterProcessor extends AbstractProcessor {
                 style = JavaType.Style.INOUT;
             }
             if (part != null) {
-                addParameter(method, getParameterFromPart(method, part, style));
+                addParameter(part, method, getParameterFromPart(method, part, style));
             }
             index++;
         }
         // now from unlisted input parts
         for (MessagePartInfo part : inputUnlistedParts) {
-            addParameter(method, getParameterFromPart(method, part, JavaType.Style.IN));
+            addParameter(part, method, getParameterFromPart(method, part, JavaType.Style.IN));
         }
         // now from unlisted output parts
         for (MessagePartInfo part : outputUnlistedParts) {
-            addParameter(method, getParameterFromPart(method, part, JavaType.Style.INOUT));
+            addParameter(part, method, getParameterFromPart(method, part, JavaType.Style.INOUT));
         }
     }
 
