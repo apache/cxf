@@ -82,7 +82,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         
         try {
             KerberosCallbackHandler handler = new KerberosCallbackHandler();
-            handler.setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
+            handler.setValueType(WSConstants.WSS_KRB_V5_AP_REQ);
             ((BindingProvider)kerberosPort).getRequestContext().put(
                 "ws-security.bst-callback-handler", handler
             );
@@ -229,7 +229,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         }
         
         KerberosCallbackHandler handler = new KerberosCallbackHandler();
-        handler.setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
+        handler.setValueType(WSConstants.WSS_KRB_V5_AP_REQ);
         ((BindingProvider)kerberosPort).getRequestContext().put(
             "ws-security.bst-callback-handler", handler
         );
