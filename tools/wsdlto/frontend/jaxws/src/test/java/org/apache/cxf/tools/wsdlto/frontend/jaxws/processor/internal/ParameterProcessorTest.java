@@ -34,11 +34,11 @@ public class ParameterProcessorTest extends Assert {
         JavaMethod method = new JavaMethod();
         JavaParameter p1 = new JavaParameter("request", String.class.getName(), null);
         p1.setStyle(JavaType.Style.IN);
-        processor.addParameter(method, p1);
+        processor.addParameter(null, method, p1);
 
         JavaParameter p2 = new JavaParameter("request", String.class.getName(), null);
         p2.setStyle(JavaType.Style.OUT);
-        processor.addParameter(method, p2);
+        processor.addParameter(null, method, p2);
 
         assertEquals(1, method.getParameters().size());
         assertEquals(JavaType.Style.INOUT, method.getParameters().get(0).getStyle());

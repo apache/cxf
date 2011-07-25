@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -473,6 +474,9 @@ public class ServiceProcessor extends AbstractProcessor {
             for (ExtensibilityElement ext : outbindings) {
                 if (SOAPBindingUtil.isSOAPHeader(ext)) {
                     SoapHeader soapHeader = SOAPBindingUtil.getSoapHeader(ext);
+                    if (isOutOfBandHeader(operation.getOutput(), ext)) {
+                        continue;
+                    }
                     boolean found = false;
                     for (JavaParameter parameter : jm.getParameters()) {
                         if (soapHeader.getPart().equals(parameter.getPartName())) {
@@ -518,7 +522,19 @@ public class ServiceProcessor extends AbstractProcessor {
         }
     }
 
+    private boolean isOutOfBandHeader(BindingMessageInfo bmi, ExtensibilityElement ext) {
+        SoapHeader soapHeader = SOAPBindingUtil.getSoapHeader(ext);
+        if (soapHeader.getMessage() != null
+            && !bmi.getMessageInfo().getName().equals(soapHeader.getMessage())) {
+            return true;
+        }
+        return false;
+    }
+
     private void processSoapHeader(JavaMethod jm, BindingOperationInfo operation, ExtensibilityElement ext) {
+        if (isOutOfBandHeader(operation.getInput(), ext)) {
+            return;
+        }
         SoapHeader soapHeader = SOAPBindingUtil.getSoapHeader(ext);
         for (JavaParameter parameter : jm.getParameters()) {
             if (soapHeader.getPart().equals(parameter.getPartName())) {
