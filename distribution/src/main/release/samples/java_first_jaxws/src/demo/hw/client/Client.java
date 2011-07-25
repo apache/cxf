@@ -20,7 +20,6 @@
 package demo.hw.client;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
