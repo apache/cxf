@@ -67,7 +67,7 @@ public final class RM10Constants extends RMConstants {
     public static final QName SEQUENCE_ACKNOWLEDGEMENT_QNAME =
         new QName(NAMESPACE_URI, "SequenceAcknowledgement");
     
-    public static final QName CLOSE_SEQUENCE_QNAME = new QName(NAMESPACE_URI, "LastMessage");
+    public static final QName CLOSE_SEQUENCE_QNAME = new QName(NAMESPACE_URI, "CloseSequence");
     
     public static final QName ACK_REQ_QNAME = new QName(NAMESPACE_URI, "AckRequested");
     

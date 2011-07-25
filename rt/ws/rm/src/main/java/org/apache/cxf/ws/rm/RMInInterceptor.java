@@ -81,7 +81,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         boolean isServer = RMContextUtils.isServerSide(message);
         LOG.fine("isServerSide: " + isServer);
-        boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);       
+        boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
         LOG.fine("isApplicationMessage: " + isApplicationMessage);
         
         // for application AND out of band messages
@@ -135,7 +135,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 if (null != ss) {
                     ss.setAcknowledged(ack);
                 } else {
-                    RMConstants consts = rme.getEncoderDecoder().getConstants();
+                    RMConstants consts = rme.getProtocol().getConstants();
                     SequenceFaultFactory sff = new SequenceFaultFactory(consts);
                     throw sff.createUnknownSequenceFault(id);
                 }

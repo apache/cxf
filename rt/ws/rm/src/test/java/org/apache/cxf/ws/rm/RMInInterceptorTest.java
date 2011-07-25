@@ -230,7 +230,7 @@ public class RMInInterceptorTest extends Assert {
         Source source = control.createMock(Source.class);
         rme = control.createMock(RMEndpoint.class);
         EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
-        EasyMock.expect(rme.getEncoderDecoder()).andReturn(EncoderDecoder10Impl.INSTANCE).anyTimes();
+        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         interceptor.setManager(manager);
         SequenceAcknowledgement ack1 = control.createMock(SequenceAcknowledgement.class);
         SequenceAcknowledgement ack2 = control.createMock(SequenceAcknowledgement.class);
@@ -279,7 +279,7 @@ public class RMInInterceptorTest extends Assert {
         // TODO
     }
     
-    private Message setupInboundMessage(String action, boolean serverSide) {
+    private Message setupInboundMessage(String action, boolean serverSide) throws RMException {
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).times(2);

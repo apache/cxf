@@ -114,7 +114,7 @@ public class DestinationTest extends Assert {
         EasyMock.expect(rmps.getSequence()).andReturn(st);
         Identifier id = control.createMock(Identifier.class);
         EasyMock.expect(st.getIdentifier()).andReturn(id).times(2);
-        EasyMock.expect(rme.getEncoderDecoder()).andReturn(EncoderDecoder10Impl.INSTANCE);
+        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         String sid = "sid";
         EasyMock.expect(id.getValue()).andReturn(sid); 
         control.replay();

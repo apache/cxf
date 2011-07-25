@@ -26,8 +26,6 @@ import javax.xml.namespace.QName;
  */
 public abstract class RMConstants {
     
-    // namespaces
-    
     public static final String NAMESPACE_PREFIX = "wsrm";
     
     // WSDL

@@ -55,7 +55,6 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
-import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
@@ -95,7 +94,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     private RMStore store;
     private SequenceIdentifierGenerator idGenerator;
     private RetransmissionQueue retransmissionQueue;
-    private Map<Endpoint, RMEndpoint> reliableEndpoints = new HashMap<Endpoint, RMEndpoint>();
+    private Map<ProtocolVariation,Map<Endpoint, RMEndpoint>> endpointMaps;
     private AtomicReference<Timer> timer = new AtomicReference<Timer>();
     private RMAssertion rmAssertion;
     private DeliveryAssuranceType deliveryAssurance;
@@ -104,10 +103,16 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     private String rmNamespace = RM10Constants.NAMESPACE_URI;
     private String rmAddressingNamespace = Names200408.WSA_NAMESPACE_NAME;
     
+    public RMManager() {
+        setEndpointMaps(new HashMap<ProtocolVariation,Map<Endpoint, RMEndpoint>>());
+    }
+    
     // ServerLifeCycleListener
     
     public void startServer(Server server) {
-        recoverReliableEndpoint(server.getEndpoint(), (Conduit)null);
+        for (ProtocolVariation protocol : ProtocolVariation.values()) {
+            recoverReliableEndpoint(server.getEndpoint(), (Conduit)null, protocol);
+        }
     }
 
     public void stopServer(Server server) {
@@ -122,13 +127,14 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         }        
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
         
-        Collection<SourceSequence> sss = store.getSourceSequences(id);
+        ProtocolVariation protocol = ProtocolVariation.findVariant(getRMNamespace(),
+            getRMAddressingNamespace());
+        Collection<SourceSequence> sss = store.getSourceSequences(id, protocol);
         if (null == sss || 0 == sss.size()) {                        
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
-        
-        recoverReliableEndpoint(client.getEndpoint(), client.getConduit());
+        recoverReliableEndpoint(client.getEndpoint(), client.getConduit(), protocol);
     }
     
     public void clientDestroyed(Client client) {
@@ -285,7 +291,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     
     // The real stuff ...
 
-    public synchronized RMEndpoint getReliableEndpoint(Message message) {
+    public synchronized RMEndpoint getReliableEndpoint(Message message) throws RMException {
         Endpoint endpoint = message.getExchange().get(Endpoint.class);
         QName name = endpoint.getEndpointInfo().getName();
         if (LOG.isLoggable(Level.FINE)) {
@@ -295,29 +301,19 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             WrappedEndpoint wrappedEndpoint = (WrappedEndpoint)endpoint;
             endpoint = wrappedEndpoint.getWrappedEndpoint();
         }
-        RMEndpoint rme = reliableEndpoints.get(endpoint);
+        String rmUri = getRMNamespace(message);
+        String addrUri = getAddressingNamespace(message);
+        ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
+        Map<Endpoint, RMEndpoint> endpointMap = endpointMaps.get(protocol);
+        if (endpointMap == null) {
+            org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
+                "UNSUPPORTED_NAMESPACE", LOG, addrUri, rmUri);
+            LOG.log(Level.INFO, msg.toString());
+            throw new RMException(msg);
+        }
+        RMEndpoint rme = endpointMap.get(endpoint);
         if (null == rme) {
-            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-            String rmUri = null;
-            if (rmps != null) {
-                rmUri = rmps.getNamespaceURI();
-            }
-            if (rmUri == null) {
-                rmUri = getRMNamespace();
-            }
-            String addrUri = null;
-            if (RM10Constants.NAMESPACE_URI.equals(rmUri)) {
-                AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
-                if (maps != null) {
-                    addrUri = maps.getNamespaceURI();
-                }
-                if (addrUri == null) {
-                    addrUri = getRMAddressingNamespace();
-                }
-            } else {
-                addrUri = Names.WSA_ADDRESS_NAME;
-            }
-            rme = createReliableEndpoint(endpoint, VersionTransformer.getEncoderDecoder(rmUri, addrUri));
+            rme = createReliableEndpoint(endpoint, protocol);
             org.apache.cxf.transport.Destination destination = message.getExchange().getDestination();
             EndpointReferenceType replyTo = null;
             if (null != destination) {
@@ -330,13 +326,51 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                     .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
                              org.apache.cxf.transport.Destination.class);
             rme.initialise(message.getExchange().getConduit(message), replyTo, dest);
-            reliableEndpoints.put(endpoint, rme);
+            endpointMap.put(endpoint, rme);
             LOG.fine("Created new RMEndpoint.");
         }
         return rme;
     }
 
-    public Destination getDestination(Message message) {
+    /**
+     * Get the WS-Addressing namespace being used for a message. If the WS-Addressing namespace has not been
+     * set, this returns the default configured for this manager.
+     * 
+     * @param message
+     * @return namespace URI
+     */
+    String getAddressingNamespace(Message message) {
+        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
+        String addrUri = null;
+        if (maps != null) {
+            addrUri = maps.getNamespaceURI();
+        }
+        if (addrUri == null) {
+            addrUri = getRMAddressingNamespace();
+        }
+        return addrUri;
+    }
+
+    /**
+     * Get the WS-RM namespace being used for a message. If the WS-RM namespace has not been set, this returns
+     * the default configured for this manager.
+     * 
+     * @param message
+     * @return namespace URI
+     */
+    String getRMNamespace(Message message) {
+        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+        String rmUri = null;
+        if (rmps != null) {
+            rmUri = rmps.getNamespaceURI();
+        }
+        if (rmUri == null) {
+            rmUri = getRMNamespace();
+        }
+        return rmUri;
+    }
+
+    public Destination getDestination(Message message) throws RMException {
         RMEndpoint rme = getReliableEndpoint(message);
         if (null != rme) {
             return rme.getDestination();
@@ -344,7 +378,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         return null;
     }
 
-    public Source getSource(Message message) {
+    public Source getSource(Message message) throws RMException {
         RMEndpoint rme = getReliableEndpoint(message);
         if (null != rme) {
             return rme.getSource();
@@ -409,11 +443,16 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     @PreDestroy
     public void shutdown() {
         // shutdown remaining endpoints 
-        
-        LOG.log(Level.FINE, "Shutting down RMManager with {0} remaining endpoints.",
-                reliableEndpoints.size());
-        for (RMEndpoint rme : reliableEndpoints.values()) {            
-            rme.shutdown();
+        for (ProtocolVariation protocol : ProtocolVariation.values()) {
+            Map<Endpoint, RMEndpoint> map = endpointMaps.get(protocol);
+            if (map.size() > 0) {
+                LOG.log(Level.FINE,
+                    "Shutting down RMManager with {0} remaining endpoints for protocol variation {1}.",
+                    new Object[] { new Integer(map.size()), protocol });
+                for (RMEndpoint rme : map.values()) {            
+                    rme.shutdown();
+                }
+            }
         }
 
         // remove references to timer tasks cancelled above to make them
@@ -426,12 +465,18 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     }
     
     synchronized void shutdownReliableEndpoint(Endpoint e) {
-        RMEndpoint rme = reliableEndpoints.get(e);
-        if (null == rme) {
-            // not interested
+        RMEndpoint rme = null;
+        for (ProtocolVariation protocol : ProtocolVariation.values()) {
+            Map<Endpoint, RMEndpoint> map = endpointMaps.get(protocol);
+            rme = map.get(e);
+            if (rme != null) {
+                break;
+            }
+        }
+        if (rme == null) {
+            // not found
             return;
         }
-        
         rme.shutdown();        
         
         // remove references to timer tasks cancelled above to make them
@@ -441,18 +486,20 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             t.purge();
         }
         
-        reliableEndpoints.remove(e);
+        for (ProtocolVariation protocol : ProtocolVariation.values()) {
+            endpointMaps.get(protocol).remove(e);
+        }
     }
     
-    void recoverReliableEndpoint(Endpoint endpoint, Conduit conduit) {
+    void recoverReliableEndpoint(Endpoint endpoint, Conduit conduit, ProtocolVariation protocol) {
         if (null == store || null == retransmissionQueue) {
             return;
         }        
         
         String id = RMUtils.getEndpointIdentifier(endpoint);
         
-        Collection<SourceSequence> sss = store.getSourceSequences(id);
-        Collection<DestinationSequence> dss = store.getDestinationSequences(id);
+        Collection<SourceSequence> sss = store.getSourceSequences(id, protocol);
+        Collection<DestinationSequence> dss = store.getDestinationSequences(id, protocol);
         if ((null == sss || 0 == sss.size()) && (null == dss || 0 == dss.size())) {                        
             return;
         }
@@ -461,10 +508,9 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         
         LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
                 new Object[] {null == conduit ? "client" : "server", id});
-        EncoderDecoder codec = VersionTransformer.getEncoderDecoder(rmNamespace, rmAddressingNamespace);
-        RMEndpoint rme = createReliableEndpoint(endpoint, codec);
+        RMEndpoint rme = createReliableEndpoint(endpoint, protocol);
         rme.initialise(conduit, null, null);
-        reliableEndpoints.put(endpoint, rme);
+        endpointMaps.get(protocol).put(endpoint, rme);
         SourceSequence css = null;
         for (SourceSequence ss : sss) {            
  
@@ -530,8 +576,8 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         
     }
     
-    RMEndpoint createReliableEndpoint(Endpoint endpoint, EncoderDecoder codec) {
-        return new RMEndpoint(this, endpoint, codec);
+    RMEndpoint createReliableEndpoint(Endpoint endpoint, ProtocolVariation protocol) {
+        return new RMEndpoint(this, endpoint, protocol);
     }  
     
     public void init(Bus b) {
@@ -590,15 +636,6 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         }
     }
 
-   
-    Map<Endpoint, RMEndpoint> getReliableEndpointsMap() {
-        return reliableEndpoints;
-    }
-    
-    void setReliableEndpointsMap(Map<Endpoint, RMEndpoint> map) {
-        reliableEndpoints = map;
-    }
-
     class DefaultSequenceIdentifierGenerator implements SequenceIdentifierGenerator {
 
         public Identifier generateSequenceIdentifier() {
@@ -607,5 +644,16 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             sid.setValue(sequenceID);
             return sid;
         }
+    }
+
+    Map<ProtocolVariation, Map<Endpoint, RMEndpoint>> getEndpointMaps() {
+        return endpointMaps;
+    }
+
+    void setEndpointMaps(Map<ProtocolVariation, Map<Endpoint, RMEndpoint>> endpointMaps) {
+        endpointMaps.put(ProtocolVariation.RM10WSA200408, new HashMap<Endpoint, RMEndpoint>());
+        endpointMaps.put(ProtocolVariation.RM10WSA200508, new HashMap<Endpoint, RMEndpoint>());
+        endpointMaps.put(ProtocolVariation.RM11WSA200508, new HashMap<Endpoint, RMEndpoint>());
+        this.endpointMaps = endpointMaps;
     }
 }

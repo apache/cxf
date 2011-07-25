@@ -79,26 +79,26 @@ public class Proxy {
             return;
         }
         
-        RMConstants constants = reliableEndpoint.getEncoderDecoder().getConstants();
+        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
             .getOperation(constants.getSequenceAckOperationName());
         invoke(oi, new Object[] {ds}, null);
     }
     
     void terminate(SourceSequence ss) throws RMException {
-        RMConstants constants = reliableEndpoint.getEncoderDecoder().getConstants();
+        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
             .getOperation(constants.getTerminateSequenceOperationName());
         
         TerminateSequenceType ts = new TerminateSequenceType();
         ts.setIdentifier(ss.getIdentifier());
-        EncoderDecoder codec = reliableEndpoint.getEncoderDecoder();
+        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
         invoke(oi, new Object[] {codec.convertToSend(ts)}, null);
     }
     
     void createSequenceResponse(final Object createResponse) throws RMException {
         LOG.fine("sending CreateSequenceResponse from client side");
-        RMConstants constants = reliableEndpoint.getEncoderDecoder().getConstants();
+        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         final OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
             .getOperation(constants.getCreateSequenceResponseOnewayOperationName());
         
@@ -147,7 +147,7 @@ public class Proxy {
         
         InterfaceInfo ii = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface();
         
-        EncoderDecoder codec = reliableEndpoint.getEncoderDecoder();
+        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
         RMConstants constants = codec.getConstants();
         final OperationInfo oi = isServer 
             ? ii.getOperation(constants.getCreateSequenceOnewayOperationName())
@@ -197,7 +197,7 @@ public class Proxy {
             return; 
         }
         
-        RMConstants constants = reliableEndpoint.getEncoderDecoder().getConstants();
+        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
             .getOperation(constants.getCloseSequenceOperationName());
         // pass reference to source sequence in invocation context
@@ -229,7 +229,7 @@ public class Proxy {
             return; 
         }
         
-        RMConstants constants = reliableEndpoint.getEncoderDecoder().getConstants();
+        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
             .getOperation(constants.getAckRequestedOperationName());
         invoke(oi, new Object[] {}, null);

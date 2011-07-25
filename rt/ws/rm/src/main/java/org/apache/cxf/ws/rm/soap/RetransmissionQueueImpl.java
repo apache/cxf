@@ -55,6 +55,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.RMContextUtils;
+import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
@@ -255,7 +256,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         resend(c, message);
     }
 
-    private void serverResend(Message message) {
+    private void serverResend(Message message) throws RMException {
         
         // get the message's to address
         

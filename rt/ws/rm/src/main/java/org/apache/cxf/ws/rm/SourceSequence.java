@@ -47,16 +47,16 @@ public class SourceSequence extends AbstractSequence {
     private Identifier offeringId;
     private EndpointReferenceType target;
 
-    public SourceSequence(Identifier i) {
-        this(i, null, null);
+    public SourceSequence(Identifier i, ProtocolVariation pv) {
+        this(i, null, null, pv);
     }
 
-    public SourceSequence(Identifier i, Date e, Identifier oi) {
-        this(i, e, oi, 0, false);
+    public SourceSequence(Identifier i, Date e, Identifier oi, ProtocolVariation pv) {
+        this(i, e, oi, 0, false, pv);
     }
 
-    public SourceSequence(Identifier i, Date e, Identifier oi, long cmn, boolean lm) {
-        super(i);
+    public SourceSequence(Identifier i, Date e, Identifier oi, long cmn, boolean lm, ProtocolVariation pv) {
+        super(i, pv);
         expires = e;
 
         offeringId = oi;

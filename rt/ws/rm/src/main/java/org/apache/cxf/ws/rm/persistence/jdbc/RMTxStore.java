@@ -44,6 +44,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
+import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.PersistenceUtils;
@@ -57,14 +58,6 @@ public class RMTxStore implements RMStore {
     
     public static final String DEFAULT_DATABASE_NAME = "rmdb";
     
-    private static final String CREATE_ENDPOINTS_TABLE_STMT =
-        "CREATE TABLE CXF_ENDPOINTS " 
-        + "(QNAME_URI VARCHAR(1024), "
-        + "QNAME_LOCAL VARCHAR(1024), "
-        + "ENDPOINT_ID VARCHAR(1024), "
-        + "WSRM_URI VARCHAR(256) NOT NULL, "
-        + "WSA_URI VARCHAR(256) NOT NULL, "
-        + "PRIMARY KEY (QNAME_URI, QNAME_LOCAL))";
     private static final String CREATE_DEST_SEQUENCES_TABLE_STMT =
         "CREATE TABLE CXF_RM_DEST_SEQUENCES " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
@@ -108,12 +101,6 @@ public class RMTxStore implements RMStore {
         = "INSERT INTO {0} VALUES(?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
-    private static final String SELECT_DEST_SEQUENCE_STMT_STR =
-        "SELECT ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
-        + "WHERE SEQ_ID = ?";
-    private static final String SELECT_SRC_SEQUENCE_STMT_STR =
-        "SELECT CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID FROM CXF_RM_SRC_SEQUENCES "
-        + "WHERE SEQ_ID = ?";
     private static final String SELECT_DEST_SEQUENCES_STMT_STR =
         "SELECT SEQ_ID, ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
         + "WHERE ENDPOINT_ID = ?";
@@ -139,8 +126,6 @@ public class RMTxStore implements RMStore {
     private PreparedStatement updateSrcSequenceStmt;
     private PreparedStatement selectDestSequencesStmt;
     private PreparedStatement selectSrcSequencesStmt;
-    private PreparedStatement selectDestSequenceStmt;
-    private PreparedStatement selectSrcSequenceStmt;
     private PreparedStatement createInboundMessageStmt;
     private PreparedStatement createOutboundMessageStmt;
     private PreparedStatement deleteInboundMessageStmt;
@@ -252,68 +237,6 @@ public class RMTxStore implements RMStore {
         }
     }
     
-    public DestinationSequence getDestinationSequence(Identifier sid) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.info("Getting destination sequence for id: " + sid);
-        }
-        try {
-            if (null == selectDestSequenceStmt) {
-                selectDestSequenceStmt = 
-                    connection.prepareStatement(SELECT_DEST_SEQUENCE_STMT_STR);               
-            }
-            selectDestSequenceStmt.setString(1, sid.getValue());
-            
-            ResultSet res = selectDestSequenceStmt.executeQuery(); 
-            if (res.next()) {
-                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(1));  
-                long lm = res.getLong(2);
-                InputStream is = res.getBinaryStream(3); 
-                SequenceAcknowledgement ack = null;
-                if (null != is) {
-                    ack = PersistenceUtils.getInstance()
-                        .deserialiseAcknowledgment(is); 
-                }
-                return new DestinationSequence(sid, acksTo, lm, ack);
-            }
-        } catch (SQLException ex) {
-            LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
-        }
-        return null;
-    }
-    
-    public SourceSequence getSourceSequence(Identifier sid) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.info("Getting source sequences for id: " + sid);
-        }
-        try {
-            if (null == selectSrcSequenceStmt) {
-                selectSrcSequenceStmt = 
-                    connection.prepareStatement(SELECT_SRC_SEQUENCE_STMT_STR);     
-            }
-            selectSrcSequenceStmt.setString(1, sid.getValue());
-            ResultSet res = selectSrcSequenceStmt.executeQuery();
-            
-            if (res.next()) {
-                long cmn = res.getLong(1);
-                boolean lm = res.getBoolean(2);
-                long lval = res.getLong(3);
-                Date expiry = 0 == lval ? null : new Date(lval);
-                String oidValue = res.getString(4);
-                Identifier oi = null;
-                if (null != oidValue) {
-                    oi = new Identifier();
-                    oi.setValue(oidValue);
-                }                            
-                return new SourceSequence(sid, expiry, oi, cmn, lm);
-                          
-            }
-        } catch (SQLException ex) {
-            // ignore
-            LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
-        }
-        return null;
-    }
-    
     public void removeDestinationSequence(Identifier sid) {
         try {
             beginTransaction();
@@ -351,7 +274,8 @@ public class RMTxStore implements RMStore {
         }        
     }
     
-    public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier) {
+    public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier,
+        ProtocolVariation protocol) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting destination sequences for endpoint: " + endpointIdentifier);
         }
@@ -375,7 +299,7 @@ public class RMTxStore implements RMStore {
                     ack = PersistenceUtils.getInstance()
                         .deserialiseAcknowledgment(is); 
                 }
-                DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, ack);
+                DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, ack, protocol);
                 seqs.add(seq);                                                 
             }
         } catch (SQLException ex) {
@@ -384,7 +308,8 @@ public class RMTxStore implements RMStore {
         return seqs;
     }
     
-    public Collection<SourceSequence> getSourceSequences(String endpointIdentifier) {
+    public Collection<SourceSequence> getSourceSequences(String endpointIdentifier,
+        ProtocolVariation protocol) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting source sequences for endpoint: " + endpointIdentifier);
         }
@@ -410,7 +335,7 @@ public class RMTxStore implements RMStore {
                     oi = new Identifier();
                     oi.setValue(oidValue);
                 }                            
-                SourceSequence seq = new SourceSequence(sid, expiry, oi, cmn, lm);
+                SourceSequence seq = new SourceSequence(sid, expiry, oi, cmn, lm, protocol);
                 seqs.add(seq);                          
             }
         } catch (SQLException ex) {
@@ -602,17 +527,6 @@ public class RMTxStore implements RMStore {
     protected void createTables() throws SQLException {
         
         Statement stmt = null;
-        stmt = connection.createStatement();
-        try {
-            stmt.executeUpdate(CREATE_ENDPOINTS_TABLE_STMT);
-        } catch (SQLException ex) {
-            if (!isTableExistsError(ex)) {
-                throw ex;
-            } else {
-                LOG.fine("Table CXF_ENDPOINTS already exists.");
-            }
-        }
-        stmt.close();
         stmt = connection.createStatement();
         try {
             stmt.executeUpdate(CREATE_SRC_SEQUENCES_TABLE_STMT);

@@ -88,7 +88,8 @@ public class DestinationSequenceTest extends Assert {
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         assertEquals(id, seq.getIdentifier());
         assertEquals(0, seq.getLastMessageNumber());
         assertSame(ref, seq.getAcksTo());
@@ -96,7 +97,7 @@ public class DestinationSequenceTest extends Assert {
         assertNotNull(seq.getMonitor());   
         
         SequenceAcknowledgement ack = new SequenceAcknowledgement();        
-        seq = new DestinationSequence(id, ref, 10, ack);
+        seq = new DestinationSequence(id, ref, 10, ack, ProtocolVariation.RM10WSA200408);
         assertEquals(id, seq.getIdentifier());
         assertEquals(10, seq.getLastMessageNumber());
         assertSame(ref, seq.getAcksTo());
@@ -108,15 +109,16 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testEqualsAndHashCode() {     
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         DestinationSequence otherSeq = null;
         assertTrue(!seq.equals(otherSeq));
-        otherSeq = new DestinationSequence(id, ref, destination);
+        otherSeq = new DestinationSequence(id, ref, destination, ProtocolVariation.RM10WSA200408);
         assertEquals(seq, otherSeq);
         assertEquals(seq.hashCode(), otherSeq.hashCode());
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
-        otherSeq = new DestinationSequence(otherId, ref, destination);
+        otherSeq = new DestinationSequence(otherId, ref, destination, ProtocolVariation.RM10WSA200408);
         assertTrue(!seq.equals(otherSeq));
         assertTrue(seq.hashCode() != otherSeq.hashCode()); 
         assertTrue(!seq.equals(this));
@@ -125,7 +127,8 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testGetSetDestination() {
         control.replay();
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         seq.setDestination(destination);
         assertSame(destination, seq.getDestination());
     }
@@ -137,7 +140,8 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(destination.getName()).andReturn(name);
         control.replay();
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         assertEquals("Unexpected endpoint identifier", name, seq.getEndpointIdentifier());
         control.verify();
     }
@@ -150,7 +154,8 @@ public class DestinationSequenceTest extends Assert {
         Message message2 = setUpMessage("2");
         control.replay();
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         List<AcknowledgementRange> ranges = seq.getAcknowledgment().getAcknowledgementRange();
         assertEquals(0, ranges.size());
         
@@ -207,7 +212,8 @@ public class DestinationSequenceTest extends Assert {
 
         control.replay();
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         List<AcknowledgementRange> ranges = seq.getAcknowledgment().getAcknowledgementRange();
         for (int i = 0; i < messages.length; i++) {
             seq.acknowledge(messages[i]);
@@ -238,7 +244,8 @@ public class DestinationSequenceTest extends Assert {
         };
         control.replay();
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         List<AcknowledgementRange> ranges = seq.getAcknowledgment().getAcknowledgementRange();
         for (int i = 0; i < messages.length; i++) {
             seq.acknowledge(messages[i]);
@@ -272,7 +279,8 @@ public class DestinationSequenceTest extends Assert {
         };
         control.replay();
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         List<AcknowledgementRange> ranges = seq.getAcknowledgment().getAcknowledgementRange();
         for (int i = 0; i < messages.length; i++) {
             seq.acknowledge(messages[i]);
@@ -290,7 +298,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testMerge() {
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         List<AcknowledgementRange> ranges = seq.getAcknowledgment().getAcknowledgementRange();
         AcknowledgementRange r;
         for (int i = 0; i < 5; i++) {
@@ -342,7 +351,8 @@ public class DestinationSequenceTest extends Assert {
         }
         control.replay();
                 
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         SequenceMonitor monitor = seq.getMonitor();
         assertNotNull(monitor);
         monitor.setMonitorInterval(500);
@@ -382,7 +392,8 @@ public class DestinationSequenceTest extends Assert {
         Message message = setUpMessage("1");
         control.replay();
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         assertTrue(!seq.sendAcknowledgement());
               
         seq.acknowledge(message); 
@@ -400,7 +411,8 @@ public class DestinationSequenceTest extends Assert {
         RMEndpoint rme = control.createMock(RMEndpoint.class);
         setUpDestination(timer, rme);
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         Proxy proxy = control.createMock(Proxy.class);
         EasyMock.expect(rme.getProxy()).andReturn(proxy).anyTimes();        
         proxy.acknowledge(seq);
@@ -442,7 +454,8 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testCorrelationID() {
         setUpDestination();
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         String correlationID = "abdc1234";
         assertNull("unexpected correlation ID", seq.getCorrelationID());
         seq.setCorrelationID(correlationID);
@@ -465,7 +478,7 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(da.isSetAtMostOnce()).andReturn(true);                    
         
         control.replay();        
-        DestinationSequence ds = new DestinationSequence(id, ref, 0, ack);
+        DestinationSequence ds = new DestinationSequence(id, ref, 0, ack, ProtocolVariation.RM10WSA200408);
         ds.setDestination(destination);
         ds.applyDeliveryAssurance(mn, null);
         control.verify();
@@ -511,7 +524,8 @@ public class DestinationSequenceTest extends Assert {
             factory.createSequenceAcknowledgementAcknowledgementRange();
         r.setUpper(new Long(messages.length));
         ranges.add(r);
-        final DestinationSequence ds = new DestinationSequence(id, ref, 0, ack);
+        final DestinationSequence ds = new DestinationSequence(id, ref, 0, ack,
+            ProtocolVariation.RM10WSA200408);
         ds.setDestination(destination);
           
         class Acknowledger extends Thread {
@@ -569,7 +583,8 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(rme.getProxy()).andReturn(control.createMock(Proxy.class)).anyTimes();
         setUpDestination(timer, rme);
         
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         destination.removeSequence(seq);
         EasyMock.expectLastCall();
         
@@ -597,7 +612,8 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testSequenceTermination() {
         destination = control.createMock(Destination.class);
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         RMEndpoint rme = control.createMock(RMEndpoint.class);
         EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme);
         DestinationSequence.SequenceTermination st = seq.new SequenceTermination();
@@ -619,7 +635,8 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(destination.getManager()).andReturn(manager);
         Timer t = new Timer();
         EasyMock.expect(manager.getTimer()).andReturn(t);
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         RMEndpoint rme = control.createMock(RMEndpoint.class);
         EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme);
         DestinationSequence.SequenceTermination st = seq.new SequenceTermination();
@@ -635,7 +652,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testCanPiggybackAckOnPartialResponse() {
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         AttributedURIType uri = control.createMock(AttributedURIType.class);
         EasyMock.expect(ref.getAddress()).andReturn(uri);
         String addr = "http://localhost:9999/reponses";
@@ -654,7 +672,8 @@ public class DestinationSequenceTest extends Assert {
     @Test
     public void testPurgeAcknowledged() {
         destination = control.createMock(Destination.class);
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);        
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);        
         manager = control.createMock(RMManager.class);
         EasyMock.expect(destination.getManager()).andReturn(manager);
         RMStore store = control.createMock(RMStore.class);
@@ -674,7 +693,8 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(destination.getManager()).andReturn(manager);
         Timer t = new Timer();
         EasyMock.expect(manager.getTimer()).andReturn(t);
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         control.replay();
         seq.scheduleDeferredAcknowledgement(30000L);
         seq.cancelDeferredAcknowledgments();
@@ -691,7 +711,8 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(destination.getManager()).andReturn(manager);
         Timer t = new Timer();
         EasyMock.expect(manager.getTimer()).andReturn(t);
-        DestinationSequence seq = new DestinationSequence(id, ref, destination);
+        DestinationSequence seq = new DestinationSequence(id, ref, destination,
+            ProtocolVariation.RM10WSA200408);
         control.replay();
         seq.scheduleSequenceTermination(30000L);
         seq.cancelTermination();

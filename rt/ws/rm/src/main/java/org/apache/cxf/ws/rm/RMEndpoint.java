@@ -84,7 +84,7 @@ public class RMEndpoint {
     private RMManager manager;
     private Endpoint applicationEndpoint;
     private Conduit conduit;
-    private EncoderDecoder encoderDecoder;
+    private ProtocolVariation protocol;
     private EndpointReferenceType replyTo;
     private Source source;
     private Destination destination;
@@ -103,16 +103,16 @@ public class RMEndpoint {
      * 
      * @param m
      * @param ae
-     * @param codec
+     * @param pv
      */
-    public RMEndpoint(RMManager m, Endpoint ae, EncoderDecoder codec) {
+    public RMEndpoint(RMManager m, Endpoint ae, ProtocolVariation pv) {
         manager = m;
         applicationEndpoint = ae;
         source = new Source(this);
         destination = new Destination(this);
         proxy = new Proxy(this);
         servant = new Servant(this);
-        encoderDecoder = codec;
+        protocol = pv;
     }
 
     /**
@@ -136,24 +136,18 @@ public class RMEndpoint {
         return endpoint;
     }
 
-    /**
-     * Get the encoder/decoder used by this endpoint.
-     * 
-     * @return URI
-     */
-    public EncoderDecoder getEncoderDecoder() {
-        return encoderDecoder;
+    public ProtocolVariation getProtocol() {
+        return protocol;
     }
 
     /**
-     * Set the encoder/decoder used by this endpoint. This should only be used if the encoder/decoder was not
-     * set by the constructor, and only used once in that case - once set the encoder/decoder should never be
-     * changed.
+     * Set the protocol used by this endpoint. This method is only intended for use in testing; all normal use
+     * uses the constructor to set the value.
      * 
-     * @param codec
+     * @param protocol
      */
-    public void setEncoderDecoder(EncoderDecoder codec) {
-        encoderDecoder = codec;
+    public void setProtocol(ProtocolVariation protocol) {
+        this.protocol = protocol;
     }
 
     /**
@@ -271,7 +265,7 @@ public class RMEndpoint {
     void createService() {
         ServiceInfo si = new ServiceInfo();
         si.setProperty(Schema.class.getName(), getSchema());
-        serviceQName = new QName(encoderDecoder.getWSRMNamespace(), SERVICE_NAME);
+        serviceQName = new QName(protocol.getWSRMNamespace(), SERVICE_NAME);
         si.setName(serviceQName);
         
         buildInterfaceInfo(si);
@@ -279,7 +273,7 @@ public class RMEndpoint {
         service = new WrappedService(applicationEndpoint.getService(), serviceQName, si);
 
         DataBinding dataBinding = null;
-        Class create = encoderDecoder.getCreateSequenceType();
+        Class create = protocol.getCodec().getCreateSequenceType();
         try {
             JAXBContext ctx =
                 JAXBContext.newInstance(PackageUtils.getPackageName(create), create.getClassLoader());
@@ -324,7 +318,7 @@ public class RMEndpoint {
 
         ei.setAddress(aei.getAddress());
         
-        ei.setName(RMUtils.getConstants(encoderDecoder.getWSRMNamespace()).getPortName());
+        ei.setName(RMUtils.getConstants(protocol.getWSRMNamespace()).getPortName());
         ei.setBinding(si.getBinding(bindingQName));
 
         // if addressing was enabled on the application endpoint by means
@@ -380,7 +374,7 @@ public class RMEndpoint {
     }
 
     void buildInterfaceInfo(ServiceInfo si) {
-        interfaceQName = new QName(encoderDecoder.getWSRMNamespace(), INTERFACE_NAME);
+        interfaceQName = new QName(protocol.getWSRMNamespace(), INTERFACE_NAME);
         InterfaceInfo ii = new InterfaceInfo(si, interfaceQName);
         buildOperationInfo(ii);
     }
@@ -400,7 +394,7 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessagePartInfo partInfo = null;
         MessageInfo messageInfo = null;
-        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        RMConstants consts = protocol.getConstants();
         operationInfo = ii.addOperation(consts.getCreateSequenceOperationName());
         messageInfo = operationInfo.createMessage(consts.getCreateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
@@ -408,7 +402,7 @@ public class RMEndpoint {
         partInfo = messageInfo.addMessagePart(CREATE_PART_NAME);
         partInfo.setElementQName(consts.getCreateSequenceOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(encoderDecoder.getCreateSequenceType());
+        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceType());
 
         messageInfo = operationInfo.createMessage(consts.getCreateSequenceResponseOperationName(),
                                                   MessageInfo.Type.OUTPUT);
@@ -416,7 +410,7 @@ public class RMEndpoint {
         partInfo = messageInfo.addMessagePart(CREATE_RESPONSE_PART_NAME);
         partInfo.setElementQName(consts.getCreateSequenceResponseOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(encoderDecoder.getCreateSequenceResponseType());
+        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceResponseType());
         partInfo.setIndex(0);
 
         operationInfo = ii.addOperation(consts.getCreateSequenceOnewayOperationName());
@@ -426,7 +420,7 @@ public class RMEndpoint {
         partInfo = messageInfo.addMessagePart(CREATE_PART_NAME);
         partInfo.setElementQName(consts.getCreateSequenceOnewayOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(encoderDecoder.getCreateSequenceType());
+        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceType());
 
         operationInfo = ii.addOperation(consts.getCreateSequenceResponseOnewayOperationName());
         messageInfo = operationInfo.createMessage(consts.getCreateSequenceResponseOnewayOperationName(),
@@ -435,7 +429,7 @@ public class RMEndpoint {
         partInfo = messageInfo.addMessagePart(CREATE_RESPONSE_PART_NAME);
         partInfo.setElementQName(consts.getCreateSequenceResponseOnewayOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(encoderDecoder.getCreateSequenceResponseType());
+        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceResponseType());
     }
 
     void buildTerminateSequenceOperationInfo(InterfaceInfo ii) {
@@ -444,7 +438,7 @@ public class RMEndpoint {
         MessagePartInfo partInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        RMConstants consts = protocol.getConstants();
         operationInfo = ii.addOperation(consts.getTerminateSequenceOperationName());
         messageInfo = operationInfo.createMessage(consts.getTerminateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
@@ -452,7 +446,7 @@ public class RMEndpoint {
         partInfo = messageInfo.addMessagePart(TERMINATE_PART_NAME);
         partInfo.setElementQName(consts.getTerminateSequenceOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(encoderDecoder.getTerminateSequenceType());
+        partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceType());
     }
 
     void buildSequenceAckOperationInfo(InterfaceInfo ii) {
@@ -460,7 +454,7 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        RMConstants consts = protocol.getConstants();
         operationInfo = ii.addOperation(consts.getSequenceAckOperationName());
         messageInfo = operationInfo.createMessage(consts.getSequenceAckOperationName(),
                                                   MessageInfo.Type.INPUT);
@@ -472,7 +466,7 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        RMConstants consts = protocol.getConstants();
         operationInfo = ii.addOperation(consts.getCloseSequenceOperationName());
         messageInfo = operationInfo.createMessage(consts.getCloseSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
@@ -484,7 +478,7 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+        RMConstants consts = protocol.getConstants();
         operationInfo = ii.addOperation(consts.getAckRequestedOperationName());
         messageInfo = operationInfo.createMessage(consts.getAckRequestedOperationName(),
                                                   MessageInfo.Type.INPUT);
@@ -501,11 +495,11 @@ public class RMEndpoint {
             SoapVersion sv = sbi.getSoapVersion();
             String bindingId = sbi.getBindingId();
             SoapBindingInfo bi = new SoapBindingInfo(si, bindingId, sv);
-            bindingQName = new QName(encoderDecoder.getWSRMNamespace(), BINDING_NAME);
+            bindingQName = new QName(protocol.getWSRMNamespace(), BINDING_NAME);
             bi.setName(bindingQName);
             BindingOperationInfo boi = null;
 
-            RMConstants consts = RMUtils.getConstants(encoderDecoder.getWSRMNamespace());
+            RMConstants consts = protocol.getConstants();
             
             boi = bi.buildOperation(consts.getCreateSequenceOperationName(),
                                     consts.getCreateSequenceOperationName().getLocalPart(), null);

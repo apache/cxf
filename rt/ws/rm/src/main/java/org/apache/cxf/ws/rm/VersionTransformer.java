@@ -72,28 +72,6 @@ public final class VersionTransformer {
     }
     
     /**
-     * Get the encoder/decoder for a supported version of WS-ReliableMessaging and WS-Addressing.
-     * 
-     * @param wsrm WS-RM namespace URI
-     * @param wsa WS-A namespace URI
-     * @return instance (<code>null</code> if not a supported version)
-     */
-    public static EncoderDecoder getEncoderDecoder(String wsrm, String wsa) {
-        if (EncoderDecoder10Impl.INSTANCE.getWSRMNamespace().equals(wsrm)
-            && EncoderDecoder10Impl.INSTANCE.getWSANamespace().equals(wsa)) {
-            return EncoderDecoder10Impl.INSTANCE;
-        } else if (EncoderDecoder10AImpl.INSTANCE.getWSRMNamespace().equals(wsrm)
-            && EncoderDecoder10AImpl.INSTANCE.getWSANamespace().equals(wsa)) {
-            return EncoderDecoder10AImpl.INSTANCE;
-        } else if (EncoderDecoder11Impl.INSTANCE.getWSRMNamespace().equals(wsrm)
-            && EncoderDecoder11Impl.INSTANCE.getWSANamespace().equals(wsa)) {
-            return EncoderDecoder11Impl.INSTANCE;
-        } else {
-            return null;
-        }
-    }
-    
-    /**
      * Convert CreateSequenceType to 200502 version with 200508 WS-Addressing namespace.
      * 
      * @param internal (non-<code>null</code>)

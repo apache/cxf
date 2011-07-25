@@ -61,14 +61,14 @@ public class DestinationSequence extends AbstractSequence {
     private long highNumberCompleted;
     private List<Continuation> continuations = new LinkedList<Continuation>();
     
-    public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d) {
-        this(i, a, 0, null);
+    public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d, ProtocolVariation pv) {
+        this(i, a, 0, null, pv);
         destination = d;
     }
     
     public DestinationSequence(Identifier i, EndpointReferenceType a,
-                              long lmn, SequenceAcknowledgement ac) {
-        super(i);
+                              long lmn, SequenceAcknowledgement ac, ProtocolVariation pv) {
+        super(i, pv);
         acksTo = a;
         lastMessageNumber = lmn;
         acknowledgement = ac;
@@ -113,7 +113,7 @@ public class DestinationSequence extends AbstractSequence {
         long messageNumber = st.getMessageNumber().longValue();
         LOG.fine("Acknowledging message: " + messageNumber);
         if (0 != lastMessageNumber && messageNumber > lastMessageNumber) {
-            RMConstants consts = destination.getReliableEndpoint().getEncoderDecoder().getConstants();
+            RMConstants consts = getProtocol().getConstants();
             SequenceFaultFactory sff = new SequenceFaultFactory(consts);
             throw sff.createSequenceTerminatedFault(st.getIdentifier(), false);
         }        

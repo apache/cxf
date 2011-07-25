@@ -65,11 +65,13 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.rm.AbstractRMInterceptor;
 import org.apache.cxf.ws.rm.EncoderDecoder;
+import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMEndpoint;
+import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
@@ -173,9 +175,9 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
             discardRMHeaders(headers);
             
             AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
-            EncoderDecoder codec = VersionTransformer
-                .getEncoderDecoder(rmps.getNamespaceURI(), maps.getNamespaceURI());
-            Element header = codec.buildHeaders(rmps, Soap11.getInstance().getHeader());
+            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
+                maps.getNamespaceURI());
+            Element header = protocol.getCodec().buildHeaders(rmps, Soap11.getInstance().getHeader());
             Node node = header.getFirstChild();
             if (node != null && MessageUtils.isPartialResponse(message)) {
                 // make sure the response is returned as HTTP 200 and not 202
@@ -206,9 +208,9 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
             Message inmsg = message.getExchange().getInMessage();
             RMProperties rmps = RMContextUtils.retrieveRMProperties(inmsg, false);
             AddressingProperties maps = RMContextUtils.retrieveMAPs(inmsg, false, false);
-            EncoderDecoder codec = VersionTransformer
-                .getEncoderDecoder(rmps.getNamespaceURI(), maps.getNamespaceURI());
-            Element header = codec.buildHeaderFault(sf, Soap11.getInstance().getHeader());
+            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
+                maps.getNamespaceURI());
+            Element header = protocol.getCodec().buildHeaderFault(sf, Soap11.getInstance().getHeader());
             Node node = header.getFirstChild();
             if (node instanceof Element) {
                 Attr attr = header.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/",
@@ -281,7 +283,8 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                             } else {
                                 wsauri = maps.getNamespaceURI();
                             }
-                            codec = VersionTransformer.getEncoderDecoder(rmUri, wsauri);
+                            ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, wsauri);
+                            codec = protocol.getCodec();
                             if (codec == null) {
                                 LOG.log(Level.WARNING, "NAMESPACE_ERROR_MSG", wsauri); 
                                 break;
@@ -339,7 +342,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      * 
      * @param message the message
      */
-    private void updateServiceModelInfo(SoapMessage message) {
+    private void updateServiceModelInfo(SoapMessage message) throws Fault {
 
         AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
         AttributedURIType actionURI = null == maps ? null : maps.getAction();
@@ -360,7 +363,13 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         RMManager manager = getManager(message);
         assert manager != null;
         
-        RMEndpoint rme = manager.getReliableEndpoint(message);
+        RMEndpoint rme = null;
+        try {
+            rme = manager.getReliableEndpoint(message);
+        } catch (RMException e) {
+            throw new SoapFault(new org.apache.cxf.common.i18n.Message("CANNOT_PROCESS", LOG), e,
+                message.getVersion().getSender());
+        }
   
         Exchange exchange = message.getExchange();
         

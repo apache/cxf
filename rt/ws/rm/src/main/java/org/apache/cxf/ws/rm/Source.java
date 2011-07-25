@@ -26,12 +26,17 @@ import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
 public class Source extends AbstractEndpoint {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(Source.class);
 
     private static final String REQUESTOR_SEQUENCE_ID = "";
     
@@ -63,13 +68,17 @@ public class Source extends AbstractEndpoint {
     }
     
     public void addSequence(SourceSequence seq, boolean persist) {
-        seq.setSource(this);
-        map.put(seq.getIdentifier().getValue(), seq);
-        if (persist) {
-            RMStore store = getReliableEndpoint().getManager().getStore();
-            if (null != store) {
-                store.createSourceSequence(seq);
+        if (seq.getProtocol() == getReliableEndpoint().getProtocol()) {
+            seq.setSource(this);
+            map.put(seq.getIdentifier().getValue(), seq);
+            if (persist) {
+                RMStore store = getReliableEndpoint().getManager().getStore();
+                if (null != store) {
+                    store.createSourceSequence(seq);
+                }
             }
+        } else {
+            LOG.log(Level.SEVERE, "Incompatible protocol version");
         }
     }
     

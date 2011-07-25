@@ -57,20 +57,24 @@ public class RetransmissionCallback implements CachedOutputStreamCallback {
         
         RMStore store = manager.getStore();
         if (null != store) {
-            Source s = manager.getSource(message);
-            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
-            Identifier sid = rmps.getSequence().getIdentifier();
-            SourceSequence ss = s.getSequence(sid);
-            RMMessage msg = new RMMessage();
-            msg.setMessageNumber(rmps.getSequence().getMessageNumber());
-            if (!MessageUtils.isRequestor(message)) {
-                AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
-                if (null != maps && null != maps.getTo()) {
-                    msg.setTo(maps.getTo().getValue());
+            try {
+                Source s = manager.getSource(message);
+                RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
+                Identifier sid = rmps.getSequence().getIdentifier();
+                SourceSequence ss = s.getSequence(sid);
+                RMMessage msg = new RMMessage();
+                msg.setMessageNumber(rmps.getSequence().getMessageNumber());
+                if (!MessageUtils.isRequestor(message)) {
+                    AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
+                    if (null != maps && null != maps.getTo()) {
+                        msg.setTo(maps.getTo().getValue());
+                    }
                 }
-            }
-            msg.setContent(saved);
-            store.persistOutgoing(ss, msg); 
+                msg.setContent(saved);
+                store.persistOutgoing(ss, msg);
+            } catch (RMException e) {
+                // ignore
+            } 
         }
     }
 

@@ -65,13 +65,17 @@ public class Destination extends AbstractEndpoint {
     }
 
     public void addSequence(DestinationSequence seq, boolean persist) {
-        seq.setDestination(this);
-        map.put(seq.getIdentifier().getValue(), seq);
-        if (persist) {
-            RMStore store = getReliableEndpoint().getManager().getStore();
-            if (null != store) {
-                store.createDestinationSequence(seq);
+        if (seq.getProtocol() == getReliableEndpoint().getProtocol()) {
+            seq.setDestination(this);
+            map.put(seq.getIdentifier().getValue(), seq);
+            if (persist) {
+                RMStore store = getReliableEndpoint().getManager().getStore();
+                if (null != store) {
+                    store.createDestinationSequence(seq);
+                }
             }
+        } else {
+            LOG.log(Level.SEVERE, "Incompatible protocol version");
         }
     }
 
@@ -134,7 +138,7 @@ public class Destination extends AbstractEndpoint {
                 }
             }
         } else {
-            RMConstants consts = getReliableEndpoint().getEncoderDecoder().getConstants();
+            RMConstants consts = getReliableEndpoint().getProtocol().getConstants();
             SequenceFaultFactory sff = new SequenceFaultFactory(consts);
             throw sff.createUnknownSequenceFault(sequenceType.getIdentifier());
         }

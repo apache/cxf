@@ -35,11 +35,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.BindingFaultFactory;
 import org.apache.cxf.ws.rm.EncoderDecoder;
+import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.SequenceFault;
-import org.apache.cxf.ws.rm.VersionTransformer;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
@@ -85,8 +85,8 @@ public class SoapFaultFactory implements BindingFaultFactory {
         try {
             RMProperties rmps = RMContextUtils.retrieveRMProperties(msg, false);
             AddressingProperties maps = RMContextUtils.retrieveMAPs(msg, false, false);
-            EncoderDecoder codec = VersionTransformer
-                .getEncoderDecoder(rmps.getNamespaceURI(), maps.getNamespaceURI());
+            EncoderDecoder codec = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
+                maps.getNamespaceURI()).getCodec();
             setDetail(fault, detail, codec);
         } catch (Exception ex) {
             LogUtils.log(LOG, Level.SEVERE, "MARSHAL_FAULT_DETAIL_EXC", ex); 

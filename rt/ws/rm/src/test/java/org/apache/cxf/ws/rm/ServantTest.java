@@ -35,10 +35,10 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
-import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
-import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
-import org.apache.cxf.ws.rm.v200702.Expires;
-import org.apache.cxf.ws.rm.v200702.OfferType;
+import org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType;
+import org.apache.cxf.ws.rm.v200502.CreateSequenceType;
+import org.apache.cxf.ws.rm.v200502.Expires;
+import org.apache.cxf.ws.rm.v200502.OfferType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
@@ -83,7 +83,7 @@ public class ServantTest extends Assert {
 
         EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
         EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        EasyMock.expect(rme.getEncoderDecoder()).andReturn(EncoderDecoder11Impl.INSTANCE).anyTimes();
+        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
 
         control.replay();
 
@@ -200,7 +200,8 @@ public class ServantTest extends Assert {
         message.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
         
         CreateSequenceType cs = new CreateSequenceType();
-        cs.setAcksTo(RMUtils.createReference(DECOUPLED_URL));
+        cs.setAcksTo(org.apache.cxf.ws.addressing.VersionTransformer
+            .convert(RMUtils.createReference(DECOUPLED_URL)));
 
         cs.setExpires(expires);
         cs.setOffer(offer);

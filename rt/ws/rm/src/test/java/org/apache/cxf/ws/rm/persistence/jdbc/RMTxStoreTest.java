@@ -31,6 +31,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.DestinationSequence;
+import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
@@ -362,18 +363,19 @@ public class RMTxStoreTest extends Assert {
         Identifier sid1 = null;
         Identifier sid2 = null;
         
-        Collection<DestinationSequence> seqs = store.getDestinationSequences("unknown");
+        Collection<DestinationSequence> seqs =
+            store.getDestinationSequences("unknown", ProtocolVariation.RM10WSA200408);
         assertEquals(0, seqs.size());
         
         try {
             sid1 = setupDestinationSequence("sequence1");
 
-            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID);
+            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
             assertEquals(1, seqs.size());
             checkRecoveredDestinationSequences(seqs);
 
             sid2 = setupDestinationSequence("sequence2");
-            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID);
+            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
             assertEquals(2, seqs.size());
             checkRecoveredDestinationSequences(seqs);
         } finally {
@@ -392,76 +394,21 @@ public class RMTxStoreTest extends Assert {
         Identifier sid1 = null;
         Identifier sid2 = null;
         
-        Collection<SourceSequence> seqs = store.getSourceSequences("unknown");
+        Collection<SourceSequence> seqs =
+            store.getSourceSequences("unknown", ProtocolVariation.RM10WSA200408);
         assertEquals(0, seqs.size());
         
         try {
             sid1 = setupSourceSequence("sequence1");
 
-            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID);
+            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
             assertEquals(1, seqs.size());
             checkRecoveredSourceSequences(seqs);
 
             sid2 = setupSourceSequence("sequence2");
-            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID);
+            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
             assertEquals(2, seqs.size());
             checkRecoveredSourceSequences(seqs);
-        } finally {
-            if (null != sid1) {
-                store.removeSourceSequence(sid1);
-            }
-            if (null != sid2) {
-                store.removeSourceSequence(sid2);
-            }
-        }
-    }
-
-    @Test
-    public void testGetDestinationSequence() throws SQLException, IOException {
-        
-        Identifier sid1 = null;
-        Identifier sid2 = null;
-        
-        DestinationSequence seq = store.getDestinationSequence(new Identifier());
-        assertNull(seq);
-
-        try {
-            sid1 = setupDestinationSequence("sequence1");
-
-            seq = store.getDestinationSequence(sid1);
-            assertNotNull(seq);
-
-            sid2 = setupDestinationSequence("sequence2");
-            seq = store.getDestinationSequence(sid2);
-            assertNotNull(seq);
-        } finally {
-            if (null != sid1) {
-                store.removeDestinationSequence(sid1);
-            }
-            if (null != sid2) {
-                store.removeDestinationSequence(sid2);
-            }
-        }
-    }
-
-    @Test
-    public void testGetSourceSequence() throws SQLException {
-        
-        Identifier sid1 = null;
-        Identifier sid2 = null;
-        
-        SourceSequence seq = store.getSourceSequence(new Identifier());
-        assertNull(seq);
-        
-        try {
-            sid1 = setupSourceSequence("sequence1");
-
-            seq = store.getSourceSequence(sid1);
-            assertNotNull(seq);
-
-            sid2 = setupSourceSequence("sequence2");
-            seq = store.getSourceSequence(sid2);
-            assertNotNull(seq);
         } finally {
             if (null != sid1) {
                 store.removeSourceSequence(sid1);
