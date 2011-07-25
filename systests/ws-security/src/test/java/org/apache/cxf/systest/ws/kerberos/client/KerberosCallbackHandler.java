@@ -38,7 +38,7 @@ import org.apache.ws.security.message.token.TokenElementCallback;
  */
 public class KerberosCallbackHandler implements CallbackHandler {
     
-    private String valueType = WSConstants.WSS_KRB_V5_AP_REQ;
+    private String valueType = WSConstants.WSS_GSS_KRB_V5_AP_REQ;
     private String token = "8721958125981";
     
     public KerberosCallbackHandler() {
