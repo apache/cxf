@@ -148,6 +148,7 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     boolean useCertificateForConfirmationKeyInfo;
     boolean isSecureConv;
+    boolean enableLifetime;
     int ttl = 300;
     
     Object actAs;
@@ -189,6 +190,14 @@ public class STSClient implements Configurable, InterceptorProvider {
         this.message = message;
     }
 
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
+    
+    public void setEnableLifetime(boolean enableLifetime) {
+        this.enableLifetime = enableLifetime;
+    }
+    
     /**
      * Sets the WS-P policy that is applied to communications between this client and the remote server
      * if no value is supplied for {@link #setWsdlLocation(String)}.
@@ -521,7 +530,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (sptt == null) {
             addTokenType(writer);
         }
-        if (isSecureConv) {
+        if (isSecureConv || enableLifetime) {
             addLifetime(writer);
         }
         if (keyTypeTemplate == null) {
