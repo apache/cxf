@@ -61,13 +61,13 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     private static final String GREETME_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
-/*    private static final String GREETME_RESPONSE_ACTION 
-        = "http://cxf.apache.org/greeter_control/Greeter/greetMeResponse";      */
+    private static final String GREETME_RESPONSE_ACTION 
+        = "http://cxf.apache.org/greeter_control/Greeter/greetMeResponse";
     private static final String PINGME_ACTION = "http://cxf.apache.org/greeter_control/Greeter/pingMeRequest";
-/*    private static final String PINGME_RESPONSE_ACTION 
+    private static final String PINGME_RESPONSE_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/pingMeResponse";
     private static final String GREETER_FAULT_ACTION
-        = "http://cxf.apache.org/greeter_control/Greeter/pingMe/Fault/faultDetail";     */
+        = "http://cxf.apache.org/greeter_control/Greeter/pingMe/Fault/faultDetail";
 
 
     public static class Server extends AbstractBusTestServerBase {
@@ -164,7 +164,10 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(5, 9, 5000);
 
-        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
+                                         inRecorder.getInboundMessages(),
+                                         "http://schemas.xmlsoap.org/ws/2004/08/addressing",
+                                         "http://schemas.xmlsoap.org/ws/2005/02/rm");
         
         
         mf.verifyMessages(5, true);
@@ -173,7 +176,7 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
                                                  GREETME_ACTION, 
                                                  PINGME_ACTION,
                                                  PINGME_ACTION};
-/*        mf.verifyActions(expectedActions, true);
+        mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3", "4"}, true);
         mf.verifyLastMessage(new boolean[] {false, false, false, false, false}, true);
         mf.verifyAcknowledgements(new boolean[] {false, false, false, true, true}, true);
@@ -191,7 +194,7 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         mf.verifyActions(expectedActions, false);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[] {false, false, false, false}, false);
-        mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);  */
+        mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
         
     }
 }
