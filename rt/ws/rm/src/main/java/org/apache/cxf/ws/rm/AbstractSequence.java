@@ -26,8 +26,8 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange
 public abstract class AbstractSequence {
     
     protected final Identifier id;
-    private final ProtocolVariation protocol;
     protected SequenceAcknowledgement acknowledgement;
+    private final ProtocolVariation protocol;
     
     protected AbstractSequence(Identifier i, ProtocolVariation p) {
         id = i;

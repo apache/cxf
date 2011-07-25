@@ -94,7 +94,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     private RMStore store;
     private SequenceIdentifierGenerator idGenerator;
     private RetransmissionQueue retransmissionQueue;
-    private Map<ProtocolVariation,Map<Endpoint, RMEndpoint>> endpointMaps;
+    private Map<ProtocolVariation, Map<Endpoint, RMEndpoint>> endpointMaps;
     private AtomicReference<Timer> timer = new AtomicReference<Timer>();
     private RMAssertion rmAssertion;
     private DeliveryAssuranceType deliveryAssurance;
@@ -104,7 +104,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     private String rmAddressingNamespace = Names200408.WSA_NAMESPACE_NAME;
     
     public RMManager() {
-        setEndpointMaps(new HashMap<ProtocolVariation,Map<Endpoint, RMEndpoint>>());
+        setEndpointMaps(new HashMap<ProtocolVariation, Map<Endpoint, RMEndpoint>>());
     }
     
     // ServerLifeCycleListener
@@ -448,7 +448,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             if (map.size() > 0) {
                 LOG.log(Level.FINE,
                     "Shutting down RMManager with {0} remaining endpoints for protocol variation {1}.",
-                    new Object[] { new Integer(map.size()), protocol });
+                    new Object[] {new Integer(map.size()), protocol });
                 for (RMEndpoint rme : map.values()) {            
                     rme.shutdown();
                 }
@@ -650,7 +650,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         return endpointMaps;
     }
 
-    void setEndpointMaps(Map<ProtocolVariation, Map<Endpoint, RMEndpoint>> endpointMaps) {
+    final void setEndpointMaps(Map<ProtocolVariation, Map<Endpoint, RMEndpoint>> endpointMaps) {
         endpointMaps.put(ProtocolVariation.RM10WSA200408, new HashMap<Endpoint, RMEndpoint>());
         endpointMaps.put(ProtocolVariation.RM10WSA200508, new HashMap<Endpoint, RMEndpoint>());
         endpointMaps.put(ProtocolVariation.RM11WSA200508, new HashMap<Endpoint, RMEndpoint>());

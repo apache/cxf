@@ -201,7 +201,8 @@ public class SourceSequenceTest extends Assert {
     @Test
     public void testAllAcknowledged() throws RMException {
         
-        SourceSequence seq = new SourceSequence(id, null, null, 4, false, ProtocolVariation.RM10WSA200408);        
+        SourceSequence seq = new SourceSequence(id, null, null, 4, false,
+                                                ProtocolVariation.RM10WSA200408);        
         setUpSource();
         seq.setSource(source);
         

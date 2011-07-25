@@ -22,8 +22,7 @@ package org.apache.cxf.ws.rm;
 /**
  * Supported protocol variations.
  */
-public enum ProtocolVariation
-{
+public enum ProtocolVariation {
     RM10WSA200408(EncoderDecoder10Impl.INSTANCE, RM10Constants.INSTANCE),
     RM10WSA200508(EncoderDecoder10AImpl.INSTANCE, RM10Constants.INSTANCE),
     RM11WSA200508(EncoderDecoder11Impl.INSTANCE, RM11Constants.INSTANCE);
@@ -60,7 +59,7 @@ public enum ProtocolVariation
      * @return variant (<code>null</code> if not a supported version)
      */
     public static ProtocolVariation findVariant(String wsrm, String wsa) {
-        for (ProtocolVariation variant: ProtocolVariation.values()) {
+        for (ProtocolVariation variant : ProtocolVariation.values()) {
             if (variant.getWSRMNamespace().equals(wsrm) && variant.getWSANamespace().equals(wsa)) {
                 return variant;
             }
