@@ -87,7 +87,6 @@ class DelegatingNamespaceContext implements NamespaceContext {
         return prefix;
     }
 
-    @SuppressWarnings("unchecked")
     public Iterator getPrefixes(String ns) {
         return nc.getPrefixes(ns);
     }
