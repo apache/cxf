@@ -20,6 +20,8 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.net.HttpURLConnection;
+import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +35,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.URLConnectionInfo;
@@ -164,6 +167,21 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 }
                 if (!isRequestor(message)) {
                     assertHttps(ais, message);
+                    // Store the TLS principal on the message context
+                    SecurityContext sc = message.get(SecurityContext.class);
+                    if (sc == null || sc.getUserPrincipal() == null) {
+                        TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);      
+                        if (tlsInfo != null && tlsInfo.getPeerCertificates() != null 
+                                && tlsInfo.getPeerCertificates().length > 0
+                                && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
+                        ) {
+                            X509Certificate cert = (X509Certificate)tlsInfo.getPeerCertificates()[0];
+                            message.put(
+                                SecurityContext.class, createSecurityContext(cert.getSubjectX500Principal())
+                            );
+                        } 
+                    }
+                    
                 } else {
                     //client side should be checked on the way out
                     for (AssertionInfo ai : ais) {
@@ -172,6 +190,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 }
             }
         }
+        
         private void assertHttps(Collection<AssertionInfo> ais, Message message) {
             for (AssertionInfo ai : ais) {
                 boolean asserted = true;
@@ -206,6 +225,17 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 
                 ai.setAsserted(asserted);
             }
+        }
+        
+        private SecurityContext createSecurityContext(final Principal p) {
+            return new SecurityContext() {
+                public Principal getUserPrincipal() {
+                    return p;
+                }
+                public boolean isUserInRole(String role) {
+                    return false;
+                }
+            };
         }
     }
 }
