@@ -31,6 +31,14 @@ import org.apache.cxf.tools.common.model.JavaParameter;
 import org.apache.cxf.tools.common.model.JavaType;
 
 public class WebParamAnnotator implements Annotator {
+    boolean forceHeader;
+    
+    public WebParamAnnotator() {
+    }
+    public WebParamAnnotator(boolean head) {
+        forceHeader = head;
+    }
+    
     public void annotate(JavaAnnotatable ja) {
         JavaParameter parameter = null;
         if (ja instanceof JavaParameter) {
@@ -85,6 +93,10 @@ public class WebParamAnnotator implements Annotator {
         }
         for (String importClz : webParamAnnotation.getImports()) {
             parameter.getMethod().getInterface().addImport(importClz);
+        }
+        
+        if (forceHeader) {
+            webParamAnnotation.addElement(new JAnnotationElement("header", true, true));
         }
         parameter.addAnnotation("WebParam", webParamAnnotation);
     }
