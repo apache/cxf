@@ -591,8 +591,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = 
             WebClient.create("http://localhost:" 
                              + PORT + "/bookstore/emptypost");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Response response = wc.post(null);
         assertEquals(204, response.getStatus());
+        assertNull(response.getMetadata().getFirst("Content-Type"));
     }
     
     @Test

@@ -358,6 +358,23 @@ public class Headers {
         }
     }
     
+    // Assumes that response body is not available only
+    // if Content-Length is available and set to 0
+    private boolean isResponseBodyAvailable() {
+        List<String> ctLen = headers.get("Content-Length");
+        if (ctLen == null || ctLen.size() != 1) {
+            return true;
+        }
+        try {
+            if (Integer.valueOf(ctLen.get(0)) == 0) {
+                return false;
+            }
+        } catch (NumberFormatException ex) {
+            // ignore
+        }
+        return true;
+    }
+    
     /**
      * Copy the response headers into the response.
      * 
@@ -367,7 +384,8 @@ public class Headers {
     protected void copyToResponse(HttpServletResponse response) {
         String contentType = getContentTypeFromMessage();
  
-        if (!headers.containsKey(Message.CONTENT_TYPE) && contentType != null) {
+        if (!headers.containsKey(Message.CONTENT_TYPE) && contentType != null 
+            && isResponseBodyAvailable()) {
             response.setContentType(contentType);
         }
 
