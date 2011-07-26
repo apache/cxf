@@ -260,7 +260,12 @@ public abstract class AbstractHTTPDestination
         if (contextPath == null) {
             contextPath = "";
         }
-        inMessage.put(Message.PATH_INFO, contextPath + req.getPathInfo());
+        String servletPath = req.getServletPath();
+        if (servletPath == null) {
+            servletPath = "";
+        }
+        String contextServletPath = contextPath + servletPath;
+        inMessage.put(Message.PATH_INFO, contextServletPath + req.getPathInfo());
         String contentType = req.getContentType();
         inMessage.put(Message.CONTENT_TYPE, contentType);
         setEncoding(inMessage, req, contentType);
@@ -268,7 +273,7 @@ public abstract class AbstractHTTPDestination
         inMessage.put(Message.QUERY_STRING, req.getQueryString());
 
         inMessage.put(Message.ACCEPT_CONTENT_TYPE, req.getHeader("Accept"));
-        String basePath = getBasePath(contextPath);
+        String basePath = getBasePath(contextServletPath);
         if (!StringUtils.isEmpty(basePath)) {
             inMessage.put(Message.BASE_PATH, basePath);
         }
