@@ -35,7 +35,7 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 public class FactoryBeanListenerManager {
     Bus bus;
     
-    List<FactoryBeanListener> listeners
+    CopyOnWriteArrayList<FactoryBeanListener> listeners
         = new CopyOnWriteArrayList<FactoryBeanListener>();
     
     public FactoryBeanListenerManager() {
@@ -55,9 +55,7 @@ public class FactoryBeanListenerManager {
         ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
         if (loc != null) {
             for (FactoryBeanListener f : loc.getBeansOfType(FactoryBeanListener.class)) {
-                if (!listeners.contains(f)) {
-                    listeners.add(f);
-                }
+                listeners.addIfAbsent(f);
             }
         }
     }
@@ -67,7 +65,7 @@ public class FactoryBeanListenerManager {
     }
     
     public void addListener(FactoryBeanListener l) {
-        listeners.add(l);
+        listeners.addIfAbsent(l);
     }
     
     public void removeListener(FactoryBeanListener l) {
