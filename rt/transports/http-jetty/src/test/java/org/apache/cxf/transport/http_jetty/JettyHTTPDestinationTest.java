@@ -695,6 +695,7 @@ public class JettyHTTPDestinationTest extends Assert {
                 //EasyMock.expect(request.getMethod()).andReturn(method);            
                 EasyMock.expect(request.getInputStream()).andReturn(is);
                 EasyMock.expect(request.getContextPath()).andReturn("/bar");
+                EasyMock.expect(request.getServletPath()).andReturn("");
                 EasyMock.expect(request.getPathInfo()).andReturn("/foo");
                 EasyMock.expect(request.getRequestURI()).andReturn("/foo");
                 EasyMock.expect(request.getRequestURL())
