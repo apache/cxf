@@ -187,6 +187,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         setResponseDate(responseHeaders, firstTry);
         if (isResponseNull(responseObj)) {
+            responseHeaders.putSingle("Content-Length", "0");
             return;
         }
         
