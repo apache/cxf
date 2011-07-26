@@ -55,6 +55,7 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         useDeflateEncoding = deflate;
     }
     
+    @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault {
         AssertionWrapper assertionWrapper = createAssertion(message);
         try {

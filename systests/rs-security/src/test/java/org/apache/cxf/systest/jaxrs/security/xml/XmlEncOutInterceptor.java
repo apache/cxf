@@ -24,7 +24,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.net.URL;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -82,7 +81,6 @@ import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
 
 public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = 
@@ -157,15 +155,9 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
                
         // encrypt payloadDoc
-        XMLCipher xmlCipher = null;
-        try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
-        } catch (XMLEncryptionException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
-            );
-        }
-        xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+        XMLCipher xmlCipher = 
+            EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.ENCRYPT_MODE, symmetricKey);
+        
         Document result = xmlCipher.doFinal(payloadDoc, payloadDoc.getDocumentElement(), false);
         NodeList list = result.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherValue");
         if (list.getLength() != 1) {
@@ -231,14 +223,8 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     protected byte[] encryptSymmetricKey(byte[] keyBytes, 
                                          X509Certificate remoteCert,
                                          Crypto crypto) throws WSSecurityException {
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
-        try {
-            cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
-        } catch (InvalidKeyException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
-            );
-        }
+        Cipher cipher = 
+            EncryptionUtils.initCipherWithCert(keyEncAlgo, Cipher.ENCRYPT_MODE, remoteCert);
         int blockSize = cipher.getBlockSize();
         if (blockSize > 0 && blockSize < keyBytes.length) {
             throw new WSSecurityException(

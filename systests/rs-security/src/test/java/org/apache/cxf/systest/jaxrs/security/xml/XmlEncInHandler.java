@@ -24,16 +24,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.security.InvalidKeyException;
 import java.security.PrivateKey;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -42,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -63,6 +61,8 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SignatureTrustValidator;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
 
 public class XmlEncInHandler implements RequestHandler {
@@ -90,22 +90,13 @@ public class XmlEncInHandler implements RequestHandler {
         
 
         Element root = doc.getDocumentElement();
-        Element encKeyElement = getNode(root, WSConstants.ENC_NS, "EncryptedKey", 0);
-        if (encKeyElement == null) {
-            throwFault("EncryptedKey element is not available", null);
-        }
-        byte[] symmetricKeyBytes = getSymmetricKey(message, encKeyElement);
+        
+        byte[] symmetricKeyBytes = getSymmetricKeyBytes(message, root);
                 
         String algorithm = getEncodingMethodAlgorithm(root);
-        Element cipherValue = getNode(root, WSConstants.ENC_NS, "CipherValue", 1);
-        if (cipherValue == null) {
-            throwFault("CipherValue element is not available", null);
-        }
-        
         byte[] decryptedPayload = null;
         try {
-            decryptedPayload = decryptPayload(symmetricKeyBytes, cipherValue.getTextContent().trim(),
-                                                algorithm);
+            decryptedPayload = decryptPayload(root, symmetricKeyBytes, algorithm);
         } catch (Exception ex) {
             throwFault("Payload can not be decrypted", ex);
         }
@@ -123,7 +114,14 @@ public class XmlEncInHandler implements RequestHandler {
         return null;
     }
     
-    private byte[] getSymmetricKey(Message message, Element encKeyElement) {
+    protected byte[] getSymmetricKeyBytes(Message message, Element encDataElement) {
+        // Subclasses can overwrite it and return the bytes, assuming they know the actual key
+        Element encKeyElement = getNode(encDataElement, WSConstants.ENC_NS, "EncryptedKey", 0);
+        if (encKeyElement == null) {
+            //TODO: support EncryptedData/ds:KeyInfo - the encrypted key is passed out of band
+            throwFault("EncryptedKey element is not available", null);
+        }
+        
         Element certNode = getNode(encKeyElement, 
                                       Constants.SignatureSpecNS, "X509Certificate", 0);
         if (certNode == null) {
@@ -136,14 +134,6 @@ public class XmlEncInHandler implements RequestHandler {
             throwFault("Base64 decoding has failed", ex);
         }
         
-        X509Certificate cert = null;
-        try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            cert = (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(certBytes));
-        } catch (Exception ex) {
-            throwFault("X509Certificate can not be created", ex);
-        }
-        
         Crypto crypto = null;
         try {
             crypto = getCrypto(message, SecurityConstants.ENCRYPT_PROPERTIES);
@@ -151,7 +141,13 @@ public class XmlEncInHandler implements RequestHandler {
             throwFault("Crypto can not be loaded", ex);
         }
         
-            
+        X509Certificate cert = null;
+        try {
+            cert = crypto.loadCertificate(new ByteArrayInputStream(certBytes));
+        } catch (Exception ex) {
+            throwFault("X509Certificate can not be created", ex);
+        }
+        
         Credential trustCredential = new Credential();
         trustCredential.setPublicKey(null);
         trustCredential.setCertificates(new X509Certificate[]{cert});
@@ -187,7 +183,8 @@ public class XmlEncInHandler implements RequestHandler {
         }
         return encMethod.getAttribute("Algorithm");
     }
-    
+
+    //TODO: Support symmetric keys if requested
     protected byte[] decryptSymmetricKey(String base64EncodedKey, 
                                          X509Certificate cert,
                                          Crypto crypto,
@@ -200,18 +197,11 @@ public class XmlEncInHandler implements RequestHandler {
         } catch (Exception ex) {
             throwFault("Encrypted key can not be decrypted", ex);
         }
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
-        try {
-            // see more: WSS4J EncryptedDataProcessor
-            cipher.init(Cipher.DECRYPT_MODE, key);
-        } catch (InvalidKeyException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
-            );
-        }
+        Cipher cipher = 
+            EncryptionUtils.initCipherWithKey(keyEncAlgo, Cipher.DECRYPT_MODE, key);
         try {
             byte[] encryptedBytes = Base64Utility.decode(base64EncodedKey);
-            return doDecrypt(cipher, encryptedBytes); 
+            return cipher.doFinal(encryptedBytes);
         } catch (Base64Exception ex) {
             throwFault("Base64 decoding has failed", ex);
         } catch (Exception ex) {
@@ -221,45 +211,22 @@ public class XmlEncInHandler implements RequestHandler {
         
     }
     
-    protected byte[] decryptPayload(byte[] secretKeyBytes,
-                                    String base64EncodedPayload, 
+    protected byte[] decryptPayload(Element root, 
+                                    byte[] secretKeyBytes,
                                     String symEncAlgo) throws WSSecurityException {
-        byte[] encryptedBytes = null;
+        SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKeyBytes);
         try {
-            encryptedBytes = Base64Utility.decode(base64EncodedPayload);
-        } catch (Base64Exception ex) {
-            throwFault("Base64 decoding has failed", ex);
+            XMLCipher xmlCipher = 
+                EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.DECRYPT_MODE, key);
+            return xmlCipher.decryptToByteArray(root);
+        } catch (XMLEncryptionException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
+            );
         }
         
-        Cipher cipher = WSSecurityUtil.getCipherInstance(symEncAlgo);
-        try {
-            // see more: WSS4J EncryptedDataProcessor
-            SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKeyBytes);
-            // IV spec
-            int ivLen = cipher.getBlockSize();
-            byte[] ivBytes = new byte[ivLen];
-            System.arraycopy(encryptedBytes, 0, ivBytes, 0, ivLen);
-            IvParameterSpec iv = new IvParameterSpec(ivBytes);
-            
-            cipher.init(Cipher.DECRYPT_MODE, key, iv);
-            
-            return cipher.doFinal(encryptedBytes, 
-                             ivLen, 
-                             encryptedBytes.length - ivLen);
-            
-        } catch (InvalidKeyException e) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
-            );
-        } catch (Exception e) {
-            throw new WSSecurityException(
-                 WSSecurityException.FAILED_ENCRYPTION, null, null, e);
-        }
     }
     
-    private byte[] doDecrypt(Cipher cipher, byte[] encryptedBytes) throws Exception {
-        return cipher.doFinal(encryptedBytes);
-    }
     
     private Element getNode(Element parent, String ns, String name, int index) {
         NodeList list = parent.getElementsByTagNameNS(ns, name);
