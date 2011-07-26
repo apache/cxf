@@ -571,8 +571,9 @@ public abstract class AbstractBindingBuilder {
                 }
             } else if (token instanceof KerberosToken) {
                 BinarySecurity binarySecurity = addKerberosToken((KerberosToken)token);
-                addSupportingElement(cloneElement(binarySecurity.getElement()));
-                ret.put(token, binarySecurity);
+                Element clone = cloneElement(binarySecurity.getElement());
+                addSupportingElement(clone);
+                ret.put(token, new BinarySecurity(clone));
             }
         }
         return ret;
