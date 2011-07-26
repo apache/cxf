@@ -32,6 +32,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.FactoryBeanListenerManager;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -105,6 +106,11 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         addBusInterceptors();
         FactoryBeanListenerManager fblm = bus.getExtension(FactoryBeanListenerManager.class);
         if (fblm != null) {
+            for (FactoryBeanListener l : fblm.getListeners()) {
+                if (l instanceof PolicyAnnotationListener) {
+                    return;
+                }
+            }
             fblm.addListener(new PolicyAnnotationListener());
         }
     }

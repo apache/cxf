@@ -117,6 +117,8 @@ public class PolicyAnnotationTest extends Assert {
                    xpu.isExist("/wsdl:definitions/wsp:Policy[@wsu:Id='" + uri + "']",
                               wsdl,
                               XPathConstants.NODE));
+        assertEquals(1, xpu.getValueList("/wsdl:definitions/wsp:Policy[@wsu:Id='" + uri + "']",
+                         wsdl).getLength());
         assertTrue(uri + " reference not found",
                xpu.isExist(path + "/wsp:PolicyReference[@URI='#" + uri + "']",
                           wsdl,
