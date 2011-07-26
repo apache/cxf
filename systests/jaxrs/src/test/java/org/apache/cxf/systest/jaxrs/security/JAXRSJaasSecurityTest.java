@@ -86,7 +86,7 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
         assertEquals(307, r.getStatus());
         Object locationHeader = r.getMetadata().getFirst(HttpHeaders.LOCATION);
         assertNotNull(locationHeader);
-        assertEquals("http://localhost:" + PORT + "/service/login.jsp",
+        assertEquals("http://localhost:" + PORT + "/login.jsp",
                      locationHeader.toString());
     }
     
