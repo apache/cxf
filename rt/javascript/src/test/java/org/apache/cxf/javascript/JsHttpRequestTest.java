@@ -35,6 +35,7 @@ import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.test.XPathAssert;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -68,6 +69,7 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
 
     @Override
     protected String[] getConfigLocations() {
+        TestUtil.getPortNumber(JsHttpRequestTest.class);
         return new String[] {"classpath:XMLHttpRequestTestBeans.xml"};
     }
     

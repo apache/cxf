@@ -50,7 +50,8 @@ function testSyncHttpFetch() {
 	
 	var r = new XMLHttpRequest();
 	
-	r.open("GET", "http://localhost:8808/test.html", false);
+    var port = java.lang.System.getProperty("testutil.ports.JsHttpRequestTest");
+	r.open("GET", "http://localhost:" + port + "/test.html", false);
 	if (r.readyState != r.OPENED) {
 		assertionFailed("state not OPENED after OPEN");
 	}
@@ -71,8 +72,9 @@ function testStateNotificationSync() {
 	// create closure.
 	r.onreadystatechange = function() {
 		globalState = r.readyState;
-	}	
-	r.open("GET", "http://localhost:8808/test.html", false);
+    }
+    var port = java.lang.System.getProperty("testutil.ports.JsHttpRequestTest");
+	r.open("GET", "http://localhost:" + port + "/test.html", false);
 	if (r.readyState != r.OPENED) {
 		assertionFailed("state not OPENED after OPEN");
 	}
@@ -138,7 +140,8 @@ function testAsyncHttpFetch1() {
 		}
 	}	
 
-	r.open("GET", "http://localhost:8808/test.html", true);
+    var port = java.lang.System.getProperty("testutil.ports.JsHttpRequestTest");
+	r.open("GET", "http://localhost:" + port + "/test.html", true);
 	if (r.readyState != r.OPENED) {
 		assertionFailed("state not OPENED after OPEN");
 	}
