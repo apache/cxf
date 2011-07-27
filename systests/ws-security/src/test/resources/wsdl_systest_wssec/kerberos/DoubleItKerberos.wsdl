@@ -364,7 +364,7 @@
                   <sp:KerberosToken
                       sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
                       <wsp:Policy>
-                          <sp:WssKerberosV5ApReqToken11/>
+                          <sp:WssGssKerberosV5ApReqToken11/>
                       </wsp:Policy>
                   </sp:KerberosToken>
               </wsp:Policy>

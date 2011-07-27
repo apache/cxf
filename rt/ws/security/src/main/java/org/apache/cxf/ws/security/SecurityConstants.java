@@ -40,7 +40,6 @@ public final class SecurityConstants {
     
     public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
     public static final String SAML_CALLBACK_HANDLER = "ws-security.saml-callback-handler";
-    public static final String BST_CALLBACK_HANDLER = "ws-security.bst-callback-handler";
     
     public static final String SIGNATURE_USERNAME = "ws-security.signature.username";
     public static final String SIGNATURE_PROPERTIES = "ws-security.signature.properties";
@@ -108,7 +107,9 @@ public final class SecurityConstants {
     public static final String STS_TOKEN_ACT_AS = "ws-security.sts.token.act-as";
     
     public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
-
+    
+    public static final String KERBEROS_CLIENT = "ws-security.kerberos.client";
+    
     public static final Set<String> ALL_PROPERTIES;
     
     static {
@@ -122,7 +123,7 @@ public final class SecurityConstants {
             SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
             SIGNATURE_TOKEN_VALIDATOR, IS_BSP_COMPLIANT, TIMESTAMP_FUTURE_TTL,
             BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER, STS_TOKEN_ON_BEHALF_OF,
-            BST_CALLBACK_HANDLER
+            KERBEROS_CLIENT
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

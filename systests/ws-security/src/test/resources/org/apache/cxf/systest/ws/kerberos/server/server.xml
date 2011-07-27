@@ -71,6 +71,12 @@
         </httpj:engine>
     </httpj:engine-factory>
     
+    <bean id="kerberosValidator"
+        class="org.apache.ws.security.validate.KerberosTokenValidator">
+        <property name="jaasLoginModuleName" value="bob"/>
+        <property name="serviceName" value="bob@service.ws.apache.org"/>
+    </bean> 
+    
     <jaxws:endpoint 
        id="KerberosOverTransport"
        address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransport" 
@@ -83,6 +89,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.is-bsp-compliant" value="false"/>
+           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -101,8 +108,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
-           <entry key="ws-security.bst.validator" 
-                  value="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenValidator"/>
+           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -121,8 +127,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
-           <entry key="ws-security.bst.validator" 
-                  value="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenValidator"/>
+           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -145,8 +150,7 @@
            <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
            <entry key="ws-security.encryption.username" value="alice"/>
-           <entry key="ws-security.bst.validator" 
-                  value="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenValidator"/>
+           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
            <entry key="ws-security.is-bsp-compliant" value="false"/>
        </jaxws:properties> 
      

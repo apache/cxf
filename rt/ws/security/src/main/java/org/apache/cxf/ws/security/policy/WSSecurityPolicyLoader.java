@@ -65,6 +65,7 @@ import org.apache.cxf.ws.security.policy.builders.WSS11Builder;
 import org.apache.cxf.ws.security.policy.builders.X509TokenBuilder;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider;
+import org.apache.cxf.ws.security.policy.interceptors.KerberosTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.SecureConversationTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.UsernameTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
@@ -165,6 +166,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.register(new WSSecurityPolicyInterceptorProvider());
         reg.register(new WSSecurityInterceptorProvider());
         reg.register(new HttpsTokenInterceptorProvider());
+        reg.register(new KerberosTokenInterceptorProvider());
         reg.register(new IssuedTokenInterceptorProvider());
         reg.register(new UsernameTokenInterceptorProvider(bus));
         reg.register(new SecureConversationTokenInterceptorProvider());

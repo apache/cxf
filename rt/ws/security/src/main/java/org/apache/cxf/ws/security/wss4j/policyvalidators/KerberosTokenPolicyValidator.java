@@ -19,20 +19,14 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Kerberos Token
@@ -40,20 +34,17 @@ import org.apache.ws.security.util.WSSecurityUtil;
  */
 public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
     
-    private List<WSSecurityEngineResult> bstResults;
     private Message message;
 
     public KerberosTokenPolicyValidator(
-        Message message,
-        List<WSSecurityEngineResult> results
+        Message message
     ) {
         this.message = message;
-        bstResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST, bstResults);
     }
     
     public boolean validatePolicy(
-        AssertionInfoMap aim
+        AssertionInfoMap aim,
+        KerberosSecurity kerberosToken
     ) {
         Collection<AssertionInfo> krbAis = aim.get(SP12Constants.KERBEROS_TOKEN);
         if (krbAis != null && !krbAis.isEmpty()) {
@@ -65,14 +56,7 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
                     continue;
                 }
                 
-                if (bstResults.isEmpty()) {
-                    ai.setNotAsserted(
-                        "The received token does not match the token inclusion requirement"
-                    );
-                    return false;
-                }
-                
-                if (!checkToken(kerberosTokenPolicy)) {
+                if (!checkToken(kerberosTokenPolicy, kerberosToken)) {
                     ai.setNotAsserted("An incorrect Kerberos Token Type is detected");
                     return false;
                 }
@@ -81,25 +65,16 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
         return true;
     }
     
-    private boolean checkToken(KerberosToken kerberosTokenPolicy) {
-        if (!bstResults.isEmpty()) {
-            boolean isV5ApReq = kerberosTokenPolicy.isV5ApReqToken11();
-            boolean isGssV5ApReq = kerberosTokenPolicy.isGssV5ApReqToken11();
-            
-            for (WSSecurityEngineResult result : bstResults) {
-                BinarySecurity binarySecurityToken = 
-                    (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                if (binarySecurityToken instanceof KerberosSecurity) {
-                    if (isV5ApReq && ((KerberosSecurity)binarySecurityToken).isV5ApReq()) {
-                        return true;
-                    } else if (isGssV5ApReq 
-                        && ((KerberosSecurity)binarySecurityToken).isGssV5ApReq()) {
-                        return true;
-                    } else if (!isV5ApReq && !isGssV5ApReq) {
-                        return true;
-                    }
-                }
-            }
+    private boolean checkToken(KerberosToken kerberosTokenPolicy, KerberosSecurity kerberosToken) {
+        boolean isV5ApReq = kerberosTokenPolicy.isV5ApReqToken11();
+        boolean isGssV5ApReq = kerberosTokenPolicy.isGssV5ApReqToken11();
+
+        if (isV5ApReq && kerberosToken.isV5ApReq()) {
+            return true;
+        } else if (isGssV5ApReq && kerberosToken.isGssV5ApReq()) {
+            return true;
+        } else if (!(isV5ApReq || isGssV5ApReq)) {
+            return true;
         }
         return false;
     }

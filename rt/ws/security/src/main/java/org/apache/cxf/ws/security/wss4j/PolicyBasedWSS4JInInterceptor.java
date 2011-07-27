@@ -74,7 +74,6 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
-import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
@@ -624,10 +623,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         X509TokenPolicyValidator x509Validator = new X509TokenPolicyValidator(msg, results);
         x509Validator.validatePolicy(aim);
-        
-        KerberosTokenPolicyValidator kerberosValidator = 
-            new KerberosTokenPolicyValidator(msg, results);
-        kerberosValidator.validatePolicy(aim);
         
         //REVISIT - probably can verify some of these like if UT is encrypted and/or signed, etc...
         assertPolicy(aim, SP12Constants.SIGNED_SUPPORTING_TOKENS);

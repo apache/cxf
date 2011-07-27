@@ -63,7 +63,6 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 
@@ -92,7 +91,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     utBuilder.prepare(saaj.getSOAPPart());
                     utBuilder.appendToHeader(secHeader);
                 }
-            } else if (token instanceof IssuedToken) {
+            } else if (token instanceof IssuedToken || token instanceof KerberosToken) {
                 SecurityToken secTok = getSecurityToken();
                 
                 if (includeToken(token.getInclusion())) {
@@ -104,9 +103,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 if (assertionWrapper != null) {
                     addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                 }
-            } else if (token instanceof KerberosToken) {
-                BinarySecurity binarySecurity = addKerberosToken((KerberosToken)token);
-                addSupportingElement(cloneElement(binarySecurity.getElement()));
             } else {
                 //REVISIT - not supported for signed.  Exception?
             }
