@@ -31,10 +31,12 @@
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 
 	<httpj:engine-factory bus="cxf">
-		<httpj:engine port="8808">
+		<httpj:engine port="${testutil.ports.JsHttpRequestTest}">
 			<httpj:handlers>
 				<bean class="org.eclipse.jetty.server.handler.ContextHandler">
 					<property name="contextPath" value="/" />
@@ -64,7 +66,7 @@
 
 	<jaxws:endpoint id="greeter-service-endpoint"
 		implementor="org.apache.hello_world_xml_http.wrapped.GreeterImpl"
-		address="http://localhost:8808/Greeter">
+		address="http://localhost:${testutil.ports.JsHttpRequestTest}/Greeter">
 	</jaxws:endpoint>
 
 </beans>
