@@ -227,7 +227,10 @@ public class JettyHTTPServerEngine
         //this is most often seen in our unit/system tests that 
         //test things in the same VM.
         
-        String s = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
+        String s = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort." + port);
+        if (s == null) {
+            s = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
+        }
         return !Boolean.valueOf(s);
     }
     
