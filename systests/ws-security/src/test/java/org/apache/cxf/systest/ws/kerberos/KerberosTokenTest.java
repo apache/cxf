@@ -25,14 +25,11 @@ import java.net.URL;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.ws.kerberos.client.KerberosCallbackHandler;
 import org.apache.cxf.systest.ws.kerberos.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.ws.security.WSConstants;
 
 import org.junit.BeforeClass;
 
@@ -40,7 +37,13 @@ import wssec.kerberos.DoubleItPortType;
 import wssec.kerberos.DoubleItService;
 
 /**
- * A set of tests for Kerberos Tokens.
+ * A set of tests for Kerberos Tokens. The tests are @Ignore'd, as they require a running KDC. To run the
+ * tests, set up a KDC of realm "WS.APACHE.ORG", with principal "alice" and service principal 
+ * "bob/service.ws.apache.org". Create keytabs for both principals in "/etc/alice.keytab" and
+ * "/etc/bob.keytab" (this can all be edited in src/test/resource/kerberos.jaas". Then disable the
+ * @Ignore annotations and run the tests with:
+ *  
+ * mvn test -Dtest=KerberosTokenTest -Djava.security.auth.login.config=src/test/resources/kerberos.jaas
  */
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -59,6 +62,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    @org.junit.Ignore
     public void testKerberosOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -72,35 +76,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         
         DoubleItPortType kerberosPort = service.getDoubleItKerberosTransportPort();
         updateAddressPort(kerberosPort, PORT2);
-        
-        try {
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with no Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("No BST CallbackHandler available"));
-        }
-        
-        try {
-            KerberosCallbackHandler handler = new KerberosCallbackHandler();
-            handler.setValueType(WSConstants.WSS_KRB_V5_AP_REQ);
-            ((BindingProvider)kerberosPort).getRequestContext().put(
-                "ws-security.bst-callback-handler", handler
-            );
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with the wrong Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("incorrect Kerberos Token Type"));
-        }
-        
-        ((BindingProvider)kerberosPort).getRequestContext().put(
-            "ws-security.bst-callback-handler", new KerberosCallbackHandler()
-        );
-
         BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     @org.junit.Test
+    @org.junit.Ignore
     public void testKerberosOverSymmetric() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -119,34 +100,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricPort();
         updateAddressPort(kerberosPort, PORT);
         
-        try {
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with no Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("No BST CallbackHandler available"));
-        }
-        
-        try {
-            KerberosCallbackHandler handler = new KerberosCallbackHandler();
-            handler.setToken("123456566");
-            ((BindingProvider)kerberosPort).getRequestContext().put(
-                "ws-security.bst-callback-handler", handler
-            );
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with the wrong Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
-        }
-
-        ((BindingProvider)kerberosPort).getRequestContext().put(
-            "ws-security.bst-callback-handler", new KerberosCallbackHandler()
-        );
-
         BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     @org.junit.Test
+    @org.junit.Ignore
     public void testKerberosOverSymmetricSupporting() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -165,34 +124,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricSupportingPort();
         updateAddressPort(kerberosPort, PORT);
         
-        try {
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with no Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("No BST CallbackHandler available"));
-        }
-        
-        try {
-            KerberosCallbackHandler handler = new KerberosCallbackHandler();
-            handler.setToken("123456566");
-            ((BindingProvider)kerberosPort).getRequestContext().put(
-                "ws-security.bst-callback-handler", handler
-            );
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with the wrong Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
-        }
-        
-        ((BindingProvider)kerberosPort).getRequestContext().put(
-            "ws-security.bst-callback-handler", new KerberosCallbackHandler()
-        );
-
         BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
     @org.junit.Test
+    @org.junit.Ignore
     public void testKerberosOverAsymmetric() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -211,29 +148,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = service.getDoubleItKerberosAsymmetricPort();
         updateAddressPort(kerberosPort, PORT);
         
-        try {
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with no Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("No BST CallbackHandler available"));
-        }
-        
-        try {
-            ((BindingProvider)kerberosPort).getRequestContext().put(
-                "ws-security.bst-callback-handler", new KerberosCallbackHandler()
-            );
-            kerberosPort.doubleIt(BigInteger.valueOf(25));
-            fail("Expected failure on an invocation with the wrong Kerberos Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("incorrect Kerberos Token Type"));
-        }
-        
-        KerberosCallbackHandler handler = new KerberosCallbackHandler();
-        handler.setValueType(WSConstants.WSS_KRB_V5_AP_REQ);
-        ((BindingProvider)kerberosPort).getRequestContext().put(
-            "ws-security.bst-callback-handler", handler
-        );
-
         BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }

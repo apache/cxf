@@ -486,13 +486,16 @@ public abstract class AbstractBindingBuilder {
                 }
             } else if (isRequestor() 
                 && (token instanceof IssuedToken
-                    || token instanceof SecureConversationToken)) {
+                    || token instanceof SecureConversationToken
+                    || token instanceof KerberosToken)) {
                 //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
                     policyNotAsserted(token, "Could not find IssuedToken");
                 }
-                addSupportingElement(cloneElement(secToken.getToken()));
+                Element clone = cloneElement(secToken.getToken());
+                secToken.setToken(clone);
+                addSupportingElement(clone);
         
                 if (suppTokens.isEncryptedToken()) {
                     this.encryptedTokensIdList.add(secToken.getId());
@@ -569,11 +572,6 @@ public abstract class AbstractBindingBuilder {
                     addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                     ret.put(token, assertionWrapper);
                 }
-            } else if (token instanceof KerberosToken) {
-                BinarySecurity binarySecurity = addKerberosToken((KerberosToken)token);
-                Element clone = cloneElement(binarySecurity.getElement());
-                addSupportingElement(clone);
-                ret.put(token, new BinarySecurity(clone));
             }
         }
         return ret;
@@ -671,7 +669,8 @@ public abstract class AbstractBindingBuilder {
                     part.setId(secRef.getID());
                     part.setElement(clone);
                 } else {
-                    policyNotAsserted(entry.getKey(), "UnsupportedTokenInSupportingToken: " + tempTok);  
+                    part = new WSEncryptionPart(token.getId());
+                    part.setElement(token.getToken());
                 }
             } else {
                 policyNotAsserted(entry.getKey(), "UnsupportedTokenInSupportingToken: " + tempTok);  
@@ -856,42 +855,6 @@ public abstract class AbstractBindingBuilder {
         }
         
         return assertion;
-    }
-    
-    protected BinarySecurity addKerberosToken(KerberosToken token) throws WSSecurityException {
-        AssertionInfo info = null;
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
-        for (AssertionInfo ai : ais) {
-            if (ai.getAssertion() == token) {
-                info = ai;
-                if (!isRequestor()) {
-                    info.setAsserted(true);
-                    return null;
-                }
-            }
-        }
-        
-        //
-        // Get the BST (Kerberos) CallbackHandler
-        //
-        Object o = message.getContextualProperty(SecurityConstants.BST_CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        if (handler == null) {
-            policyNotAsserted(token, "No BST CallbackHandler available");
-            return null;
-        }
-        return new BinarySecurity(handler);
     }
     
     public String getPassword(String userName, Assertion info, int type) {

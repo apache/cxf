@@ -105,7 +105,7 @@ public final class SP11Constants extends SPConstants {
     public static final QName SAML_TOKEN = new QName(SP11Constants.SP_NS,
             SPConstants.SAML_TOKEN , SP11Constants.SP_PREFIX);
     
-    public static final QName KERBEROS_TOKEN = new QName(SP12Constants.SP_NS,
+    public static final QName KERBEROS_TOKEN = new QName(SP11Constants.SP_NS,
             SPConstants.KERBEROS_TOKEN, SP11Constants.SP_PREFIX);
 
     public static final QName WSS_USERNAME_TOKEN10 = new QName(SP11Constants.SP_NS,
