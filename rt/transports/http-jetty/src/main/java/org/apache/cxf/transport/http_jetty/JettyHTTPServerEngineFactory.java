@@ -20,10 +20,10 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,8 +57,10 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      */
     // Still use the static map to hold the port information
     // in the same JVM
-    private static Map<Integer, JettyHTTPServerEngine> portMap =
-        new HashMap<Integer, JettyHTTPServerEngine>();
+    private static ConcurrentHashMap<Integer, JettyHTTPServerEngine> portMap =
+        new ConcurrentHashMap<Integer, JettyHTTPServerEngine>();
+    
+    
    
     private BusLifeCycleManager lifeCycleManager;
     /**
@@ -99,6 +101,23 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         setBus(b);
     }    
     
+    private static synchronized JettyHTTPServerEngine getOrCreate(JettyHTTPServerEngineFactory factory,
+                    String host,
+                    int port,
+                    TLSServerParameters tlsParams) throws IOException, GeneralSecurityException {
+        
+        JettyHTTPServerEngine ref = portMap.get(port);
+        if (ref == null) {
+            ref = new JettyHTTPServerEngine(factory, host, port);
+            if (tlsParams != null) {
+                ref.setTlsServerParameters(tlsParams);
+            }
+            portMap.put(port, ref);
+            ref.finalizeConfig();
+        }
+        return ref;
+    }
+
     
     /**
      * This call is used to set the bus. It should only be called once.
@@ -141,7 +160,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
             if (engine.getPort() == FALLBACK_THREADING_PARAMS_KEY) {
                 fallbackThreadingParameters = engine.getThreadingParameters();
             }
-            portMap.put(engine.getPort(), engine);
+            portMap.putIfAbsent(engine.getPort(), engine);
         }    
     }
     
@@ -179,10 +198,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         }
         JettyHTTPServerEngine ref = retrieveJettyHTTPServerEngine(port);
         if (null == ref) {
-            ref = new JettyHTTPServerEngine(this, bus, host, port);
-            ref.setTlsServerParameters(tlsParams);
-            portMap.put(port, ref);
-            ref.finalizeConfig();
+            ref = getOrCreate(this, host, port, tlsParams);
         } else {
             if (ref.getConnector() != null && ref.getConnector().isRunning()) {
                 throw new IOException("can't set the TLS params on the opened connector");
@@ -229,12 +245,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(String host, int port, 
         String protocol) throws GeneralSecurityException, IOException {
         LOG.fine("Creating Jetty HTTP Server Engine for port " + port + ".");        
-        JettyHTTPServerEngine ref = retrieveJettyHTTPServerEngine(port);
-        if (null == ref) {
-            ref = new JettyHTTPServerEngine(this, bus, host, port);            
-            portMap.put(port, ref);
-            ref.finalizeConfig();
-        } 
+        JettyHTTPServerEngine ref = getOrCreate(this, host, port, null);
         // checking the protocol    
         if (!protocol.equals(ref.getProtocol())) {
             throw new IOException("Protocol mismatch for port " + port + ": "

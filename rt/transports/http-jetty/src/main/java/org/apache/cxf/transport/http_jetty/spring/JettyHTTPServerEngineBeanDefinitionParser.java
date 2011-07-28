@@ -156,13 +156,15 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         
         String threadingRef;
         String tlsRef;
+        Bus bus;
         
         public SpringJettyHTTPServerEngine(
-            JettyHTTPServerEngineFactory fac, 
-            Bus bus,
+            JettyHTTPServerEngineFactory fac,
+            Bus b,
             String host,
             int port) {
-            super(fac, bus, host, port);
+            super(fac, host, port);
+            bus = b;
         }
         
         public SpringJettyHTTPServerEngine() {
@@ -171,7 +173,7 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-            if (getBus() == null) {
+            if (bus == null) {
                 Bus bus = BusFactory.getThreadDefaultBus();
                 BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
                 setBus(bus);
@@ -190,7 +192,9 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
             throws GeneralSecurityException,
                    IOException {
             if (tlsRef != null || threadingRef != null) {
-                retrieveEngineFactory();
+                if (bus != null) {
+                    setBus(bus);
+                }
                 if (threadingRef != null) {
                     setThreadingParameters(factory.getThreadingParametersMap().get(threadingRef));
                 }
