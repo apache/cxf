@@ -153,6 +153,10 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP11Constants.REQUIRE_ISSUER_SERIAL_REFERENCE,
             new QName(SP12Constants.SP_NS, SP12Constants.ENCRYPT_BEFORE_SIGNING),
             new QName(SP11Constants.SP_NS, SP11Constants.ENCRYPT_BEFORE_SIGNING),
+            new QName(SP12Constants.SP_NS, SP12Constants.SIGN_BEFORE_ENCRYPTING),
+            new QName(SP11Constants.SP_NS, SP11Constants.SIGN_BEFORE_ENCRYPTING),
+            SP12Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
+            SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
         });
         reg.registerBuilder(new PrimitiveAssertionBuilder(others));
     }
