@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.sts.provider;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +32,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.DetailEntry;
-import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
@@ -223,32 +221,40 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
                                           .createRequestSecurityTokenResponse(tokenResponse));
             }
 
-        } catch (Exception e) {
+        } catch (InvocationTargetException ex) {
             try {
-                SOAPFault fault = soapFactory.createFault();
-                if (e.getMessage() != null) {
-                    fault.setFaultString(e.getMessage());
-                } else if (e.getCause() != null && e.getCause().getMessage() != null) {
-                    fault.setFaultString(e.getCause().getMessage());
-                } else {
-                    fault.setFaultString("Internal STS error");
-                }
-                Detail detail = fault.addDetail();
-                detail = fault.getDetail();
-                QName qName = new QName(WSTRUST_13_NAMESPACE, "Fault", "ns");
-                DetailEntry de = detail.addDetailEntry(qName);
-                qName = new QName(WSTRUST_13_NAMESPACE, "ErrorCode", "ns");
-                SOAPElement errorElement = de.addChildElement(qName);
-                StackTraceElement[] ste = e.getStackTrace();
-                errorElement.setTextContent(ste[0].toString());
+                Throwable cause = ex.getCause();
+                SOAPFault fault = createSOAPFault(cause);
                 throw new SOAPFaultException(fault);
             } catch (SOAPException e1) {
                 throw new Fault(e1);
             }
-
+        } catch (Exception ex) {
+            try {
+                SOAPFault fault = createSOAPFault(ex);
+                throw new SOAPFaultException(fault);
+            } catch (SOAPException e1) {
+                throw new Fault(e1);
+            }
         }
 
         return response;
+    }
+    
+    private SOAPFault createSOAPFault(Throwable ex) throws SOAPException {
+        SOAPFault fault = soapFactory.createFault();
+        String faultString = "Internal STS error";
+        QName faultCode = fault.getFaultCodeAsQName();
+        
+        if (ex != null) {
+            if (ex instanceof STSException && ((STSException)ex).getFaultCode() != null) {
+                faultCode = ((STSException)ex).getFaultCode();
+            }
+            faultString = ex.getMessage();
+        }
+        fault.setFaultString(faultString);
+        fault.setFaultCode(faultCode);
+        return fault;
     }
 
     private Object convertToJAXBObject(Source source) throws Exception {
