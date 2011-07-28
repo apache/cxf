@@ -410,12 +410,14 @@ public class InTransformReaderTest extends Assert {
      */
     private void verifyReaders(XMLStreamReader reader, XMLStreamReader teacher, 
                                boolean eec) throws XMLStreamException {
+        /*
         if (true) {
             System.out.println(">>>>>>>>>");
             StaxUtils.copy(reader, System.out);
             System.out.println("<<<<<<<<<");
             return;
         }
+        */
         // compare the elements and attributes while ignoring comments, line breaks, etc
         for (;;) {
             int revent = getNextEvent(reader);

@@ -89,7 +89,10 @@ public class SourceProviderTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
         reader = new InTransformReader(reader, 
                                        Collections.singletonMap("{http://bar}test", "test2"),
-                                       null, false);
+                                       null,
+                                       null,
+                                       null,
+                                       false);
         
         p.getMessage().setContent(XMLStreamReader.class, reader);
         
