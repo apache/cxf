@@ -69,8 +69,6 @@ public class PartialXMLStreamReaderTest extends Assert {
         writer.flush();
         String value = bos.toString();
         
-        System.out.println("value: " + value);
-        
         assertTrue(("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                 + "<soap:Header>"
                 + "<ns2:SoapHeaderIn xmlns=\"http://cxf.apache.org/transform/test\" "
