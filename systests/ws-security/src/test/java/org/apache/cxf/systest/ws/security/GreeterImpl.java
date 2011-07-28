@@ -47,7 +47,7 @@ public class GreeterImpl
             user = p;
         }        
         
-        System.out.println("\n\n*** GreetMe called with: " + me + "***\n\n");
+        //System.out.println("\n\n*** GreetMe called with: " + me + "***\n\n");
         return "Hello " + me;
     }
     
