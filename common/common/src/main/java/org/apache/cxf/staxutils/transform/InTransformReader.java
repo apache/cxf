@@ -18,9 +18,15 @@
  */
 package org.apache.cxf.staxutils.transform;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -34,25 +40,38 @@ public class InTransformReader extends DepthXMLStreamReader {
     private static final String INTERN_NAMES = "org.codehaus.stax2.internNames";
     private static final String INTERN_NS = "org.codehaus.stax2.internNsUris";
     
+    private Stack<QName> elementStack = new Stack<QName>();
     private QNamesMap inElementsMap;
-    private Map<QName, QName> inAppendMap = new HashMap<QName, QName>(5);
+    private QNamesMap inAttributesMap;
+    private Map<QName, ElementProperty> inAppendMap = new HashMap<QName, ElementProperty>(5);
+    private Set<QName> inDropSet = new HashSet<QName>(5);
     private Map<String, String> nsMap = new HashMap<String, String>(5);
     private QName currentQName;
-    private QName previousQName;
+    private QName pushBackQName;
+    private QName pushAheadQName;
+    private String currentText;
+    private String pushAheadText;
+    private List<Integer> attributesIndexes = new ArrayList<Integer>(); 
     private int previousDepth = -1;
     private boolean blockOriginalReader = true;
+    private boolean attributesIndexed;
     private DelegatingNamespaceContext namespaceContext;
-    private boolean appendInProgress;
-    
+
     public InTransformReader(XMLStreamReader reader, 
-                             Map<String, String> inMap,
+                             Map<String, String> inEMap,
                              Map<String, String> appendMap,
+                             List<String> dropESet,
+                             Map<String, String> inAMap,
                              boolean blockOriginalReader) {
         super(reader);
-        inElementsMap = new QNamesMap(inMap == null ? 0 : inMap.size());
+        inElementsMap = new QNamesMap(inEMap == null ? 0 : inEMap.size());
+        inAttributesMap = new QNamesMap(inAMap == null ? 0 : inAMap.size());
         this.blockOriginalReader = blockOriginalReader;
-        TransformUtils.convertToQNamesMap(inMap, inElementsMap, nsMap);
-        TransformUtils.convertToMapOfQNames(appendMap, inAppendMap);
+        TransformUtils.convertToQNamesMap(inEMap, inElementsMap, nsMap);
+        TransformUtils.convertToQNamesMap(inAMap, inAttributesMap, null);
+        
+        TransformUtils.convertToMapOfElementProperties(appendMap, inAppendMap);
+        TransformUtils.convertToSetOfQNames(dropESet, inDropSet);
         namespaceContext = new DelegatingNamespaceContext(
             reader.getNamespaceContext(), nsMap);
     }
@@ -65,19 +84,112 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
     
     public int next() throws XMLStreamException {
-        if (currentQName != null && appendInProgress) {
-            appendInProgress = false;
+        if (isAtText()) {
+            resetCurrentText();
+            return currentText != null 
+                   ? XMLStreamConstants.CHARACTERS : XMLStreamConstants.END_ELEMENT;
+        } else if (isAtPushedQName()) {
+            resetCurrentQName();
+            pushElement();
             return XMLStreamConstants.START_ELEMENT;
-        } else if (previousDepth != -1 && previousDepth == getDepth() + 1) {
+        } else if (isAtMarkedDepth()) { 
             previousDepth = -1;
+            popElement();
             return XMLStreamConstants.END_ELEMENT;
         } else {
-            return super.next();
+            final int event = super.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                attributesIndexed = false;
+                final QName theName = super.getName();
+                final ElementProperty appendProp = inAppendMap.remove(theName);
+                final boolean dropped = inDropSet.contains(theName);
+                if (appendProp != null) {
+                    if (appendProp.isChild()) {
+                        // append-post-*
+                        pushAheadQName = appendProp.getName();
+                    } else {
+                        // append-pre-*
+                        currentQName = appendProp.getName();
+                    }
+                    if (appendProp.getText() != null) {
+                        // append-*-include
+                        pushAheadText = appendProp.getText();
+                    } else {
+                        // append-*-wrap
+                        previousDepth = getDepth();
+                        pushElement();
+                    }
+                } else if (dropped) {
+                    // unwrap the current element (shallow drop)
+                    previousDepth = getDepth();
+                    return super.next();
+                }
+                
+                QName expected = inElementsMap.get(theName);
+                if (expected == null) {
+                    expected = theName;
+                } else if (isEmpty(expected)) {
+                    // drop the current element (deep drop)
+                    final int depth = getDepth();
+                    while (depth != getDepth() || super.next() != XMLStreamConstants.END_ELEMENT) {
+                        // get to the matching end element event
+                    }
+                    popElement();
+                    return XMLStreamConstants.END_ELEMENT;
+                }
+                
+                if (appendProp != null && appendProp.isChild()) {
+                    // append-post-*
+                    currentQName = expected;
+                } else if (appendProp != null && !appendProp.isChild()) {
+                    // append-pre-*
+                    pushBackQName = expected;
+                } else {
+                    // no append
+                    currentQName = expected;
+                    pushElement();
+                }
+            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                QName theName = super.getName();
+                boolean dropped = inDropSet.contains(theName);
+                if (dropped) {
+                    super.next();
+                }
+                popElement();
+            } else {
+                // reset the element context and content
+                currentQName = null;
+                currentText = null;
+            }
+            return event;
         }
     }
-    
-    public Object getProperty(String name) throws IllegalArgumentException {
 
+    private boolean isAtText() {
+        return pushAheadQName == null && (pushAheadText != null || currentText != null);
+    }
+
+    private boolean isAtPushedQName() {
+        return pushBackQName != null || pushAheadQName != null;
+    }
+    
+    private boolean isAtMarkedDepth() {
+        return previousDepth != -1 && previousDepth == getDepth() + 1;
+    }
+    
+    private boolean isEmpty(QName qname) {
+        return XMLConstants.NULL_NS_URI.equals(qname.getNamespaceURI()) && "".equals(qname.getLocalPart());
+    }
+    
+    private void popElement() {
+        currentQName = elementStack.empty() ? null : elementStack.pop();
+    }
+    
+    private void pushElement() {
+        elementStack.push(currentQName);
+    }
+
+    public Object getProperty(String name) throws IllegalArgumentException {
         if (INTERN_NAMES.equals(name) || INTERN_NS.equals(name)) {
             return Boolean.FALSE;
         }
@@ -85,25 +197,24 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public String getLocalName() {
-        QName cQName = getCurrentName();
-        if (cQName != null) {
-            String name = cQName.getLocalPart();
-            resetCurrentQName();
-            return name;
+        if (currentQName != null) {
+            return currentQName.getLocalPart();    
+        } else {
+            return super.getLocalName();
         }
-        return super.getLocalName();
     }
 
-    private QName getCurrentName() {
-        return currentQName != null ? currentQName 
-            : previousQName != null ? previousQName : null;
-    }
-    
     private void resetCurrentQName() {
-        currentQName = previousQName;
-        previousQName = null;
+        currentQName = pushBackQName != null ? pushBackQName : pushAheadQName;
+        pushBackQName = null;
+        pushAheadQName = null;
     }
     
+    private void resetCurrentText() {
+        currentText = pushAheadText;
+        pushAheadText = null;
+    }
+
     public NamespaceContext getNamespaceContext() {
         return namespaceContext;
     }
@@ -138,24 +249,13 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
     
     public String getNamespaceURI() {
-     
-        QName theName = readCurrentElement();
-        QName appendQName = inAppendMap.remove(theName);
-        if (appendQName != null) {
-            appendInProgress = true;
-            previousDepth = getDepth();
-            previousQName = theName;
-            currentQName = appendQName;
+        if (currentQName != null) {
             return currentQName.getNamespaceURI();
+        } else {
+            return super.getNamespaceURI();
         }
-        QName expected = inElementsMap.get(theName);
-        if (expected == null) {
-            return theName.getNamespaceURI();
-        }
-        currentQName = expected;
-        return currentQName.getNamespaceURI();
     }
-    
+
     private QName readCurrentElement() {
         if (currentQName != null) {
             return currentQName;
@@ -168,5 +268,150 @@ public class InTransformReader extends DepthXMLStreamReader {
     
     public QName getName() { 
         return new QName(getNamespaceURI(), getLocalName());
+    }
+
+    public int getAttributeCount() {
+        if (pushBackQName != null) {
+            return 0;
+        }
+        checkAttributeIndexRange(-1);
+        return attributesIndexes.size();
+    }
+
+    public String getAttributeLocalName(int arg0) {
+        if (pushBackQName != null) {
+            throwIndexException(arg0, 0);
+        }
+        checkAttributeIndexRange(arg0);
+        
+        return getAttributeName(arg0).getLocalPart();
+    }
+
+    public QName getAttributeName(int arg0) {
+        if (pushBackQName != null) {
+            throwIndexException(arg0, 0);
+        }
+        checkAttributeIndexRange(arg0);
+        QName aname = super.getAttributeName(attributesIndexes.get(arg0));
+        QName expected = inAttributesMap.get(aname);
+        
+        return expected == null ? aname : expected;
+    }
+
+    public String getAttributeNamespace(int arg0) {
+        if (pushBackQName != null) {
+            throwIndexException(arg0, 0);
+        }
+        checkAttributeIndexRange(arg0);
+
+        return getAttributeName(arg0).getNamespaceURI();
+    }
+
+    public String getAttributePrefix(int arg0) {
+        if (pushBackQName != null) {
+            throwIndexException(arg0, 0);
+        }
+        checkAttributeIndexRange(arg0);
+
+        QName aname = getAttributeName(arg0);
+        if (XMLConstants.NULL_NS_URI.equals(aname.getNamespaceURI())) {
+            return "";
+        } else {
+            String actualNs = nsMap.get(aname.getNamespaceURI());
+            if (actualNs != null) {
+                return namespaceContext.findUniquePrefix(actualNs);
+            } else {
+                return namespaceContext.getPrefix(aname.getNamespaceURI());
+            }
+        }
+    }
+
+    public String getAttributeType(int arg0) {
+        if (pushBackQName != null) {
+            throwIndexException(arg0, 0);
+        }
+        checkAttributeIndexRange(arg0);
+        return super.getAttributeType(attributesIndexes.get(arg0));
+    }
+
+    public String getAttributeValue(int arg0) {
+        if (pushBackQName != null) {
+            throwIndexException(arg0, 0);
+        }
+        checkAttributeIndexRange(arg0);
+        return super.getAttributeValue(attributesIndexes.get(arg0));
+    }
+
+    public String getAttributeValue(String namespace, String localName) {
+        if (pushBackQName != null) {
+            return null;
+        }
+        checkAttributeIndexRange(-1);
+        //TODO need reverse lookup
+        return super.getAttributeValue(namespace, localName);    
+    }
+
+    public String getText() {
+        if (currentText != null) {
+            return currentText;
+        }
+        return super.getText();
+    }
+
+    public char[] getTextCharacters() {
+        if (currentText != null) {
+            return currentText.toCharArray();
+        }
+        return super.getTextCharacters();
+    }
+
+    public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) 
+        throws XMLStreamException {
+        if (currentText != null) {
+            int len = currentText.length() - sourceStart;
+            if (len > length) {
+                len = length;
+            }
+            currentText.getChars(sourceStart, sourceStart + len, target, targetStart);
+            return len;
+        }
+
+        return super.getTextCharacters(sourceStart, target, targetStart, length);
+    }
+
+    public int getTextLength() {
+        if (currentText != null) {
+            return currentText.length();
+        }
+        return super.getTextLength();
+    }
+
+    /**
+     * Checks the index range for the current attributes set.
+     * If the attributes are not indexed for the current element context, they
+     * will be indexed. 
+     * @param index
+     */
+    private void checkAttributeIndexRange(int index) {
+        if (!attributesIndexed) {
+            attributesIndexes.clear();
+            final int c = super.getAttributeCount();
+            for (int i = 0; i < c; i++) {
+                QName aname = super.getAttributeName(i);
+                QName expected = inAttributesMap.get(aname);
+                if (expected == null || !isEmpty(expected)) {
+                    attributesIndexes.add(i);
+                }
+            }
+            attributesIndexed = true;
+        }
+        if (index >= attributesIndexes.size()) {
+            throwIndexException(index, attributesIndexes.size());
+        }
+    }
+    
+    private void throwIndexException(int index, int size) {
+        throw new IllegalArgumentException("Invalid index " + index 
+                                           + "; current element has only " + size + " attributes");
     }
 }

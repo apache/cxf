@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.helpers.XMLUtils;
-import org.apache.cxf.staxutils.StaxStreamFilter;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public final class TransformUtils {
@@ -66,15 +65,24 @@ public final class TransformUtils {
                                                                 Map<String, String> inElementsMap,
                                                                 Map<String, String> inAppendMap,
                                                                 boolean blockOriginalReader) {
-        if (inDropElements != null) {
-            Set<QName> dropElements = XMLUtils.convertStringsToQNames(inDropElements);
-            reader = StaxUtils.createFilteredReader(createNewReaderIfNeeded(reader, is),
-                                               new StaxStreamFilter(dropElements.toArray(new QName[]{})));    
-        }
-        if (inElementsMap != null || inAppendMap != null) {
+        return createTransformReaderIfNeeded(reader, is, 
+                          inDropElements, inElementsMap, inAppendMap, null, blockOriginalReader);
+    }
+    
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, 
+                                                                InputStream is,
+                                                                List<String> inDropElements,
+                                                                Map<String, String> inElementsMap,
+                                                                Map<String, String> inAppendMap,
+                                                                Map<String, String> inAttributesMap,
+                                                                boolean blockOriginalReader) {
+        if (inElementsMap != null || inAppendMap != null || inDropElements != null 
+            || inAttributesMap != null) {
             reader = new InTransformReader(createNewReaderIfNeeded(reader, is),
-                                           inElementsMap, inAppendMap, blockOriginalReader);
+                                           inElementsMap, inAppendMap, inDropElements, 
+                                           inAttributesMap, blockOriginalReader);
         }
+
         return reader;
     }
     
@@ -93,6 +101,9 @@ public final class TransformUtils {
         }
     }
     
+    /*
+     * @deprecated
+     */
     protected static void convertToMapOfQNames(Map<String, String> map,
                                                Map<QName, QName> elementsMap) {
         if (map != null) {
@@ -104,4 +115,44 @@ public final class TransformUtils {
         }
     }
     
+    static void convertToMapOfElementProperties(Map<String, String> map,
+                                                Map<QName, ElementProperty> elementsMap) {
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                String text = null;
+                boolean child = false;
+                
+                // if the content delimiter is present in the value, extract the content
+                int d = value.indexOf('}');
+                d = value.indexOf(':', d < 0 ? 0 : d);
+                if (d > 0) {
+                    text = value.substring(d + 1);
+                    value = value.substring(0, d);
+                }
+                
+                // if the trailer delimiter is present in the key, remove it
+                if (key.endsWith("/")) {
+                    key = key.substring(0, key.length() - 1);
+                    child = true;
+                }
+                QName lname = XMLUtils.convertStringToQName(key);
+                QName rname = XMLUtils.convertStringToQName(value);
+                
+                ElementProperty desc = new ElementProperty(rname, text, child); 
+                elementsMap.put(lname, desc);
+            }
+        }
+    }
+    
+    protected static void convertToSetOfQNames(List<String> set,
+                                               Set<QName> elementsSet) {
+        if (set != null) {
+            for (String entry : set) {
+                QName name = XMLUtils.convertStringToQName(entry);
+                elementsSet.add(name);
+            }
+        }
+    }
 }

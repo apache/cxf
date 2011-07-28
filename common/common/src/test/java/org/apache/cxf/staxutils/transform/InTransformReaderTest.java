@@ -21,22 +21,17 @@ package org.apache.cxf.staxutils.transform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -44,13 +39,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class InTransformReaderTest extends Assert {
+    
     @Test
     public void testReadWithDefaultNamespace() throws Exception {
         InputStream is = new ByteArrayInputStream("<test xmlns=\"http://bar\"/>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
         reader = new InTransformReader(reader, 
-                                       Collections.singletonMap("{http://bar}test", "test2"),
-                                       null, false);
+                                        Collections.singletonMap("{http://bar}test", "test2"),
+                                        null, null, null, false);
         
         ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
         StaxUtils.copy(reader, bos);
@@ -64,8 +60,8 @@ public class InTransformReaderTest extends Assert {
             "<test xmlns=\"http://bar\"><ns:subtest xmlns:ns=\"http://bar1\"/></test>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
         reader = new InTransformReader(reader, 
-                                       Collections.singletonMap("{http://bar1}subtest", "subtest"),
-                                       null, false);
+                                        Collections.singletonMap("{http://bar1}subtest", "subtest"), 
+                                        null, null, null, false);
         
         ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
         StaxUtils.copy(reader, bos);
@@ -73,119 +69,30 @@ public class InTransformReaderTest extends Assert {
         assertEquals("<ps1:test xmlns:ps1=\"http://bar\"><subtest xmlns=\"\"/></ps1:test>",
                      value);        
     }
-    
-    @Test
-    public void testTransformAndAppend() throws Exception {
-        InputStream is = new ByteArrayInputStream("<test/>".getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        reader = new InTransformReader(reader, 
-                                       Collections.singletonMap("test", "test2"),
-                                       Collections.singletonMap("test", "wrapper"), 
-                                       false);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        StaxUtils.copy(reader, bos);
-        String value = bos.toString();
-        System.out.println(value);
-        assertTrue("<wrapper><test2/></wrapper>".equals(value));        
-    }
-    
-    
-    @Test
-    public void testReadWithSameNamespace() throws Exception {
-        InputStream is = new ByteArrayInputStream(
-                ("<test xmlns=\"http://bar\" xmlns:ns1=\"http://foo\">" 
-                + "<ns1:subtest>Hello</ns1:subtest></test>").getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://bar}test", "test2");
-        inMap.put("{http://foo}*", "{http://foo}*");
-        
-        reader = new InTransformReader(reader, 
-                                       inMap,
-                                       null, false);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        StaxUtils.copy(reader, bos);
-        String value = bos.toString();
-        assertTrue(("<test2 xmlns=\"\" xmlns:ps1=\"http://foo\">" 
-                + "<ps1:subtest>Hello</ps1:subtest></test2>").equals(value));        
-    }
-    
     @Test
     public void testReadWithComplexRequestSameNamespace() throws Exception {
-        InputStream is = new ByteArrayInputStream(
-                ("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" 
-                + "<soap:Header>"
-                + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns=\"http://cxf.apache.org/transform/test\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType>"
-                + "</ns2:SoapHeaderIn>"
-                + "</soap:Header>"
-                + "<soap:Body>"
-                + "<TransformTestRequest xmlns=\"http://cxf.apache.org/transform/test\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\" />"
-                + "</soap:Body></soap:Envelope>").getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));        
         Map<String, String> inMap = new HashMap<String, String>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*", 
                 "{http://cxf.apache.org/transform/header/element}*");
         
         reader = new InTransformReader(reader, 
-                                       inMap,
+                                       inMap, null, null,
                                        null, false);
         
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        StaxUtils.copy(reader, bos);
-        String value = bos.toString();
-        
-        assertTrue(("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                + "<soap:Header><ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ps1=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns=\"http://cxf.apache.org/transform/test\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ps1:CallerCorrelationId>SomeComplexValue</ps1:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType></ns2:SoapHeaderIn></soap:Header><soap:Body>"
-                + "<TransformTestRequest xmlns=\"http://cxf.apache.org/transform/test\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ps1=\"http://cxf.apache.org/transform/header/element\" " 
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\"/></soap:Body></soap:Envelope>").
-                equals(value.trim()));
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/complexReq1.xml"));
+        verifyReaders(reader, reader2, true);
     }
     
     @Test
     public void testReadWithComplexRequestMultipleNamespace() throws Exception {
-        InputStream is = new ByteArrayInputStream(
-                ("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" 
-                + "<soap:Header>"
-                + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns=\"http://cxf.apache.org/transform/test\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType>"
-                + "</ns2:SoapHeaderIn>"
-                + "</soap:Header>"
-                + "<soap:Body>"
-                + "<TransformTestRequest xmlns=\"http://cxf.apache.org/transform/test\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\" />"
-                + "</soap:Body></soap:Envelope>").getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));        
         
         Map<String, String> inMap = new HashMap<String, String>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*", 
@@ -194,258 +101,20 @@ public class InTransformReaderTest extends Assert {
                 "{http://cxf.apache.org/transform/othertest}*");
         
         reader = new InTransformReader(reader, 
-                                       inMap,
-                                       null, false);
+                                        inMap, null, null,
+                                        null, false);
         
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        StaxUtils.copy(reader, bos);
-        String value = bos.toString();
-        assertTrue(("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                + "<soap:Header><ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ps1=\"http://cxf.apache.org/transform/header/otherelement\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ps2=\"http://cxf.apache.org/transform/othertest\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ps1:CallerCorrelationId>SomeComplexValue</ps1:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType></ns2:SoapHeaderIn></soap:Header><soap:Body>"
-                + "<ps2:TransformTestRequest xmlns:ps2=\"http://cxf.apache.org/transform/othertest\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ps1=\"http://cxf.apache.org/transform/header/otherelement\" " 
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\"/></soap:Body></soap:Envelope>").
-                equals(value.trim()));
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/complexReq2.xml"));        
+        verifyReaders(reader, reader2, true);
     }
+    
     @Test
     public void testReadWithComplexTransformationNamespace() throws Exception {
-        InputStream is = new ByteArrayInputStream(
-                ("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" 
-                + "<soap:Header>"
-                + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns=\"http://cxf.apache.org/transform/test\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType>"
-                + "</ns2:SoapHeaderIn>"
-                + "</soap:Header>"
-                + "<soap:Body>"
-                + "<TransformTestRequest xmlns=\"http://cxf.apache.org/transform/test\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\" />"
-                + "</soap:Body></soap:Envelope>").getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
-                "{http://cxf.apache.org/transform/header/otherelement}*");
-        inMap.put("{http://cxf.apache.org/transform/test}*", 
-                "{http://cxf.apache.org/transform/othertest}*");
-        inMap.put("{http://schemas.xmlsoap.org/soap/envelope/}Envelope", 
-                "{http://schemas.xmlsoap.org/soap/envelope/}TheEnvelope");
-        
-        reader = new InTransformReader(reader, 
-                                       inMap,
-                                       null, false);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        StaxUtils.copy(reader, bos);
-        String value = bos.toString();
-        assertTrue(("<ps1:TheEnvelope xmlns:ps1=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                + "<soap:Header xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ps2=\"http://cxf.apache.org/transform/header/otherelement\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ps3=\"http://cxf.apache.org/transform/othertest\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ps2:CallerCorrelationId>SomeComplexValue</ps2:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType></ns2:SoapHeaderIn></soap:Header>"
-                + "<soap:Body xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                + "<ps3:TransformTestRequest xmlns:ps3=\"http://cxf.apache.org/transform/othertest\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ps2=\"http://cxf.apache.org/transform/header/otherelement\" " 
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\"/></soap:Body></ps1:TheEnvelope>").
-                equals(value.trim()));
-    }
-    
-    @Test
-    public void testReadPartialWithComplexRequestSameNamespace() throws Exception {
-        InputStream is = new ByteArrayInputStream(
-                ("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" 
-                + "<soap:Header>"
-                + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns=\"http://cxf.apache.org/transform/test\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType>"
-                + "</ns2:SoapHeaderIn>"
-                + "</soap:Header>"
-                + "<soap:Body>"
-                + "<TransformTestRequest xmlns=\"http://cxf.apache.org/transform/test\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\" />"
-                + "</soap:Body></soap:Envelope>").getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
-                "{http://cxf.apache.org/transform/header/element}*");
-        
-        reader = new InTransformReader(reader, 
-                                       inMap,
-                                       null, false);
-        
-        QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-        PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
-        
-        Document doc = StaxUtils.read(filteredReader);
-        
-        assertNotNull(doc);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(bos);
-        StaxUtils.copy(doc, writer);
-        writer.flush();
-
-        String value = bos.toString();
-        
-        Document docTransformed = DOMUtils.readXml(new StringReader(value));
-        Element env = docTransformed.getDocumentElement();
-        assertEquals("http://schemas.xmlsoap.org/soap/envelope/", env.getNamespaceURI());
-        assertEquals("soap", env.getPrefix());
-        
-        Element header = getElement(env, "http://schemas.xmlsoap.org/soap/envelope/", "Header", "soap");
-        
-        Element customHeader = getElement(header, "http://cxf.apache.org/transform/header", 
-                                          "SoapHeaderIn", "ns2");
-        NamedNodeMap map = customHeader.getAttributes();
-        assertEquals(4, map.getLength());
-        validateAttribute(map, "xmlns", "http://cxf.apache.org/transform/test");
-        validateAttribute(map, "xmlns:ns2", "http://cxf.apache.org/transform/header");
-        validateAttribute(map, "xmlns:ns4", "http://cxf.apache.org/transform/fault");
-        validateAttribute(map, "xmlns:ps1", "http://cxf.apache.org/transform/header/element");
-        
-        Element mode = 
-            getElement(customHeader, "http://cxf.apache.org/transform/header", "OperationalMode", "ns2");
-        assertEquals("SIMULATION1", mode.getTextContent());
-        Element headerType = 
-            getElement(customHeader, "http://cxf.apache.org/transform/header", 
-                       "SomeComplexHeaderType", "ns2");
-        
-        Element correlationId = 
-            getElement(headerType, "http://cxf.apache.org/transform/header/element", 
-                       "CallerCorrelationId", "ps1");
-        assertEquals("SomeComplexValue", correlationId.getTextContent());
-        getElement(env, "http://schemas.xmlsoap.org/soap/envelope/", "Body", "soap");
-    }
-    
-    @Test
-    public void testPartialReadWithComplexRequestMultipleNamespace() throws Exception {
-        InputStream is = new ByteArrayInputStream(
-                ("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" 
-                + "<soap:Header>"
-                + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns=\"http://cxf.apache.org/transform/test\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType>"
-                + "</ns2:SoapHeaderIn>"
-                + "</soap:Header>"
-                + "<soap:Body>"
-                + "<TransformTestRequest xmlns=\"http://cxf.apache.org/transform/test\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\" />"
-                + "</soap:Body></soap:Envelope>").getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
-                "{http://cxf.apache.org/transform/header/otherelement}*");
-        inMap.put("{http://cxf.apache.org/transform/test}*", 
-                "{http://cxf.apache.org/transform/othertest}*");
-        
-        reader = new InTransformReader(reader, 
-                                       inMap,
-                                       null, false);
-        
-        QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-        PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
-        
-        Document doc = StaxUtils.read(filteredReader);
-        
-        assertNotNull(doc);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(bos);
-        StaxUtils.copy(doc, writer);
-        writer.flush();
-
-        String value = bos.toString();
-        
-        Document docTransformed = DOMUtils.readXml(new StringReader(value));
-        Element env = docTransformed.getDocumentElement();
-        assertEquals("http://schemas.xmlsoap.org/soap/envelope/", env.getNamespaceURI());
-        assertEquals("soap", env.getPrefix());
-        
-        Element header = getElement(env, "http://schemas.xmlsoap.org/soap/envelope/", "Header", "soap");
-        
-        Element customHeader = getElement(header, "http://cxf.apache.org/transform/header", 
-                                          "SoapHeaderIn", "ns2");
-        NamedNodeMap map = customHeader.getAttributes();
-        assertEquals(4, map.getLength());
-        validateAttribute(map, "xmlns:ps2", "http://cxf.apache.org/transform/othertest");
-        validateAttribute(map, "xmlns:ns2", "http://cxf.apache.org/transform/header");
-        validateAttribute(map, "xmlns:ns4", "http://cxf.apache.org/transform/fault");
-        validateAttribute(map, "xmlns:ps1", "http://cxf.apache.org/transform/header/otherelement");
-        
-        Element mode = 
-            getElement(customHeader, "http://cxf.apache.org/transform/header", "OperationalMode", "ns2");
-        assertEquals("SIMULATION1", mode.getTextContent());
-        Element headerType = 
-            getElement(customHeader, "http://cxf.apache.org/transform/header", 
-                       "SomeComplexHeaderType", "ns2");
-        
-        Element correlationId = 
-            getElement(headerType, "http://cxf.apache.org/transform/header/otherelement", 
-                       "CallerCorrelationId", "ps1");
-        assertEquals("SomeComplexValue", correlationId.getTextContent());
-        getElement(env, "http://schemas.xmlsoap.org/soap/envelope/", "Body", "soap");
-        
-    }
-    
-    @Test
-    public void testPartialReadWithComplexTransformationNamespace() throws Exception {
-        InputStream is = new ByteArrayInputStream(
-                ("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" 
-                + "<soap:Header>"
-                + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns=\"http://cxf.apache.org/transform/test\">"
-                + "<ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>"
-                + "<ns2:SomeComplexHeaderType>"
-                + "<ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>"
-                + "</ns2:SomeComplexHeaderType>"
-                + "</ns2:SoapHeaderIn>"
-                + "</soap:Header>"
-                + "<soap:Body>"
-                + "<TransformTestRequest xmlns=\"http://cxf.apache.org/transform/test\" "
-                + "xmlns:ns2=\"http://cxf.apache.org/transform/header\" "
-                + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
-                + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\" />"
-                + "</soap:Body></soap:Envelope>").getBytes());
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));        
         
         Map<String, String> inMap = new HashMap<String, String>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*", 
@@ -457,66 +126,365 @@ public class InTransformReaderTest extends Assert {
         
         // set the block original reader flag to true
         reader = new InTransformReader(reader, 
-                                       inMap,
+                                       inMap, null, null,
+                                       null, true);
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/complexReq3.xml"));        
+        verifyReaders(reader, reader2, true);
+    }
+
+    @Test
+    public void testReadPartialWithComplexRequestSameNamespace() throws Exception {
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));        
+        Map<String, String> inMap = new HashMap<String, String>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                "{http://cxf.apache.org/transform/header/element}*");
+        
+        reader = new InTransformReader(reader, 
+                                       inMap, null, null,
+                                       null, false);
+        
+        QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
+        PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
+        
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/complexReq1partial.xml"));        
+        verifyReaders(filteredReader, reader2, false);
+    }
+    
+    @Test
+    public void testPartialReadWithComplexRequestMultipleNamespace() throws Exception {
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));        
+        
+        Map<String, String> inMap = new HashMap<String, String>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                "{http://cxf.apache.org/transform/header/otherelement}*");
+        inMap.put("{http://cxf.apache.org/transform/test}*", 
+                "{http://cxf.apache.org/transform/othertest}*");
+        
+        reader = new InTransformReader(reader, 
+                                        inMap, null, null,
+                                        null, false);
+        
+        QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
+        PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
+        
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/complexReq2partial.xml"));        
+        verifyReaders(filteredReader, reader2, false);
+    }
+    
+    @Test
+    public void testPartialReadWithComplexTransformationNamespace() throws Exception {
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));        
+        
+        Map<String, String> inMap = new HashMap<String, String>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                "{http://cxf.apache.org/transform/header/otherelement}*");
+        inMap.put("{http://cxf.apache.org/transform/test}*", 
+                "{http://cxf.apache.org/transform/othertest}*");
+        inMap.put("{http://schemas.xmlsoap.org/soap/envelope/}Envelope", 
+                "{http://schemas.xmlsoap.org/soap/envelope/}TheEnvelope");
+        
+        // set the block original reader flag to true
+        reader = new InTransformReader(reader, 
+                                       inMap, null, null,
                                        null, true);
         
         QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
         PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
         
-        Document doc = StaxUtils.read(filteredReader);
-        
-        assertNotNull(doc);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(bos);
-        StaxUtils.copy(doc, writer);
-        writer.flush();
-        
-        String value = bos.toString();
-        
-        Document docTransformed = DOMUtils.readXml(new StringReader(value));
-        Element env = docTransformed.getDocumentElement();
-        assertEquals("http://schemas.xmlsoap.org/soap/envelope/", env.getNamespaceURI());
-        assertEquals("ps1", env.getPrefix());
-        assertEquals("TheEnvelope", env.getLocalName());
-        
-        Element header = getElement(env, "http://schemas.xmlsoap.org/soap/envelope/", "Header", "soap");
-        
-        Element customHeader = getElement(header, "http://cxf.apache.org/transform/header", 
-                                          "SoapHeaderIn", "ns2");
-        NamedNodeMap map = customHeader.getAttributes();
-        assertEquals(4, map.getLength());
-        validateAttribute(map, "xmlns:ps3", "http://cxf.apache.org/transform/othertest");
-        validateAttribute(map, "xmlns:ns2", "http://cxf.apache.org/transform/header");
-        validateAttribute(map, "xmlns:ns4", "http://cxf.apache.org/transform/fault");
-        validateAttribute(map, "xmlns:ps2", "http://cxf.apache.org/transform/header/otherelement");
-        
-        Element mode = 
-            getElement(customHeader, "http://cxf.apache.org/transform/header", "OperationalMode", "ns2");
-        assertEquals("SIMULATION1", mode.getTextContent());
-        Element headerType = 
-            getElement(customHeader, "http://cxf.apache.org/transform/header", 
-                       "SomeComplexHeaderType", "ns2");
-        
-        Element correlationId = 
-            getElement(headerType, "http://cxf.apache.org/transform/header/otherelement", 
-                       "CallerCorrelationId", "ps2");
-        assertEquals("SomeComplexValue", correlationId.getTextContent());
-        getElement(env, "http://schemas.xmlsoap.org/soap/envelope/", "Body", "soap");
-        
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                  InTransformReader.class.getResourceAsStream("../resources/complexReq3partial.xml"));        
+        verifyReaders(filteredReader, reader2, false);
     }
     
-    
-    private Element getElement(Element parent, String namespace, String name, String prefix) {
-        NodeList list = parent.getElementsByTagNameNS(namespace, name);
-        assertEquals(1, list.getLength());
-        Element el = (Element)list.item(0);
-        assertEquals(prefix, el.getPrefix());
-        return el;
+    @Test
+    public void testReadPartial() throws Exception {
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn4.xml"));        
+        
+        Map<String, String> inMap = new HashMap<String, String>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                "{http://cxf.apache.org/transform/header/element}*");
+        
+        // set the block original reader flag to true
+        reader = new InTransformReader(reader, 
+                                       inMap, null, null,
+                                       null, true);
+        
+        QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
+        PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
+        
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/complexReq4partial.xml"));        
+        verifyReaders(filteredReader, reader2, false);
     }
     
-    private void validateAttribute(NamedNodeMap map, String name, String value) {
-        Node attr = map.getNamedItem(name);
-        assertEquals(attr.getTextContent(), value);
+    @Test
+    public void testReadWithRepaceAppend() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("requestValue",
+                              "{http://cxf.apache.org/hello_world_soap_http/types}requestType");
+        
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("requestValue",
+                           "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
+
+        transformStreamAndCompare("../resources/greetMeReqIn1.xml", "../resources/greetMeReq.xml",
+                                  transformElements, appendElements, null, null, null);
+    }
+
+    @Test
+    public void testReadWithReplaceAppendDelete() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("requestValue",
+                              "{http://cxf.apache.org/hello_world_soap_http/types}requestType");
+        transformElements.put("{http://cxf.apache.org/hello_world_soap_http/types}requestDate",
+                              "");
+        
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("requestValue",
+                           "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
+        
+        List<String> dropElements = new ArrayList<String>();
+        dropElements.add("value");
+        
+        Map<String, String> transformAttributes = new HashMap<String, String>();
+        transformAttributes.put("num", "");
+        transformAttributes.put("nombre", "{http://cxf.apache.org/hello_world_soap_http/types}name");
+        
+        transformStreamAndCompare("../resources/greetMeReqIn2.xml", "../resources/greetMeReq.xml",
+                                  transformElements, appendElements, dropElements, 
+                                  transformAttributes, null);
+    }
+
+    @Test
+    public void testReadWithChangeNamespaces() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("*",
+                              "{http://cxf.apache.org/hello_world_soap_http/types}*");
+
+        transformStreamAndCompare("../resources/greetMeReqIn3.xml", "../resources/greetMeReq.xml",
+                                  transformElements, null, null, null, null);
+    }
+
+    @Test
+    public void testReadWithDeleteAttributes() throws Exception {
+        Map<String, String> transformAttributes = new HashMap<String, String>();
+        transformAttributes.put("{http://www.w3.org/2001/XMLSchema-instance}type",
+                                "");
+
+        transformStreamAndCompare("../resources/greetMeReqIn4.xml", "../resources/greetMeReq.xml",
+                                  null, null, null, transformAttributes, null);
+    }
+    
+    @Test
+    public void testReadWithAppendPreInclude1() throws Exception {
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+        transformStreamAndCompare("../resources/amazonIn1.xml", "../resources/amazon.xml",
+                                  null, appendElements, null, null, null);
+        
+    }
+
+    @Test
+    public void testReadWithAppendPreInclude2() throws Exception {
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+        transformStreamAndCompare("../resources/amazonIn1nospace.xml", "../resources/amazon.xml",
+                                  null, appendElements, null, null, null);
+        
+    }
+
+    @Test
+    public void testReadWithAppendPreWrap1() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("payload",
+                              "{http://www.w3.org/2003/05/soap-envelope}Envelope");
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://apache.org/cxf/calculator/types}add",
+                           "{http://www.w3.org/2003/05/soap-envelope}Body");
+        transformStreamAndCompare("../resources/AddRequestIn2.xml", "../resources/AddRequest.xml",
+                                  transformElements, appendElements, null, null, null);
+    }
+
+    @Test
+    public void testReadWithAppendPreWrap2() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("payload",
+                              "{http://www.w3.org/2003/05/soap-envelope}Envelope");
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://apache.org/cxf/calculator/types}add",
+                           "{http://www.w3.org/2003/05/soap-envelope}Body");
+        transformStreamAndCompare("../resources/AddRequestIn2nospace.xml", "../resources/AddRequest.xml",
+                                  transformElements, appendElements, null, null, null);
+    }
+
+    @Test
+    public void testReadWithAppendPostInclude1() throws Exception {
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+        transformStreamAndCompare("../resources/amazonIn1.xml", "../resources/amazon.xml",
+                                  null, appendElements, null, null, null);
+        
+    }
+
+    @Test
+    public void testReadWithAppendPostInclude2() throws Exception {
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+        transformStreamAndCompare("../resources/amazonIn1nospace.xml", "../resources/amazon.xml",
+                                  null, appendElements, null, null, null);
+        
+    }
+
+    @Test
+    public void testReadWithAppendPostWrap() throws Exception {
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
+                           "{http://apache.org/cxf/calculator/types}add");
+        transformStreamAndCompare("../resources/AddRequestIn1.xml", "../resources/AddRequest.xml",
+                                  null, appendElements, null, null, null);
+        
+    }
+
+    @Test
+    public void testReadWithAppendPostWrap2() throws Exception {
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
+                           "{http://apache.org/cxf/calculator/types}add");
+        transformStreamAndCompare("../resources/AddRequestIn1nospace.xml", "../resources/AddRequest.xml",
+                                  null, appendElements, null, null, null);
+        
+    }
+
+    // test utilities methods 
+    
+    private void transformStreamAndCompare(String inname, String outname, 
+                                           Map<String, String> transformElements,
+                                           Map<String, String> appendElements,
+                                           List<String> dropElements,
+                                           Map<String, String> transformAttributes,
+                                           Map<String, String> appendAttributes) 
+        throws XMLStreamException {
+        
+        XMLStreamReader reader = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream(inname));
+
+        reader = new InTransformReader(reader,
+                                        transformElements, appendElements, dropElements, 
+                                        transformAttributes, false);
+
+        XMLStreamReader teacher = 
+            StaxUtils.createXMLStreamReader(
+                      InTransformReader.class.getResourceAsStream(outname));
+        
+        verifyReaders(reader, teacher, false);
+    }
+
+    /**
+     * Verifies the two stream events are equivalent and throws an assertion 
+     * exception at the first mismatch.
+     * @param reader
+     * @param teacher
+     * @param eec
+     * @throws XMLStreamException
+     */
+    private void verifyReaders(XMLStreamReader reader, XMLStreamReader teacher, 
+                               boolean eec) throws XMLStreamException {
+        if (true) {
+            System.out.println(">>>>>>>>>");
+            StaxUtils.copy(reader, System.out);
+            System.out.println("<<<<<<<<<");
+            return;
+        }
+        // compare the elements and attributes while ignoring comments, line breaks, etc
+        for (;;) {
+            int revent = getNextEvent(reader);
+            int tevent = getNextEvent(teacher);
+            
+            if (revent == -1 && tevent == -1) {
+                break;
+            }
+            assertEquals(revent, tevent);
+
+            switch (revent) {
+            case XMLStreamConstants.START_ELEMENT:
+                assertEquals(teacher.getName(), reader.getName());
+                verifyAttributes(reader, teacher);
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                if (eec) {
+                    // perform end-element-check
+                    assertEquals(teacher.getName(), reader.getName());
+                }
+                break;
+            case XMLStreamConstants.CHARACTERS:
+                assertEquals(teacher.getText(), reader.getText());
+                break;
+            default:
+            }
+        }
+    }
+
+    private void verifyAttributes(XMLStreamReader reader, XMLStreamReader teacher) {
+        int acount = teacher.getAttributeCount();
+        assertEquals(acount, reader.getAttributeCount());
+        Map<QName, String> attributesMap = new HashMap<QName, String>();
+        // temporarily store all the attributes
+        for (int i = 0; i < acount; i++) {
+            attributesMap.put(reader.getAttributeName(i), reader.getAttributeValue(i));
+        }
+        // compares each attribute
+        for (int i = 0; i < acount; i++) {
+            String avalue = attributesMap.remove(teacher.getAttributeName(i));
+            assertEquals(avalue, teacher.getAttributeValue(i));
+        }
+        // attributes must be exhausted
+        assertTrue(attributesMap.isEmpty());
+    }
+
+    /**
+     * Returns the next relevant reader event.
+     *  
+     * @param reader
+     * @return
+     * @throws XMLStreamException
+     */
+    private int getNextEvent(XMLStreamReader reader) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int e = reader.next();
+            if (e == XMLStreamConstants.END_DOCUMENT) {
+                return e;
+            }
+            if (e == XMLStreamConstants.START_ELEMENT || e == XMLStreamConstants.END_ELEMENT) {
+                return e;
+            } else if (e == XMLStreamConstants.CHARACTERS) {
+                String text = reader.getText();
+                if (text.trim().length() == 0) {
+                    continue;
+                }
+                return e;
+            }
+        }
+        return -1;
     }
 }

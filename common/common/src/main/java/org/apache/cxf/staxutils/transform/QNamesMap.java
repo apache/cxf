@@ -51,4 +51,8 @@ class QNamesMap {
         }
         return null;    
     }
+    
+    public int size() {
+        return index; 
+    }
 }
