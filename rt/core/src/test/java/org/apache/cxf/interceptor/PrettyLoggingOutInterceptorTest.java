@@ -29,6 +29,7 @@ import org.junit.Test;
 
 public class PrettyLoggingOutInterceptorTest extends Assert {
     
+    @SuppressWarnings("deprecation")
     @Test
     public void testFormatting() throws Exception { 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
