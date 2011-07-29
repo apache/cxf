@@ -209,29 +209,6 @@ public class InTransformReaderTest extends Assert {
         verifyReaders(filteredReader, reader2, false);
     }
     
-    @Test
-    public void testReadPartial() throws Exception {
-        XMLStreamReader reader = 
-            StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn4.xml"));        
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
-                "{http://cxf.apache.org/transform/header/element}*");
-        
-        // set the block original reader flag to true
-        reader = new InTransformReader(reader, 
-                                       inMap, null, null,
-                                       null, true);
-        
-        QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-        PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
-        
-        XMLStreamReader reader2 = 
-            StaxUtils.createXMLStreamReader(
-                InTransformReader.class.getResourceAsStream("../resources/complexReq4partial.xml"));        
-        verifyReaders(filteredReader, reader2, false);
-    }
     
     @Test
     public void testReadWithRepaceAppend() throws Exception {
@@ -356,7 +333,7 @@ public class InTransformReaderTest extends Assert {
     }
 
     @Test
-    public void testReadWithAppendPostWrap() throws Exception {
+    public void testReadWithAppendPostWrap1() throws Exception {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
                            "{http://apache.org/cxf/calculator/types}add");
@@ -410,14 +387,6 @@ public class InTransformReaderTest extends Assert {
      */
     private void verifyReaders(XMLStreamReader reader, XMLStreamReader teacher, 
                                boolean eec) throws XMLStreamException {
-        /*
-        if (true) {
-            System.out.println(">>>>>>>>>");
-            StaxUtils.copy(reader, System.out);
-            System.out.println("<<<<<<<<<");
-            return;
-        }
-        */
         // compare the elements and attributes while ignoring comments, line breaks, etc
         for (;;) {
             int revent = getNextEvent(reader);

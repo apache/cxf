@@ -58,6 +58,14 @@ public class InTransformReader extends DepthXMLStreamReader {
     private DelegatingNamespaceContext namespaceContext;
 
     public InTransformReader(XMLStreamReader reader, 
+                             Map<String, String> inMap,
+                             Map<String, String> appendMap,
+                             boolean blockOriginalReader) {
+        
+        this(reader, inMap, appendMap, null, null, blockOriginalReader);
+    }
+    
+    public InTransformReader(XMLStreamReader reader, 
                              Map<String, String> inEMap,
                              Map<String, String> appendMap,
                              List<String> dropESet,
