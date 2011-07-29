@@ -255,6 +255,9 @@ public class HTTPTransportFactory
     }
     
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
+        if (endpointInfo == null) {
+            throw new IllegalArgumentException("EndpointInfo cannot be null");
+        }
         AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
         if (d == null) {
             HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
