@@ -129,7 +129,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
      * before making remote calls
      */
     @Override
-    public Object create() {
+    public synchronized Object create() {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         try {
             if (getBus() != null) {
