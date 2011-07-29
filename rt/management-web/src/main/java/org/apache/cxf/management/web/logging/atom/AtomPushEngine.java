@@ -101,15 +101,15 @@ final class AtomPushEngine {
     private boolean isValid() {
         if (deliverer == null) {
             // TODO report cause
-            System.err.println("deliverer is not set");
+            ///System.err.println("deliverer is not set");
             return false;
         }
         if (converter == null) {
-            System.err.println("converter is not set");
+            //System.err.println("converter is not set");
             return false;
         }
         if (executor.isShutdown()) {
-            System.err.println("engine shutdown");
+            //System.err.println("engine shutdown");
             return false;
         }
         return true;

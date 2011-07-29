@@ -55,8 +55,6 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
     }
     
     protected void run() {
-        System.out.println("Starting Server");
-
         server = new org.eclipse.jetty.server.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();

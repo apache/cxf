@@ -105,12 +105,12 @@ public class BookStore {
     
     @PostConstruct
     public void postConstruct() {
-        System.out.println("PostConstruct called");
+        //System.out.println("PostConstruct called");
     }
     
     @PreDestroy
     public void preDestroy() {
-        System.out.println("PreDestroy called");
+        //System.out.println("PreDestroy called");
     }
     
     @GET
@@ -126,7 +126,7 @@ public class BookStore {
     @Path("emptypost")
     public void emptypost() {
         String uri = ui.getAbsolutePath().toString();
-        System.out.println(uri);
+        //System.out.println(uri);
         if (uri.endsWith("/")) {
             throw new WebApplicationException(400);
         }
