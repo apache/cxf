@@ -131,19 +131,24 @@ public abstract class BusFactory {
     public static Bus getThreadDefaultBus(boolean createIfNeeded) {
         Bus threadBus;
         synchronized (threadBusses) {
-            if (createIfNeeded) {
-                threadBus = threadBusses.get(Thread.currentThread());
-                if (createIfNeeded && threadBus == null) {
-                    threadBus = getDefaultBus(createIfNeeded);
-                    threadBusses.put(Thread.currentThread(), threadBus);
-                }
-            } else {
-                threadBus = threadBusses.get(Thread.currentThread());
-            }
+            threadBus = threadBusses.get(Thread.currentThread());
+        }
+        if (createIfNeeded && threadBus == null) {
+            threadBus = createThreadBus();
         }
         return threadBus;
     }
-
+    private static synchronized Bus createThreadBus() {
+        Bus threadBus;
+        synchronized (threadBusses) {
+            threadBus = threadBusses.get(Thread.currentThread());
+        }
+        if (threadBus == null) {
+            threadBus = getDefaultBus(true);
+            threadBusses.put(Thread.currentThread(), threadBus);
+        }
+        return threadBus;
+    }
     /**
      * Removes a bus from being a thread default bus for any thread.
      * <p>
