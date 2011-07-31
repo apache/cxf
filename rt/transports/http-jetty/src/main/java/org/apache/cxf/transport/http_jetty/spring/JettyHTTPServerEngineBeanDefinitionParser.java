@@ -174,9 +174,9 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (bus == null) {
-                Bus bus = BusFactory.getThreadDefaultBus();
-                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
-                setBus(bus);
+                Bus threadBus = BusFactory.getThreadDefaultBus();
+                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(threadBus, ctx);
+                setBus(threadBus);
             }
         }
         
