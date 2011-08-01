@@ -60,9 +60,10 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;
         }
-        maps.exposeAs(getManager().getRMAddressingNamespace());
         
         Source source = getManager().getSource(msg);
+        ProtocolVariation protocol = source.getReliableEndpoint().getProtocol();
+        maps.exposeAs(protocol.getWSANamespace());
         Destination destination = getManager().getDestination(msg);
 
         String action = null;
@@ -76,8 +77,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
 
         boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
         boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
-        boolean isLastMessage = RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action)
-            || RM11Constants.CLOSE_SEQUENCE_ACTION.equals(action);
+        RMConstants constants = protocol.getConstants();
+        boolean isLastMessage = constants.getCloseSequenceAction().equals(action);
         
         if (isApplicationMessage && !isPartialResponse) {
             RetransmissionInterceptor ri = new RetransmissionInterceptor();
@@ -96,22 +97,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
         if (null == rmpsOut) {
             rmpsOut = new RMProperties();
-            String uri = null;
-            if (RMContextUtils.isServerSide(msg)) {
-                RMProperties rmpsIn = RMContextUtils
-                    .retrieveRMProperties(msg.getExchange().getInMessage(), false);
-                uri = rmpsIn.getNamespaceURI();
-            } else {
-                uri = (String)msg.getContextualProperty(RMManager.WSRM_VERSION_PROPERTY);
-            }
-            if (uri != null && RMUtils.getConstants(uri) == null) {
-                LogUtils.log(LOG, Level.WARNING, "Ignoring unknown WS-RM namespace: " + uri);
-                uri = null;
-            }
-            if (uri == null) {
-                uri = getManager().getRMNamespace();
-            }
-            rmpsOut.exposeAs(uri);
+            rmpsOut.exposeAs(protocol.getWSRMNamespace());
             RMContextUtils.storeRMProperties(msg, rmpsOut, true);
         }
         
@@ -160,35 +146,25 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                     source.setCurrent(null);
                 }
             }
-        } else {
-            if (!MessageUtils.isRequestor(msg)) {
-                if (RM10Constants.CREATE_SEQUENCE_ACTION.equals(action)) {
-                    maps.getAction().setValue(RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION);
-                } else if (RM11Constants.CREATE_SEQUENCE_ACTION.equals(action)) {
-                    maps.getAction().setValue(RM11Constants.CREATE_SEQUENCE_RESPONSE_ACTION);
-                }
-            }
+        } else if (!MessageUtils.isRequestor(msg) && constants.getCreateSequenceAction().equals(action)) {
+            maps.getAction().setValue(constants.getCreateSequenceResponseAction());
         }
         
         // add Acknowledgements (to application messages or explicitly 
         // created Acknowledgement messages only)
-        if (isApplicationMessage || RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)
-            || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
+        if (isApplicationMessage || constants.getSequenceAckAction().equals(action)) {
             AttributedURIType to = maps.getTo();
             assert null != to;
             addAcknowledgements(destination, rmpsOut, inSeqId, to);
             if (isPartialResponse && rmpsOut.getAcks() != null && rmpsOut.getAcks().size() > 0) {
                 AttributedURIType actionURI = new AttributedURIType();
-                actionURI.setValue(RMUtils.getConstants(rmpsOut.getNamespaceURI())
-                                   .getSequenceAckAction());
+                actionURI.setValue(constants.getSequenceAckAction());
                 maps.setAction(actionURI);
             }
         } 
         
-        if (RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)
-            || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)
-            || RM10Constants.TERMINATE_SEQUENCE_ACTION.equals(action)
-            || RM11Constants.TERMINATE_SEQUENCE_ACTION.equals(action)) {
+        if (constants.getSequenceAckAction().equals(action)
+            || constants.getTerminateSequenceAction().equals(action)) {
             maps.setReplyTo(RMUtils.createNoneReference());
         }
         

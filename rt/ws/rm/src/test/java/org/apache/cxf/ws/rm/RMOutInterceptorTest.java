@@ -133,7 +133,10 @@ public class RMOutInterceptorTest extends Assert {
         queue.start();
         EasyMock.expectLastCall();
                 
+        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         Source source = control.createMock(Source.class);
+        EasyMock.expect(source.getReliableEndpoint()).andReturn(rme).anyTimes();
         EasyMock.expect(manager.getSource(message)).andReturn(source).anyTimes();
         Destination destination = control.createMock(Destination.class);
         EasyMock.expect(manager.getDestination(message)).andReturn(destination).anyTimes();
