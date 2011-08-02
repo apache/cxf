@@ -22,13 +22,18 @@ package org.apache.cxf.systest.lifecycle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jws.WebService;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientLifeCycleListener;
+import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
@@ -36,6 +41,7 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.greeter_control.ControlImpl;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.apache.hello_world_soap_http.Greeter;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -79,6 +85,43 @@ public class LifeCycleTest extends Assert {
     @After
     public void tearDown() throws Exception {
         bus.shutdown(true);
+    }
+    
+    @Test 
+    public void testClientLifecycle() throws Exception {
+        final AtomicBoolean created = new AtomicBoolean();
+        final AtomicBoolean destroyed = new AtomicBoolean();
+        
+        bus.getExtension(ClientLifeCycleManager.class)
+            .registerListener(new ClientLifeCycleListener() {
+                public void clientCreated(Client client) {
+                    created.set(true);
+                }
+
+                public void clientDestroyed(Client client) {
+                    destroyed.set(true);
+                }
+            });
+        
+        org.apache.hello_world_soap_http.SOAPService service 
+            = new org.apache.hello_world_soap_http.SOAPService();
+        
+        Greeter client = service.getSoapPort();
+        ((BindingProvider)client).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                 ADDRESSES[0]);
+        assertTrue("clientCreated not called", created.get());
+        client = null;
+        int count = 0;
+        while (count < 10 && !destroyed.get()) {
+            System.gc();
+            System.runFinalization();
+            count++;
+            if (count > 5) {
+                Thread.sleep(100);
+            }
+        }
+        assertTrue("clientDestroyed not called", destroyed.get());
     }
     
     @Test
@@ -155,8 +198,8 @@ public class LifeCycleTest extends Assert {
         greeter.stop();
         control.stop();
         for (int i = 0; i < 2; i++) {
-            verifyNotification(startNotificationMap, ADDRESSES[0], 1);
-            verifyNotification(stopNotificationMap, ADDRESSES[0], 1);
+            verifyNotification(startNotificationMap, ADDRESSES[i], 1);
+            verifyNotification(stopNotificationMap, ADDRESSES[i], 1);
         }
     }
     
