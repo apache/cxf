@@ -65,6 +65,8 @@ public abstract class RMConstants {
     
     public static final String WSRM_REQUIRED_FAULT_CODE = "WSRMRequired";
     
+    public abstract String getWSRMNamespace();
+    
     // actions access methods
     
     public abstract String getCreateSequenceAction();

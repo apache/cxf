@@ -160,6 +160,10 @@ public final class RM11Constants extends RMConstants {
     private RM11Constants() {
     }
     
+    public String getWSRMNamespace() {
+        return NAMESPACE_URI;
+    }
+    
     // actions access methods
     
     public String getCreateSequenceAction() {

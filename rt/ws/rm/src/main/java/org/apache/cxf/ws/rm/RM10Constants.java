@@ -146,8 +146,12 @@ public final class RM10Constants extends RMConstants {
     private RM10Constants() {
     }
     
-    // actions access methods
+    public String getWSRMNamespace() {
+        return NAMESPACE_URI;
+    }
     
+    // actions access methods
+
     public String getCreateSequenceAction() {
         return CREATE_SEQUENCE_ACTION;
     }
