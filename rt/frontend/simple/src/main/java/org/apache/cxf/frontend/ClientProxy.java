@@ -89,6 +89,12 @@ public class ClientProxy implements InvocationHandler {
         return client;
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        client.destroy();
+        super.finalize();
+    }
+
     public static Client getClient(Object o) {
         return ((ClientProxy)Proxy.getInvocationHandler(o)).getClient();
     }
