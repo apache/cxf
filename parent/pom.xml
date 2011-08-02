@@ -1438,6 +1438,18 @@
             </properties>
         </profile>
         <profile>
+            <id>jdk17</id>
+            <activation>
+                <jdk>1.7</jdk>
+            </activation>
+            <properties>
+                <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
+                <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
+                <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
+                <jdk.version>1.6</jdk.version>
+            </properties>
+        </profile>
+        <profile>
             <id>validateServices</id>
             <properties>
                 <cxf.validateServices>true</cxf.validateServices>
