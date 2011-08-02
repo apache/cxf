@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.cxf.transport.AbstractDestination;
 
 public class DestinationRegistryImpl implements DestinationRegistry {
-
+    private static final String SLASH = "/";
     private ConcurrentMap<String, AbstractHTTPDestination> destinations 
         = new ConcurrentHashMap<String, AbstractHTTPDestination>();
     private Map<String, AbstractHTTPDestination> decodedDestinations = 
@@ -78,12 +78,14 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     public AbstractHTTPDestination checkRestfulRequest(String address) {
         int len = -1;
         AbstractHTTPDestination ret = null;
-        for (String path : getDestinationsPaths()) {           
-            if ((address.equals(path) 
-                || "/".equals(path)
-                || (address.length() > path.length() 
-                    && address.startsWith(path) && address.charAt(path.length()) == '/'))
-                && path.length() > len) {
+        for (String path : getDestinationsPaths()) {
+            String thePath = path.length() > 1 && path.endsWith(SLASH) 
+                ? path.substring(0, path.length() - 1) : path;
+            if ((address.equals(thePath) 
+                || SLASH.equals(thePath)
+                || (address.length() > thePath.length() 
+                    && address.startsWith(thePath) && address.charAt(thePath.length()) == '/'))
+                && thePath.length() > len) {
                 ret = getDestinationForPath(path);
                 len = path.length();
             }
