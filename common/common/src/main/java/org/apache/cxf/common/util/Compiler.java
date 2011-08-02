@@ -73,6 +73,8 @@ public class Compiler {
         if (!StringUtils.isEmpty(target)) {
             list.add("-target");
             list.add(target);
+            list.add("-source");
+            list.add(target);
         }
 
         if (!StringUtils.isEmpty(outputDir)) {

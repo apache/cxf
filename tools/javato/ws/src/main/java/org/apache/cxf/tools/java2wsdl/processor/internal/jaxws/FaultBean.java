@@ -41,6 +41,7 @@ public final class FaultBean {
     private static final String[] EXCLUDED_GETTER = new String[] {"getCause",
                                                                   "getLocalizedMessage",
                                                                   "getStackTrace",
+                                                                  "getSuppressed",
                                                                   "getClass"};
 
     public boolean faultBeanExists(final Class<?> exceptionClass) {
