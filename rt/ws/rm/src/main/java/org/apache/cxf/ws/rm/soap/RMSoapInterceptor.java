@@ -356,6 +356,8 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         } else {
             return;
         }
+        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+        rmps.exposeAs(consts.getWSRMNamespace());
         
         LOG.info("Updating service model info in exchange");
         
