@@ -129,7 +129,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
      * before making remote calls
      */
     @Override
-    public Object create() {
+    public synchronized Object create() {
         Object obj = super.create();
         Service service = getServiceFactory().getService();
         if (needWrapperClassInterceptor(service.getServiceInfos().get(0))) {
