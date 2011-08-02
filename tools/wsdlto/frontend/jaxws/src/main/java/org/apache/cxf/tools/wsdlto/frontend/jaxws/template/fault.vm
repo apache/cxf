@@ -40,10 +40,10 @@ $expClass.classJavaDoc
 @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
 #end
 public class $expClass.Name extends $exceptionSuperclass {
+#if (${suid} != "")
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-#if (${suid} != "")
     public static final long serialVersionUID = ${suid}L;
 #end
 #foreach ($field in $expClass.Fields)
