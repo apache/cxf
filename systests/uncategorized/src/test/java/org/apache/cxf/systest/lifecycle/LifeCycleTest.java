@@ -122,6 +122,17 @@ public class LifeCycleTest extends Assert {
             }
         }
         assertTrue("clientDestroyed not called", destroyed.get());
+        
+        created.set(false);
+        destroyed.set(false);
+        
+        client = service.getSoapPort();
+        ((BindingProvider)client).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                 ADDRESSES[0]);
+        assertTrue("clientCreated not called", created.get());
+        ((java.io.Closeable)client).close();
+        assertTrue("clientDestroyed not called", destroyed.get());
     }
     
     @Test

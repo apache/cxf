@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxws;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -67,14 +68,19 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
     
     private static final Logger LOG = LogUtils.getL7dLogger(JaxWsClientProxy.class);
 
-    private final Binding binding;
-    private final EndpointReferenceBuilder builder;
+    private Binding binding;
+    private EndpointReferenceBuilder builder;
 
     public JaxWsClientProxy(Client c, Binding b) {
         super(c);
         this.binding = b;
         setupEndpointAddressContext(getClient().getEndpoint());
         this.builder = new EndpointReferenceBuilder((JaxWsEndpointImpl)getClient().getEndpoint());
+    }
+    public void close() throws IOException {
+        super.close();
+        binding = null;
+        builder = null;
     }
 
     private void setupEndpointAddressContext(Endpoint endpoint) {
@@ -86,6 +92,9 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
 
         Endpoint endpoint = getClient().getEndpoint();
         String address = endpoint.getEndpointInfo().getAddress();
@@ -101,7 +110,8 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         if (oi == null) {
             // check for method on BindingProvider and Object
             if (method.getDeclaringClass().equals(BindingProvider.class)
-                || method.getDeclaringClass().equals(Object.class)) {
+                || method.getDeclaringClass().equals(Object.class)
+                || method.getDeclaringClass().equals(Closeable.class)) {
                 try {
                     return method.invoke(this, params);
                 } catch (InvocationTargetException e) {
@@ -256,25 +266,40 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
     }
 
     public Map<String, Object> getRequestContext() {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         return new WrappedMessageContext(this.getClient().getRequestContext(),
                                          null,
                                          Scope.APPLICATION);
     }
     public Map<String, Object> getResponseContext() {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         return new WrappedMessageContext(this.getClient().getResponseContext(),
                                                           null,
                                                           Scope.APPLICATION);
     }
 
     public Binding getBinding() {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         return binding;
     }
 
     public EndpointReference getEndpointReference() {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         return builder.getEndpointReference();
     }
 
     public <T extends EndpointReference> T getEndpointReference(Class<T> clazz) {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         return builder.getEndpointReference(clazz);
     }    
 }

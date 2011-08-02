@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxws;
 
+import java.io.Closeable;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,8 +113,16 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     }
 
     protected Class[] getImplementingClasses() {
-        Class cls = getClientFactoryBean().getServiceClass();
+        Class<?> cls = getClientFactoryBean().getServiceClass();
         Class ret[] = new Class[] {cls, BindingProvider.class};
+        try {
+            cls.getMethod("close");
+        } catch (Exception e) {
+            //ignore - doesn't have a close method so we
+            //can implement Closeable
+            ret = new Class[] {cls, BindingProvider.class, Closeable.class};
+        }
+
         try {
             Proxy.getProxyClass(cls.getClassLoader(), ret);
         } catch (Throwable t) {

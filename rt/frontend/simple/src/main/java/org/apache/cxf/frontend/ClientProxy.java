@@ -19,6 +19,8 @@
 
 package org.apache.cxf.frontend;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -32,7 +34,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
-public class ClientProxy implements InvocationHandler {
+public class ClientProxy implements InvocationHandler, Closeable {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClientProxy.class);
 
@@ -44,16 +46,26 @@ public class ClientProxy implements InvocationHandler {
         endpoint = c.getEndpoint();
         client = c;
     }
+    public void close() throws IOException {
+        if (client != null) {
+            client.destroy();
+            client = null;
+            endpoint = null;
+        }
+    }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-        MethodDispatcher dispatcher = (MethodDispatcher)endpoint.getService().get(
-                                                                                  MethodDispatcher.class
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
+        
+        MethodDispatcher dispatcher = (MethodDispatcher)endpoint.getService().get(MethodDispatcher.class
                                                                                       .getName());
         BindingOperationInfo oi = dispatcher.getBindingOperation(method, endpoint);
         if (oi == null) {
             // check for method on BindingProvider and Object
-            if (method.getDeclaringClass().equals(Object.class)) {
+            if (method.getDeclaringClass().equals(Object.class)
+                || method.getDeclaringClass().equals(Closeable.class)) {
                 return method.invoke(this);
             }
 
@@ -70,6 +82,9 @@ public class ClientProxy implements InvocationHandler {
 
     public Object invokeSync(Method method, BindingOperationInfo oi, Object[] params)
         throws Exception {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         Object rawRet[] = client.invoke(oi, params);
 
         if (rawRet != null && rawRet.length > 0) {
@@ -79,9 +94,15 @@ public class ClientProxy implements InvocationHandler {
         }
     }
     public Map<String, Object> getRequestContext() {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         return client.getRequestContext();
     }
     public Map<String, Object> getResponseContext() {
+        if (client == null) {
+            throw new IllegalStateException("The client has been closed.");
+        }
         return client.getResponseContext();
     }
 
@@ -91,7 +112,7 @@ public class ClientProxy implements InvocationHandler {
 
     @Override
     protected void finalize() throws Throwable {
-        client.destroy();
+        close();
         super.finalize();
     }
 

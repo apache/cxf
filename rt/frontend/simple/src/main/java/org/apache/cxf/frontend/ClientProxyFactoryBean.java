@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.frontend;
 
+import java.io.Closeable;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -166,6 +167,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
             ClientProxy handler = clientClientProxy(c);
     
             Class classes[] = getImplementingClasses();
+            
             Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(),
                                                 classes,
                                                 handler);
@@ -179,8 +181,16 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     protected Class[] getImplementingClasses() {
-        Class cls = clientFactoryBean.getServiceClass();
-        return new Class[] {cls};
+        Class<?> cls = clientFactoryBean.getServiceClass();
+        try {
+            if (cls.getMethod("close") != null) {
+                return new Class[] {cls};
+            }
+        } catch (Exception e) {
+            //ignore - doesn't have a close method so we
+            //can implement Closeable
+        }
+        return new Class[] {cls, Closeable.class};
     }
 
     protected ClientProxy clientClientProxy(Client c) {
