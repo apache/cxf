@@ -35,18 +35,19 @@ public class SoapMessage extends MessageImpl {
 
     public SoapMessage(Message message) {
         super(message);
-        version = Soap11.getInstance();
+        setVersion(Soap11.getInstance());
     }
     public SoapMessage(SoapVersion ver) {
         super();
-        version = ver;
+        setVersion(ver);
     }
 
     public SoapVersion getVersion() {
         return version;
     }
 
-    public void setVersion(SoapVersion v) {
+    public final void setVersion(SoapVersion v) {
+        super.put(SoapVersion.class, v);
         this.version = v;
     }
     
