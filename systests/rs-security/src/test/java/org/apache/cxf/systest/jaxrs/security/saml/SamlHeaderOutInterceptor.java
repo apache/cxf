@@ -77,7 +77,6 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         
     }
         
-    @SuppressWarnings("unchecked")
     private Map<String, List<String>> getHeaders(Message message) {
         Map<String, List<String>> headers = 
             CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
