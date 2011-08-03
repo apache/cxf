@@ -22,13 +22,11 @@ package org.apache.cxf.systest.jaxrs.security.saml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -36,21 +34,17 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.saml.SAMLKeyInfo;
@@ -59,6 +53,7 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.ws.security.validate.Validator;
+
 
 public abstract class AbstractSamlInHandler implements RequestHandler {
 
@@ -92,7 +87,8 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                 data.setWssConfig(cfg);
                 data.setCallbackHandler(getCallbackHandler(message));
                 try {
-                    data.setSigCrypto(getCrypto(message, 
+                    data.setSigCrypto(new CryptoLoader().getCrypto(message,
+                                                SecurityConstants.SIGNATURE_CRYPTO,
                                                 SecurityConstants.SIGNATURE_PROPERTIES));
                 } catch (IOException ex) {
                     throwFault("Crypto can not be loaded", ex);
@@ -296,41 +292,6 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
 //            }
         }
         return false;
-    }
-    
- // this code will be moved to a common utility class
-    protected Crypto getCrypto(Message message, String propKey) 
-        throws IOException, WSSecurityException {
-        
-        Object o = message.getContextualProperty(propKey);
-        if (o == null) {
-            return null;
-        }
-        
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
-        try {
-            URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
-            if (url == null) {
-                ResourceManager manager = message.getExchange()
-                        .getBus().getExtension(ResourceManager.class);
-                ClassLoader loader = manager.resolveResource("", ClassLoader.class);
-                if (loader != null) {
-                    Thread.currentThread().setContextClassLoader(loader);
-                }
-                url = manager.resolveResource((String)o, URL.class);
-            }
-            if (url != null) {
-                Properties props = new Properties();
-                InputStream in = url.openStream(); 
-                props.load(in);
-                in.close();
-                return CryptoFactory.getInstance(props);
-            } else {
-                return CryptoFactory.getInstance((String)o);
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(orig);
-        }
     }
     
     private CallbackHandler getCallbackHandler(Message message) {

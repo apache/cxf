@@ -61,11 +61,7 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
             
             String encodedToken = encodeToken(assertionWrapper.assertionToString());
             
-            Map<String, List<String>> headers = 
-                CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
-            if (headers == null) {
-                headers = new HashMap<String, List<String>>();
-            }
+            Map<String, List<String>> headers = getHeaders(message);
             
             StringBuilder builder = new StringBuilder();
             builder.append("SAML").append(" ").append(encodedToken);
@@ -81,6 +77,16 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         
     }
         
+    @SuppressWarnings("unchecked")
+    private Map<String, List<String>> getHeaders(Message message) {
+        Map<String, List<String>> headers = 
+            CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
+        if (headers == null) {
+            headers = new HashMap<String, List<String>>();
+        }
+        return headers;
+    }
+    
     private String encodeToken(String assertion) throws Base64Exception {
         byte[] tokenBytes = null;
         try {

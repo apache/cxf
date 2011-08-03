@@ -20,13 +20,10 @@
 package org.apache.cxf.systest.jaxrs.security.xml;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
@@ -49,14 +46,13 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
+import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
@@ -72,6 +68,7 @@ public class XmlEncInHandler implements RequestHandler {
     static {
         WSSConfig.init();
     }
+    
     
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
         
@@ -136,7 +133,9 @@ public class XmlEncInHandler implements RequestHandler {
         
         Crypto crypto = null;
         try {
-            crypto = getCrypto(message, SecurityConstants.ENCRYPT_PROPERTIES);
+            crypto = new CryptoLoader().getCrypto(message,
+                               SecurityConstants.ENCRYPT_CRYPTO,
+                               SecurityConstants.ENCRYPT_PROPERTIES);
         } catch (Exception ex) {
             throwFault("Crypto can not be loaded", ex);
         }
@@ -249,41 +248,6 @@ public class XmlEncInHandler implements RequestHandler {
         LOG.warning(error);
         Response response = Response.status(401).entity(error).build();
         throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
-    }
-    
-    // this code will be moved to a common utility class
-    protected Crypto getCrypto(Message message, String propKey) 
-        throws IOException, WSSecurityException {
-        
-        Object o = message.getContextualProperty(propKey);
-        if (o == null) {
-            return null;
-        }
-        
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
-        try {
-            URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
-            if (url == null) {
-                ResourceManager manager = message.getExchange()
-                        .getBus().getExtension(ResourceManager.class);
-                ClassLoader loader = manager.resolveResource("", ClassLoader.class);
-                if (loader != null) {
-                    Thread.currentThread().setContextClassLoader(loader);
-                }
-                url = manager.resolveResource((String)o, URL.class);
-            }
-            if (url != null) {
-                Properties props = new Properties();
-                InputStream in = url.openStream(); 
-                props.load(in);
-                in.close();
-                return CryptoFactory.getInstance(props);
-            } else {
-                return CryptoFactory.getInstance((String)o);
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(orig);
-        }
     }
     
     private CallbackHandler getCallbackHandler(Message message) {

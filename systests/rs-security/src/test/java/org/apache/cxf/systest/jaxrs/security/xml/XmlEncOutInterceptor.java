@@ -18,19 +18,13 @@
  */
 package org.apache.cxf.systest.jaxrs.security.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -49,13 +43,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -64,15 +55,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.DOMX509Data;
 import org.apache.ws.security.message.token.DOMX509IssuerSerial;
@@ -85,7 +74,6 @@ import org.apache.xml.security.encryption.XMLCipher;
 public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlEncOutInterceptor.class);
-    private static final String CRYPTO_CACHE = "ws-security.crypto.cache";
     
     static {
         WSSConfig.init();
@@ -140,11 +128,12 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
         Document encryptedDataDoc = DOMUtils.createDocument();
         Element encryptedDataElement = createEncryptedDataElement(encryptedDataDoc);
         if (encryptSymmetricKey) {
-            Crypto crypto = getCrypto(message, 
+            CryptoLoader loader = new CryptoLoader();
+            Crypto crypto = loader.getCrypto(message, 
                                       SecurityConstants.ENCRYPT_CRYPTO,
                                       SecurityConstants.ENCRYPT_PROPERTIES);
             
-            String user = getUserName(message, crypto);
+            String user = getUserName(message, crypto, SecurityConstants.ENCRYPT_USERNAME);
             if (StringUtils.isEmpty(user)) {
                 return null;
             }
@@ -401,8 +390,7 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
  // This code will be moved to a common utility class
-    private String getUserName(Message message, Crypto crypto) {
-        String userNameKey = SecurityConstants.ENCRYPT_USERNAME;
+    private String getUserName(Message message, Crypto crypto, String userNameKey) {
         String user = (String)message.getContextualProperty(userNameKey);
         if (crypto != null && StringUtils.isEmpty(user)) {
             try {
@@ -415,81 +403,5 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
         
-    private Crypto getCrypto(Message message,
-                             String cryptoKey, 
-                             String propKey) {
-        Crypto crypto = (Crypto)message.getContextualProperty(cryptoKey);
-        if (crypto != null) {
-            return crypto;
-        }
-        
-        Object o = message.getContextualProperty(propKey);
-        if (o == null) {
-            return null;
-        }
-        
-        crypto = getCryptoCache(message).get(o);
-        if (crypto != null) {
-            return crypto;
-        }
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-            URL url = rm.resolveResource((String)o, URL.class);
-            try {
-                if (url == null) {
-                    url = ClassLoaderUtils.getResource((String)o, this.getClass());
-                }
-                if (url == null) {
-                    try {
-                        url = new URL((String)o);
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-                if (url != null) {
-                    InputStream ins = url.openStream();
-                    properties = new Properties();
-                    properties.load(ins);
-                    ins.close();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }            
-        }
-        
-        if (properties != null) {
-            try {
-                crypto = CryptoFactory.getInstance(properties);
-            } catch (Exception ex) {
-                return null;
-            }
-            getCryptoCache(message).put(o, crypto);
-        }
-        return crypto;
-    }
     
-    protected final Map<Object, Crypto> getCryptoCache(Message message) {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        synchronized (info) {
-            Map<Object, Crypto> o = 
-                CastUtils.cast((Map<?, ?>)message.getContextualProperty(CRYPTO_CACHE));
-            if (o == null) {
-                o = new ConcurrentHashMap<Object, Crypto>();
-                info.setProperty(CRYPTO_CACHE, o);
-            }
-            return o;
-        }
-    }
 }
