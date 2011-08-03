@@ -650,12 +650,10 @@ public class WebClient extends AbstractClient {
                                 Class<?> responseClass, Type outGenericType) {
         
         MultivaluedMap<String, String> headers = getHeaders();
-        if (body != null) {
-            if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
-                headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE.toString());
-            }
-        } else {
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.WILDCARD);
+        boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;
+        if (contentTypeNotSet) {
+            String ct = body != null ? MediaType.APPLICATION_XML_TYPE.toString() : "*/*";
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
         }
         if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
