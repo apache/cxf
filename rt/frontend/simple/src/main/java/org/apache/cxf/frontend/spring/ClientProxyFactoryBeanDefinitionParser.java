@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.frontend.spring;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 
@@ -28,9 +29,12 @@ import org.w3c.dom.Element;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientFactoryBean;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -91,7 +95,7 @@ public class ClientProxyFactoryBeanDefinitionParser
     
     @NoJSR250Annotations
     public static class SpringClientProxyFactoryBean extends ClientProxyFactoryBean
-        implements ApplicationContextAware, FactoryBean {
+        implements ApplicationContextAware, FactoryBean, DisposableBean {
 
         private Object obj;
         
@@ -122,6 +126,16 @@ public class ClientProxyFactoryBeanDefinitionParser
         }
         public boolean isSingleton() {
             return true;
+        }
+        public void destroy() throws Exception {
+            if (obj != null) {
+                if (obj instanceof Closeable) {
+                    ((Closeable)obj).close();
+                } else {
+                    Client c = ClientProxy.getClient(obj);
+                    c.destroy();
+                }
+            }
         }
     }
 }

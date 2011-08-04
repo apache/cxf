@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 import org.apache.cxf.message.Exchange;
@@ -32,7 +33,7 @@ import org.apache.cxf.transport.MessageObserver;
  * outbound message.
  */
 public class PreexistingConduitSelector implements
-    ConduitSelector {
+    ConduitSelector, Closeable {
 
     private Conduit selectedConduit;
     private Endpoint endpoint;
@@ -107,5 +108,9 @@ public class PreexistingConduitSelector implements
      */
     public void setEndpoint(Endpoint ep) {
         endpoint = ep;
+    }
+
+    public void close() throws IOException {
+        selectedConduit.close();
     }
 }

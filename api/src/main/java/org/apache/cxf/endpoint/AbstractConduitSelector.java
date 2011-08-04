@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -41,7 +42,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * Abstract base class holding logic common to any ConduitSelector
  * that retreives a Conduit from the ConduitInitiator.
  */
-public abstract class AbstractConduitSelector implements ConduitSelector {
+public abstract class AbstractConduitSelector implements ConduitSelector, Closeable {
     protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
     
     protected Conduit selectedConduit;
@@ -56,6 +57,12 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
         selectedConduit = c;
     }
         
+    public void close() {
+        if (selectedConduit != null) {
+            selectedConduit.close();
+            selectedConduit = null;
+        }
+    }
     /**
      * Mechanics to actually get the Conduit from the ConduitInitiator
      * if necessary.

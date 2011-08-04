@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -204,7 +205,15 @@ public class ClientImpl
         }
 
         if (conduitSelector != null) {
-            getConduit().close();
+            if (conduitSelector instanceof Closeable) {
+                try {
+                    ((Closeable)conduitSelector).close();
+                } catch (IOException e) {
+                    //ignore, we're destroying anyway
+                }
+            } else {
+                getConduit().close();
+            }
         }
     }
 
