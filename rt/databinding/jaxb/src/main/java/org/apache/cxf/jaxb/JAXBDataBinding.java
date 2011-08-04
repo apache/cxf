@@ -307,7 +307,7 @@ public class JAXBDataBinding extends AbstractDataBinding
 
             boolean schemasFromCache = false;
             Collection<DOMSource> schemas = getSchemas();
-            if (schemas == null) {
+            if (schemas == null || schemas.size() == 0) {
                 schemas = cachedContextAndSchemas.getSchemas();
                 if (schemas != null) {
                     schemasFromCache = true;
