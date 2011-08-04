@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,7 +34,6 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -47,6 +45,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
+import org.apache.cxf.systest.jaxrs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -58,6 +57,8 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.ElementProxy;
 import org.opensaml.xml.signature.SignatureConstants;
+
+
 
 
 public class XmlSigOutInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -116,15 +117,14 @@ public class XmlSigOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                       SecurityConstants.ENCRYPT_PROPERTIES);
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
         }
-        String user = getUserName(message, crypto, userNameKey);
+        String user = SecurityUtils.getUserName(message, crypto, userNameKey);
          
         if (StringUtils.isEmpty(user)) {
             return;
         }
 
-        String password = getPassword(message, user, WSPasswordCallback.SIGNATURE);
-        //---
-        // 
+        String password = 
+            SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(user);
@@ -201,56 +201,6 @@ public class XmlSigOutInterceptor extends AbstractPhaseInterceptor<Message> {
                          MediaType.APPLICATION_XML_TYPE,
                          (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS), null);
         return writer.getDocument();
-    }
-    
- // This code will be moved to a common utility class
-    private String getUserName(Message message, Crypto crypto, String userNameKey) {
-        String user = (String)message.getContextualProperty(userNameKey);
-        if (crypto != null && StringUtils.isEmpty(user)) {
-            try {
-                user = crypto.getDefaultX509Identifier();
-            } catch (WSSecurityException e1) {
-                throw new Fault(e1);
-            }
-        }
-        return user;
-    }
-    
-    
-    private String getPassword(Message message, String userName, int type) {
-        CallbackHandler handler = getCallbackHandler(message);
-        if (handler == null) {
-            return null;
-        }
-        
-        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, type)};
-        try {
-            handler.handle(cb);
-        } catch (Exception e) {
-            return null;
-        }
-        
-        //get the password
-        String password = cb[0].getPassword();
-        return password == null ? "" : password;
-    }
-    
-    private CallbackHandler getCallbackHandler(Message message) {
-        //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
     }
     
     

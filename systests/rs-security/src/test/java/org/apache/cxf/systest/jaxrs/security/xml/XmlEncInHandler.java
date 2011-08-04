@@ -37,8 +37,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -48,6 +46,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
+import org.apache.cxf.systest.jaxrs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -189,7 +188,7 @@ public class XmlEncInHandler implements RequestHandler {
                                          Crypto crypto,
                                          String keyEncAlgo,
                                          Message message) throws WSSecurityException {
-        CallbackHandler callback = getCallbackHandler(message);
+        CallbackHandler callback = SecurityUtils.getCallbackHandler(message, this.getClass());
         PrivateKey key = null;
         try {
             key = crypto.getPrivateKey(cert, callback);
@@ -250,21 +249,5 @@ public class XmlEncInHandler implements RequestHandler {
         throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
     }
     
-    private CallbackHandler getCallbackHandler(Message message) {
-        //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
     
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
-    }
 }

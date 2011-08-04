@@ -57,6 +57,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
+import org.apache.cxf.systest.jaxrs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -133,7 +134,8 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                       SecurityConstants.ENCRYPT_CRYPTO,
                                       SecurityConstants.ENCRYPT_PROPERTIES);
             
-            String user = getUserName(message, crypto, SecurityConstants.ENCRYPT_USERNAME);
+            String user = 
+                SecurityUtils.getUserName(message, crypto, SecurityConstants.ENCRYPT_USERNAME);
             if (StringUtils.isEmpty(user)) {
                 return null;
             }
@@ -388,20 +390,5 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
                          (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS), null);
         return writer.getDocument();
     }
-    
- // This code will be moved to a common utility class
-    private String getUserName(Message message, Crypto crypto, String userNameKey) {
-        String user = (String)message.getContextualProperty(userNameKey);
-        if (crypto != null && StringUtils.isEmpty(user)) {
-            try {
-                user = crypto.getDefaultX509Identifier();
-            } catch (WSSecurityException e1) {
-                throw new Fault(e1);
-            }
-        }
-        return user;
-    }
-    
-        
     
 }
