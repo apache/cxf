@@ -37,6 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -47,15 +48,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
 import org.apache.cxf.systest.jaxrs.security.common.SecurityUtils;
+import org.apache.cxf.systest.jaxrs.security.common.TrustValidator;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
@@ -146,11 +145,8 @@ public class XmlEncInHandler implements RequestHandler {
             throwFault("X509Certificate can not be created", ex);
         }
         
-        Credential trustCredential = new Credential();
-        trustCredential.setPublicKey(null);
-        trustCredential.setCertificates(new X509Certificate[]{cert});
         try {
-            validateTrust(trustCredential, crypto);
+            new TrustValidator().validateTrust(crypto, cert, null);
         } catch (Exception ex) {
             throwFault(ex.getMessage(), ex);
         }
@@ -234,13 +230,7 @@ public class XmlEncInHandler implements RequestHandler {
         return null;
     }
     
-    private void validateTrust(Credential cred, Crypto crypto) throws Exception {
-        SignatureTrustValidator validator = new SignatureTrustValidator();
-        RequestData data = new RequestData();
-        data.setSigCrypto(crypto);
-        validator.validate(cred, data);
-    }
-    
+       
     protected void throwFault(String error, Exception ex) {
         // TODO: get bundle resource message once this filter is moved 
         // to rt/rs/security

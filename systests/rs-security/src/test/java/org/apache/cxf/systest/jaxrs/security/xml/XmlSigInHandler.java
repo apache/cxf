@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -39,12 +40,10 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
+import org.apache.cxf.systest.jaxrs.security.common.TrustValidator;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.Reference;
@@ -125,10 +124,9 @@ public class XmlSigInHandler implements RequestHandler {
             // is this call redundant given that signature.checkSignatureValue uses References ?
             validateReference(root, signature);
             
-            Credential trustCredential = new Credential();
-            trustCredential.setPublicKey(keyInfo.getPublicKey());
-            trustCredential.setCertificates(new X509Certificate[]{keyInfo.getX509Certificate()});
-            validateTrust(trustCredential, crypto);
+            // validate trust 
+            new TrustValidator().validateTrust(crypto, cert, keyInfo.getPublicKey());
+            
         } catch (Exception ex) {
             throwFault("Signature validation failed", ex);
         }
@@ -156,13 +154,6 @@ public class XmlSigInHandler implements RequestHandler {
             return (Element)list.item(0);
         } 
         return null;
-    }
-    
-    private void validateTrust(Credential cred, Crypto crypto) throws Exception {
-        SignatureTrustValidator validator = new SignatureTrustValidator();
-        RequestData data = new RequestData();
-        data.setSigCrypto(crypto);
-        validator.validate(cred, data);
     }
     
     protected void throwFault(String error, Exception ex) {

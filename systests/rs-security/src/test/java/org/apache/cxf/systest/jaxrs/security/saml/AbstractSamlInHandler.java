@@ -29,12 +29,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -42,6 +41,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
+import org.apache.cxf.systest.jaxrs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -85,7 +85,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                 RequestData data = new RequestData();
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
                 data.setWssConfig(cfg);
-                data.setCallbackHandler(getCallbackHandler(message));
+                data.setCallbackHandler(SecurityUtils.getCallbackHandler(message, this.getClass()));
                 try {
                     data.setSigCrypto(new CryptoLoader().getCrypto(message,
                                                 SecurityConstants.SIGNATURE_CRYPTO,
@@ -294,21 +294,4 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         return false;
     }
     
-    private CallbackHandler getCallbackHandler(Message message) {
-        //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
-    }
 }

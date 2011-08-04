@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security.common;
 
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -31,11 +32,24 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 
 public final class SecurityUtils {
     
     private SecurityUtils() {
         
+    }
+    
+    public static X509Certificate[] getCertificates(Crypto crypto, String user)
+        throws WSSecurityException {
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(user);
+        X509Certificate[] issuerCerts = crypto.getX509Certificates(cryptoType);
+        if (issuerCerts == null || issuerCerts.length == 0) {
+            throw new WSSecurityException(
+                "No issuer certs were found using issuer name: " + user);
+        }
+        return issuerCerts;
     }
     
     public static Crypto getCrypto(Message message,

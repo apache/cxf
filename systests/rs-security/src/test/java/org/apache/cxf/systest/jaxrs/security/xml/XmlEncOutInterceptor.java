@@ -18,13 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs.security.xml;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.annotation.Annotation;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -32,10 +28,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,27 +35,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
-import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.systest.jaxrs.security.common.CryptoLoader;
 import org.apache.cxf.systest.jaxrs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.DOMX509Data;
 import org.apache.ws.security.message.token.DOMX509IssuerSerial;
 import org.apache.ws.security.util.Base64;
@@ -72,13 +54,9 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 
-public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
+public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlEncOutInterceptor.class);
-    
-    static {
-        WSSConfig.init();
-    }
     
     private boolean encryptSymmetricKey = true;
     private SecretKey symmetricKey;
@@ -86,7 +64,6 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private String symEncAlgo = XMLCipher.AES_256;
     
     public XmlEncOutInterceptor() {
-        super(Phase.WRITE);
         addAfter(XmlSigOutInterceptor.class.getName());
     } 
 
@@ -98,30 +75,12 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
         keyEncAlgo = algo;
     }
     
-    public void handleMessage(Message message) throws Fault {
-        try {
-            Object body = getRequestBody(message);
-            if (body == null) {
-                return;
-            }
-            Document doc = getDomDocument(body, message);
-            if (doc == null) {
-                return;
-            }
- 
-            Document encryptedDataDoc = encryptDocument(message, doc);
-            message.setContent(List.class, 
-                new MessageContentsList(new DOMSource(encryptedDataDoc)));
-        } catch (Exception ex) {
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            LOG.warning(sw.toString());
-            throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
-        }
+    protected Document processDocument(Message message, Document payloadDoc) 
+        throws Exception {
+        return encryptDocument(message, payloadDoc);
     }
     
-    // at the moment all the doc gets encrypted
-    private Document encryptDocument(Message message, Document payloadDoc) 
+    protected Document encryptDocument(Message message, Document payloadDoc) 
         throws Exception {
         
         byte[] secretKey = getSymmetricKey();
@@ -174,16 +133,7 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     private X509Certificate getReceiverCertificate(Crypto crypto, String user) throws Exception {
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias(user);
-        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        if (certs == null || certs.length <= 0) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "noUserCertsFound",  
-                new Object[] {user, "encryption"}
-            );
-        }
+        X509Certificate[] certs = SecurityUtils.getCertificates(crypto, user);
         return certs[0];
     }
     
@@ -218,10 +168,12 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
             EncryptionUtils.initCipherWithCert(keyEncAlgo, Cipher.ENCRYPT_MODE, remoteCert);
         int blockSize = cipher.getBlockSize();
         if (blockSize > 0 && blockSize < keyBytes.length) {
+            String message = "Public key algorithm too weak to encrypt symmetric key";
+            LOG.severe(message);
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
                 "unsupportedKeyTransp",
-                new Object[] {"public key algorithm too weak to encrypt symmetric key"}
+                new Object[] {message}
             );
         }
         byte[] encryptedEphemeralKey = null;
@@ -354,41 +306,5 @@ public class XmlEncOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     
-    private Object getRequestBody(Message message) {
-        MessageContentsList objs = MessageContentsList.getContentsList(message);
-        if (objs == null || objs.size() == 0) {
-            return null;
-        } else {
-            return objs.get(0);
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    private Document getDomDocument(Object body, Message m) throws Exception {
-        
-        if (body instanceof Document) {
-            return (Document)body;
-        }
-        if (body instanceof DOMSource) {
-            return (Document)((DOMSource)body).getNode();
-        }
-        
-        ProviderFactory pf = ProviderFactory.getInstance(m);
-        
-        Object providerObject = pf.createMessageBodyWriter(body.getClass(), 
-                                   body.getClass(), new Annotation[]{}, 
-                                   MediaType.APPLICATION_XML_TYPE, m);
-        if (!(providerObject instanceof JAXBElementProvider)) {
-            return null;
-        }
-        JAXBElementProvider provider = (JAXBElementProvider)providerObject;
-        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        m.setContent(XMLStreamWriter.class, writer);
-        provider.writeTo(body, body.getClass(), 
-                         body.getClass(), new Annotation[]{},
-                         MediaType.APPLICATION_XML_TYPE,
-                         (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS), null);
-        return writer.getDocument();
-    }
     
 }
