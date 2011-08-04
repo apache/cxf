@@ -25,7 +25,7 @@ import org.apache.cxf.transport.Conduit;
 
 
 /**
- * Strategy for retreiving a Conduit to mediate an outbound message.
+ * Strategy for retrieving a Conduit to mediate an outbound message.
  * A specific instance implementing a particular strategy may be injected
  * into the Client via config.
  */
