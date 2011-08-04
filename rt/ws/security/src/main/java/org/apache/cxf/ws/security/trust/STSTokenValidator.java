@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.util.Arrays;
 import java.util.List;
 import org.w3c.dom.Element;
 
@@ -68,8 +69,12 @@ public class STSTokenValidator implements Validator {
             Element tokenElement = null;
             int hash = 0;
             if (credential.getAssertion() != null) {
+                AssertionWrapper assertion = credential.getAssertion();
+                byte[] signatureValue = assertion.getSignatureValue();
+                if (signatureValue != null && signatureValue.length > 0) {
+                    hash = Arrays.hashCode(signatureValue);
+                }
                 tokenElement = credential.getAssertion().getElement();
-                hash = credential.getAssertion().hashCode();
             } else if (credential.getUsernametoken() != null) {
                 tokenElement = credential.getUsernametoken().getElement();
                 hash = credential.getUsernametoken().hashCode();
