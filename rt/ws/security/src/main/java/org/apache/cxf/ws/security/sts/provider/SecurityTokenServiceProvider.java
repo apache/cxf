@@ -32,18 +32,15 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPFault;
 import javax.xml.transform.Source;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.ws.handler.MessageContext;
 
-import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
-import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
@@ -117,7 +114,6 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     
     protected JAXBContext jaxbContext;
     protected Set<Class<?>> jaxbContextClasses;
-    protected SOAPFactory soapFactory;
     
     private CancelOperation cancelOperation;
     private IssueOperation issueOperation;
@@ -134,7 +130,6 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
         CachedContextAndSchemas cache = JAXBContextCache.getCachedContextAndSchemas(ObjectFactory.class);
         jaxbContext = cache.getContext();
         jaxbContextClasses = cache.getClasses();
-        soapFactory = SAAJFactoryResolver.createSOAPFactory(null);
     }
     
     public void setCancelOperation(CancelOperation cancelOperation) {
@@ -222,29 +217,18 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
             }
 
         } catch (InvocationTargetException ex) {
-            try {
-                Throwable cause = ex.getCause();
-                SOAPFault fault = createSOAPFault(cause);
-                throw new SOAPFaultException(fault);
-            } catch (SOAPException e1) {
-                throw new Fault(e1);
-            }
+            Throwable cause = ex.getCause();
+            throw createSOAPFault(cause);
         } catch (Exception ex) {
-            try {
-                SOAPFault fault = createSOAPFault(ex);
-                throw new SOAPFaultException(fault);
-            } catch (SOAPException e1) {
-                throw new Fault(e1);
-            }
+            throw createSOAPFault(ex);
         }
 
         return response;
     }
     
-    private SOAPFault createSOAPFault(Throwable ex) throws SOAPException {
-        SOAPFault fault = soapFactory.createFault();
+    private SoapFault createSOAPFault(Throwable ex) {
         String faultString = "Internal STS error";
-        QName faultCode = fault.getFaultCodeAsQName();
+        QName faultCode = null;
         
         if (ex != null) {
             if (ex instanceof STSException && ((STSException)ex).getFaultCode() != null) {
@@ -252,8 +236,18 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
             }
             faultString = ex.getMessage();
         }
-        fault.setFaultString(faultString);
-        fault.setFaultCode(faultCode);
+        
+        MessageContext messageContext = context.getMessageContext();
+        SoapVersion soapVersion = (SoapVersion)messageContext.get(SoapVersion.class.getName());
+        SoapFault fault;
+        if (soapVersion.getVersion() == 1.1 && faultCode != null) {
+            fault = new SoapFault(faultString, faultCode);
+        } else {
+            fault = new SoapFault(faultString, soapVersion.getSender());
+            if (soapVersion.getVersion() != 1.1 && faultCode != null) {
+                fault.setSubCode(faultCode);
+            }
+        }
         return fault;
     }
 
