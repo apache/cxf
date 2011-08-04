@@ -32,7 +32,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.xml.security.encryption.XMLCipher;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -123,14 +122,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostEncryptedSignedBook() throws Exception {
         String address = "https://localhost:" + PORT + "/xmlsec/bookstore/books";
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(address);
-        
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
-        Bus springBus = bf.createBus(busFile.toString());
-        bean.setBus(springBus);
-
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
@@ -140,6 +131,34 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
+        doTestPostEncryptedSignedBook(address, properties);
+        
+    }
+    
+    @Test
+    //Encryption properties are shared by encryption and signature handlers
+    public void testPostEncryptedSignedBookSharedProps() throws Exception {
+        String address = "https://localhost:" + PORT + "/xmlsec2/bookstore/books";
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("ws-security.callback-handler", 
+                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        properties.put("ws-security.encryption.username", "bob");
+        properties.put("ws-security.encryption.properties", 
+                       "org/apache/cxf/systest/jaxrs/security/bob.properties");
+        doTestPostEncryptedSignedBook(address, properties);
+        
+    }
+    
+    public void doTestPostEncryptedSignedBook(String address, Map<String, Object> properties) 
+        throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
         bean.setProperties(properties);
         bean.getOutInterceptors().add(new XmlSigOutInterceptor());
         XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
