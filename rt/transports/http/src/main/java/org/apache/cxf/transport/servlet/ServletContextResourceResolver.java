@@ -22,16 +22,15 @@ package org.apache.cxf.transport.servlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.resource.ResourceResolver;
 
 
@@ -60,14 +59,11 @@ public class ServletContextResourceResolver implements ResourceResolver {
         Object obj = null;
         try {
             if (entryName != null) {
-                Object ic = ClassLoaderUtils.loadClass("javax.naming.InitialContext", 
-                                                        this.getClass());
+                InitialContext ic = new InitialContext();
                 try {
-                    Method lookupMethod = ic.getClass().getMethod("lookup", new Class[]{String.class});
-                    obj = lookupMethod.invoke(ic, new Object[]{entryName});
+                    obj = ic.lookup(entryName);
                 } finally {
-                    Method closeMethod = ic.getClass().getMethod("close", new Class[]{});
-                    closeMethod.invoke(ic, new Object[]{});
+                    ic.close();
                 }
             }
         } catch (Throwable e) {
