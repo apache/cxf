@@ -98,7 +98,7 @@ public abstract class AbstractHTTPDestination
     public static final String CXF_ASYNC_CONTEXT = "cxf.async.context";
     
     private static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
-    
+    private static final String ADD_HEADERS_PROPERTY = "org.apache.cxf.http.add-headers";    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     protected final Bus bus;
@@ -254,26 +254,27 @@ public abstract class AbstractHTTPDestination
             if (!headers.containsKey(Message.CONTENT_TYPE) && ct != null) {
                 response.setContentType(ct);
             }
-            
+            boolean addHeaders = MessageUtils.isTrue(
+                    message.getContextualProperty(ADD_HEADERS_PROPERTY));
             for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
                 String header = (String)iter.next();
                 List<?> headerList = (List<?>)headers.get(header);
-                StringBuilder sb = new StringBuilder();
-
-                if (HTTP_HEADERS_SETCOOKIE.equals(header)) {
+                
+                if (addHeaders || HTTP_HEADERS_SETCOOKIE.equals(header)) {
                     for (int i = 0; i < headerList.size(); i++) {
                         response.addHeader(header, headerList.get(i).toString());
                     }
                 } else {
+                    StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < headerList.size(); i++) {
                         sb.append(headerList.get(i));
                         if (i + 1 < headerList.size()) {
                             sb.append(',');
                         }
                     }
+                    response.addHeader(header, sb.toString());
                 }
-
-                response.addHeader(header, sb.toString());
+                
             }
         } else {
             response.setContentType(ct);
