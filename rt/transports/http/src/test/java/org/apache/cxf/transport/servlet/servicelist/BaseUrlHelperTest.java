@@ -52,6 +52,12 @@ public class BaseUrlHelperTest {
     }
 
     @Test
+    public void testGetRequestURLWithRepeatingValues() throws Exception {
+        String url = testGetBaseURL("http://services.com/services/bar", "/services", "", "/bar");
+        Assert.assertEquals("http://services.com/services", url);
+    }
+    
+    @Test
     public void testGetRequestURL() throws Exception {
         String url = testGetBaseURL("http://localhost:8080/services/bar", "", "/services", "/bar");
         Assert.assertEquals("http://localhost:8080/services", url);
