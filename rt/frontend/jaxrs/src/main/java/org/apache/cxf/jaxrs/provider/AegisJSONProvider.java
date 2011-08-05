@@ -139,7 +139,7 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
         // the namespace map. Oh, the namespace map.
         // This is wrong, but might make unit tests pass until we redesign.
         if (typeToRead != null) {
-            namespaceMap.put(typeToRead.getSchemaType().getNamespaceURI(), "ns1");
+            namespaceMap.putIfAbsent(typeToRead.getSchemaType().getNamespaceURI(), "ns1");
         }
         return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
     }
