@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.servlet;
 
+import java.net.URI;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.transport.AbstractDestination;
@@ -28,36 +30,31 @@ public final class BaseUrlHelper {
     private BaseUrlHelper() {
     }
 
+    /**
+     * Returns base URL which includes scheme, host, port, Servlet context and servlet paths
+     * @param request current HttpServletRequest
+     * @return base URL
+     */
     public static String getBaseURL(HttpServletRequest request) {
         String reqPrefix = request.getRequestURL().toString();        
         String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
         //fix for CXF-898
         if (!"/".equals(pathInfo) || reqPrefix.endsWith("/")) {
-            String basePath = request.getContextPath() + request.getServletPath();
-            int index;
-            if (basePath.length() == 0) {
-                index = reqPrefix.indexOf(request.getRequestURI());
-            } else {
-                index = reqPrefix.indexOf(basePath);
-            }
-            reqPrefix = reqPrefix.substring(0, index + basePath.length());
+            StringBuilder sb = new StringBuilder();
+            // request.getScheme(), request.getLocalName() and request.getLocalPort()
+            // should be marginally cheaper - provided request.getLocalName() does 
+            // return the actual name used in request URI as opposed to localhost
+            // consistently across the Servlet stacks
+            
+            URI uri = URI.create(reqPrefix);
+            sb.append(uri.getScheme()).append("://").append(uri.getRawAuthority());
+            sb.append(request.getContextPath()).append(request.getServletPath());
+            
+            reqPrefix = sb.toString();
         }
         return reqPrefix;
     }
     
-    public static void makeAddressesAbsolute(HttpServletRequest request, String baseAddress, 
-                                              AbstractDestination[] destinations) {
-        for (AbstractDestination dest : destinations) {
-            String addr = dest.getEndpointInfo().getAddress();
-            if (addr == null || addr.length() == 0) {
-                addr = "/";
-            }
-            if (addr != null && !addr.startsWith("http")) {
-                String base = baseAddress == null ? BaseUrlHelper.getBaseURL(request) : baseAddress;
-                setAddress(dest, base + addr);
-            }
-        }
-    }
 
     public static void setAddress(AbstractDestination dest, String absAddress) {
         dest.getEndpointInfo().setAddress(absAddress);
