@@ -41,6 +41,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.version.Version;
@@ -53,7 +54,8 @@ public class Headers {
     public static final String KEY_HTTP_CONNECTION = "http.connection";
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
     private static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
-
+    private static final String ADD_HEADERS_PROPERTY = "org.apache.cxf.http.add-headers";             
+    
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     private final Message message;
     private final Map<String, List<String>> headers;
@@ -287,12 +289,14 @@ public class Headers {
      * from the PROTOCOL_HEADERS in the message.
      */
     private void transferProtocolHeadersToURLConnection(URLConnection connection) {
+        boolean addHeaders = MessageUtils.isTrue(
+                message.getContextualProperty(ADD_HEADERS_PROPERTY));
         for (String header : headers.keySet()) {
             List<String> headerList = headers.get(header);
             if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header)) {
                 continue;
             }
-            if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
+            if (addHeaders || HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
                 for (String s : headerList) {
                     connection.addRequestProperty(HttpHeaderHelper.COOKIE, s);
                 }
@@ -389,25 +393,28 @@ public class Headers {
             response.setContentType(contentType);
         }
 
+        boolean addHeaders = MessageUtils.isTrue(
+                message.getContextualProperty(ADD_HEADERS_PROPERTY));
         for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
             String header = (String)iter.next();
             List<?> headerList = (List<?>)headers.get(header);
-            StringBuilder sb = new StringBuilder();
-
-            if (HTTP_HEADERS_SETCOOKIE.equals(header)) {
+            
+            if (addHeaders || HTTP_HEADERS_SETCOOKIE.equals(header)) {
                 for (int i = 0; i < headerList.size(); i++) {
                     response.addHeader(header, headerList.get(i).toString());
                 }
             } else {
+                StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < headerList.size(); i++) {
                     sb.append(headerList.get(i));
                     if (i + 1 < headerList.size()) {
                         sb.append(',');
                     }
                 }
+                response.addHeader(header, sb.toString());
             }
 
-            response.addHeader(header, sb.toString());
+            
         }
     }
     
