@@ -1140,7 +1140,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return o;
     }
 
-    private Crypto createCrypto(boolean decrypt) throws IOException {
+    private Crypto createCrypto(boolean decrypt) throws IOException, WSSecurityException {
         Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO + (decrypt ? ".decrypt" : ""));
         if (crypto != null) {
             return crypto;
