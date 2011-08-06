@@ -41,9 +41,11 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractFaultChainInitiatorObserver.class);
     
     private Bus bus;
+    private ClassLoader loader;
 
     public AbstractFaultChainInitiatorObserver(Bus bus) {
         this.bus = bus;
+        loader = bus.getExtension(ClassLoader.class);
     }
 
     public void onMessage(Message message) {
@@ -54,7 +56,6 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
         BusFactory.setThreadDefaultBus(bus);
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }

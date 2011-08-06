@@ -51,16 +51,16 @@ import org.apache.cxf.transport.ChainInitiationObserver;
 public class ColocMessageObserver extends ChainInitiationObserver {
     private static final Logger LOG = LogUtils.getL7dLogger(ColocMessageObserver.class);
     private static final String COLOCATED = Message.class.getName() + ".COLOCATED";
-
+    private ClassLoader loader;
     public ColocMessageObserver(Endpoint endpoint, Bus bus) {
         super(endpoint, bus);
+        loader = bus.getExtension(ClassLoader.class);
     }
 
     public void onMessage(Message m) {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }

@@ -77,10 +77,8 @@ public class ColocMessageObserverTest extends Assert {
 
     @Test
     public void testSetExchangeProperties() throws Exception {
-        observer = new ColocMessageObserver(ep, bus);
         QName opName = new QName("A", "B");
-        msg.put(Message.WSDL_OPERATION, opName);
-
+        msg.put(Message.WSDL_OPERATION, opName);    
         EasyMock.expect(ep.getService()).andReturn(srv);
         Binding binding = control.createMock(Binding.class);
         EasyMock.expect(ep.getBinding()).andReturn(binding);
@@ -91,8 +89,9 @@ public class ColocMessageObserverTest extends Assert {
         BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
         EasyMock.expect(bi.getOperation(opName)).andReturn(boi);
         EasyMock.expect(boi.getOperationInfo()).andReturn(oi);        
-
+        EasyMock.expect(bus.getExtension(ClassLoader.class)).andReturn(this.getClass().getClassLoader());
         control.replay();
+        observer = new ColocMessageObserver(ep, bus);
         observer.setExchangeProperties(ex, msg);
         control.verify();
 
@@ -112,7 +111,6 @@ public class ColocMessageObserverTest extends Assert {
 
     @Test
     public void testObserverOnMessage() throws Exception {
-        observer = new TestColocMessageObserver(ep, bus);
         msg.setExchange(ex);
         
         Binding binding = control.createMock(Binding.class);
@@ -131,8 +129,9 @@ public class ColocMessageObserverTest extends Assert {
         EasyMock.expect(bus.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
         EasyMock.expect(ep.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
         EasyMock.expect(srv.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
-
+        EasyMock.expect(bus.getExtension(ClassLoader.class)).andReturn(this.getClass().getClassLoader());
         control.replay();
+        observer = new TestColocMessageObserver(ep, bus);
         observer.onMessage(msg);
         control.verify();
 

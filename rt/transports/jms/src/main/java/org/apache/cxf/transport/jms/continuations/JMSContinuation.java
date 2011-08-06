@@ -50,6 +50,7 @@ public class JMSContinuation implements Continuation {
     private volatile boolean isResumed;
     private volatile boolean isCanceled;
     private WorkQueue workQueue;
+    private ClassLoader loader;
     
     public JMSContinuation(Bus b, Message m, MessageObserver observer,
                            Collection<JMSContinuation> cList, 
@@ -70,6 +71,7 @@ public class JMSContinuation implements Continuation {
         } else {
             LOG.warning("ERROR_GETTING_WORK_QUEUE");
         }
+        loader = bus.getExtension(ClassLoader.class);
     }
     
     public Object getObject() {
@@ -110,7 +112,6 @@ public class JMSContinuation implements Continuation {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
             BusFactory.setThreadDefaultBus(bus);
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }
