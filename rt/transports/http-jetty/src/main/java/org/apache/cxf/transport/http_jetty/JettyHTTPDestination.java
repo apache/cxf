@@ -62,6 +62,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected JettyHTTPServerEngineFactory serverEngineFactory;
     protected ServletContext servletContext;
     protected URL nurl;
+    protected ClassLoader loader;
     
     /**
      * This variable signifies that finalizeConfig() has been called.
@@ -90,6 +91,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
         this.serverEngineFactory = serverEngineFactory;
         nurl = new URL(endpointInfo.getAddress());
+        loader = bus.getExtension(ClassLoader.class);
     }
 
     protected Logger getLogger() {
@@ -278,7 +280,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         // REVISIT: service on executor if associated with endpoint
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }

@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import javax.jbi.messaging.MessageExchange;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.jbi.JBIBindingInfo;
 import org.apache.cxf.binding.jbi.JBIConstants;
 import org.apache.cxf.binding.jbi.JBIMessage;
@@ -60,12 +62,16 @@ public class JBIOperationInInterceptorTest extends Assert {
         MessageExchange me = EasyMock.createMock(MessageExchange.class);
         EasyMock.expect(me.getOperation()).andReturn(new QName("urn:test", "SayHi")).times(4);
         EasyMock.replay(me);
+
         msg.put(MessageExchange.class, me);
         EndpointInfo endpointInfo = new EndpointInfo();
         endpointInfo.setBinding(new JBIBindingInfo(null, JBIConstants.NS_JBI_BINDING));
-        Endpoint ep = new EndpointImpl(null, null, endpointInfo);
+        Bus bus = BusFactory.getThreadDefaultBus();
+        bus.setExtension(this.getClass().getClassLoader(), ClassLoader.class);
+        Endpoint ep = new EndpointImpl(bus, null, endpointInfo);
         msg.setExchange(new ExchangeImpl());
         msg.getExchange().put(Endpoint.class, ep);
+
         try { 
             interceptor.handleMessage(msg);
             fail("shouldn't found SayHi operation");

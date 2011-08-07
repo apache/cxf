@@ -27,10 +27,12 @@ import org.apache.cxf.transport.MessageObserver;
 
 class ClientMessageObserver implements MessageObserver {
 
-    private ClientConfiguration cfg; 
+    private ClientConfiguration cfg;
+    private ClassLoader loader;
     
     public ClientMessageObserver(ClientConfiguration cfg) {
         this.cfg = cfg;
+        loader = cfg.getBus().getExtension(ClassLoader.class);
     }
     
     public void onMessage(Message m) {
@@ -45,7 +47,6 @@ class ClientMessageObserver implements MessageObserver {
         BusFactory.setThreadDefaultBus(cfg.getBus());
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader loader = cfg.getBus().getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }

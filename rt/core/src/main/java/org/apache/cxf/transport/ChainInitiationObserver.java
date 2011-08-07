@@ -46,6 +46,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 public class ChainInitiationObserver implements MessageObserver {
     protected Endpoint endpoint;
     protected Bus bus;
+    protected ClassLoader loader;
     
     private PhaseChainCache chainCache = new PhaseChainCache();
 
@@ -53,6 +54,9 @@ public class ChainInitiationObserver implements MessageObserver {
         super();
         this.endpoint = endpoint;
         this.bus = bus;
+        if (bus != null) {
+            loader = bus.getExtension(ClassLoader.class);
+        }
     }
 
     public void onMessage(Message m) {
@@ -60,7 +64,6 @@ public class ChainInitiationObserver implements MessageObserver {
         BusFactory.setThreadDefaultBus(bus);
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }

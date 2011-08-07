@@ -81,6 +81,7 @@ public class JMSDestination extends AbstractMultiplexDestination
     private AbstractMessageListenerContainer jmsListener;
     private Collection<JMSContinuation> continuations = 
         new ConcurrentLinkedQueue<JMSContinuation>();
+    private ClassLoader loader;
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
@@ -88,6 +89,7 @@ public class JMSDestination extends AbstractMultiplexDestination
         this.ei = info;
         this.jmsConfig = jmsConfig;
         info.setProperty(OneWayProcessorInterceptor.USE_ORIGINAL_THREAD, Boolean.TRUE);
+        loader = bus.getExtension(ClassLoader.class);
     }
 
     /**
@@ -183,7 +185,6 @@ public class JMSDestination extends AbstractMultiplexDestination
     public void onMessage(javax.jms.Message message, Session session) {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }

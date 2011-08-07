@@ -571,8 +571,10 @@ public class JettyHTTPDestinationTest extends Assert {
             bus = EasyMock.createMock(Bus.class);
             bus.getExtension(EndpointResolverRegistry.class);
             EasyMock.expectLastCall().andReturn(null);
-            bus.getExtension(PolicyEngine.class);
+            bus.getExtension(PolicyEngine.class);          
             EasyMock.expectLastCall().andReturn(null);
+            bus.getExtension(ClassLoader.class);
+            EasyMock.expectLastCall().andReturn(this.getClass().getClassLoader());
             EasyMock.replay(bus);
         }
         

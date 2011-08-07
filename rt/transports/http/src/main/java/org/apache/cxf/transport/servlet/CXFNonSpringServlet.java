@@ -40,6 +40,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     private DestinationRegistry destinationRegistry;
     private Bus bus;
     private ServletController controller;
+    private ClassLoader loader;
     
     public CXFNonSpringServlet() {
     }
@@ -54,7 +55,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         if (this.bus == null) {
             loadBus(sc);
         }
-
+        loader = bus.getExtension(ClassLoader.class);
         ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
         resourceManager.addResourceResolver(new ServletContextResourceResolver(
                                                sc.getServletContext()));
@@ -106,7 +107,6 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 Thread.currentThread().setContextClassLoader(loader);
             }
