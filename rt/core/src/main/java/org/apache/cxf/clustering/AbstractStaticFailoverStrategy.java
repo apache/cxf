@@ -42,8 +42,16 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
         LogUtils.getL7dLogger(AbstractStaticFailoverStrategy.class);
 
     private List<String> alternateAddresses;
+    private long delayBetweenRetries;
 
-
+    public void setDelayBetweenRetries(long delay) {
+        this.delayBetweenRetries = delay;
+    }
+    
+    public long getDelayBetweenRetries() {
+        return this.delayBetweenRetries;
+    }
+    
     public void setAlternateAddresses(List<String> alternateAddresses) {
         this.alternateAddresses = alternateAddresses;
     }
