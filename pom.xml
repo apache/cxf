@@ -42,8 +42,8 @@
 
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-        <cxf.build-utils.version>2.3.3-SNAPSHOT</cxf.build-utils.version>
-        <cxf.xjc-utils.version>2.3.3-SNAPSHOT</cxf.xjc-utils.version>
+        <cxf.build-utils.version>2.4.0</cxf.build-utils.version>
+        <cxf.xjc-utils.version>2.4.0</cxf.xjc-utils.version>
         <cxf.jdk.version>1.6</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
