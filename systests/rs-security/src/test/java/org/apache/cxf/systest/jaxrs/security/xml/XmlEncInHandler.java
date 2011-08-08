@@ -109,26 +109,8 @@ public class XmlEncInHandler implements RequestHandler {
         return null;
     }
     
+    // Subclasses can overwrite it and return the bytes, assuming they know the actual key
     protected byte[] getSymmetricKeyBytes(Message message, Element encDataElement) {
-        // Subclasses can overwrite it and return the bytes, assuming they know the actual key
-        Element encKeyElement = getNode(encDataElement, WSConstants.ENC_NS, "EncryptedKey", 0);
-        if (encKeyElement == null) {
-            //TODO: support EncryptedData/ds:KeyInfo - the encrypted key is passed out of band
-            throwFault("EncryptedKey element is not available", null);
-        }
-        
-        Element certNode = getNode(encKeyElement, 
-                                      Constants.SignatureSpecNS, "X509Certificate", 0);
-        if (certNode == null) {
-            throwFault("Certificate is missing", null);
-        }
-        byte[] certBytes = null;
-        try {
-            certBytes = Base64Utility.decode(certNode.getTextContent().trim());
-        } catch (Base64Exception ex) {
-            throwFault("Base64 decoding has failed", ex);
-        }
-        
         Crypto crypto = null;
         try {
             crypto = new CryptoLoader().getCrypto(message,
@@ -138,12 +120,13 @@ public class XmlEncInHandler implements RequestHandler {
             throwFault("Crypto can not be loaded", ex);
         }
         
-        X509Certificate cert = null;
-        try {
-            cert = crypto.loadCertificate(new ByteArrayInputStream(certBytes));
-        } catch (Exception ex) {
-            throwFault("X509Certificate can not be created", ex);
+        Element encKeyElement = getNode(encDataElement, WSConstants.ENC_NS, "EncryptedKey", 0);
+        if (encKeyElement == null) {
+            //TODO: support EncryptedData/ds:KeyInfo - the encrypted key is passed out of band
+            throwFault("EncryptedKey element is not available", null);
         }
+        
+        X509Certificate cert = loadCertificate(crypto, encKeyElement);
         
         try {
             new TrustValidator().validateTrust(crypto, cert, null);
@@ -167,6 +150,36 @@ public class XmlEncInHandler implements RequestHandler {
         } catch (Exception ex) {
             throwFault(ex.getMessage(), ex);
         }
+        return null;
+    }
+    
+    private X509Certificate loadCertificate(Crypto crypto, Element encKeyElement) {
+        /**
+         * TODO: the following can be easily supported too  
+         <X509SKI>31d97bd7</X509SKI>
+         <X509SubjectName>Subject of Certificate B</X509SubjectName>
+         * 
+         */
+        
+        Element certNode = getNode(encKeyElement, 
+                                   Constants.SignatureSpecNS, "X509Certificate", 0);
+        if (certNode != null) {
+            try {
+                return SecurityUtils.loadX509Certificate(crypto, certNode);
+            } catch (Exception ex) {
+                throwFault("X509Certificate can not be created", ex);
+            }
+        }
+        certNode = getNode(encKeyElement, 
+                Constants.SignatureSpecNS, "X509IssuerSerial", 0);
+        if (certNode != null) {
+            try {
+                return SecurityUtils.loadX509IssuerSerial(crypto, certNode);
+            } catch (Exception ex) {
+                throwFault("X509Certificate can not be created", ex);
+            }
+        }
+        throwFault("Certificate is missing", null);
         return null;
     }
     

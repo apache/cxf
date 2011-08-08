@@ -19,12 +19,18 @@
 
 package org.apache.cxf.systest.jaxrs.security.common;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -33,11 +39,34 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.xml.security.utils.Constants;
 
 public final class SecurityUtils {
     
+    public static final String X509_KEY = "X509_KEY";
+    public static final String X509_ISSUER_SERIAL = "X509_ISSUER_SERIAL";
+    
     private SecurityUtils() {
         
+    }
+    
+    public static X509Certificate loadX509Certificate(Crypto crypto, Element certNode) 
+        throws Exception {
+        String base64Value = certNode.getTextContent().trim();
+        byte[] certBytes = Base64Utility.decode(base64Value);
+        return crypto.loadCertificate(new ByteArrayInputStream(certBytes));
+    }
+    
+    public static X509Certificate loadX509IssuerSerial(Crypto crypto, Element certNode) 
+        throws Exception {
+        Node issuerNameNode = 
+            certNode.getElementsByTagNameNS(Constants.SignatureSpecNS, "X509IssuerName").item(0);
+        Node serialNumberNode = 
+            certNode.getElementsByTagNameNS(Constants.SignatureSpecNS, "X509SerialNumber").item(0);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+        cryptoType.setIssuerSerial(issuerNameNode.getTextContent(), 
+                                   new BigInteger(serialNumberNode.getTextContent()));
+        return crypto.getX509Certificates(cryptoType)[0];
     }
     
     public static X509Certificate[] getCertificates(Crypto crypto, String user)

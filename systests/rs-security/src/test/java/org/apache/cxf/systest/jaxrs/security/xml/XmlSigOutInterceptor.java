@@ -46,10 +46,20 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         LogUtils.getL7dLogger(XmlSigOutInterceptor.class);
     
     private boolean createReferenceId = true;
+    private String defaultSigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
+    private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
     
     public XmlSigOutInterceptor() {
     } 
 
+    public void setSignatureAlgorithm(String algo) {
+        defaultSigAlgo = algo;
+    }
+    
+    public void setDigestAlgorithm(String algo) {
+        digestAlgo = algo;
+    }
+    
     public void setCreateReferenceId(boolean create) {
         createReferenceId = create;
     }
@@ -87,7 +97,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     
         X509Certificate[] issuerCerts = SecurityUtils.getCertificates(crypto, user);
         
-        String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
+        String sigAlgo = defaultSigAlgo;
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
@@ -116,7 +126,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
         transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
         
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1, referenceId, null);
+        sig.addDocument("", transforms, digestAlgo, referenceId, null);
         
         sig.addKeyInfo(issuerCerts[0]);
         sig.addKeyInfo(issuerCerts[0].getPublicKey());

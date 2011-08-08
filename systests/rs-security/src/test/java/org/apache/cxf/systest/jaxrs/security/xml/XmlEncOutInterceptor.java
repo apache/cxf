@@ -55,18 +55,26 @@ import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 
 public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
+    
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlEncOutInterceptor.class);
+    private static final String DEFAULT_RETRIEVAL_METHOD_TYPE =
+        "http://www.w3.org/2001/04/xmlenc#EncryptedKey";
     
     private boolean encryptSymmetricKey = true;
     private SecretKey symmetricKey;
     private String keyEncAlgo = XMLCipher.RSA_OAEP; 
     private String symEncAlgo = XMLCipher.AES_256;
+    private String keyIdentifierType = SecurityUtils.X509_KEY;
     
     public XmlEncOutInterceptor() {
         addAfter(XmlSigOutInterceptor.class.getName());
     } 
 
+    public void setKeyIdentifierType(String type) {
+        keyIdentifierType = type;
+    }
+    
     public void setSymmetricEncAlgorithm(String algo) {
         symEncAlgo = algo;
     }
@@ -208,14 +216,26 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         String encKeyId = "EK-" + UUIDGenerator.getUUID();
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
                 
-        Element keyInfoElement = createKeyInfoElement(doc, cert, WSConstants.X509_KEY_IDENTIFIER);
+        Element keyInfoElement = createKeyInfoElement(doc, cert);
         encryptedKeyElement.appendChild(keyInfoElement);
         
         Element xencCipherValue = createCipherValue(doc, encryptedKeyElement);
         xencCipherValue.appendChild(doc.createTextNode(encodedKey));
         
+        Element topKeyInfoElement = 
+            doc.createElementNS(
+                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+            );
+        Element retrievalMethodElement = 
+            doc.createElementNS(
+                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":RetrievalMethod"
+            );
+        retrievalMethodElement.setAttribute("Type", DEFAULT_RETRIEVAL_METHOD_TYPE);
+        topKeyInfoElement.appendChild(retrievalMethodElement);
         
-        encryptedDataElement.appendChild(encryptedKeyElement);
+        topKeyInfoElement.appendChild(encryptedKeyElement);
+        
+        encryptedDataElement.appendChild(topKeyInfoElement);
     }
     
     protected Element createCipherValue(Document doc, Element encryptedKey) {
@@ -229,16 +249,14 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     }
     
     private Element createKeyInfoElement(Document encryptedDataDoc,
-                                         X509Certificate remoteCert,
-                                         int keyIdentifierType) throws Exception {
+                                         X509Certificate remoteCert) throws Exception {
         Element keyInfoElement = 
             encryptedDataDoc.createElementNS(
                 WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
             );
         
         Node keyIdentifierNode = null; 
-        switch (keyIdentifierType) {
-        case WSConstants.X509_KEY_IDENTIFIER:
+        if (keyIdentifierType.equals(SecurityUtils.X509_KEY)) {
             byte data[] = null;
             try {
                 data = remoteCert.getEncoded();
@@ -255,10 +273,8 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_DATA_LN);
             
             x509Data.appendChild(cert);
-            keyIdentifierNode = x509Data; 
-            break;
-
-        case WSConstants.ISSUER_SERIAL:
+            keyIdentifierNode = x509Data;
+        } else if (keyIdentifierType.equals(SecurityUtils.X509_ISSUER_SERIAL)) {
             String issuer = remoteCert.getIssuerDN().getName();
             java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
             DOMX509IssuerSerial domIssuerSerial = 
@@ -267,8 +283,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 );
             DOMX509Data domX509Data = new DOMX509Data(encryptedDataDoc, domIssuerSerial);
             keyIdentifierNode = domX509Data.getElement();
-            break;
-        default:
+        } else {
             throw new WSSecurityException("Unsupported key identifier:" + keyIdentifierType);
         }
  
