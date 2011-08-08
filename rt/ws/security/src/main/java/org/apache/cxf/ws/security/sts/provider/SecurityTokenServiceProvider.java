@@ -22,6 +22,7 @@ package org.apache.cxf.ws.security.sts.provider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,7 +128,12 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     private WebServiceContext context;
 
     public SecurityTokenServiceProvider() throws Exception {
-        CachedContextAndSchemas cache = JAXBContextCache.getCachedContextAndSchemas(ObjectFactory.class);
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        classes.add(ObjectFactory.class);
+        classes.add(org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory.class);
+                
+        CachedContextAndSchemas cache = 
+            JAXBContextCache.getCachedContextAndSchemas(classes, null, null, null, false);
         jaxbContext = cache.getContext();
         jaxbContextClasses = cache.getClasses();
     }

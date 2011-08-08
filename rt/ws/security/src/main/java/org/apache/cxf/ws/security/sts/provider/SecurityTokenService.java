@@ -35,6 +35,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 @WebService(targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", 
             name = "SecurityTokenService")
 @XmlSeeAlso({org.apache.cxf.ws.security.sts.provider.model.ObjectFactory.class,
+    org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory.class,
     org.apache.cxf.ws.security.sts.provider.model.secext.ObjectFactory.class,
     org.apache.cxf.ws.security.sts.provider.model.utility.ObjectFactory.class, 
     org.apache.cxf.ws.security.sts.provider.model.xmldsig.ObjectFactory.class,
