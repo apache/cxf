@@ -59,6 +59,9 @@ import java.util.*;
    won't go through the blocked/recorded items again.  (Flushes occur
    automatically when DoMerges is finished running.)
 
+   [C]hanges will display the changes in the commit to help you decide the 
+   appropriate action to take.
+
 */
 
 public class DoMerges {
@@ -130,6 +133,29 @@ public class DoMerges {
             System.exit(1);
         }
     }   
+    public static void changes(String ver, String root) throws Exception {
+        Process p;
+        BufferedReader reader;
+        String line;
+
+        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "diff", "-c", ver, root}));
+        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        line = reader.readLine();
+        while (line != null) {
+            System.out.println(line);
+            line = reader.readLine();
+        }
+        if (p.waitFor() != 0) {
+            System.out.println("ERROR!");
+            reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            line = reader.readLine();
+            while (line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            System.exit(1);
+        }
+    }
 
     public static void flush(List<String> blocks, List<String> records) throws Exception {
         Process p;
@@ -258,9 +284,9 @@ public class DoMerges {
         List<String> blocks = new ArrayList<String>();
         List<String> records = new ArrayList<String>();
 
-        int count = 1;
-        for (String ver : verList) {
-            System.out.println("Merging: " + ver + " (" + (count++) + "/" + verList.size() + ")");
+        for (int cur = 0; cur < verList.size(); cur++) {
+            String ver = verList.get(cur);
+            System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
             p = Runtime.getRuntime().exec(new String[] {"svn", "log", "-r" , ver, root});
             reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             line = reader.readLine();
@@ -278,8 +304,9 @@ public class DoMerges {
                    && c != 'B'
                    && c != 'I'
                    && c != 'R'
-                   && c != 'F') {
-                System.out.print("[M]erge, [B]lock, or [I]gnore, [R]ecord only, [F]lush? ");
+                   && c != 'F'
+                   && c != 'C') {
+                System.out.print("[M]erge, [B]lock, or [I]gnore, [R]ecord only, [F]lush, [C]hanges? ");
                 int i = System.in.read();
                 c = Character.toUpperCase((char)i);
             }
@@ -314,6 +341,11 @@ public class DoMerges {
                 break;
             case 'F':
                 flush(blocks, records);
+                cur--;
+                break;
+            case 'C':
+                changes(ver, root);
+                cur--;
                 break;
             case 'I':
                 System.out.println("Ignoring");
