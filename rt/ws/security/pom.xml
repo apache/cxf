@@ -172,6 +172,11 @@
                                 <xsd>${basedir}/src/main/model/ws-trust-1.3.xsd</xsd>
                                 <bindingFile>${basedir}/src/main/model/binding.xjb</bindingFile>
                             </xsdOption>
+                            <xsdOption>
+                                <extension>true</extension>
+                                <xsd>${basedir}/src/main/model/ws-trust-1.4.xsd</xsd>
+                                <bindingFile>${basedir}/src/main/model/binding14.xjb</bindingFile>
+                            </xsdOption>
                         </xsdOptions>
                     </configuration>
                 </execution>
