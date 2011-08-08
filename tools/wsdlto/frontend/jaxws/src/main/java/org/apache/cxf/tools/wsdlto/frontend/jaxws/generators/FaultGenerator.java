@@ -113,8 +113,12 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                     }
                     setAttributes("paraName", ProcessorUtil.mangleNameToVariableName(jf.getName()));
                 }
-                
-                
+                ClassCollector collector = penv.get(ClassCollector.class);
+                for (String pkg : collector.getTypesPackages()) {
+                    if (collector.containTypesClass(pkg, "Exception")) {
+                        exceptionSuperclass = "java.lang.Exception";
+                    }
+                }
                 if (expClz.getName().equals(exceptionSuperclass)) {
                     exceptionSuperclass = "java.lang.Exception";
                 }
