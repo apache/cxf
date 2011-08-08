@@ -244,7 +244,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 Response excResponse;
                 if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), 
                         (String)exchange.getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
-                    excResponse = JAXRSUtils.createResponse(subCri, 200, true);
+                    excResponse = JAXRSUtils.createResponse(subCri, null, null, 200, true);
                 } else {
                     excResponse = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
                 }

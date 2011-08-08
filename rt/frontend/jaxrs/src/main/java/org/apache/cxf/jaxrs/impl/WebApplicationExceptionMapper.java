@@ -40,32 +40,23 @@ public class WebApplicationExceptionMapper
     private boolean printStackTrace;
     
     public Response toResponse(WebApplicationException ex) {
-        if (LOG.isLoggable(Level.WARNING)) {
-            String message = ex.getCause() == null ? ex.getMessage() : ex.getCause().getMessage();
-            if (message == null) {
-                if (ex.getCause() != null) {
-                    message = "cause is " + ex.getCause().getClass().getName();
-                } else {
-                    message = "no cause is available";
-                }
+        
+        String message = ex.getCause() == null ? ex.getMessage() : ex.getCause().getMessage();
+        if (message == null) {
+            if (ex.getCause() != null) {
+                message = "cause is " + ex.getCause().getClass().getName();
+            } else {
+                message = "no cause is available";
             }
-            org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("WEB_APP_EXCEPTION", BUNDLE, message);
+        }
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message("WEB_APP_EXCEPTION", BUNDLE, message);
+        if (LOG.isLoggable(Level.WARNING)) {
             LOG.warning(errorMsg.toString());
         }
         Response r = ex.getResponse(); 
         if (r == null) {
-            String message = null;
-            if (ex.getCause() == null) {
-                message = new org.apache.cxf.common.i18n.Message("DEFAULT_EXCEPTION_MESSAGE", 
-                                                                 BUNDLE).toString();
-            } else {
-                message = ex.getCause().getMessage();
-                if (message == null) {
-                    message = ex.getCause().getClass().getName();
-                }
-            }
-            r = Response.status(500).type(MediaType.TEXT_PLAIN).entity(message).build();
+            r = Response.status(500).type(MediaType.TEXT_PLAIN).entity(errorMsg.toString()).build();
         }
         
         if (printStackTrace) {
