@@ -398,6 +398,12 @@ public class STSClient implements Configurable, InterceptorProvider {
         this.setPolicyInternal(bus.getExtension(PolicyBuilder.class).getPolicy(newPolicy));
     }
 
+    public Client getClient()  throws BusException, EndpointException {
+        if (client == null) {
+            createClient();
+        }
+        return client;
+    }
 
     private void createClient() throws BusException, EndpointException {
         if (client != null) {
