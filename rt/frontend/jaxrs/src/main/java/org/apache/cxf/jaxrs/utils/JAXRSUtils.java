@@ -114,6 +114,7 @@ public final class JAXRSUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PROPAGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
+    private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
     
     private JAXRSUtils() {        
     }
@@ -407,7 +408,8 @@ public final class JAXRSUtils {
         if (!"OPTIONS".equalsIgnoreCase(httpMethod) && logNow) {
             LOG.warning(errorMsg.toString());
         }
-        Response response = createResponse(resource, status, methodMatched == 0);
+        Response response = 
+            createResponse(resource, message, errorMsg.toString(), status, methodMatched == 0);
         throw new WebApplicationException(response);
         
     }    
@@ -437,7 +439,8 @@ public final class JAXRSUtils {
         LOG.fine(errorMsg.toString());
     }
 
-    public static Response createResponse(ClassResourceInfo cri, int status, boolean addAllow) {
+    public static Response createResponse(ClassResourceInfo cri, Message msg,
+                                          String responseMessage, int status, boolean addAllow) {
         ResponseBuilder rb = Response.status(status);
         if (addAllow) {
             Set<String> allowedMethods = cri.getAllowedMethods();
@@ -451,6 +454,9 @@ public final class JAXRSUtils {
             if (!allowedMethods.contains("HEAD") && allowedMethods.contains("GET")) {
                 rb.header("Allow", "HEAD");
             }
+        }
+        if (msg != null && MessageUtils.isTrue(msg.getContextualProperty(REPORT_FAULT_MESSAGE_PROPERTY))) {
+            rb.type(MediaType.TEXT_PLAIN_TYPE).entity(responseMessage);
         }
         return rb.build();
     }

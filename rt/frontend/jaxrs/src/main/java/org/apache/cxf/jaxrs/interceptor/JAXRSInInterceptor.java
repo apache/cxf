@@ -146,8 +146,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                    message.get(Message.REQUEST_URI),
                                                    rawPath);
             LOG.warning(errorMsg.toString());
-
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            Response resp = JAXRSUtils.createResponse(resource, message, errorMsg.toString(), 
+                    Response.Status.NOT_FOUND.getStatusCode(), false);
+            throw new WebApplicationException(resp);
         }
 
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
@@ -207,7 +208,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 setExchangeProperties(message, ori, values, resources.size());
             } catch (WebApplicationException ex) {
                 if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), httpMethod)) {
-                    Response response = JAXRSUtils.createResponse(resource, 200, true);
+                    Response response = JAXRSUtils.createResponse(resource, null, null, 200, true);
                     message.getExchange().put(Response.class, response);
                     return;
                 } else {
