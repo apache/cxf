@@ -132,6 +132,10 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                 if (retry != null) {
                     try {
                         failover = true;
+                        long delay = getDelayBetweenRetries();
+                        if (delay > 0) {
+                            Thread.sleep(delay);
+                        }
                         retry.invoke(invocation.getBindingOperationInfo(),
                                      invocation.getParams(),
                                      invocation.getContext(),
@@ -187,6 +191,19 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         return LOG;
     }
 
+    /**
+     * Returns delay (in milliseconds) between retries
+     * @return delay, 0 means no delay
+     */
+    protected long getDelayBetweenRetries() {
+        FailoverStrategy strategy = getStrategy();
+        if (strategy instanceof AbstractStaticFailoverStrategy) {
+            return ((AbstractStaticFailoverStrategy)strategy).getDelayBetweenRetries();
+        }
+        //perhaps supporting FailoverTargetSelector specific property can make sense too
+        return 0;
+    }
+    
     /**
      * Check if the exchange is suitable for a failover.
      * 
