@@ -32,13 +32,46 @@ import org.apache.cxf.message.Exchange;
  */
 public class RetryStrategy extends SequentialStrategy {
 
+    private int maxNumberOfRetries;
+    private int counter;
+    
     /* (non-Javadoc)
      * @see org.apache.cxf.clustering.AbstractStaticFailoverStrategy#getAlternateEndpoints(
      * org.apache.cxf.message.Exchange)
      */
     @Override
     public List<Endpoint> getAlternateEndpoints(Exchange exchange) {
-        return getEndpoints(exchange, true);
+        return getEndpoints(exchange, stillTheSameAddress());
+    }
+
+    protected boolean stillTheSameAddress() {
+        if (maxNumberOfRetries == 0) {
+            return true;
+        }
+        // let the target selector move to the next address
+        // and then stay on the same address for maxNumberOfRetries
+        synchronized (this) {
+            if (++counter <= maxNumberOfRetries) {
+                return true;    
+            } else {
+                counter = 0;
+                return false;
+            }
+        }
+        
+    }
+    
+
+    public void setMaxNumberOfRetries(int maxNumberOfRetries) {
+        if (maxNumberOfRetries < 0) {
+            throw new IllegalArgumentException();
+        }
+        this.maxNumberOfRetries = maxNumberOfRetries;
+    }
+
+
+    public int getMaxNumberOfRetries() {
+        return maxNumberOfRetries;
     }
 
 }
