@@ -48,6 +48,7 @@ public class ServerImpl implements Server {
     private BindingFactory bindingFactory;
     private MessageObserver messageObserver;
     private ManagedEndpoint mep;
+    private boolean stopped;
 
     public ServerImpl(Bus bus, 
                       Endpoint endpoint, 
@@ -136,9 +137,18 @@ public class ServerImpl implements Server {
         if (slcMgr != null) {
             slcMgr.startServer(this);
         }
+        stopped = false;
+    }
+    
+    public boolean isStopped() {
+        return stopped;
     }
 
     public void stop() {
+        if (stopped) {
+            return;
+        }
+        
         LOG.fine("Server is stopping.");
         
         if (slcMgr != null) {
@@ -159,6 +169,7 @@ public class ServerImpl implements Server {
         }
         getDestination().shutdown();
         getDestination().setMessageObserver(null);
+        stopped = true;
     }
     
     public void destroy() {
