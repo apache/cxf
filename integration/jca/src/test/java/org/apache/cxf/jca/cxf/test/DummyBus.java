@@ -20,6 +20,7 @@ package org.apache.cxf.jca.cxf.test;
 
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -27,6 +28,7 @@ import java.util.ResourceBundle;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.service.model.AbstractPropertiesHolder;
 
@@ -133,6 +135,12 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
 
 
     public void setProperty(String s, Object o) {
+    }
+
+
+    public Collection<AbstractFeature> getFeatures() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

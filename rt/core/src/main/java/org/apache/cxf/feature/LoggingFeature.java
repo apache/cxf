@@ -49,6 +49,7 @@ public class LoggingFeature extends AbstractFeature {
     
     String inLocation;
     String outLocation;
+    boolean prettyLogging;
     
     int limit = DEFAULT_LIMIT;
 
@@ -68,15 +69,24 @@ public class LoggingFeature extends AbstractFeature {
         limit = lim;
     }
 
+    public LoggingFeature(String in, String out, int lim, boolean p) {
+        inLocation = in;
+        outLocation = out;
+        limit = lim;
+        prettyLogging = p;
+    }
+
     public LoggingFeature(Logging annotation) {
         inLocation = annotation.inLocation();
         outLocation = annotation.outLocation();
         limit = annotation.limit();
+        prettyLogging = annotation.pretty();
     }
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        if (limit == DEFAULT_LIMIT && inLocation == null && outLocation == null) {
+        if (limit == DEFAULT_LIMIT && inLocation == null 
+            && outLocation == null && !prettyLogging) {
             provider.getInInterceptors().add(IN);
             provider.getInFaultInterceptors().add(IN);
             provider.getOutInterceptors().add(OUT);
@@ -84,8 +94,10 @@ public class LoggingFeature extends AbstractFeature {
         } else {
             LoggingInInterceptor in = new LoggingInInterceptor(limit);
             in.setOutputLocation(inLocation);
+            in.setPrettyLogging(prettyLogging);
             LoggingOutInterceptor out = new LoggingOutInterceptor(limit);
             out.setOutputLocation(outLocation);
+            out.setPrettyLogging(prettyLogging);
             
             provider.getInInterceptors().add(in);
             provider.getInFaultInterceptors().add(in);
@@ -108,5 +120,19 @@ public class LoggingFeature extends AbstractFeature {
      */
     public int getLimit() {
         return limit;
+    }
+    
+    /**
+     * @return
+     */
+    public boolean isPrettyLogging() {
+        return prettyLogging;
+    }
+    /**
+     * Turn pretty logging of XML content on/off
+     * @param prettyLogging
+     */
+    public void setPrettyLogging(boolean prettyLogging) {
+        this.prettyLogging = prettyLogging;
     }    
 }
