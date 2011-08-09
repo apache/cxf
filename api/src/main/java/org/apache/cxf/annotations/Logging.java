@@ -44,5 +44,12 @@ public @interface Logging {
      */
     String inLocation() default "<logger>";
     String outLocation() default "<logger>";
+    
+    
+    /**
+     * For XML content, turn on pretty printing in the logs
+     * @return
+     */
+    boolean pretty() default false;
 }
 
