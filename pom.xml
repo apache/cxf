@@ -141,7 +141,7 @@
             <organization>Apache Software Foundation</organization>
             <organizationUrl>http://apache.org/</organizationUrl>
             <properties>
-                <picUrl>http://cxf.apache.org/docs/cxf.png</picUrl>
+                <picUrl>http://cxf.apache.org/images/cxf.png</picUrl>
             </properties>
         </developer>
     </developers>
