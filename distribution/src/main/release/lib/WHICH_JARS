@@ -77,6 +77,12 @@ For WS-Security support:
 - wss4j.jar
 - xmlsec.jar
 
+For SAML support in WS-Security
+- joda-time.jar 
+- opensaml.jar
+- openws.jar
+- xmltooling.jar
+
 For HTTP Binding support:
 - jra.jar
 - jettison.jar (Needed for JSON services only)
