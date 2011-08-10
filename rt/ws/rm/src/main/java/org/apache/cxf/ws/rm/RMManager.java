@@ -75,7 +75,7 @@ import org.apache.cxf.ws.rmp.v200502.RMAssertion.ExponentialBackoff;
 /**
  * 
  */
-public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListener {
+public class RMManager {
     
     /**
      * Message contextual property giving WS-ReliableMessaging namespace.
@@ -628,11 +628,25 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         }
         ServerLifeCycleManager slm = bus.getExtension(ServerLifeCycleManager.class);
         if (null != slm) {
-            slm.registerListener(this);
+            slm.registerListener(new ServerLifeCycleListener() {
+                public void startServer(Server server) {
+                    RMManager.this.startServer(server);
+                }
+                public void stopServer(Server server) {
+                    RMManager.this.stopServer(server);
+                }
+            });
         }
         ClientLifeCycleManager clm = bus.getExtension(ClientLifeCycleManager.class);
         if (null != clm) {
-            clm.registerListener(this);
+            clm.registerListener(new ClientLifeCycleListener() {
+                public void clientCreated(Client client) {
+                    RMManager.this.clientCreated(client);
+                }
+                public void clientDestroyed(Client client) {
+                    RMManager.this.clientDestroyed(client);
+                }
+            });
         }
     }
 
