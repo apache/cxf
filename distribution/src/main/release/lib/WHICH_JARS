@@ -37,7 +37,6 @@ For Java2WSDL and WSDL2Java:
 - The above jars
 - jaxb-xjc.jar
 - velocity.jar
-- oro.jar
 - commons-collections.jar
 - commons-lang.jar
 - cxf-xjc*.jar (optional, these are xjc extensions for providing enhanced
