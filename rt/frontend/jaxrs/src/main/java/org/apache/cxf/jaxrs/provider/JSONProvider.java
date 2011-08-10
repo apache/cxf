@@ -294,6 +294,15 @@ public class JSONProvider extends AbstractJAXBProvider  {
     public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
+        if (os == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Jettison needs initialized OutputStream");
+            if (getContext() != null && getContext().getContent(XMLStreamWriter.class) == null) {
+                sb.append("; if you need to customize Jettison output with the custom XMLStreamWriter"
+                          + " then extend JSONProvider or when possible configure it directly.");
+            }
+            throw new IOException(sb.toString());
+        }
         try {
             
             String encoding = HttpUtils.getSetEncoding(m, headers, "UTF-8");
