@@ -407,11 +407,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 if (!utWithCallbacks) {
                     WSS4JTokenConverter.convertToken(msg, p);
                 }
-                SecurityContext sc = msg.get(SecurityContext.class);
-                if (sc == null || sc.getUserPrincipal() == null) {
-                    msg.put(SecurityContext.class, createSecurityContext(p));
-                    break;
-                }
+                msg.put(SecurityContext.class, createSecurityContext(p));
             }            
         }
     }
