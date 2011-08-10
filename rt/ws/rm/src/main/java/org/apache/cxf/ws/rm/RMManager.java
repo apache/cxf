@@ -70,7 +70,7 @@ import org.apache.cxf.ws.rm.soap.SoapFaultFactory;
 /**
  * 
  */
-public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListener {
+public class RMManager {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMManager.class);
 
@@ -527,11 +527,25 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         }
         ServerLifeCycleManager slm = bus.getExtension(ServerLifeCycleManager.class);
         if (null != slm) {
-            slm.registerListener(this);
+            slm.registerListener(new ServerLifeCycleListener() {
+                public void startServer(Server server) {
+                    RMManager.this.startServer(server);
+                }
+                public void stopServer(Server server) {
+                    RMManager.this.stopServer(server);
+                }
+            });
         }
         ClientLifeCycleManager clm = bus.getExtension(ClientLifeCycleManager.class);
         if (null != clm) {
-            clm.registerListener(this);
+            clm.registerListener(new ClientLifeCycleListener() {
+                public void clientCreated(Client client) {
+                    RMManager.this.clientCreated(client);
+                }
+                public void clientDestroyed(Client client) {
+                    RMManager.this.clientDestroyed(client);
+                }
+            });
         }
     }
 

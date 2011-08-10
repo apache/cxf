@@ -19,41 +19,50 @@
 
 package org.apache.cxf.endpoint;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.extension.BusExtension;
 
 @NoJSR250Annotations
 public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusExtension {
     
-    private List<ClientLifeCycleListener> listeners = new ArrayList<ClientLifeCycleListener>(); 
+    private CopyOnWriteArrayList<ClientLifeCycleListener> listeners 
+        = new CopyOnWriteArrayList<ClientLifeCycleListener>(); 
 
+    public ClientLifeCycleManagerImpl() {
+        
+    }
+    
+    public ClientLifeCycleManagerImpl(Bus b) {
+        Collection<? extends ClientLifeCycleListener> l = b.getExtension(ConfiguredBeanLocator.class)
+                .getBeansOfType(ClientLifeCycleListener.class);
+        if (l != null) {
+            listeners.addAll(l);
+        }
+    }
+    
     public Class<?> getRegistrationType() {
         return ClientLifeCycleManager.class;
     }
 
     public void registerListener(ClientLifeCycleListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+        listeners.addIfAbsent(listener);
     }
 
     public void clientCreated(Client client) {
-        if (null != listeners) {
-            for (ClientLifeCycleListener listener : listeners) {
-                listener.clientCreated(client);
-            }
+        for (ClientLifeCycleListener listener : listeners) {
+            listener.clientCreated(client);
         }
     }
 
     public void clientDestroyed(Client client) {
-        if (null != listeners) {
-            for (ClientLifeCycleListener listener : listeners) {
-                listener.clientDestroyed(client);
-            }
-        } 
+        for (ClientLifeCycleListener listener : listeners) {
+            listener.clientDestroyed(client);
+        }
     }
 
     public void unRegisterListener(ClientLifeCycleListener listener) {
