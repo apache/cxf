@@ -122,7 +122,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         }
 
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-            if (getBus() == null) {
+            if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }
