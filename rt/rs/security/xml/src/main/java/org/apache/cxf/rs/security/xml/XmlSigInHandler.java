@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.xml;
+package org.apache.cxf.rs.security.xml;
 
 import java.io.InputStream;
 import java.security.PublicKey;

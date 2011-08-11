@@ -65,8 +65,8 @@ under the License.
     </httpj:engine-factory>
     
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
-    <bean id="xmlSigHandler" class="org.apache.cxf.systest.jaxrs.security.xml.XmlSigInHandler"/>
-    <bean id="xmlEncHandler" class="org.apache.cxf.systest.jaxrs.security.xml.XmlEncInHandler"/>
+    <bean id="xmlSigHandler" class="org.apache.cxf.rs.security.xml.XmlSigInHandler"/>
+    <bean id="xmlEncHandler" class="org.apache.cxf.rs.security.xml.XmlEncInHandler"/>
     
     <jaxrs:server 
        address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsig"> 
