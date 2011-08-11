@@ -28,32 +28,26 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import junit.framework.Assert;
 
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.RMConstants;
+
+
 
 public class MessageFlow extends Assert {
     
-    private final String addressingNamespace;
-    private final String rmNamespace;
     private List<byte[]> inStreams;
     private List<byte[]> outStreams;
     private List<Document> outboundMessages;
     private List<Document> inboundMessages;
       
-    public MessageFlow(List<byte[]> out, List<byte[]> in, String addrns, String rmns) throws Exception {
-        addressingNamespace = addrns;
-        rmNamespace = rmns;
+    public MessageFlow(List<byte[]> out, List<byte[]> in) throws Exception {
         inboundMessages = new ArrayList<Document>();
         outboundMessages = new ArrayList<Document>();
         reset(out, in);
-    }
-    
-    public MessageFlow(List<byte[]> out, List<byte[]> in) throws Exception {
-        this(out, in, Names.WSA_NAMESPACE_NAME, null);
     }
     
     public void clear() throws Exception {
@@ -86,17 +80,12 @@ public class MessageFlow extends Assert {
         }
     }
     
-    public Document getMessage(int i, boolean outbound) {
-        return outbound ? outboundMessages.get(i) : inboundMessages.get(i);
-    }
-    
     public void verifyActions(String[] expectedActions, boolean outbound) throws Exception {
 
         assertEquals(expectedActions.length, outbound ? outboundMessages.size() : inboundMessages.size());
 
         for (int i = 0; i < expectedActions.length; i++) {
-            Document doc = outbound ? outboundMessages.get(i) : inboundMessages.get(i);
-            String action = getAction(doc);
+            String action = outbound ? getAction(outboundMessages.get(i)) : getAction(inboundMessages.get(i));
             if (null == expectedActions[i]) {
                 assertNull((outbound ? "Outbound " : "Inbound") + " message " + i
                            + " has unexpected action: " + action, action);
@@ -195,8 +184,8 @@ public class MessageFlow extends Assert {
 
         if (exact) {
             for (int i = 0; i < expectedMessageNumbers.length; i++) {
-                Document doc = outbound ? outboundMessages.get(i) : inboundMessages.get(i);
-                Element e = getSequence(doc);
+                Element e = outbound ? getSequence(outboundMessages.get(i))
+                    : getSequence(inboundMessages.get(i));
                 if (null == expectedMessageNumbers[i]) {
                     assertNull((outbound ? "Outbound" : "Inbound") + " message " + i
                         + " contains unexpected message number ", e);
@@ -321,7 +310,7 @@ public class MessageFlow extends Assert {
     
     public void verifySequenceFault(QName code, boolean outbound, int index) throws Exception {
         Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
-        assert null != getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME);
+        assert null != getRMHeaderElement(d, RMConstants.getSequenceFaultName());
     }
     
     public void verifyHeader(QName name, boolean outbound, int index) throws Exception {
@@ -339,7 +328,7 @@ public class MessageFlow extends Assert {
     }
    
     protected String getAction(Document document) throws Exception {
-        Element e = getHeaderElement(document, addressingNamespace, "Action");
+        Element e = getHeaderElement(document, RMConstants.getAddressingNamespace(), "Action");
         if (null != e) {
             return getText(e);
         }
@@ -347,7 +336,7 @@ public class MessageFlow extends Assert {
     }
 
     protected Element getSequence(Document document) throws Exception {
-        return getRMHeaderElement(document, RMConstants.SEQUENCE_NAME);
+        return getRMHeaderElement(document, RMConstants.getSequenceName());
     }
 
     public String getMessageNumber(Element elem) throws Exception {
@@ -369,15 +358,15 @@ public class MessageFlow extends Assert {
     }
 
     protected Element getAcknowledgment(Document document) throws Exception {
-        return getRMHeaderElement(document, RMConstants.SEQUENCE_ACK_NAME);
+        return getRMHeaderElement(document, RMConstants.getSequenceAckName());
     }
     
     private Element getAckRequested(Document document) throws Exception {
-        return getRMHeaderElement(document, RMConstants.ACK_REQUESTED_NAME);
+        return getRMHeaderElement(document, RMConstants.getAckRequestedName());
     }
 
     private Element getRMHeaderElement(Document document, String name) throws Exception {
-        return getHeaderElement(document, rmNamespace, name);
+        return getHeaderElement(document, RMConstants.getNamespace(),  name);
     }
 
     private Element getHeaderElement(Document document, String namespace, String localName)
@@ -438,7 +427,7 @@ public class MessageFlow extends Assert {
         long currentUpper = 0;
         // get the final ack range
         for (Document doc : inboundMessages) {
-            Element e = getRMHeaderElement(doc, RMConstants.SEQUENCE_ACK_NAME);
+            Element e = getRMHeaderElement(doc, RMConstants.getSequenceAckName());
             // let the newer messages take precedence over the older messages in getting the final range
             if (null != e) {
                 e = getNamedElement(e, "AcknowledgementRange");
@@ -456,12 +445,35 @@ public class MessageFlow extends Assert {
     
 
     // note that this method picks the first match and returns
-    public static Element getNamedElement(Element element, String lcname) throws Exception {
+    private Element getNamedElement(Element element, String lcname) throws Exception {
         for (Node nd = element.getFirstChild(); nd != null; nd = nd.getNextSibling()) { 
             if (Node.ELEMENT_NODE == nd.getNodeType() && lcname.equals(nd.getLocalName())) {
                 return (Element)nd;
             }
         } 
+        return null;
+    }
+
+    public void verifyCreateSequenceAction(int index, String expiration, boolean outbound) throws Exception {
+        Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
+
+        String expires = getCreateSequenceExpires(d);
+
+        assertEquals("Unexpected expires-value", expiration, expires);
+    }
+    
+    private String getCreateSequenceExpires(Document document) throws Exception {
+        Element envelopeElement = document.getDocumentElement();
+        QName qname = RMConstants.getCreateSequenceOperationName(); 
+        NodeList nodes = 
+            envelopeElement.getElementsByTagNameNS(qname.getNamespaceURI(), qname.getLocalPart());
+        
+        if (nodes.getLength() == 1) {
+            Element element = getNamedElement((Element)nodes.item(0), "Expires");
+            if (element != null) {
+                return getText(element);
+            }
+        }
         return null;
     }
     
@@ -540,7 +552,7 @@ public class MessageFlow extends Assert {
         return buf.toString();
     }
     
-    public static String getText(Node node) {
+    private String getText(Node node) {
         for (Node nd = node.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.TEXT_NODE == nd.getNodeType()) {
                 return nd.getNodeValue();

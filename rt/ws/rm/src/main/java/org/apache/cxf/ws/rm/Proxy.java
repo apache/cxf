@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,15 +43,10 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AttributedURIType;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.RelatesToType;
+import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
-import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
-import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
-import org.apache.cxf.ws.rm.v200702.Expires;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.OfferType;
-import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
+
 
 /**
  * 
@@ -73,34 +69,29 @@ public class Proxy {
     }
 
     void acknowledge(DestinationSequence ds) throws RMException {        
-        String address = ds.getAcksTo().getAddress().getValue();
-        if (RMUtils.getAddressingConstants().getAnonymousURI().equals(address)) {
+        if (RMConstants.getAnonymousAddress().equals(ds.getAcksTo().getAddress().getValue())) {
             LOG.log(Level.WARNING, "STANDALONE_ANON_ACKS_NOT_SUPPORTED");
             return;
         }
         
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getSequenceAckOperationName());
+            .getOperation(RMConstants.getSequenceAckOperationName());
         invoke(oi, new Object[] {ds}, null);
     }
     
     void terminate(SourceSequence ss) throws RMException {
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getTerminateSequenceOperationName());
+            .getOperation(RMConstants.getTerminateSequenceOperationName());
         
-        TerminateSequenceType ts = new TerminateSequenceType();
+        TerminateSequenceType ts = RMUtils.getWSRMFactory().createTerminateSequenceType();
         ts.setIdentifier(ss.getIdentifier());
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
-        invoke(oi, new Object[] {codec.convertToSend(ts)}, null);
+        invoke(oi, new Object[] {ts}, null);
     }
     
-    void createSequenceResponse(final Object createResponse) throws RMException {
+    void createSequenceResponse(final CreateSequenceResponseType createResponse) throws RMException {
         LOG.fine("sending CreateSequenceResponse from client side");
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         final OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getCreateSequenceResponseOnewayOperationName());
+            .getOperation(RMConstants.getCreateSequenceResponseOnewayOperationName());
         
         // TODO: need to set relatesTo
 
@@ -114,12 +105,12 @@ public class Proxy {
                         boolean isServer) throws RMException {
         
         SourcePolicyType sp = reliableEndpoint.getManager().getSourcePolicy();
-        CreateSequenceType create = new CreateSequenceType();        
+        final CreateSequenceType create = RMUtils.getWSRMFactory().createCreateSequenceType();        
 
         String address = sp.getAcksTo();
         EndpointReferenceType acksTo = null;
         if (null != address) {
-            acksTo = RMUtils.createReference(address);
+            acksTo = RMUtils.createReference2004(address);
         } else {
             acksTo = defaultAcksTo; 
         }
@@ -127,16 +118,16 @@ public class Proxy {
 
         Duration d = sp.getSequenceExpiration();
         if (null != d) {
-            Expires expires = new Expires();
+            Expires expires = RMUtils.getWSRMFactory().createExpires();
             expires.setValue(d);  
             create.setExpires(expires);
         }
         
         if (sp.isIncludeOffer()) {
-            OfferType offer = new OfferType();
+            OfferType offer = RMUtils.getWSRMFactory().createOfferType();
             d = sp.getOfferedSequenceExpiration();
             if (null != d) {
-                Expires expires = new Expires();
+                Expires expires = RMUtils.getWSRMFactory().createExpires();
                 expires.setValue(d);  
                 offer.setExpires(expires);
             }
@@ -147,13 +138,10 @@ public class Proxy {
         
         InterfaceInfo ii = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface();
         
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
-        RMConstants constants = codec.getConstants();
         final OperationInfo oi = isServer 
-            ? ii.getOperation(constants.getCreateSequenceOnewayOperationName())
-            : ii.getOperation(constants.getCreateSequenceOperationName());
-        final Object send = codec.convertToSend(create);
-            
+            ? ii.getOperation(RMConstants.getCreateSequenceOnewayOperationName())
+            : ii.getOperation(RMConstants.getCreateSequenceOperationName());
+        
         // tried using separate thread - did not help either
         
         if (isServer) {
@@ -161,7 +149,7 @@ public class Proxy {
             Runnable r = new Runnable() {
                 public void run() {
                     try {
-                        invoke(oi, new Object[] {send}, null);
+                        invoke(oi, new Object[] {create}, null);
                     } catch (RMException ex) {
                         // already logged
                     }
@@ -172,12 +160,11 @@ public class Proxy {
         }
         
         
-        Object resp = invoke(oi, new Object[] {send}, null);
-        return codec.convertReceivedCreateSequenceResponse(resp);
+        return (CreateSequenceResponseType)invoke(oi, new Object[] {create}, null);
     }
     
     void lastMessage(SourceSequence s) throws RMException {
-        EndpointReferenceType target = s.getTarget();
+        org.apache.cxf.ws.addressing.EndpointReferenceType target = s.getTarget();
         AttributedURIType uri = null;
         if (null != target) {
             uri = target.getAddress();
@@ -188,18 +175,17 @@ public class Proxy {
         }
         
         if (addr == null) {
-            LOG.log(Level.WARNING, "STANDALONE_CLOSE_SEQUENCE_NO_TARGET_MSG");
+            LOG.log(Level.WARNING, "STANDALONE_LAST_MESSAGE_NO_TARGET_MSG");
             return;
         }
         
         if (RMUtils.getAddressingConstants().getAnonymousURI().equals(addr)) {
-            LOG.log(Level.WARNING, "STANDALONE_CLOSE_SEQUENCE_ANON_TARGET_MSG");
+            LOG.log(Level.WARNING, "STANDALONE_LAST_MESSAGE_ANON_TARGET_MSG");
             return; 
         }
         
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getCloseSequenceOperationName());
+            .getOperation(RMConstants.getLastMessageOperationName());
         // pass reference to source sequence in invocation context
         Map<String, Object> context = new HashMap<String, Object>(
                 Collections.singletonMap(SourceSequence.class.getName(), 
@@ -209,7 +195,7 @@ public class Proxy {
     }
     
     void ackRequested(SourceSequence s) throws RMException {
-        EndpointReferenceType target = s.getTarget();
+        org.apache.cxf.ws.addressing.EndpointReferenceType target = s.getTarget();
         AttributedURIType uri = null;
         if (null != target) {
             uri = target.getAddress();
@@ -229,9 +215,8 @@ public class Proxy {
             return; 
         }
         
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getAckRequestedOperationName());
+            .getOperation(RMConstants.getAckRequestedOperationName());
         invoke(oi, new Object[] {}, null);
     }
         
@@ -259,16 +244,19 @@ public class Proxy {
         Conduit c = reliableEndpoint.getConduit();
         Client client = null;
         if (params.length > 0 && params[0] instanceof DestinationSequence) {
-            EndpointReferenceType acksTo = ((DestinationSequence)params[0]).getAcksTo();
+            EndpointReferenceType acksTo = 
+                ((DestinationSequence)params[0]).getAcksTo();
             String acksAddress = acksTo.getAddress().getValue();
-            AttributedURIType attrURIType =  new AttributedURIType();
+            org.apache.cxf.ws.addressing.AttributedURIType attrURIType = 
+                new org.apache.cxf.ws.addressing.AttributedURIType();
             attrURIType.setValue(acksAddress);
-            EndpointReferenceType acks =  new EndpointReferenceType();
+            org.apache.cxf.ws.addressing.EndpointReferenceType acks = 
+                new org.apache.cxf.ws.addressing.EndpointReferenceType();
             acks.setAddress(attrURIType);
             client = createClient(bus, endpoint, c, acks);
             params = new Object[] {};
         } else {
-            EndpointReferenceType replyTo = reliableEndpoint.getReplyTo();
+            org.apache.cxf.ws.addressing.EndpointReferenceType replyTo = reliableEndpoint.getReplyTo();
             client = createClient(bus, endpoint, c, replyTo);
         }
         
@@ -290,13 +278,13 @@ public class Proxy {
     }
     
     protected Client createClient(Bus bus, Endpoint endpoint, Conduit conduit,
-                                  final EndpointReferenceType address) {
+                                  final org.apache.cxf.ws.addressing.EndpointReferenceType address) {
         ConduitSelector cs = new DeferredConduitSelector(conduit) {
             @Override
             public synchronized Conduit selectConduit(Message message) {
                 Conduit conduit = null;
                 EndpointInfo endpointInfo = getEndpoint().getEndpointInfo();
-                EndpointReferenceType original = 
+                org.apache.cxf.ws.addressing.EndpointReferenceType original = 
                     endpointInfo.getTarget();
                 try {
                     if (null != address) {
@@ -330,4 +318,6 @@ public class Proxy {
     void setReliableEndpoint(RMEndpoint rme) {
         reliableEndpoint = rme;
     }
+    
+
 }

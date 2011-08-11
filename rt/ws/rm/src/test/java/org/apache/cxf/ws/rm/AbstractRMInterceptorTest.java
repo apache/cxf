@@ -34,7 +34,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,6 +45,7 @@ import org.junit.Test;
 public class AbstractRMInterceptorTest extends Assert {
 
     private IMocksControl control;
+    
 
     @Before
     public void setUp() {
@@ -112,7 +112,7 @@ public class AbstractRMInterceptorTest extends Assert {
         BindingFaultFactory bff = control.createMock(BindingFaultFactory.class);
         EasyMock.expect(mgr.getBindingFaultFactory(b)).andReturn(bff);
         Fault fault = control.createMock(Fault.class);
-        EasyMock.expect(bff.createFault(sf, message)).andReturn(fault);
+        EasyMock.expect(bff.createFault(sf)).andReturn(fault);
         EasyMock.expect(bff.toString(fault)).andReturn("f");
         control.replay();
         try {
@@ -152,7 +152,7 @@ public class AbstractRMInterceptorTest extends Assert {
         control.replay();
         interceptor.assertReliability(message);
         assertTrue(!ai.isAsserted());
-        aim.put(RM10Constants.RMASSERTION_QNAME, ais);
+        aim.put(RMConstants.getRMAssertionQName(), ais);
         interceptor.assertReliability(message);
         assertTrue(!ai.isAsserted());
         ais.add(ai);

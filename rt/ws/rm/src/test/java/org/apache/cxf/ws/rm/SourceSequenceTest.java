@@ -26,10 +26,6 @@ import javax.xml.datatype.Duration;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
-import org.apache.cxf.ws.rm.v200702.Expires;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.ObjectFactory;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
@@ -93,7 +89,7 @@ public class SourceSequenceTest extends Assert {
        
         SourceSequence seq = null;
         
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        seq = new SourceSequence(id);
         assertEquals(id, seq.getIdentifier());
         assertTrue(!seq.isLastMessage());
         assertTrue(!seq.isExpired());
@@ -105,7 +101,7 @@ public class SourceSequenceTest extends Assert {
         
         Date expiry = new Date(System.currentTimeMillis() + 3600 * 1000);
         
-        seq = new SourceSequence(id, expiry, null, ProtocolVariation.RM10WSA200408);
+        seq = new SourceSequence(id, expiry, null);
         assertEquals(id, seq.getIdentifier());
         assertTrue(!seq.isLastMessage());
         assertTrue(!seq.isExpired());
@@ -115,14 +111,14 @@ public class SourceSequenceTest extends Assert {
         assertTrue(!seq.allAcknowledged());
         assertFalse(seq.offeredBy(otherId));
         
-        seq = new SourceSequence(id, expiry, otherId, ProtocolVariation.RM10WSA200408);
+        seq = new SourceSequence(id, expiry, otherId);
         assertTrue(seq.offeredBy(otherId));
         assertFalse(seq.offeredBy(id));
     }
     
     @Test
     public void testSetExpires() {
-        SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        SourceSequence seq = new SourceSequence(id);
         
         Expires expires = factory.createExpires();
         seq.setExpires(expires);
@@ -151,15 +147,15 @@ public class SourceSequenceTest extends Assert {
 
     @Test
     public void testEqualsAndHashCode() {
-        SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        SourceSequence seq = new SourceSequence(id);
         SourceSequence otherSeq = null;
         assertTrue(!seq.equals(otherSeq));
-        otherSeq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        otherSeq = new SourceSequence(id);
         assertEquals(seq, otherSeq);
         assertEquals(seq.hashCode(), otherSeq.hashCode());
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
-        otherSeq = new SourceSequence(otherId, ProtocolVariation.RM10WSA200408);
+        otherSeq = new SourceSequence(otherId);
         assertTrue(!seq.equals(otherSeq));
         assertTrue(seq.hashCode() != otherSeq.hashCode()); 
         assertTrue(!seq.equals(this));
@@ -167,7 +163,7 @@ public class SourceSequenceTest extends Assert {
     
     @Test
     public void testSetAcknowledged() throws RMException {
-        SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        SourceSequence seq = new SourceSequence(id);
         setUpSource();
         seq.setSource(source);
         
@@ -199,10 +195,9 @@ public class SourceSequenceTest extends Assert {
     } 
 
     @Test
-    public void testAllAcknowledged() throws RMException {
+    public void testAllAcknowledged() throws SequenceFault, RMException {
         
-        SourceSequence seq = new SourceSequence(id, null, null, 4, false,
-                                                ProtocolVariation.RM10WSA200408);        
+        SourceSequence seq = new SourceSequence(id, null, null, 4, false);        
         setUpSource();
         seq.setSource(source);
         
@@ -236,14 +231,14 @@ public class SourceSequenceTest extends Assert {
         
         // default termination policy
 
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);  
+        seq = new SourceSequence(id);  
         seq.setSource(source);
         assertTrue(!nextMessages(seq, 10));
         control.verify();
         
         // termination policy max length = 1
         
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+        seq = new SourceSequence(id); 
         seq.setSource(source);
         stp.setMaxLength(1);
         assertTrue(nextMessages(seq, 10));
@@ -251,7 +246,7 @@ public class SourceSequenceTest extends Assert {
         control.verify();
         
         // termination policy max length = 5
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+        seq = new SourceSequence(id); 
         seq.setSource(source);
         stp.setMaxLength(5);
         assertTrue(!nextMessages(seq, 2));
@@ -259,10 +254,10 @@ public class SourceSequenceTest extends Assert {
         
         // termination policy max range exceeded
         
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+        seq = new SourceSequence(id); 
         seq.setSource(source);
         stp.setMaxLength(0);
-        stp.setMaxRanges(3);
+        stp.setMaxRanges(new Integer(3));
         acknowledge(seq, 1, 2, 4, 5, 6, 8, 9, 10);
         assertTrue(nextMessages(seq, 10));
         assertEquals(1, seq.getCurrentMessageNr());
@@ -270,10 +265,10 @@ public class SourceSequenceTest extends Assert {
         
         // termination policy max range not exceeded
         
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+        seq = new SourceSequence(id); 
         seq.setSource(source);
         stp.setMaxLength(0);
-        stp.setMaxRanges(4);
+        stp.setMaxRanges(new Integer(4));
         acknowledge(seq, 1, 2, 4, 5, 6, 8, 9, 10);
         assertTrue(!nextMessages(seq, 10));
         control.verify();
@@ -288,7 +283,7 @@ public class SourceSequenceTest extends Assert {
         EasyMock.expect(source.getName()).andReturn(name);
         control.replay();
         
-        SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        SourceSequence seq = new SourceSequence(id);
         seq.setSource(source);
         assertEquals("Unexpected endpoint identifier", name, seq.getEndpointIdentifier());
         control.verify();
@@ -312,7 +307,7 @@ public class SourceSequenceTest extends Assert {
         
         control.replay();
         
-        seq = new SourceSequence(id, null, did, ProtocolVariation.RM10WSA200408);  
+        seq = new SourceSequence(id, null, did);  
         seq.setSource(source);        
         seq.nextMessageNumber(did, 1, false);
         assertTrue(seq.isLastMessage());

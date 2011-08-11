@@ -19,10 +19,10 @@
 
 package org.apache.cxf.ws.rm.soap;
 
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -31,10 +31,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -42,10 +47,13 @@ import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.headers.Header;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
@@ -62,22 +70,21 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
+//import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.rm.AbstractRMInterceptor;
-import org.apache.cxf.ws.rm.EncoderDecoder;
-import org.apache.cxf.ws.rm.ProtocolVariation;
-import org.apache.cxf.ws.rm.RM10Constants;
-import org.apache.cxf.ws.rm.RM11Constants;
+import org.apache.cxf.ws.rm.AckRequestedType;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMEndpoint;
-import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.SequenceFault;
-import org.apache.cxf.ws.rm.v200702.AckRequestedType;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.SequenceFaultType;
+import org.apache.cxf.ws.rm.SequenceType;
+
 
 /**
  * Protocol Handler responsible for {en|de}coding the RM 
@@ -86,16 +93,10 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 public class RMSoapInterceptor extends AbstractSoapInterceptor {
 
     protected static JAXBContext jaxbContext;
-    
-    private static final Set<QName> HEADERS;
-    static {
-        Set<QName> set = new HashSet<QName>();
-        set.addAll(RM10Constants.HEADERS);
-        set.addAll(RM11Constants.HEADERS);
-        HEADERS = set;
-    }
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMSoapInterceptor.class);
+    private static final String WS_RM_PACKAGE = 
+        PackageUtils.getPackageName(SequenceType.class);
     
     /**
      * Constructor.
@@ -112,7 +113,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      * @return the set of SOAP headers understood by this handler 
      */
     public Set<QName> getUnderstoodHeaders() {
-        return HEADERS;
+        return RMConstants.getHeaders();
     }
     
     // Interceptor interface
@@ -120,15 +121,18 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
     /* (non-Javadoc)
      * @see org.apache.cxf.interceptor.Interceptor#handleMessage(org.apache.cxf.message.Message)
      */
+
     public void handleMessage(SoapMessage message) throws Fault {
         mediate(message);
     }
+
 
     /**
      * Mediate message flow, peforming RMProperties {en|de}coding.
      * 
      * @param message the messsage
      */ 
+
     void mediate(SoapMessage message) {
         if (MessageUtils.isOutbound(message)) {
             encode(message);
@@ -143,6 +147,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      *
      * @param message the SOAP message
      */
+    
     void encode(SoapMessage message) {
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
         if (null != rmps) {
@@ -169,56 +174,114 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         LOG.log(Level.FINE, "encoding RMPs in SOAP headers");
         
         try {
+            List<Header> header = message.getHeaders();
+            discardRMHeaders(header);
             
-            List<Header> headers = message.getHeaders();
-            discardRMHeaders(headers);
+            Document doc = DOMUtils.createDocument();
+            SoapVersion version = Soap11.getInstance();
+            Element hdr = doc.createElementNS(version.getHeader().getNamespaceURI(), 
+                    version.getHeader().getLocalPart());
+            // add WSRM namespace declaration to header, instead of
+            // repeating in each individual child node
             
-            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
-            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
-                maps.getNamespaceURI());
-            Element header = protocol.getCodec().buildHeaders(rmps, Soap11.getInstance().getHeader());
-            Node node = header.getFirstChild();
+            Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
+                                   "xmlns:" + RMConstants.getNamespacePrefix());
+            attr.setValue(RMConstants.getNamespace());
+            hdr.setAttributeNodeNS(attr);
+
+            Marshaller marshaller = getJAXBContext().createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+           
+            SequenceType seq = rmps.getSequence();
+            if (null != seq) {
+                encodeProperty(seq, 
+                               RMConstants.getSequenceQName(), 
+                               SequenceType.class, 
+                               hdr,
+                               marshaller);
+            } 
+            Collection<SequenceAcknowledgement> acks = rmps.getAcks();
+            if (null != acks) {
+                for (SequenceAcknowledgement ack : acks) {
+                    encodeProperty(ack, 
+                                   RMConstants.getSequenceAckQName(), 
+                                   SequenceAcknowledgement.class, 
+                                   hdr,
+                                   marshaller);
+                }
+            }
+            Collection<AckRequestedType> requested = rmps.getAcksRequested();
+            if (null != requested) {
+                for (AckRequestedType ar : requested) {
+                    encodeProperty(ar, 
+                                   RMConstants.getAckRequestedQName(), 
+                                   AckRequestedType.class, 
+                                   hdr,
+                                   marshaller);
+                }
+            }
+            Node node = hdr.getFirstChild();
             if (node != null && MessageUtils.isPartialResponse(message)) {
                 // make sure the response is returned as HTTP 200 and not 202
                 message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
             }
             while (node != null) {
                 Header holder = new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node);
-                headers.add(holder);
+                header.add(holder);
                 node = node.getNextSibling();
             }
 
+        } catch (SOAPException se) {
+            LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", se); 
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
         }        
     }
     
     /**
-     * Encode the SequenceFault in protocol-specific header.
+     * Encode the SeuqnceFault in protocol-specific header.
      *
      * @param message the SOAP message.
      * @param sf the SequenceFault.
      */
     public static void encodeFault(SoapMessage message, SequenceFault sf) {
+        if (null == sf.getSequenceFault()) {
+            return;
+        }
         LOG.log(Level.FINE, "Encoding SequenceFault in SOAP header");
         try {
-            List<Header> headers = message.getHeaders();
-            discardRMHeaders(headers);
-            Message inmsg = message.getExchange().getInMessage();
-            RMProperties rmps = RMContextUtils.retrieveRMProperties(inmsg, false);
-            AddressingProperties maps = RMContextUtils.retrieveMAPs(inmsg, false, false);
-            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
-                maps.getNamespaceURI());
-            Element header = protocol.getCodec().buildHeaderFault(sf, Soap11.getInstance().getHeader());
-            Node node = header.getFirstChild();
+            List<Header> header = message.getHeaders();
+            discardRMHeaders(header);
+            
+            Document doc = DOMUtils.createDocument();
+            SoapVersion version = message.getVersion();
+            Element hdr = doc.createElementNS(version.getHeader().getNamespaceURI(), 
+                    version.getHeader().getLocalPart());
+            // add WSRM namespace declaration to header, instead of
+            // repeating in each individual child node
+//            hdr.setAttributeNS("http://www.w3.org/2000/xmlns/",
+//                                  "xmlns:" + RMConstants.getNamespacePrefix(),
+//                                 RMConstants.getNamespace());
+            Marshaller marshaller = getJAXBContext().createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+
+            encodeProperty(sf.getSequenceFault(), 
+                           RMConstants.getSequenceFaultQName(), 
+                           SequenceFaultType.class, 
+                           hdr, 
+                           marshaller);
+            Node node = hdr.getFirstChild();
             if (node instanceof Element) {
-                Attr attr = header.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/",
-                    "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-                attr.setValue(rmps.getNamespaceURI());
+                
+                Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
+                                                  "xmlns:" + RMConstants.getNamespacePrefix());
+                attr.setValue(RMConstants.getNamespace());
                 ((Element)node).setAttributeNodeNS(attr);
             }
             
-            headers.add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
+            header.add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
+        } catch (SOAPException se) {
+            LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", se); 
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
         }        
@@ -244,74 +307,116 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      */
     public RMProperties unmarshalRMProperties(SoapMessage message) { 
         RMProperties rmps = new RMProperties();
-        List<Header> headers = message.getHeaders();
-        if (headers != null) {
-            decodeHeaders(message, headers, rmps);
-        } 
-        return rmps;
-    }
-
-    public void decodeHeaders(SoapMessage message, List<Header> headers, RMProperties rmps) {
+        
         try {
             Collection<SequenceAcknowledgement> acks = new ArrayList<SequenceAcknowledgement>();
             Collection<AckRequestedType> requested = new ArrayList<AckRequestedType>();           
             
-            String rmUri = null;
-            EncoderDecoder codec = null;
-            Iterator<Header> iter = headers.iterator();
-            while (iter.hasNext()) {
-                Object node = iter.next().getObject();
-                if (node instanceof Element) {
-                    Element elem = (Element) node;
-                    if (Node.ELEMENT_NODE != elem.getNodeType()) {
-                        continue;
-                    }
-                    String ns = elem.getNamespaceURI();
-                    if (rmUri == null && (RM10Constants.NAMESPACE_URI.equals(ns)
-                        || RM11Constants.NAMESPACE_URI.equals(ns))) {
-                        LOG.log(Level.FINE, "set RM namespace {0}", ns);
-                        rmUri = ns;
-                        rmps.exposeAs(rmUri);
-                    }
-                    if (rmUri != null && rmUri.equals(ns)) {
-                        if (codec == null) {
-                            String wsauri = null;
-                            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
-                            if (maps == null) {
-                                wsauri = getManager(message).getRMAddressingNamespace();
-                            } else {
-                                wsauri = maps.getNamespaceURI();
-                            }
-                            ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, wsauri);
-                            codec = protocol.getCodec();
-                            if (codec == null) {
-                                LOG.log(Level.WARNING, "NAMESPACE_ERROR_MSG", wsauri); 
-                                break;
-                            }
+            List<Header> header = message.getHeaders();
+ 
+            if (header != null) {
+                Unmarshaller unmarshaller = 
+                    getJAXBContext().createUnmarshaller();
+                Iterator<Header> iter = header.iterator();
+                while (iter.hasNext()) {
+                    Object node = iter.next().getObject();
+                    if (node instanceof Element) {
+                        Element elem = (Element) node;
+                        if (Node.ELEMENT_NODE != elem.getNodeType()) {
+                            continue;
                         }
+                        String headerURI = elem.getNamespaceURI();
                         String localName = elem.getLocalName();
-                        LOG.log(Level.FINE, "decoding RM header {0}", localName);
-                        if (RMConstants.SEQUENCE_NAME.equals(localName)) {
-                            rmps.setSequence(codec.decodeSequenceType(elem));
-                            rmps.setCloseSequence(codec.decodeSequenceTypeCloseSequence(elem));
-                        } else if (RMConstants.SEQUENCE_ACK_NAME.equals(localName)) {
-                            acks.add(codec.decodeSequenceAcknowledgement(elem));
-                        } else if (RMConstants.ACK_REQUESTED_NAME.equals(localName)) {
-                            requested.add(codec.decodeAckRequestedType(elem));
+                        if (RMConstants.getNamespace().equals(headerURI)) {
+                            LOG.log(Level.FINE, "decoding RM header {0}", localName);
+                            if (RMConstants.getSequenceName().equals(localName)) {
+                                SequenceType s = decodeProperty(SequenceType.class,
+                                        elem,
+                                                                unmarshaller);
+                                
+                                rmps.setSequence(s);
+                            } else if (RMConstants.getSequenceAckName().equals(localName)) {
+                                SequenceAcknowledgement ack = decodeProperty(SequenceAcknowledgement.class,
+                                        elem,
+                                                                unmarshaller);
+                                acks.add(ack);                            
+                            } else if (RMConstants.getAckRequestedName().equals(localName)) {
+                                AckRequestedType ar = decodeProperty(AckRequestedType.class,
+                                        elem,
+                                                                unmarshaller);
+                                requested.add(ar);
+                            }
                         }
                     }
                 }
-            }
-            if (acks.size() > 0) {
-                rmps.setAcks(acks);
-            }
-            if (requested.size() > 0) {
-                rmps.setAcksRequested(requested);
-            }
+                if (acks.size() > 0) {
+                    rmps.setAcks(acks);
+                }
+                if (requested.size() > 0) {
+                    rmps.setAcksRequested(requested);
+                }
+            } 
         } catch (JAXBException ex) {
             LOG.log(Level.WARNING, "SOAP_HEADER_DECODE_FAILURE_MSG", ex); 
         }
+        return rmps;
     }
+
+
+    /**
+     * @return a JAXBContext
+     */
+    private static synchronized JAXBContext getJAXBContext() throws JAXBException {
+        if (jaxbContext == null) {
+            jaxbContext =
+                JAXBContext.newInstance(
+                    WS_RM_PACKAGE,
+                    SequenceAcknowledgement.class.getClassLoader());
+        }
+        return jaxbContext;
+    }
+    
+    /**
+     * Encodes an RM property as a SOAP header.
+     *
+     * @param value the value to encode
+     * @param qname the QName for the header 
+     * @param clz the class
+     * @param header the SOAP header element
+     * @param marshaller the JAXB marshaller to use
+     */
+    private static <T> void encodeProperty(T value, 
+                                           QName qname, 
+                                           Class<T> clz, 
+                                           Element header,
+                                           Marshaller marshaller)
+        throws JAXBException {
+        if (value != null) {
+            LOG.log(Level.FINE, "encoding " + value + " into RM header {0}", qname);
+            marshaller.marshal(new JAXBElement<T>(qname, clz, value), header);
+        }
+    }
+    
+    /**
+     * Decodes an RM property from a SOAP header.
+     * 
+     * @param clz the class
+     * @param headerElement the SOAP header element
+     * @param marshaller the JAXB marshaller to use
+     * @return the decoded EndpointReference
+     */
+    public static <T> T decodeProperty(Class<T> clz,
+                                       Element headerElement,
+                                       Unmarshaller unmarshaller)
+        throws JAXBException {
+        if (null == unmarshaller) {
+            unmarshaller = getJAXBContext().createUnmarshaller();
+        }
+        JAXBElement<T> element =
+            unmarshaller.unmarshal(headerElement, clz);
+        return element.getValue();
+    }
+
 
     /**
      * Discard any pre-existing RM headers - this may occur if the runtime
@@ -319,17 +424,17 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      *
      * @param header the SOAP header element
      */
-    private static void discardRMHeaders(List<Header> header) {
+    private static void discardRMHeaders(List<Header> header) throws SOAPException {
+        
         Iterator<Header> iter = header.iterator();
         while (iter.hasNext()) {
             Header hdr = iter.next();
-            String uri = hdr.getName().getNamespaceURI();
-            if (RM10Constants.NAMESPACE_URI.equals(uri)
-                || RM11Constants.NAMESPACE_URI.equals(uri)) {
+            if (RMConstants.getNamespace().equals(hdr.getName().getNamespaceURI())) {
                 iter.remove();
             }
         }
     }
+    
     
     /**
      * When invoked inbound, check if the action indicates that this is one of the 
@@ -341,36 +446,28 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      * 
      * @param message the message
      */
-    private void updateServiceModelInfo(SoapMessage message) throws Fault {
+    private void updateServiceModelInfo(SoapMessage message) {
 
         AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
         AttributedURIType actionURI = null == maps ? null : maps.getAction();
         String action = null == actionURI ? null : actionURI.getValue().trim();
         
         LOG.fine("action: " + action);
-        RMConstants consts;
-        if (RM10Constants.ACTIONS.contains(action)) {
-            consts = RM10Constants.INSTANCE;
-        } else if (RM11Constants.ACTIONS.contains(action)) {
-            consts = RM11Constants.INSTANCE;
-        } else {
+   
+        if (!(RMConstants.getCreateSequenceAction().equals(action)
+            || RMConstants.getCreateSequenceResponseAction().equals(action)
+            || RMConstants.getTerminateSequenceAction().equals(action)
+            || RMConstants.getSequenceAckAction().equals(action)
+            || RMConstants.getLastMessageAction().equals(action))) {
             return;
         }
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        rmps.exposeAs(consts.getWSRMNamespace());
         
         LOG.info("Updating service model info in exchange");
         
         RMManager manager = getManager(message);
         assert manager != null;
         
-        RMEndpoint rme = null;
-        try {
-            rme = manager.getReliableEndpoint(message);
-        } catch (RMException e) {
-            throw new SoapFault(new org.apache.cxf.common.i18n.Message("CANNOT_PROCESS", LOG), e,
-                message.getVersion().getSender());
-        }
+        RMEndpoint rme = manager.getReliableEndpoint(message);
   
         Exchange exchange = message.getExchange();
         
@@ -385,26 +482,26 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         BindingInfo bi = rme.getEndpoint().getEndpointInfo().getBinding();
         BindingOperationInfo boi = null;
         boolean isOneway = true;
-        if (consts.getCreateSequenceAction().equals(action)) {
+        if (RMConstants.getCreateSequenceAction().equals(action)) {
             if (RMContextUtils.isServerSide(message)) {
-                boi = bi.getOperation(consts.getCreateSequenceOperationName());
+                boi = bi.getOperation(RMConstants.getCreateSequenceOperationName());
                 isOneway = false;
             } else {
-                boi = bi.getOperation(consts.getCreateSequenceOnewayOperationName());
+                boi = bi.getOperation(RMConstants.getCreateSequenceOnewayOperationName());
             }
-        } else if (consts.getCreateSequenceResponseAction().equals(action)) {
+        } else if (RMConstants.getCreateSequenceResponseAction().equals(action)) {
             if (RMContextUtils.isServerSide(message)) {
-                boi = bi.getOperation(consts.getCreateSequenceResponseOnewayOperationName());
+                boi = bi.getOperation(RMConstants.getCreateSequenceResponseOnewayOperationName());
             } else {
-                boi = bi.getOperation(consts.getCreateSequenceOperationName());
+                boi = bi.getOperation(RMConstants.getCreateSequenceOperationName());
                 isOneway = false;
             }
-        } else if (consts.getSequenceAckAction().equals(action)) {
-            boi = bi.getOperation(consts.getSequenceAckOperationName()); 
-        } else if (consts.getTerminateSequenceAction().equals(action)) {
-            boi = bi.getOperation(consts.getTerminateSequenceOperationName()); 
-        } else if (consts.getCloseSequenceAction().equals(action)) {
-            boi = bi.getOperation(consts.getCloseSequenceOperationName()); 
+        } else if (RMConstants.getSequenceAckAction().equals(action)) {
+            boi = bi.getOperation(RMConstants.getSequenceAckOperationName()); 
+        } else if (RMConstants.getTerminateSequenceAction().equals(action)) {
+            boi = bi.getOperation(RMConstants.getTerminateSequenceOperationName()); 
+        } else if (RMConstants.getLastMessageAction().equals(action)) {
+            boi = bi.getOperation(RMConstants.getLastMessageOperationName()); 
         }
         assert boi != null;
         exchange.put(BindingOperationInfo.class, boi);
@@ -418,7 +515,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         // server originated oneway RM protocol messages.        
         // 
         
-        if (!consts.getCreateSequenceResponseAction().equals(action)) {
+        if (!RMConstants.getCreateSequenceResponseAction().equals(action)) {
             LOG.fine("Changing requestor role from " + message.get(Message.REQUESTOR_ROLE)
                      + " to false");
             Object originalRequestorRole = message.get(Message.REQUESTOR_ROLE);
@@ -429,7 +526,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         }       
         
         // replace WrappedInInterceptor with BareInInterceptor if necessary
-        // as RM protocol messages use parameter style BARE
+        // as RM protocol messages use paremeter style BARE
 
         InterceptorChain chain = message.getInterceptorChain();
         ListIterator it = chain.getIterator();            
@@ -464,3 +561,10 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         return null;
     }
 }
+
+
+
+
+
+
+

@@ -54,7 +54,6 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
@@ -70,49 +69,41 @@ import org.apache.neethi.Policy;
 public class RMEndpoint {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMEndpoint.class);
-    
-    private static final String SERVICE_NAME = "SequenceAbstractService";
-    private static final String INTERFACE_NAME = "SequenceAbstractPortType";
-    private static final String BINDING_NAME = "SequenceAbstractSoapBinding";
 
-    private static final String CREATE_PART_NAME = "create";
-    private static final String CREATE_RESPONSE_PART_NAME = "createResponse";
-    private static final String TERMINATE_PART_NAME = "terminate";
+    private static final QName SERVICE_NAME = new QName(RMConstants.getWsdlNamespace(),
+                                                        "SequenceAbstractService");
+    private static final QName INTERFACE_NAME = new QName(RMConstants.getWsdlNamespace(),
+                                                          "SequenceAbstractPortType");
+    private static final QName BINDING_NAME = new QName(RMConstants.getWsdlNamespace(),
+                                                        "SequenceAbstractSoapBinding");
+
+    private static final QName CREATE_PART_NAME = new QName(RMConstants.getWsdlNamespace(), "create");
+    private static final QName CREATE_RESPONSE_PART_NAME = new QName(RMConstants.getWsdlNamespace(),
+                                                                     "createResponse");
+    private static final QName TERMINATE_PART_NAME = new QName(RMConstants.getWsdlNamespace(), "terminate");
     
     private static Schema rmSchema;
 
     private RMManager manager;
     private Endpoint applicationEndpoint;
     private Conduit conduit;
-    private ProtocolVariation protocol;
-    private EndpointReferenceType replyTo;
+    private org.apache.cxf.ws.addressing.EndpointReferenceType replyTo;
     private Source source;
     private Destination destination;
     private WrappedService service;
     private Endpoint endpoint;
     private Proxy proxy;
     private Servant servant;
-    private QName serviceQName;
-    private QName bindingQName;
-    private QName interfaceQName;
     private long lastApplicationMessage;
     private long lastControlMessage;
 
-    /**
-     * Constructor.
-     * 
-     * @param m
-     * @param ae
-     * @param pv
-     */
-    public RMEndpoint(RMManager m, Endpoint ae, ProtocolVariation pv) {
+    public RMEndpoint(RMManager m, Endpoint ae) {
         manager = m;
         applicationEndpoint = ae;
         source = new Source(this);
         destination = new Destination(this);
         proxy = new Proxy(this);
         servant = new Servant(this);
-        protocol = pv;
     }
 
     /**
@@ -136,20 +127,6 @@ public class RMEndpoint {
         return endpoint;
     }
 
-    public ProtocolVariation getProtocol() {
-        return protocol;
-    }
-
-    /**
-     * Set the protocol used by this endpoint. This method is only intended for use in testing; all normal use
-     * uses the constructor to set the value.
-     * 
-     * @param protocol
-     */
-    public void setProtocol(ProtocolVariation protocol) {
-        this.protocol = protocol;
-    }
-
     /**
      * @return Returns the RM protocol service.
      */
@@ -161,7 +138,7 @@ public class RMEndpoint {
      * @return Returns the RM protocol binding info.
      */
     public BindingInfo getBindingInfo() {
-        return service.getServiceInfo().getBinding(bindingQName);
+        return service.getServiceInfo().getBinding(BINDING_NAME);
     }
 
     /**
@@ -248,12 +225,12 @@ public class RMEndpoint {
      * 
      * @return the replyTo address
      */
-    EndpointReferenceType getReplyTo() {
+    org.apache.cxf.ws.addressing.EndpointReferenceType getReplyTo() {
         return replyTo;
     }
 
     void initialise(Conduit c, 
-                    EndpointReferenceType r,
+                    org.apache.cxf.ws.addressing.EndpointReferenceType r,
                     org.apache.cxf.transport.Destination d) {
         conduit = c;
         replyTo = r;
@@ -265,18 +242,19 @@ public class RMEndpoint {
     void createService() {
         ServiceInfo si = new ServiceInfo();
         si.setProperty(Schema.class.getName(), getSchema());
-        serviceQName = new QName(protocol.getWSRMNamespace(), SERVICE_NAME);
-        si.setName(serviceQName);
+        
+        si.setName(SERVICE_NAME);
         
         buildInterfaceInfo(si);
 
-        service = new WrappedService(applicationEndpoint.getService(), serviceQName, si);
+        service = new WrappedService(applicationEndpoint.getService(), SERVICE_NAME, si);
 
         DataBinding dataBinding = null;
-        Class create = protocol.getCodec().getCreateSequenceType();
         try {
             JAXBContext ctx =
-                JAXBContext.newInstance(PackageUtils.getPackageName(create), create.getClassLoader());
+                JAXBContext.newInstance(
+                    PackageUtils.getPackageName(CreateSequenceType.class),
+                    CreateSequenceType.class.getClassLoader());
             dataBinding = new JAXBDataBinding(ctx);
         } catch (JAXBException e) {
             throw new ServiceConstructionException(e);
@@ -317,9 +295,9 @@ public class RMEndpoint {
         }
 
         ei.setAddress(aei.getAddress());
-        
-        ei.setName(RMUtils.getConstants(protocol.getWSRMNamespace()).getPortName());
-        ei.setBinding(si.getBinding(bindingQName));
+
+        ei.setName(RMConstants.getPortName());
+        ei.setBinding(si.getBinding(BINDING_NAME));
 
         // if addressing was enabled on the application endpoint by means
         // of the UsingAddressing element extensor, use this for the
@@ -374,8 +352,7 @@ public class RMEndpoint {
     }
 
     void buildInterfaceInfo(ServiceInfo si) {
-        interfaceQName = new QName(protocol.getWSRMNamespace(), INTERFACE_NAME);
-        InterfaceInfo ii = new InterfaceInfo(si, interfaceQName);
+        InterfaceInfo ii = new InterfaceInfo(si, INTERFACE_NAME);
         buildOperationInfo(ii);
     }
 
@@ -383,7 +360,7 @@ public class RMEndpoint {
         buildCreateSequenceOperationInfo(ii);
         buildTerminateSequenceOperationInfo(ii);
         buildSequenceAckOperationInfo(ii);
-        buildCloseSequenceOperationInfo(ii);
+        buildLastMessageOperationInfo(ii);
         buildAckRequestedOperationInfo(ii);
 
         // TODO: FaultInfo (SequenceFault)
@@ -394,42 +371,42 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessagePartInfo partInfo = null;
         MessageInfo messageInfo = null;
-        RMConstants consts = protocol.getConstants();
-        operationInfo = ii.addOperation(consts.getCreateSequenceOperationName());
-        messageInfo = operationInfo.createMessage(consts.getCreateSequenceOperationName(),
+
+        operationInfo = ii.addOperation(RMConstants.getCreateSequenceOperationName());
+        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_PART_NAME);
-        partInfo.setElementQName(consts.getCreateSequenceOperationName());
+        partInfo.setElementQName(RMConstants.getCreateSequenceOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceType());
+        partInfo.setTypeClass(CreateSequenceType.class);
 
-        messageInfo = operationInfo.createMessage(consts.getCreateSequenceResponseOperationName(),
+        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceResponseOperationName(),
                                                   MessageInfo.Type.OUTPUT);
         operationInfo.setOutput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_RESPONSE_PART_NAME);
-        partInfo.setElementQName(consts.getCreateSequenceResponseOperationName());
+        partInfo.setElementQName(RMConstants.getCreateSequenceResponseOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceResponseType());
+        partInfo.setTypeClass(CreateSequenceResponseType.class);
         partInfo.setIndex(0);
 
-        operationInfo = ii.addOperation(consts.getCreateSequenceOnewayOperationName());
-        messageInfo = operationInfo.createMessage(consts.getCreateSequenceOnewayOperationName(),
+        operationInfo = ii.addOperation(RMConstants.getCreateSequenceOnewayOperationName());
+        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_PART_NAME);
-        partInfo.setElementQName(consts.getCreateSequenceOnewayOperationName());
+        partInfo.setElementQName(RMConstants.getCreateSequenceOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceType());
+        partInfo.setTypeClass(CreateSequenceType.class);
 
-        operationInfo = ii.addOperation(consts.getCreateSequenceResponseOnewayOperationName());
-        messageInfo = operationInfo.createMessage(consts.getCreateSequenceResponseOnewayOperationName(),
+        operationInfo = ii.addOperation(RMConstants.getCreateSequenceResponseOnewayOperationName());
+        messageInfo = operationInfo.createMessage(RMConstants.getCreateSequenceResponseOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(CREATE_RESPONSE_PART_NAME);
-        partInfo.setElementQName(consts.getCreateSequenceResponseOnewayOperationName());
+        partInfo.setElementQName(RMConstants.getCreateSequenceResponseOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(protocol.getCodec().getCreateSequenceResponseType());
+        partInfo.setTypeClass(CreateSequenceResponseType.class);
     }
 
     void buildTerminateSequenceOperationInfo(InterfaceInfo ii) {
@@ -438,15 +415,14 @@ public class RMEndpoint {
         MessagePartInfo partInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = protocol.getConstants();
-        operationInfo = ii.addOperation(consts.getTerminateSequenceOperationName());
-        messageInfo = operationInfo.createMessage(consts.getTerminateSequenceOperationName(),
+        operationInfo = ii.addOperation(RMConstants.getTerminateSequenceOperationName());
+        messageInfo = operationInfo.createMessage(RMConstants.getTerminateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
         partInfo = messageInfo.addMessagePart(TERMINATE_PART_NAME);
-        partInfo.setElementQName(consts.getTerminateSequenceOperationName());
+        partInfo.setElementQName(RMConstants.getTerminateSequenceOperationName());
         partInfo.setElement(true);
-        partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceType());
+        partInfo.setTypeClass(TerminateSequenceType.class);
     }
 
     void buildSequenceAckOperationInfo(InterfaceInfo ii) {
@@ -454,21 +430,19 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = protocol.getConstants();
-        operationInfo = ii.addOperation(consts.getSequenceAckOperationName());
-        messageInfo = operationInfo.createMessage(consts.getSequenceAckOperationName(),
+        operationInfo = ii.addOperation(RMConstants.getSequenceAckOperationName());
+        messageInfo = operationInfo.createMessage(RMConstants.getSequenceAckOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
 
-    void buildCloseSequenceOperationInfo(InterfaceInfo ii) {
+    void buildLastMessageOperationInfo(InterfaceInfo ii) {
 
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = protocol.getConstants();
-        operationInfo = ii.addOperation(consts.getCloseSequenceOperationName());
-        messageInfo = operationInfo.createMessage(consts.getCloseSequenceOperationName(),
+        operationInfo = ii.addOperation(RMConstants.getLastMessageOperationName());
+        messageInfo = operationInfo.createMessage(RMConstants.getLastMessageOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
@@ -478,9 +452,8 @@ public class RMEndpoint {
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
 
-        RMConstants consts = protocol.getConstants();
-        operationInfo = ii.addOperation(consts.getAckRequestedOperationName());
-        messageInfo = operationInfo.createMessage(consts.getAckRequestedOperationName(),
+        operationInfo = ii.addOperation(RMConstants.getAckRequestedOperationName());
+        messageInfo = operationInfo.createMessage(RMConstants.getAckRequestedOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
@@ -495,43 +468,41 @@ public class RMEndpoint {
             SoapVersion sv = sbi.getSoapVersion();
             String bindingId = sbi.getBindingId();
             SoapBindingInfo bi = new SoapBindingInfo(si, bindingId, sv);
-            bindingQName = new QName(protocol.getWSRMNamespace(), BINDING_NAME);
-            bi.setName(bindingQName);
+            bi.setName(BINDING_NAME);
             BindingOperationInfo boi = null;
 
-            RMConstants consts = protocol.getConstants();
-            
-            boi = bi.buildOperation(consts.getCreateSequenceOperationName(),
-                                    consts.getCreateSequenceOperationName().getLocalPart(), null);
-            addAction(boi, consts.getCreateSequenceAction(), consts.getCreateSequenceResponseAction());
+            boi = bi.buildOperation(RMConstants.getCreateSequenceOperationName(), RMConstants
+                .getCreateSequenceOperationName().getLocalPart(), null);
+            addAction(boi,
+                      RMConstants.getCreateSequenceAction(),
+                      RMConstants.getCreateSequenceResponseAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(consts.getTerminateSequenceOperationName(),
-                                    consts.getTerminateSequenceOperationName().getLocalPart(), null);
-            addAction(boi, consts.getTerminateSequenceAction());
+            boi = bi.buildOperation(RMConstants.getTerminateSequenceOperationName(), RMConstants
+                .getTerminateSequenceOperationName().getLocalPart(), null);
+            addAction(boi, RMConstants.getTerminateSequenceAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(consts.getSequenceAckOperationName(), null, null);
-            addAction(boi, consts.getSequenceAckAction());
+            boi = bi.buildOperation(RMConstants.getSequenceAckOperationName(), null, null);
+            addAction(boi, RMConstants.getSequenceAckAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(consts.getCloseSequenceOperationName(), null, null);
-            addAction(boi, consts.getCloseSequenceAction());
+            boi = bi.buildOperation(RMConstants.getLastMessageOperationName(), null, null);
+            addAction(boi, RMConstants.getLastMessageAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(consts.getAckRequestedOperationName(), null, null);
-            addAction(boi, consts.getAckRequestedAction());
+            boi = bi.buildOperation(RMConstants.getAckRequestedOperationName(), null, null);
+            addAction(boi, RMConstants.getAckRequestedAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(consts.getCreateSequenceOnewayOperationName(),
-                                    consts.getCreateSequenceOnewayOperationName().getLocalPart(), null);
-            addAction(boi, consts.getCreateSequenceAction());
+            boi = bi.buildOperation(RMConstants.getCreateSequenceOnewayOperationName(), RMConstants
+                .getCreateSequenceOperationName().getLocalPart(), null);
+            addAction(boi, RMConstants.getCreateSequenceAction());
             bi.addOperation(boi);
 
-            boi = bi.buildOperation(consts.getCreateSequenceResponseOnewayOperationName(),
-                                    consts.getCreateSequenceResponseOnewayOperationName().getLocalPart(),
-                                    null);
-            addAction(boi, consts.getCreateSequenceResponseAction());
+            boi = bi.buildOperation(RMConstants.getCreateSequenceResponseOnewayOperationName(), RMConstants
+                .getCreateSequenceResponseOperationName().getLocalPart(), null);
+            addAction(boi, RMConstants.getCreateSequenceResponseAction());
             bi.addOperation(boi);
 
             si.addBinding(bi);

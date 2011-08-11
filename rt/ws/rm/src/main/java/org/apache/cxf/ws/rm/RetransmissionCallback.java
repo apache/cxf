@@ -28,7 +28,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.v200702.Identifier;
 
 /**
  * 
@@ -57,24 +56,20 @@ public class RetransmissionCallback implements CachedOutputStreamCallback {
         
         RMStore store = manager.getStore();
         if (null != store) {
-            try {
-                Source s = manager.getSource(message);
-                RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
-                Identifier sid = rmps.getSequence().getIdentifier();
-                SourceSequence ss = s.getSequence(sid);
-                RMMessage msg = new RMMessage();
-                msg.setMessageNumber(rmps.getSequence().getMessageNumber());
-                if (!MessageUtils.isRequestor(message)) {
-                    AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
-                    if (null != maps && null != maps.getTo()) {
-                        msg.setTo(maps.getTo().getValue());
-                    }
+            Source s = manager.getSource(message);
+            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
+            Identifier sid = rmps.getSequence().getIdentifier();
+            SourceSequence ss = s.getSequence(sid);
+            RMMessage msg = new RMMessage();
+            msg.setMessageNumber(rmps.getSequence().getMessageNumber());
+            if (!MessageUtils.isRequestor(message)) {
+                AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
+                if (null != maps && null != maps.getTo()) {
+                    msg.setTo(maps.getTo().getValue());
                 }
-                msg.setContent(saved);
-                store.persistOutgoing(ss, msg);
-            } catch (RMException e) {
-                // ignore
-            } 
+            }
+            msg.setContent(saved);
+            store.persistOutgoing(ss, msg); 
         }
     }
 

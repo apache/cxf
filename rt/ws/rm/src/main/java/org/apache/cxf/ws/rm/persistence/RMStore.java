@@ -22,9 +22,8 @@ package org.apache.cxf.ws.rm.persistence;
 import java.util.Collection;
 
 import org.apache.cxf.ws.rm.DestinationSequence;
-import org.apache.cxf.ws.rm.ProtocolVariation;
+import org.apache.cxf.ws.rm.Identifier;
 import org.apache.cxf.ws.rm.SourceSequence;
-import org.apache.cxf.ws.rm.v200702.Identifier;
 
 public interface RMStore {
  
@@ -42,6 +41,20 @@ public interface RMStore {
      * @param seq the sequence
      */
     void createDestinationSequence(DestinationSequence seq);
+    
+    /**
+     * Retrieve the source sequence with the specified identifier from persistent store. 
+     * @param seq the sequence
+     * @return the sequence if present; otherwise null
+     */
+    SourceSequence getSourceSequence(Identifier seq);
+    
+    /**
+     * Retrieve the destination sequence with the specified identifier from persistent store. 
+     * @param seq the sequence
+     * @return the sequence if present; otherwise null
+     */
+    DestinationSequence getDestinationSequence(Identifier seq);
 
     /**
      * Remove the source sequence with the specified identifier from persistent store. 
@@ -62,8 +75,7 @@ public interface RMStore {
      * @param endpointIdentifier the identifier for the source
      * @return the collection of sequences
      */    
-    Collection<SourceSequence> getSourceSequences(String endpointIdentifier,
-        ProtocolVariation protocol);
+    Collection<SourceSequence> getSourceSequences(String endpointIdentifier);
     
     /**
      * Retrieves all sequences managed by the identified RM destination endpoint 
@@ -72,8 +84,7 @@ public interface RMStore {
      * @param endpointIdentifier the identifier for the destination
      * @return the collection of sequences
      */    
-    Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier,
-        ProtocolVariation protocol);
+    Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier);
     
     /**
      * Retrieves the outbound/inbound messages stored for the source/destination sequence with 

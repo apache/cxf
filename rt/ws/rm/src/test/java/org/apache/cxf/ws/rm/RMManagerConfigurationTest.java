@@ -26,8 +26,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -116,8 +114,7 @@ public class RMManagerConfigurationTest extends Assert {
             
         }
 
-        public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier,
-            ProtocolVariation protocol) {
+        public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -127,8 +124,7 @@ public class RMManagerConfigurationTest extends Assert {
             return null;
         }
 
-        public Collection<SourceSequence> getSourceSequences(String endpointIdentifier,
-            ProtocolVariation protocol) {
+        public Collection<SourceSequence> getSourceSequences(String endpointIdentifier) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -156,6 +152,16 @@ public class RMManagerConfigurationTest extends Assert {
         public void removeSourceSequence(Identifier seq) {
             // TODO Auto-generated method stub
             
+        }
+
+        public SourceSequence getSourceSequence(Identifier seq) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public DestinationSequence getDestinationSequence(Identifier seq) {
+            // TODO Auto-generated method stub
+            return null;
         }
         
     }

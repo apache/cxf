@@ -62,12 +62,6 @@ public class FormEncodingProvider implements
     private String attachmentDir;
     private String attachmentThreshold;
 
-    private boolean expectEncoded;
-    
-    public void setExpectedEncoded(boolean expect) {
-        this.expectEncoded = expect;
-    }
-    
     public void setAttachmentDirectory(String dir) {
         attachmentDir = dir;
     }
@@ -100,7 +94,8 @@ public class FormEncodingProvider implements
             }
             
             MultivaluedMap<String, String> params = createMap(clazz);
-            populateMap(params, is, mt, !keepEncoded(annotations));
+            populateMap(params, is, mt,
+                        AnnotationUtils.getAnnotation(annotations, Encoded.class) == null);
             validateMap(params);
             
             persistParamsOnMessage(params);
@@ -113,11 +108,6 @@ public class FormEncodingProvider implements
         }
     }
 
-    protected boolean keepEncoded(Annotation[] anns) {
-        return AnnotationUtils.getAnnotation(anns, Encoded.class) != null 
-               || expectEncoded;
-    }
-    
     protected void persistParamsOnMessage(MultivaluedMap<String, String> params) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null) {
@@ -190,7 +180,7 @@ public class FormEncodingProvider implements
         
         MultivaluedMap<String, String> map = 
             (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).getData() : obj);
-        boolean encoded = keepEncoded(anns);
+        boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
         
         String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
         

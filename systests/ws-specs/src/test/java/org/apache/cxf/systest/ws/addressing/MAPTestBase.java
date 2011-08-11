@@ -228,7 +228,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         }
     }
     
-/*    @Test
+    @Test
     public void testFaultTo() throws Exception {
         try {
             String greeting = greeter.greetMe("warmup");
@@ -245,7 +245,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-    }   */
+    }
     
     @Test
     public void testOneway() throws Exception {

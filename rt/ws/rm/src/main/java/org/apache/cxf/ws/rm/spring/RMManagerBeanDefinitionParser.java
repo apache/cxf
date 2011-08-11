@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.rm.spring;
 
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -25,6 +26,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.ws.rm.RMManager;
+import org.apache.cxf.ws.rm.policy.RMAssertion;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 
@@ -44,11 +46,7 @@ public class RMManagerBeanDefinitionParser extends AbstractBeanDefinitionParser 
         mapElementToJaxbProperty(element, bean, 
                 new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"), 
                 "RMAssertion",
-                org.apache.cxf.ws.rmp.v200502.RMAssertion.class);
-        mapElementToJaxbProperty(element, bean, 
-                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
-                "RMAssertion",
-                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
+                RMAssertion.class);
         
         ctx.getDelegate().parsePropertyElements(element, bean.getBeanDefinition());
         
@@ -66,8 +64,6 @@ public class RMManagerBeanDefinitionParser extends AbstractBeanDefinitionParser 
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
         if ("store".equals(name)) {  
             setFirstChildAsProperty(e, ctx, bean, name);
-        } else if ("addressingNamespace".equals(name)) {
-            bean.addPropertyValue("addressingNamespace", e.getTextContent());
         }
     }
 

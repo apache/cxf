@@ -50,7 +50,6 @@ public final class SecurityConstants {
     public static final String SIGNATURE_CRYPTO = "ws-security.signature.crypto";
     public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
     
-    public static final String CRYPTO_CACHE = "ws-security.crypto.cache";
 
     public static final String TOKEN = "ws-security.token";
     public static final String TOKEN_ID = "ws-security.token.id";

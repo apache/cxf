@@ -19,19 +19,16 @@
 
 package org.apache.cxf.ws.rm;
 
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
+
 
 public abstract class AbstractSequence {
     
     protected final Identifier id;
     protected SequenceAcknowledgement acknowledgement;
-    private final ProtocolVariation protocol;
     
-    protected AbstractSequence(Identifier i, ProtocolVariation p) {
+    protected AbstractSequence(Identifier i) {
         id = i;
-        protocol = p;
     }
     
     /**
@@ -40,11 +37,7 @@ public abstract class AbstractSequence {
     public Identifier getIdentifier() {
         return id;
     }
-
-    public ProtocolVariation getProtocol() {
-        return protocol;
-    }
-
+    
     public String toString() {
         return id.getValue();
     }

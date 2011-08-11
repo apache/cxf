@@ -23,6 +23,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.VersionTransformer;
 
 /**
  * Holder for utility methods relating to contexts.
@@ -47,7 +48,7 @@ public final class RMContextUtils {
      * Determine if message is currently being processed on server side.
      * 
      * @param message the current Message
-     * @return true if message is currently being processed on server side
+     * @return true iff message is currently being processed on server side
      */
     public static boolean isServerSide(Message message) {
         return message.getExchange().getDestination() != null;
@@ -57,17 +58,22 @@ public final class RMContextUtils {
      * Checks if the action String belongs to an RM protocol message.
      * 
      * @param action the action
-     * @return true if the action is not one of the RM protocol actions.
+     * @return true iff the action is not one of the RM protocol actions.
      */
     public static boolean isRMProtocolMessage(String action) {
-        return RM10Constants.ACTIONS.contains(action) || RM11Constants.ACTIONS.contains(action);
+        return RMConstants.getCreateSequenceAction().equals(action)
+            || RMConstants.getCreateSequenceResponseAction().equals(action)
+            || RMConstants.getTerminateSequenceAction().equals(action)
+            || RMConstants.getLastMessageAction().equals(action)
+            || RMConstants.getSequenceAcknowledgmentAction().equals(action)
+            || RMConstants.getSequenceInfoAction().equals(action);
     }
 
     /**
      * Retrieve the RM properties from the current message.
      * 
      * @param message the current message
-     * @param outbound true if the message direction is outbound
+     * @param outbound true iff the message direction is outbound
      * @return the RM properties
      */
     public static RMProperties retrieveRMProperties(Message message, boolean outbound) {
@@ -97,7 +103,7 @@ public final class RMContextUtils {
      * 
      * @param message the current message
      * @param rmps the RM properties
-     * @param outbound if the message direction is outbound
+     * @param outbound iff the message direction is outbound
      */
     public static void storeRMProperties(Message message, RMProperties rmps, boolean outbound) {
         String key = getRMPropertiesKey(outbound);
@@ -111,7 +117,7 @@ public final class RMContextUtils {
      * @param isProviderContext true if the binding provider request context
      *            available to the client application as opposed to the message
      *            context visible to handlers
-     * @param isOutbound true if the message is outbound
+     * @param isOutbound true iff the message is outbound
      * @return the current addressing properties
      */
     public static AddressingPropertiesImpl retrieveMAPs(Message message, boolean isProviderContext,
@@ -124,14 +130,23 @@ public final class RMContextUtils {
      * 
      * @param maps the MAPs to store
      * @param message the current message
-     * @param isOutbound true if the message is outbound
-     * @param isRequestor true if the current messaging role is that of
+     * @param isOutbound true iff the message is outbound
+     * @param isRequestor true iff the current messaging role is that of
      *            requestor
      * @param handler true if HANDLER scope, APPLICATION scope otherwise
      */
     public static void storeMAPs(AddressingProperties maps, Message message, boolean isOutbound,
                                  boolean isRequestor) {
         org.apache.cxf.ws.addressing.ContextUtils.storeMAPs(maps, message, isOutbound, isRequestor);
+    }
+
+    /**
+     * Ensures the appropriate version of WS-Addressing is used.
+     * 
+     * @param maps the addressing properties
+     */
+    public static void ensureExposedVersion(AddressingProperties maps) {
+        ((AddressingPropertiesImpl)maps).exposeAs(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
     }
 
     public static String getRMPropertiesKey(boolean outbound) {

@@ -28,8 +28,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 /**
  * 
@@ -81,7 +79,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         boolean isServer = RMContextUtils.isServerSide(message);
         LOG.fine("isServerSide: " + isServer);
-        boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
+        boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);       
         LOG.fine("isApplicationMessage: " + isApplicationMessage);
         
         // for application AND out of band messages
@@ -91,7 +89,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         if (isApplicationMessage) {                        
             if (null != rmps) {
-                processAcknowledgments(rme, rmps);
+                processAcknowledgments(rme.getSource(), rmps);
                 processAcknowledgmentRequests(destination, message);
                 processSequence(destination, message);
                 processDeliveryAssurance(rmps);
@@ -104,17 +102,14 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             }
         } else {
             rme.receivedControlMessage();
-            if (RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)
-                || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
-                processAcknowledgments(rme, rmps);
-            } else if (RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action)
-                || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
+            if (RMConstants.getSequenceAckAction().equals(action)) {
+                processAcknowledgments(rme.getSource(), rmps);
+            } else if (RMConstants.getLastMessageAction().equals(action)) {
                 processSequence(destination, message);
-            } else if ((RM10Constants.CREATE_SEQUENCE_ACTION.equals(action)
-                || RM11Constants.CREATE_SEQUENCE_ACTION.equals(action)) && !isServer) {
+            } else if (RMConstants.getCreateSequenceAction().equals(action) && !isServer) {
                 LOG.fine("Processing inbound CreateSequence on client side.");
                 Servant servant = rme.getServant();
-                Object csr = servant.createSequence(message);
+                CreateSequenceResponseType csr = servant.createSequence(message);
                 Proxy proxy = rme.getProxy();
                 proxy.createSequenceResponse(csr);
                 return;
@@ -124,10 +119,9 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         assertReliability(message);
     }
     
-    void processAcknowledgments(RMEndpoint rme, RMProperties rmps) throws SequenceFault, RMException {
+    void processAcknowledgments(Source source, RMProperties rmps) throws SequenceFault, RMException {
         
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();
-        Source source = rme.getSource();
         if (null != acks) {
             for (SequenceAcknowledgement ack : acks) {
                 Identifier id = ack.getIdentifier();
@@ -135,9 +129,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 if (null != ss) {
                     ss.setAcknowledged(ack);
                 } else {
-                    RMConstants consts = rme.getProtocol().getConstants();
-                    SequenceFaultFactory sff = new SequenceFaultFactory(consts);
-                    throw sff.createUnknownSequenceFault(id);
+                    throw (new SequenceFaultFactory()).createUnknownSequenceFault(id);
                 }
             }
         }

@@ -27,20 +27,13 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
-import org.apache.cxf.ws.rm.RM10Constants;
-import org.apache.cxf.ws.rm.RMContextUtils;
-import org.apache.cxf.ws.rm.RMProperties;
+import org.apache.cxf.ws.rm.Identifier;
+import org.apache.cxf.ws.rm.RMConstants;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.SequenceFault;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
+import org.apache.cxf.ws.rm.SequenceFaultType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,11 +55,11 @@ public class SoapFaultFactoryTest extends Assert {
         sf = control.createMock(SequenceFault.class);
         EasyMock.expect(sf.getReason()).andReturn("reason");
         EasyMock.expect(sf.isSender()).andReturn(isSender);
-        EasyMock.expect(sf.getFaultCode()).andReturn(code);
+        EasyMock.expect(sf.getSubCode()).andReturn(code);
         if (null != detail) {
             EasyMock.expect(sf.getDetail()).andReturn(detail);
             SequenceFaultType sft = new SequenceFaultType();
-            sft.setFaultCode(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME);
+            sft.setFaultCode(RMConstants.getUnknownSequenceFaultCode());
         }
         return sf;
     }
@@ -75,13 +68,13 @@ public class SoapFaultFactoryTest extends Assert {
     public void createSoap11Fault() {
         SoapBinding sb = control.createMock(SoapBinding.class);
         EasyMock.expect(sb.getSoapVersion()).andReturn(Soap11.getInstance());        
-        setupSequenceFault(false, RM10Constants.SEQUENCE_TERMINATED_FAULT_QNAME, null);
+        setupSequenceFault(false, RMConstants.getSequenceTerminatedFaultCode(), null);
         control.replay();
         SoapFaultFactory factory = new SoapFaultFactory(sb);
-        SoapFault fault = (SoapFault)factory.createFault(sf, createInboundMessage());
+        SoapFault fault = (SoapFault)factory.createFault(sf);
         assertEquals("reason", fault.getReason());
         assertEquals(Soap11.getInstance().getReceiver(), fault.getFaultCode());
-        assertEquals(RM10Constants.SEQUENCE_TERMINATED_FAULT_QNAME, fault.getSubCode());
+        assertEquals(RMConstants.getSequenceTerminatedFaultCode(), fault.getSubCode());
         assertNull(fault.getDetail());
         assertSame(sf, fault.getCause());
         control.verify();        
@@ -93,15 +86,15 @@ public class SoapFaultFactoryTest extends Assert {
         EasyMock.expect(sb.getSoapVersion()).andReturn(Soap12.getInstance());        
         Identifier id = new Identifier();
         id.setValue("sid");
-        setupSequenceFault(true, RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, id);        
+        setupSequenceFault(true, RMConstants.getUnknownSequenceFaultCode(), id);        
         control.replay();
         SoapFaultFactory factory = new SoapFaultFactory(sb);
-        SoapFault fault = (SoapFault)factory.createFault(sf, createInboundMessage());
+        SoapFault fault = (SoapFault)factory.createFault(sf);
         assertEquals("reason", fault.getReason());
         assertEquals(Soap12.getInstance().getSender(), fault.getFaultCode());
-        assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, fault.getSubCode());
+        assertEquals(RMConstants.getUnknownSequenceFaultCode(), fault.getSubCode());
         Element elem = fault.getDetail();
-        assertEquals(RM10Constants.NAMESPACE_URI, elem.getNamespaceURI());
+        assertEquals(RMConstants.getNamespace(), elem.getNamespaceURI());
         assertEquals("Identifier", elem.getLocalName());
         assertNull(fault.getCause());
         control.verify();        
@@ -113,15 +106,15 @@ public class SoapFaultFactoryTest extends Assert {
         EasyMock.expect(sb.getSoapVersion()).andReturn(Soap12.getInstance());        
         Identifier id = new Identifier();
         id.setValue("sid");
-        setupSequenceFault(true, RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, id);        
+        setupSequenceFault(true, RMConstants.getUnknownSequenceFaultCode(), id);        
         control.replay();
         SoapFaultFactory factory = new SoapFaultFactory(sb);
-        SoapFault fault = (SoapFault)factory.createFault(sf, createInboundMessage());
+        SoapFault fault = (SoapFault)factory.createFault(sf);
         assertEquals("reason", fault.getReason());
         assertEquals(Soap12.getInstance().getSender(), fault.getFaultCode());
-        assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, fault.getSubCode());
+        assertEquals(RMConstants.getUnknownSequenceFaultCode(), fault.getSubCode());
         Element elem = fault.getDetail();
-        assertEquals(RM10Constants.NAMESPACE_URI, elem.getNamespaceURI());
+        assertEquals(RMConstants.getNamespace(), elem.getNamespaceURI());
         assertEquals("Identifier", elem.getLocalName());
         control.verify();        
     }
@@ -139,15 +132,15 @@ public class SoapFaultFactoryTest extends Assert {
         range.setLower(new Long(1));
         range.setUpper(new Long(10));
         ack.getAcknowledgementRange().add(range);   
-        setupSequenceFault(true, RM10Constants.INVALID_ACKNOWLEDGMENT_FAULT_QNAME, ack);        
+        setupSequenceFault(true, RMConstants.getInvalidAcknowledgmentFaultCode(), ack);        
         control.replay();
         SoapFaultFactory factory = new SoapFaultFactory(sb);
-        SoapFault fault = (SoapFault)factory.createFault(sf, createInboundMessage());
+        SoapFault fault = (SoapFault)factory.createFault(sf);
         assertEquals("reason", fault.getReason());
         assertEquals(Soap12.getInstance().getSender(), fault.getFaultCode());
-        assertEquals(RM10Constants.INVALID_ACKNOWLEDGMENT_FAULT_QNAME, fault.getSubCode());
+        assertEquals(RMConstants.getInvalidAcknowledgmentFaultCode(), fault.getSubCode());
         Element elem = fault.getDetail();
-        assertEquals(RM10Constants.NAMESPACE_URI, elem.getNamespaceURI());
+        assertEquals(RMConstants.getNamespace(), elem.getNamespaceURI());
         assertEquals("SequenceAcknowledgement", elem.getLocalName());
         control.verify();        
     }
@@ -156,13 +149,13 @@ public class SoapFaultFactoryTest extends Assert {
     public void createSoap12FaultWithoutDetail() {
         SoapBinding sb = control.createMock(SoapBinding.class);
         EasyMock.expect(sb.getSoapVersion()).andReturn(Soap12.getInstance());
-        setupSequenceFault(true, RM10Constants.CREATE_SEQUENCE_REFUSED_FAULT_QNAME, null);        
+        setupSequenceFault(true, RMConstants.getCreateSequenceRefusedFaultCode(), null);        
         control.replay();
         SoapFaultFactory factory = new SoapFaultFactory(sb);
-        SoapFault fault = (SoapFault)factory.createFault(sf, createInboundMessage());
+        SoapFault fault = (SoapFault)factory.createFault(sf);
         assertEquals("reason", fault.getReason());
         assertEquals(Soap12.getInstance().getSender(), fault.getFaultCode());
-        assertEquals(RM10Constants.CREATE_SEQUENCE_REFUSED_FAULT_QNAME, fault.getSubCode());
+        assertEquals(RMConstants.getCreateSequenceRefusedFaultCode(), fault.getSubCode());
         assertNull(fault.getDetail());
 
         control.verify();        
@@ -181,15 +174,6 @@ public class SoapFaultFactoryTest extends Assert {
         assertEquals("Reason: r, code: {ns}code, subCode: {ns}subcode",
                      factory.toString(fault));
         control.verify();
-    }
-    
-    private Message createInboundMessage() {
-        Message message = new MessageImpl();
-        RMProperties rmps = new RMProperties();
-        rmps.exposeAs(RM10Constants.NAMESPACE_URI);
-        RMContextUtils.storeRMProperties(message, rmps, false);
-        AddressingProperties maps = new AddressingPropertiesImpl();
-        RMContextUtils.storeMAPs(maps, message, false, false);
-        return message;
+        
     }
 }

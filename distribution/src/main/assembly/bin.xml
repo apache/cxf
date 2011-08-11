@@ -78,6 +78,7 @@
                 <exclude>**/target</exclude>
                 <exclude>**/build/**/*</exclude>
                 <exclude>**/target/**/*</exclude>
+                <exclude>integration/JBI/**/build.properties</exclude>
             </excludes>
         </fileSet>
         <fileSet>
@@ -130,6 +131,13 @@
             <outputDirectory>apache-cxf-${cxf.version}/etc</outputDirectory>
             <includes>
                 <include>ra.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory>apache-cxf-${cxf.version}/samples/integration/JBI/service-engine/etc</outputDirectory>
+            <includes>
+                <include>jbi.xml</include>
             </includes>
         </fileSet>
         <!-- include the JavaScript client utilities for users who don't want to use ?js. -->

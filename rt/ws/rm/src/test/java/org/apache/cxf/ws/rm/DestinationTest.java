@@ -23,12 +23,14 @@ import java.lang.reflect.Method;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -114,7 +116,6 @@ public class DestinationTest extends Assert {
         EasyMock.expect(rmps.getSequence()).andReturn(st);
         Identifier id = control.createMock(Identifier.class);
         EasyMock.expect(st.getIdentifier()).andReturn(id).times(2);
-        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         String sid = "sid";
         EasyMock.expect(id.getValue()).andReturn(sid); 
         control.replay();
@@ -122,7 +123,7 @@ public class DestinationTest extends Assert {
             destination.acknowledge(message);   
             fail("Expected SequenceFault not thrown.");
         } catch (SequenceFault ex) {
-            assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, ex.getFaultCode());
+            assertEquals(RMConstants.getUnknownSequenceFaultCode(), ex.getSequenceFault().getFaultCode());
         }
     }
     
@@ -156,7 +157,7 @@ public class DestinationTest extends Assert {
         
     }
     
-/*    @Test
+    @Test
     public void testAcknowledgeLastMessage() throws Exception {
         
         Method m1 = Destination.class.getDeclaredMethod("getSequence", new Class[] {Identifier.class});
@@ -214,7 +215,7 @@ public class DestinationTest extends Assert {
         
         control.replay();
         destination.acknowledge(message);   
-    }   */
+    }
     
     private Message setupMessage() {
         Message message = control.createMock(Message.class);
@@ -224,4 +225,7 @@ public class DestinationTest extends Assert {
         EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null);
         return message;
     }
+    
+
+    
 }

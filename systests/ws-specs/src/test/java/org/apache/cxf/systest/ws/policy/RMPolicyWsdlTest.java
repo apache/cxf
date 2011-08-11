@@ -40,7 +40,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyEngine;
-import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
@@ -164,14 +164,11 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(5, 9, 5000);
 
-        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
-                                         inRecorder.getInboundMessages(),
-                                         "http://schemas.xmlsoap.org/ws/2004/08/addressing",
-                                         "http://schemas.xmlsoap.org/ws/2005/02/rm");
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
         
         
         mf.verifyMessages(5, true);
-        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(), 
+        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(), 
                                                  GREETMEONEWAY_ACTION,
                                                  GREETME_ACTION, 
                                                  PINGME_ACTION,
@@ -186,7 +183,7 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         mf.purgePartialResponses();
 
         expectedActions = new String[] {
-            RM10Constants.INSTANCE.getCreateSequenceResponseAction(),
+            RMConstants.getCreateSequenceResponseAction(),
             GREETME_RESPONSE_ACTION,
             PINGME_RESPONSE_ACTION,
             GREETER_FAULT_ACTION
@@ -195,6 +192,6 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[] {false, false, false, false}, false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
-        
+         
     }
 }

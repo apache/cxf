@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,7 +27,10 @@ import java.util.logging.Logger;
 
 import javax.xml.datatype.Duration;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.message.Exchange;
@@ -34,14 +38,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.VersionTransformer;
+import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
-import org.apache.cxf.ws.rm.v200702.AcceptType;
-import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
-import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
-import org.apache.cxf.ws.rm.v200702.Expires;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.OfferType;
-import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
 /**
  * 
@@ -57,6 +56,24 @@ public class Servant implements Invoker {
         reliableEndpoint = rme;
     }
     
+    private void throwSequenceFault(SequenceFault sf, Exchange exchange) {
+        Endpoint e = exchange.get(Endpoint.class);
+        Binding b = null;
+        if (null != e) {
+            b = e.getBinding();
+        }
+        Bus bus = exchange.get(Bus.class);
+        if (null != b && bus != null) {
+            RMManager m = bus.getExtension(RMManager.class);
+            LOG.fine("Manager: " + m);
+            BindingFaultFactory bff = m.getBindingFaultFactory(b);
+            Fault f = bff.createFault(sf);
+            LogUtils.log(LOG, Level.SEVERE, "SEQ_FAULT_MSG", bff.toString(f));
+            throw f;
+        }
+        throw new Fault(sf);
+    }
+    
     
     public Object invoke(Exchange exchange, Object o) {
         LOG.fine("Invoking on RM Endpoint");
@@ -66,31 +83,38 @@ public class Servant implements Invoker {
             return null;
         }
         
-        if (RM10Constants.INSTANCE.getCreateSequenceOperationName().equals(oi.getName())
-            || RM11Constants.INSTANCE.getCreateSequenceOperationName().equals(oi.getName())
-            || RM10Constants.INSTANCE.getCreateSequenceOnewayOperationName().equals(oi.getName())
-            || RM11Constants.INSTANCE.getCreateSequenceOnewayOperationName().equals(oi.getName())) {
+        if (RMConstants.getCreateSequenceOperationName().equals(oi.getName())
+            || RMConstants.getCreateSequenceOnewayOperationName().equals(oi.getName())) {
             try {
                 return Collections.singletonList(createSequence(exchange.getInMessage()));
+            } catch (SequenceFault ex) {
+                throwSequenceFault(ex, exchange);
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
-        } else if (RM10Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())
-            || RM11Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())) {
-            EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
+        } else if (RMConstants.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())) {
             CreateSequenceResponseType createResponse = 
-                codec.convertReceivedCreateSequenceResponse(getParameter(exchange.getInMessage()));
-            createSequenceResponse(createResponse);
-        } else if (RM10Constants.INSTANCE.getTerminateSequenceOperationName().equals(oi.getName())
-            || RM11Constants.INSTANCE.getTerminateSequenceOperationName().equals(oi.getName())) {
-            terminateSequence(exchange.getInMessage());
+                (CreateSequenceResponseType)getParameter(exchange.getInMessage());
+            try {
+                createSequenceResponse(createResponse);
+            } catch (SequenceFault ex) {
+                throwSequenceFault(ex, exchange);
+            }
+        } else if (RMConstants.getTerminateSequenceOperationName().equals(oi.getName())) {            
+            try {
+                terminateSequence(exchange.getInMessage());
+            } catch (SequenceFault ex) {
+                throwSequenceFault(ex, exchange);
+            } catch (RMException ex) {
+                throw new Fault(ex);
+            }
         }
         
         return null;
     }
 
 
-    Object createSequence(Message message) {
+    CreateSequenceResponseType createSequence(Message message) throws SequenceFault {
         LOG.fine("Creating sequence");
         
         AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);        
@@ -99,11 +123,11 @@ public class Servant implements Invoker {
             RMContextUtils.storeMAPs(maps, outMessage, false, false);
         }
         
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
-        CreateSequenceType create = codec.convertReceivedCreateSequence(getParameter(message));
+        CreateSequenceType create = (CreateSequenceType)getParameter(message);
         Destination destination = reliableEndpoint.getDestination();
         
-        CreateSequenceResponseType createResponse = new CreateSequenceResponseType();        
+        CreateSequenceResponseType createResponse = 
+            RMUtils.getWSRMFactory().createCreateSequenceResponseType();        
         createResponse.setIdentifier(destination.generateSequenceIdentifier());
         
         DestinationPolicyType dp = reliableEndpoint.getManager().getDestinationPolicy();
@@ -121,23 +145,25 @@ public class Servant implements Invoker {
                     &&  supportedDuration.isShorterThan(effectiveDuration)))  {
                 effectiveDuration = supportedDuration;
             }
-            ex = new Expires();
+            ex = RMUtils.getWSRMFactory().createExpires();
             ex.setValue(effectiveDuration);
             createResponse.setExpires(ex);
         }
         
         OfferType offer = create.getOffer();
         if (null != offer) {
-            AcceptType accept = new AcceptType();
+            AcceptType accept = RMUtils.getWSRMFactory().createAcceptType();
             if (dp.isAcceptOffers()) {
                 Source source = reliableEndpoint.getSource();
                 LOG.fine("Accepting inbound sequence offer");
                 // AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
-                accept.setAcksTo(RMUtils.createReference(maps.getTo().getValue()));
-                SourceSequence seq = new SourceSequence(offer.getIdentifier(), null,
-                    createResponse.getIdentifier(), reliableEndpoint.getProtocol());
+                AttributedURI to = VersionTransformer.convert(maps.getTo());
+                accept.setAcksTo(RMUtils.createReference2004(to.getValue()));
+                SourceSequence seq = new SourceSequence(offer.getIdentifier(), 
+                                                                    null, 
+                                                                    createResponse.getIdentifier());
                 seq.setExpires(offer.getExpires());
-                seq.setTarget(create.getAcksTo());
+                seq.setTarget(VersionTransformer.convert(create.getAcksTo()));
                 source.addSequence(seq);
                 source.setCurrent(createResponse.getIdentifier(), seq);  
                 if (LOG.isLoggable(Level.FINE)) {
@@ -148,24 +174,23 @@ public class Servant implements Invoker {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Refusing inbound sequence offer"); 
                 }
-                accept.setAcksTo(RMUtils.createNoneReference());
+                accept.setAcksTo(RMUtils.createNoneReference2004());
             }
             createResponse.setAccept(accept);
         }
         
         DestinationSequence seq = new DestinationSequence(createResponse.getIdentifier(),
-            create.getAcksTo(), destination, reliableEndpoint.getProtocol());
+                                                          create.getAcksTo(), destination);
         seq.setCorrelationID(maps.getMessageID().getValue());
         destination.addSequence(seq);
         LOG.fine("returning " + createResponse);
-        return codec.convertToSend(createResponse);
+        return createResponse;
     }
 
-    public void createSequenceResponse(CreateSequenceResponseType createResponse) {
+    public void createSequenceResponse(CreateSequenceResponseType createResponse) throws SequenceFault {
         LOG.fine("Creating sequence response");
         
-        SourceSequence seq = new SourceSequence(createResponse.getIdentifier(),
-            reliableEndpoint.getProtocol());
+        SourceSequence seq = new SourceSequence(createResponse.getIdentifier());
         seq.setExpires(createResponse.getExpires());
         Source source  = reliableEndpoint.getSource();
         source.addSequence(seq);
@@ -186,18 +211,17 @@ public class Servant implements Invoker {
             Destination dest = reliableEndpoint.getDestination();
             String address = accept.getAcksTo().getAddress().getValue();
             if (!RMUtils.getAddressingConstants().getNoneURI().equals(address)) {
-                DestinationSequence ds =  new DestinationSequence(offeredId, accept.getAcksTo(), dest,
-                    reliableEndpoint.getProtocol());
+                DestinationSequence ds = 
+                    new DestinationSequence(offeredId, accept.getAcksTo(), dest);
                 dest.addSequence(ds);
             }
         }
     }
 
-    public void terminateSequence(Message message) {
+    public void terminateSequence(Message message) throws SequenceFault, RMException {
         LOG.fine("Terminating sequence");
         
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
-        TerminateSequenceType terminate = codec.convertReceivedTerminateSequence(getParameter(message));
+        TerminateSequenceType terminate = (TerminateSequenceType)getParameter(message);
         
         // check if the terminated sequence was created in response to a a createSequence
         // request
@@ -224,7 +248,7 @@ public class Servant implements Invoker {
         for (SourceSequence outboundSeq : source.getAllSequences()) {
             if (outboundSeq.offeredBy(sid) && !outboundSeq.isLastMessage()) {
                 
-                if (outboundSeq.getCurrentMessageNr() == 0) {
+                if (BigInteger.ZERO.equals(outboundSeq.getCurrentMessageNr())) {
                     source.removeSequence(outboundSeq);
                 }
                 // send an out of band message with an empty body and a 

@@ -29,7 +29,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 
 /**
  * 

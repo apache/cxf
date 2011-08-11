@@ -33,7 +33,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
 
 /**
  * Interceptor responsible for implementing exchange of RM protocol messages,
@@ -94,7 +93,7 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
                 RMManager m = getManager();
                 LOG.fine("Manager: " + m);
                 BindingFaultFactory bff = m.getBindingFaultFactory(b);
-                Fault f = bff.createFault(sf, msg);
+                Fault f = bff.createFault(sf);
                 LogUtils.log(LOG, Level.SEVERE, "SEQ_FAULT_MSG", bff.toString(f));
                 throw f;
             }
@@ -112,7 +111,15 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
      */
     void assertReliability(Message message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = RM10PolicyUtils.collectRMAssertions(aim);
+        if (null == aim) {
+            return;
+            
+        }
+        Collection<AssertionInfo> ais = aim.get(RMConstants.getRMAssertionQName());
+        if (null == ais || ais.size() == 0) {
+            return;
+        }
+        
         for (AssertionInfo ai : ais) {
             ai.setAsserted(true);
         }

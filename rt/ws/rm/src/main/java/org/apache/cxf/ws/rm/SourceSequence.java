@@ -28,14 +28,9 @@ import javax.xml.datatype.Duration;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.ws.addressing.ContextUtils;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
-import org.apache.cxf.ws.rm.v200702.Expires;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
-// TODO: handle lastMessage
 public class SourceSequence extends AbstractSequence {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SourceSequence.class);
@@ -45,25 +40,25 @@ public class SourceSequence extends AbstractSequence {
     private long currentMessageNumber;
     private boolean lastMessage;
     private Identifier offeringId;
-    private EndpointReferenceType target;
+    private org.apache.cxf.ws.addressing.EndpointReferenceType target;
 
-    public SourceSequence(Identifier i, ProtocolVariation pv) {
-        this(i, null, null, pv);
+    public SourceSequence(Identifier i) {
+        this(i, null, null);
     }
 
-    public SourceSequence(Identifier i, Date e, Identifier oi, ProtocolVariation pv) {
-        this(i, e, oi, 0, false, pv);
+    public SourceSequence(Identifier i, Date e, Identifier oi) {
+        this(i, e, oi, 0, false);
     }
 
-    public SourceSequence(Identifier i, Date e, Identifier oi, long cmn, boolean lm, ProtocolVariation pv) {
-        super(i, pv);
+    public SourceSequence(Identifier i, Date e, Identifier oi, long cmn, boolean lm) {
+        super(i);
         expires = e;
 
         offeringId = oi;
 
         currentMessageNumber = cmn;
         lastMessage = lm;
-        acknowledgement = new SequenceAcknowledgement();
+        acknowledgement = RMUtils.getWSRMFactory().createSequenceAcknowledgement();
         acknowledgement.setIdentifier(id);
     }
 
@@ -240,13 +235,13 @@ public class SourceSequence extends AbstractSequence {
      * 
      * @param to
      */
-    synchronized void setTarget(EndpointReferenceType to) {
+    synchronized void setTarget(org.apache.cxf.ws.addressing.EndpointReferenceType to) {
         if (target == null && !ContextUtils.isGenericAddress(to)) {
             target = to;
         }
     }
 
-    synchronized EndpointReferenceType getTarget() {
+    synchronized org.apache.cxf.ws.addressing.EndpointReferenceType getTarget() {
         return target;
     }
 

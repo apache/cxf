@@ -44,17 +44,14 @@ import org.apache.cxf.systest.ws.util.MessageRecorder;
 import org.apache.cxf.systest.ws.util.OutMessageRecorder;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.DestinationSequence;
-import org.apache.cxf.ws.rm.ProtocolVariation;
-import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -163,6 +160,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
         ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
+
         out = new OutMessageRecorder();
         in = new InMessageRecorder();
 
@@ -183,12 +181,11 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
 
         awaitMessages(5, 3);
         
-        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
-            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
-        
+        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
+
         // sent create seq + 4 app messages and losing 2 app messages
         mf.verifyMessages(5, true);
-        String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION,
+        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
                                                  GREETMEONEWAY_ACTION,
                                                  GREETMEONEWAY_ACTION,
                                                  GREETMEONEWAY_ACTION,
@@ -199,11 +196,11 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
 
         // as 2 messages being lost, received seq ack and 2 ack messages 
         mf.verifyMessages(3, false);
-        expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
-            RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION,
-            RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
+        expectedActions = new String[] {RMConstants.getCreateSequenceResponseAction(),
+                                        RMConstants.getSequenceAcknowledgmentAction(),
+                                        RMConstants.getSequenceAcknowledgmentAction()};
         mf.verifyActions(expectedActions, false);
-        mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);        
+        mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
     
     void verifyStorePopulation() {
@@ -218,11 +215,11 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
         
         Collection<DestinationSequence> dss =
-            store.getDestinationSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getDestinationSequences(id);
         assertEquals(1, dss.size());
         
         Collection<SourceSequence> sss =
-            store.getSourceSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getSourceSequences(id);
         assertEquals(1, sss.size());
         
         Collection<RMMessage> msgs = 
@@ -242,15 +239,13 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
     void populateStoreAfterRestart() throws Exception {
         
         bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-            .setMilliseconds(new Long(60000));
+        .setMilliseconds(new Long(60000));
 
         greeter.greetMeOneWay("five");
 
-        // force at least two outbound messages, since can't always count on three
         awaitMessages(1, 3);
         
-        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
-            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
+        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
         
         // sent 1 app message and no create seq messag this time
         mf.verifyMessages(1, true);
@@ -262,10 +257,10 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
 
         mf.verifyMessages(3, false);
 
+        expectedActions = new String[] {RMConstants.getSequenceAcknowledgmentAction(),
+                                        RMConstants.getSequenceAcknowledgmentAction(),
+                                        null};
         // we can't reliably predict how the three remaining messages are acknowledged
-//        expectedActions = new String[] {RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION,
-//            RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION,
-//            null};
 //        mf.verifyActions(expectedActions, false);
 //        mf.verifyAcknowledgements(new boolean[]{true, true, false}, false);
         
@@ -294,11 +289,11 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
         
         Collection<DestinationSequence> dss =
-            store.getDestinationSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getDestinationSequences(id);
         assertEquals(1, dss.size());
         
         Collection<SourceSequence> sss =
-            store.getSourceSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getSourceSequences(id);
         assertEquals(1, sss.size());
         
         int i = 0;

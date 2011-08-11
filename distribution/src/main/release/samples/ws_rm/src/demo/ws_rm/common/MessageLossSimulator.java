@@ -53,8 +53,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         AddressingProperties maps =
             RMContextUtils.retrieveMAPs(message, false, true);
-        //Fixed the build error of ws_rm, now there is no ensureExposedVersion anymore
-        //RMContextUtils.ensureExposedVersion(maps);
+        RMContextUtils.ensureExposedVersion(maps);
         String action = null;
         if (maps != null && null != maps.getAction()) {
             action = maps.getAction().getValue();

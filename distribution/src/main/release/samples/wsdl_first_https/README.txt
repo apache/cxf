@@ -20,11 +20,11 @@ javac, and java to build and run the demos, you must set the
 environment by running the script.
 
 
-Building and running the demo using Maven
+Building and running the demo using maven
 -----------------------------------------
 
 From the base directory of this sample (i.e., where this README file is
-located), the Maven pom.xml file can be used to build and run the demo. 
+located), the maven pom.xml file can be used to build and run the demo. 
 
   mvn install (builds the demo)
 

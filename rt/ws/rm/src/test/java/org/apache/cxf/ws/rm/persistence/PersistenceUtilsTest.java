@@ -21,9 +21,8 @@ package org.apache.cxf.ws.rm.persistence;
 
 import java.io.InputStream;
 
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
-
+import org.apache.cxf.ws.rm.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
 import org.junit.Assert;
 import org.junit.Test;
 

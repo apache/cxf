@@ -131,6 +131,7 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
             assertEquals("unexpected id", 123L, book.getId());
             
             String address = getCurrentEndpointAddress(bookStore);
+            System.out.println(address);
             if (Server.ADDRESS2.equals(address)) {
                 address2Count++;
             } else if (Server.ADDRESS3.equals(address)) {
@@ -146,7 +147,7 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
             .getEndpoint().getEndpointInfo().getAddress();
     }
     
-    protected void verifyStrategy(Object proxy, Class<?> clz) {
+    protected void verifyStrategy(Object proxy, Class clz) {
         ConduitSelector conduitSelector =
             WebClient.getConfig(proxy).getConduitSelector();
         if (conduitSelector instanceof FailoverTargetSelector) {

@@ -430,6 +430,10 @@ public class WSDLServiceBuilder {
                         break;
                         // TODO: this is really ugly, but how to link between
                         // this binding and this transport ?
+                    } else if ("http://cxf.apache.org/bindings/jbi".equals(el.getElementType()
+                        .getNamespaceURI())) {
+                        ns = "http://cxf.apache.org/transports/jbi";
+                        break;
                     }
                 }
             }

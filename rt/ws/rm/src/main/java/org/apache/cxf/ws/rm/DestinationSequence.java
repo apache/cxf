@@ -20,7 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimerTask;
@@ -32,18 +32,15 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
-import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout;
+import org.apache.cxf.ws.rm.policy.PolicyUtils;
+import org.apache.cxf.ws.rm.policy.RMAssertion;
+import org.apache.cxf.ws.rm.policy.RMAssertion.AcknowledgementInterval;
+import org.apache.cxf.ws.rm.policy.RMAssertion.InactivityTimeout;
 
 public class DestinationSequence extends AbstractSequence {
     
@@ -61,19 +58,19 @@ public class DestinationSequence extends AbstractSequence {
     private long highNumberCompleted;
     private List<Continuation> continuations = new LinkedList<Continuation>();
     
-    public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d, ProtocolVariation pv) {
-        this(i, a, 0, null, pv);
+    public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d) {
+        this(i, a, 0, null);
         destination = d;
     }
     
     public DestinationSequence(Identifier i, EndpointReferenceType a,
-                              long lmn, SequenceAcknowledgement ac, ProtocolVariation pv) {
-        super(i, pv);
+                              long lmn, SequenceAcknowledgement ac) {
+        super(i);
         acksTo = a;
         lastMessageNumber = lmn;
         acknowledgement = ac;
         if (null == acknowledgement) {
-            acknowledgement = new SequenceAcknowledgement();
+            acknowledgement = RMUtils.getWSRMFactory().createSequenceAcknowledgement();
             acknowledgement.setIdentifier(id);
         }
         monitor = new SequenceMonitor();
@@ -108,14 +105,11 @@ public class DestinationSequence extends AbstractSequence {
     }
     
     public void acknowledge(Message message) throws SequenceFault {
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        SequenceType st = rmps.getSequence();
+        SequenceType st = RMContextUtils.retrieveRMProperties(message, false).getSequence();
         long messageNumber = st.getMessageNumber().longValue();
         LOG.fine("Acknowledging message: " + messageNumber);
         if (0 != lastMessageNumber && messageNumber > lastMessageNumber) {
-            RMConstants consts = getProtocol().getConstants();
-            SequenceFaultFactory sff = new SequenceFaultFactory(consts);
-            throw sff.createSequenceTerminatedFault(st.getIdentifier(), false);
+            throw new SequenceFaultFactory().createLastMessageNumberExceededFault(st.getIdentifier());
         }        
         
         monitor.acknowledgeMessage();
@@ -129,38 +123,33 @@ public class DestinationSequence extends AbstractSequence {
                     && r.getUpper().compareTo(messageNumber) >= 0) {
                     done = true;
                     break;
-                }
-                long diff = r.getLower() - messageNumber;
-                if (diff == 1) {
-                    r.setLower(messageNumber);
-                    done = true;
-                } else if (diff > 0) {
-                    break;
-                } else if (messageNumber - r.getUpper().longValue() == 1) {
-                    r.setUpper(messageNumber);
-                    done = true;
-                    break;
+                } else {
+                    long diff = r.getLower() - messageNumber;
+                    if (diff == 1) {
+                        r.setLower(messageNumber);
+                        done = true;
+                    } else if (diff > 0) {
+                        break;
+                    } else if (messageNumber - r.getUpper().longValue() == 1) {
+                        r.setUpper(messageNumber);
+                        done = true;
+                        break;
+                    }
                 }
             }
 
             if (!done) {
-                
-                // need new acknowledgement range
-                AcknowledgementRange range = new AcknowledgementRange();
+                AcknowledgementRange range = RMUtils.getWSRMFactory()
+                    .createSequenceAcknowledgementAcknowledgementRange();
                 range.setLower(messageNumber);
                 range.setUpper(messageNumber);
                 acknowledgement.getAcknowledgementRange().add(i, range);
-                if (acknowledgement.getAcknowledgementRange().size() > 1) {
-                    
-                    // acknowledge out-of-order at first opportunity
-                    scheduleImmediateAcknowledgement();
-                    
-                }
             }
             mergeRanges();
+            wakeupAll();
         }
-        
-        RMAssertion rma = RM10PolicyUtils.getRMAssertion(destination.getManager().getRMAssertion(), message);
+                
+        RMAssertion rma = PolicyUtils.getRMAssertion(destination.getManager().getRMAssertion(), message);
         long acknowledgementInterval = 0;
         AcknowledgementInterval ai = rma.getAcknowledgementInterval();
         if (null != ai) {
@@ -220,7 +209,7 @@ public class DestinationSequence extends AbstractSequence {
     boolean canPiggybackAckOnPartialResponse() {
         // TODO: should also check if we allow breaking the WI Profile rule by which no headers
         // can be included in a HTTP response
-        return getAcksTo().getAddress().getValue().equals(RMUtils.getAddressingConstants().getAnonymousURI());
+        return getAcksTo().getAddress().getValue().equals(RMConstants.getAnonymousAddress());
     }
     
     /**
@@ -232,27 +221,24 @@ public class DestinationSequence extends AbstractSequence {
      * 
      * @param mn message number
      * @return <code>true</code> if message processing to continue, <code>false</code> if to be dropped
-     * @throws RMException if message had already been acknowledged
+     * @throws Fault if message had already been acknowledged
      */
     boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
         Continuation cont = getContinuation(message);
         DeliveryAssuranceType da = destination.getManager().getDeliveryAssurance();
-        boolean canSkip = !da.isSetAtLeastOnce() && !da.isSetExactlyOnce();
         if (cont != null && da.isSetInOrder() && !cont.isNew()) {
-            return waitInQueue(mn, canSkip, message, cont);
+            return waitInQueue(mn, !(da.isSetAtLeastOnce() || da.isSetExactlyOnce()),
+                               message, cont);
         }
         if ((da.isSetExactlyOnce() || da.isSetAtMostOnce()) && isAcknowledged(mn)) {            
-            
-            // acknowledge at first opportunity following duplicate message
-            scheduleImmediateAcknowledgement();
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "MESSAGE_ALREADY_DELIVERED_EXC", LOG, mn, getIdentifier().getValue());
             LOG.log(Level.INFO, msg.toString());
             throw new RMException(msg);
-            
         } 
         if (da.isSetInOrder()) {
-            return waitInQueue(mn, canSkip, message, cont);
+            return waitInQueue(mn, !(da.isSetAtLeastOnce() || da.isSetExactlyOnce()),
+                               message, cont);
         }
         return true;
     }
@@ -271,7 +257,7 @@ public class DestinationSequence extends AbstractSequence {
             // can process now if no other in process and this one is next
             if (inProcessNumber == 0) {
                 long diff = mn - highNumberCompleted;
-                if (diff == 1 || (canSkip && diff > 0)) {
+                if (diff == 1 || canSkip && diff > 0) {
                     inProcessNumber = mn;
                     return true;
                 }
@@ -327,7 +313,9 @@ public class DestinationSequence extends AbstractSequence {
         if (null == store) {
             return;
         }
-        store.removeMessages(getIdentifier(), Collections.singleton(new Long(messageNr)), false);
+        Collection<Long> messageNrs = new ArrayList<Long>();
+        messageNrs.add(messageNr);
+        store.removeMessages(getIdentifier(), messageNrs, false);
     }
 
     /**
@@ -497,4 +485,6 @@ public class DestinationSequence extends AbstractSequence {
             }
         }
     }
+    
+    
 }

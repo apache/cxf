@@ -28,12 +28,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.addressing.VersionTransformer;
+import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 
 /**
  * 
@@ -46,8 +46,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         addAfter(MAPAggregator.class.getName());
     }
     
-    protected void handle(Message msg) throws SequenceFault, RMException {  
-        if (isRuntimeFault(msg)) {
+    protected void handle(Message message) throws SequenceFault, RMException {  
+        if (isRuntimeFault(message)) {
             LogUtils.log(LOG, Level.WARNING, "RUNTIME_FAULT_MSG");
             // TODO: in case of a SequenceFault need to set action
             // to http://schemas.xmlsoap.org/ws/2004/a08/addressing/fault
@@ -55,19 +55,20 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return;
         }
        
-        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(msg, false, true);
+        AddressingProperties maps =
+            RMContextUtils.retrieveMAPs(message, false, true);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;
         }
         
-        Source source = getManager().getSource(msg);
-        ProtocolVariation protocol = source.getReliableEndpoint().getProtocol();
-        maps.exposeAs(protocol.getWSANamespace());
-        Destination destination = getManager().getDestination(msg);
+        RMContextUtils.ensureExposedVersion(maps);
+        
+        Source source = getManager().getSource(message);
+        Destination destination = getManager().getDestination(message);
 
         String action = null;
-        if (null != maps.getAction()) {
+        if (maps != null && null != maps.getAction()) {
             action = maps.getAction().getValue();
         }
         
@@ -76,9 +77,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
 
         boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
-        boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
-        RMConstants constants = protocol.getConstants();
-        boolean isLastMessage = constants.getCloseSequenceAction().equals(action);
+        boolean isPartialResponse = MessageUtils.isPartialResponse(message);
+        boolean isLastMessage = RMConstants.getLastMessageAction().equals(action);
         
         if (isApplicationMessage && !isPartialResponse) {
             RetransmissionInterceptor ri = new RetransmissionInterceptor();
@@ -88,17 +88,16 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             // interceptor chains (if this is not already a fault message) and therefore need to 
             // make sure the retransmission interceptor is added to the fault chain
             // 
-            msg.getInterceptorChain().add(ri);
+            message.getInterceptorChain().add(ri);
             LOG.fine("Added RetransmissionInterceptor to chain.");
             
             getManager().getRetransmissionQueue().start();
         }
         
-        RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
+        RMProperties rmpsOut = (RMProperties)RMContextUtils.retrieveRMProperties(message, true);
         if (null == rmpsOut) {
             rmpsOut = new RMProperties();
-            rmpsOut.exposeAs(protocol.getWSRMNamespace());
-            RMContextUtils.storeRMProperties(msg, rmpsOut, true);
+            RMContextUtils.storeRMProperties(message, rmpsOut, true);
         }
         
         RMProperties rmpsIn = null;
@@ -106,12 +105,12 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         long inMessageNumber = 0;
         
         if (isApplicationMessage) {
-            rmpsIn = RMContextUtils.retrieveRMProperties(msg, false);
+            rmpsIn = (RMProperties)RMContextUtils.retrieveRMProperties(message, false);
             if (null != rmpsIn && null != rmpsIn.getSequence()) {
                 inSeqId = rmpsIn.getSequence().getIdentifier();
                 inMessageNumber = rmpsIn.getSequence().getMessageNumber();
             }
-            ContextUtils.storeDeferUncorrelatedMessageAbort(msg);
+            ContextUtils.storeDeferUncorrelatedMessageAbort(message);
         }
         
         if ((isApplicationMessage || isLastMessage)
@@ -125,15 +124,16 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             synchronized (source) {
                 SourceSequence seq = null;
                 if (isLastMessage) {
-                    Map<?, ?> invocationContext = (Map)msg.get(Message.INVOCATION_CONTEXT);
+                    Map<?, ?> invocationContext = (Map)message.get(Message.INVOCATION_CONTEXT);
                     seq = (SourceSequence)invocationContext.get(SourceSequence.class.getName());
                 } else {
-                    seq = getManager().getSequence(inSeqId, msg, maps);
+                    seq = getManager().getSequence(inSeqId, message, maps);
                 }
                 assert null != seq;
 
                 // increase message number and store a sequence type object in
                 // context
+
                 seq.nextMessageNumber(inSeqId, inMessageNumber, isLastMessage);
                 
                 rmpsOut.setSequence(seq);
@@ -146,35 +146,40 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                     source.setCurrent(null);
                 }
             }
-        } else if (!MessageUtils.isRequestor(msg) && constants.getCreateSequenceAction().equals(action)) {
-            maps.getAction().setValue(constants.getCreateSequenceResponseAction());
+        } else {
+            if (!MessageUtils.isRequestor(message)
+                && RMConstants.getCreateSequenceAction().equals(action)) {
+                maps.getAction().setValue(RMConstants.getCreateSequenceResponseAction());
+            }
         }
         
         // add Acknowledgements (to application messages or explicitly 
         // created Acknowledgement messages only)
-        if (isApplicationMessage || constants.getSequenceAckAction().equals(action)) {
-            AttributedURIType to = maps.getTo();
+
+        if (isApplicationMessage 
+            || RMConstants.getSequenceAcknowledgmentAction().equals(action)) {
+            AttributedURI to = VersionTransformer.convert(maps.getTo());
             assert null != to;
             addAcknowledgements(destination, rmpsOut, inSeqId, to);
             if (isPartialResponse && rmpsOut.getAcks() != null && rmpsOut.getAcks().size() > 0) {
                 AttributedURIType actionURI = new AttributedURIType();
-                actionURI.setValue(constants.getSequenceAckAction());
+                actionURI.setValue(RMConstants.getSequenceAcknowledgmentAction());
                 maps.setAction(actionURI);
             }
         } 
         
-        if (constants.getSequenceAckAction().equals(action)
-            || constants.getTerminateSequenceAction().equals(action)) {
+        if (RMConstants.getSequenceAckAction().equals(action)
+            || RMConstants.getTerminateSequenceAction().equals(action)) {
             maps.setReplyTo(RMUtils.createNoneReference());
         }
         
-        assertReliability(msg);
+        assertReliability(message);
     }
     
     void addAcknowledgements(Destination destination, 
                              RMProperties rmpsOut, 
                              Identifier inSeqId, 
-                             AttributedURIType to) {
+                             AttributedURI to) {
         for (DestinationSequence seq : destination.getAllSequences()) {
             if (!seq.sendAcknowledgement()) {
                 if (LOG.isLoggable(Level.FINE)) {
@@ -183,16 +188,15 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                 }
                 continue;
             }
-            String address = seq.getAcksTo().getAddress().getValue();
-            if (!to.getValue().equals(address)) {
+            if (!to.getValue().equals(seq.getAcksTo().getAddress().getValue())) {
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("sequences acksTo address (" + address
+                    LOG.fine("sequences acksTo address (" + seq.getAcksTo().getAddress().getValue()
                         + ") does not match to address (" + to.getValue() + ")");
                 }
                 continue;
             }
             // there may be multiple sources with anonymous acksTo 
-            if (RMUtils.getAddressingConstants().getAnonymousURI().equals(address)
+            if (RMConstants.getAnonymousAddress().equals(seq.getAcksTo().getAddress().getValue())
                 && !AbstractSequence.identifierEquals(seq.getIdentifier(), inSeqId)) {                
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("sequence identifier does not match inbound sequence identifier");

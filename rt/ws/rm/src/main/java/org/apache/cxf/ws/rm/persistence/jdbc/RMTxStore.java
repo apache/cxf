@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,17 +43,17 @@ import javax.annotation.PostConstruct;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
-import org.apache.cxf.ws.rm.ProtocolVariation;
+import org.apache.cxf.ws.rm.Identifier;
 import org.apache.cxf.ws.rm.RMUtils;
+import org.apache.cxf.ws.rm.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.PersistenceUtils;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+
 
 public class RMTxStore implements RMStore {
     
@@ -85,6 +86,7 @@ public class RMTxStore implements RMStore {
     private static final String INBOUND_MSGS_TABLE_NAME = "CXF_RM_INBOUND_MESSAGES";
     private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";    
     
+    
     private static final String CREATE_DEST_SEQUENCE_STMT_STR 
         = "INSERT INTO CXF_RM_DEST_SEQUENCES (SEQ_ID, ACKS_TO, ENDPOINT_ID) VALUES(?, ?, ?)";
     private static final String CREATE_SRC_SEQUENCE_STMT_STR
@@ -101,6 +103,12 @@ public class RMTxStore implements RMStore {
         = "INSERT INTO {0} VALUES(?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
+    private static final String SELECT_DEST_SEQUENCE_STMT_STR =
+        "SELECT ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
+        + "WHERE SEQ_ID = ?";
+    private static final String SELECT_SRC_SEQUENCE_STMT_STR =
+        "SELECT CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID FROM CXF_RM_SRC_SEQUENCES "
+        + "WHERE SEQ_ID = ?";
     private static final String SELECT_DEST_SEQUENCES_STMT_STR =
         "SELECT SEQ_ID, ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
         + "WHERE ENDPOINT_ID = ?";
@@ -109,7 +117,7 @@ public class RMTxStore implements RMStore {
         + "WHERE ENDPOINT_ID = ?";
     private static final String SELECT_MESSAGES_STMT_STR =
         "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
-    
+
     private static final String DERBY_TABLE_EXISTS_STATE = "X0Y32";
     private static final int ORACLE_TABLE_EXISTS_CODE = 955;
     
@@ -117,7 +125,7 @@ public class RMTxStore implements RMStore {
     
     private Connection connection;
     private Lock writeLock = new ReentrantLock();
-    
+
     private PreparedStatement createDestSequenceStmt;
     private PreparedStatement createSrcSequenceStmt;
     private PreparedStatement deleteDestSequenceStmt;
@@ -126,6 +134,8 @@ public class RMTxStore implements RMStore {
     private PreparedStatement updateSrcSequenceStmt;
     private PreparedStatement selectDestSequencesStmt;
     private PreparedStatement selectSrcSequencesStmt;
+    private PreparedStatement selectDestSequenceStmt;
+    private PreparedStatement selectSrcSequenceStmt;
     private PreparedStatement createInboundMessageStmt;
     private PreparedStatement createOutboundMessageStmt;
     private PreparedStatement deleteInboundMessageStmt;
@@ -147,7 +157,7 @@ public class RMTxStore implements RMStore {
     public String getDriverClassName() {
         return driverClassName;
     }
-    
+
     public void setPassword(String p) {
         password = p;
     }
@@ -163,7 +173,7 @@ public class RMTxStore implements RMStore {
     public String getUrl() {
         return url;
     }
-    
+
     public void setUserName(String un) {
         userName = un;
     }
@@ -171,7 +181,7 @@ public class RMTxStore implements RMStore {
     public String getUserName() {
         return userName;
     }    
-    
+   
     public void setConnection(Connection c) {
         connection = c;
     }
@@ -237,6 +247,68 @@ public class RMTxStore implements RMStore {
         }
     }
     
+    public DestinationSequence getDestinationSequence(Identifier sid) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.info("Getting destination sequence for id: " + sid);
+        }
+        try {
+            if (null == selectDestSequenceStmt) {
+                selectDestSequenceStmt = 
+                    connection.prepareStatement(SELECT_DEST_SEQUENCE_STMT_STR);               
+            }
+            selectDestSequenceStmt.setString(1, sid.getValue());
+            
+            ResultSet res = selectDestSequenceStmt.executeQuery(); 
+            if (res.next()) {
+                EndpointReferenceType acksTo = RMUtils.createReference2004(res.getString(1));  
+                long lm = res.getLong(2);
+                InputStream is = res.getBinaryStream(3); 
+                SequenceAcknowledgement ack = null;
+                if (null != is) {
+                    ack = PersistenceUtils.getInstance()
+                        .deserialiseAcknowledgment(is); 
+                }
+                return new DestinationSequence(sid, acksTo, lm, ack);
+            }
+        } catch (SQLException ex) {
+            LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
+        }
+        return null;
+    }
+    
+    public SourceSequence getSourceSequence(Identifier sid) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.info("Getting source sequences for id: " + sid);
+        }
+        try {
+            if (null == selectSrcSequenceStmt) {
+                selectSrcSequenceStmt = 
+                    connection.prepareStatement(SELECT_SRC_SEQUENCE_STMT_STR);     
+            }
+            selectSrcSequenceStmt.setString(1, sid.getValue());
+            ResultSet res = selectSrcSequenceStmt.executeQuery();
+            
+            if (res.next()) {
+                long cmn = res.getLong(1);
+                boolean lm = res.getBoolean(2);
+                long lval = res.getLong(3);
+                Date expiry = 0 == lval ? null : new Date(lval);
+                String oidValue = res.getString(4);
+                Identifier oi = null;
+                if (null != oidValue) {
+                    oi = RMUtils.getWSRMFactory().createIdentifier();
+                    oi.setValue(oidValue);
+                }                            
+                return new SourceSequence(sid, expiry, oi, cmn, lm);
+                          
+            }
+        } catch (SQLException ex) {
+            // ignore
+            LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
+        }
+        return null;
+    }
+
     public void removeDestinationSequence(Identifier sid) {
         try {
             beginTransaction();
@@ -254,8 +326,8 @@ public class RMTxStore implements RMStore {
             throw new RMStoreException(ex);
         }        
     }
-    
-    
+
+
     public void removeSourceSequence(Identifier sid) {
         try {
             beginTransaction();
@@ -274,8 +346,7 @@ public class RMTxStore implements RMStore {
         }        
     }
     
-    public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier,
-        ProtocolVariation protocol) {
+    public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting destination sequences for endpoint: " + endpointIdentifier);
         }
@@ -289,9 +360,9 @@ public class RMTxStore implements RMStore {
             
             ResultSet res = selectDestSequencesStmt.executeQuery(); 
             while (res.next()) {
-                Identifier sid = new Identifier();                
+                Identifier sid = RMUtils.getWSRMFactory().createIdentifier();                
                 sid.setValue(res.getString(1));
-                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(2));  
+                EndpointReferenceType acksTo = RMUtils.createReference2004(res.getString(2));  
                 long lm = res.getLong(3);
                 InputStream is = res.getBinaryStream(4); 
                 SequenceAcknowledgement ack = null;
@@ -299,7 +370,7 @@ public class RMTxStore implements RMStore {
                     ack = PersistenceUtils.getInstance()
                         .deserialiseAcknowledgment(is); 
                 }
-                DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, ack, protocol);
+                DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, ack);
                 seqs.add(seq);                                                 
             }
         } catch (SQLException ex) {
@@ -308,8 +379,7 @@ public class RMTxStore implements RMStore {
         return seqs;
     }
     
-    public Collection<SourceSequence> getSourceSequences(String endpointIdentifier,
-        ProtocolVariation protocol) {
+    public Collection<SourceSequence> getSourceSequences(String endpointIdentifier) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting source sequences for endpoint: " + endpointIdentifier);
         }
@@ -323,7 +393,7 @@ public class RMTxStore implements RMStore {
             ResultSet res = selectSrcSequencesStmt.executeQuery();
             
             while (res.next()) {
-                Identifier sid = new Identifier();
+                Identifier sid = RMUtils.getWSRMFactory().createIdentifier();
                 sid.setValue(res.getString(1));
                 long cmn = res.getLong(2);
                 boolean lm = res.getBoolean(3);
@@ -332,10 +402,10 @@ public class RMTxStore implements RMStore {
                 String oidValue = res.getString(5);
                 Identifier oi = null;
                 if (null != oidValue) {
-                    oi = new Identifier();
+                    oi = RMUtils.getWSRMFactory().createIdentifier();
                     oi.setValue(oidValue);
                 }                            
-                SourceSequence seq = new SourceSequence(sid, expiry, oi, cmn, lm, protocol);
+                SourceSequence seq = new SourceSequence(sid, expiry, oi, cmn, lm);
                 seqs.add(seq);                          
             }
         } catch (SQLException ex) {
@@ -376,7 +446,7 @@ public class RMTxStore implements RMStore {
         }
         return msgs;
     }
-    
+
     public void persistIncoming(DestinationSequence seq, RMMessage msg) {        
         try {
             beginTransaction();
@@ -413,7 +483,7 @@ public class RMTxStore implements RMStore {
             throw new RMStoreException(ex);        
         }        
     }
-    
+
     public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
         try {
             beginTransaction();
@@ -427,7 +497,7 @@ public class RMTxStore implements RMStore {
                     deleteInboundMessageStmt = stmt;
                 }
             }
-    
+
             stmt.setString(1, sid.getValue());
                         
             for (Long messageNr : messageNrs) {
@@ -442,7 +512,7 @@ public class RMTxStore implements RMStore {
             throw new RMStoreException(ex);
         }        
     }
-    
+
     // transaction demarcation
     // 
     
@@ -581,11 +651,11 @@ public class RMTxStore implements RMStore {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
                 return;
             }
-    
+
             try {
                 LOG.log(Level.FINE, "Using url: " + url);
                 connection = DriverManager.getConnection(url, userName, password);
-    
+
             } catch (SQLException ex) {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
                 return;
@@ -645,9 +715,9 @@ public class RMTxStore implements RMStore {
             LOG.log(Level.FINE, "Trying to delete directory {0}", root);
             recursiveDelete(root, now);
         }
-    
+
     }
-    
+
     private static void recursiveDelete(File dir, boolean now) {
         for (File f : dir.listFiles()) {
             if (f.isDirectory()) {
@@ -666,9 +736,11 @@ public class RMTxStore implements RMStore {
             dir.deleteOnExit();
         }
     }
-    
+
     private static boolean isTableExistsError(SQLException ex) {
         return DERBY_TABLE_EXISTS_STATE.equals(ex.getSQLState())
                 || ORACLE_TABLE_EXISTS_CODE == ex.getErrorCode();
     }
+
+
 }

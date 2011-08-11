@@ -43,18 +43,15 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.EndpointPolicy;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
-import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -72,7 +69,7 @@ public class RMEndpointTest extends Assert {
         control = EasyMock.createNiceControl();
         manager = control.createMock(RMManager.class);
         ae = control.createMock(Endpoint.class);
-        rme = new RMEndpoint(manager, ae, ProtocolVariation.RM10WSA200408);
+        rme = new RMEndpoint(manager, ae);
     }
 
     @After
@@ -147,7 +144,8 @@ public class RMEndpointTest extends Assert {
         rme.setPolicies();
         EasyMock.expectLastCall();
         Conduit c = control.createMock(Conduit.class);
-        EndpointReferenceType epr = control.createMock(EndpointReferenceType.class);
+        org.apache.cxf.ws.addressing.EndpointReferenceType epr = control
+            .createMock(org.apache.cxf.ws.addressing.EndpointReferenceType.class);
         control.replay();
         rme.initialise(c, epr, null);
         assertSame(c, rme.getConduit());
@@ -174,7 +172,6 @@ public class RMEndpointTest extends Assert {
         rme = control.createMock(RMEndpoint.class, new Method[] {m});
         rme.setAplicationEndpoint(ae);
         rme.setManager(manager);
-        rme.setProtocol(ProtocolVariation.RM10WSA200408);
         Service as = control.createMock(Service.class);
         EasyMock.expect(ae.getService()).andReturn(as);
         EndpointInfo aei = control.createMock(EndpointInfo.class);
@@ -198,7 +195,7 @@ public class RMEndpointTest extends Assert {
         assertSame(ae, we.getWrappedEndpoint());
         Service s = rme.getService();
         assertEquals(1, s.getEndpoints().size());
-        assertSame(e, s.getEndpoints().get(RM10Constants.PORT_NAME));
+        assertSame(e, s.getEndpoints().get(RMConstants.getPortName()));
     }
 
     @Test
@@ -318,24 +315,22 @@ public class RMEndpointTest extends Assert {
     public void testShutdown() {
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         Identifier did = control.createMock(Identifier.class);
-        EasyMock.expect(ds.getIdentifier()).andReturn(did).anyTimes();
-        EasyMock.expect(ds.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        EasyMock.expect(ds.getIdentifier()).andReturn(did);
         String d = "d";
-        EasyMock.expect(did.getValue()).andReturn(d).anyTimes();        
+        EasyMock.expect(did.getValue()).andReturn(d);        
         SourceSequence ss = control.createMock(SourceSequence.class);
         Identifier sid = control.createMock(Identifier.class);
-        EasyMock.expect(ss.getIdentifier()).andReturn(sid).anyTimes();
-        EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        EasyMock.expect(ss.getIdentifier()).andReturn(sid);
         String s = "s";
-        EasyMock.expect(sid.getValue()).andReturn(s).anyTimes();        
+        EasyMock.expect(sid.getValue()).andReturn(s);        
         ds.cancelDeferredAcknowledgments();
-        EasyMock.expectLastCall().anyTimes();
+        EasyMock.expectLastCall();
         ds.cancelTermination();
-        EasyMock.expectLastCall().anyTimes();
+        EasyMock.expectLastCall();
         RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
-        EasyMock.expect(manager.getRetransmissionQueue()).andReturn(queue).anyTimes();
+        EasyMock.expect(manager.getRetransmissionQueue()).andReturn(queue);
         queue.stop(ss);
-        EasyMock.expectLastCall().anyTimes();
+        EasyMock.expectLastCall();
         control.replay();
         rme.getDestination().addSequence(ds, false);
         rme.getSource().addSequence(ss, false);
@@ -368,7 +363,8 @@ public class RMEndpointTest extends Assert {
 
         assertEquals(7, intf.getOperations().size());
 
-        String ns = RM10Constants.NAMESPACE_URI;
+        String ns = si.getName().getNamespaceURI();
+        ns = RMConstants.getNamespace();
         OperationInfo oi = intf.getOperation(new QName(ns, "CreateSequence"));
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is oneway.", !oi.isOneWay());
@@ -384,7 +380,7 @@ public class RMEndpointTest extends Assert {
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is toway.", oi.isOneWay());
         
-        oi = intf.getOperation(new QName(ns, "CloseSequence"));
+        oi = intf.getOperation(new QName(ns, "LastMessage"));
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is toway.", oi.isOneWay());
         
@@ -400,4 +396,5 @@ public class RMEndpointTest extends Assert {
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is toway.", oi.isOneWay());
     }
+
 }

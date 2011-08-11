@@ -1,0 +1,110 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project name="jbi-demo-service-unit" default="build">
+
+  <property name="build.dir" location="./build"/>
+  <property name="build.classes.dir" location="${build.dir}/classes"/>
+  <property name="build.src.dir" location="${build.dir}/src"/>
+  <property name="build.lib.dir" location="${build.dir}/lib"/>
+  <property name="src.dir" location="./src"/>
+  <property name="wsdl.dir" location="./wsdl"/>
+  <property environment="env"/>
+  <property file="${env.CXF_HOME}/etc/version.properties"/>
+  <!-- reuse the macros defined in cxf samples -->
+  <import file="${env.CXF_HOME}/samples/common_build.xml"/>        
+  
+  <condition property="integration.jar.dir" value="${env.CXF_HOME}/modules/integration" else="${env.CXF_HOME}/lib">
+      <available file="${env.CXF_HOME}/modules/integration" type="dir"/>
+  </condition>
+  <path id="build.classpath">
+    <pathelement location="${build.classes.dir}"/>
+    <pathelement location="${env.SERVICEMIX_HOME}/lib/servicemix-jbi-3.2.1.jar"/>
+    <fileset dir="${env.CXF_HOME}/lib">
+      <include name="cxf-manifest.jar"/>
+    </fileset>
+    <fileset dir="${integration.jar.dir}">
+      <include name="cxf-integration-jbi-${cxf.version}.jar"/>    
+    </fileset>
+  </path>
+  
+  <target name="build" depends="build-service-units"/>
+
+  <target name="generate-code">
+    <mkdir dir="${build.src.dir}"/>
+    <echo level="info" message="Generating code using wsdl2java..."/>
+    <wsdl2java file="hello_world.wsdl"/>
+  </target>
+
+  <target name="update-code" description="updates code with actual wsdl location">
+
+    <replace dir="src"  value="${wsdl.dir}${file.separator}">
+       <include name="**/*.java"/>
+       <replacetoken>@wsdl_path@</replacetoken>
+    </replace>
+
+    <!-- for windows make sure that '\' are escaped -->
+    <replace dir="src"  value="\\">
+       <include name="**/*.java"/>
+       <replacetoken>\</replacetoken>
+    </replace>
+
+  </target>
+
+  <target name="compile" depends="generate-code">
+    <mkdir dir="${build.classes.dir}"/>
+    <javac destdir="${build.classes.dir}" srcdir="${build.src.dir}" debug="true">
+      <classpath refid="build.classpath"/>
+    </javac>
+    <javac destdir="${build.classes.dir}" srcdir="${src.dir}" debug="true">
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <target name="build-service-units" depends="compile">
+    <mkdir dir="${build.lib.dir}"/>
+    <zip destfile="${build.lib.dir}/jms-binding-su.zip">
+      <fileset dir="./etc/jms-binding-su"/>
+      <fileset dir="./wsdl"/>
+    </zip>
+    <zip destfile="${build.lib.dir}/http-binding-su.zip">
+      <fileset dir="./etc/http-binding-su"/>
+      <fileset dir="./wsdl"/>
+    </zip>
+
+
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <target name="server" description="run demo client">
+      <cxfrun classname="test.provider.Server" 
+            param1="./wsdl/hello_world.wsdl"/>
+  </target>
+
+  <target name="client" description="run demo client">
+        <property name="param" value=""/>
+        <cxfrun classname="test.consumer.HelloWorldConsumer"
+            
+            param1="./wsdl/hello_world.wsdl"/>
+  </target>
+
+</project>
+

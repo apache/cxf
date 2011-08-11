@@ -37,9 +37,6 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.v200702.AckRequestedType;
-import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 public class Destination extends AbstractEndpoint {
     
@@ -65,17 +62,13 @@ public class Destination extends AbstractEndpoint {
     }
 
     public void addSequence(DestinationSequence seq, boolean persist) {
-        if (seq.getProtocol() == getReliableEndpoint().getProtocol()) {
-            seq.setDestination(this);
-            map.put(seq.getIdentifier().getValue(), seq);
-            if (persist) {
-                RMStore store = getReliableEndpoint().getManager().getStore();
-                if (null != store) {
-                    store.createDestinationSequence(seq);
-                }
+        seq.setDestination(this);
+        map.put(seq.getIdentifier().getValue(), seq);
+        if (persist) {
+            RMStore store = getReliableEndpoint().getManager().getStore();
+            if (null != store) {
+                store.createDestinationSequence(seq);
             }
-        } else {
-            LOG.log(Level.SEVERE, "Incompatible protocol version");
         }
     }
 
@@ -102,8 +95,7 @@ public class Destination extends AbstractEndpoint {
      *             <code>sequenceType</code> does not exist
      */
     public void acknowledge(Message message) throws SequenceFault, RMException {
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        SequenceType sequenceType = rmps.getSequence();
+        SequenceType sequenceType = RMContextUtils.retrieveRMProperties(message, false).getSequence();
         if (null == sequenceType) {
             return;
         }
@@ -114,7 +106,7 @@ public class Destination extends AbstractEndpoint {
             if (seq.applyDeliveryAssurance(sequenceType.getMessageNumber(), message)) {
                 seq.acknowledge(message);
     
-                if (null != rmps.getCloseSequence()) {
+                if (null != sequenceType.getLastMessage()) {
                     seq.setLastMessageNumber(sequenceType.getMessageNumber());
                     ackImmediately(seq, message);
                 }
@@ -138,8 +130,7 @@ public class Destination extends AbstractEndpoint {
                 }
             }
         } else {
-            RMConstants consts = getReliableEndpoint().getProtocol().getConstants();
-            SequenceFaultFactory sff = new SequenceFaultFactory(consts);
+            SequenceFaultFactory sff = new SequenceFaultFactory();
             throw sff.createUnknownSequenceFault(sequenceType.getIdentifier());
         }
 
@@ -201,9 +192,8 @@ public class Destination extends AbstractEndpoint {
         DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
         if (null != seq) {
-            long mn = sequenceType.getMessageNumber().longValue();
-            seq.processingComplete(mn);
-            seq.purgeAcknowledged(mn);
+            seq.processingComplete(sequenceType.getMessageNumber());
+            seq.purgeAcknowledged(sequenceType.getMessageNumber());
         }
     }
     

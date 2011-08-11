@@ -42,11 +42,9 @@ import org.apache.cxf.systest.ws.util.OutMessageRecorder;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -144,6 +142,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         responses[2] = greeter.greetMeAsync("three");
         
         verifyMissingResponse(responses);
+
         control.stopGreeter(SERVER_LOSS_CFG);
         LOG.fine("Stopped greeter server");
        
@@ -171,7 +170,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     
     void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
         awaitMessages(5, 8, 10000);
-
+        
         int nDone = 0;
         for (int i = 0; i < 3; i++) {
             if (responses[i].isDone()) {
@@ -181,20 +180,19 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         assertEquals("Unexpected number of responses already received.", 2, nDone);
         
-        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
-            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
-        String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION,
+        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
+        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
                                                  GREETME_ACTION,
                                                  GREETME_ACTION,
                                                  GREETME_ACTION,
-                                                 RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
+                                                 RMConstants.getSequenceAckAction()};
         mf.verifyActions(expectedActions, true);
         // mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
         // mf.verifyAcknowledgements(new boolean[] {false, false, true, false}, true);
         
         mf.verifyPartialResponses(5);
         mf.purgePartialResponses();
-        expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
+        expectedActions = new String[] {RMConstants.getCreateSequenceResponseAction(),
                                         GREETME_RESPONSE_ACTION,
                                         GREETME_RESPONSE_ACTION};
         mf.verifyActions(expectedActions, false);
@@ -226,8 +224,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         // verify that all inbound messages are resent responses
         
         synchronized (this) {
-            MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
-                Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
+            MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
             int nOut = out.getOutboundMessages().size();
             int nIn = in.getInboundMessages().size();
             assertEquals("Unexpected outbound message(s)", 0, nOut);
@@ -250,8 +247,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     }
     
     void verifyAcknowledgementRange(long lower, long higher) throws Exception {
-        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
-            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
+        MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages());
         mf.verifyAcknowledgementRange(lower, higher);
     }
 

@@ -40,8 +40,7 @@ import org.apache.cxf.systest.ws.util.MessageRecorder;
 import org.apache.cxf.systest.ws.util.OutMessageRecorder;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rm.RMConstants;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -162,12 +161,11 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(5, 9, 5000);
 
-        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages(),
-            Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
         
         
         mf.verifyMessages(5, true);
-        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(), 
+        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(), 
                                                  GREETMEONEWAY_ACTION,
                                                  GREETME_ACTION, 
                                                  PINGME_ACTION,
@@ -182,7 +180,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         mf.purgePartialResponses();
 
         expectedActions = new String[] {
-            RM10Constants.INSTANCE.getCreateSequenceResponseAction(),
+            RMConstants.getCreateSequenceResponseAction(),
             GREETME_RESPONSE_ACTION,
             PINGME_RESPONSE_ACTION,
             GREETER_FAULT_ACTION

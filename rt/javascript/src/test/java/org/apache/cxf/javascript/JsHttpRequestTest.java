@@ -38,6 +38,7 @@ import org.apache.cxf.test.XPathAssert;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.GenericApplicationContext;
@@ -83,6 +84,7 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
     
     // just one test function to avoid muddles with engine startup/shutdown
     @Test
+    @Ignore
     public void runTests() throws Exception {
         testUtilities.rhinoCallExpectingExceptionInContext("SYNTAX_ERR", "testOpaqueURI");
         testUtilities.rhinoCallExpectingExceptionInContext("SYNTAX_ERR", "testNonAbsolute");
