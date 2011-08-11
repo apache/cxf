@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.common;
+package org.apache.cxf.rs.security.common;
 
 import java.io.IOException;
 import java.io.InputStream;

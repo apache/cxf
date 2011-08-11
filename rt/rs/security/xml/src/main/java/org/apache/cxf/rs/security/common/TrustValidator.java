@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.security.common;
+package org.apache.cxf.rs.security.common;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
