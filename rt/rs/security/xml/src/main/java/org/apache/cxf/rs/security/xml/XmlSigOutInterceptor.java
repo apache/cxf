@@ -24,9 +24,12 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
@@ -37,7 +40,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.ElementProxy;
 import org.opensaml.xml.signature.SignatureConstants;
 
 
@@ -45,13 +47,17 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlSigOutInterceptor.class);
     
-    private boolean createReferenceId = true;
+    private boolean enveloping;
     private String defaultSigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
     private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
     
     public XmlSigOutInterceptor() {
     } 
 
+    public void setEnveloping(boolean env) {
+        this.enveloping = env;
+    }
+    
     public void setSignatureAlgorithm(String algo) {
         defaultSigAlgo = algo;
     }
@@ -60,18 +66,14 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         digestAlgo = algo;
     }
     
-    public void setCreateReferenceId(boolean create) {
-        createReferenceId = create;
-    }
     
     protected Document processDocument(Message message, Document doc) 
         throws Exception {
-        createEnvelopedSignature(message, doc);
-        return doc;
+        return createEnvelopedSignature(message, doc);
     }
     
     // enveloping & detached sigs will be supported too
-    private void createEnvelopedSignature(Message message, Document doc) 
+    private Document createEnvelopedSignature(Message message, Document doc) 
         throws Exception {
         
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
@@ -89,7 +91,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         String user = SecurityUtils.getUserName(message, crypto, userNameKey);
          
         if (StringUtils.isEmpty(user)) {
-            return;
+            return null;
         }
 
         String password = 
@@ -110,28 +112,60 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             LOG.severe(errorMessage);
             throw new WSSecurityException(errorMessage, ex);
         }
-        //
-        ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, "ds");
         
-        String referenceId = "";
-        if (createReferenceId) {
-            String id = UUID.randomUUID().toString();
-            referenceId = "#" + id;
-            doc.getDocumentElement().setAttribute("ID", id);    
+        String id = UUID.randomUUID().toString();
+        String referenceId = "#" + id;
+        
+        XMLSignature sig = null;
+        if (enveloping) {
+            sig = prepareEnvelopingSignature(doc, id, referenceId, sigAlgo);
+        } else {
+            sig = prepareEnvelopedSignature(doc, id, referenceId, sigAlgo);
         }
         
+        
+        sig.addKeyInfo(issuerCerts[0]);
+        sig.addKeyInfo(issuerCerts[0].getPublicKey());
+        sig.sign(privateKey);
+        return sig.getElement().getOwnerDocument();
+    }
+    
+    private XMLSignature prepareEnvelopingSignature(Document doc, 
+                                                    String id, 
+                                                    String referenceId,
+                                                    String sigAlgo) throws Exception {
+        Element docEl = doc.getDocumentElement();
+        Document newDoc = DOMUtils.createDocument();
+        doc.removeChild(docEl);
+        newDoc.adoptNode(docEl);
+        Element object = newDoc.createElementNS(Constants.SignatureSpecNS, "ds:Object");
+        object.appendChild(docEl);
+        object.setAttribute("ID", id);
+        
+        XMLSignature sig = new XMLSignature(newDoc, "", sigAlgo);
+        newDoc.appendChild(sig.getElement());
+        sig.getElement().appendChild(object);
+        
+        Transforms transforms = new Transforms(newDoc);
+        transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+        
+        sig.addDocument(referenceId, transforms, digestAlgo);
+        return sig;
+    }
+    
+    private XMLSignature prepareEnvelopedSignature(Document doc, 
+            String id, 
+            String referenceURI,
+            String sigAlgo) throws Exception {
+        doc.getDocumentElement().setAttribute("ID", id);    
+    
         XMLSignature sig = new XMLSignature(doc, "", sigAlgo);
         doc.getDocumentElement().appendChild(sig.getElement());
         Transforms transforms = new Transforms(doc);
         transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
         transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
         
-        sig.addDocument("", transforms, digestAlgo, referenceId, null);
-        
-        sig.addKeyInfo(issuerCerts[0]);
-        sig.addKeyInfo(issuerCerts[0].getPublicKey());
-        sig.sign(privateKey);
+        sig.addDocument(referenceURI, transforms, digestAlgo);
+        return sig;
     }
-    
-        
 }

@@ -50,6 +50,16 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostBookWithEnvelopedSig() throws Exception {
         String address = "https://localhost:" + PORT + "/xmlsig/bookstore/books";
+        doTestSignature(address, false);
+    }
+    
+    @Test
+    public void testPostBookWithEnvelopingSig() throws Exception {
+        String address = "https://localhost:" + PORT + "/xmlsig/bookstore/books";
+        doTestSignature(address, true);
+    }
+    
+    private void doTestSignature(String address, boolean enveloping) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -65,7 +75,9 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
-        bean.getOutInterceptors().add(new XmlSigOutInterceptor());
+        XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
+        sigInterceptor.setEnveloping(enveloping);
+        bean.getOutInterceptors().add(sigInterceptor);
         
         
         WebClient wc = bean.createWebClient();
@@ -81,7 +93,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                 fail(ex.getMessage());
             }
         }
-        
     }
     
     @Test

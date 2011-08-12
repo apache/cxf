@@ -30,8 +30,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -133,9 +133,15 @@ public class XmlSigInHandler implements RequestHandler {
         if (!valid) {
             throwFault("Signature validation failed", null);
         }
-        
-        root.removeAttribute("ID");
-        root.removeChild(sigElement);
+        if (!isEnveloping(root)) {
+            root.removeAttribute("ID");
+            root.removeChild(sigElement);
+        } else {
+            Element actualBody = getActualBody(root);
+            Document newDoc = DOMUtils.createDocument();
+            newDoc.adoptNode(actualBody);
+            root = actualBody;
+        }
         message.setContent(XMLStreamReader.class, 
                            new W3CDOMStreamReader(root));
         message.setContent(InputStream.class, null);
@@ -148,10 +154,40 @@ public class XmlSigInHandler implements RequestHandler {
         return null;
     }
     
+    private Element getActualBody(Element envelopingSigElement) {
+        Element objectNode = getNode(envelopingSigElement, Constants.SignatureSpecNS, "Object", 0);
+        if (objectNode == null) {
+            throwFault("Object envelope is not available", null);
+        }
+        NodeList list = objectNode.getChildNodes();
+        for (int i = 0; i < list.getLength(); i++) {
+            Node node = list.item(i);
+            if (node instanceof Element) {
+                objectNode.removeChild(node);
+                return (Element)node;
+            }
+        }
+        throwFault("No signed data is found", null);
+        return null;
+       
+    }
+    
     private Element getSignatureElement(Element root) {
-        NodeList list = root.getElementsByTagNameNS(Constants.SignatureSpecNS, "Signature");
-        if (list != null && list.getLength() == 1) {
-            return (Element)list.item(0);
+        if (isEnveloping(root)) {    
+            return root;
+        }
+        return getNode(root, Constants.SignatureSpecNS, "Signature", 0);
+    }
+    
+    protected boolean isEnveloping(Element root) {
+        return Constants.SignatureSpecNS.equals(root.getNamespaceURI())
+                && "Signature".equals(root.getLocalName());
+    }
+    
+    private Element getNode(Element parent, String ns, String name, int index) {
+        NodeList list = parent.getElementsByTagNameNS(ns, name);
+        if (list != null && list.getLength() >= index + 1) {
+            return (Element)list.item(index);
         } 
         return null;
     }
@@ -175,16 +211,16 @@ public class XmlSigInHandler implements RequestHandler {
         } catch (XMLSecurityException ex) {
             throwFault("Signature Reference is not available", ex);
         }
-        String rootId = root.getAttribute("ID");
-        String refId = ref.getId();
-        if (refId.length() == 0 && rootId.length() == 0) {
-            // or fragment must be expected ?
-            return;
-        }
-        if (refId.startsWith("#") && refId.length() > 1 && refId.substring(1).equals(rootId)) {
-            return;
-        } else {
-            throwFault("Signature Reference ID is invalid", null);
+        if (!isEnveloping(root)) {
+            String rootId = root.getAttribute("ID");
+            String refId = ref.getURI();
+            if (refId.length() == 0 && rootId.length() == 0) {
+                // or fragment must be expected ?
+                return;
+            }
+            if (!refId.startsWith("#") || refId.length() <= 1 || !refId.substring(1).equals(rootId)) {
+                throwFault("Signature Reference ID is invalid", null);
+            }
         }
         Transforms transforms = null;
         try {
@@ -192,20 +228,22 @@ public class XmlSigInHandler implements RequestHandler {
         } catch (XMLSecurityException ex) {
             throwFault("Signature transforms can not be obtained", ex);
         }
-        boolean isEnveloped = false;
-        for (int i = 0; i < transforms.getLength(); i++) {
-            try {
-                Transform tr = transforms.item(i);
-                if (Transforms.TRANSFORM_ENVELOPED_SIGNATURE.equals(tr.getURI())) {
-                    isEnveloped = true;
-                    break;
+        if (!isEnveloping(root)) {
+            boolean isEnveloped = false;
+            for (int i = 0; i < transforms.getLength(); i++) {
+                try {
+                    Transform tr = transforms.item(i);
+                    if (Transforms.TRANSFORM_ENVELOPED_SIGNATURE.equals(tr.getURI())) {
+                        isEnveloped = true;
+                        break;
+                    }
+                } catch (Exception ex) {
+                    throwFault("Problem accessing Transform instance", ex);    
                 }
-            } catch (Exception ex) {
-                throwFault("Problem accessing Transform instance", ex);    
             }
-        }
-        if (!isEnveloped) {
-            throwFault("Only enveloped signatures are currently supported", null);
+            if (!isEnveloped) {
+                throwFault("Only enveloped signatures are currently supported", null);
+            }
         }
     }
 }
