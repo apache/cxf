@@ -41,7 +41,7 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server11.class));
+                   launchServer(Server11.class, true));
     }
     
     @Test
@@ -52,9 +52,19 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             fail("Should throw Exception!");
         } catch (SOAPFaultException ex) {
             assertEquals("sayHiFault Caused by: Get a wrong name <sayHi>", ex.getMessage());
-            StackTraceElement[] element = ex.getCause().getStackTrace();
-            assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", element[0].getClassName());
-        }
+            StackTraceElement[] elements = ex.getCause().getStackTrace();
+            assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", 
+                         elements[0].getClassName());
+            ex.printStackTrace();
+            boolean findNPE = false;
+            for (StackTraceElement element : elements) {
+                if (element.getClassName().startsWith("Caused by:class java.lang.NullPointerException: ")) {
+                    findNPE = true;
+                    break;
+                }
+            }
+            assertTrue("Cannot find the Cause of NPE", findNPE);
+        } 
     }
     
 
