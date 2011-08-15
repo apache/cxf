@@ -86,4 +86,16 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://WSSec/ut}DoubleItSignedEndorsingPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.username" value="Alice"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+           <entry key="ws-security.signature.username" value="alice"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties>
+    </jaxws:client>
+    
 </beans>
