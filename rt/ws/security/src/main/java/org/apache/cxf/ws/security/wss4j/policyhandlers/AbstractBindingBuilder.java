@@ -1246,7 +1246,8 @@ public abstract class AbstractBindingBuilder {
         message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         setKeyIdentifierType(encrKey, wrapper, token);
         setEncryptionUser(encrKey, wrapper, false, crypto);
-        encrKey.setKeySize(binding.getAlgorithmSuite().getMaximumSymmetricKeyLength());
+        
+        encrKey.setSymmetricEncAlgorithm(binding.getAlgorithmSuite().getEncryption());
         encrKey.setKeyEncAlgo(binding.getAlgorithmSuite().getAsymmetricKeyWrap());
         
         encrKey.prepare(saaj.getSOAPPart(), crypto);
