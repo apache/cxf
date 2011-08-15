@@ -303,6 +303,31 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSaml2EndorsingOverTransport() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType saml1Port = service.getDoubleItSaml2EndorsingTransportPort();
+        updateAddressPort(saml1Port, PORT2);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+        );
+
+        BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
+    
+    
     
     private boolean checkUnrestrictedPoliciesInstalled() {
         try {
