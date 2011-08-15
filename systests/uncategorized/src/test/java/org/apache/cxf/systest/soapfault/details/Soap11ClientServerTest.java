@@ -58,7 +58,7 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             ex.printStackTrace();
             boolean findNPE = false;
             for (StackTraceElement element : elements) {
-                if (element.getClassName().startsWith("Caused by:class java.lang.NullPointerException: ")) {
+                if (element.getClassName().indexOf("java.lang.NullPointerException") > 0) {
                     findNPE = true;
                     break;
                 }
