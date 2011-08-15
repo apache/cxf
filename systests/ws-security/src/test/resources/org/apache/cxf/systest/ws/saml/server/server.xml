@@ -149,6 +149,24 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
+       id="Saml2EndorsingOverTransport"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingTransport" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml2EndorsingTransportPort"
+       xmlns:s="http://WSSec/saml"
+       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="Saml2TokenOverSymmetricProtection"
        address="http://localhost:${testutil.ports.Server}/DoubleItSaml2SymmetricProtection" 
        serviceName="s:DoubleItService"
