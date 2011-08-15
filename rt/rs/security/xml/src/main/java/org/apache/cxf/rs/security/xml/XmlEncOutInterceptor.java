@@ -53,6 +53,7 @@ import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.utils.EncryptionConstants;
 
 public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     
@@ -76,6 +77,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     }
     
     public void setSymmetricEncAlgorithm(String algo) {
+        if (!algo.startsWith(EncryptionConstants.EncryptionSpecNS)) {
+            algo = EncryptionConstants.EncryptionSpecNS + algo;
+        }
         symEncAlgo = algo;
     }
     

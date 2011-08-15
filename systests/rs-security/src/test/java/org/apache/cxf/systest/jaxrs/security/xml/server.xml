@@ -67,6 +67,9 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
     <bean id="xmlSigHandler" class="org.apache.cxf.rs.security.xml.XmlSigInHandler"/>
     <bean id="xmlEncHandler" class="org.apache.cxf.rs.security.xml.XmlEncInHandler"/>
+    <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
+        <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
+    </bean>
     
     <jaxrs:server 
        address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsig"> 
@@ -90,7 +93,10 @@ under the License.
        </jaxrs:serviceBeans>
        <jaxrs:providers>
           <ref bean="xmlEncHandler"/>
-       </jaxrs:providers> 
+       </jaxrs:providers>
+       <jaxrs:outInterceptors>
+          <ref bean="xmlEncOutHandler"/>
+       </jaxrs:outInterceptors> 
        <jaxrs:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
@@ -109,6 +115,9 @@ under the License.
           <ref bean="xmlEncHandler"/>
           <ref bean="xmlSigHandler"/>
        </jaxrs:providers> 
+       <jaxrs:outInterceptors>
+          <ref bean="xmlEncOutHandler"/>
+       </jaxrs:outInterceptors>
        <jaxrs:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
@@ -130,6 +139,9 @@ under the License.
           <ref bean="xmlEncHandler"/>
           <ref bean="xmlSigHandler"/>
        </jaxrs:providers> 
+       <jaxrs:outInterceptors>
+          <ref bean="xmlEncOutHandler"/>
+       </jaxrs:outInterceptors>
        <jaxrs:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>

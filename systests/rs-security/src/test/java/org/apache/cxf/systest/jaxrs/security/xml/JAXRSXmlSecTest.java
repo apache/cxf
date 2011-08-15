@@ -30,6 +30,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.xml.XmlEncInInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
@@ -215,6 +216,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         encInterceptor.setSymmetricEncAlgorithm(XMLCipher.AES_128);
         bean.getOutInterceptors().add(encInterceptor);
         
+        bean.getInInterceptors().add(new XmlEncInInterceptor());
         
         WebClient wc = bean.createWebClient();
         try {
