@@ -47,8 +47,10 @@ public class GreeterImpl11 {
     }
 
     public String sayHi() {
-        // throw the exception out
-        Exception cause = new IllegalArgumentException("Get a wrong name <sayHi>");
+        // throw the exception out with some cause
+        Exception cause = new IllegalArgumentException("Get a wrong name <sayHi>"
+                                                       , new NullPointerException("Test cause."));
+        cause.printStackTrace();
         throw new Fault("sayHiFault", LOG, cause);
     }
 
