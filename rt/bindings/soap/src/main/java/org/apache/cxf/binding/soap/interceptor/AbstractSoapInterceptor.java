@@ -77,9 +77,16 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             .getContextualProperty(org.apache.cxf.message.Message.FAULT_STACKTRACE_ENABLED);
         if (config != null && Boolean.valueOf(config).booleanValue() && fault.getCause() != null) {
             StringBuilder sb = new StringBuilder();
-            for (StackTraceElement ste : fault.getCause().getStackTrace()) {
-                sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName() + "!"
+            Throwable throwable = fault.getCause();
+            while (throwable != null) {
+                for (StackTraceElement ste : fault.getCause().getStackTrace()) {
+                    sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName() + "!"
                           + ste.getLineNumber() + "\n");
+                }
+                throwable = throwable.getCause();
+                if (throwable != null) {
+                    sb.append("Caused by:" +  throwable.getClass() + ":" + throwable.getMessage() + " ");
+                }
             }
             Element detail = fault.getDetail();
             String soapNamespace = message.getVersion().getNamespace();
