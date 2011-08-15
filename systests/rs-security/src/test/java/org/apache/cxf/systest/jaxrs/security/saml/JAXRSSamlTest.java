@@ -29,6 +29,7 @@ import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -58,6 +59,8 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        properties.put("ws-security.saml-callback-handler", 
+                       "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
         properties.put("ws-security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");

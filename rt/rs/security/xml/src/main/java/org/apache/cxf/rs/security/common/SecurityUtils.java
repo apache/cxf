@@ -120,8 +120,14 @@ public final class SecurityUtils {
     }
     
     public static CallbackHandler getCallbackHandler(Message message, Class<?> callingClass) {
+        return getCallbackHandler(message, callingClass, SecurityConstants.CALLBACK_HANDLER);
+    }
+    
+    public static CallbackHandler getCallbackHandler(Message message, 
+                                                     Class<?> callingClass,
+                                                     String callbackProperty) {
         //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        Object o = message.getContextualProperty(callbackProperty);
     
         CallbackHandler handler = null;
         if (o instanceof CallbackHandler) {

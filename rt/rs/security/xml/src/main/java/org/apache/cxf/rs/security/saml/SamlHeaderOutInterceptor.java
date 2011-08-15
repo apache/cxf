@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.security.saml;
+package org.apache.cxf.rs.security.saml;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

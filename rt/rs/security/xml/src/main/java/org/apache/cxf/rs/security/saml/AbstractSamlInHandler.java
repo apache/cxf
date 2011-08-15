@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.saml;
+package org.apache.cxf.rs.security.saml;
 
 import java.io.IOException;
 import java.io.InputStream;
