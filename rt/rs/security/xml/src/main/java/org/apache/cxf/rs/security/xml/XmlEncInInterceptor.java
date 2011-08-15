@@ -37,11 +37,9 @@ public class XmlEncInInterceptor extends AbstractXmlEncInHandler implements Phas
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlEncInInterceptor.class);
     
-    @Override
     public void handleFault(Message message) {
     }
 
-    @Override
     public void handleMessage(Message message) throws Fault {
         decryptContent(message);
     }
@@ -52,27 +50,22 @@ public class XmlEncInInterceptor extends AbstractXmlEncInHandler implements Phas
         throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
     }
     
-    @Override
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
 
-    @Override
     public Set<String> getAfter() {
         return Collections.emptySet();
     }
 
-    @Override
     public Set<String> getBefore() {
         return Collections.emptySet();
     }
 
-    @Override
     public String getId() {
         return getClass().getName();
     }
 
-    @Override
     public String getPhase() {
         return Phase.UNMARSHAL;
     }
