@@ -132,6 +132,11 @@ public class BookStore {
         }
     }
     
+    @PUT
+    @Path("emptyput")
+    public void emptyput() {
+    }
+    
     @POST
     public void emptypostNoPath() {
         emptypost();

@@ -555,7 +555,11 @@ public class HTTPConduit
         if (HTTP_PUT_METHOD.equals(httpMethod)) {
             MessageContentsList objs = MessageContentsList.getContentsList(message);
             if (objs != null && objs.size() > 0) {
-                return true;
+                Object obj = objs.get(0);
+                if (obj.getClass() != String.class 
+                    || (obj.getClass() == String.class && ((String)obj).length() > 0)) {
+                    return true;
+                }
             }
         }
         return false;
