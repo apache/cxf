@@ -50,6 +50,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private List<String> outDropElements;
     private boolean attributesToElements;
     private String contextPropertyName;
+    private String defaultNamespace;
     
     public TransformOutInterceptor() {
         this(Phase.PRE_STREAM);
@@ -106,7 +107,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                                       outElementsMap,
                                                       outDropElements,
                                                       outAppendMap,
-                                                      attributesToElements);
+                                                      attributesToElements,
+                                                      defaultNamespace);
     }
     
     public void setOutTransformElements(Map<String, String> outElements) {
@@ -131,6 +133,10 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public void setContextPropertyName(String propertyName) {
         contextPropertyName = propertyName;
+    }
+
+    public void setDefaultNamespace(String defaultNamespace) {
+        this.defaultNamespace = defaultNamespace;
     }
     
 }
