@@ -49,12 +49,13 @@ public final class TransformUtils {
                                                                 Map<String, String> outElementsMap,
                                                                 List<String> outDropElements,
                                                                 Map<String, String> outAppendMap,
-                                                                boolean attributesToElements) {
+                                                                boolean attributesToElements,
+                                                                String defaultNamespace) {
         if (outElementsMap != null || outDropElements != null 
             || outAppendMap != null || attributesToElements) {
             writer = createNewWriterIfNeeded(writer, os);
             writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
-                                            outDropElements, attributesToElements);
+                                            outDropElements, attributesToElements, defaultNamespace);
         }
         return writer;
     }

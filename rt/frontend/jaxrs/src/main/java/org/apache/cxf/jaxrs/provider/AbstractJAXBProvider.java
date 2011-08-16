@@ -589,7 +589,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                                                       outElementsMap,
                                                       outDropElements,
                                                       outAppendMap,
-                                                      attributesToElements);
+                                                      attributesToElements,
+                                                      null);
     }
     
     protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
