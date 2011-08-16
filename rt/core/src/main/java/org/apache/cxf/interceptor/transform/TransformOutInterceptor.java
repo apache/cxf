@@ -81,6 +81,10 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         
+        if (null != message.getContent(Exception.class)) {
+            return;
+        }
+        
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         OutputStream out = message.getContent(OutputStream.class);
         
