@@ -20,11 +20,14 @@ package org.apache.cxf.rs.security.saml;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.Base64Exception;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -35,6 +38,7 @@ import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
@@ -43,10 +47,19 @@ public abstract class AbstractSamlOutInterceptor extends AbstractPhaseIntercepto
     private static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractSamlOutInterceptor.class);
     
+    static {
+        WSSConfig.init();
+    }
+    
+    private boolean useDeflateEncoding = true;
+    
     protected AbstractSamlOutInterceptor() {
-        super(Phase.PRE_MARSHAL);
+        super(Phase.WRITE);
     } 
 
+    public void setUseDeflateEncoding(boolean deflate) {
+        useDeflateEncoding = deflate;
+    }
     
     protected AssertionWrapper createAssertion(Message message) throws Fault {
         CallbackHandler handler = SecurityUtils.getCallbackHandler(
@@ -86,5 +99,18 @@ public abstract class AbstractSamlOutInterceptor extends AbstractPhaseIntercepto
         
     }
     
-    
+    protected String encodeToken(String assertion) throws Base64Exception {
+        byte[] tokenBytes = null;
+        try {
+            tokenBytes = assertion.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            // won't happen
+        }
+        if (useDeflateEncoding) {
+            tokenBytes = new DeflateEncoderDecoder().deflateToken(tokenBytes);
+        }
+        StringWriter writer = new StringWriter();
+        Base64Utility.encode(tokenBytes, 0, tokenBytes.length, writer);
+        return writer.toString();
+    }
 }

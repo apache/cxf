@@ -21,11 +21,13 @@ package org.apache.cxf.systest.jaxrs.security;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 @Path("/bookstore")
 public class BookStore {
@@ -46,6 +48,14 @@ public class BookStore {
     @Consumes("application/xml")
     public Book addBook(Book book) {
         return book;
+    }
+    
+    @POST
+    @Path("/books")
+    @Produces("application/xml")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Book addBookForm(@FormParam("name") String name, @FormParam("id") long id) {
+        return new Book(name, id);
     }
 }
 

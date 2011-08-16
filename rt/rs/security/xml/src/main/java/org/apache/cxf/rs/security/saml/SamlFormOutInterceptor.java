@@ -20,35 +20,34 @@ package org.apache.cxf.rs.security.saml;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 
-public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
+public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
     private static final Logger LOG = 
-        LogUtils.getL7dLogger(SamlHeaderOutInterceptor.class);
+        LogUtils.getL7dLogger(SamlFormOutInterceptor.class);
+    private static final String SAML_ELEMENT = "SAMLToken";
     
     public void handleMessage(Message message) throws Fault {
+        Form form = getRequestForm(message);
+        if (form == null) {
+            return;
+        }
         AssertionWrapper assertionWrapper = createAssertion(message);
         try {
             
             String encodedToken = encodeToken(assertionWrapper.assertionToString());
-            
-            Map<String, List<String>> headers = getHeaders(message);
-            
-            StringBuilder builder = new StringBuilder();
-            builder.append("SAML").append(" ").append(encodedToken);
-            headers.put("Authorization", 
-                CastUtils.cast(Collections.singletonList(builder.toString()), String.class));
-            
+                
+            form.set(SAML_ELEMENT, encodedToken);
         } catch (Exception ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
@@ -58,14 +57,21 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         
     }
         
-    private Map<String, List<String>> getHeaders(Message message) {
-        Map<String, List<String>> headers = 
-            CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
-        if (headers == null) {
-            headers = new HashMap<String, List<String>>();
+    @SuppressWarnings("unchecked")
+    private Form getRequestForm(Message message) {
+        Object ct = message.get(Message.CONTENT_TYPE);
+        if (ct == null || !MediaType.APPLICATION_FORM_URLENCODED.equalsIgnoreCase(ct.toString())) {
+            return null;
         }
-        return headers;
+        MessageContentsList objs = MessageContentsList.getContentsList(message);
+        if (objs != null && objs.size() == 1) {
+            Object obj = objs.get(0);
+            if (obj instanceof Form) {
+                return (Form)obj;
+            } else if (obj instanceof MultivaluedMap) {
+                return new Form((MultivaluedMap)obj);
+            }
+        }
+        return null;
     }
-    
-    
 }

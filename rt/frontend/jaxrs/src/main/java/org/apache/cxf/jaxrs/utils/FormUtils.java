@@ -77,17 +77,20 @@ public final class FormUtils {
         if (!StringUtils.isEmpty(postBody)) {
             List<String> parts = Arrays.asList(postBody.split("&"));
             for (String part : parts) {
-                String[] keyValue = part.split("=");
-                // Change to add blank string if key but not value is specified
-                String name = HttpUtils.urlDecode(keyValue[0]);
-                if (keyValue.length == 2) {
-                    if (decode) {
-                        params.add(name, HttpUtils.urlDecode(keyValue[1]));
-                    } else {
-                        params.add(name, keyValue[1]);
-                    }
+                String[] keyValue = new String[2];
+                int index = part.indexOf("=");
+                if (index != -1) {
+                    keyValue[0] = part.substring(0, index);
+                    keyValue[1] = index + 1 < part.length() ? part.substring(index + 1) : "";
                 } else {
-                    params.add(name, "");
+                    keyValue[0] = part;
+                    keyValue[1] = "";
+                }
+                String name = HttpUtils.urlDecode(keyValue[0]);
+                if (decode) {
+                    params.add(name, HttpUtils.urlDecode(keyValue[1]));
+                } else {
+                    params.add(name, keyValue[1]);
                 }
             }
         } else if (request != null) {

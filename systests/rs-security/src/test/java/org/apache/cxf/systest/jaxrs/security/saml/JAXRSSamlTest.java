@@ -23,16 +23,22 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,7 +53,53 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBookSAMLTokenAsHeader() throws Exception {
-        String address = "https://localhost:" + PORT + "/bookstore/books/123";
+        String address = "https://localhost:" + PORT + "/samlheader/bookstore/books/123";
+        
+        WebClient wc = createWebClient(address, new SamlHeaderOutInterceptor(), null);
+        
+        try {
+            Book book = wc.get(Book.class);
+            assertEquals(123L, book.getId());
+        } catch (ServerWebApplicationException ex) {
+            fail(ex.getMessage());
+        } catch (ClientWebApplicationException ex) {
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                fail(ex.getCause().getMessage());
+            } else {
+                fail(ex.getMessage());
+            }
+        }
+        
+    }
+    
+    @Test
+    public void testGetBookSAMLTokenInForm() throws Exception {
+        String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
+        FormEncodingProvider formProvider = new FormEncodingProvider();
+        formProvider.setExpectedEncoded(true);
+        WebClient wc = createWebClient(address, new SamlFormOutInterceptor(),
+                                       formProvider);
+        
+        wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_XML);
+        try {
+            Book book = wc.post(new Form().set("name", "CXF").set("id", 125),
+                                Book.class);                
+            assertEquals(125L, book.getId());
+        } catch (ServerWebApplicationException ex) {
+            fail(ex.getMessage());
+        } catch (ClientWebApplicationException ex) {
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                fail(ex.getCause().getMessage());
+            } else {
+                fail(ex.getMessage());
+            }
+        }
+        
+    }
+    
+    private WebClient createWebClient(String address, 
+                                      Interceptor<Message> outInterceptor,
+                                      Object provider) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -66,24 +118,11 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         properties.put("ws-security.self-sign-saml-assertion", "true");
         bean.setProperties(properties);
-        bean.getOutInterceptors().add(new SamlHeaderOutInterceptor());
         
-        
-        WebClient wc = bean.createWebClient();
-        try {
-            Book book = wc.get(Book.class);
-            assertEquals(123L, book.getId());
-        } catch (ServerWebApplicationException ex) {
-            fail(ex.getMessage());
-        } catch (ClientWebApplicationException ex) {
-            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
-                fail(ex.getCause().getMessage());
-            } else {
-                fail(ex.getMessage());
-            }
+        bean.getOutInterceptors().add(outInterceptor);
+        if (provider != null) {
+            bean.setProvider(provider);
         }
-        
+        return bean.createWebClient();
     }
-    
-    
 }

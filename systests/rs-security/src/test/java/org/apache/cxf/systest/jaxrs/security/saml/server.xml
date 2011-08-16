@@ -23,7 +23,9 @@ under the License.
        xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
        xmlns:sec="http://cxf.apache.org/configuration/security"
        xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
        xsi:schemaLocation="
+        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
@@ -62,4 +64,39 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
 
+    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
+    <bean id="samlHeaderHandler" class="org.apache.cxf.rs.security.saml.SamlHeaderInHandler"/>
+    <bean id="samlFormHandler" class="org.apache.cxf.rs.security.saml.SamlFormInHandler"/>
+    
+    <jaxrs:server 
+       address="https://localhost:${testutil.ports.jaxrs-saml}/samlheader"> 
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="samlHeaderHandler"/>
+       </jaxrs:providers>
+       
+       <jaxrs:properties>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+       </jaxrs:properties>
+        
+    </jaxrs:server>
+    
+    <jaxrs:server 
+       address="https://localhost:${testutil.ports.jaxrs-saml}/samlform"> 
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="samlFormHandler"/>
+       </jaxrs:providers>
+       
+       <jaxrs:properties>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+       </jaxrs:properties>
+        
+    </jaxrs:server>
 </beans>
