@@ -10,7 +10,9 @@ This product also includes WS-* schemas developed by International
    (http://schemas.xmlsoap.org/wsdl/http)
    (http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm.xsd)
    (http://www.w3.org/2005/08/addressing/ws-addr.xsd)
-
+   (http://www.w3.org/TR/ws-metadata-exchange/)
+   (http://schemas.xmlsoap.org/ws/2004/09/mex/)
+   (http://docs.oasis-open.org/ws-sx/ws-trust/v1.4/ws-trust.html)
 
 The product contains code (StaxBuilder.java) that is
   Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
