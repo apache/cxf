@@ -282,6 +282,7 @@ public class ProxyTest extends Assert {
         Conduit conduit = control.createMock(Conduit.class);
         org.apache.cxf.ws.addressing.EndpointReferenceType address = 
             control.createMock(org.apache.cxf.ws.addressing.EndpointReferenceType.class);
+        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         control.replay();
         assertNotNull(proxy.createClient(bus, endpoint, conduit, address));
     }
