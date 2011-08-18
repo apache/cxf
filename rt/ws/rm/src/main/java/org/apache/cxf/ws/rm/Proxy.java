@@ -309,7 +309,12 @@ public class Proxy {
                 return conduit;
             }
         };  
-        return new RMClient(bus, endpoint, cs);
+        RMClient client = new RMClient(bus, endpoint, cs);
+        Map<String, Object> context = client.getRequestContext();
+        ProtocolVariation protocol = reliableEndpoint.getProtocol();
+        context.put(RMManager.WSRM_VERSION_PROPERTY, protocol.getWSRMNamespace());
+        context.put(RMManager.WSRM_WSA_VERSION_PROPERTY, protocol.getWSANamespace());
+        return client;
     }
     
     class RMClient extends ClientImpl {
