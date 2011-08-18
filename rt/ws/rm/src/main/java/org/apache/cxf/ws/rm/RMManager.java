@@ -85,7 +85,7 @@ public class RMManager {
     /**
      * Message contextual property giving addressing namespace to be used by WS-RM implementation.
      */
-    public static final String WSRM10_WSA_VERSION_PROPERTY = "org.apache.cxf.ws.rm.wsa-namespace";
+    public static final String WSRM_WSA_VERSION_PROPERTY = "org.apache.cxf.ws.rm.wsa-namespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMManager.class);
 
@@ -340,13 +340,15 @@ public class RMManager {
      * @return namespace URI
      */
     String getAddressingNamespace(Message message) {
-        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
-        String addrUri = null;
-        if (maps != null) {
-            addrUri = maps.getNamespaceURI();
-        }
+        String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
         if (addrUri == null) {
-            addrUri = getRMAddressingNamespace();
+            AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
+            if (maps != null) {
+                addrUri = maps.getNamespaceURI();
+            }
+            if (addrUri == null) {
+                addrUri = getRMAddressingNamespace();
+            }
         }
         return addrUri;
     }
@@ -359,13 +361,15 @@ public class RMManager {
      * @return namespace URI
      */
     String getRMNamespace(Message message) {
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        String rmUri = null;
-        if (rmps != null) {
-            rmUri = rmps.getNamespaceURI();
-        }
+        String rmUri = (String)message.getContextualProperty(WSRM_VERSION_PROPERTY);
         if (rmUri == null) {
-            rmUri = getRMNamespace();
+            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+            if (rmps != null) {
+                rmUri = rmps.getNamespaceURI();
+            }
+            if (rmUri == null) {
+                rmUri = getRMNamespace();
+            }
         }
         return rmUri;
     }
