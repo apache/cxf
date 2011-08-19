@@ -41,7 +41,7 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server11.class, true));
+                   launchServer(Server11.class, false));
     }
     
     @Test
@@ -55,7 +55,7 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             StackTraceElement[] elements = ex.getCause().getStackTrace();
             assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", 
                          elements[0].getClassName());
-            ex.printStackTrace();
+            //ex.printStackTrace();
             boolean findNPE = false;
             for (StackTraceElement element : elements) {
                 if (element.getClassName().indexOf("java.lang.NullPointerException") > 0) {
