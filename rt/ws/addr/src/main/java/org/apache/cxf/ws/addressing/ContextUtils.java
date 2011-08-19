@@ -429,7 +429,7 @@ public final class ContextUtils {
                         //need to suck in all the data from the input stream as
                         //the transport might discard any data on the stream when this 
                         //thread unwinds or when the empty response is sent back
-                        DelegatingInputStream in = inMessage.get(DelegatingInputStream.class);
+                        DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
                         if (in != null) {
                             in.cacheInput();
                         }
