@@ -28,6 +28,7 @@ import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.AddressingFeature;
 
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
@@ -129,6 +130,7 @@ public class WSADisableTest extends AbstractWSATestBase {
             port.addNumbers(1, 2);
             fail("Expected missing WSA header exception");
         } catch (Exception e) {
+            assertTrue("expected WebServiceException", e instanceof WebServiceException);
             String expected = "A required header representing a Message Addressing"
                               + " Property is not present";
             assertTrue("Caught unexpected exception : " + e.getMessage(),
