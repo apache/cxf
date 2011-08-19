@@ -76,7 +76,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 //need to suck in all the data from the input stream as
                 //the transport might discard any data on the stream when this 
                 //thread unwinds or when the empty response is sent back
-                DelegatingInputStream in = message.get(DelegatingInputStream.class);
+                DelegatingInputStream in = message.getContent(DelegatingInputStream.class);
                 if (in != null) {
                     in.cacheInput();
                 }
@@ -102,12 +102,13 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             if (Boolean.FALSE.equals(o)) {
                 chain.pause();
                 try {
-                    synchronized (chain) {
+                    final Object lock = new Object();
+                    synchronized (lock) {
                         message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
                             .getAutomaticWorkQueue().execute(new Runnable() {
                                 public void run() {
-                                    synchronized (chain) {
-                                        chain.notifyAll();
+                                    synchronized (lock) {
+                                        lock.notifyAll();
                                     }
                                     chain.resume();
                                 }
@@ -115,7 +116,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                         //wait a few milliseconds for the background thread to start processing
                         //Mostly just to make an attempt at keeping the ordering of the 
                         //messages coming in from a client.  Not guaranteed though.
-                        chain.wait(20);
+                        lock.wait(20);
                     }
                 } catch (RejectedExecutionException e) {
                     //the executor queue is full, so run the task in the caller thread
