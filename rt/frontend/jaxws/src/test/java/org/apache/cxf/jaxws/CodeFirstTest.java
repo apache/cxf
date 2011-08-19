@@ -387,7 +387,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
 
     }
 
-    public static interface GenericsService2Typed extends GenericsService2<Float, Double> {
+    public interface GenericsService2Typed extends GenericsService2<Float, Double> {
         
     }
     public static class GenericsService2Impl implements GenericsService2<Integer, String> {
@@ -422,7 +422,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     
     @WebService
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
-    public static interface NoRootBare {
+    public interface NoRootBare {
         NoRootResponse echoString(NoRootRequest request);
     }
     
@@ -498,7 +498,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     }
     @WebService(targetNamespace = "http://cxf.apache.org/service.wsdl")
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
-    public static interface CXF2766 {
+    public interface CXF2766 {
         @WebResult(name = "return-response", 
                    targetNamespace = "http://cxf.apache.org/service.wsdl/types",
                    partName = "returnResponse")

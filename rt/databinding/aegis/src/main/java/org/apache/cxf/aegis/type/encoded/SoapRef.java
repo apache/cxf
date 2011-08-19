@@ -70,7 +70,7 @@ public class SoapRef {
         }
     }
 
-    public static interface Action {
+    public interface Action {
         void onSet(SoapRef ref);
     }
 }

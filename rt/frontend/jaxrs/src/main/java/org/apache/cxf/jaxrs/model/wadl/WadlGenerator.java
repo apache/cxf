@@ -1155,7 +1155,7 @@ public class WadlGenerator implements RequestHandler {
         }
     }
 
-    private static interface SchemaWriter {
+    private interface SchemaWriter {
         void write(StringBuilder sb);
     }
 
