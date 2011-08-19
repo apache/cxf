@@ -31,7 +31,6 @@ import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
@@ -56,6 +55,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
@@ -67,6 +67,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -390,7 +391,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             if (this.mode == Service.Mode.MESSAGE) {
                 StaxUtils.skipToStartOfElement(reader);
                 StaxUtils.toNextTag(reader,
-                                    new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+                                    new QName(ele.getNamespaceURI(), "Body"));
                 reader.nextTag();
                 return reader.getName().toString();
             }
@@ -404,13 +405,15 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     
     private String getPayloadElementName(SOAPMessage soapMessage) {
         try {            
-            SOAPElement element  = (SOAPElement)soapMessage.getSOAPBody().getChildElements().next();
-            return new QName(element.getNamespaceURI(), element.getLocalName()).toString();
+            // we only care about the first element node, not text nodes
+            Element element = DOMUtils.getFirstElement(soapMessage.getSOAPBody());
+            if (element != null) {
+                return DOMUtils.getElementQName(element).toString();
+            }
         } catch (Exception e) {
             //ignore
         }
         return null;
-        
     }
     
     private String getPayloadElementName(Object object) {
@@ -441,10 +444,21 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     
     private Map<String, QName> createPayloadEleOpNameMap(BindingInfo bindingInfo) {
         Map<String, QName> payloadElementMap = new java.util.HashMap<String, QName>();
+        // assume a document binding style, which is default according to W3C spec on WSDL
+        String bindingStyle = "document";
+        // if the bindingInfo is a SOAPBindingInfo instance then we can see if it has a style
+        if (bindingInfo instanceof SoapBindingInfo) {
+            String tempStyle = ((SoapBindingInfo)bindingInfo).getStyle();
+            if (tempStyle != null) {
+                bindingStyle = tempStyle;
+            }
+        }
         for (BindingOperationInfo bop : bindingInfo.getOperations()) {
             SoapOperationInfo soi = (SoapOperationInfo)bop.getExtensor(SoapOperationInfo.class);
             if (soi != null) {
-                if ("document".equals(soi.getStyle())) {
+                // operation style overrides binding style, if present
+                String operationStyle = soi.getStyle() != null ? soi.getStyle() : bindingStyle;  
+                if ("document".equals(operationStyle)) {
                     // if doc
                     if (bop.getOperationInfo().getInput() != null
                         && !bop.getOperationInfo().getInput().getMessageParts().isEmpty()) {
@@ -452,7 +466,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                             .getElementQName();
                         payloadElementMap.put(qn.toString(), bop.getOperationInfo().getName());
                     }
-                } else if ("rpc".equals(soi.getStyle())) {
+                } else if ("rpc".equals(operationStyle)) {
                     // if rpc
                     payloadElementMap.put(bop.getOperationInfo().getName().toString(), bop.getOperationInfo()
                         .getName());
