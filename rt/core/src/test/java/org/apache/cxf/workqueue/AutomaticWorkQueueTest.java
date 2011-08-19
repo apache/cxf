@@ -281,7 +281,7 @@ public class AutomaticWorkQueueTest extends Assert {
 
         // Give threads a chance to dequeue (5sec max)
         int i = 0;
-        while (workqueue.getPoolSize() != 10 && i++ < 50) {
+        while (workqueue.getPoolSize() > 10 && i++ < 50) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ie) {
@@ -300,7 +300,7 @@ public class AutomaticWorkQueueTest extends Assert {
     }
 
     @Test
-    public void testThreadPoolShrinkUnbounded() {
+    public void testThreadPoolShrinkUnbounded() throws Exception {
         workqueue = new AutomaticWorkQueueImpl(UNBOUNDED_MAX_QUEUE_SIZE, INITIAL_SIZE,
                                                UNBOUNDED_HIGH_WATER_MARK,
                                                DEFAULT_LOW_WATER_MARK, 100L);
@@ -311,18 +311,15 @@ public class AutomaticWorkQueueTest extends Assert {
         // Give threads a chance to dequeue (5sec max)
         int i = 0;
         int last = workqueue.getPoolSize();
-        while (workqueue.getPoolSize() != DEFAULT_LOW_WATER_MARK && i++ < 50) {
+        while (workqueue.getPoolSize() > DEFAULT_LOW_WATER_MARK && i++ < 50) {
             if (last != workqueue.getPoolSize()) {
                 last = workqueue.getPoolSize();
                 i = 0;
             }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ie) {
-                // ignore
-            }
+            Thread.sleep(100);
         }
-        assertTrue("threads_total()", workqueue.getPoolSize() <= DEFAULT_LOW_WATER_MARK);
+        int sz = workqueue.getPoolSize();
+        assertTrue("threads_total(): " + sz, workqueue.getPoolSize() <= DEFAULT_LOW_WATER_MARK);
     }
 
     @Test    

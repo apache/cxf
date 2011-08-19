@@ -19,6 +19,8 @@
 
 package org.apache.cxf.workqueue;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.DelayQueue;
@@ -30,6 +32,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +55,9 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
     
     WorkQueueManagerImpl manager;
     String name = "default";
+    final int corePoolSize;
+    final int maxPoolSize;
+    final ReentrantLock mainLock;
 
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
@@ -125,6 +131,19 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         // start the watch dog thread
         watchDog.setDaemon(true);
         watchDog.start();
+        
+        corePoolSize = this.getCorePoolSize();
+        maxPoolSize = this.getMaximumPoolSize(); 
+        
+        ReentrantLock l = null;
+        try {
+            Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
+            f.setAccessible(true);
+            l = (ReentrantLock)f.get(this);
+        } catch (Throwable t) {
+            l = new ReentrantLock();
+        }
+        mainLock = l;
     }
     private static ThreadFactory createThreadFactory(final String name) {
         ThreadGroup group;
@@ -337,7 +356,33 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
                 }
             }
         };
+        //The ThreadPoolExecutor in the JDK doesn't expand the number
+        //of threads until the queue is full.   However, we would 
+        //prefer the number of threads to expand immediately and 
+        //only uses the queue if we've reached the maximum number 
+        //of threads.   Thus, we'll set the core size to the max,
+        //add the runnable, and set back.  That will cause the
+        //threads to be created as needed.
         super.execute(r);
+        if (!getQueue().isEmpty() && this.getPoolSize() < maxPoolSize) {
+            mainLock.lock();
+            try {
+                int ps = this.getPoolSize();
+                int sz = getQueue().size();
+                int sz2 = this.getActiveCount();
+                
+                if ((sz + sz2) > ps) {
+                    Method m = ThreadPoolExecutor.class.getDeclaredMethod("addIfUnderMaximumPoolSize",
+                                                                          Runnable.class);
+                    m.setAccessible(true);
+                    m.invoke(this, new Object[1]);
+                }
+            } catch (Exception ex) {
+                //ignore
+            } finally {
+                mainLock.unlock();
+            }
+        }
     }
     
     // WorkQueue interface
