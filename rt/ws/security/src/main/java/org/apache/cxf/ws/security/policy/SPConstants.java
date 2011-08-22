@@ -127,6 +127,8 @@ public abstract class SPConstants {
     public static final String SAML_TOKEN = "SamlToken";
     
     public static final String KERBEROS_TOKEN = "KerberosToken";
+    
+    public static final String SPNEGO_CONTEXT_TOKEN = "SpnegoContextToken";
 
     public static final String KEYVALUE_TOKEN = "KeyValueToken";
     
@@ -456,6 +458,7 @@ public abstract class SPConstants {
     public abstract QName getUserNameToken();
     public abstract QName getSamlToken();
     public abstract QName getKerberosToken();
+    public abstract QName getSpnegoContextToken();
     public abstract QName getX509Token();
     
     public abstract QName getSupportingTokens();
