@@ -130,6 +130,9 @@ public final class SP12Constants extends SPConstants {
     public static final QName KERBEROS_TOKEN = new QName(SP12Constants.SP_NS,
             SPConstants.KERBEROS_TOKEN, SP12Constants.SP_PREFIX);
     
+    public static final QName SPNEGO_CONTEXT_TOKEN = new QName(SP12Constants.SP_NS,
+            SPConstants.SPNEGO_CONTEXT_TOKEN, SP12Constants.SP_PREFIX);
+    
     public static final QName KEYVALUE_TOKEN = new QName(SP12Constants.SP_NS,
                                                          SPConstants.KEYVALUE_TOKEN ,
                                                          SP12Constants.SP_PREFIX);
@@ -451,6 +454,9 @@ public final class SP12Constants extends SPConstants {
     }
     public QName getKerberosToken() {
         return KERBEROS_TOKEN;
+    }
+    public QName getSpnegoContextToken() {
+        return SPNEGO_CONTEXT_TOKEN;
     }
     public QName getKeyValueToken() {
         return KEYVALUE_TOKEN;
