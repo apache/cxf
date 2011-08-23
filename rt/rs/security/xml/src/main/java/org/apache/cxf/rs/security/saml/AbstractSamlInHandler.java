@@ -33,6 +33,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -70,7 +71,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         samlValidator = validator;
     }
     
-    public void validateToken(Message message, InputStream tokenStream) {
+    protected void validateToken(Message message, InputStream tokenStream) {
         
         Document doc = null;
         try {
@@ -78,9 +79,13 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         } catch (Exception ex) {
             throwFault("Assertion can not be read as XML document", ex);
         }
+        validateToken(message, doc.getDocumentElement());
         
+    }
+
+    protected void validateToken(Message message, Element tokenElement) {
         try {
-            AssertionWrapper assertion = new AssertionWrapper(doc.getDocumentElement());
+            AssertionWrapper assertion = new AssertionWrapper(tokenElement);
             if (assertion.isSigned()) {
                 RequestData data = new RequestData();
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
@@ -122,7 +127,8 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
             throwFault("Assertion can not be validated", ex);
         }
     }
-
+    
+    
     private Certificate[] getTLSCertificates(Message message) {
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         return tlsInfo != null ? tlsInfo.getPeerCertificates() : null;

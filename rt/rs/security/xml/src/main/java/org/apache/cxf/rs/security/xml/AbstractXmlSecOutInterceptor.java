@@ -61,8 +61,8 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
             if (doc == null) {
                 return;
             }
- 
             Document finalDoc = processDocument(message, doc);
+            
             message.setContent(List.class, 
                 new MessageContentsList(new DOMSource(finalDoc)));
         } catch (Exception ex) {

@@ -67,6 +67,7 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
     <bean id="samlHeaderHandler" class="org.apache.cxf.rs.security.saml.SamlHeaderInHandler"/>
     <bean id="samlFormHandler" class="org.apache.cxf.rs.security.saml.SamlFormInHandler"/>
+    <bean id="samlEnvHandler" class="org.apache.cxf.rs.security.saml.SamlEnvelopedInHandler"/>
     
     <jaxrs:server 
        address="https://localhost:${testutil.ports.jaxrs-saml}/samlheader"> 
@@ -91,6 +92,22 @@ under the License.
        </jaxrs:serviceBeans>
        <jaxrs:providers>
           <ref bean="samlFormHandler"/>
+       </jaxrs:providers>
+       
+       <jaxrs:properties>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+       </jaxrs:properties>
+        
+    </jaxrs:server>
+    
+    <jaxrs:server 
+       address="https://localhost:${testutil.ports.jaxrs-saml}/samlxml"> 
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="samlEnvHandler"/>
        </jaxrs:providers>
        
        <jaxrs:properties>

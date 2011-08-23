@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -33,9 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
@@ -46,7 +43,6 @@ import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -55,34 +51,16 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
 
 
-public abstract class AbstractXmlEncInHandler {
-    private static final Logger LOG = 
-        LogUtils.getL7dLogger(AbstractXmlEncInHandler.class);
-    
-    static {
-        WSSConfig.init();
-    }
-    
+public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
     
     public void decryptContent(Message message) {
         Message outMs = message.getExchange().getOutMessage();
         Message inMsg = outMs == null ? message : outMs.getExchange().getInMessage();
-        String method = (String)inMsg.get(Message.HTTP_REQUEST_METHOD);
-        if ("GET".equals(method)) {
+        Document doc = getDocument(inMsg);
+        if (doc == null) {
             return;
         }
         
-        InputStream is = message.getContent(InputStream.class);
-        Document doc = null;
-        try {
-            doc = DOMUtils.readXml(is);
-        } catch (Exception ex) {
-            String errorMessage = "Invalid XML payload";
-            LOG.warning(errorMessage);
-            throwFault(errorMessage, ex);
-        }
-        
-
         Element root = doc.getDocumentElement();
         
         byte[] symmetricKeyBytes = getSymmetricKeyBytes(message, root);
@@ -232,16 +210,5 @@ public abstract class AbstractXmlEncInHandler {
         
     }
     
-    
-    private Element getNode(Element parent, String ns, String name, int index) {
-        NodeList list = parent.getElementsByTagNameNS(ns, name);
-        if (list != null && list.getLength() >= index + 1) {
-            return (Element)list.item(index);
-        } 
-        return null;
-    }
-    
-       
-    protected abstract void throwFault(String error, Exception ex);
     
 }

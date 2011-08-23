@@ -22,9 +22,7 @@ package org.apache.cxf.rs.security.xml;
 import java.io.InputStream;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamReader;
 
@@ -33,7 +31,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -42,7 +39,6 @@ import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
@@ -52,37 +48,19 @@ import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 
-public class XmlSigInHandler implements RequestHandler {
-    private static final Logger LOG = 
-        LogUtils.getL7dLogger(XmlSigInHandler.class);
+public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestHandler {
     
-    static {
-        WSSConfig.init();
+    private boolean removeSignature = true;
+    
+    public void setRemoveSignature(boolean remove) {
+        this.removeSignature = remove;
     }
     
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
         
-        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if ("GET".equals(method)) {
-            return null;
-        }
-        
-        Document doc = null;
-        InputStream is = message.getContent(InputStream.class);
-        if (is != null) {
-            try {
-                doc = DOMUtils.readXml(is);
-            } catch (Exception ex) {
-                throwFault("Invalid XML payload", ex);
-            }
-        } else {
-            XMLStreamReader reader = message.getContent(XMLStreamReader.class);
-            if (reader instanceof W3CDOMStreamReader) {
-                doc = ((W3CDOMStreamReader)reader).getDocument();
-            }
-        }
+        Document doc = getDocument(message);
         if (doc == null) {
-            throwFault("No payload is available", null);
+            return null;
         }
 
         Element root = doc.getDocumentElement();
@@ -108,8 +86,7 @@ public class XmlSigInHandler implements RequestHandler {
         boolean valid = false;
         try {
             XMLSignature signature = new XMLSignature(sigElement, "");
-            // WSS4J SAMLUtil.getCredentialFromKeyInfo will also handle 
-            // the X509IssuerSerial case
+            // See also WSS4J SAMLUtil.getCredentialFromKeyInfo 
             KeyInfo keyInfo = signature.getKeyInfo();
             
             X509Certificate cert = keyInfo.getX509Certificate();
@@ -133,14 +110,16 @@ public class XmlSigInHandler implements RequestHandler {
         if (!valid) {
             throwFault("Signature validation failed", null);
         }
-        if (!isEnveloping(root)) {
-            root.removeAttribute("ID");
-            root.removeChild(sigElement);
-        } else {
-            Element actualBody = getActualBody(root);
-            Document newDoc = DOMUtils.createDocument();
-            newDoc.adoptNode(actualBody);
-            root = actualBody;
+        if (removeSignature) {
+            if (!isEnveloping(root)) {
+                root.removeAttribute("ID");
+                root.removeChild(sigElement);
+            } else {
+                Element actualBody = getActualBody(root);
+                Document newDoc = DOMUtils.createDocument();
+                newDoc.adoptNode(actualBody);
+                root = actualBody;
+            }
         }
         message.setContent(XMLStreamReader.class, 
                            new W3CDOMStreamReader(root));
@@ -184,21 +163,6 @@ public class XmlSigInHandler implements RequestHandler {
                 && "Signature".equals(root.getLocalName());
     }
     
-    private Element getNode(Element parent, String ns, String name, int index) {
-        NodeList list = parent.getElementsByTagNameNS(ns, name);
-        if (list != null && list.getLength() >= index + 1) {
-            return (Element)list.item(index);
-        } 
-        return null;
-    }
-    
-    protected void throwFault(String error, Exception ex) {
-        // TODO: get bundle resource message once this filter is moved 
-        // to rt/rs/security
-        LOG.warning(error);
-        Response response = Response.status(401).entity(error).build();
-        throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
-    }
     
     protected void validateReference(Element root, XMLSignature sig) {
         Reference ref = null;

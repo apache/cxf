@@ -19,34 +19,18 @@
 
 package org.apache.cxf.rs.security.xml;
 
-import java.util.logging.Logger;
-
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 
 public class XmlEncInHandler extends AbstractXmlEncInHandler implements RequestHandler {
-    private static final Logger LOG = 
-        LogUtils.getL7dLogger(XmlEncInHandler.class);
-    
     
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
         
         decryptContent(message);
         return null;
     }
-    
-    protected void throwFault(String error, Exception ex) {
-        // TODO: get bundle resource message once this filter is moved 
-        // to rt/rs/security
-        LOG.warning(error);
-        Response response = Response.status(401).entity(error).build();
-        throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
-    }
-    
     
 }

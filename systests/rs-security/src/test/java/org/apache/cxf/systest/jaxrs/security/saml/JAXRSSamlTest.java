@@ -35,6 +35,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
@@ -84,6 +85,28 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         try {
             Book book = wc.post(new Form().set("name", "CXF").set("id", 125),
                                 Book.class);                
+            assertEquals(125L, book.getId());
+        } catch (ServerWebApplicationException ex) {
+            fail(ex.getMessage());
+        } catch (ClientWebApplicationException ex) {
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                fail(ex.getCause().getMessage());
+            } else {
+                fail(ex.getMessage());
+            }
+        }
+        
+    }
+    
+    @Test
+    public void testEnvelopedSAMLToken() throws Exception {
+        String address = "https://localhost:" + PORT + "/samlxml/bookstore/books";
+        WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(),
+                                       null);
+        
+        wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
+        try {
+            Book book = wc.post(new Book("CXF", 125L), Book.class);                
             assertEquals(125L, book.getId());
         } catch (ServerWebApplicationException ex) {
             fail(ex.getMessage());

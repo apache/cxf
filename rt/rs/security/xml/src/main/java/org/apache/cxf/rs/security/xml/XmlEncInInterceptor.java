@@ -21,12 +21,7 @@ package org.apache.cxf.rs.security.xml;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -34,9 +29,6 @@ import org.apache.cxf.phase.PhaseInterceptor;
 
 public class XmlEncInInterceptor extends AbstractXmlEncInHandler implements PhaseInterceptor<Message> {
 
-    private static final Logger LOG = 
-        LogUtils.getL7dLogger(XmlEncInInterceptor.class);
-    
     public void handleFault(Message message) {
     }
 
@@ -44,12 +36,6 @@ public class XmlEncInInterceptor extends AbstractXmlEncInHandler implements Phas
         decryptContent(message);
     }
 
-    protected void throwFault(String error, Exception ex) {
-        LOG.warning(error);
-        Response response = Response.status(400).entity(error).build();
-        throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
-    }
-    
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
