@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Logger;
@@ -51,7 +52,21 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
     public OneWayProcessorInterceptor(String phase) {
         super(phase);
     }
-    
+    public void handleFault(Message message) {
+        if (message.getExchange().isOneWay() 
+            && !isRequestor(message)) {
+            //in a one way, if an exception is thrown, the stream needs to be closed
+            InputStream in = message.getContent(InputStream.class);
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+            
+        }
+    }
     public void handleMessage(Message message) throws Fault {
         
         if (message.getExchange().isOneWay() 
@@ -90,10 +105,12 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 Conduit conduit = message.getExchange().getDestination()
                     .getBackChannel(message, null, null);
                 if (conduit != null) {
+                    message.getExchange().setInMessage(null);
                     //for a one-way, the back channel could be
                     //null if it knows it cannot send anything.
                     conduit.prepare(partial);
                     conduit.close(partial);
+                    message.getExchange().setInMessage(message);
                 }
             } catch (IOException e) {
                 //IGNORE
