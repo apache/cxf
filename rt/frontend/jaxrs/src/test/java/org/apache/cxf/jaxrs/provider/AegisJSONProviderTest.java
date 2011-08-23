@@ -337,7 +337,7 @@ public class AegisJSONProviderTest extends Assert {
     public static class AegisSuperBean extends AegisTestBean {
     }
     
-    private static interface InterfaceWithMap {
+    private interface InterfaceWithMap {
         Map<AegisTestBean, AegisSuperBean> mapFunction();
     }
 }

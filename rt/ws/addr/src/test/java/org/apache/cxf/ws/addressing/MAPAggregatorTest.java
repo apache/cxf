@@ -933,7 +933,7 @@ public class MAPAggregatorTest extends Assert {
         } 
     }
 
-    private static interface SEI {
+    private interface SEI {
         @RequestWrapper(targetNamespace = "http://foo/bar", className = "SEI", localName = "opRequest")
         @ResponseWrapper(targetNamespace = "http://foo/bar", className = "SEI", localName = "opResponse")
         String op();

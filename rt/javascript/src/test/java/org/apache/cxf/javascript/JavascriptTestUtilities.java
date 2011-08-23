@@ -241,7 +241,7 @@ public class JavascriptTestUtilities extends TestUtilities {
         return rhinoContextFactory;
     }
 
-    public static interface JSRunnable<T> {
+    public interface JSRunnable<T> {
         T run(Context context);
     }
 

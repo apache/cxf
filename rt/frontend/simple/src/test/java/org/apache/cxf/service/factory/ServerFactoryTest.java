@@ -55,7 +55,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         assertTrue(server.getDestination() instanceof CustomDestination);
     }
     
-    public static interface TestService<P> {
+    public interface TestService<P> {
         int open(P args);
         void close(int handle);
     }

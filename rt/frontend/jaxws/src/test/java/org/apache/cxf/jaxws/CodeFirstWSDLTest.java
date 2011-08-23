@@ -180,7 +180,7 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
                            placement = WSDLDocumentation.Placement.TOP), 
         @WSDLDocumentation(value = "My binding doc", placement = WSDLDocumentation.Placement.BINDING) 
     })
-    public static interface CXF3093PortType { 
+    public interface CXF3093PortType { 
         int doubleIt(int numberToDouble); 
     }
     
@@ -228,7 +228,7 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
     }
 
     @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt")
-    public static interface CXF3092PortType { 
+    public interface CXF3092PortType { 
         int doubleIt(int numberToDouble); 
     }
     

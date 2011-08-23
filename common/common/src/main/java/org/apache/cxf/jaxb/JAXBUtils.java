@@ -645,7 +645,7 @@ public final class JAXBUtils {
             throw new JAXBException(ex);
         }
     }
-    public static interface BridgeWrapper {
+    public interface BridgeWrapper {
 
         Object unmarshal(XMLStreamReader source, AttachmentUnmarshaller am) throws JAXBException;
 
@@ -939,7 +939,7 @@ public final class JAXBUtils {
        
     }
     
-    public static interface SchemaCompiler {
+    public interface SchemaCompiler {
 
         void setErrorListener(Object elForRun);
 
@@ -955,7 +955,7 @@ public final class JAXBUtils {
         @WrapReturn(Options.class)
         Options getOptions();
     }
-    public static interface S2JJAXBModel {
+    public interface S2JJAXBModel {
 
         @WrapReturn(JCodeModel.class)
         JCodeModel generateCode(Object object, Object elForRun);
@@ -966,15 +966,15 @@ public final class JAXBUtils {
         @WrapReturn(TypeAndAnnotation.class)
         TypeAndAnnotation getJavaType(QName typeQName);
     }
-    public static interface Mapping {
+    public interface Mapping {
         @WrapReturn(TypeAndAnnotation.class)
         TypeAndAnnotation getType();        
     }
-    public static interface TypeAndAnnotation {
+    public interface TypeAndAnnotation {
         @WrapReturn(JType.class)
         JType getTypeClass();
     }
-    public static interface JType {
+    public interface JType {
         boolean isArray();
 
         @WrapReturn(JType.class)
@@ -991,7 +991,7 @@ public final class JAXBUtils {
         @WrapReturn(value = JType.class, iterator = true)
         Iterator<JType> classes();
     }
-    public static interface Options {
+    public interface Options {
 
         void addGrammar(InputSource is);
 
@@ -999,21 +999,21 @@ public final class JAXBUtils {
 
         String getBuildID();
     }
-    public static interface JCodeModel {
+    public interface JCodeModel {
 
         void build(Object writer) throws IOException;
 
         @WrapReturn(value = JPackage.class, iterator = true)
         Iterator<JPackage> packages();
     }
-    public static interface JPackage {
+    public interface JPackage {
 
         String name();
 
         @WrapReturn(value = JDefinedClass.class, iterator = true)
         Iterator<JDefinedClass> classes();
     }
-    public static interface JDefinedClass {
+    public interface JDefinedClass {
         String name();
 
         String fullName();

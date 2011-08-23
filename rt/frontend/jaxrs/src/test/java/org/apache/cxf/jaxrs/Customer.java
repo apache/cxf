@@ -63,7 +63,7 @@ import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
 public class Customer extends AbstractCustomer implements CustomerInfo {
     
-    public static interface CustomerBeanInterface {
+    public interface CustomerBeanInterface {
         
     }
     

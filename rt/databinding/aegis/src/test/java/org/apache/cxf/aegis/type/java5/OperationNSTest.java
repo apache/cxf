@@ -73,7 +73,7 @@ public class OperationNSTest extends AbstractAegisTest {
     }
 
     @WebService(name = "NotificationLog", targetNamespace = "http://www.sics.se/NotificationLog")
-    public static interface NotificationLog {
+    public interface NotificationLog {
 
         @WebMethod(operationName = "Notify", action = "")
         @Oneway
