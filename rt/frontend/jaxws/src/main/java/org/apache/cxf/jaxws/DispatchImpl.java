@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -51,7 +53,6 @@ import javax.xml.ws.http.HTTPBinding;
 import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -316,7 +317,19 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             
             //CXF-2836 : find the operation for the dispatched object 
             boolean wsaEnabled = false;
-            for (AbstractFeature feature : ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures()) {
+            // the feature list to be searched is the endpoint and the bus's lists
+            List<AbstractFeature> endpointFeatures 
+                = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
+            List<AbstractFeature> allFeatures;
+            if (client.getBus().getFeatures() != null) {
+                allFeatures = new ArrayList<AbstractFeature>(endpointFeatures.size() 
+                    + client.getBus().getFeatures().size());
+                allFeatures.addAll(endpointFeatures);
+                allFeatures.addAll(client.getBus().getFeatures());
+            } else {
+                allFeatures = endpointFeatures;
+            }
+            for (AbstractFeature feature : allFeatures) {
                 if (feature instanceof WSAddressingFeature) {
                     wsaEnabled = true; 
                 }
@@ -333,7 +346,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                         createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
                         payloadElementName = getPayloadElementName(document.getDocumentElement());
                     } catch (Exception e) {                        
-                        // ignore, we are tring to get the operation name
+                        // ignore, we are trying to get the operation name
                     }
                 }
                 if (obj instanceof SOAPMessage) {
