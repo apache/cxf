@@ -54,6 +54,7 @@ import javax.xml.ws.spi.ServiceDelegate;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -64,12 +65,12 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.binding.soap.JaxWsSoapBindingConfiguration;
 import org.apache.cxf.jaxws.handler.HandlerResolverImpl;
@@ -604,38 +605,69 @@ public class ServiceImpl extends ServiceDelegate {
                                           Class<T> type,
                                           Mode mode,
                                           WebServiceFeature... features) {
-        JaxWsClientFactoryBean clientFac = new JaxWsClientFactoryBean();
+        return createDispatch(portName, type, null, mode, features); 
+    }
+    public <T> Dispatch<T> createDispatch(QName portName,
+                                          Class<T> type,
+                                          JAXBContext context,
+                                          Mode mode,
+                                          WebServiceFeature... features) {
+        //using this instead of JaxWsClientFactoryBean so that handlers are configured
+        JaxWsProxyFactoryBean clientFac = new JaxWsProxyFactoryBean();
 
         //Initialize Features.
         configureObject(portName.toString() + ".jaxws-client.proxyFactory", clientFac);
 
         AbstractServiceFactoryBean sf = null;
         try {
-            sf = createDispatchService(new SourceDataBinding());
+            DataBinding db;
+            if (context != null) {
+                db = new JAXBDataBinding(context);
+            } else {
+                db = new SourceDataBinding();
+            }
+            sf = createDispatchService(db);
         } catch (ServiceConstructionException e) {
             throw new WebServiceException(e);
         }
         JaxWsEndpointImpl endpoint = getJaxwsEndpoint(portName, sf, features);
-        Client client = new ClientImpl(getBus(), endpoint, clientFac.getConduitSelector());
-        for (AbstractFeature af : clientFac.getFeatures()) {
-            af.initialize(client, bus);
+        // if the client factory has properties specified, then set those into the endpoint
+        if (clientFac.getProperties() != null) {
+            endpoint.putAll(clientFac.getProperties());
         }
+        // add all the client factory features onto the endpoint feature list
+        endpoint.getFeatures().addAll(clientFac.getFeatures());
+        // if the client factory has a bus specified (other than the thread default),
+        // then use that for the client.  Otherwise use the bus from this service.
+        Bus clientBus = getBus();
+        if (clientFac.getBus() != BusFactory.getThreadDefaultBus(false)
+            && clientFac.getBus() != null) {
+            clientBus = clientFac.getBus();
+        }
+        endpoint.getJaxwsBinding().setHandlerChain(clientFac.getHandlers());
+        // create the client object, then initialize the endpoint features against it
+        Client client = new ClientImpl(clientBus, endpoint, clientFac.getConduitSelector());
         for (AbstractFeature af : endpoint.getFeatures()) {
-            af.initialize(client, bus);
+            af.initialize(client, clientBus);
         }
         //CXF-2822
         initIntercepors(client, clientFac);
         if (executor != null) {
             client.getEndpoint().setExecutor(executor);
         }
-        
-        //Set the the EPR's address in EndpointInfo
-        PortInfoImpl portInfo = portInfos.get(portName);
-        if (portInfo != null && !StringUtils.isEmpty(portInfo.getAddress())) {
-            client.getEndpoint().getEndpointInfo().setAddress(portInfo.getAddress());
+        // if the client factory has an address specified, use that, if not
+        // then try to get it from the wsdl
+        if (!StringUtils.isEmpty(clientFac.getAddress())) {
+            client.getEndpoint().getEndpointInfo().setAddress(clientFac.getAddress());
+        } else {
+            //Set the the EPR's address in EndpointInfo
+            PortInfoImpl portInfo = portInfos.get(portName);
+            if (portInfo != null && !StringUtils.isEmpty(portInfo.getAddress())) {
+                client.getEndpoint().getEndpointInfo().setAddress(portInfo.getAddress());
+            }
         }
 
-        Dispatch<T> disp = new DispatchImpl<T>(client, mode, type);
+        Dispatch<T> disp = new DispatchImpl<T>(client, mode, context, type);
         configureObject(disp);
         return disp;
     }
@@ -662,36 +694,9 @@ public class ServiceImpl extends ServiceDelegate {
                                            JAXBContext context,
                                            Mode mode,
                                            WebServiceFeature... features) {
-        JaxWsClientFactoryBean clientFac = new JaxWsClientFactoryBean();
-        
-        //Initialize Features.
-        configureObject(portName.toString() + ".jaxws-client.proxyFactory", clientFac);
-
-        AbstractServiceFactoryBean sf = null;
-        try {
-            JAXBDataBinding db = new JAXBDataBinding(context);
-            sf = createDispatchService(db);
-        } catch (ServiceConstructionException e) {
-            throw new WebServiceException(e);
-        }
-        Endpoint endpoint = getJaxwsEndpoint(portName, sf, features);
-        Client client = new ClientImpl(getBus(), endpoint, clientFac.getConduitSelector());
-        for (AbstractFeature af : clientFac.getFeatures()) {
-            af.initialize(client, bus);
-        }
-        //CXF-2822
-        initIntercepors(client, clientFac);
-        if (executor != null) {
-            client.getEndpoint().setExecutor(executor);
-        }
-        
-        Dispatch<Object> disp = new DispatchImpl<Object>(client, mode, 
-                                                         context, Object.class);
-        configureObject(disp);
-
-        return disp;
+        return createDispatch(portName, Object.class, context, mode, features);
     }
-
+    
     @Override
     public Dispatch<Object> createDispatch(EndpointReference endpointReference,
                                            JAXBContext context,
@@ -711,7 +716,7 @@ public class ServiceImpl extends ServiceDelegate {
 
     }
     
-    private void initIntercepors(Client client, JaxWsClientFactoryBean clientFact) {
+    private void initIntercepors(Client client, AbstractBasicInterceptorProvider clientFact) {
         client.getInInterceptors().addAll(clientFact.getInInterceptors());
         client.getOutInterceptors().addAll(clientFact.getOutInterceptors());
         client.getInFaultInterceptors().addAll(clientFact.getInFaultInterceptors());
