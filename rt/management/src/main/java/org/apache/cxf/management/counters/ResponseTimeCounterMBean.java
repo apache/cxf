@@ -28,4 +28,5 @@ public interface ResponseTimeCounterMBean {
     Number getMaxResponseTime();
     Number getMinResponseTime();   
     Number getTotalHandlingTime();
+    void reset();
 }
