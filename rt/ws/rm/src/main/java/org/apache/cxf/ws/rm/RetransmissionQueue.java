@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.cxf.message.Message;
 
 public interface RetransmissionQueue {
@@ -39,8 +42,8 @@ public interface RetransmissionQueue {
     boolean isEmpty();
     
     /**
-     * Accepts a new context for posible future retransmission. 
-     * @param ctx the message context.
+     * Accepts a new message for possible future retransmission. 
+     * @param message the message context.
      */
     void addUnacknowledged(Message message);
     
@@ -52,15 +55,47 @@ public interface RetransmissionQueue {
     void purgeAcknowledged(SourceSequence seq);
     
     /**
+     * 
+     * @param seq
+     * @return
+     */
+    List<Long> getUnacknowledgedMessageNumbers(SourceSequence seq);
+    
+    /**
+     * Returns the retransmission status for the specified message.
+     * @param seq
+     * @param num
+     * @return
+     */
+    RetransmissionStatus getRetransmissionStatus(SourceSequence seq, long num);
+    
+    /**
+     * Return the retransmission status of all the messages assigned to the sequence.
+     * @param seq
+     * @return
+     */
+    Map<Long, RetransmissionStatus> getRetransmissionStatuses(SourceSequence seq);
+        
+    /**
      * Initiate resends.
-     *
      */
     void start();
     
     /**
      * Stops retransmission queue.
+     * @param seq
      */
     void stop(SourceSequence seq);
     
-    
+    /**
+     * Suspends the retransmission attempts for the specified sequence
+     * @param seq
+     */
+    void suspend(SourceSequence seq);
+
+    /**
+     * Resumes the retransmission attempts for the specified sequence
+     * @param seq
+     */
+    void resume(SourceSequence seq);
 }

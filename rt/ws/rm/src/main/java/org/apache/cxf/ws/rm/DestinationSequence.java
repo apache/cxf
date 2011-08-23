@@ -327,7 +327,7 @@ public class DestinationSequence extends AbstractSequence {
         if (null == store) {
             return;
         }
-        store.removeMessages(getIdentifier(), Collections.singleton(new Long(messageNr)), false);
+        store.removeMessages(getIdentifier(), Collections.singleton(messageNr), false);
     }
 
     /**
@@ -339,6 +339,10 @@ public class DestinationSequence extends AbstractSequence {
 
     public boolean sendAcknowledgement() {
         return acknowledgeOnNextOccasion;
+    }
+    
+    List<DeferredAcknowledgment> getDeferredAcknowledgements() {
+        return deferredAcknowledgments;
     }
     
     /**

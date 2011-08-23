@@ -21,8 +21,13 @@ package org.apache.cxf.ws.rm;
 
 import java.io.OutputStream;
 
+import javax.management.JMException;
+import javax.management.ObjectName;
+
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
+import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingConstants;
 import org.apache.cxf.ws.addressing.AddressingConstantsImpl;
@@ -123,5 +128,41 @@ public final class RMUtils {
             os = cached;
         }
         return (WriteOnCloseOutputStream) os;
+    }
+    
+    public static ObjectName getManagedObjectName(RMManager manager) throws JMException {
+        StringBuilder buffer = new StringBuilder();
+        writeTypeProperty(buffer, manager.getBus(), "WSRM.Manager");
+        return new ObjectName(buffer.toString());
+    }
+    
+    public static ObjectName getManagedObjectName(RMEndpoint endpoint) throws JMException {
+        StringBuilder buffer = new StringBuilder();
+        writeTypeProperty(buffer, endpoint.getManager().getBus(), "WSRM.Endpoint");
+        Endpoint ep = endpoint.getApplicationEndpoint();
+        writeEndpointProperty(buffer, ep);
+        return new ObjectName(buffer.toString());
+    }
+    
+    public static ObjectName getManagedObjectName(RMManager manager, Endpoint ep) throws JMException {
+        StringBuilder buffer = new StringBuilder();
+        writeTypeProperty(buffer, manager.getBus(), "WSRM.Endpoint");
+        writeEndpointProperty(buffer, ep);
+        return new ObjectName(buffer.toString());
+    }
+
+    private static void writeTypeProperty(StringBuilder buffer, Bus bus, String type) {
+        String busId = bus.getId();
+        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
+        buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
+        buffer.append(ManagementConstants.TYPE_PROP + "=" + type);
+    }
+
+    private static void writeEndpointProperty(StringBuilder buffer, Endpoint ep) {
+        String serviceName = ObjectName.quote(ep.getService().getName().toString());
+        buffer.append(",");
+        buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
+        String endpointName = ObjectName.quote(ep.getEndpointInfo().getName().toString());
+        buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName);
     }
 }

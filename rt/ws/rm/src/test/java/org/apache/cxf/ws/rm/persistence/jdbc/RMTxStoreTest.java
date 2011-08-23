@@ -226,30 +226,34 @@ public class RMTxStoreTest extends Assert {
     
     @Test
     public void testCreateDeleteMessages() throws IOException, SQLException  {
-        RMMessage msg = control.createMock(RMMessage.class);
+        RMMessage msg1 = control.createMock(RMMessage.class);
+        RMMessage msg2 = control.createMock(RMMessage.class);
         Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
-        EasyMock.expect(msg.getMessageNumber()).andReturn(ONE).times(2); 
+        EasyMock.expect(msg1.getMessageNumber()).andReturn(ONE); 
+        EasyMock.expect(msg2.getMessageNumber()).andReturn(ONE); 
         byte[] bytes = new byte[89];
-        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
+        EasyMock.expect(msg1.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg2.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
+        EasyMock.expect(msg2.getSize()).andReturn(bytes.length);
         
         control.replay();
         store.beginTransaction();
-        store.storeMessage(sid1, msg, true);
-        store.storeMessage(sid1, msg, false);
+        store.storeMessage(sid1, msg1, true);
+        store.storeMessage(sid1, msg2, false);
         store.commit();
         control.verify();
         
         control.reset();
-        EasyMock.expect(msg.getMessageNumber()).andReturn(ONE); 
-        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg1.getMessageNumber()).andReturn(ONE); 
+        EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
+        EasyMock.expect(msg1.getSize()).andReturn(bytes.length);
         
         control.replay();
         store.beginTransaction();
         try {
-            store.storeMessage(sid1, msg, true);
+            store.storeMessage(sid1, msg1, true);
         } catch (SQLException ex) {
             assertEquals("23505", ex.getSQLState());
         }
@@ -257,14 +261,17 @@ public class RMTxStoreTest extends Assert {
         control.verify();
         
         control.reset();
-        EasyMock.expect(msg.getMessageNumber()).andReturn(TEN).times(2); 
-        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
-        EasyMock.expect(msg.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg1.getMessageNumber()).andReturn(TEN);
+        EasyMock.expect(msg2.getMessageNumber()).andReturn(TEN); 
+        EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
+        EasyMock.expect(msg1.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg2.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
+        EasyMock.expect(msg2.getSize()).andReturn(bytes.length);
         
         control.replay();
         store.beginTransaction();
-        store.storeMessage(sid1, msg, true);
-        store.storeMessage(sid1, msg, false);
+        store.storeMessage(sid1, msg1, true);
+        store.storeMessage(sid1, msg2, false);
         store.commit();
         control.verify();
         
@@ -409,6 +416,64 @@ public class RMTxStoreTest extends Assert {
             seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
             assertEquals(2, seqs.size());
             checkRecoveredSourceSequences(seqs);
+        } finally {
+            if (null != sid1) {
+                store.removeSourceSequence(sid1);
+            }
+            if (null != sid2) {
+                store.removeSourceSequence(sid2);
+            }
+        }
+    }
+
+    @Test
+    public void testGetDestinationSequence() throws SQLException, IOException {
+        
+        Identifier sid1 = null;
+        Identifier sid2 = null;
+        
+        DestinationSequence seq = 
+            store.getDestinationSequence(new Identifier(), ProtocolVariation.RM10WSA200408);
+        assertNull(seq);
+
+        try {
+            sid1 = setupDestinationSequence("sequence1");
+
+            seq = store.getDestinationSequence(sid1, ProtocolVariation.RM10WSA200408);
+            assertNotNull(seq);
+
+            sid2 = setupDestinationSequence("sequence2");
+            seq = store.getDestinationSequence(sid2, ProtocolVariation.RM10WSA200408);
+            assertNotNull(seq);
+        } finally {
+            if (null != sid1) {
+                store.removeDestinationSequence(sid1);
+            }
+            if (null != sid2) {
+                store.removeDestinationSequence(sid2);
+            }
+        }
+    }
+
+    @Test
+    public void testGetSourceSequence() throws SQLException, IOException {
+        
+        Identifier sid1 = null;
+        Identifier sid2 = null;
+        
+        SourceSequence seq = 
+            store.getSourceSequence(new Identifier(), ProtocolVariation.RM10WSA200408);
+        assertNull(seq);
+        
+        try {
+            sid1 = setupSourceSequence("sequence1");
+
+            seq = store.getSourceSequence(sid1, ProtocolVariation.RM10WSA200408);
+            assertNotNull(seq);
+
+            sid2 = setupSourceSequence("sequence2");
+            seq = store.getSourceSequence(sid2, ProtocolVariation.RM10WSA200408);
+            assertNotNull(seq);
         } finally {
             if (null != sid1) {
                 store.removeSourceSequence(sid1);

@@ -101,6 +101,12 @@ public class RMTxStore implements RMStore {
         = "INSERT INTO {0} VALUES(?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
+    private static final String SELECT_DEST_SEQUENCE_STMT_STR =
+        "SELECT ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
+        + "WHERE SEQ_ID = ?";
+    private static final String SELECT_SRC_SEQUENCE_STMT_STR =
+        "SELECT CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID FROM CXF_RM_SRC_SEQUENCES "
+        + "WHERE SEQ_ID = ?";
     private static final String SELECT_DEST_SEQUENCES_STMT_STR =
         "SELECT SEQ_ID, ACKS_TO, LAST_MSG_NO, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
         + "WHERE ENDPOINT_ID = ?";
@@ -126,6 +132,8 @@ public class RMTxStore implements RMStore {
     private PreparedStatement updateSrcSequenceStmt;
     private PreparedStatement selectDestSequencesStmt;
     private PreparedStatement selectSrcSequencesStmt;
+    private PreparedStatement selectDestSequenceStmt;
+    private PreparedStatement selectSrcSequenceStmt;
     private PreparedStatement createInboundMessageStmt;
     private PreparedStatement createOutboundMessageStmt;
     private PreparedStatement deleteInboundMessageStmt;
@@ -237,6 +245,68 @@ public class RMTxStore implements RMStore {
         }
     }
     
+    public DestinationSequence getDestinationSequence(Identifier sid, ProtocolVariation protocol) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.info("Getting destination sequence for id: " + sid);
+        }
+        try {
+            if (null == selectDestSequenceStmt) {
+                selectDestSequenceStmt = 
+                    connection.prepareStatement(SELECT_DEST_SEQUENCE_STMT_STR);               
+            }
+            selectDestSequenceStmt.setString(1, sid.getValue());
+            
+            ResultSet res = selectDestSequenceStmt.executeQuery(); 
+            if (res.next()) {
+                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(1));  
+                long lm = res.getLong(2);
+                InputStream is = res.getBinaryStream(3); 
+                SequenceAcknowledgement ack = null;
+                if (null != is) {
+                    ack = PersistenceUtils.getInstance()
+                        .deserialiseAcknowledgment(is); 
+                }
+                return new DestinationSequence(sid, acksTo, lm, ack, protocol);
+            }
+        } catch (SQLException ex) {
+            LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
+        }
+        return null;
+    }
+    
+    public SourceSequence getSourceSequence(Identifier sid, ProtocolVariation protocol) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.info("Getting source sequences for id: " + sid);
+        }
+        try {
+            if (null == selectSrcSequenceStmt) {
+                selectSrcSequenceStmt = 
+                    connection.prepareStatement(SELECT_SRC_SEQUENCE_STMT_STR);     
+            }
+            selectSrcSequenceStmt.setString(1, sid.getValue());
+            ResultSet res = selectSrcSequenceStmt.executeQuery();
+            
+            if (res.next()) {
+                long cmn = res.getLong(1);
+                boolean lm = res.getBoolean(2);
+                long lval = res.getLong(3);
+                Date expiry = 0 == lval ? null : new Date(lval);
+                String oidValue = res.getString(4);
+                Identifier oi = null;
+                if (null != oidValue) {
+                    oi = RMUtils.getWSRMFactory().createIdentifier();
+                    oi.setValue(oidValue);
+                }                            
+                return new SourceSequence(sid, expiry, oi, cmn, lm, protocol);
+                          
+            }
+        } catch (SQLException ex) {
+            // ignore
+            LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
+        }
+        return null;
+    }
+
     public void removeDestinationSequence(Identifier sid) {
         try {
             beginTransaction();

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.management.JMException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -42,6 +43,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -97,7 +99,9 @@ public class RMEndpoint {
     private QName interfaceQName;
     private long lastApplicationMessage;
     private long lastControlMessage;
-
+    private InstrumentationManager instrumentationManager;
+    private ManagedRMEndpoint managedEndpoint;
+    
     /**
      * Constructor.
      * 
@@ -260,6 +264,17 @@ public class RMEndpoint {
         createService();
         createEndpoint(d);
         setPolicies();
+        if (manager != null && manager.getBus() != null) {
+            managedEndpoint = new ManagedRMEndpoint(this);
+            instrumentationManager = manager.getBus().getExtension(InstrumentationManager.class);        
+            if (instrumentationManager != null) {   
+                try {
+                    instrumentationManager.register(managedEndpoint);
+                } catch (JMException jmex) {
+                    LOG.log(Level.WARNING, "Registering ManagedRMEndpoint failed.", jmex);
+                }
+            }
+        }
     }
 
     void createService() {
@@ -645,6 +660,8 @@ public class RMEndpoint {
         for (SourceSequence ss : getSource().getAllSequences()) {
             manager.getRetransmissionQueue().stop(ss);
         }
+
+        // unregistering of this managed bean from the server is done by the bus itself
     }
 
     class EffectivePolicyImpl implements EffectivePolicy {

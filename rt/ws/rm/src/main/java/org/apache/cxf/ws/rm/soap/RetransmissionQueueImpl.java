@@ -62,6 +62,7 @@ import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.RetransmissionCallback;
 import org.apache.cxf.ws.rm.RetransmissionQueue;
+import org.apache.cxf.ws.rm.RetransmissionStatus;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
@@ -76,7 +77,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RetransmissionQueueImpl.class);
 
-    private Map<String, List<ResendCandidate>> candidates = new HashMap<String, List<ResendCandidate>>();
+    private Map<String, List<ResendCandidate>> candidates = 
+        new HashMap<String, List<ResendCandidate>>();
+    private Map<String, List<ResendCandidate>> suspendedCandidates = 
+        new HashMap<String, List<ResendCandidate>>();
     private Resender resender;
     private RMManager manager;
 
@@ -149,6 +153,52 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
     }
 
+    public List<Long> getUnacknowledgedMessageNumbers(SourceSequence seq) {
+        List<Long> unacknowledged = new ArrayList<Long>();
+        List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
+        if (null != sequenceCandidates) {
+            for (int i = 0; i < sequenceCandidates.size(); i++) {
+                ResendCandidate candidate = sequenceCandidates.get(i);
+                RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
+                                                                              true);
+                SequenceType st = properties.getSequence();
+                unacknowledged.add(st.getMessageNumber());
+            }
+        }
+        return unacknowledged;
+    }
+    
+    public RetransmissionStatus getRetransmissionStatus(SourceSequence seq, long num) {
+        List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
+        if (null != sequenceCandidates) {
+            for (int i = 0; i < sequenceCandidates.size(); i++) {
+                ResendCandidate candidate = sequenceCandidates.get(i);
+                RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
+                                                                              true);
+                SequenceType st = properties.getSequence();
+                if (num == st.getMessageNumber()) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public Map<Long, RetransmissionStatus> getRetransmissionStatuses(SourceSequence seq) {
+        Map<Long, RetransmissionStatus> cp = new HashMap<Long, RetransmissionStatus>();
+        List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
+        if (null != sequenceCandidates) {
+            for (int i = 0; i < sequenceCandidates.size(); i++) {
+                ResendCandidate candidate = sequenceCandidates.get(i);
+                RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
+                                                                              true);
+                SequenceType st = properties.getSequence();
+                cp.put(st.getMessageNumber(), candidate);
+            }
+        }
+        return cp;
+    }
+
     /**
      * Initiate resends.
      */
@@ -181,6 +231,36 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     
     void stop() {
         
+    }
+    
+    public void suspend(SourceSequence seq) {
+        synchronized (this) {
+            String key = seq.getIdentifier().getValue();
+            List<ResendCandidate> sequenceCandidates = candidates.remove(key);
+            if (null != sequenceCandidates) {
+                for (int i = sequenceCandidates.size() - 1; i >= 0; i--) {
+                    ResendCandidate candidate = sequenceCandidates.get(i);
+                    candidate.suspend();
+                }
+                suspendedCandidates.put(key, sequenceCandidates);
+                LOG.log(Level.FINE, "Suspended resends for sequence {0}.", key);
+            }
+        }
+    }
+    
+    public void resume(SourceSequence seq) {
+        synchronized (this) {
+            String key = seq.getIdentifier().getValue();
+            List<ResendCandidate> sequenceCandidates = suspendedCandidates.remove(key);
+            if (null != sequenceCandidates) {
+                for (int i = 0; i < sequenceCandidates.size(); i++) {
+                    ResendCandidate candidate = sequenceCandidates.get(i);
+                    candidate.resume();
+                }
+                candidates.put(key, sequenceCandidates);
+                LOG.log(Level.FINE, "Resumed resends for sequence {0}.", key);
+            }           
+        }
     }
 
     /**
@@ -219,6 +299,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 candidates.put(key, sequenceCandidates);
             }
             candidate = new ResendCandidate(message);
+            if (isSequenceSuspended(key)) {
+                candidate.suspend();
+            }
             sequenceCandidates.add(candidate);
         }
         LOG.fine("Cached unacknowledged message.");
@@ -248,7 +331,20 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @pre called with mutex held
      */
     protected List<ResendCandidate> getSequenceCandidates(String key) {
-        return candidates.get(key);
+        List<ResendCandidate> sc = candidates.get(key);
+        if (null == sc) {
+            sc = suspendedCandidates.get(key);
+        }
+        return sc;
+    }
+    
+    /**
+     * @param key the sequence identifier under consideration
+     * @return true if the sequence is currently suspended; false otherwise
+     * @pre called with mutex held
+     */
+    protected boolean isSequenceSuspended(String key) {
+        return suspendedCandidates.containsKey(key);
     }
 
     private void clientResend(Message message) {
@@ -373,7 +469,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     /**
      * Represents a candidate for resend, i.e. an unacked outgoing message.
      */
-    protected class ResendCandidate implements Runnable {
+    protected class ResendCandidate implements Runnable, RetransmissionStatus {
         private Message message;
         private OutputStream out;
         private Date next;
@@ -382,6 +478,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         private long nextInterval;
         private long backoff;
         private boolean pending;
+        private boolean suspended;
         private boolean includeAckRequested;
 
         /**
@@ -458,21 +555,43 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         /**
          * @return number of resend attempts
          */
-        protected int getResends() {
+        public int getResends() {
             return resends;
         }
 
         /**
          * @return date of next resend
          */
-        protected Date getNext() {
+        public Date getNext() {
             return next;
+        }
+
+        /**
+         * @return date of previous resend or null if no attempt is yet taken 
+         */
+        public Date getPrevious() {
+            if (resends > 0) {
+                return new Date(next.getTime() - nextInterval / backoff);
+            }
+            return null;
+        }
+
+        public long getNextInterval() {
+            return nextInterval;
+        }
+
+        public long getBackoff() {
+            return backoff;
+        }
+
+        public boolean isSuspended() {
+            return suspended;
         }
 
         /**
          * @return if resend attempt is pending
          */
-        protected synchronized boolean isPending() {
+        public synchronized boolean isPending() {
             return pending;
         }
 
@@ -498,13 +617,29 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
         }
 
+        protected void suspend() {
+            suspended = true;
+            pending = false;
+            //TODO release the message and later reload it upon resume
+            //cancel();
+            if (null != nextTask) {
+                nextTask.cancel();
+            }
+        }
+
+        protected void resume() {
+            suspended = false;
+            next = new Date(System.currentTimeMillis());
+            attempted();
+        }
+
         private void releaseSavedMessage() {
-            CachedOutputStream saved = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            CachedOutputStream saved = (CachedOutputStream)message.remove(RMMessageConstants.SAVED_CONTENT);
             if (saved != null) {
                 saved.releaseTempFileHold();
             }
-
         }
+
         /**
          * @return associated message context
          */

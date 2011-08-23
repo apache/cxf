@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.management.JMException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -42,6 +43,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
+import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -100,6 +102,8 @@ public class RMManager {
     private DeliveryAssuranceType deliveryAssurance;
     private SourcePolicyType sourcePolicy;
     private DestinationPolicyType destinationPolicy;
+    private InstrumentationManager instrumentationManager;
+    private ManagedRMManager managedManager;
     private String rmNamespace = RM10Constants.NAMESPACE_URI;
     private String rmAddressingNamespace = Names200408.WSA_NAMESPACE_NAME;
     
@@ -466,6 +470,8 @@ public class RMManager {
             t.purge();
             t.cancel();
         }
+
+        // unregistring of this managed bean from the server is done by the bus itself
     }
     
     synchronized void shutdownReliableEndpoint(Endpoint e) {
@@ -622,6 +628,17 @@ public class RMManager {
         }
         if (null == idGenerator) {
             idGenerator = new DefaultSequenceIdentifierGenerator();
+        }
+        if (null != bus) {
+            managedManager = new ManagedRMManager(this);
+            instrumentationManager = bus.getExtension(InstrumentationManager.class);        
+            if (instrumentationManager != null) {   
+                try {
+                    instrumentationManager.register(managedManager);
+                } catch (JMException jmex) {
+                    LOG.log(Level.WARNING, "Registering ManagedRMManager failed.", jmex);
+                }
+            }
         }
     }
     
