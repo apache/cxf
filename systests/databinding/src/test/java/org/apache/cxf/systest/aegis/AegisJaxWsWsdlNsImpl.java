@@ -31,7 +31,7 @@ public class AegisJaxWsWsdlNsImpl implements AegisJaxWsWsdlNs {
     
 
     public void updateVO(VO vo) {
-        System.out.println(vo.getStr());
+        //System.out.println(vo.getStr());
     }
 
     
