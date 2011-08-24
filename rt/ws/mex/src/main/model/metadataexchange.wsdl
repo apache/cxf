@@ -1,0 +1,93 @@
+<wsdl:definitions
+    targetNamespace='http://www.w3.org/2009/09/ws-mex'
+    xmlns:tns='http://www.w3.org/2009/09/ws-mex'
+    xmlns:wsa='http://www.w3.org/2005/08/addressing'
+    xmlns:wsam='http://www.w3.org/2007/05/addressing/metadata'
+    xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/'
+    xmlns:xs='http://www.w3.org/2001/XMLSchema' >
+
+  <wsdl:types>
+    <xs:schema
+        targetNamespace='http://www.w3.org/2009/09/ws-mex' >
+      <xs:include schemaLocation='metadataexchange.xsd' />
+    </xs:schema>
+  </wsdl:types>
+
+  <wsdl:message name='GetWSDLMsg'>
+    <wsdl:part name='body' element='tns:GetWSDL'/>
+  </wsdl:message>
+
+  <wsdl:message name='GetWSDLResponseMsg'>
+    <wsdl:part name='body' element='tns:GetWSDLResponse'/>
+  </wsdl:message>
+
+  <wsdl:message name='GetMetadataMsg' >
+    <wsdl:part name='body' element='tns:GetMetadata' />
+  </wsdl:message>
+  <wsdl:message name='GetMetadataResponseMsg' >
+    <wsdl:part name='body' element='tns:GetMetadataResponse' />
+  </wsdl:message>
+
+  <wsdl:message name='PutMetadataMsg' >
+    <wsdl:part name='body' element='tns:PutMetadata' />
+  </wsdl:message>
+  <wsdl:message name='PutMetadataResponseMsg' >
+    <wsdl:part name='body' element='tns:PutMetadataResponse' />
+  </wsdl:message>
+
+  <wsdl:message name='DeleteMetadataMsg' >
+    <wsdl:part name='body' element='tns:DeleteMetadata' />
+  </wsdl:message>
+  <wsdl:message name='DeleteMetadataResponseMsg' >
+    <wsdl:part name='body' element='tns:DeleteMetadataResponse' />
+  </wsdl:message>
+
+  <wsdl:portType name='MetadataExchange' >
+
+    <wsdl:operation name='GetWSDL'>
+      <wsdl:input
+       message='tns:GetWSDLMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/GetWSDL'/>
+      <wsdl:output
+       message='tns:GetWSDLResponseMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/GetWSDLResponse'/>
+    </wsdl:operation>
+
+    <wsdl:operation name='GetMetadata' >
+      <wsdl:input
+       message='tns:GetMetadataMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/GetMetadata'/>
+      <wsdl:output
+       message='tns:GetMetadataResponseMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/GetMetadataResponse'/>
+    </wsdl:operation>
+
+    <wsdl:operation name='PutMetadata' >
+      <wsdl:input
+       message='tns:PutMetadataMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/PutMetadata'/>
+      <wsdl:output
+       message='tns:PutMetadataResponseMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/PutMetadataResponse'/>
+    </wsdl:operation>
+
+    <wsdl:operation name='DeleteMetadata' >
+      <wsdl:input
+       message='tns:DeleteMetadataMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/DeleteMetadata'/>
+      <wsdl:output
+       message='tns:DeleteMetadataResponseMsg'
+       wsam:Action=
+        'http://www.w3.org/2009/09/ws-mex/DeleteMetadataResponse'/>
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+</wsdl:definitions>

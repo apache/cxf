@@ -1,0 +1,296 @@
+<xs:schema
+    targetNamespace='http://www.w3.org/2009/09/ws-mex'
+    xmlns:tns='http://www.w3.org/2009/09/ws-mex'
+    xmlns:wsa='http://www.w3.org/2005/08/addressing'
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    elementFormDefault='qualified'
+    blockDefault='#all'>
+
+  <xs:import
+      namespace='http://www.w3.org/2005/08/addressing'
+      schemaLocation='ws-addr.xsd'/>
+
+  <!-- Types and global elements -->
+  <xs:simpleType name='QNameSerialization'>
+    <xs:restriction base='xs:string'>
+      <xs:pattern value='\{.*\}.+'/>
+      <!-- A QName w/o a namespace-uri is realized as "{}local-name} -->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- GetWSDL request -->
+  <xs:element name='GetWSDL'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- GetWSDL response -->
+  <xs:element name='GetWSDLResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Get Metadata request -->
+  <xs:element name='GetMetadata'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='tns:Dialect' minOccurs='0' maxOccurs='unbounded'/>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Get Metadata response -->
+  <xs:element name='GetMetadataResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='tns:Metadata'/>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:attribute name='Content' type='xs:anyURI'/>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Put Metadata request -->
+  <xs:element name='PutMetadata'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='tns:Metadata'/>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Put Metadata response -->
+  <xs:element name='PutMetadataResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='tns:Metadata'/>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Delete Metadata request -->
+  <xs:element name='DeleteMetadata'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='tns:Dialect' minOccurs='0' maxOccurs='unbounded'/>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Delete Metadata response -->
+  <xs:element name='DeleteMetadataResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='Dialect'>
+    <xs:complexType>
+      <xs:attribute name='Type' type='tns:QNameSerialization' use='required'/>
+      <xs:attribute name='Identifier' type='xs:anyURI'/>
+      <xs:attribute name='Content' type='xs:anyURI'/>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Metadata -->
+  <xs:element name='Metadata'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='tns:MetadataSection'
+                    minOccurs='0'
+                    maxOccurs='unbounded'/>
+        <xs:any namespace='##other' processContents='lax'
+                minOccurs='0'
+                maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='MetadataSection'>
+    <xs:complexType>
+      <xs:choice>
+        <xs:any namespace='##other' processContents='lax'/>
+        <xs:element name='MetadataReference' type='wsa:EndpointReferenceType' />
+        <xs:element name='MetadataLocation' type='tns:URI'/>
+      </xs:choice>
+      <xs:attribute name='Dialect' type='tns:QNameSerialization' use='required'/>
+      <xs:attribute name='Identifier' type='xs:anyURI' use='required'/>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name='LocationType'>
+    <xs:sequence>
+      <xs:any namespace='##other' processContents='lax' minOccurs='0'
+              maxOccurs='unbounded'/>
+    </xs:sequence>
+    <xs:attribute name='URL'  type='xs:anyURI' use='required'/>
+    <xs:attribute name='Type' type='tns:QNameSerialization'  use='required'/>
+    <xs:attribute name='Identifier' type='xs:anyURI' use='required'/>
+    <xs:anyAttribute namespace='##other' processContents='lax'/>
+  </xs:complexType>
+  <xs:element name='Location' type='tns:LocationType'/>
+
+  <xs:complexType name='ReferenceType'>
+    <xs:complexContent>
+      <xs:extension base='wsa:EndpointReferenceType'>
+        <xs:attribute name='Type' type='tns:QNameSerialization'  use='required'/>
+        <xs:attribute name='Identifier' type='xs:anyURI' use='required'/>
+        <xs:anyAttribute processContents='lax'/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name='Reference' type='tns:ReferenceType'/>
+
+  <!-- Policy -->
+  <xs:complexType name='URI'>
+    <xs:simpleContent>
+      <xs:extension base='xs:anyURI'>
+        <xs:anyAttribute namespace='##other' processContents='lax'/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name='MetadataExchange'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='GetMetadataSupported' minOccurs='0'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='MetadataExchangeDialect' 
+                          minOccurs='0' maxOccurs='unbounded'>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name='MetadataContent' 
+                                minOccurs='0' maxOccurs='unbounded'>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:any namespace='##other' processContents='lax' 
+                                  minOccurs='0' maxOccurs='0'/>
+                        </xs:sequence>
+                        <xs:attribute name='URI' type='xs:anyURI' 
+                                                 use='required' />
+                        <xs:anyAttribute namespace="##other" 
+                                         processContents='lax'/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:any namespace='##other' processContents='lax'
+                            minOccurs='0' maxOccurs='unbounded'/>
+                  </xs:sequence>
+                  <xs:attribute name='URI' type='xs:anyURI' 
+                                use='required'/>
+                  <xs:anyAttribute namespace='##other' 
+                                   processContents='lax'/>
+                </xs:complexType>
+              </xs:element>
+              <xs:any namespace='##other' processContents='lax' 
+                      minOccurs='0' maxOccurs='unbounded'/>
+            </xs:sequence>
+            <xs:anyAttribute namespace='##other' processContents='lax' />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='PutMetadataSupported' minOccurs='0'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='MetadataExchangeDialect' 
+                          minOccurs='0' maxOccurs='unbounded'>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name='MetadataContent' 
+                                minOccurs='0' maxOccurs='unbounded'>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:any namespace='##other' processContents='lax' 
+                                  minOccurs='0' maxOccurs='0'/>
+                        </xs:sequence>
+                        <xs:attribute name='URI' type='xs:anyURI' 
+                                                 use='required' />
+                        <xs:anyAttribute namespace="##other" 
+                                         processContents='lax'/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:any namespace='##other' processContents='lax'
+                            minOccurs='0' maxOccurs='unbounded'/>
+                  </xs:sequence>
+                  <xs:attribute name='URI' type='xs:anyURI' 
+                                use='required'/>
+                  <xs:anyAttribute namespace='##other' 
+                                   processContents='lax'/>
+                </xs:complexType>
+              </xs:element>
+              <xs:any namespace='##other' processContents='lax' 
+                      minOccurs='0' maxOccurs='unbounded'/>
+            </xs:sequence>
+            <xs:anyAttribute namespace='##other' processContents='lax' />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='DeleteMetadataSupported' minOccurs='0'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='MetadataExchangeDialect' 
+                          minOccurs='0' maxOccurs='unbounded'>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name='MetadataContent' 
+                                minOccurs='0' maxOccurs='unbounded'>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:any namespace='##other' processContents='lax' 
+                                  minOccurs='0' maxOccurs='0'/>
+                        </xs:sequence>
+                        <xs:attribute name='URI' type='xs:anyURI' 
+                                                 use='required' />
+                        <xs:anyAttribute namespace="##other" 
+                                         processContents='lax'/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:any namespace='##other' processContents='lax'
+                            minOccurs='0' maxOccurs='unbounded'/>
+                  </xs:sequence>
+                  <xs:attribute name='URI' type='xs:anyURI' 
+                                use='required'/>
+                  <xs:anyAttribute namespace='##other' 
+                                   processContents='lax'/>
+                </xs:complexType>
+              </xs:element>
+              <xs:any namespace='##other' processContents='lax' 
+                      minOccurs='0' maxOccurs='unbounded'/>
+            </xs:sequence>
+            <xs:anyAttribute namespace='##other' processContents='lax' />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
