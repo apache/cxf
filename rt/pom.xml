@@ -52,6 +52,7 @@
         <module>ws/addr</module>
         <module>ws/rm</module>
         <module>ws/security</module>
+        <module>ws/mex</module>
         <module>rs/security/xml</module>
         <module>management</module>
         <module>management-web</module>
