@@ -103,6 +103,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -1069,30 +1070,24 @@ public class STSClient implements Configurable, InterceptorProvider {
                 // First check for the binary secret
                 String b64Secret = DOMUtils.getContent(child);
                 secret = Base64.decode(b64Secret);
-            } else if (childQname.equals(new QName(namespace, WSConstants.ENC_KEY_LN))) {
-                try {
-                    EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                    WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
-                    RequestData data = new RequestData();
-                    data.setDecCrypto(createCrypto(true));
-                    data.setCallbackHandler(createHandler());
-                    List<WSSecurityEngineResult> result =
-                        proc.handleToken(child, data, docInfo);
-                    secret = 
-                        (byte[])result.get(0).get(
-                            WSSecurityEngineResult.TAG_SECRET
-                        );
-                } catch (IOException e) {
-                    throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
-                }
+            } else if (childQname.equals(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN))) {
+                secret = decryptKey(child);
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
                 // Handle the computed key
-                Element binSecElem = entropy == null ? null : DOMUtils.getFirstElement(entropy);
-                String content = binSecElem == null ? null : DOMUtils.getContent(binSecElem);
-                if (content != null && !StringUtils.isEmpty(content.trim())) {
+                Element computedKeyChild = entropy == null ? null : DOMUtils.getFirstElement(entropy);
+                byte[] serviceEntr = null;
 
-                    byte[] serviceEntr = Base64.decode(content);
-
+                if (computedKeyChild != null) {
+                    QName computedKeyChildQName = DOMUtils.getElementQName(computedKeyChild);
+                    if (computedKeyChildQName.equals(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN))) {
+                        serviceEntr = decryptKey(computedKeyChild);
+                    } else if (computedKeyChildQName.equals(new QName(namespace, "BinarySecret"))) {
+                        String content = DOMUtils.getContent(computedKeyChild);
+                        serviceEntr = Base64.decode(content);
+                    }
+                }
+                
+                if (serviceEntr != null) {
                     // Right now we only use PSHA1 as the computed key algo
                     P_SHA1 psha1 = new P_SHA1();
 
@@ -1117,6 +1112,25 @@ public class STSClient implements Configurable, InterceptorProvider {
         token.setSecret(secret);
 
         return token;
+    }
+    
+    private byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
+        try {
+            EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
+            WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+            RequestData data = new RequestData();
+            data.setWssConfig(WSSConfig.getNewInstance());
+            data.setDecCrypto(createCrypto(true));
+            data.setCallbackHandler(createHandler());
+            List<WSSecurityEngineResult> result =
+                proc.handleToken(child, data, docInfo);
+            return 
+                (byte[])result.get(0).get(
+                    WSSecurityEngineResult.TAG_SECRET
+                );
+        } catch (IOException e) {
+            throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
+        }
     }
 
     private CallbackHandler createHandler() {
