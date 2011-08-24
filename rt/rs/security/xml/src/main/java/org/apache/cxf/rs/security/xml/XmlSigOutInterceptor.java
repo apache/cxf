@@ -23,6 +23,8 @@ import java.security.cert.X509Certificate;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -30,6 +32,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
@@ -44,9 +47,14 @@ import org.opensaml.xml.signature.SignatureConstants;
 
 
 public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
+    public static final String DEFAULT_ENV_PREFIX = "env";
+    public static final QName DEFAULT_ENV_QNAME = 
+        new QName("http://org.apache.cxf/rs/env", "Envelope", DEFAULT_ENV_PREFIX);
+    
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlSigOutInterceptor.class);
     
+    private QName envelopeQName;
     private boolean enveloping;
     private String defaultSigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
     private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
@@ -69,12 +77,16 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     protected Document processDocument(Message message, Document doc) 
         throws Exception {
-        return createEnvelopedSignature(message, doc);
+        return createSignature(message, doc);
     }
     
     // enveloping & detached sigs will be supported too
-    private Document createEnvelopedSignature(Message message, Document doc) 
+    private Document createSignature(Message message, Document doc) 
         throws Exception {
+        
+        if (enveloping && envelopeQName != null) {
+            throw new IllegalStateException("Enveloping XMLSignature can not have custom envelope names");
+        }
         
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         
@@ -119,6 +131,8 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         XMLSignature sig = null;
         if (enveloping) {
             sig = prepareEnvelopingSignature(doc, id, referenceId, sigAlgo);
+        } else if (envelopeQName != null) {
+            sig = prepareDetachedSignature(doc, id, referenceId, sigAlgo);
         } else {
             sig = prepareEnvelopedSignature(doc, id, referenceId, sigAlgo);
         }
@@ -153,6 +167,31 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         return sig;
     }
     
+    private XMLSignature prepareDetachedSignature(Document doc, 
+            String id, 
+            String referenceId,
+            String sigAlgo) throws Exception {
+        Element docEl = doc.getDocumentElement();
+        Document newDoc = DOMUtils.createDocument();
+        doc.removeChild(docEl);
+        newDoc.adoptNode(docEl);
+        docEl.setAttribute("ID", id);
+        
+        Element root = newDoc.createElementNS(envelopeQName.getNamespaceURI(), 
+                envelopeQName.getPrefix() + ":" + envelopeQName.getLocalPart());
+        root.appendChild(docEl);
+        newDoc.appendChild(root);
+        
+        XMLSignature sig = new XMLSignature(newDoc, "", sigAlgo);
+        root.appendChild(sig.getElement());
+        
+        Transforms transforms = new Transforms(newDoc);
+        transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+        
+        sig.addDocument(referenceId, transforms, digestAlgo);
+        return sig;
+    }
+    
     private XMLSignature prepareEnvelopedSignature(Document doc, 
             String id, 
             String referenceURI,
@@ -167,5 +206,16 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         
         sig.addDocument(referenceURI, transforms, digestAlgo);
         return sig;
+    }
+    
+    public void setEnvelopeName(String expandedName) {
+        setEnvelopeQName(XMLUtils.convertStringToQName(expandedName, DEFAULT_ENV_PREFIX));
+    }
+    
+    public void setEnvelopeQName(QName name) {
+        if (name.getPrefix().length() == 0) {
+            name = new QName(name.getNamespaceURI(), name.getLocalPart(), DEFAULT_ENV_PREFIX);
+        }
+        this.envelopeQName = name;
     }
 }

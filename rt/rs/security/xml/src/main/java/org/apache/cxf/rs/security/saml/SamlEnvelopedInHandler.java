@@ -27,8 +27,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -91,16 +91,11 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
     }
     
     private Element getActualBody(Element root) {
-        NodeList list = root.getChildNodes();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node node = list.item(i);
-            if (node instanceof Element) {
-                root.removeChild(node);
-                return (Element)node;
-            }
+        Element node = DOMUtils.getFirstElement(root);
+        if (node != null) {
+            root.removeChild(node);
         }
-        return null;
-       
+        return node;
     }
     
     protected Element getNode(Element parent, String ns, String name) {

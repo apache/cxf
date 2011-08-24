@@ -28,8 +28,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -56,6 +54,7 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         this.removeSignature = remove;
     }
     
+    
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
         
         Document doc = getDocument(message);
@@ -66,7 +65,7 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         Element root = doc.getDocumentElement();
         Element sigElement = getSignatureElement(root);
         if (sigElement == null) {
-            throwFault("Enveloped Signature is not available", null);
+            throwFault("XML Signature is not available", null);
         }
         
         Crypto crypto = null;
@@ -84,8 +83,9 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
             throwFault("Crypto can not be loaded", ex);
         }
         boolean valid = false;
+        Reference ref = null;
         try {
-            XMLSignature signature = new XMLSignature(sigElement, "");
+            XMLSignature signature = new XMLSignature(sigElement, "");    
             // See also WSS4J SAMLUtil.getCredentialFromKeyInfo 
             KeyInfo keyInfo = signature.getKeyInfo();
             
@@ -99,7 +99,8 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
                 }
             }
             // is this call redundant given that signature.checkSignatureValue uses References ?
-            validateReference(root, signature);
+            ref = getReference(signature);
+            validateReference(root, ref);
             
             // validate trust 
             new TrustValidator().validateTrust(crypto, cert, keyInfo.getPublicKey());
@@ -112,7 +113,8 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         }
         if (removeSignature) {
             if (!isEnveloping(root)) {
-                root.removeAttribute("ID");
+                Element signedEl = getSignedElement(root, ref);
+                signedEl.removeAttribute("ID");
                 root.removeChild(sigElement);
             } else {
                 Element actualBody = getActualBody(root);
@@ -138,24 +140,19 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         if (objectNode == null) {
             throwFault("Object envelope is not available", null);
         }
-        NodeList list = objectNode.getChildNodes();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node node = list.item(i);
-            if (node instanceof Element) {
-                objectNode.removeChild(node);
-                return (Element)node;
-            }
+        Element node = DOMUtils.getFirstElement(objectNode);
+        if (node == null) {
+            throwFault("No signed data is found", null);
         }
-        throwFault("No signed data is found", null);
-        return null;
+        return node;
        
     }
     
-    private Element getSignatureElement(Element root) {
-        if (isEnveloping(root)) {    
-            return root;
+    private Element getSignatureElement(Element sigParentElement) {
+        if (isEnveloping(sigParentElement)) {    
+            return sigParentElement;
         }
-        return getNode(root, Constants.SignatureSpecNS, "Signature", 0);
+        return DOMUtils.getFirstChildWithName(sigParentElement, Constants.SignatureSpecNS, "Signature");
     }
     
     protected boolean isEnveloping(Element root) {
@@ -163,18 +160,21 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
                 && "Signature".equals(root.getLocalName());
     }
     
-    
-    protected void validateReference(Element root, XMLSignature sig) {
-        Reference ref = null;
+    protected Reference getReference(XMLSignature sig) {
         int count = sig.getSignedInfo().getLength();
         if (count != 1) {
             throwFault("Multiple Signature Reference are not currently supported", null);
         }
         try {
-            ref = sig.getSignedInfo().item(0);
+            return sig.getSignedInfo().item(0);
         } catch (XMLSecurityException ex) {
             throwFault("Signature Reference is not available", ex);
         }
+        return null;
+    }
+    
+    protected void validateReference(Element root, Reference ref) {
+        boolean detached = false;
         if (!isEnveloping(root)) {
             String rootId = root.getAttribute("ID");
             String refId = ref.getURI();
@@ -182,17 +182,25 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
                 // or fragment must be expected ?
                 return;
             }
-            if (!refId.startsWith("#") || refId.length() <= 1 || !refId.substring(1).equals(rootId)) {
+            if (!refId.startsWith("#") || refId.length() <= 1) {
+                throwFault("Only local Signature References are supported", null);
+            }
+            
+            Element signedEl = getSignedElement(root, ref);
+            if (signedEl != null) {
+                detached = signedEl != root;
+            } else {
                 throwFault("Signature Reference ID is invalid", null);
             }
         }
+        
         Transforms transforms = null;
         try {
             transforms = ref.getTransforms();
         } catch (XMLSecurityException ex) {
             throwFault("Signature transforms can not be obtained", ex);
         }
-        if (!isEnveloping(root)) {
+        if (!isEnveloping(root) && !detached) {
             boolean isEnveloped = false;
             for (int i = 0; i < transforms.getLength(); i++) {
                 try {
@@ -208,6 +216,17 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
             if (!isEnveloped) {
                 throwFault("Only enveloped signatures are currently supported", null);
             }
+        }
+    }
+    
+    private Element getSignedElement(Element root, Reference ref) {
+        String rootId = root.getAttribute("ID");
+        String expectedID = ref.getURI().substring(1);
+        
+        if (!expectedID.equals(rootId)) {
+            return (Element)DOMUtils.findChildWithAtt(root, null, "ID", expectedID);
+        } else {
+            return root;
         }
     }
 }
