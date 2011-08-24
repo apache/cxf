@@ -963,26 +963,24 @@ public class STSClient implements Configurable, InterceptorProvider {
                 // First check for the binary secret
                 String b64Secret = DOMUtils.getContent(child);
                 secret = Base64.decode(b64Secret);
-            } else if (childQname.equals(new QName(namespace, WSConstants.ENC_KEY_LN))) {
-                try {
-
-                    EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
-
-                    processor.handleToken(child, null, createCrypto(true), createHandler(), null,
-                                          new Vector(), null);
-
-                    secret = processor.getDecryptedBytes();
-                } catch (IOException e) {
-                    throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
-                }
+            } else if (childQname.equals(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN))) {
+                secret = decryptKey(child);
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
                 // Handle the computed key
-                Element binSecElem = entropy == null ? null : DOMUtils.getFirstElement(entropy);
-                String content = binSecElem == null ? null : DOMUtils.getContent(binSecElem);
-                if (content != null && !StringUtils.isEmpty(content.trim())) {
+                Element computedKeyChild = entropy == null ? null : DOMUtils.getFirstElement(entropy);
+                byte[] serviceEntr = null;
 
-                    byte[] serviceEntr = Base64.decode(content);
-
+                if (computedKeyChild != null) {
+                    QName computedKeyChildQName = DOMUtils.getElementQName(computedKeyChild);
+                    if (computedKeyChildQName.equals(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN))) {
+                        serviceEntr = decryptKey(computedKeyChild);
+                    } else if (computedKeyChildQName.equals(new QName(namespace, "BinarySecret"))) {
+                        String content = DOMUtils.getContent(computedKeyChild);
+                        serviceEntr = Base64.decode(content);
+                    }
+                }
+                
+                if (serviceEntr != null) {
                     // Right now we only use PSHA1 as the computed key algo
                     P_SHA1 psha1 = new P_SHA1();
 
@@ -1007,6 +1005,19 @@ public class STSClient implements Configurable, InterceptorProvider {
         token.setSecret(secret);
 
         return token;
+    }
+    
+    private byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
+        try {
+            EncryptedKeyProcessor processor = new EncryptedKeyProcessor();
+
+            processor.handleToken(child, null, createCrypto(true), createHandler(), null,
+                                  new Vector(), null);
+
+            return processor.getDecryptedBytes();
+        } catch (IOException e) {
+            throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
+        }
     }
 
     private CallbackHandler createHandler() {
