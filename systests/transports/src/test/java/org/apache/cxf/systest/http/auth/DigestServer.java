@@ -81,7 +81,13 @@ public class DigestServer extends AbstractBusTestServerBase {
             e.printStackTrace();
         }     
     }
-    
+    public void tearDown() throws Exception {
+        if (server != null) {
+            server.stop();
+            server.destroy();
+            server = null;
+        }
+    }
     public static void main(String args[]) {
         try {
             DigestServer s = new DigestServer();
