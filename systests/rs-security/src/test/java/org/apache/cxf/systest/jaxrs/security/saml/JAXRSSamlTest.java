@@ -38,6 +38,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
+import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
@@ -103,7 +104,10 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/samlxml/bookstore/books";
         WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(),
                                        null);
+        XmlSigOutInterceptor xmlSig = new XmlSigOutInterceptor();
+        xmlSig.setEnvelopeQName(XmlSigOutInterceptor.DEFAULT_ENV_QNAME);
         
+        WebClient.getConfig(wc).getOutInterceptors().add(xmlSig);
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
         try {
             Book book = wc.post(new Book("CXF", 125L), Book.class);                

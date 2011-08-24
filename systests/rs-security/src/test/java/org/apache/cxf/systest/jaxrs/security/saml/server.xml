@@ -69,6 +69,8 @@ under the License.
     <bean id="samlFormHandler" class="org.apache.cxf.rs.security.saml.SamlFormInHandler"/>
     <bean id="samlEnvHandler" class="org.apache.cxf.rs.security.saml.SamlEnvelopedInHandler"/>
     
+    <bean id="xmlSigHandler" class="org.apache.cxf.rs.security.xml.XmlSigInHandler"/>
+    
     <jaxrs:server 
        address="https://localhost:${testutil.ports.jaxrs-saml}/samlheader"> 
        <jaxrs:serviceBeans>
@@ -107,6 +109,7 @@ under the License.
           <ref bean="serviceBean"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
+          <ref bean="xmlSigHandler"/>
           <ref bean="samlEnvHandler"/>
        </jaxrs:providers>
        
