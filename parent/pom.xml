@@ -56,7 +56,7 @@
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
         <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
-        <cxf.jaxb22.version>2.2.4</cxf.jaxb22.version>
+        <cxf.jaxb22.version>2.2.3</cxf.jaxb22.version>
         <cxf.jaxb22.impl.version>2.2.4-1</cxf.jaxb22.impl.version>
         <cxf.jaxb22.xjc.version>2.2.4-1</cxf.jaxb22.xjc.version>
 
