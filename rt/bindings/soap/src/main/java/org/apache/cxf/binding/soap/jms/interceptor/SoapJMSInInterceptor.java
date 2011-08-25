@@ -124,8 +124,14 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
                 contentTypeAction = contentTypeAction.substring(1, contentTypeAction.lastIndexOf("\""));
             }
         }
-        if (soapAction != null && contentTypeAction != null && !soapAction.equals(contentTypeAction)) {
-            jmsFault = JMSFaultFactory.createMismatchedSoapActionFault(contentTypeAction);
+        if (contentTypeAction != null) {
+            if (sa == null) {
+                //miss SOAPJMS_soapAction header, throw fault per the spec
+                jmsFault = JMSFaultFactory.createMissingSoapActionFault();
+            }
+            if (soapAction != null && !soapAction.equals(contentTypeAction)) {
+                jmsFault = JMSFaultFactory.createMismatchedSoapActionFault(contentTypeAction);
+            }
         }
         if (jmsFault != null) {
             Fault f = createFault(message, jmsFault);

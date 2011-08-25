@@ -59,6 +59,7 @@ public final class SoapJMSConstants {
     private static final String JMS_MALFORMEDREQUESTURI_FAULT_CODE = "malformedRequestURI";
     private static final String JMS_MISMATCHEDSOAPACTION_FAULT_CODE = "mismatchedSoapAction";
     private static final String JMS_MISSINGCONTENTTYPE_FAULT_CODE = "missingContentType";
+    private static final String JMS_MISSINGSOAPACTION_FAULT_CODE = "missingSoapAction";
     private static final String JMS_MISSINGREQUESTURI_FAULT_CODE = "missingRequestURI";
     private static final String JMS_TARGETSERVICENOTALLOWEDINREQUESTURI_FAULT_CODE = 
         "targetServiceNotAllowedInRequestURI";
@@ -88,6 +89,10 @@ public final class SoapJMSConstants {
         return new QName(SOAP_JMS_NAMESPACE, JMS_MISSINGCONTENTTYPE_FAULT_CODE);
     }
 
+    public static QName getMissingSoapActionQName() {
+        return new QName(SOAP_JMS_NAMESPACE, JMS_MISSINGSOAPACTION_FAULT_CODE);
+    }
+    
     public static QName getMissingRequestURIQName() {
         return new QName(SOAP_JMS_NAMESPACE, JMS_MISSINGREQUESTURI_FAULT_CODE);
     }
