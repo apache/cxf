@@ -76,10 +76,15 @@ public class OutTransformWriterTest extends Assert {
         Marshaller m = context.createMarshaller();
         m.marshal(new TestBean(), transformWriter);
         
-        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
-            + "<ps1:testBean xmlns:ps1=\"http://testbeans.com/v2\""
+        String xmlPI = "<?xml version='1.0' encoding='UTF-8'?>";
+        String start = "<ps1:testBean xmlns:ps1=\"http://testbeans.com/v2\"";
+        String expected1 = xmlPI + start
             + " xmlns:ps2=\"http://testbeans.com/v3\"><ps2:bean/></ps1:testBean>";
-        assertEquals(expected, os.toString());
+        String expected2 = xmlPI + start
+            + "><ps2:bean xmlns:ps2=\"http://testbeans.com/v3\"/></ps1:testBean>";
+        String out = os.toString();
+        assertTrue("Output \"" + out + "\" does not match expected values",
+                expected1.equals(out) || expected2.equals(out));
         
     }
     
@@ -101,10 +106,15 @@ public class OutTransformWriterTest extends Assert {
         Marshaller m = context.createMarshaller();
         m.marshal(new TestBean(), transformWriter);
         
-        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
-            + "<testBean xmlns=\"http://testbeans.com/v2\""
+        String xmlPI = "<?xml version='1.0' encoding='UTF-8'?>";
+        String start = "<testBean xmlns=\"http://testbeans.com/v2\"";
+        String expected1 = xmlPI + start
             + " xmlns:ps2=\"http://testbeans.com/v3\"><ps2:bean/></testBean>";
-        assertEquals(expected, os.toString());
+        String expected2 = xmlPI + start
+            + "><ps2:bean xmlns:ps2=\"http://testbeans.com/v3\"/></testBean>";
+        String out = os.toString();
+        assertTrue("Output \"" + out + "\" does not match expected values",
+                expected1.equals(out) || expected2.equals(out));
     }
  
     @XmlRootElement(name = "testBean", namespace = "http://testbeans.com")
