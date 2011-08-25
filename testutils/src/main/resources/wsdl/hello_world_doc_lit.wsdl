@@ -27,6 +27,7 @@ xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
 xmlns:jms="http://cxf.apache.org/transports/jms"
 xmlns:tns="http://apache.org/hello_world_doc_lit"
 xmlns:x1="http://apache.org/hello_world_doc_lit/types"
+xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
 targetNamespace="http://apache.org/hello_world_doc_lit" name="HelloWorld">
     <wsdl:types>
         <schema targetNamespace="http://apache.org/hello_world_doc_lit/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
@@ -158,6 +159,46 @@ targetNamespace="http://apache.org/hello_world_doc_lit" name="HelloWorld">
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="Greeter_SOAPBinding_soap12" type="tns:Greeter">
+        <soap12:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
+        <wsdl:operation name="sayHi">
+            <soap12:operation soapAction="sayHi" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="greetMe">
+            <soap12:operation soapAction="greetMe" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="greetMeOneWay">
+            <soap12:operation soapAction="greetMeOneWay" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="pingMe">
+            <soap12:operation soapAction="pingMe" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="pingMeFault">
+                <soap12:fault name="pingMeFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+
     <wsdl:binding name="Greeter_XMLBinding" type="tns:Greeter">
         <xformat:binding/>
         <wsdl:operation name="sayHi">
@@ -252,6 +293,18 @@ targetNamespace="http://apache.org/hello_world_doc_lit" name="HelloWorld">
                </jms:address>
         </wsdl:port>
     </wsdl:service>
+
+    <wsdl:service name="SOAPService8">
+        <wsdl:port name="SoapPort8" binding="tns:Greeter_SOAPBinding_soap12">
+               <jms:address
+                   jndiConnectionFactoryName="ConnectionFactory"
+                   jndiDestinationName="dynamicQueues/routertest.SOAPService2Q.text">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
+        </wsdl:port>
+    </wsdl:service>
+
 
     <!-- XML Binding based Services-->
     <wsdl:service name="XMLService1">

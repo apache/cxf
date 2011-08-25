@@ -72,6 +72,11 @@ public final class JMSFaultFactory {
         return createFault(SoapJMSConstants.getMissingContentTypeQName(), m);
     }
 
+    public static JMSFault createMissingSoapActionFault() {
+        String m = new org.apache.cxf.common.i18n.Message("MISSING_SOAPACTION", LOG).toString();
+        return createFault(SoapJMSConstants.getMissingSoapActionQName(), m);
+    }
+    
     public static JMSFault createMissingRequestURIFault() {
         String m = new org.apache.cxf.common.i18n.Message("MISSING_REQUESTURI", LOG).toString();
         return createFault(SoapJMSConstants.getMissingRequestURIQName(), m);

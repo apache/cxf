@@ -613,6 +613,15 @@ public final class JMSUtils {
                 soapAction = action.get(0);
             }
         }
+        
+        if (soapAction == null) {
+            soapAction = messageProperties.getSOAPJMSSOAPAction();
+        }
+        
+        if (soapAction == null) {
+            soapAction = extractActionFromSoap12(outMessage);
+        }
+        
         if (soapAction != null) {
             messageProperties.setSOAPJMSSOAPAction(soapAction);
         }
@@ -651,5 +660,30 @@ public final class JMSUtils {
         id.append(CORRELATTION_ID_PADDING, 0, 16 - index.length());
         id.append(index);
         return id.toString();
+    }
+    
+    private static String extractActionFromSoap12(org.apache.cxf.message.Message message) {
+        String ct = (String) message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
+        
+        if (ct == null) {
+            return null;
+        }
+        
+        int start = ct.indexOf("action=");
+        if (start != -1) {
+            int end;
+            if (ct.charAt(start + 7) == '\"') {
+                start += 8;
+                end = ct.indexOf('\"', start);
+            } else {
+                start += 7;
+                end = ct.indexOf(';', start);
+                if (end == -1) {
+                    end = ct.length();
+                }
+            }
+            return ct.substring(start, end);
+        }
+        return null;
     }
 }
