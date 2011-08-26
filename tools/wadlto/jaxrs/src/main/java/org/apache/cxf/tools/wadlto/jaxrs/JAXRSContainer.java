@@ -117,6 +117,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         List<InputSource> bindingFiles = parser.getJaxbBindings();
         sg.setBindingFiles(bindingFiles);
         
+        sg.setCompilerArgs(parser.getCompilerArgs());
+        
         List<InputSource> schemaPackageFiles = parser.getSchemaPackageFiles();
         sg.setSchemaPackageFiles(schemaPackageFiles);
         sg.setSchemaPackageMap(context.getNamespacePackageMap());

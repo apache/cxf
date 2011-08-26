@@ -20,6 +20,7 @@ package org.apache.cxf.tools.wadlto.jaxb;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,7 +29,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Element;
-
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
@@ -49,10 +49,12 @@ import org.apache.cxf.tools.util.JAXBUtils;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
+
 public final class CustomizationParser {
     private static final Logger LOG = LogUtils.getL7dLogger(CustomizationParser.class);
     private final List<InputSource> jaxbBindings = new ArrayList<InputSource>();
     private final List<InputSource> packageFiles = new ArrayList<InputSource>();
+    private final List<String> compilerArgs = new ArrayList<String>();
     
     private Bus bus;
     private String wadlPath;
@@ -74,6 +76,19 @@ public final class CustomizationParser {
                 throw new ToolException(msg, xse);
             }
         }
+        
+        if (env.get(WadlToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
+            //hard code to enable jaxb extensions
+            compilerArgs.add("-extension");
+            String name = "/org/apache/cxf/tools/common/jaxb/W3CEPRJaxbBinding.xml";
+            if (org.apache.cxf.jaxb.JAXBUtils.isJAXB22()) {
+                name = "/org/apache/cxf/tools/common/jaxb/W3CEPRJaxbBinding_jaxb22.xml";
+            }
+            URL bindingFileUrl = getClass().getResource(name);
+            InputSource ins = new InputSource(bindingFileUrl.toString());
+            jaxbBindings.add(ins);
+        }
+        
         // Schema Namespace to Package customizations
         for (String ns : env.getNamespacePackageMap().keySet()) {
             File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, env.mapPackageName(ns));
@@ -166,5 +181,9 @@ public final class CustomizationParser {
 
     public List<InputSource> getSchemaPackageFiles() {
         return this.packageFiles;
+    }
+    
+    public List<String> getCompilerArgs() {
+        return this.compilerArgs;
     }
 }
