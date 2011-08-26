@@ -836,8 +836,12 @@ public class SourceGenerator {
         List<SchemaInfo> schemas = new ArrayList<SchemaInfo>();
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
              XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
-        for (Element schemaEl : schemasEls) {
-            schemas.add(createSchemaInfo(schemaEl, app.getWadlPath()));
+        for (int i = 0; i < schemasEls.size(); i++) {
+            String systemId = app.getWadlPath();
+            if (schemasEls.size() > 1) {
+                systemId += "#grammar" + (i + 1);
+            }
+            schemas.add(createSchemaInfo(schemasEls.get(i), systemId));
         }
         List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
              WadlGenerator.WADL_NS, "include");
