@@ -581,7 +581,7 @@ public class SourceGenerator {
             Element okResponse = null;
             if (responseEls.size() > 1) {
                 for (int i = 0; i < responseEls.size(); i++) {
-                    String statusValue = responseEls.get(0).getAttribute("status");
+                    String statusValue = responseEls.get(i).getAttribute("status");
                     try {
                         int status = statusValue.length() == 0 ? 200 : Integer.valueOf(statusValue);
                         if (status == 200) {
