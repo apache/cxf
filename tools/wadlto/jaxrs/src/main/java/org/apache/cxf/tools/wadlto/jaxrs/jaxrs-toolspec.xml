@@ -129,6 +129,14 @@ Examples:
                 <switch>impl</switch>
             </option>
             
+            <option id="noAddressBinding" maxOccurs="1">
+                <annotation>
+                    Specifies that the generator should not use the address jaxb binding file to map wsa:EndpointReferenceType 
+                    or wsa:EndpointReference to javax.xml.ws.wsaddressing.W3CEndpointReference.
+                </annotation>
+                <switch>noAddressBinding</switch>
+            </option>
+            
 <!-- 
 
 TODO: consider implementing most of the following options

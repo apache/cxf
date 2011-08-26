@@ -196,6 +196,7 @@ public class Option {
         destination.setDeleteDirs(getDeleteDirs());
         destination.setDependencies(getDependencies());
         destination.setOutputDir(getOutputDir());
+        destination.setExtraargs(getExtraargs());
     }
     
     
