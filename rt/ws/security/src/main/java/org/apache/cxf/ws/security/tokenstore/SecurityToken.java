@@ -54,6 +54,11 @@ public class SecurityToken {
     private String id;
     
     /**
+     * WSU Identifier of the token
+     */
+    private String wsuId;
+    
+    /**
      * Current state of the token
      */
     private State state = State.UNKNOWN;
@@ -392,8 +397,14 @@ public class SecurityToken {
         tokenType = s;
     }
     
+    public void setWsuId(String wsuId) {
+        this.wsuId = wsuId;
+    }
     
     public String getWsuId() {
+        if (wsuId != null) {
+            return wsuId;
+        }
         Element elem = getAttachedReference();
         if (elem != null) {
             String t = getIdFromSTR(elem);

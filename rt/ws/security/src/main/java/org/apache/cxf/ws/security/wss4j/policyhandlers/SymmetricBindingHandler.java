@@ -40,6 +40,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
+import org.apache.cxf.ws.security.policy.model.KerberosToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
@@ -153,7 +154,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 //SecureConversationToken
                 String tokenId = null;
                 SecurityToken tok = null;
-                if (encryptionToken instanceof IssuedToken) {
+                if (encryptionToken instanceof IssuedToken || encryptionToken instanceof KerberosToken) {
                     tok = getSecurityToken();
                 } else if (encryptionToken instanceof SecureConversationToken) {
                     tok = getSecurityToken();
@@ -269,7 +270,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (sigToken != null) {
                 if (sigToken instanceof SecureConversationToken) {
                     sigTok = getSecurityToken();
-                } else if (sigToken instanceof IssuedToken) {
+                } else if (sigToken instanceof IssuedToken || sigToken instanceof KerberosToken) {
                     sigTok = getSecurityToken();
                 } else if (sigToken instanceof X509Token) {
                     if (isRequestor()) {
