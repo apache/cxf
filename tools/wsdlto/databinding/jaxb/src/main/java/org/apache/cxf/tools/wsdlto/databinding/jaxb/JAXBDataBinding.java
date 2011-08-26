@@ -23,8 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URL;
@@ -40,7 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -309,9 +306,9 @@ public class JAXBDataBinding implements DataBindingProfile {
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
             //hard code to enable jaxb extensions
             args.add("-extension");
-            String name = "W3CEPRJaxbBinding.xml";
+            String name = "/org/apache/cxf/tools/common/jaxb/W3CEPRJaxbBinding.xml";
             if (isJAXB22()) {
-                name = "W3CEPRJaxbBinding_jaxb22.xml";
+                name = "/org/apache/cxf/tools/common/jaxb/W3CEPRJaxbBinding_jaxb22.xml";
             }
             URL bindingFileUrl = getClass().getResource(name);
             InputSource ins = new InputSource(bindingFileUrl.toString());
@@ -414,14 +411,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private boolean isJAXB22() {
-        Target t = XmlElement.class.getAnnotation(Target.class);
-        //JAXB 2.2 allows XmlElement on params.
-        for (ElementType et : t.value()) {
-            if (et == ElementType.PARAMETER) {
-                return true;
-            }
-        }
-        return false;
+        return org.apache.cxf.jaxb.JAXBUtils.isJAXB22();
     }
 
     private static final class ReferenceFinder extends AbstractReferenceFinderImpl {

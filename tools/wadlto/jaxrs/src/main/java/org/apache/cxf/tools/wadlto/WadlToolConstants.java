@@ -40,6 +40,8 @@ public final class WadlToolConstants {
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;
     public static final String CFG_BINDING = ToolConstants.CFG_BINDING;
     
+    public static final String CFG_NO_ADDRESS_BINDING = ToolConstants.CFG_NO_ADDRESS_BINDING;
+    
     public static final String CFG_WADLURL = "wadl";
     
     

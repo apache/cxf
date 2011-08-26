@@ -144,6 +144,32 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             fail();
         }
     }
+    @Test
+    public void testResourceWithEPR() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceWithEPR.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(4, files.size());
+            assertTrue(checkContains(files, "application" + ".Resource.class"));
+            assertTrue(checkContains(files, "superbooks" + ".Book.class"));
+            assertTrue(checkContains(files, "superbooks" + ".ObjectFactory.class"));
+            assertTrue(checkContains(files, "superbooks" + ".package-info.class"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
     
     @Test    
     public void testCodeGenWithImportedSchemaAndResourceSet() {

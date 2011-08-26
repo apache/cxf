@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -50,6 +52,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.SchemaOutputResolver;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.QName;
@@ -997,6 +1000,8 @@ public final class JAXBUtils {
 
         void addBindFile(InputSource is);
 
+        void parseArguments(String[] args);
+        
         String getBuildID();
     }
     public interface JCodeModel {
@@ -1019,6 +1024,17 @@ public final class JAXBUtils {
         String fullName();
     }
  
+    public static boolean isJAXB22() {
+        Target t = XmlElement.class.getAnnotation(Target.class);
+        //JAXB 2.2 allows XmlElement on params.
+        for (ElementType et : t.value()) {
+            if (et == ElementType.PARAMETER) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private static synchronized Object createNamespaceWrapper(Map<String, String> map) {
         ASMHelper helper = new ASMHelper();
         String className = "org.apache.cxf.jaxb.NamespaceMapperInternal";
