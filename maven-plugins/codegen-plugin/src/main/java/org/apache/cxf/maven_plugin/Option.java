@@ -151,6 +151,11 @@ public class Option {
     String faultSerialVersionUID;
 
     /**
+     * The superclass to use for generated exceptions, default is java.lang.Exception
+     */
+    String exceptionSuper;
+
+    /**
      * Uses @Generated annotation in all generated java classes if the flag is set to true.
      */
     Boolean markGenerated;
@@ -359,6 +364,14 @@ public class Option {
     public void setFaultSerialVersionUID(String faultSerialVersionUID) {
         this.faultSerialVersionUID = faultSerialVersionUID;
     }
+    
+    public String getExceptionSuper() {
+        return exceptionSuper;
+    }
+    
+    public void setExceptionSuper(String exceptionSuper) {
+        this.exceptionSuper = exceptionSuper;
+    }
 
     public Boolean isMarkGenerated() {
         return markGenerated;
@@ -446,6 +459,7 @@ public class Option {
         destination.setMimeMethods(getMimeMethods());
         destination.setAsyncMethods(getAsyncMethods());
         destination.setBareMethods(getBareMethods());
+        destination.setExceptionSuper(getExceptionSuper());
     }
     
     private <T> T setIfNull(T dest, T source) {
@@ -457,6 +471,7 @@ public class Option {
     
     public void merge(Option defaultOptions) {
         wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
+        exceptionSuper = setIfNull(exceptionSuper, defaultOptions.exceptionSuper);
         extendedSoapHeaders = setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
         noTypes = setIfNull(noTypes, defaultOptions.noTypes);
         validateWsdl = setIfNull(validateWsdl, defaultOptions.validateWsdl);

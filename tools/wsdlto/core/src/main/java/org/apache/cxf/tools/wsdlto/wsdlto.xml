@@ -208,6 +208,16 @@ under the License.
                 </associatedArgument>
             </option>
 
+            <option id="exceptionSuper" maxOccurs="1">
+                <annotation>
+                    Specifies the superclass to use for generated exceptions, the default is java.lang.Exception.
+                </annotation>
+                <switch>exceptionSuper</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>exceptionSuper</annotation>
+                </associatedArgument>
+            </option>
+
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">

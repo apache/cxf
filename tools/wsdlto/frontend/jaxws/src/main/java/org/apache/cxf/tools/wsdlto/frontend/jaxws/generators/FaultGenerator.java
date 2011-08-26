@@ -105,24 +105,33 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                     setAttributes("suid", "");
                 }
                 setAttributes("expClass", expClz);
-                String exceptionSuperclass = "Exception";
+                String exceptionSuperclass;
+                if (penv.containsKey(ToolConstants.CFG_EXCEPTION_SUPER)) {
+                    exceptionSuperclass = penv.get(ToolConstants.CFG_EXCEPTION_SUPER).toString();
+                } else {
+                    exceptionSuperclass = "java.lang.Exception";
+                }
+                String simpleName = exceptionSuperclass.indexOf('.') == -1 ? exceptionSuperclass 
+                    : exceptionSuperclass.substring(exceptionSuperclass.lastIndexOf('.') + 1);
+                String exceptionSuperclassString = simpleName;
                 for (JavaField jf : expClz.getFields()) {
                     String jfClassName = jf.getClassName();
-                    if (jfClassName.substring(jfClassName.lastIndexOf(".") + 1).equals("Exception")) {
-                        exceptionSuperclass = "java.lang.Exception";
+                    if (jfClassName.substring(jfClassName.lastIndexOf(".") + 1)
+                        .equals(simpleName)) {
+                        exceptionSuperclassString = exceptionSuperclass;
                     }
                     setAttributes("paraName", ProcessorUtil.mangleNameToVariableName(jf.getName()));
                 }
                 ClassCollector collector = penv.get(ClassCollector.class);
                 for (String pkg : collector.getTypesPackages()) {
-                    if (collector.containTypesClass(pkg, "Exception")) {
-                        exceptionSuperclass = "java.lang.Exception";
+                    if (collector.containTypesClass(pkg, simpleName)) {
+                        exceptionSuperclassString = exceptionSuperclass;
                     }
                 }
-                if (expClz.getName().equals(exceptionSuperclass)) {
-                    exceptionSuperclass = "java.lang.Exception";
+                if (expClz.getName().equals(exceptionSuperclassString)) {
+                    exceptionSuperclassString = exceptionSuperclass;
                 }
-                setAttributes("exceptionSuperclass", exceptionSuperclass);
+                setAttributes("exceptionSuperclass", exceptionSuperclassString);
 
                 setCommonAttributes();
                 doWrite(FAULT_TEMPLATE, parseOutputName(expClz.getPackageName(),

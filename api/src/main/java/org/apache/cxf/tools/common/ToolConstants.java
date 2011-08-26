@@ -96,6 +96,7 @@ public final class ToolConstants {
     public static final String CFG_ALLOW_ELEMENT_REFS = "allowElementReferences";
     public static final String CFG_RESERVE_NAME = "reserveClass";
     public static final String CFG_FAULT_SERIAL_VERSION_UID = "faultSerialVersionUID";
+    public static final String CFG_EXCEPTION_SUPER = "exceptionSuper";
     public static final String CFG_MARK_GENERATED = "mark-generated";
 
 

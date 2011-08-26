@@ -156,6 +156,7 @@ public class WsdlOption extends Option {
         addIfNotNull(list, getDefaultNamespacePackageMapping(), "-dns");
         addIfNotNull(list, getServiceName(), "-sn");
         addIfNotNull(list, getFaultSerialVersionUID(), "-faultSerialVersionUID");
+        addIfNotNull(list, getExceptionSuper(), "-exceptionSuper");
         addIfTrue(list, isAutoNameResolution(), "-autoNameResolution");
         addIfTrue(list, isNoAddressBinding(), "-noAddressBinding");
         addList(list, "-xjc", false, getXJCargs());
