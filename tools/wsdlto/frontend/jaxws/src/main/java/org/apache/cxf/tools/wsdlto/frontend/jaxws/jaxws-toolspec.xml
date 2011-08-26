@@ -354,6 +354,16 @@ Examples:
                 </associatedArgument>
             </option>
 
+            <option id="exceptionSuper" maxOccurs="1">
+                <annotation>
+                    Specifies the superclass to use for generated exceptions, the default is java.lang.Exception.
+                </annotation>
+                <switch>exceptionSuper</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>exceptionSuper</annotation>
+                </associatedArgument>
+            </option>
+
             <option id="mark-generated" maxOccurs="1">
                 <annotation>
                     Adds @Generated annotation in all java files that are generated.

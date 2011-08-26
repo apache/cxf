@@ -1542,6 +1542,36 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertEquals(123456789L, l.longValue());
     }
     @Test
+    public void testNoExceptionSuper() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+        
+        File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
+        assertTrue(faultFile.exists());
+        faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
+        assertTrue(faultFile.exists());
+        
+        Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        assertEquals(Exception.class, fault.getSuperclass());
+    }
+    @Test
+    public void testExceptionSuper() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_EXCEPTION_SUPER, "java.lang.RuntimeException");
+        processor.setContext(env);
+        processor.execute();
+        
+        File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
+        assertTrue(faultFile.exists());
+        faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
+        assertTrue(faultFile.exists());
+        
+        Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        assertEquals(RuntimeException.class, fault.getSuperclass());
+    }
+
+    @Test
     public void testExtensionWrapper() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL,
                 getLocation("/wsdl2java_wsdl/cxf2193/hello_world_extension_wrapped.wsdl"));
