@@ -152,6 +152,63 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testKerberosOverTransportEndorsing() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType kerberosPort = service.getDoubleItKerberosTransportEndorsingPort();
+        updateAddressPort(kerberosPort, PORT2);
+        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testKerberosOverAsymmetricEndorsing() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType kerberosPort = service.getDoubleItKerberosAsymmetricEndorsingPort();
+        updateAddressPort(kerberosPort, PORT);
+        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testKerberosOverSymmetricProtection() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricProtectionPort();
+        updateAddressPort(kerberosPort, PORT);
+        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
+    
     private boolean checkUnrestrictedPoliciesInstalled() {
         try {
             byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
