@@ -217,14 +217,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                                        String namespace,
                                        Policy policy) {
         Exchange ex = message.getExchange();
-        Bus bus = ex.get(Bus.class);
+        Bus bus = ex.getBus();
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
         }
         Destination destination = ex.getDestination();
         try {
-            Endpoint endpoint = message.getExchange().get(Endpoint.class);
+            Endpoint endpoint = message.getExchange().getEndpoint();
             
             TokenStore store = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
             if (store == null) {
