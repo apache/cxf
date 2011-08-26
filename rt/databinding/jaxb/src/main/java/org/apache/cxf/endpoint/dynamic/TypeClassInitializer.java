@@ -65,7 +65,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
     @Override
     public void begin(MessagePartInfo part) {
         OperationInfo op = part.getMessageInfo().getOperation();
-        if (!allowWrapperOperations && op.isUnwrappedCapable() && !op.isUnwrapped()) {
+        if (!isFault && !allowWrapperOperations && op.isUnwrappedCapable() && !op.isUnwrapped()) {
             return;
         }
         
