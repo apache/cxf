@@ -292,11 +292,18 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         List<MediaType> accepts = getAccept(headers);
         if (accepts == null) {
-            accepts = InjectionUtils.isPrimitive(responseClass) 
-                ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
-                : ori.getProduceTypes().size() == 0 
-                || ori.getProduceTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
-                ? Collections.singletonList(MediaType.APPLICATION_XML_TYPE) : ori.getProduceTypes();
+            boolean produceWildcard = ori.getProduceTypes().size() == 0 
+                || ori.getProduceTypes().get(0).equals(MediaType.WILDCARD_TYPE);
+            if (produceWildcard) {
+                accepts = InjectionUtils.isPrimitive(responseClass)
+                    ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
+                    : Collections.singletonList(MediaType.APPLICATION_XML_TYPE);        
+            } else if (responseClass == Void.class) {
+                accepts = Collections.singletonList(MediaType.WILDCARD_TYPE);
+            } else {
+                accepts = ori.getProduceTypes();
+            }
+            
             for (MediaType mt : accepts) {
                 headers.add(HttpHeaders.ACCEPT, mt.toString());
             }
