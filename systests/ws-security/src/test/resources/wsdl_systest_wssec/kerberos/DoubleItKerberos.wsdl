@@ -214,6 +214,26 @@
         </wsdl:operation>
     </wsdl:binding>
     
+    <wsdl:binding name="DoubleItKerberosSymmetricDerivedProtectionBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItKerberosSymmetricDerivedProtectionPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItKerberosTransportPort" binding="tns:DoubleItKerberosTransportBinding">
             <soap:address location="https://localhost:9009/DoubleItKerberosTransport" />
@@ -241,6 +261,10 @@
         <wsdl:port name="DoubleItKerberosSymmetricProtectionPort" 
                    binding="tns:DoubleItKerberosSymmetricProtectionBinding">
             <soap:address location="http://localhost:9001/DoubleItKerberosSymmetricProtection" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItKerberosSymmetricDerivedProtectionPort" 
+                   binding="tns:DoubleItKerberosSymmetricDerivedProtectionBinding">
+            <soap:address location="http://localhost:9001/DoubleItKerberosSymmetricDerivedProtection" />
         </wsdl:port>
     </wsdl:service>
 
@@ -555,6 +579,47 @@
                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
                             <wsp:Policy>
                               <sp:WssGssKerberosV5ApReqToken11/>
+                            </wsp:Policy>
+                         </sp:KerberosToken>
+                     </wsp:Policy>
+                  </sp:ProtectionToken>
+                  <sp:Layout>
+                     <wsp:Policy>
+                        <sp:Lax/>
+                     </wsp:Policy>
+                  </sp:Layout>
+                  <sp:IncludeTimestamp/>
+                  <sp:OnlySignEntireHeadersAndBody/>
+                  <sp:AlgorithmSuite>
+                     <wsp:Policy>
+                        <sp:Basic256/>
+                     </wsp:Policy>
+                  </sp:AlgorithmSuite>
+               </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:Wss11>
+               <wsp:Policy>
+                  <sp:MustSupportRefIssuerSerial/>
+                  <sp:MustSupportRefThumbprint/>
+                  <sp:MustSupportRefEncryptedKey/>
+               </wsp:Policy>
+            </sp:Wss11>
+         </wsp:All>
+      </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItKerberosSymmetricDerivedProtectionPolicy">
+      <wsp:ExactlyOne>
+         <wsp:All>
+            <sp:SymmetricBinding>
+               <wsp:Policy>
+                  <sp:ProtectionToken>
+                     <wsp:Policy>
+                         <sp:KerberosToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                            <wsp:Policy>
+                              <sp:WssGssKerberosV5ApReqToken11/>
+                              <sp:RequireDerivedKeys />
                             </wsp:Policy>
                          </sp:KerberosToken>
                      </wsp:Policy>

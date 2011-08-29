@@ -603,7 +603,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
         } else {
-            if (policyToken instanceof SecureConversationToken) {
+            if (!attached || policyToken instanceof SecureConversationToken) {
                 dkSign.setTokenIdDirectId(true);
             }
             dkSign.setExternalKey(tok.getSecret(), tok.getId());

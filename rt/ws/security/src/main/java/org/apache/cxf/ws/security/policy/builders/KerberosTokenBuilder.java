@@ -74,6 +74,8 @@ public class KerberosTokenBuilder implements AssertionBuilder<Element> {
                                 kerberosToken.setV5ApReqToken11(true);
                             } else if (SPConstants.KERBEROS_GSS_V5_AP_REQ_TOKEN_11.equals(localpart)) {
                                 kerberosToken.setGssV5ApReqToken11(true);
+                            } else if (SPConstants.REQUIRE_DERIVED_KEYS.equals(localpart)) {
+                                kerberosToken.setDerivedKeys(true);
                             }
                         }
                     }
