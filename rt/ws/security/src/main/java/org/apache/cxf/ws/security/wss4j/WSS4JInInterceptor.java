@@ -666,6 +666,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 key = SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR;
             } else if (WSSecurityEngine.BINARY_TOKEN.equals(qName)) {
                 key = SecurityConstants.BST_TOKEN_VALIDATOR;
+            } else if (WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02.equals(qName)
+                || WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12.equals(qName)) {
+                key = SecurityConstants.SCT_TOKEN_VALIDATOR;
             }
             if (key != null) {
                 Object o = ((SoapMessage)this.getMsgContext()).getContextualProperty(key);
