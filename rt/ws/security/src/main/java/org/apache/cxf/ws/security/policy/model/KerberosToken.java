@@ -117,6 +117,12 @@ public class KerberosToken extends Token {
             writer.writeStartElement(prefix, SPConstants.KERBEROS_GSS_V5_AP_REQ_TOKEN_11, namespaceURI);
             writer.writeEndElement();
         }
+        
+        if (isDerivedKeys()) {
+            // <sp:RequireDerivedKeys />
+            writer.writeStartElement(prefix, SPConstants.REQUIRE_DERIVED_KEYS, namespaceURI);
+            writer.writeEndElement();
+        }
 
         // </wsp:Policy>
         writer.writeEndElement();
