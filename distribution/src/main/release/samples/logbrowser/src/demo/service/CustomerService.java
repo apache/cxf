@@ -21,8 +21,8 @@ package demo.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import static java.util.logging.Level.*;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -49,12 +49,12 @@ public class CustomerService {
         Validate.notNull(id);
         Validate.notEmpty(id);
         
-        LOGGER.log(FINE, "Invoking getCustomer, id={0}", id);
+        LOGGER.log(Level.FINE, "Invoking getCustomer, id={0}", id);
 
         Customer customer = customers.get(Long.parseLong(id));
 
         if (customer == null) {
-            LOGGER.log(SEVERE, "Specified customer does not exist, id={0}", id);    
+            LOGGER.log(Level.SEVERE, "Specified customer does not exist, id={0}", id);    
         }
 
         return customer;
@@ -65,17 +65,17 @@ public class CustomerService {
     public Response updateCustomer(final Customer customer) {
         Validate.notNull(customer);
 
-        LOGGER.log(FINE, "Invoking updateCustomer, customer={0}", customer);
+        LOGGER.log(Level.FINE, "Invoking updateCustomer, customer={0}", customer);
 
         if (isCustomerExists(customer)) {
-            LOGGER.log(FINE, "Specified customer exists, update data, customer={0}", customer);
+            LOGGER.log(Level.FINE, "Specified customer exists, update data, customer={0}", customer);
         } else {
-            LOGGER.log(WARNING, "Specified customer does not exist, add data, customer={0}", customer);
+            LOGGER.log(Level.WARNING, "Specified customer does not exist, add data, customer={0}", customer);
         }
 
         customers.put(customer.getId(), customer);
 
-        LOGGER.log(INFO, "Customer was updated successful, customer={0}", customer);
+        LOGGER.log(Level.INFO, "Customer was updated successful, customer={0}", customer);
         return Response.ok().build();
     }
 
@@ -85,19 +85,19 @@ public class CustomerService {
         Validate.notNull(id);
         Validate.notEmpty(id);
         
-        LOGGER.log(FINE, "Invoking deleteCustomer, id={0}", id);
+        LOGGER.log(Level.FINE, "Invoking deleteCustomer, id={0}", id);
 
         long identifier = Long.parseLong(id);
 
         Response response;
 
         if (isCustomerExists(identifier)) {
-            LOGGER.log(FINE, "Specified customer exists, remove data, id={0}", id);
+            LOGGER.log(Level.FINE, "Specified customer exists, remove data, id={0}", id);
             customers.remove(identifier);
-            LOGGER.log(INFO, "Customer was removed successful, id={0}", id);
+            LOGGER.log(Level.INFO, "Customer was removed successful, id={0}", id);
             response = Response.ok().build();
         } else {
-            LOGGER.log(SEVERE, "Specified customer does not exist, remove fail, id={0}", id);
+            LOGGER.log(Level.SEVERE, "Specified customer does not exist, remove fail, id={0}", id);
             response = Response.notModified().build();
         }
 
