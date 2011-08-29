@@ -239,6 +239,11 @@
             <artifactId>cxf-rt-ws-policy</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-ws-mex</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
