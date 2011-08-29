@@ -81,6 +81,9 @@ public class STSTokenValidator implements Validator {
             } else if (credential.getBinarySecurityToken() != null) {
                 tokenElement = credential.getBinarySecurityToken().getElement();
                 hash = credential.getBinarySecurityToken().hashCode();
+            } else if (credential.getSecurityContextToken() != null) {
+                tokenElement = credential.getSecurityContextToken().getElement();
+                hash = credential.getSecurityContextToken().hashCode();
             }
             token.setToken(tokenElement);
             

@@ -37,6 +37,7 @@ public final class SecurityConstants {
     public static final String TIMESTAMP_TOKEN_VALIDATOR = "ws-security.timestamp.validator";
     public static final String SIGNATURE_TOKEN_VALIDATOR = "ws-security.signature.validator";
     public static final String BST_TOKEN_VALIDATOR = "ws-security.bst.validator";
+    public static final String SCT_TOKEN_VALIDATOR = "ws-security.sct.validator";
     
     public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
     public static final String SAML_CALLBACK_HANDLER = "ws-security.saml-callback-handler";
@@ -124,7 +125,7 @@ public final class SecurityConstants {
             SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
             SIGNATURE_TOKEN_VALIDATOR, IS_BSP_COMPLIANT, TIMESTAMP_FUTURE_TTL,
             BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER, STS_TOKEN_ON_BEHALF_OF,
-            KERBEROS_CLIENT
+            KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
