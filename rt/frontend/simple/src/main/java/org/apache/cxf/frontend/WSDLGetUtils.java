@@ -24,8 +24,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -80,6 +82,46 @@ public class WSDLGetUtils {
     }
 
 
+    public Set<String> getWSDLIds(Message message,
+                            String base,
+                            String ctxUri,
+                            EndpointInfo endpointInfo) {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("wsdl", "");
+        new WSDLGetUtils().getDocument(message, base, 
+                                       params, ctxUri, 
+                                       endpointInfo);
+        
+        Map<String, Definition> mp = CastUtils.cast((Map)endpointInfo.getService()
+                                                    .getProperty(WSDLS_KEY));
+        return mp.keySet();
+    }
+    private String buildUrl(String base, String ctxUri, String s) {
+        return base + ctxUri + "?" + s;
+    }
+    public Map<String, String> getSchemaLocations(Message message,
+                                                  String base,
+                                                  String ctxUri,
+                                                  EndpointInfo endpointInfo) {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("wsdl", "");
+        new WSDLGetUtils().getDocument(message, base, 
+                                       params, ctxUri, 
+                                       endpointInfo);
+      
+        Map<String, SchemaReference> mp = CastUtils.cast((Map)endpointInfo.getService()
+                                                         .getProperty(SCHEMAS_KEY));
+        
+        Map<String, String> schemas = new HashMap<String, String>();
+        for (Map.Entry<String, SchemaReference> ent : mp.entrySet()) {
+            params.clear();
+            params.put("xsd", ent.getKey());
+            Document doc = getDocument(message, base, params, ctxUri, endpointInfo);
+            schemas.put(doc.getDocumentElement().getAttribute("targetNamespace"), 
+                        buildUrl(base, ctxUri, "xsd=" + ent.getKey()));
+        }
+        return schemas;
+    }
 
     public Document getDocument(Message message,
                             String base,
@@ -89,6 +131,9 @@ public class WSDLGetUtils {
         try {
             Bus bus = message.getExchange().getBus();
             Object prop = message.getContextualProperty(PUBLISHED_ENDPOINT_URL);
+            if (prop == null) {
+                prop = endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL);
+            }
             if (prop != null) {
                 base = String.valueOf(prop);
             }

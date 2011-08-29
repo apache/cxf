@@ -64,7 +64,8 @@ public class MEXInInterceptor extends AbstractPhaseInterceptor<Message> {
                 action = inProps.getAction().getValue();
             }
         }
-        if ("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get".equals(action)) {
+        if ("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get".equals(action)
+            || "http://schemas.xmlsoap.org/ws/2004/09/mex/GetMetadata/Request".equals(action)) {
             message.remove(AssertionInfoMap.class);
             Exchange ex = message.getExchange();
             Endpoint endpoint = createEndpoint(message);

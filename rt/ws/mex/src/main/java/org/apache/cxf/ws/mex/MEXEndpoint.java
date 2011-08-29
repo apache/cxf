@@ -62,8 +62,8 @@ public class MEXEndpoint implements MetadataExchange {
         org.apache.cxf.ws.mex.model._2004_09.Metadata metadata 
             = new org.apache.cxf.ws.mex.model._2004_09.Metadata();
         
-        Element el = MEXUtils.getWSDL(server);
-        if (el != null) {
+        List<Element> wsdls = MEXUtils.getWSDLs(server);
+        for (Element el : wsdls) {
             org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
                 = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
             sect.setAny(el);
@@ -83,7 +83,7 @@ public class MEXEndpoint implements MetadataExchange {
             }
         }
         Map<String, String> policies = MEXUtils.getPolicyLocations(server);
-        if (schemas != null && !policies.isEmpty()) {
+        if (policies != null && !policies.isEmpty()) {
             for (Map.Entry<String, String>  s : policies.entrySet()) {
                 org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
@@ -92,7 +92,7 @@ public class MEXEndpoint implements MetadataExchange {
                 org.apache.cxf.ws.mex.model._2004_09.MetadataReference ref 
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataReference();
                 
-                el = DOMUtils.createDocument().createElementNS(getAddressingNamespace(), 
+                Element el = DOMUtils.createDocument().createElementNS(getAddressingNamespace(), 
                                                                "wsa:Address");
                 el.setTextContent(s.getValue());
                 ref.getAny().add(el);
@@ -114,8 +114,8 @@ public class MEXEndpoint implements MetadataExchange {
             = new org.apache.cxf.ws.mex.model._2004_09.Metadata();
         
         if ("http://schemas.xmlsoap.org/wsdl/".equals(dialect)) {
-            Element el = MEXUtils.getWSDL(server);
-            if (el != null) {
+            List<Element> wsdls = MEXUtils.getWSDLs(server);
+            for (Element el : wsdls) {
                 org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
                 sect.setAny(el);

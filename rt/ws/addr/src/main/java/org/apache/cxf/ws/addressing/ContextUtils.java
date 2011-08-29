@@ -508,7 +508,7 @@ public final class ContextUtils {
     }
     
     /**
-     * Propogate inbound MAPs onto full reponse & fault messages.
+     * Propagate inbound MAPs onto full reponse & fault messages.
      * 
      * @param inMAPs the inbound MAPs
      * @param exchange the current Exchange
