@@ -46,10 +46,6 @@ public class WebServiceContextImpl implements WebServiceContext {
     public WebServiceContextImpl() { 
     }
 
-    public WebServiceContextImpl(MessageContext ctx) { 
-        setMessageContext(ctx);
-    } 
-
     // Implementation of javax.xml.ws.WebServiceContext
 
     public final MessageContext getMessageContext() {
@@ -123,7 +119,7 @@ public class WebServiceContextImpl implements WebServiceContext {
     }
 
     public static void clear() {
-        context.set(null);
+        context.remove();
     }
 
 }

@@ -34,15 +34,7 @@ public class WebServiceContextImplTest extends Assert {
     @After
     public void tearDown() { 
         WebServiceContextImpl.clear();
-    } 
-
-    @Test
-    public void testConstructor() { 
-        MessageImpl msg = new MessageImpl();
-        WrappedMessageContext msgCtx = new WrappedMessageContext(msg); 
-        WebServiceContextImpl ctx = new WebServiceContextImpl(msgCtx);
-        assertSame(msgCtx, ctx.getMessageContext());
-    }     
+    }    
 
     @Test
     public void testGetSetMessageContext() { 
