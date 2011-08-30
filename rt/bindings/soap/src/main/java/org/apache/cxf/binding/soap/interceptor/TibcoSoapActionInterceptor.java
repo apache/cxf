@@ -19,6 +19,7 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -43,6 +44,11 @@ public class TibcoSoapActionInterceptor extends AbstractPhaseInterceptor<SoapMes
     public void handleMessage(SoapMessage soapMessage) throws Fault {
         Map<String, Object> headers = (Map<String, Object>)soapMessage.get(Message.PROTOCOL_HEADERS);
         if (headers != null && headers.containsKey(SoapBindingConstants.SOAP_ACTION)) {
+            //need to flip to a case sensitive map.  The default
+            //is a case insensitive map, but in this case, we need 
+            //to use a case sensitive map to make sure both versions go out
+            headers = new TreeMap<String, Object>(headers);
+            soapMessage.put(Message.PROTOCOL_HEADERS, headers);
             headers.put(SOAPACTION_TIBCO, headers.get(SoapBindingConstants.SOAP_ACTION));
         }
     }
