@@ -158,7 +158,7 @@ public final class JMSUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map)inMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (headers == null) {
-            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            headers = new TreeMap<String, List<String>>();
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
         headers.put(JMSSpecConstants.JMS_MESSAGE_TYPE, Collections.singletonList(messageType));
@@ -194,7 +194,7 @@ public final class JMSUtils {
             }
 
             Map<String, List<String>> protHeaders
-                = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                = new TreeMap<String, List<String>>();
             List<JMSPropertyType> props = messageProperties.getProperty();
             Enumeration enm = message.getPropertyNames();
             while (enm.hasMoreElements()) {
@@ -266,7 +266,7 @@ public final class JMSUtils {
                 Map<String, List<String>> headers = CastUtils.cast((Map)inMessage
                     .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
                 if (headers == null) {
-                    headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                    headers = new TreeMap<String, List<String>>();
                     inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
                 }
                 try {
@@ -361,6 +361,7 @@ public final class JMSUtils {
         return normalizedEncoding;
     }
 
+    /*
     protected static void addProtocolHeaders(Message message, Map<String, List<String>> headers)
         throws JMSException {
         if (headers == null) {
@@ -386,7 +387,7 @@ public final class JMSUtils {
 
         }
     }
-
+*/
     public static void addContentTypeToProtocolHeader(org.apache.cxf.message.Message message) {
         String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
         String enc = (String)message.get(org.apache.cxf.message.Message.ENCODING);
@@ -405,7 +406,7 @@ public final class JMSUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (null == headers) {
-            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            headers = new TreeMap<String, List<String>>();
             message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
 
@@ -608,7 +609,7 @@ public final class JMSUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (headers != null) {
-            List<String> action = headers.get(SOAPConstants.SOAP_ACTION);
+            List<String> action = headers.remove(SOAPConstants.SOAP_ACTION);
             if (action != null && action.size() > 0) {
                 soapAction = action.get(0);
             }
@@ -634,6 +635,23 @@ public final class JMSUtils {
         }
         if (!messageProperties.isSetSOAPJMSRequestURI()) {
             messageProperties.setSOAPJMSRequestURI(jmsConfig.getRequestURI());
+        }
+        for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
+            JMSPropertyType prop = new JMSPropertyType();
+            prop.setName(ent.getKey());
+            if (ent.getValue().size() > 1) {
+                StringBuilder b = new StringBuilder();
+                for (String s : ent.getValue()) {
+                    if (b.length() > 0) {
+                        b.append(',');
+                    }
+                    b.append(s);
+                }
+                prop.setValue(b.toString());
+            } else {
+                prop.setValue(ent.getValue().get(0));
+            }
+            messageProperties.getProperty().add(prop);
         }
     }
 

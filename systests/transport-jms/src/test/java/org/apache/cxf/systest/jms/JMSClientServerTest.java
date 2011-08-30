@@ -47,6 +47,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.soap.interceptor.TibcoSoapActionInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_jms.BadRecordLitFault;
@@ -156,6 +157,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             Greeter greeter = service.getPort(portName, Greeter.class);
             
             Client client = ClientProxy.getClient(greeter);
+            client.getEndpoint().getOutInterceptors().add(new TibcoSoapActionInterceptor());
             EndpointInfo ei = client.getEndpoint().getEndpointInfo();
             AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
             JMSNamingPropertyType name = new JMSNamingPropertyType();
