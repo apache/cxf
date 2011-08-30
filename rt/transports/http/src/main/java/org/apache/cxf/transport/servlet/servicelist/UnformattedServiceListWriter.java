@@ -71,7 +71,11 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
     }
 
     private String getAbsoluteAddress(String basePath, AbstractDestination d) {
-        String endpointAddress = d.getEndpointInfo().getAddress();
+        String endpointAddress = (String)d.getEndpointInfo().getProperty("publishedEndpointUrl");
+        if (endpointAddress != null) {
+            return endpointAddress;
+        }
+        endpointAddress = d.getEndpointInfo().getAddress();
         if (basePath == null || endpointAddress.startsWith(basePath)) {
             return endpointAddress;
         } else {
