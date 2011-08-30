@@ -132,21 +132,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     private List<WadlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions() 
         throws MojoExecutionException {
         List<WadlOption> effectiveOptions = new ArrayList<WadlOption>();
-        List<WadlOption> temp;
-        if (wadlRoot != null && wadlRoot.exists() && !disableDirectoryScan) {
-            temp = OptionLoader.loadWsdlOptionsFromFiles(wadlRoot, includes, excludes, defaultOptions,
-                                                             sourceRoot);
-            effectiveOptions.addAll(temp);
-        }
-        if (testWadlRoot != null && testWadlRoot.exists() && !disableDirectoryScan) {
-            temp = OptionLoader.loadWsdlOptionsFromFiles(testWadlRoot, includes, excludes,
-                                                             defaultOptions, testSourceRoot);
-            effectiveOptions.addAll(temp);
-        }
-        if (!disableDependencyScan) {
-            temp = OptionLoader.loadWsdlOptionsFromDependencies(project, defaultOptions, sourceRoot);
-            effectiveOptions.addAll(temp);
-        }
+        
         mergeOptions(effectiveOptions);
         downloadRemoteDocs(effectiveOptions);
         return effectiveOptions;
