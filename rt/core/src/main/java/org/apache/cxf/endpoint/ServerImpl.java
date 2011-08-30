@@ -181,6 +181,7 @@ public class ServerImpl implements Server {
             } catch (JMException jmex) {
                 LOG.log(Level.WARNING, "Unregistering ManagedEndpoint failed.", jmex);
             }
+            iMgr = null;
         }
         
     }
