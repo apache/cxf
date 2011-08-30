@@ -244,6 +244,10 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     }
 
     public void setProperty(String s, Object o) {
-        properties.put(s, o);
+        if (o == null) {
+            properties.remove(s);
+        } else {
+            properties.put(s, o);
+        }
     }
 }
