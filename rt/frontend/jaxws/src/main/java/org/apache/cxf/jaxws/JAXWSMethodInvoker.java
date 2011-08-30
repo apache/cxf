@@ -66,9 +66,10 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             updateHeader(exchange, ctx);
             throw f;
         } finally {
-            addHandlerProperties(ctx, handlerScopedStuff);
             //clear the WebServiceContextImpl's ThreadLocal variable
             WebServiceContextImpl.clear();
+            
+            addHandlerProperties(ctx, handlerScopedStuff);
         }
         return res;
     }
