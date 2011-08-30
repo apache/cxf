@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -25,6 +27,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
@@ -33,9 +37,7 @@ import org.apache.cxf.ws.security.policy.SPConstants;
  */
 public class IssuedToken extends Token {
 
-    private Element issuerEpr;
-
-    private Element issuerMex;
+    private EndpointReferenceType issuerEpr;
 
     private Element rstTemplate;
 
@@ -50,14 +52,14 @@ public class IssuedToken extends Token {
     /**
      * @return Returns the issuerEpr.
      */
-    public Element getIssuerEpr() {
+    public EndpointReferenceType getIssuerEpr() {
         return issuerEpr;
     }
 
     /**
      * @param issuerEpr The issuerEpr to set.
      */
-    public void setIssuerEpr(Element issuerEpr) {
+    public void setIssuerEpr(EndpointReferenceType issuerEpr) {
         this.issuerEpr = issuerEpr;
     }
 
@@ -141,9 +143,14 @@ public class IssuedToken extends Token {
         }
 
         if (issuerEpr != null) {
-            writer.writeStartElement(prefix, SPConstants.ISSUER, namespaceURI);
-            StaxUtils.copy(issuerEpr, writer);
-            writer.writeEndElement();
+            JAXBElement<EndpointReferenceType> elem 
+                = new JAXBElement<EndpointReferenceType>(new QName(namespaceURI, SPConstants.ISSUER), 
+                    EndpointReferenceType.class, issuerEpr);
+            try {
+                ContextUtils.getJAXBContext().createMarshaller().marshal(elem, writer);
+            } catch (JAXBException e) {
+                //ignore
+            }
         }
 
         if (rstTemplate != null) {
@@ -198,12 +205,5 @@ public class IssuedToken extends Token {
         writer.writeEndElement();
     }
 
-    public Element getIssuerMex() {
-        return issuerMex;
-    }
-
-    public void setIssuerMex(Element issuerMex) {
-        this.issuerMex = issuerMex;
-    }
 
 }

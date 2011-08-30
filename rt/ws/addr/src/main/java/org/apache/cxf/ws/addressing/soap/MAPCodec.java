@@ -506,7 +506,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                         // Need to check the uri before getting unmarshaller else
                         // would get wrong unmarshaller and fail to process required
                         // headers.
-                        if (transformer.isSupported(headerURI)) {
+                        if (VersionTransformer.isSupported(headerURI)) {
                             if (unmarshaller == null) {
                                 JAXBContext jaxbContext = 
                                     VersionTransformer.getExposedJAXBContext(headerURI);

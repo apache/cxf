@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,6 +33,9 @@ import javax.xml.ws.EndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.ibm.wsdl.util.xml.DOMUtils;
 
 // importation convention: if the same class name is used for 
 // 2005/08 and 2004/08, then the former version is imported
@@ -74,7 +78,7 @@ public class VersionTransformer {
     /**
      * Constructor.
      */
-    public VersionTransformer() {
+    protected VersionTransformer() {
     }
     
     /**
@@ -82,7 +86,7 @@ public class VersionTransformer {
      * @return true if th WS-Addressing version specified by the namespace 
      * URI is supported
      */
-    public boolean isSupported(String namespace) {
+    public static boolean isSupported(String namespace) {
         return NATIVE_VERSION.equals(namespace) 
                || Names200408.WSA_NAMESPACE_NAME.equals(namespace)
                || Names200403.WSA_NAMESPACE_NAME.equals(namespace);
@@ -457,7 +461,65 @@ public class VersionTransformer {
         }
         return internal;
     }
+    
+    
+    /**
+     * Parse an EndpointReferenceType from a DOM element.  Handles all of
+     * the WS-Addressing namespaces currently supported.
+     * @param ref
+     * @return
+     * @throws JAXBException
+     */
+    public static EndpointReferenceType parseEndpointReference(Element ref) throws JAXBException {
+        Element child = DOMUtils.getFirstChildElement(ref);
+        String tns = null;
+        while (child != null && tns == null) {
+            if (isSupported(child.getNamespaceURI())) {
+                tns = child.getNamespaceURI();
+            }
+            child = DOMUtils.getNextSiblingElement(child);
+        }
+        if (tns == null) {
+            return null;
+        }
+        JAXBContext ctx = getExposedJAXBContext(tns);
+        Object o = ctx.createUnmarshaller().unmarshal(ref, getExposedReferenceType(tns));
+        if (o instanceof JAXBElement) {
+            o = ((JAXBElement)o).getValue();
+        }
+        return convertToNative(o);
+        
+    }
+    /**
+     * Converts a version specific EndpointReferenceType to the native version
+     * used internally by CXF
+     * @param exposed
+     * @return
+     */
+    public static EndpointReferenceType convertToNative(Object exposed) {
+        if (EndpointReferenceType.class.isInstance(exposed)) {
+            return (EndpointReferenceType)exposed;
+        } else if (Names200408.EPR_TYPE.isInstance(exposed)) {
+            return convert((org.apache.cxf.ws.addressing.v200408.EndpointReferenceType)exposed);
+        } else if (Names200403.EPR_TYPE.isInstance(exposed)) {
+            return convert((org.apache.cxf.ws.addressing.v200403.EndpointReferenceType)exposed);
+        }        
+        return null;
+    }
 
+    /**
+     * Gets the Class representing the EndpointReferenceType that is used
+     * for the specific WS-Addressing version
+     * @param exposedURI
+     * @return
+     */
+    public static Class<?> getExposedReferenceType(String exposedURI) {
+        return NATIVE_VERSION.equals(exposedURI)
+            ? EndpointReferenceType.class 
+                : Names200408.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200408.EPR_TYPE 
+                    : Names200403.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200403.EPR_TYPE : null;
+    }
+    
     /**
      * @param exposedURI specifies the version WS-Addressing
      * @return JABXContext for the exposed namespace URI

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -94,6 +95,17 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public IssuedTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
+        }    
+        private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
+            for (String s : SecurityConstants.ALL_PROPERTIES) {
+                Object v = message.getContextualProperty(s + ".it");
+                if (v == null) {
+                    v = message.getContextualProperty(s);
+                }
+                if (v != null) {
+                    ctx.put(s, v);
+                }
+            }
         }
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
@@ -114,7 +126,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         }
                     }
                     if (tok == null) {
-                        STSClient client = STSUtils.getClient(message, "sts");
+                        STSClient client = STSUtils.getClient(message, "sts", itok);
                         AddressingProperties maps =
                             (AddressingProperties)message
                                 .get("javax.xml.ws.addressing.context.outbound");
@@ -135,7 +147,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                 if (token != null) {
                                     client.setOnBehalfOf(token);
                                 }
-
+                                Map<String, Object> ctx = client.getRequestContext();
+                                mapSecurityProps(message, ctx);
+                            
                                 client.setMessage(message);
                                 client.setTrust(getTrust10(aim));
                                 client.setTrust(getTrust13(aim));

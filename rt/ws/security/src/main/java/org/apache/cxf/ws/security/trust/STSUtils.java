@@ -44,6 +44,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.neethi.Policy;
 
 /**
@@ -81,18 +82,38 @@ public final class STSUtils {
     }
     
     public static STSClient getClient(Message message, String type) {
-        if (type == null) {
-            type = "";
-        } else {
-            type = "." + type + "-client";
-        }
         STSClient client = (STSClient)message
             .getContextualProperty(SecurityConstants.STS_CLIENT);
         if (client == null) {
+            if (type == null) {
+                type = "";
+            } else {
+                type = "." + type + "-client";
+            }
             client = new STSClient(message.getExchange().get(Bus.class));
             Endpoint ep = message.getExchange().get(Endpoint.class);
             client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
             client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
+        }
+        return client;
+    }
+    public static STSClient getClient(Message message, String type, IssuedToken itok) {
+        STSClient client = (STSClient)message
+            .getContextualProperty(SecurityConstants.STS_CLIENT);
+        if (client == null) {
+            if (type == null) {
+                type = "";
+            } else {
+                type = "." + type + "-client";
+            }
+            client = new STSClient(message.getExchange().get(Bus.class));
+            Endpoint ep = message.getExchange().get(Endpoint.class);
+            client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
+            client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
+            if (itok.getIssuerEpr() != null) {
+                //configure via mex
+                client.configureViaEPR(itok.getIssuerEpr());
+            }
         }
         return client;
     }

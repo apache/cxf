@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -69,6 +70,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
@@ -76,9 +78,15 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.VersionTransformer;
+import org.apache.cxf.ws.mex.MetadataExchange;
+import org.apache.cxf.ws.mex.model._2004_09.Metadata;
+import org.apache.cxf.ws.mex.model._2004_09.MetadataSection;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
@@ -96,6 +104,8 @@ import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
+import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
@@ -405,7 +415,80 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
         return client;
     }
-
+    
+    public void configureViaEPR(EndpointReferenceType ref) {
+        if (client != null) {
+            return;
+        }
+        location = EndpointReferenceUtils.getAddress(ref);
+        String mexLoc = findMEXLocation(ref);
+        if (mexLoc != null) {
+            try {
+                JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
+                proxyFac.setAddress(mexLoc);
+                MetadataExchange exc = proxyFac.create(MetadataExchange.class);
+                Metadata metadata = exc.get2004();
+                for (MetadataSection s : metadata.getMetadataSection()) {
+                    if ("http://schemas.xmlsoap.org/wsdl/".equals(s.getDialect())) {
+                        //got the wsdl...
+                        Definition definition = bus.getExtension(WSDLManager.class)
+                            .getDefinition((Element)s.getAny());
+                        WSDLServiceFactory factory = new WSDLServiceFactory(bus, definition);
+                        SourceDataBinding dataBinding = new SourceDataBinding();
+                        factory.setDataBinding(dataBinding);
+                        Service service = factory.create();
+                        service.setDataBinding(dataBinding);
+                        
+                        
+                        for (ServiceInfo serv : service.getServiceInfos()) {
+                            for (EndpointInfo ei : serv.getEndpoints()) {
+                                if (ei.getAddress().equals(location)) {
+                                    endpointName = ei.getName();
+                                    serviceName = serv.getName();
+                                }
+                            }
+                        }
+                        EndpointInfo ei = service.getEndpointInfo(endpointName);
+                        Endpoint endpoint = new EndpointImpl(bus, service, ei);
+                        client = new ClientImpl(bus, endpoint);
+                    }
+                }
+            } catch (Exception ex) {
+                //TODO
+                ex.printStackTrace();
+            }
+        }
+    }
+    private String findMEXLocation(EndpointReferenceType ref) {
+        if (ref.getMetadata() != null && ref.getMetadata().getAny() != null) {
+            for (Object any : ref.getMetadata().getAny()) {
+                if (any instanceof Element) {
+                    String addr = findMEXLocation((Element)any);
+                    if (addr != null) {
+                        return addr;
+                    }
+                }
+            }
+        }
+        return EndpointReferenceUtils.getAddress(ref);
+    }
+    private String findMEXLocation(Element ref) {
+        Element el = DOMUtils.getFirstElement(ref);
+        while (el != null) {
+            if (el.getLocalName().equals("Address")
+                && VersionTransformer.isSupported(el.getNamespaceURI())
+                && "MetadataReference".equals(ref.getLocalName())) {
+                return DOMUtils.getContent(el);
+            } else {
+                String ad = findMEXLocation(el);
+                if (ad != null) {
+                    return ad;
+                }
+            }
+            el = DOMUtils.getNextElement(el);
+        }
+        return null;
+    }
     private void createClient() throws BusException, EndpointException {
         if (client != null) {
             return;

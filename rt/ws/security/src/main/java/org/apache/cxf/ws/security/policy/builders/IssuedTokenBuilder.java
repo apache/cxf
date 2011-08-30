@@ -21,11 +21,14 @@ package org.apache.cxf.ws.security.policy.builders;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -39,8 +42,6 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 
 public class IssuedTokenBuilder implements AssertionBuilder<Element> {
-    private static final String WSA_NAMESPACE_SUB = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
-    private static final String WSA_NAMESPACE = "http://www.w3.org/2005/08/addressing";
     
     PolicyBuilder builder;
     public IssuedTokenBuilder(PolicyBuilder b) {
@@ -69,33 +70,13 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
         Element child = DOMUtils.getFirstElement(element);
         while (child != null) {
             String ln = child.getLocalName();
-            if (SP11Constants.ISSUER.getLocalPart().equals(ln)) {
-                Element issuerEpr = DOMUtils
-                    .getFirstChildWithName(child, 
-                                       new QName(WSA_NAMESPACE, "Address"));
-
-                // try the other addressing namespace
-                if (issuerEpr == null) {
-                    issuerEpr = DOMUtils
-                        .getFirstChildWithName(child,
-                                           new QName(WSA_NAMESPACE_SUB,
-                                                     "Address"));
+            if (SPConstants.ISSUER.equals(ln)) {
+                try {
+                    EndpointReferenceType epr = VersionTransformer.parseEndpointReference(child);
+                    issuedToken.setIssuerEpr(epr);
+                } catch (JAXBException e) {
+                    throw new IllegalArgumentException(e);
                 }
-                issuedToken.setIssuerEpr(issuerEpr);
-
-                Element issuerMex = DOMUtils
-                    .getFirstChildWithName(child,
-                                       new QName(WSA_NAMESPACE, "Metadata"));
-
-                // try the other addressing namespace
-                if (issuerMex == null) {
-                    issuerMex = DOMUtils
-                        .getFirstChildWithName(child,
-                                               new QName(WSA_NAMESPACE_SUB, 
-                                                         "Metadata"));
-                }
-    
-                issuedToken.setIssuerMex(issuerMex);
             } else if (SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE.equals(ln)) {
                 issuedToken.setRstTemplate(child);
             } else if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
