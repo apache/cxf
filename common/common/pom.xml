@@ -129,22 +129,6 @@
 
     <profiles>
         <profile>
-            <id>ibmjdk</id>
-            <activation>
-                <property>
-                    <name>java.vendor</name>
-                    <value>IBM Corporation</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.parsers</groupId>
-                    <artifactId>jaxp-ri</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>jdk15</id>
             <activation>
                  <jdk>1.5</jdk>
@@ -180,6 +164,7 @@
                 <dependency>
                     <groupId>${cxf.saaj.impl.groupId}</groupId>
                     <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
+                    <version>${cxf.saaj.impl.version}</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -187,7 +172,12 @@
                     <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
                     <scope>test</scope>
                 </dependency>
-
+                <dependency>
+                    <groupId>${extra.saaj.dep.groupId}</groupId>
+                    <artifactId>${extra.saaj.dep.artifactId}</artifactId>
+                    <version>${extra.saaj.dep.version}</version>
+                    <scope>test</scope>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>

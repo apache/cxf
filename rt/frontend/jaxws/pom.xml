@@ -280,21 +280,6 @@
             </build>
         </profile>
         <profile>
-            <id>ibmjdk</id>
-            <activation>
-                <property>
-                    <name>java.vendor</name>
-                    <value>IBM Corporation</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.parsers</groupId>
-                    <artifactId>jaxp-ri</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>jdk17</id>
             <activation>
                 <jdk>1.7</jdk>
@@ -385,6 +370,12 @@
                 <dependency>
                     <groupId>${cxf.saaj.impl.groupId}</groupId>
                     <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
+                    <version>${cxf.saaj.impl.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${extra.saaj.dep.groupId}</groupId>
+                    <artifactId>${extra.saaj.dep.artifactId}</artifactId>
+                    <version>${extra.saaj.dep.version}</version>
                 </dependency>
             </dependencies>
             <build>
