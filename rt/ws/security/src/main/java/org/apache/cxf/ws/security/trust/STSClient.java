@@ -820,49 +820,59 @@ public class STSClient implements Configurable, InterceptorProvider {
         return tokens;
     }
 
-    public void cancelSecurityToken(SecurityToken token) throws Exception {
+    public boolean cancelSecurityToken(SecurityToken token) throws Exception {
         createClient();
 
         if (addressingNamespace == null) {
             addressingNamespace = "http://www.w3.org/2005/08/addressing";
         }
-        Policy cancelPolicy = new Policy();
-        ExactlyOne one = new ExactlyOne();
-        cancelPolicy.addPolicyComponent(one);
-        All all = new All();
-        one.addPolicyComponent(all); 
-        PolicyBuilder pbuilder = bus.getExtension(PolicyBuilder.class);
-        SymmetricBinding binding = new SymmetricBinding(pbuilder);
-        all.addAssertion(binding);
-        all.addAssertion(getAddressingAssertion());
-        ProtectionToken ptoken = new ProtectionToken(pbuilder);
-        binding.setProtectionToken(ptoken);
-        binding.setIncludeTimestamp(true);
-        binding.setEntireHeadersAndBodySignatures(true);
-        binding.setTokenProtection(false);
-        AlgorithmSuite suite = new AlgorithmSuite();
-        binding.setAlgorithmSuite(suite);
-        SecureConversationToken sct = new SecureConversationToken();
-        sct.setOptional(true);
-        ptoken.setToken(sct);
-        
-        SignedEncryptedParts parts = new SignedEncryptedParts(true);
-        parts.setOptional(true);
-        parts.setBody(true);
-        parts.addHeader(new Header("To", addressingNamespace));
-        parts.addHeader(new Header("From", addressingNamespace));
-        parts.addHeader(new Header("FaultTo", addressingNamespace));
-        parts.addHeader(new Header("ReplyTo", addressingNamespace));
-        parts.addHeader(new Header("Action", addressingNamespace));
-        parts.addHeader(new Header("MessageID", addressingNamespace));
-        parts.addHeader(new Header("RelatesTo", addressingNamespace));
-        all.addPolicyComponent(parts);
-        
 
+        client.getRequestContext().clear();
         client.getRequestContext().putAll(ctx);
-        client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, cancelPolicy);
         client.getRequestContext().put(SecurityConstants.TOKEN, token);
+        
         BindingOperationInfo boi = findOperation("/RST/Cancel");
+        boolean attachTokenDirectly = true;
+        if (boi == null) {
+            attachTokenDirectly = false;
+            boi = findOperation("/RST/Issue");
+            
+            Policy cancelPolicy = new Policy();
+            ExactlyOne one = new ExactlyOne();
+            cancelPolicy.addPolicyComponent(one);
+            All all = new All();
+            one.addPolicyComponent(all);
+            all.addAssertion(getAddressingAssertion());
+            
+            PolicyBuilder pbuilder = bus.getExtension(PolicyBuilder.class);
+            SymmetricBinding binding = new SymmetricBinding(pbuilder);
+            all.addAssertion(binding);
+            all.addAssertion(getAddressingAssertion());
+            ProtectionToken ptoken = new ProtectionToken(pbuilder);
+            binding.setProtectionToken(ptoken);
+            binding.setIncludeTimestamp(true);
+            binding.setEntireHeadersAndBodySignatures(true);
+            binding.setTokenProtection(false);
+            AlgorithmSuite suite = new AlgorithmSuite();
+            binding.setAlgorithmSuite(suite);
+            SecureConversationToken sct = new SecureConversationToken();
+            sct.setOptional(true);
+            ptoken.setToken(sct);
+            
+            SignedEncryptedParts parts = new SignedEncryptedParts(true);
+            parts.setOptional(true);
+            parts.setBody(true);
+            parts.addHeader(new Header("To", addressingNamespace));
+            parts.addHeader(new Header("From", addressingNamespace));
+            parts.addHeader(new Header("FaultTo", addressingNamespace));
+            parts.addHeader(new Header("ReplyTo", addressingNamespace));
+            parts.addHeader(new Header("Action", addressingNamespace));
+            parts.addHeader(new Header("MessageID", addressingNamespace));
+            parts.addHeader(new Header("RelatesTo", addressingNamespace));
+            all.addPolicyComponent(parts);
+            
+            client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, cancelPolicy);
+        }
         
         if (isSecureConv) {
             client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION,
@@ -872,7 +882,6 @@ public class STSClient implements Configurable, InterceptorProvider {
                                            namespace + "/RST/Cancel");            
         }
 
-
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         writer.writeNamespace("wst", namespace);
@@ -881,9 +890,14 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeEndElement();
 
         writer.writeStartElement("wst", "CancelTarget", namespace);
-        Element el = token.getUnattachedReference();
-        if (el == null) {
-            el = token.getAttachedReference();
+        Element el = null;
+        if (attachTokenDirectly) {
+            el = token.getToken();
+        } else {
+            el = token.getUnattachedReference();
+            if (el == null) {
+                el = token.getAttachedReference();
+            }
         }
         StaxUtils.copy(el, writer);
 
@@ -893,8 +907,10 @@ public class STSClient implements Configurable, InterceptorProvider {
         try {
             client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
             token.setState(SecurityToken.State.CANCELLED);
+            return true;
         } catch (Exception ex) {
             LOG.log(Level.WARNING, "Problem cancelling token", ex);
+            return false;
         }
     }
     
