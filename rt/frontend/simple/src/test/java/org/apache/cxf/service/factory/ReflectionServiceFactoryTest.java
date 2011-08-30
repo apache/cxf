@@ -132,7 +132,19 @@ public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
         
         return serviceFactory.create();        
     }
-    
+    @Test
+    public void testWSDLRequired() throws Exception {
+        
+        getBus().setProperty("requireExplicitContractLocation", Boolean.TRUE);
+        try {
+            createService(true);
+            fail("Should have failed");
+        } catch (ServiceConstructionException ex) {
+            getBus().setProperty("requireExplicitContractLocation", null);
+        }
+        
+        
+    }    
     @Test
     public void testServerFactoryBean() throws Exception {
         Service service = createService(true);

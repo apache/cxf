@@ -401,6 +401,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected void buildServiceFromClass() {
+        Object o = getBus().getProperty("requireExplicitContractLocation");
+        if (o != null 
+            && ("true".equals(o) || Boolean.TRUE.equals(o))) {
+            throw new ServiceConstructionException(new Message("NO_WSDL_PROVIDED", LOG, 
+                                                               getServiceClass().getName()));
+        }
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("Creating Service " + getServiceQName() + " from class " + getServiceClass().getName());
         }
