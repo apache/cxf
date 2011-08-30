@@ -53,6 +53,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.VersionTransformer;
@@ -338,6 +339,14 @@ public class RMManager {
                 }
             }
 
+            if (ContextUtils.isGenericAddress(to)) {
+                org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
+                    "CREATE_SEQ_ANON_TARGET", LOG, 
+                    to != null && to.getAddress() != null 
+                    ? to.getAddress().getValue() : null);
+                LOG.log(Level.INFO, msg.toString());
+                throw new RMException(msg);
+            }
             Proxy proxy = source.getReliableEndpoint().getProxy();
             CreateSequenceResponseType createResponse = proxy.createSequence(acksTo, relatesTo, isServer);
             if (!isServer) {
