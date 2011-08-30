@@ -44,5 +44,18 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <jaxws:schemaLocation>/org/apache/cxf/systest/servlet/hello_world_includes.xsd</jaxws:schemaLocation>
     </jaxws:schemaLocations>
   </jaxws:endpoint>
+
+  <jaxws:endpoint 
+    id="greeter4" 
+    address="/greeter4"
+    implementor="org.apache.cxf.systest.servlet.CXFServletTest$NoWsdlGreeter">
+    <jaxws:schemaLocations >
+        <jaxws:schemaLocation>/org/apache/cxf/systest/servlet/hello_world_includes.xsd</jaxws:schemaLocation>
+    </jaxws:schemaLocations>
+    <jaxws:properties>
+        <entry key="publishedEndpointUrl" value="http://cxf.apache.org/MyGreeter"/>
+    </jaxws:properties>
+  </jaxws:endpoint>
+
   
 </beans>

@@ -96,7 +96,7 @@ public class CXFServletTest extends AbstractServletTest {
         
         
         WebLink[] links = res.getLinks();
-        assertEquals("There should get two links for the service", 3, links.length);
+        assertEquals("Wrong number of service links", 4, links.length);
         
         Set<String> links2 = new HashSet<String>();
         for (WebLink l : links) {
@@ -105,6 +105,7 @@ public class CXFServletTest extends AbstractServletTest {
         
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter?wsdl"));       
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter2?wsdl")); 
+        assertTrue(links2.contains("http://cxf.apache.org/MyGreeter?wsdl")); 
         assertEquals("text/html", res.getContentType());
         
         res = client.getResponse(CONTEXT_URL + "/services/");
@@ -116,9 +117,10 @@ public class CXFServletTest extends AbstractServletTest {
             links2.add(l.getURLString());
         }
         
-        assertEquals("There should get two links for the service", 3, links.length);
+        assertEquals("Wrong number of service links", 4, links.length);
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter?wsdl"));       
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter2?wsdl")); 
+        assertTrue(links2.contains("http://cxf.apache.org/MyGreeter?wsdl")); 
         
         assertEquals("text/html", res.getContentType());
         
