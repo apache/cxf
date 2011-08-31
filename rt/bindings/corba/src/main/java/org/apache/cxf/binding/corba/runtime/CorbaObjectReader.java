@@ -551,6 +551,7 @@ public class CorbaObjectReader {
                 for (int i = 0; i < length; ++i) {
                     read(seqElements.get(i));
                 }
+                sequenceObj.setElements(seqElements.subList(0, length));
             }
         }
     }
