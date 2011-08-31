@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.utils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,7 +87,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.easymock.EasyMock;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,7 +96,43 @@ public class JAXRSUtilsTest extends Assert {
     @Before
     public void setUp() {
     }
+    
+    @Test
+    public void testFormParametersUTF8Encoding() throws Exception {
+        doTestFormParamsWithEncoding("UTF-8", true);
+        doTestFormParamsWithEncoding("UTF-8", false);
+    }
+    
+    @Test
+    public void testFormParametersISO88591Encoding() throws Exception {
+        doTestFormParamsWithEncoding("ISO-8859-1", true);
+    }
 
+    private void doTestFormParamsWithEncoding(String enc, boolean setEnc) throws Exception {
+        Class[] argType = {String.class, List.class};
+        Method m = Customer.class.getMethod("testFormParam", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        String body = "p1=" + URLEncoder.encode("\u00E4\u00F6\u00FC", enc) + "&p2=2&p2=3";
+        messageImpl.put(Message.REQUEST_URI, "/foo");
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        String ct = MediaType.APPLICATION_FORM_URLENCODED;
+        if (setEnc) {
+            ct += ";charset=" + enc;
+        }
+        headers.putSingle("Content-Type", ct);
+        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, messageImpl);
+        assertEquals("2 form params should've been identified", 2, params.size());
+        assertEquals("First Form Parameter not matched correctly",
+                     "\u00E4\u00F6\u00FC", params.get(0));
+        List<String> list = (List<String>)params.get(1);
+        assertEquals(2, list.size());
+        assertEquals("2", list.get(0));
+        assertEquals("3", list.get(1));
+    }
+    
     @Test
     public void testSelectBetweenMultipleResourceClasses() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();

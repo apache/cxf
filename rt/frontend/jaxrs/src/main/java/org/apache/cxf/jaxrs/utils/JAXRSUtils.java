@@ -731,9 +731,10 @@ public final class JAXRSUtils {
             m.put(FormUtils.FORM_PARAM_MAP, params);
         
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
-                String body = FormUtils.readBody(m.getContent(InputStream.class), mt);
+                String enc = HttpUtils.getEncoding(mt, "UTF-8");
+                String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
-                FormUtils.populateMapFromString(params, (String)body, decode, request);
+                FormUtils.populateMapFromString(params, (String)body, enc, decode, request);
             } else {
                 if (mt != null && "multipart".equalsIgnoreCase(mt.getType()) 
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
