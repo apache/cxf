@@ -29,7 +29,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -61,28 +60,30 @@ public final class FormUtils {
         }
     }
     
-    public static String readBody(InputStream is, MediaType mt) {
+    public static String readBody(InputStream is, String encoding) {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             IOUtils.copy(is, bos, 1024);
-            return new String(bos.toByteArray(), HttpUtils.getEncoding(mt, "UTF-8"));
+            return new String(bos.toByteArray(), encoding);
         } catch (Exception ex) {
             throw new WebApplicationException(ex);
         }
     }
     
     public static void populateMapFromString(MultivaluedMap<String, String> params, 
-                                             String postBody, boolean decode,
+                                             String postBody, 
+                                             String enc,
+                                             boolean decode,
                                              HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
             List<String> parts = Arrays.asList(postBody.split("&"));
             for (String part : parts) {
                 String[] keyValue = part.split("=");
                 // Change to add blank string if key but not value is specified
-                String name = HttpUtils.urlDecode(keyValue[0]);
+                String name = HttpUtils.urlDecode(keyValue[0], enc);
                 if (keyValue.length == 2) {
                     if (decode) {
-                        params.add(name, HttpUtils.urlDecode(keyValue[1]));
+                        params.add(name, HttpUtils.urlDecode(keyValue[1], enc));
                     } else {
                         params.add(name, keyValue[1]);
                     }
