@@ -59,7 +59,7 @@ public class SecureConversationTokenBuilder implements AssertionBuilder<Element>
 
         String attribute = DOMUtils.getAttribute(element, consts.getIncludeToken());
         if (attribute == null) {
-            throw new IllegalArgumentException("SecurityContextToken doesn't contain "
+            throw new IllegalArgumentException("SecureConversationToken doesn't contain "
                                                + "any sp:IncludeToken attribute");
         }
 
@@ -99,6 +99,12 @@ public class SecureConversationTokenBuilder implements AssertionBuilder<Element>
                                                    consts.getNamespace(),
                                                    SPConstants.SC10_SECURITY_CONTEXT_TOKEN) != null) {
                     conversationToken.setSc10SecurityContextToken(true);
+                }
+                
+                if (DOMUtils.getFirstChildWithName(elem, 
+                        consts.getNamespace(),
+                        SPConstants.SC13_SECURITY_CONTEXT_TOKEN) != null) {
+                    conversationToken.setSc13SecurityContextToken(true);
                 }
 
                 Element bootstrapPolicyElement = DOMUtils.getFirstChildWithName(elem, 

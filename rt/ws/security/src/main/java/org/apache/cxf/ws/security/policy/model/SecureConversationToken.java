@@ -112,7 +112,7 @@ public class SecureConversationToken extends SecurityContextToken {
         }
 
         if (isDerivedKeys() || isRequireExternalUriRef() || isSc10SecurityContextToken()
-            || bootstrapPolicy != null) {
+            || isSc13SecurityContextToken() || bootstrapPolicy != null) {
 
             String wspNamespaceURI = SPConstants.POLICY.getNamespaceURI();
 
@@ -149,6 +149,11 @@ public class SecureConversationToken extends SecurityContextToken {
             if (isSc10SecurityContextToken()) {
                 // <sp:SC10SecurityContextToken />
                 writer.writeEmptyElement(prefix, SPConstants.SC10_SECURITY_CONTEXT_TOKEN, namespaceURI);
+            }
+            
+            if (isSc13SecurityContextToken()) {
+                // <sp:SC13SecurityContextToken />
+                writer.writeEmptyElement(prefix, SPConstants.SC13_SECURITY_CONTEXT_TOKEN, namespaceURI);
             }
 
             if (bootstrapPolicy != null) {

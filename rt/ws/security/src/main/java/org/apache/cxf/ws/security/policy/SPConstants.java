@@ -405,6 +405,8 @@ public abstract class SPConstants {
     
     public static final String SC10_SECURITY_CONTEXT_TOKEN = "SC10SecurityContextToken";
     
+    public static final String SC13_SECURITY_CONTEXT_TOKEN = "SC13SecurityContextToken";
+    
     public static final String BOOTSTRAP_POLICY = "BootstrapPolicy";
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
