@@ -93,7 +93,6 @@ public class PolicyAnnotationTest extends Assert {
             ns.put("wsp", Constants.URI_POLICY_13_NS);
             XPathUtils xpu = new XPathUtils(ns);
             //org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
-            check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestImplServiceServicePolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/wsdl:port", "TestImplPortPortPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/", "TestInterfacePortTypePolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/wsdl:operation/", "echoIntPortTypeOpPolicy");
@@ -107,6 +106,68 @@ public class PolicyAnnotationTest extends Assert {
                   "echoIntBindingOpInputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:output",
                   "echoIntBindingOpOutputPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestImplServiceServicePolicy");
+        } finally {
+            bus.shutdown(true);
+        }
+    }
+    @org.junit.Test
+    public void testAnnotationsInterfaceAsClass() throws Exception {
+        Bus bus = BusFactory.getDefaultBus();
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
+        factory.setServiceBean(new TestImpl());
+        factory.setServiceClass(TestInterface.class);
+        factory.setStart(false);
+        List<String> tp = Arrays.asList(
+            "http://schemas.xmlsoap.org/soap/http",
+            "http://schemas.xmlsoap.org/wsdl/http/",
+            "http://schemas.xmlsoap.org/wsdl/soap/http",
+            "http://www.w3.org/2003/05/soap/bindings/HTTP/",
+            "http://cxf.apache.org/transports/http/configuration",
+            "http://cxf.apache.org/bindings/xformat");
+        
+        LocalTransportFactory f = new LocalTransportFactory(bus);
+        f.getUriPrefixes().add("http");
+        f.setTransportIds(tp);
+        f.setBus(bus);
+        f.register();
+        
+        
+        Server s = factory.create();
+
+        try {
+            ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus,
+                                                                s.getEndpoint().getService()
+                                                                    .getServiceInfos());
+            Definition def = builder.build();
+            WSDLWriter wsdlWriter = bus.getExtension(WSDLManager.class)
+                .getWSDLFactory().newWSDLWriter();
+            def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
+            Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
+            
+            Map<String, String> ns = new HashMap<String, String>();
+            ns.put("wsdl", WSDLConstants.NS_WSDL11);
+            ns.put("wsu", 
+                   "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+            ns.put("wsp", Constants.URI_POLICY_13_NS);
+            XPathUtils xpu = new XPathUtils(ns);
+            //org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:service/wsdl:port", "TestInterfacePortPortPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/", "TestInterfacePortTypePolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/wsdl:operation/", "echoIntPortTypeOpPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/wsdl:operation/wsdl:input",
+                  "echoIntPortTypeOpInputPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/wsdl:operation/wsdl:output",
+                  "echoIntPortTypeOpOutputPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/", 
+                  "TestInterfaceServiceSoapBindingBindingPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/", "echoIntBindingOpPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:input",
+                  "echoIntBindingOpInputPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:output",
+                  "echoIntBindingOpOutputPolicy");
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestInterfaceServiceServicePolicy");
         } finally {
             bus.shutdown(true);
         }
@@ -158,7 +219,7 @@ public class PolicyAnnotationTest extends Assert {
         @Policy(uri = "annotationpolicies/TestImplPolicy.xml")
     }
     )
-    @WebService()
+    @WebService(endpointInterface = "org.apache.cxf.ws.policy.PolicyAnnotationTest$TestInterface")
     public static class TestImpl implements TestInterface {
         public int echoInt(int i) {
             return i;

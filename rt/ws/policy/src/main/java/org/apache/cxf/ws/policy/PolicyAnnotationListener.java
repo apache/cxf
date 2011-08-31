@@ -326,11 +326,13 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                            Class<?> cls,
                            String defName) {
         Element el = addPolicy(service, p, cls, defName);
-        UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-        uee.setElement(el);
-        uee.setRequired(true);
-        uee.setElementType(DOMUtils.getElementQName(el));
-        place.addExtensor(uee);
+        if (el != null) {
+            UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
+            uee.setElement(el);
+            uee.setRequired(true);
+            uee.setElementType(DOMUtils.getElementQName(el));
+            place.addExtensor(uee);
+        }
     }
     private Element addPolicy(ServiceInfo service, Policy p, Class<?> cls, String defName) {
         String uri = p.uri();
@@ -345,11 +347,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                         service.setDescription(new DescriptionInfo());
                         service.getDescription().setBaseURI(cls.getResource("/").toString());
                     }
-                    UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-                    uee.setElement(doc.getDocumentElement());
-                    uee.setRequired(true);
-                    uee.setElementType(DOMUtils.getElementQName(doc.getDocumentElement()));
-                    service.getDescription().addExtensor(uee);
+                    
                     uri = doc.getDocumentElement().getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                                                   PolicyConstants.WSU_ID_ATTR_NAME);
                     if (StringUtils.isEmpty(uri)) {
@@ -360,6 +358,25 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                         doc.getDocumentElement().setAttributeNodeNS(att);
                     }
                     ns = doc.getDocumentElement().getNamespaceURI();
+                    Object exts[] = service.getDescription().getExtensors().get();
+                    exts = exts == null ? new Object[0] : exts;
+                    for (Object o : exts) {
+                        if (o instanceof UnknownExtensibilityElement) {
+                            UnknownExtensibilityElement uee = (UnknownExtensibilityElement)o;
+                            String uri2 = uee.getElement()
+                                    .getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                                    PolicyConstants.WSU_ID_ATTR_NAME);
+                            if (uri.equals(uri2)) {
+                                return null;
+                            }
+                        }
+                    }
+                    UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
+                    uee.setElement(doc.getDocumentElement());
+                    uee.setRequired(true);
+                    uee.setElementType(DOMUtils.getElementQName(doc.getDocumentElement()));
+                    service.getDescription().addExtensor(uee);
+                    
                     uri = "#" + uri;
                 } catch (XMLStreamException e) {
                     //ignore
