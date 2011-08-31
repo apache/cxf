@@ -74,6 +74,12 @@ public class SecurityContextTokenBuilder implements AssertionBuilder<Element> {
                                                SPConstants.SC10_SECURITY_CONTEXT_TOKEN) != null) {
                 contextToken.setSc10SecurityContextToken(true);
             }
+            
+            if (DOMUtils.getFirstChildWithName(element,
+                    consts.getNamespace(),
+                    SPConstants.SC13_SECURITY_CONTEXT_TOKEN) != null) {
+                contextToken.setSc13SecurityContextToken(true);
+            }
         }
 
         return contextToken;

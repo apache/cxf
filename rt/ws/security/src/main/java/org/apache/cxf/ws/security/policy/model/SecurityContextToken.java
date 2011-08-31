@@ -33,6 +33,8 @@ public class SecurityContextToken extends Token {
     boolean requireExternalUriRef;
 
     boolean sc10SecurityContextToken;
+    
+    boolean sc13SecurityContextToken;
 
     public SecurityContextToken(SPConstants version) {
         super(version);
@@ -64,6 +66,20 @@ public class SecurityContextToken extends Token {
      */
     public void setSc10SecurityContextToken(boolean sc10SecurityContextToken) {
         this.sc10SecurityContextToken = sc10SecurityContextToken;
+    }
+    
+    /**
+     * @return Returns the sc13SecurityContextToken.
+     */
+    public boolean isSc13SecurityContextToken() {
+        return sc13SecurityContextToken;
+    }
+    
+    /**
+     * @param sc13SecurityContextToken The sc13SecurityContextToken to set.
+     */
+    public void setSc13SecurityContextToken(boolean sc13SecurityContextToken) {
+        this.sc13SecurityContextToken = sc13SecurityContextToken;
     }
 
     /*
