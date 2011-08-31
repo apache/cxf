@@ -45,7 +45,17 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
         super.addAfter(XmlSigOutInterceptor.class.getName());
         
         super.addBefore(XmlEncOutInterceptor.class.getName());
-    } 
+    }
+    
+    public SamlEnvelopedOutInterceptor(boolean signLater) {
+        if (signLater) {
+            super.addAfter(XmlSigOutInterceptor.class.getName());
+        } else {
+            super.addAfter(XmlSigOutInterceptor.class.getName());
+        }
+        
+        super.addBefore(XmlEncOutInterceptor.class.getName());
+    }
 
     
     protected Document processDocument(Message message, Document doc) 

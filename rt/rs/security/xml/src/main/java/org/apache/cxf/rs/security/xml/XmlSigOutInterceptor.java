@@ -20,6 +20,9 @@ package org.apache.cxf.rs.security.xml;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -47,23 +50,35 @@ import org.opensaml.xml.signature.SignatureConstants;
 
 
 public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
+    public static final String ENVELOPED_SIG = "enveloped";
+    public static final String ENVELOPING_SIG = "enveloping";
+    public static final String DETACHED_SIG = "detached";
+    
     public static final String DEFAULT_ENV_PREFIX = "env";
     public static final QName DEFAULT_ENV_QNAME = 
         new QName("http://org.apache.cxf/rs/env", "Envelope", DEFAULT_ENV_PREFIX);
     
     private static final Logger LOG = 
         LogUtils.getL7dLogger(XmlSigOutInterceptor.class);
+    private static final Set<String> SUPPORTED_STYLES = 
+        new HashSet<String>(Arrays.asList(ENVELOPED_SIG, ENVELOPING_SIG, DETACHED_SIG));
     
     private QName envelopeQName;
-    private boolean enveloping;
+    private String sigStyle = ENVELOPED_SIG;
     private String defaultSigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
     private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
     
     public XmlSigOutInterceptor() {
     } 
 
-    public void setEnveloping(boolean env) {
-        this.enveloping = env;
+    public void setStyle(String style) {
+        if (!SUPPORTED_STYLES.contains(style)) {
+            throw new IllegalArgumentException("Unsupported XML Signature style");
+        }
+        if (DETACHED_SIG.equals(style)) {
+            envelopeQName = DEFAULT_ENV_QNAME;
+        }
+        sigStyle = style;    
     }
     
     public void setSignatureAlgorithm(String algo) {
@@ -84,6 +99,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     private Document createSignature(Message message, Document doc) 
         throws Exception {
         
+        boolean enveloping = ENVELOPING_SIG.equals(sigStyle);
         if (enveloping && envelopeQName != null) {
             throw new IllegalStateException("Enveloping XMLSignature can not have custom envelope names");
         }
