@@ -49,6 +49,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.Customer2;
 import org.apache.cxf.jaxrs.CustomerApplication;
@@ -127,7 +128,7 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("2 form params should've been identified", 2, params.size());
         assertEquals("First Form Parameter not matched correctly",
                      "\u00E4\u00F6\u00FC", params.get(0));
-        List<String> list = (List<String>)params.get(1);
+        List<String> list = CastUtils.cast((List)params.get(1));
         assertEquals(2, list.size());
         assertEquals("2", list.get(0));
         assertEquals("3", list.get(1));
