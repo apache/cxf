@@ -42,7 +42,11 @@ public class CorbaPrimitiveTypeEventProducer implements CorbaTypeEventProducer {
     }
 
     public String getText() {
-        return handler.getDataFromValue();
+        String s = handler.getDataFromValue();
+        if (s == null) {
+            return "";
+        }
+        return s;
     }
 
     public int next() {
