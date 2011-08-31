@@ -20,8 +20,11 @@ package org.apache.cxf.jaxrs.model.wadl;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -44,7 +47,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -403,9 +405,11 @@ public class WadlGeneratorTest extends Assert {
         
         checkDocs(requestEls.get(0), "", "Request", "");
         
-        verifyParameters(requestEls.get(0), 3, 
+        verifyParameters(requestEls.get(0), 4, 
                          new Param("hid", "header", "xs:int"),
                          new Param("provider.bar", "query", "xs:int"),
+                         new Param("bookstate", "query", "xs:string",
+                                 new HashSet<String>(Arrays.asList("NEW", "USED", "OLD"))),
                          new Param("a", "query", "xs:string", true));
         
         verifyXmlJsonRepresentations(requestEls.get(0), book2El, "InputBook");
@@ -564,6 +568,17 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(p.getType(), paramEl.getAttribute("style"));
         assertEquals(p.getSchemaType(), paramEl.getAttribute("type"));
         assertEquals(p.isRepeating(), Boolean.valueOf(paramEl.getAttribute("repeating")));
+        Set<String> options = p.getOptions();
+        if (options != null) {
+            Set<String> actualOptions = new HashSet<String>();
+            List<Element> els = DOMUtils.getChildrenWithNamespace(paramEl, WadlGenerator.WADL_NS);
+            assertFalse(els.isEmpty());
+            assertEquals(options.size(), els.size());
+            for (Element op : els) {
+                actualOptions.add(op.getAttribute("value"));
+            }
+            assertEquals(options, actualOptions);
+        }
         String docs = p.getDocs();
         if (docs != null) {
             checkDocs(paramEl, "", docs, "");
@@ -614,8 +629,16 @@ public class WadlGeneratorTest extends Assert {
         private String schemaType;
         private String docs;
         private boolean repeating;
+        private Set<String> options;
         public Param(String name, String type, String schemaType) {
             this(name, type, schemaType, false);
+        }
+        
+        public Param(String name, String type, String schemaType, Set<String> opts) {
+            this.name = name;
+            this.type = type;
+            this.schemaType = schemaType;
+            this.options = opts;
         }
         
         public Param(String name, String type, String schemaType, boolean repeating) {
@@ -633,6 +656,10 @@ public class WadlGeneratorTest extends Assert {
             this.schemaType = schemaType;
             this.docs = docs;
             this.repeating = repeating;
+        }
+        
+        public Set<String> getOptions() {
+            return options;
         }
         
         public String getName() {

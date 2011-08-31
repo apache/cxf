@@ -568,13 +568,39 @@ public class WadlGenerator implements RequestHandler {
             type = InjectionUtils.getActualType(genericType);
             sb.append(" repeating=\"true\"");
         }
+        
         String value = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
+        if (value == null && type.isEnum()) {
+            value = "xs:string";
+        }
         if (value != null) {
             sb.append(" type=\"").append(value).append("\"");
         }
-        addDocsAndCloseElement(sb, anns, "param", DocTarget.PARAM, true);
+        if (type.isEnum()) {
+            sb.append(">");
+            handleDocs(anns, sb, DocTarget.PARAM, true);
+            setEnumOptions(sb, type);
+            sb.append("</param>");
+        } else {
+            addDocsAndCloseElement(sb, anns, "param", DocTarget.PARAM, true);
+        }
     }
 
+    private void setEnumOptions(StringBuilder sb, Class<?> enumClass) {
+        try {
+            Method m = enumClass.getMethod("values", new Class[]{});
+            Object[] values = (Object[])m.invoke(null, new Object[]{});
+            m = enumClass.getMethod("toString", new Class[]{});
+            for (Object o : values) {
+                String str = (String)m.invoke(o, new Object[]{});
+                sb.append("<option value=\"" + str + "\"/>");
+            }
+            
+        } catch (Throwable ex) {
+            // ignore
+        }
+    }
+    
     private void addDocsAndCloseElement(StringBuilder sb, Annotation[] anns, String elementName,
                                         String category, boolean allowDefault) {
         if (isDocAvailable(anns)) {

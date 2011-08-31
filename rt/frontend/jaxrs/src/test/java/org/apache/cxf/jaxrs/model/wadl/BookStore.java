@@ -85,6 +85,7 @@ public class BookStore {
                         @HeaderParam("hid") int headerId,
                         @CookieParam("cid") int cookieId,
                         @QueryParam("provider.bar") int queryParam,
+                        @QueryParam("bookstate") BookEnum state,
                         @QueryParam("a") List<String> queryList,
                         @Context HttpHeaders headers,
                         @Description("InputBook")      
