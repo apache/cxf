@@ -170,12 +170,11 @@ public class ClientImpl
     /**
      * Create a Client that uses a specific EndpointImpl.
      * @param bus
-     * @param wsdlUrl
      * @param service
      * @param port
      * @param endpointImplFactory
      */
-    public ClientImpl(Bus bus, URL wsdlUrl, Service svc, QName port,
+    public ClientImpl(Bus bus, Service svc, QName port,
                       EndpointImplFactory endpointImplFactory) {
         this.bus = bus;
         outFaultObserver = new ClientOutFaultObserver(bus);

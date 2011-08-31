@@ -256,15 +256,14 @@ public class DynamicClientFactory {
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
         }
-        URL u = composeUrl(wsdlUrl);
-        LOG.log(Level.FINE, "Creating client from URL " + u.toString());
+        LOG.log(Level.FINE, "Creating client from WSDL " + wsdlUrl);
 
         WSDLServiceFactory sf = (service == null)
             ? (new WSDLServiceFactory(bus, wsdlUrl)) : (new WSDLServiceFactory(bus, wsdlUrl, service));
         sf.setAllowElementRefs(allowRefs);
         Service svc = sf.create();
 
-        ClientImpl client = new ClientImpl(bus, u, svc, port,
+        ClientImpl client = new ClientImpl(bus, svc, port,
                                            getEndpointImplFactory());
 
         //all SI's should have the same schemas
