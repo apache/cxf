@@ -43,13 +43,19 @@ public class WebServiceContextImpl implements WebServiceContext {
 
     private static ThreadLocal<MessageContext> context = new ThreadLocal<MessageContext>();
 
+    private final MessageContext localCtx;
+    
     public WebServiceContextImpl() { 
+        localCtx = null;
+    }
+    
+    public WebServiceContextImpl(MessageContext c) {
+        localCtx = c;
     }
 
     // Implementation of javax.xml.ws.WebServiceContext
-
     public final MessageContext getMessageContext() {
-        return context.get();
+        return localCtx == null ? context.get() : localCtx; 
     }
 
     public final Principal getUserPrincipal() {
