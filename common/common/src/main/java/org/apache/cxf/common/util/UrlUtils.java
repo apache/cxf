@@ -43,15 +43,20 @@ public final class UrlUtils {
     /**
      * Decodes using URLDecoder - use when queries or form post values are decoded
      * @param value value to decode
+     * @param enc encoding
      * @return
      */
-    public static String urlDecode(String value) {
+    public static String urlDecode(String value, String enc) {
         try {
-            value = URLDecoder.decode(value, "UTF-8");
+            value = URLDecoder.decode(value, enc);
         } catch (UnsupportedEncodingException e) {
             LOG.warning("UTF-8 encoding can not be used to decode " + value);          
         }
         return value;
+    }
+    
+    public static String urlDecode(String value) {
+        return urlDecode(value, "UTF-8");
     }
     
     /**

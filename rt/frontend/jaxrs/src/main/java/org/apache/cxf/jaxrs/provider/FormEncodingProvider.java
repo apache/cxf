@@ -151,8 +151,10 @@ public class FormEncodingProvider implements
                 AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold);
             FormUtils.populateMapFromMultipart(params, body, decode);
         } else {
+            String enc = HttpUtils.getEncoding(mt, "UTF-8");
             FormUtils.populateMapFromString(params, 
-                                            FormUtils.readBody(is, mt), 
+                                            FormUtils.readBody(is, enc),
+                                            enc,
                                             decode,
                                             mc != null ? mc.getHttpServletRequest() : null);
         }

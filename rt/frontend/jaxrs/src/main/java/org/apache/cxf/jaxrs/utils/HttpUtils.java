@@ -68,6 +68,10 @@ public final class HttpUtils {
     private HttpUtils() {
     }
     
+    public static String urlDecode(String value, String enc) {
+        return UrlUtils.urlDecode(value, enc);
+    }
+    
     public static String urlDecode(String value) {
         return UrlUtils.urlDecode(value);
     }
