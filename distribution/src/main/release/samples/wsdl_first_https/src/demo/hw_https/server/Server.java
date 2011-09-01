@@ -24,6 +24,7 @@ import javax.xml.ws.Endpoint;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 
 public class Server {
@@ -34,7 +35,7 @@ public class Server {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = Server.class.getResource("CherryServer.xml");
         Bus bus = bf.createBus(busFile.toString());
-        bf.setDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
 
         Object implementor = new GreeterImpl();
         String address = "https://localhost:9001/SoapContext/SoapPort";
