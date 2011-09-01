@@ -534,11 +534,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                              + PORT + "/bookstore/emptyput");
         Response response = wc.put(null);
         assertEquals(204, response.getStatus());
-        assertNull(response.getMetadata().getFirst("Content-Type"));
         
         response = wc.put("");
         assertEquals(204, response.getStatus());
-        assertNull(response.getMetadata().getFirst("Content-Type"));
     }
     
     @Test
