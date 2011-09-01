@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.URL;
 import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -58,7 +59,7 @@ public final class Client {
         URL busFile = Client.class.getResource("wssec.xml");
         
         Bus bus = bf.createBus(busFile.toString());
-        bf.setDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
 
         System.out.println(wsdlURL);
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
