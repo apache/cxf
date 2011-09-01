@@ -72,7 +72,9 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
-        sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+        if (enveloping) {
+            sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+        }
         bean.getOutInterceptors().add(sigInterceptor);
         bean.setServiceClass(BookStore.class);
         
@@ -120,7 +122,9 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
-        sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+        if (enveloping) {
+            sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+        }
         bean.getOutInterceptors().add(sigInterceptor);
         
         

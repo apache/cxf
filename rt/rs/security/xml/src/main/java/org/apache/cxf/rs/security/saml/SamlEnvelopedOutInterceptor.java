@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
@@ -38,6 +39,7 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
     private static final QName DEFAULT_ENV_QNAME = 
         new QName("http://org.apache.cxf/rs/env", "Envelope", DEFAULT_ENV_PREFIX);
     private QName envelopeQName = DEFAULT_ENV_QNAME;
+    private boolean signLater;
     
     public SamlEnvelopedOutInterceptor() {
         // SAML assertions may contain enveloped XML signatures so
@@ -49,10 +51,11 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     public SamlEnvelopedOutInterceptor(boolean signLater) {
         if (signLater) {
-            super.addAfter(XmlSigOutInterceptor.class.getName());
+            super.addBefore(XmlSigOutInterceptor.class.getName());
         } else {
             super.addAfter(XmlSigOutInterceptor.class.getName());
         }
+        this.signLater = signLater;
         
         super.addBefore(XmlEncOutInterceptor.class.getName());
     }
@@ -89,7 +92,20 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
         payloadDoc.removeChild(docEl);
         newDoc.adoptNode(docEl);
         root.appendChild(docEl);
-        return newDoc;
+
+        if (signLater) {
+            // it appears all the above manipulation with 
+            // adopting and removing nodes
+            // leaves some stale refs/state and thus the digest ends uo being wrong 
+            // on the server side if XML sig is applied later in the enveloped mode
+            // TODO: this is not critical now - but figure iut if we can avoid copying
+            // DOMs
+            CachedOutputStream bos = new CachedOutputStream();
+            DOMUtils.writeXml(newDoc, bos);
+            return DOMUtils.readXml(bos.getInputStream());
+        } else {
+            return newDoc;
+        }
     }
 
 

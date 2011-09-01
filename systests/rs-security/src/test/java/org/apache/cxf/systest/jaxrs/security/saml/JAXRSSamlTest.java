@@ -114,7 +114,9 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(!signed),
                                        null, signed);
         XmlSigOutInterceptor xmlSig = new XmlSigOutInterceptor();
-        xmlSig.setStyle(XmlSigOutInterceptor.DETACHED_SIG);
+        if (signed) {
+            xmlSig.setStyle(XmlSigOutInterceptor.DETACHED_SIG);
+        }
                 
         WebClient.getConfig(wc).getOutInterceptors().add(xmlSig);
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
