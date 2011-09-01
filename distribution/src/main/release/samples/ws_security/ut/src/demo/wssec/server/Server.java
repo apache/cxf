@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
@@ -66,7 +67,7 @@ public class Server {
 
         bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
 
-        bf.setDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
 
         new Server();
         System.out.println("Server ready...");

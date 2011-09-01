@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
@@ -47,7 +48,7 @@ public final class Client {
             SpringBusFactory bf = new SpringBusFactory();
             URL busFile = Client.class.getResource("wssec.xml");
             Bus bus = bf.createBus(busFile.toString());
-            bf.setDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
 
             Map<String, Object> outProps = new HashMap<String, Object>();
             outProps.put("action", "UsernameToken Timestamp");

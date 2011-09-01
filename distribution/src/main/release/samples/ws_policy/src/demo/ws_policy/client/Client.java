@@ -22,6 +22,7 @@ package demo.ws_policy.client;
 import java.net.URL;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;
@@ -40,7 +41,7 @@ public final class Client {
             SpringBusFactory bf = new SpringBusFactory();
             URL busFile = Client.class.getResource("client.xml");
             Bus bus = bf.createBus(busFile.toString());
-            bf.setDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
 
             SOAPService service = new SOAPService();
             Greeter port = service.getSoapPort();

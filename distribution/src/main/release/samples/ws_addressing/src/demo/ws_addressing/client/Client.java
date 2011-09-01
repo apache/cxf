@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.addressing.AddressingBuilder;
 import org.apache.cxf.ws.addressing.AddressingProperties;
@@ -70,7 +71,7 @@ public final class Client {
             SpringBusFactory bf = new SpringBusFactory();
             URL busFile = Client.class.getResource("client.xml");
             Bus bus = bf.createBus(busFile.toString());
-            bf.setDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
 
 
             SOAPService service = new SOAPService(wsdlURL, SERVICE_NAME);
