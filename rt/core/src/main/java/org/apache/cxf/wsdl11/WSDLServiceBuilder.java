@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Binding;
@@ -109,6 +110,7 @@ public class WSDLServiceBuilder {
     private boolean recordOriginal = true;
     private boolean allowRefs;
     private boolean ignoreUnknownBindings;
+    private Level unwrapLogLevel = Level.FINE;
 
     public WSDLServiceBuilder(Bus bus) {
         this.bus = bus;
@@ -118,6 +120,9 @@ public class WSDLServiceBuilder {
         recordOriginal = record;
     }
 
+    public void setUnwrapLogLevel(Level l) {
+        unwrapLogLevel = l;
+    }
     public void setIgnoreUnknownBindings(boolean b) {
         ignoreUnknownBindings = b;
     }
@@ -495,7 +500,7 @@ public class WSDLServiceBuilder {
             copyExtensionAttributes(bi, binding);
 
             for (BindingOperation bop : cast(binding.getBindingOperations(), BindingOperation.class)) {
-                LOG.fine("binding operation name is " + bop.getName());
+                LOG.finer("binding operation name is " + bop.getName());
                 String inName = null;
                 String outName = null;
                 if (bop.getBindingInput() != null) {
@@ -618,13 +623,18 @@ public class WSDLServiceBuilder {
             copyExtensors(finfo, entry.getValue().getExtensibilityElements());
             copyExtensionAttributes(finfo, entry.getValue());
         }
-        checkForWrapped(opInfo, allowRefs, false);
+        checkForWrapped(opInfo, allowRefs, false, unwrapLogLevel);
     }
 
     public static void checkForWrapped(OperationInfo opInfo, boolean relaxed) {
         checkForWrapped(opInfo, relaxed, relaxed);
     }
     public static void checkForWrapped(OperationInfo opInfo, boolean allowRefs, boolean relaxed) {
+        checkForWrapped(opInfo, allowRefs, relaxed, Level.FINE);
+    }
+
+    public static void checkForWrapped(OperationInfo opInfo, boolean allowRefs,
+                                       boolean relaxed, Level logLevel) {
         MessageInfo inputMessage = opInfo.getInput();
         MessageInfo outputMessage = opInfo.getOutput();
         boolean passedRule = true;
@@ -641,6 +651,9 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
+            org.apache.cxf.common.i18n.Message message 
+                = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_1", LOG, opInfo.getName());
+            LOG.log(logLevel, message.toString());
             return;
         }
         SchemaCollection schemas = opInfo.getInterface().getService().getXmlSchemaCollection();
@@ -664,6 +677,9 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
+            org.apache.cxf.common.i18n.Message message 
+                = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_2", LOG, opInfo.getName());
+            LOG.log(logLevel, message.toString());
             return;
         }
         // RULE No.3:
@@ -682,6 +698,9 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
+            org.apache.cxf.common.i18n.Message message 
+                = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_3", LOG, opInfo.getName());
+            LOG.log(logLevel, message.toString());
             return;
         }
         // RULE No.4 and No5:
@@ -709,6 +728,9 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
+            org.apache.cxf.common.i18n.Message message 
+                = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_4", LOG, opInfo.getName());
+            LOG.log(logLevel, message.toString());
             return;
         }
 
@@ -732,6 +754,9 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
+            org.apache.cxf.common.i18n.Message message 
+                = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_5", LOG, opInfo.getName());
+            LOG.log(logLevel, message.toString());
             return;
         }
         // we are wrappable!!
