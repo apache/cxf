@@ -48,7 +48,7 @@ public class ServerImpl implements Server {
     private BindingFactory bindingFactory;
     private MessageObserver messageObserver;
     private ManagedEndpoint mep;
-    private boolean stopped;
+    private boolean stopped = true;
 
     public ServerImpl(Bus bus, 
                       Endpoint endpoint, 
@@ -119,7 +119,10 @@ public class ServerImpl implements Server {
         this.destination = destination;
     }
 
-    public void start() {     
+    public void start() {
+        if (!stopped) {
+            return;
+        }
         LOG.fine("Server is starting.");
         
         if (messageObserver != null) {
