@@ -19,7 +19,7 @@
 #    under the License.
 #
 #
-# run the Apache CXF wsdl2corba tool 
+# run the Apache CXF idl2wsdl tool 
 #
 # Check for irritating 'operating systems'.
 cygwin=false;

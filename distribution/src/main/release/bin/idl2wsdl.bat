@@ -21,7 +21,7 @@ rem
 rem
 
 rem 
-rem  invoke the CXF java2js tool
+rem  invoke the CXF idl2wsdl tool
 rem 
 @setlocal
 
