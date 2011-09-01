@@ -49,6 +49,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
@@ -356,16 +357,18 @@ public final class JAXBEncoderDecoder {
             } else {
                 LOG.warning("Schema associated with " + namespace + " is null");
             }
-            
             for (Field f : cls.getDeclaredFields()) {
                 if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
-                    QName fname = new QName(namespace, f.getName());
-                    f.setAccessible(true);
-                    if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
-                        writeArrayObject(marshaller, writer, fname, f.get(elValue));                        
-                    } else {
-                        writeObject(marshaller, writer, new JAXBElement(fname, String.class, 
-                                                                        f.get(elValue)));
+                    XmlAttribute at = f.getAnnotation(XmlAttribute.class);
+                    if (at == null) {
+                        QName fname = new QName(namespace, f.getName());
+                        f.setAccessible(true);
+                        if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
+                            writeArrayObject(marshaller, writer, fname, f.get(elValue));
+                        } else {
+                            writeObject(marshaller, writer, new JAXBElement(fname, String.class, 
+                                                                            f.get(elValue)));
+                        }
                     }
                 }
             }
@@ -462,7 +465,12 @@ public final class JAXBEncoderDecoder {
             while (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
                 QName q = reader.getName();
                 try {
-                    Field f = cls.getField(q.getLocalPart());
+                    Field f =  null;
+                    try {
+                        f = cls.getDeclaredField(q.getLocalPart());
+                    } catch (NoSuchFieldException nsf) {
+                        f = cls.getField(q.getLocalPart());
+                    }
                     Type type = f.getGenericType();
                     if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
                         f.setAccessible(true);
