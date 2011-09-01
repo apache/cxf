@@ -42,6 +42,10 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
         factoriesAreAbstract = b;
     }
     
+    protected String getDestroyMethod() {
+        return null;
+    }
+    
     @SuppressWarnings("deprecation")
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
@@ -130,6 +134,9 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             ctx.getRegistry().registerBeanDefinition(factoryId, factoryBean.getBeanDefinition());
             bean.getBeanDefinition().setAttribute("id", id);
             bean.setFactoryBean(factoryId, "create");
+        }
+        if (getDestroyMethod() != null) {
+            bean.setDestroyMethodName(getDestroyMethod());
         }
     }
 

@@ -90,6 +90,8 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
         public boolean isSingleton() {
             return true;
         }
+        
+
         public void destroy() throws Exception {
             if (obj != null) {
                 if (obj instanceof Closeable) {
@@ -98,6 +100,7 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
                     Client c = ClientProxy.getClient(obj);
                     c.destroy();
                 }
+                obj = null;
             }
         }
     }
