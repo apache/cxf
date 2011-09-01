@@ -65,7 +65,7 @@ public class ClientProxyFactoryBeanDefinitionParser
     protected String getSuffix() {
         return ".simple-client";
     }
-
+    
     @Override
     protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
         if ("endpointName".equals(name) || "serviceName".equals(name)) {
@@ -127,6 +127,7 @@ public class ClientProxyFactoryBeanDefinitionParser
         public boolean isSingleton() {
             return true;
         }
+        
         public void destroy() throws Exception {
             if (obj != null) {
                 if (obj instanceof Closeable) {
@@ -135,6 +136,7 @@ public class ClientProxyFactoryBeanDefinitionParser
                     Client c = ClientProxy.getClient(obj);
                     c.destroy();
                 }
+                obj = null;
             }
         }
     }
