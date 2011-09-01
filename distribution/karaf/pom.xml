@@ -34,7 +34,7 @@
     <name>CXF :: Apache Karaf</name>
 
     <properties>
-      <karaf-version>2.1.4</karaf-version>
+      <karaf-version>2.2.3</karaf-version>
     </properties>
 
     <modules>
