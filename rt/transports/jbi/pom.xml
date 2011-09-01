@@ -127,7 +127,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.cxf.*;version=${project.version};-split-package:=merge-first,
+                            org.apache.cxf.transport.jbi.*;version=${project.version};-split-package:=merge-first,
                             META-INF.cxf.transport.jbi
                         </Export-Package>
                         <_failok>true</_failok>
