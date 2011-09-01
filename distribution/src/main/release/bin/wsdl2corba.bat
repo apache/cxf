@@ -21,7 +21,7 @@ rem
 rem
 
 rem 
-rem  invoke the Apache CXF wsdl2java tool
+rem  invoke the Apache CXF wsdl2corba tool
 rem 
 @setlocal
 

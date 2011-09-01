@@ -19,7 +19,7 @@
 #    under the License.
 #
 #
-# run the Apache CXF wsdl2java tool 
+# run the Apache CXF wsdlvalidator tool 
 #
 # Check for irritating 'operating systems'.
 cygwin=false;
