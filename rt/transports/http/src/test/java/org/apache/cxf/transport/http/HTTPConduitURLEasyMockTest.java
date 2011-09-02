@@ -212,6 +212,22 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         finalVerify();
     }
     
+    @Test
+    public void testSendTwowayDecoupledEmptyPartialResponse() 
+        throws Exception {
+        control = EasyMock.createNiceControl();
+        HTTPConduit conduit = setUpConduit(true, false);
+        Message message = new MessageImpl();
+        conduit.prepare(message);
+        verifySentMessage(conduit, 
+                          message, 
+                          ResponseStyle.DECOUPLED,
+                          ResponseDelimiter.EOF,
+                          true,  // empty response
+                          "POST");
+        finalVerify();
+    }
+
     private void setUpHeaders(Message message) {
         Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         List<String> contentTypes = new ArrayList<String>();
