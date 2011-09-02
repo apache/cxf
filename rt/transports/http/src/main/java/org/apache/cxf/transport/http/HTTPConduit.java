@@ -1545,7 +1545,8 @@ public class HTTPConduit
             }
 
             InputStream in = null;
-            if (isOneway(exchange)) {
+            // oneway or decoupled twoway calls may expect HTTP 202 with no content
+            if (isOneway(exchange) || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
                 in = ChunkedUtil.getPartialResponse(connection, responseCode);
                 if (in == null) {
                     // oneway operation or decoupled MEP without 
