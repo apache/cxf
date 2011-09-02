@@ -95,12 +95,10 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
             if (lst == null) {
                 return;
             }
-            if (lst != null) {
-                message.put(MessageInfo.class, messageInfo);
-                message.put(BindingMessageInfo.class, bmi);
-                ex.put(BindingOperationInfo.class, boi2);
-                ex.put(OperationInfo.class, op);
-            }
+            message.put(MessageInfo.class, messageInfo);
+            message.put(BindingMessageInfo.class, bmi);
+            ex.put(BindingOperationInfo.class, boi2);
+            ex.put(OperationInfo.class, op);
             
             if (isGET(message)) {
                 LOG.fine("WrapperClassInInterceptor skipped in HTTP GET method");

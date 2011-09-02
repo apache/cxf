@@ -359,7 +359,6 @@ public class ClientImpl
                            Exchange exchange) throws Exception {
         Map<String, Object> context = new HashMap<String, Object>();
         Map<String, Object> resp = new HashMap<String, Object>();
-        resp.clear();
         Map<String, Object> req = new HashMap<String, Object>(getRequestContext());
         context.put(RESPONSE_CONTEXT, resp);
         context.put(REQUEST_CONTEXT, req);
