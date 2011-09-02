@@ -495,8 +495,10 @@ public final class JAXBEncoderDecoder {
 
                             f.set(obj, o);
                         } else {
-                            f.set(obj, u.unmarshal(reader, f.getType()));
+                            f.set(obj, getElementValue(u.unmarshal(reader, f.getType())));
                         }
+                    } else {
+                        throw new NoSuchFieldException("No accessible field " + q.getLocalPart());
                     }
                 } catch (NoSuchFieldException ex) {
                     String s = Character.toUpperCase(q.getLocalPart().charAt(0))
