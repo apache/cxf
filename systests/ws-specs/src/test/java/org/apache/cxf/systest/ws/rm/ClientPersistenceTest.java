@@ -247,7 +247,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMeOneWay("five");
 
         // force at least two outbound messages, since can't always count on three
-        awaitMessages(1, 3);
+        awaitMessages(1, 2);
         
         MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -260,7 +260,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {"5"}, true);
         mf.verifyAcknowledgements(new boolean[1], true);
 
-        mf.verifyMessages(3, false);
+        mf.verifyMessages(2, false);
 
         // we can't reliably predict how the three remaining messages are acknowledged
 //        expectedActions = new String[] {RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION,

@@ -101,6 +101,17 @@ public final class MessageUtils {
     }
     
     /**
+     * Determines if the current message is an empty partial response, which
+     * is a partial response with an empty content.
+     * 
+     * @param message the current message
+     * @return true if the current messags is a partial empty response
+     */
+    public static boolean isEmptyPartialResponse(Message message) {
+        return Boolean.TRUE.equals(message.get(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE));
+    }
+
+    /**
      * Returns true if a value is either the String "true" (regardless of case)  or Boolean.TRUE.
      * @param value
      * @return true if value is either the String "true" or Boolean.TRUE

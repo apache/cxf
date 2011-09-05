@@ -235,7 +235,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         greeter.greetMeOneWay("thrice");
 
-        awaitMessages(4, 4);
+        awaitMessages(4, 2);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
                 
@@ -249,13 +249,13 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // createSequenceResponse message plus 3 partial responses, only the
         // last one should include a sequence acknowledgment
 
-        mf.verifyMessages(4, false);
+        mf.verifyMessages(2, false);
         expectedActions = 
-            new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, null, null, 
+            new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
                           RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
         mf.verifyActions(expectedActions, false);
-        mf.verifyMessageNumbers(new String[] {null, null, null, null}, false);
-        mf.verifyAcknowledgements(new boolean[] {false, false, false, true}, false);
+        mf.verifyMessageNumbers(new String[] {null, null}, false);
+        mf.verifyAcknowledgements(new boolean[] {false, true}, false);
     }
     
     @Test
@@ -267,7 +267,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         // CreateSequence plus two greetMeOneWay requests
 
-        awaitMessages(3, 4);
+        awaitMessages(3, 1);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
@@ -281,13 +281,10 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // CreateSequenceResponse plus three partial responses, no
         // acknowledgments included
 
-        mf.verifyMessages(4, false);
-        mf.verifyMessageNumbers(new String[4], false);
-        mf.verifyAcknowledgements(new boolean[4], false);
+        mf.verifyMessages(1, false);
+        mf.verifyMessageNumbers(new String[1], false);
+        mf.verifyAcknowledgements(new boolean[1], false);
         
-        mf.verifyPartialResponses(3);        
-        mf.purgePartialResponses();
-  
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION};
         mf.verifyActionsIgnoringPartialResponses(expectedActions);
         mf.purge();
@@ -320,7 +317,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // two application messages plus two createSequence plus two
         // terminateSequence
 
-        awaitMessages(6, 6);
+        awaitMessages(6, 4);
         
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -340,16 +337,16 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // createSequenceResponse message plus partial responses to
         // greetMeOneWay and terminateSequence ||: 2
 
-        mf.verifyMessages(6, false);
+        mf.verifyMessages(4, false);
 
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
-                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION, null,
+                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION, 
                                         RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
-                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION, null};
+                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
         mf.verifyActions(expectedActions, false);
-        mf.verifyMessageNumbers(new String[] {null, null, null, null, null, null}, false);
-        mf.verifyLastMessage(new boolean[] {false, false, false, false, false, false}, false);
-        mf.verifyAcknowledgements(new boolean[] {false, true, false, false, true, false}, false);
+        mf.verifyMessageNumbers(new String[] {null, null, null, null}, false);
+        mf.verifyLastMessage(new boolean[] {false, false, false, false}, false);
+        mf.verifyAcknowledgements(new boolean[] {false, true, false, true}, false);
     }
    
     @Test
@@ -372,7 +369,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         // three application messages plus createSequence
         
-        awaitMessages(4, 4, 2000);
+        awaitMessages(4, 1, 2000);
         
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -389,9 +386,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // createSequenceResponse plus 3 partial responses, none of which
         // contain an acknowledgment
 
-        mf.verifyMessages(4, false);
-        mf.verifyPartialResponses(3, new boolean[3]);
-        mf.purgePartialResponses();
+        mf.verifyMessages(1, false);
         
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION};
         mf.verifyActions(expectedActions, false);
@@ -465,7 +460,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // CreateSequence and three greetMe messages
         // TODO there should be partial responses to the decoupled responses!
 
-        awaitMessages(4, 8);
+        awaitMessages(4, 4);
         
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -485,10 +480,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // one partial response for each of the four messages
         // the first partial response should no include an acknowledgement, the other three should
 
-        mf.verifyMessages(8, false);
-        mf.verifyPartialResponses(4, new boolean[4]);
-
-        mf.purgePartialResponses();
+        mf.verifyMessages(4, false);
 
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
                                         GREETME_RESPONSE_ACTION, 
@@ -514,7 +506,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // CreateSequence and three greetMe messages
         // TODO there should be partial responses to the decoupled responses!
 
-        awaitMessages(4, 8);
+        awaitMessages(4, 4);
         
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -534,10 +526,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // one partial response for each of the four messages
         // the first partial response should no include an acknowledgement, the other three should
 
-        mf.verifyMessages(8, false);
-        mf.verifyPartialResponses(4, new boolean[4]);
-
-        mf.purgePartialResponses();
+        mf.verifyMessages(4, false);
 
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
                                         GREETME_RESPONSE_ACTION, 
@@ -559,7 +548,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // CreateSequence and three greetMe messages, no acknowledgments
         // included
 
-        awaitMessages(3, 6);
+        awaitMessages(3, 3);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
@@ -576,12 +565,10 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // one partial response for each of the three messages no acknowledgments
         // included
 
-        mf.verifyMessages(6, false);
-        mf.verifyLastMessage(new boolean[6], false);
-        mf.verifyAcknowledgements(new boolean[6], false);
+        mf.verifyMessages(3, false);
+        mf.verifyLastMessage(new boolean[3], false);
+        mf.verifyAcknowledgements(new boolean[3], false);
         
-        mf.verifyPartialResponses(3);
-        mf.purgePartialResponses();
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
                                         GREETME_RESPONSE_ACTION, 
                                         GREETME_RESPONSE_ACTION};
@@ -621,7 +608,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMe("two");
         greeter.greetMe("three");
 
-        awaitMessages(7, 13, 5000);
+        awaitMessages(7, 6, 5000);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
@@ -642,11 +629,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // plus 3 full responses to greetMe requests plus server originiated
         // TerminateSequence request
 
-        mf.verifyMessages(13, false);
-
-        mf.verifyPartialResponses(7);
-
-        mf.purgePartialResponses();
+        mf.verifyMessages(6, false);
 
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
                                         GREETME_RESPONSE_ACTION,
@@ -922,7 +905,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMe("three");
         greeter.greetMe("four");
         
-        awaitMessages(7, 10, 10000);
+        awaitMessages(7, 5, 10000);
         
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -952,9 +935,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // + 5 partial responses (to CSR & each of the initial greetMe messages)
         // + at least 2 further partial response (for each of the resends)
         
-        mf.verifyPartialResponses(5);
-        mf.purgePartialResponses();
-        
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
                                         GREETME_RESPONSE_ACTION, GREETME_RESPONSE_ACTION,
                                         GREETME_RESPONSE_ACTION, GREETME_RESPONSE_ACTION};
@@ -974,7 +954,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // Outbound expected:
         // CreateSequence + greetMe + CreateSequenceResponse = 3 messages
   
-        awaitMessages(3, 6);
+        awaitMessages(3, 3);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
@@ -986,9 +966,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", null}, true);
         mf.verifyLastMessage(new boolean[] {false, false, false}, true);
         mf.verifyAcknowledgements(new boolean[] {false, false, false}, true);
-
-        mf.verifyPartialResponses(3, new boolean[3]);
-        mf.purgePartialResponses();
 
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
                                         RM10Constants.CREATE_SEQUENCE_ACTION, 
@@ -1010,7 +987,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // CreateSequence and five greetMe messages
         // full and partial responses to each
 
-        awaitMessages(max + 1, (max * 2) + 1, 7500);
+        awaitMessages(max + 1, 1, 7500);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
@@ -1144,7 +1121,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
                 // three application messages plus createSequence
 
-                awaitMessages(4, 8);
+                awaitMessages(5, 4);
             }
         }
         
@@ -1166,24 +1143,21 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
                     clients[i].inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME,
                     RM10Constants.NAMESPACE_URI);
                                 
-                mf.verifyMessages(4, true);
+                mf.verifyMessages(5, true);
                 String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION, 
                                                          GREETME_ACTION,
                                                          GREETME_ACTION, 
-                                                         GREETME_ACTION};
+                                                         GREETME_ACTION,
+                                                         RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
                 mf.verifyActions(expectedActions, true);
-                mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
-                mf.verifyLastMessage(new boolean[] {false, false, false, false}, true);
-                mf.verifyAcknowledgements(new boolean[] {false, false, true, true}, true);
+                mf.verifyMessageNumbers(new String[] {null, "1", "2", "3", null}, true);
+                mf.verifyLastMessage(new boolean[] {false, false, false, false, false}, true);
+                mf.verifyAcknowledgements(new boolean[] {false, false, true, true, true}, true);
 
                 // createSequenceResponse plus 3 greetMeResponse messages plus
-                // one partial response for each of the four messages
-                // the first partial response should no include an acknowledgement, the other three should
+                // one sequence ack response.
 
-                mf.verifyMessages(8, false);
-                mf.verifyPartialResponses(4, new boolean[4]);
-
-                mf.purgePartialResponses();
+                mf.verifyMessages(4, false);
 
                 expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
                                                 GREETME_RESPONSE_ACTION, 
@@ -1226,7 +1200,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         // outbound: CreateSequence and two greetMe messages 
 
-        awaitMessages(3, 6);
+        awaitMessages(3, 3);
         
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -1245,10 +1219,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // one partial response for each of the four messages
         // the first partial response should no include an acknowledgement, the other three should
 
-        mf.verifyMessages(6, false);
-        mf.verifyPartialResponses(3, new boolean[3]);
-
-        mf.purgePartialResponses();
+        mf.verifyMessages(3, false);
 
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
                                         GREETME_RESPONSE_ACTION, 
@@ -1275,8 +1246,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // let the first sequence expire
         Thread.sleep(8000);
         
-        // expecting 3 outbounds and 5 or 6 inbounds
-        awaitMessages(3, 5, 5000);
+        // expecting 3 outbounds and 2 inbounds
+        awaitMessages(3, 2, 5000);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
@@ -1299,8 +1270,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         greeter.greetMeOneWay("three");
 
-        // expecting 2 outbounds and 4 inbounds
-        awaitMessages(2, 4, 5000);
+        // expecting 2 outbounds and 2 inbounds
+        awaitMessages(2, 2, 5000);
         
         mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -1315,8 +1286,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1"}, true);
 
         // PR, CSR, PR, ACK
-        mf.verifyMessages(4, false);
-        mf.purgePartialResponses();
+        mf.verifyMessages(2, false);
         
         expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceResponseAction(),
                                         RM10Constants.INSTANCE.getSequenceAckAction()};
@@ -1336,7 +1306,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMeOneWay("eosinophil");
         stopGreeterButNotCloseConduit();
 
-        awaitMessages(6, 8);
+        awaitMessages(6, 2);
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         
@@ -1353,12 +1323,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         // inbound: CreateSequenceResponse, out-of-band SequenceAcknowledgement
         // plus 6 partial responses
         
-        mf.verifyMessages(8, false);
-        mf.verifyMessageNumbers(new String[8], false);
-        
-        mf.verifyPartialResponses(6);
-        mf.purgePartialResponses();
-        
+        mf.verifyMessages(2, false);
+        mf.verifyMessageNumbers(new String[2], false);
         
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
                                         RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};

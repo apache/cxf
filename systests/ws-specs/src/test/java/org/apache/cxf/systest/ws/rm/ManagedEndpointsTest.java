@@ -199,9 +199,9 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
         verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L});
 
-        // 7 sec retry interval + 3 sec
-        LOG.info("waiting for 10 secs for the retry to complete ...");
-        Thread.sleep(10000);
+        // 7 sec retry interval + 5 sec
+        LOG.info("waiting for 12 secs for the retry to complete ...");
+        Thread.sleep(12000);
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());

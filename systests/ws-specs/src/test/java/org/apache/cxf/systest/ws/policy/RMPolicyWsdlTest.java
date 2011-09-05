@@ -162,7 +162,8 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         } 
 
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
-        mr.awaitMessages(5, 9, 5000);
+        mr.awaitMessages(5, 4, 5000);
+//        mr.awaitMessages(5, 9, 5000);
 
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
                                          inRecorder.getInboundMessages(),
@@ -181,9 +182,10 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         mf.verifyLastMessage(new boolean[] {false, false, false, false, false}, true);
         mf.verifyAcknowledgements(new boolean[] {false, false, false, true, true}, true);
 
-        mf.verifyMessages(9, false);
-        mf.verifyPartialResponses(5);        
-        mf.purgePartialResponses();
+        mf.verifyMessages(4, false);
+//        mf.verifyMessages(9, false);
+//        mf.verifyPartialResponses(5);      
+//        mf.purgePartialResponses();
 
         expectedActions = new String[] {
             RM10Constants.INSTANCE.getCreateSequenceResponseAction(),

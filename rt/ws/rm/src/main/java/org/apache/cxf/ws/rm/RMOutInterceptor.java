@@ -160,6 +160,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                 AttributedURIType actionURI = new AttributedURIType();
                 actionURI.setValue(constants.getSequenceAckAction());
                 maps.setAction(actionURI);
+                msg.remove(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
             }
         } 
         

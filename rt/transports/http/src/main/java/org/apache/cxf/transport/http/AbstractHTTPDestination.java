@@ -472,7 +472,7 @@ public abstract class AbstractHTTPDestination
 
         outMessage.put(RESPONSE_HEADERS_COPIED, "true");
         
-        if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
+        if (hasNoResponseContent(outMessage)) {
             response.setContentLength(0);
             response.flushBuffer();
             response.getOutputStream().close();
@@ -492,13 +492,34 @@ public abstract class AbstractHTTPDestination
         Integer i = (Integer)message.get(Message.RESPONSE_CODE);
         if (i != null) {
             return i.intValue();  
-        } else if (isOneWay(message) && !MessageUtils.isPartialResponse(message)) {
+        } else if (hasNoResponseContent(message)) {
             return HttpURLConnection.HTTP_ACCEPTED;
         } else {
             return HttpURLConnection.HTTP_OK;
         }
     }
 
+    /**
+     * Determines if the current message has no response content.
+     * The message has no response content if either:
+     *  - the request is oneway and the current message is no partial 
+     *    response or an empty partial response.
+     *  - the request is not oneway but the current message is an empty partial 
+     *    response. 
+     * @param message
+     * @return
+     */
+    private boolean hasNoResponseContent(Message message) {
+        final boolean ow = isOneWay(message);
+        final boolean pr = MessageUtils.isPartialResponse(message);
+        final boolean epr = MessageUtils.isEmptyPartialResponse(message);
+
+        //REVISIT may need to provide an option to choose other behavior?
+        // old behavior not suppressing any responses  => ow && !pr
+        // suppress empty responses for oneway calls   => ow && (!pr || epr)
+        // suppress additionally empty responses for decoupled twoway calls =>
+        return (ow && (!pr || epr)) || (!ow && epr);
+    }
     
     private HttpServletResponse getHttpResponseFromMessage(Message message) throws IOException {
         Object responseObj = message.get(HTTP_RESPONSE);
@@ -592,14 +613,14 @@ public abstract class AbstractHTTPDestination
             OutputStream responseStream = flushHeaders(outMessage);
             if (null != responseStream) {
                 wrappedStream = responseStream;
-            }            
+            }
         }
 
         /**
          * Perform any actions required on stream closure (handle response etc.)
          */
         public void close() throws IOException {
-            if (wrappedStream == null) {
+            if (!written && wrappedStream == null) {
                 OutputStream responseStream = flushHeaders(outMessage, false);
                 if (null != responseStream) {
                     wrappedStream = responseStream;

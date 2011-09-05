@@ -64,9 +64,11 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (MessageUtils.isPartialResponse(message)) {
             return;
         }
-        appMessageCount++;
-        if (0 != (appMessageCount % 2)) {
-            return;
+        synchronized (this) {
+            appMessageCount++;
+            if (0 != (appMessageCount % 2)) {
+                return;
+            }
         }
         
         InterceptorChain chain = message.getInterceptorChain();

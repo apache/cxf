@@ -381,6 +381,7 @@ public final class ContextUtils {
             // message (used to determine relatesTo etc.)
             propogateReceivedMAPs(inMAPs, partialResponse);
             partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
+            partialResponse.put(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
             Destination target = inMessage.getDestination();
             if (target == null) {
                 return;
