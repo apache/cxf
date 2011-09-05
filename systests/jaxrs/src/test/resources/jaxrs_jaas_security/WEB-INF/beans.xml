@@ -58,7 +58,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:providers>
   </jaxrs:server>
   
-  <bean id="authenticationInterceptor" class="org.apache.cxf.systest.jaxrs.security.JettyJAASLoginInterceptor">
+  <bean id="authenticationInterceptor" class="org.apache.cxf.interceptor.security.JAASLoginInterceptor">
         <property name="contextName" value="BookLogin"/>
         <property name="rolePrefix" value="ROLE_"/>
   </bean>
