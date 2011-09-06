@@ -15,55 +15,6 @@ circumstances. This handler is specified programatically.
 
 Please review the README in the samples directory before continuing.
 
-
-Prerequisite
-------------
-
-If your environment already includes cxf-manifest.jar on the CLASSPATH,
-and the JDK and ant bin directories on the PATH, it is not necessary to
-set the environment as described in the samples directory's README.
-If your environment is not properly configured, or if you are planning
-on using wsdl2java, javac, and java to build and run the demos, you must
-set the environment.
-
-
-Building and running the demo using Ant
----------------------------------------
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo. 
-The server and client targets automatically build the demo.
-
-Using either UNIX or Windows:
-
-  ant server  (from one command line window)
-  ant client  (from a second command line window)
-
-When using these ant targets, the server process uses the LoggingHandler
-and the client process uses the SmallNumberHandler. Notice that both
-the client and server consoles display short informative messages. The 
-client handler examines the operation parameters and, based on the 
-parameter values, may decide not to forward the request to the server. The server 
-handler displays the entire content of each message in its console. 
-The @HandlerChain annotation in the implementation class indicates that 
-the file demo_handler.xml includes the information needed to identify the
-handler class.
-
-  @HandlerChain(file = "../common/demo_handlers.xml", name = "DemoHandlerChain")
-
-The client side SmallNumberHandler is specified programatically:
-
-    SmallNumberHandler sh = new SmallNumberHandler();
-    List<Handler> newHandlerChain = new ArrayList<Handler>();
-    newHandlerChain.add(sh);
-    ((BindingProvider)port).getBinding().setHandlerChain(newHandlerChain);
-
-
-After running the client, terminate the server process.
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".
-
-
 Building and running the demo using Maven
 ---------------------------------------
 
@@ -84,6 +35,12 @@ files, run "mvn clean".
 
 Building the demo using wsdl2java and javac
 -------------------------------------------
+If your environment already includes cxf-manifest.jar on the CLASSPATH,
+and the JDK directory on the PATH, it is not necessary to
+set the environment as described in the samples directory's README.
+If your environment is not properly configured, or if you are planning
+on using wsdl2java, javac, and java to build and run the demos, you must
+set the environment.
 
 From the base directory of this sample (i.e., where this README file is
 located) first create the target directory build/classes and then 
@@ -154,7 +111,4 @@ The server process starts in a new command window.
 
 After running the client, terminate the server process.
 
-To remove the code generated from the WSDL file and the .class
-files, either delete the build directory and its contents or run:
 
-  ant clean

@@ -12,39 +12,8 @@ src/demo/hwDispatch/client directory.
 Please review the README in the samples directory before
 continuing.
 
-
-Prerequisite
-------------
-
-If your environment already includes cxf-manifest.jar on the
-CLASSPATH, and the JDK and ant bin directories on the PATH
-it is not necessary to set the environment as described in
-the samples directory's README.  If your environment is not
-properly configured, or if you are planning on using wsdl2java,
-javac, and java to build and run the demos, you must set the
-environment.
-
-
-Building and running the demo using Ant
----------------------------------------
-
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo. 
-The server and client targets automatically build the demo.
-
-Using either UNIX or Windows:
-
-  ant server  (from one command line window)
-  ant client  (from a second command line window)
-    
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".
-
-
 Building and running the demo using Maven
 ---------------------------------------
-
 From the base directory of this sample (i.e., where this README file is
 located), the pom.xml file is used to build and run the demo. 
 
@@ -62,6 +31,13 @@ files, run "mvn clean".
 
 Building the demo using wsdl2java and javac
 -------------------------------------------
+If your environment already includes cxf-manifest.jar on the
+CLASSPATH, and the JDK directory on the PATH
+it is not necessary to set the environment as described in
+the samples directory's README.  If your environment is not
+properly configured, or if you are planning on using wsdl2java,
+javac, and java to build and run the demos, you must set the
+environment.
 
 From the base directory of this sample (i.e., where this README file is
 located) first create the target directory build/classes and then 
@@ -131,7 +107,4 @@ For Windows (may use either forward or back slashes):
 A new command windows opens for the server process.  After running the
 client, terminate the server process by issuing Ctrl-C in its command window.
 
-To remove the code generated from the WSDL file and the .class
-files, either delete the build directory and its contents or run:
 
-  ant clean

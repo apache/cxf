@@ -16,11 +16,8 @@ The Demo consist of three parts:
 
 Code generation
 ---------------
-
 When using maven the code generation is done using the maven cxf-codegen-plugin
 (see http://cxf.apache.org/docs/maven-cxf-codegen-plugin-wsdl-to-java.html).
-In case ant is used the macro wsdl2java in the common_build.xml builds the code
-(see http://cxf.apache.org/docs/wsdl-to-java.html).
 
 The code generation is tuned using a binding.xml file. In this case the file configures that 
 normal java Date is used for xsd:date and xsd:DateTime. If this is not present then XMLGregorianCalendar
@@ -65,26 +62,6 @@ Prerequisite
 ------------
 
 Please review the README in the samples main directory before continuing.
-
-Building and running the demo using Ant
----------------------------------------
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo. 
-The server and client targets automatically build the demo.
-
-Using either UNIX or Windows:
-
-  ant server  (from one command line window)
-  ant client  (from a second command line window)
-  
-  You can also publish or consumer the demo webservice from spring
-  
-  ant spring.server  (from one command line window)
-  ant spring.client  (from a second command line window)
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean".
-
 
 Building and running the demo using Maven
 ---------------------------------------

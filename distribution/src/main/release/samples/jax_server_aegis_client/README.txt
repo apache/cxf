@@ -13,36 +13,8 @@ server, you merely need to add .aegis.xml files to specify the information
 otherwise present in the @nnotations. Note that the client needs both the WSDL
 and the .aegis.xml file to achieve coherence.
 
-Prerequisite
-------------
-
-If your environment already includes cxf-manifest.jar on the
-CLASSPATH, and the JDK and ant bin directories on the PATH
-it is not necessary to set the environment as described in
-the samples directory README.  If your environment is not
-properly configured, or if you are planning on using wsdl2java,
-javac, and java to build and run the demos, you must set the
-environment.
-
-
-Building and running the demo using Ant
----------------------------------------
-
-From the base directory of this sample (i.e., where this README file is
-located), the Ant build.xml file can be used to build and run the demo. 
-The server and client targets automatically build the demo.
-
-Using either UNIX or Windows:
-
-  ant server (from one command line window)
-  ant client (from a second command line window)
-    
-
-To remove the code generated from the WSDL file and the .class
-files, run "ant clean"
-
 Building and running the demo using Maven
----------------------------------------
+-----------------------------------------
 
 From the base directory of this sample (i.e., where this README file is
 located), the pom.xml file is used to build and run the demo. 
@@ -60,6 +32,14 @@ files, run "mvn clean".
 
 Building the demo using javac
 ------------------------------
+
+If your environment already includes cxf-manifest.jar on the
+CLASSPATH, and the JDK directory on the PATH
+it is not necessary to set the environment as described in
+the samples directory README.  If your environment is not
+properly configured, or if you are planning on using wsdl2java,
+javac, and java to build and run the demos, you must set the
+environment.
 
 From the base directory of this sample (i.e., where this README file is
 located), first create the target directory build/classes:
@@ -112,28 +92,9 @@ For Windows (may use either forward or back slashes):
 A new command windows opens for the server process.  After running the
 client, terminate the server process by issuing Ctrl-C in its command window.
 
-To remove the code generated from the WSDL file and the .class
-files, either delete the build directory and its contents or run:
-
-  ant clean
-
 
 Building and running the demo in a servlet container
 ----------------------------------------------------
-
-Please refer to samples directory README for building demo in a servlet container.
-
-Using ant, run the client application with the command:
-
-  ant client-servlet -Dbase.url=http://localhost:#
-
-Where # is the TCP/IP port used by the servlet container,
-e.g., 8080.
-
-Or
-  ant client-servlet -Dhost=localhost -Dport=8080
-
-You can ignore the -Dhost and -Dport if your tomcat setup is same, i.e ant client-servlet
 
 Using java, run the client application with the command:
 
