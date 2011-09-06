@@ -304,7 +304,8 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                 getRequestContext().put("unwrap.jaxb.element", unwrapProperty);
             }
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
-                       
+            boolean findDispatchOp = Boolean.TRUE.equals(getRequestContext().get("find.dispatch.operation"));
+            
             if (opName == null) {
                 opName = isOneWay ? INVOKE_ONEWAY_QNAME : INVOKE_QNAME;
             } else {
@@ -315,28 +316,31 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                 }
             }
             
-            //CXF-2836 : find the operation for the dispatched object 
-            boolean wsaEnabled = false;
-            // the feature list to be searched is the endpoint and the bus's lists
-            List<AbstractFeature> endpointFeatures 
-                = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
-            List<AbstractFeature> allFeatures;
-            if (client.getBus().getFeatures() != null) {
-                allFeatures = new ArrayList<AbstractFeature>(endpointFeatures.size() 
-                    + client.getBus().getFeatures().size());
-                allFeatures.addAll(endpointFeatures);
-                allFeatures.addAll(client.getBus().getFeatures());
-            } else {
-                allFeatures = endpointFeatures;
-            }
-            for (AbstractFeature feature : allFeatures) {
-                if (feature instanceof WSAddressingFeature) {
-                    wsaEnabled = true; 
+            //CXF-2836 : find the operation for the dispatched object
+            // if findDispatchOp is already true, skip the addressing feature lookup.
+            // if the addressing feature is enabled, set findDispatchOp to true
+            if (!findDispatchOp) {
+                // the feature list to be searched is the endpoint and the bus's lists
+                List<AbstractFeature> endpointFeatures 
+                    = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
+                List<AbstractFeature> allFeatures;
+                if (client.getBus().getFeatures() != null) {
+                    allFeatures = new ArrayList<AbstractFeature>(endpointFeatures.size() 
+                        + client.getBus().getFeatures().size());
+                    allFeatures.addAll(endpointFeatures);
+                    allFeatures.addAll(client.getBus().getFeatures());
+                } else {
+                    allFeatures = endpointFeatures;
+                }
+                for (AbstractFeature feature : allFeatures) {
+                    if (feature instanceof WSAddressingFeature) {
+                        findDispatchOp = true; 
+                    }
                 }
             }
             Map<String, QName> payloadOPMap = 
                 createPayloadEleOpNameMap(client.getEndpoint().getBinding().getBindingInfo());
-            if (wsaEnabled && !payloadOPMap.isEmpty()) {
+            if (findDispatchOp && !payloadOPMap.isEmpty()) {
                 String payloadElementName = null;              
                 if (obj instanceof javax.xml.transform.Source) {
                     try {
@@ -360,10 +364,15 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
 
                 if (payloadElementName != null) {
                     QName dispatchedOpName = payloadOPMap.get(payloadElementName);
-                    BindingOperationInfo bop = client.getEndpoint().getBinding().getBindingInfo()
-                        .getOperation(opName);
-                    if (bop != null) {
-                        bop.setProperty("dispatchToOperation", dispatchedOpName);
+                    if (null != dispatchedOpName) {
+                        BindingOperationInfo bop = client.getEndpoint().getBinding().getBindingInfo()
+                          .getOperation(opName);
+                        BindingOperationInfo dbop = client.getEndpoint().getBinding().getBindingInfo()
+                          .getOperation(dispatchedOpName);
+                        if (bop != null) {
+                            // set the actual binding operation object to this dispatch operation
+                            bop.setProperty("dispatchToOperation", dbop);
+                        }
                     }
                 }
             } 

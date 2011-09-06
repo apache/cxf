@@ -778,21 +778,12 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             op = ((UnwrappedOperationInfo)op).getWrappedOperation();
         }
         //CXF-2836:To correct the wsa:action header value for dispatch client
-        if (bop.getProperty("dispatchToOperation") != null) {
+        BindingOperationInfo dbop = (BindingOperationInfo)bop.getProperty("dispatchToOperation");
+        if (null != dbop) {
             //modifies the bop and bp to the value of dispatch client really invokes, 
             //This helps corrct the wsa:action header value
-            QName opName = (QName)bop.getProperty("dispatchToOperation");
-            OperationInfo dispatchOP = bop.getBinding().getService().getInterface().getOperation(opName);
-            BindingOperationInfo dispachBop = null;
-            for (BindingOperationInfo binfo : bop.getBinding().getOperations()) {
-                if (binfo.getOperationInfo().getName().toString().equals(opName.toString())) {
-                    dispachBop = binfo;
-                }
-            }
-            if (dispachBop != null && dispatchOP != null) {
-                bop = dispachBop;
-                op = dispatchOP;
-            }
+            bop = dbop;
+            op = dbop.getOperationInfo();
         }
         
         String actionUri = null;
