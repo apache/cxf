@@ -439,7 +439,31 @@ public class MAPAggregatorTest extends Assert {
         assertSame(replyTo, props.getReplyTo());
     }
 
+    @Test
+    public void testGetActionUriForNormalOp() throws Exception {
+        Message message = setUpMessage(true, true, false, true, true);
+        String action = aggregator.getActionUri(message, false);
+        control.verify();
+        assertEquals("http://foo/bar/SEI/opRequest", action);
+    }
     
+    @Test
+    public void testGetActionUriForDispatchOp() throws Exception {
+        Message message = setUpMessage(true, true, false, true, true);
+        BindingOperationInfo dbop = setUpBindingOperationInfo("http://foo/bar/d",
+                                                              "opDRequest",
+                                                              "opDResponse",
+                                                              "opDFault", 
+                                                              DSEI.class.getMethod("op", new Class[0]));
+
+        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+        bop.setProperty("dispatchToOperation", dbop);
+
+        String action = aggregator.getActionUri(message, false);
+        control.verify();
+        assertEquals("http://foo/bar/d/DSEI/opDRequest", action);
+    }
+
     private Message setUpMessage(boolean requestor, 
                                  boolean outbound,
                                  boolean oneway) 
@@ -583,17 +607,17 @@ public class MAPAggregatorTest extends Assert {
         List<ExtensibilityElement> endpointExts =
             new ArrayList<ExtensibilityElement>();
         endpointInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
-        EasyMock.expectLastCall().andReturn(endpointExts);
+        EasyMock.expectLastCall().andReturn(endpointExts).anyTimes();
         BindingInfo bindingInfo = control.createMock(BindingInfo.class);
         endpointInfo.getBinding();
         EasyMock.expectLastCall().andReturn(bindingInfo).anyTimes();
         bindingInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
-        EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST);
+        EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST).anyTimes();
         ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
         endpointInfo.getService();
-        EasyMock.expectLastCall().andReturn(serviceInfo).times(2);
+        EasyMock.expectLastCall().andReturn(serviceInfo).anyTimes();
         serviceInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
-        EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST);
+        EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST).anyTimes();
         ExtensibilityElement ext = 
             control.createMock(ExtensibilityElement.class);
         if (usingAddressing) {
@@ -601,7 +625,7 @@ public class MAPAggregatorTest extends Assert {
                 ? Names.WSAW_USING_ADDRESSING_QNAME 
                 : new QName(SOAP_NAMESPACE, "encodingStyle");
             ext.getElementType();
-            EasyMock.expectLastCall().andReturn(elementType);
+            EasyMock.expectLastCall().andReturn(elementType).anyTimes();
             endpointExts.add(ext);
         }
     }
@@ -786,19 +810,10 @@ public class MAPAggregatorTest extends Assert {
     
     private void setUpMethod(Message message, Exchange exchange, Method method) {
         setUpMessageExchange(message, exchange);
-        ServiceInfo si = new ServiceInfo();
-        InterfaceInfo iinf = new InterfaceInfo(si, new QName("http://foo/bar", "SEI"));
-        OperationInfo opInfo = iinf.addOperation(new QName("http://foo/bar", method.getName()));
-        opInfo.setProperty(Method.class.getName(), method);
-        opInfo.setInput("opRequest",
-                        opInfo.createMessage(new QName("http://foo/bar", "opRequest"), Type.INPUT));
-        opInfo.setOutput("opResponse",
-                         opInfo.createMessage(new QName("http://foo/bar", "opResponse"), Type.INPUT));
-        FaultInfo finfo = opInfo.addFault(new QName("http://foo/bar", "opFault"),
-                new QName("http://foo/bar", "opFault"));
-        finfo.addMessagePart("fault");
-        
-        BindingOperationInfo bindingOpInfo = new TestBindingOperationInfo(opInfo);
+        BindingOperationInfo bindingOpInfo = setUpBindingOperationInfo("http://foo/bar",
+                                                                       "opRequest",
+                                                                       "opResponse",
+                                                                       "opFault", method);
         setUpExchangeGet(exchange, BindingOperationInfo.class, bindingOpInfo);
         // Usual fun with EasyMock not always working as expected
         //BindingOperationInfo bindingOpInfo =
@@ -808,6 +823,25 @@ public class MAPAggregatorTest extends Assert {
         //EasyMock.expectLastCall().andReturn(opInfo);
         //opInfo.getProperty(EasyMock.eq(Method.class.getName()));
         //EasyMock.expectLastCall().andReturn(method);
+    }
+    
+    private BindingOperationInfo setUpBindingOperationInfo(String nsuri, 
+                                                           String opreq,
+                                                           String opresp,
+                                                           String opfault, Method method) {
+        ServiceInfo si = new ServiceInfo();
+        InterfaceInfo iinf = new InterfaceInfo(si, 
+                                               new QName(nsuri, method.getDeclaringClass().getSimpleName()));
+        OperationInfo opInfo = iinf.addOperation(new QName(nsuri, method.getName()));
+        opInfo.setProperty(Method.class.getName(), method);
+        opInfo.setInput(opreq, opInfo.createMessage(new QName(nsuri, opreq), Type.INPUT));
+        opInfo.setOutput(opresp, opInfo.createMessage(new QName(nsuri, opresp), Type.INPUT));
+        FaultInfo finfo = opInfo.addFault(new QName(nsuri, opfault), new QName(nsuri, opfault));
+        finfo.addMessagePart("fault");
+        
+        BindingOperationInfo bindingOpInfo = new TestBindingOperationInfo(opInfo);
+        
+        return bindingOpInfo;
     }
     
     private Message getMessage() {
@@ -936,6 +970,12 @@ public class MAPAggregatorTest extends Assert {
     private interface SEI {
         @RequestWrapper(targetNamespace = "http://foo/bar", className = "SEI", localName = "opRequest")
         @ResponseWrapper(targetNamespace = "http://foo/bar", className = "SEI", localName = "opResponse")
+        String op();
+    }
+
+    private interface DSEI {
+        @RequestWrapper(targetNamespace = "http://foo/bar/d", className = "DSEI", localName = "opDRequest")
+        @ResponseWrapper(targetNamespace = "http://foo/bar/d", className = "DSEI", localName = "opDResponse")
         String op();
     }
     
