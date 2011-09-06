@@ -94,11 +94,10 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
         root.appendChild(docEl);
 
         if (signLater) {
-            // it appears all the above manipulation with 
-            // adopting and removing nodes
-            // leaves some stale refs/state and thus the digest ends uo being wrong 
-            // on the server side if XML sig is applied later in the enveloped mode
-            // TODO: this is not critical now - but figure iut if we can avoid copying
+            // It appears adopting and removing nodes
+            // leaves some stale refs/state with adopted nodes and thus the digest ends up
+            // being wrong on the server side if XML sig is applied later in the enveloped mode
+            // TODO: this is not critical now - but figure out if we can avoid copying
             // DOMs
             CachedOutputStream bos = new CachedOutputStream();
             DOMUtils.writeXml(newDoc, bos);

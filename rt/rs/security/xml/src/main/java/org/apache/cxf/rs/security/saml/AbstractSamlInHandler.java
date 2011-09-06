@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -42,10 +43,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
+import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.saml.SAMLKeyInfo;
@@ -54,6 +57,7 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.ws.security.validate.Validator;
+import org.apache.xml.security.signature.XMLSignature;
 
 
 public abstract class AbstractSamlInHandler implements RequestHandler {
@@ -66,10 +70,16 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     }
     
     private Validator samlValidator = new SamlAssertionValidator();
+    private SecurityContextProvider scProvider = new SecurityContextProviderImpl(); 
     
     public void setValidator(Validator validator) {
         samlValidator = validator;
     }
+    
+    public void setSecurityContextProvider(SecurityContextProvider p) {
+        scProvider = p;
+    }
+    
     
     protected void validateToken(Message message, InputStream tokenStream) {
         
@@ -109,10 +119,10 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                 }
                 
                 Certificate[] tlsCerts = getTLSCertificates(message);
-                if (!checkHolderOfKey(assertion, null, tlsCerts)) {
+                if (!checkHolderOfKey(message, assertion, tlsCerts)) {
                     throwFault("Holder Of Key claim fails", null);
                 }
-                if (!checkSenderVouches(assertion, null, tlsCerts)) {
+                if (!checkSenderVouches(message, assertion, tlsCerts)) {
                     throwFault("Sender vouchers claim fails", null);
                 }
                 if (!checkBearer(assertion, tlsCerts)) {
@@ -123,11 +133,19 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                 // from the xml-sig envelope which this assertion must be contained in 
                 throwFault("Unsigned Assertion can only be validated with two-way TLS", null);
             }
+            setSecurityContext(message, assertion);
+            
         } catch (Exception ex) {
             throwFault("Assertion can not be validated", ex);
         }
     }
     
+    protected void setSecurityContext(Message message, AssertionWrapper wrapper) {
+        if (scProvider != null) {
+            SecurityContext sc = scProvider.getSecurityContext(message, wrapper);
+            message.setContent(SecurityContext.class, sc);
+        }
+    }
     
     private Certificate[] getTLSCertificates(Message message) {
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
@@ -142,83 +160,58 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
     }
     
-    // TODO: Most of this code can make it into rt/security to minimize the duplication
-    //       between ws/security and rs/security
-    
-    // WSSecurityEngineResult is HashMap extension and can be used as such
     /**
      * Check the sender-vouches requirements against the received assertion. The SAML
      * Assertion and the request body must be signed by the same signature.
      */
     private boolean checkSenderVouches(
+        Message message,
         AssertionWrapper assertionWrapper,
-        List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {
         //
         // If we have a 2-way TLS connection, then we don't have to check that the
-        // assertion + SOAP body are signed
+        // assertion + body are signed
+        
+        // If no body is available (ex, with GET) then consider validating that
+        // the base64-encoded token is signed by the same signature
         //
         if (tlsCerts != null && tlsCerts.length > 0) {
             return true;
         }
-        return false;
-//        List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
-//        for (String confirmationMethod : confirmationMethods) {
-//            if (OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
-//                if (signedResults == null || signedResults.isEmpty()) {
-//                    return false;
-//                }
-//                if (!checkAssertionAndBodyAreSigned(assertionWrapper)) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
+        List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
+        for (String confirmationMethod : confirmationMethods) {
+            if (OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
+                XMLSignature sig = message.getContent(XMLSignature.class);
+                if (sig == null) {
+                    return false;
+                }
+                try {
+                    byte[] sigValue1 = sig.getSignatureValue();
+                    byte[] sigValue2 = assertionWrapper.getSignatureValue();
+                    return Arrays.equals(sigValue1, sigValue2);
+                } catch (Exception ex) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
-    private boolean checkBearer(AssertionWrapper assertionWrapper, Certificate[] tlsCerts) {
-        
-        // Check Recipient attribute. Perhaps, if STS validator is injected, then it can forward 
-        // this assertion to IDP which will confirm being Recipient 
-        
-        // It seems if we have a signed assertion and a payload then bearer may get validated same
-        // way as sender-vouches.
-        
-        if (tlsCerts != null && tlsCerts.length > 0) {
-            return true;
-        } 
-        
-        
-        return false;
-        
-        
-        //List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
-        //      for (String confirmationMethod : confirmationMethods) {
-        //          if (isMethodBearer(confirmationMethod)) {
-        //
-        //          }
-        //      }
-        
-         
-    }
     
-    //private boolean isMethodBearer(String confirmMethod) {
-    //    return confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
-    //            && confirmMethod.endsWith(":cm:bearer");
-    //}
     
-    public boolean checkHolderOfKey(AssertionWrapper assertionWrapper,
-                                    List<WSSecurityEngineResult> signedResults,
+    public boolean checkHolderOfKey(Message message,
+                                    AssertionWrapper assertionWrapper,
                                     Certificate[] tlsCerts) {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
         for (String confirmationMethod : confirmationMethods) {
             if (OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
-                if (tlsCerts == null && (signedResults == null || signedResults.isEmpty())) {
+                XMLSignature sig = message.getContent(XMLSignature.class);
+                if (tlsCerts == null || sig == null) {
                     return false;
                 }
                 SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-                if (!compareCredentials(subjectKeyInfo, signedResults, tlsCerts)) {
+                if (!compareCredentials(subjectKeyInfo, sig, tlsCerts)) {
                     return false;
                 }
             }
@@ -236,12 +229,11 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
      */
     private boolean compareCredentials(
         SAMLKeyInfo subjectKeyInfo,
-        List<WSSecurityEngineResult> signedResults,
+        XMLSignature sig,
         Certificate[] tlsCerts
     ) {
         X509Certificate[] subjectCerts = subjectKeyInfo.getCerts();
         PublicKey subjectPublicKey = subjectKeyInfo.getPublicKey();
-        byte[] subjectSecretKey = subjectKeyInfo.getSecret();
         
         //
         // Try to match the TLS certs first
@@ -257,13 +249,10 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         //
         // Now try the message-level signatures
         //
-        for (WSSecurityEngineResult signedResult : signedResults) {
+        try {
             X509Certificate[] certs =
-                (X509Certificate[])signedResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-            PublicKey publicKey =
-                (PublicKey)signedResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-            byte[] secretKey =
-                (byte[])signedResult.get(WSSecurityEngineResult.TAG_SECRET);
+                new X509Certificate[] {sig.getKeyInfo().getX509Certificate()};
+            PublicKey publicKey = sig.getKeyInfo().getPublicKey();
             if (certs != null && certs.length > 0 && subjectCerts != null
                 && subjectCerts.length > 0 && certs[0].equals(subjectCerts[0])) {
                 return true;
@@ -271,33 +260,26 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
             if (publicKey != null && publicKey.equals(subjectPublicKey)) {
                 return true;
             }
-            if (checkSecretKey(secretKey, subjectSecretKey, signedResult)) {
+        } catch (Exception ex) {
+            // ignore
+        }
+        
+        return false;
+    }
+    
+    private boolean checkBearer(AssertionWrapper assertionWrapper, Certificate[] tlsCerts) {
+        List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
+        for (String confirmationMethod : confirmationMethods) {
+            if (isMethodBearer(confirmationMethod)) {
+                // do some more validation - time based, etc
                 return true;
             }
         }
-        return false;
+        return true;
     }
     
-    private boolean checkSecretKey(
-        byte[] secretKey,
-        byte[] subjectSecretKey,
-        WSSecurityEngineResult signedResult
-    ) {
-        if (secretKey != null && subjectSecretKey != null 
-            && Arrays.equals(secretKey, subjectSecretKey)) {
-            return true;
-//            else {
-//                Principal principal =
-//                    (Principal)signedResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-//                if (principal instanceof WSDerivedKeyTokenPrincipal) {
-//                    secretKey = ((WSDerivedKeyTokenPrincipal)principal).getSecret();
-//                    if (Arrays.equals(secretKey, subjectSecretKey)) {
-//                        return true;
-//                    }
-//                }
-//            }
-        }
-        return false;
+    private boolean isMethodBearer(String confirmMethod) {
+        return confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
+                && confirmMethod.endsWith(":cm:bearer");
     }
-    
 }

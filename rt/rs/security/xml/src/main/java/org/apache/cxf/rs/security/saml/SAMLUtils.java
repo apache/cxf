@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.saml;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -31,11 +33,18 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.saml.assertion.Claim;
+import org.apache.cxf.rs.security.saml.assertion.Claims;
+import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
+import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
+import org.opensaml.saml2.core.NameID;
+import org.opensaml.xml.XMLObject;
 
 public final class SAMLUtils {
     private static final Logger LOG = 
@@ -43,6 +52,43 @@ public final class SAMLUtils {
     
     private SAMLUtils() {
         
+    }
+    
+    public static Subject getSubject(Message message, AssertionWrapper assertionW) {
+        org.opensaml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
+        Subject subject = new Subject();
+        NameID nameId = s.getNameID();
+        subject.setNameQualifier(nameId.getNameQualifier());
+        // if format is transient then we may need to use STSClient
+        // to request an alternate name from IDP
+        subject.setNameFormat(nameId.getFormat());
+        
+        subject.setName(nameId.getValue());
+        subject.setSpId(nameId.getSPProvidedID());
+        subject.setSpQualifier(nameId.getSPNameQualifier());
+        return subject;
+    }
+    
+    
+    public static Claims getClaims(AssertionWrapper assertionW) {
+        // Should we just do a simple DOM parsing without even relying on
+        // OpenSaml
+        List<Claim> claims = new ArrayList<Claim>();
+        List<AttributeStatement> statements = assertionW.getSaml2().getAttributeStatements();
+        for (AttributeStatement as : statements) {
+            for (Attribute atr : as.getAttributes()) {
+                Claim claim = new Claim();
+                claim.setName(atr.getName());
+                claim.setNameFormat(atr.getNameFormat());
+                claim.setFriendlyName(atr.getFriendlyName());
+                for (XMLObject o : atr.getAttributeValues()) {
+                    String attrValue = o.getDOM().getTextContent();
+                    claim.getValues().add(attrValue);
+                }
+                claims.add(claim);
+            }
+        }
+        return new Claims(claims);
     }
     
     public static AssertionWrapper createAssertion(Message message) throws Fault {

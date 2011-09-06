@@ -49,11 +49,15 @@ import org.apache.xml.security.utils.Constants;
 public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestHandler {
     
     private boolean removeSignature = true;
+    private boolean persistSignature = true;
     
     public void setRemoveSignature(boolean remove) {
         this.removeSignature = remove;
     }
     
+    public void setPersistSignature(boolean persist) {
+        this.persistSignature = persist;
+    }
     
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
         
@@ -105,6 +109,9 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
             // validate trust 
             new TrustValidator().validateTrust(crypto, cert, keyInfo.getPublicKey());
             
+            if (persistSignature) {
+                message.put(XMLSignature.class, signature);
+            }
         } catch (Exception ex) {
             throwFault("Signature validation failed", ex);
         }
