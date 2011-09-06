@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.osgi.framework.ServiceReference;
 import org.springframework.beans.Mergeable;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -47,6 +48,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     ApplicationContext context;
     ConfiguredBeanLocator orig;
     Set<String> passThroughs = new HashSet<String>();
+    boolean osgi = true;
     
     public SpringBeanLocator(ApplicationContext ctx, Bus bus) {
         context = ctx;
@@ -95,8 +97,33 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             lst.add(context.getBean(n, type));
         }
         lst.addAll(orig.getBeansOfType(type));
+        if (lst.isEmpty()) {
+            tryOSGI(lst, type);
+        }
         return lst;
     }
+    private <T> void tryOSGI(Collection<T> lst, Class<T> type) {
+        if (!osgi) {
+            return;
+        }
+        try {
+            //use a little reflection to allow this to work without the spring-dm jars
+            //for the non-osgi cases
+            Object bc = context.getClass().getMethod("getBundleContext").invoke(context);
+            Object o = bc.getClass()
+                .getMethod("getServiceReference", String.class).invoke(bc, type.getName());
+            if (o != null) {
+                o = bc.getClass().getMethod("getService", ServiceReference.class).invoke(bc, o);
+                lst.add(type.cast(o));
+            }
+        } catch (NoSuchMethodException e) {
+            osgi = false;
+            //not using OSGi
+        } catch (Throwable e) {
+            //ignore
+        }
+    }
+    
 
     public <T> boolean loadBeansOfType(Class<T> type,
                                        BeanLoaderListener<T> listener) {
