@@ -56,12 +56,10 @@ public class SAMLSecurityContext implements SecurityContext {
         
     }
     
-    @Override
     public Principal getUserPrincipal() {
         return p;
     }
 
-    @Override
     public boolean isUserInRole(String role) {
         if (rolesClaim == null) {
             return false;
