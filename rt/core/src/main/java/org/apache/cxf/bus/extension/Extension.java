@@ -31,6 +31,7 @@ public class Extension {
     protected String className;
     protected ClassLoader classloader;
     protected Class<?> clazz;
+    protected Class<?> intf;
     protected String interfaceName;
     protected boolean deferred;
     protected Collection<String> namespaces = new ArrayList<String>();
@@ -38,6 +39,20 @@ public class Extension {
     
     public Extension() {
     }
+    
+    public Extension(Class<?> cls, Class<?> inf) {
+        clazz = cls;
+        intf = inf;
+        interfaceName = inf.getName();
+        className = cls.getName();
+        classloader = cls.getClassLoader();
+    }
+    public Extension(Class<?> cls) {
+        clazz = cls;
+        className = cls.getName();
+        classloader = cls.getClassLoader();
+    }
+    
     public Extension(Extension ext) {
         className = ext.className;
         interfaceName = ext.interfaceName;
@@ -45,6 +60,7 @@ public class Extension {
         namespaces = ext.namespaces;
         obj = ext.obj;
         clazz = ext.clazz;
+        intf = ext.intf;
         classloader = ext.classloader;
     }
     
@@ -59,6 +75,7 @@ public class Extension {
         Extension ext = new Extension(this);
         ext.obj = null;
         ext.clazz = null;
+        ext.intf = null;
         return ext;
     }
     
@@ -162,26 +179,31 @@ public class Extension {
     }
     
     public Class loadInterface(ClassLoader cl) {
-        Class<?> cls = null;
+        if (intf != null) {
+            return intf;
+        }
         if (classloader != null) {
             try {
-                return classloader.loadClass(interfaceName);
+                intf = classloader.loadClass(interfaceName);
+                if (intf != null) {
+                    return intf;
+                }
             } catch (ClassNotFoundException nex) {
                 //ignore, fall into the stuff below
             }
         }                
 
         try {
-            cls = cl.loadClass(interfaceName);
+            intf = cl.loadClass(interfaceName);
         } catch (ClassNotFoundException ex) {
             try {
                 // using the extension classloader as a fallback
-                cls = this.getClass().getClassLoader().loadClass(interfaceName);
+                intf = this.getClass().getClassLoader().loadClass(interfaceName);
             } catch (ClassNotFoundException nex) {
                 throw new ExtensionException(nex);
             }
         }
-        return cls;
+        return intf;
     }
     
     

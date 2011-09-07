@@ -45,6 +45,7 @@ public class BlueprintBus extends ExtensionManagerBus {
         super.setExtension(new BundleDelegatingClassLoader(c.getBundle(), 
                                                            this.getClass().getClassLoader()),
                            ClassLoader.class);
+        super.setExtension(c, BundleContext.class);
     }
     public void setBlueprintContainer(BlueprintContainer con) {
         container = con;

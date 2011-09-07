@@ -76,37 +76,6 @@ public class CXFBusLifeCycleManagerTest extends Assert {
     }
     
     @Test
-    public void testDuplicateRegistration() {
-        
-        BusLifeCycleListener listener1 = EasyMock.createMock(BusLifeCycleListener.class);
-        CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
-
-        mgr.registerLifeCycleListener(listener1);
-        mgr.registerLifeCycleListener(listener1);
-
-        EasyMock.reset(listener1);
-        listener1.initComplete();
-        EasyMock.expectLastCall().times(2);
-        EasyMock.replay(listener1);
-        mgr.initComplete();
-        EasyMock.verify(listener1);
-
-        EasyMock.reset(listener1);
-        listener1.preShutdown();
-        EasyMock.expectLastCall().times(2);
-        EasyMock.replay(listener1);
-        mgr.preShutdown();
-        EasyMock.verify(listener1);
-
-        EasyMock.reset(listener1);
-        listener1.postShutdown();
-        EasyMock.expectLastCall().times(2);
-        EasyMock.replay(listener1);
-        mgr.postShutdown();
-        EasyMock.verify(listener1);
-    }
-    
-    @Test
     public void testMultipleListeners() {
        
         IMocksControl ctrl = EasyMock.createStrictControl();
