@@ -32,7 +32,7 @@
         <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-ws-metadata_2.0_spec/${cxf.geronimo.ws.metadata.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.0/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${cxf.servicemix.specs.version}</bundle>
-        <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/${cxf.servicemix.specs.version}</bundle>
+        <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-jaxws_2.2_spec/${cxf.specs.jaxws.api.version}</bundle>
         <bundle>mvn:http://download.java.net/maven/2!javax.mail/mail/${cxf.javax.mail.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1/${cxf.servicemix.specs.version}</bundle>
     </feature>
