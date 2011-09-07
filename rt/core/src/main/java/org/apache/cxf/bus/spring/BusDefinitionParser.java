@@ -64,10 +64,6 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         if (!StringUtils.isEmpty(id)) {
             bean.addPropertyValue("id", id);
         }
-        //element.removeAttribute("bus");
-        //element.removeAttribute("name");
-        //element.removeAttribute("id");
-        
 
         bean.addConstructorArgValue(bus);
         bean.setLazyInit(false);

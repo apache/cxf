@@ -53,7 +53,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     }
     
     protected final Map<Class, Object> extensions;
-    private String id;
+    protected String id;
     private BusState state;      
     private Collection<AbstractFeature> features;
     private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();

@@ -100,5 +100,20 @@ public class SpringBus extends ExtensionManagerBus
         ctx.close();
         super.destroyBeans();
     }
+    
+    public String getId() {
+        if (id == null) {
+            try {
+                Class<?> cls = Class.forName("org.osgi.framework.BundleContext");
+                Object o = getExtension(cls);
+                Object o2 = o.getClass().getMethod("getBundle").invoke(o);
+                String s = (String)o2.getClass().getMethod("getSymbolicName").invoke(o2);
+                id = s + "-" + DEFAULT_BUS_ID + Integer.toString(this.hashCode());
+            } catch (Throwable t) {
+                id = super.getId();
+            }
+        }
+        return id;
+    }
 
 }
