@@ -65,6 +65,7 @@ public class BusRegistrationTest extends Assert {
         final SpringBusFactory factory = new SpringBusFactory();
 
         serverBus =  factory.createBus("managed-spring.xml");
+        assertEquals("CXF-Test-Bus", serverBus.getId());
         serverIM = serverBus.getExtension(InstrumentationManager.class);
         assertTrue("Instrumentation Manager should not be null", serverIM != null);
         Thread t = new Thread(new Runnable() {

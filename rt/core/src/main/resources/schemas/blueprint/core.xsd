@@ -117,7 +117,24 @@
         </xsd:element>
       </xsd:all>
       <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
-      <xsd:attribute name="bus" type="xsd:string" />        
+      <xsd:attribute name="bus" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+              Name of the bus that is being configured.  Defaults to "cxf", but can 
+              be used to specify a different bus to allow for multiple Bus instances
+              within an application.  
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>        
+      <xsd:attribute name="id" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>
+              Unique identifier for the particular Bus instance.  Mostly used by the
+              JMX management and OSGi service registry to provide some level of 
+              persitent naming to the Bus instances.  The default is "cxf" + random number. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>        
     </xsd:complexType>
   </xsd:element>
 </xsd:schema>
