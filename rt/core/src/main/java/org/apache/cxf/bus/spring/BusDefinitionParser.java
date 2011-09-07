@@ -37,6 +37,7 @@ import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
@@ -52,11 +53,22 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         String bus = element.getAttribute("bus");        
         if (StringUtils.isEmpty(bus)) {
+            bus = element.getAttribute("name");
+        }
+        if (StringUtils.isEmpty(bus)) {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY);
         } else {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus);
         }
-        element.removeAttribute("bus");
+        String id = element.getAttribute("id");
+        if (!StringUtils.isEmpty(id)) {
+            bean.addPropertyValue("id", id);
+        }
+        //element.removeAttribute("bus");
+        //element.removeAttribute("name");
+        //element.removeAttribute("id");
+        
+
         bean.addConstructorArgValue(bus);
         bean.setLazyInit(false);
         super.doParse(element, ctx, bean);
@@ -77,20 +89,28 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             bean.addPropertyValue("properties", map);
         }
     }
-    
-    protected String getIdOrName(Element elem) {
-        String id = super.getIdOrName(elem); 
-        if (StringUtils.isEmpty(id)) {
-            id = Bus.DEFAULT_BUS_ID + ".config" + counter.getAndIncrement();
+    @Override
+    protected String resolveId(Element element, AbstractBeanDefinition definition, 
+                               ParserContext ctx) {
+        String bus = element.getAttribute("bus");        
+        if (StringUtils.isEmpty(bus)) {
+            bus = element.getAttribute("name");
         }
-        return id;
+        if (StringUtils.isEmpty(bus)) {
+            bus = Bus.DEFAULT_BUS_ID + ".config" + counter.getAndIncrement();
+        } else {
+            bus = bus + ".config";
+        }
+        return bus;
     }
+    
     @NoJSR250Annotations
     public static class BusConfig extends AbstractBasicInterceptorProvider
         implements ApplicationContextAware {
         
         CXFBusImpl bus;
         String busName;
+        String id;
         Collection<AbstractFeature> features;
         Map<String, Object> properties;
         
@@ -119,6 +139,9 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
             if (!getOutFaultInterceptors().isEmpty()) {
                 b.setOutFaultInterceptors(getOutFaultInterceptors());
+            }
+            if (!StringUtils.isEmpty(id)) {
+                b.setId(id);
             }
             bus = b;
         }
@@ -222,6 +245,10 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             } else {
                 this.properties = s;
             }
+        }
+        
+        public void setId(String s) {
+            id = s;
         }
 
 

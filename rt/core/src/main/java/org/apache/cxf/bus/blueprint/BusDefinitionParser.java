@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -35,10 +36,14 @@ public class BusDefinitionParser
     
     public Metadata parse(Element element, ParserContext context) {
         String bname = element.hasAttribute("bus") ? element.getAttribute("bus") : "cxf";
+        String id = element.hasAttribute("id") ? element.getAttribute("id") : null;
         MutableBeanMetadata cxfBean = getBus(context, bname);
         parseAttributes(element, context, cxfBean);
         parseChildElements(element, context, cxfBean);
         context.getComponentDefinitionRegistry().removeComponentDefinition(bname);
+        if (!StringUtils.isEmpty(id)) {
+            cxfBean.addProperty("id", createValue(context, id));
+        }
         return cxfBean;
     }
     
