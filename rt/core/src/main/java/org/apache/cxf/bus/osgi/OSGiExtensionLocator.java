@@ -142,7 +142,6 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         public static final String CONTEXT_NAME_PROPERTY = "cxf.bus.id";
         
         Bus bus;
-        BundleContext context;
         ServiceRegistration service;
  
         public OSGIBusListener(Bus b) {
@@ -156,19 +155,23 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         }
  
         public void initComplete() {
-            context = bus.getExtension(BundleContext.class);
-            Properties props = new Properties();
-            props.put(CONTEXT_SYMBOLIC_NAME_PROPERTY, context.getBundle().getSymbolicName());
-            props.put(CONTEXT_VERSION_PROPERTY, getBundleVersion(context.getBundle()));
-            props.put(CONTEXT_NAME_PROPERTY, bus.getId());
-
-            service = context.registerService(Bus.class.getName(), bus, props);
+            BundleContext context = bus.getExtension(BundleContext.class);
+            if (context != null) {
+                Properties props = new Properties();
+                props.put(CONTEXT_SYMBOLIC_NAME_PROPERTY, context.getBundle().getSymbolicName());
+                props.put(CONTEXT_VERSION_PROPERTY, getBundleVersion(context.getBundle()));
+                props.put(CONTEXT_NAME_PROPERTY, bus.getId());
+    
+                service = context.registerService(Bus.class.getName(), bus, props);
+            }
         }
         public void preShutdown() {
         }
         public void postShutdown() {
-            service.unregister();
-            service = null;
+            if (service != null) {
+                service.unregister();
+                service = null;
+            }
         }
     }
     
