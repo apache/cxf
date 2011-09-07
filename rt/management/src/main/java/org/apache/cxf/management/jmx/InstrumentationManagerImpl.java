@@ -117,9 +117,13 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     }
     
     @PostConstruct     
-    public void init() {    
+    public void init() {
+        if (bus != null && bus.getExtension(MBeanServer.class) != null) {
+            enabled = true;
+            createMBServerConnectorFactory = false;
+            mbs = bus.getExtension(MBeanServer.class);
+        }
         if (isEnabled()) {
-            
             if (mbs == null) {
                 // return platform mbean server if the option is specified.
                 if (usePlatformMBeanServer) {
