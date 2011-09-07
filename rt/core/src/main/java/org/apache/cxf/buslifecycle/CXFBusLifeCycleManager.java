@@ -19,7 +19,6 @@
 
 package org.apache.cxf.buslifecycle;
 
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.Resource;
@@ -30,7 +29,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 @NoJSR250Annotations(unlessNull = "bus")
 public class CXFBusLifeCycleManager implements BusLifeCycleManager {
 
-    private final List<BusLifeCycleListener> listeners;
+    private final CopyOnWriteArrayList<BusLifeCycleListener> listeners;
     private Bus bus;
     private boolean preShutdownCalled;
     private boolean postShutdownCalled;
@@ -56,7 +55,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
      * org.apache.cxf.buslifecycle.BusLifeCycleListener)
      */
     public void registerLifeCycleListener(BusLifeCycleListener listener) {
-        listeners.add(listener);
+        listeners.addIfAbsent(listener);
         
     }
 
@@ -77,7 +76,6 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     }
     
     public void preShutdown() {
-        // TODO inverse order of registration?
         if (!preShutdownCalled) { 
             preShutdownCalled = true;
             for (BusLifeCycleListener listener : listeners) {
@@ -92,7 +90,6 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         }
         if (!postShutdownCalled) {
             postShutdownCalled = true;
-            // TODO inverse order of registration?
             for (BusLifeCycleListener listener : listeners) {
                 listener.postShutdown();
             }

@@ -22,22 +22,31 @@ package org.apache.cxf.bus.osgi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionFragmentParser;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.framework.Version;
 
 /**
  * 
@@ -47,6 +56,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     private ConcurrentMap<Long, List<Extension>> extensions 
         = new ConcurrentHashMap<Long, List<Extension>>();
     private long id;
+    private Extension listener;
 
     /** {@inheritDoc}*/
     public void bundleChanged(BundleEvent event) {
@@ -65,6 +75,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     public void start(BundleContext context) throws Exception {
         context.addBundleListener(this);
         id = context.getBundle().getBundleId();
+        registerBusListener();
         for (Bundle bundle : context.getBundles()) {
             if ((bundle.getState() == Bundle.RESOLVED 
                 || bundle.getState() == Bundle.STARTING 
@@ -79,11 +90,19 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     /** {@inheritDoc}*/
     public void stop(BundleContext context) throws Exception {
         context.removeBundleListener(this);
+        unregisterBusListener();
         while (!extensions.isEmpty()) {
             unregister(extensions.keySet().iterator().next());
         }
     }
-
+    private void registerBusListener() {
+        listener = new Extension(OSGIBusListener.class);
+        ExtensionRegistry.addExtensions(Collections.singletonList(listener));
+    }
+    private void unregisterBusListener() {
+        ExtensionRegistry.removeExtensions(Collections.singletonList(listener));
+        listener = null;
+    }
     
     protected void register(final Bundle bundle) throws IOException {
         List<Extension> list = extensions.get(bundle.getBundleId());
@@ -116,6 +135,43 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             ExtensionRegistry.removeExtensions(list);
         }
     }
+    
+    public static class OSGIBusListener implements BusLifeCycleListener {
+        public static final String CONTEXT_SYMBOLIC_NAME_PROPERTY = "cxf.context.symbolicname";
+        public static final String CONTEXT_VERSION_PROPERTY = "cxf.context.version";
+        public static final String CONTEXT_NAME_PROPERTY = "cxf.bus.id";
+        
+        Bus bus;
+        BundleContext context;
+        ServiceRegistration service;
+ 
+        public OSGIBusListener(Bus b) {
+            bus = b;
+            bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+        }
+        private Version getBundleVersion(Bundle bundle) {
+            Dictionary headers = bundle.getHeaders();
+            String version = (String) headers.get(Constants.BUNDLE_VERSION);
+            return (version != null) ? Version.parseVersion(version) : Version.emptyVersion;
+        }
+ 
+        public void initComplete() {
+            context = bus.getExtension(BundleContext.class);
+            Properties props = new Properties();
+            props.put(CONTEXT_SYMBOLIC_NAME_PROPERTY, context.getBundle().getSymbolicName());
+            props.put(CONTEXT_VERSION_PROPERTY, getBundleVersion(context.getBundle()));
+            props.put(CONTEXT_NAME_PROPERTY, bus.getId());
+
+            service = context.registerService(Bus.class.getName(), bus, props);
+        }
+        public void preShutdown() {
+        }
+        public void postShutdown() {
+            service.unregister();
+            service = null;
+        }
+    }
+    
     public class OSGiExtension extends Extension {
         final Bundle bundle;
         public OSGiExtension(Extension e, Bundle b) {

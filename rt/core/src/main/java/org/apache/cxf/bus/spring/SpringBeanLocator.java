@@ -19,6 +19,7 @@
 
 package org.apache.cxf.bus.spring;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +49,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     ApplicationContext context;
     ConfiguredBeanLocator orig;
     Set<String> passThroughs = new HashSet<String>();
+    Object bundleContext;
     boolean osgi = true;
     
     public SpringBeanLocator(ApplicationContext ctx, Bus bus) {
@@ -74,8 +76,26 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             
             ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
         }
+        
+        loadOSGIContext(bus);
     }
 
+    private void loadOSGIContext(Bus b) {
+        try {
+            //use a little reflection to allow this to work without the spring-dm jars
+            //for the non-osgi cases
+            Method m = context.getClass().getMethod("getBundleContext");
+            bundleContext = m.invoke(context);
+            @SuppressWarnings("unchecked")
+            Class<Object> cls = (Class<Object>)m.getReturnType();
+            b.setExtension(bundleContext, cls);
+        } catch (Throwable t) {
+            //ignore
+            osgi = false;
+        }
+    }
+    
+    
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
         Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
@@ -109,11 +129,12 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         try {
             //use a little reflection to allow this to work without the spring-dm jars
             //for the non-osgi cases
-            Object bc = context.getClass().getMethod("getBundleContext").invoke(context);
-            Object o = bc.getClass()
-                .getMethod("getServiceReference", String.class).invoke(bc, type.getName());
+
+            Object o = bundleContext.getClass()
+                .getMethod("getServiceReference", String.class).invoke(bundleContext, type.getName());
             if (o != null) {
-                o = bc.getClass().getMethod("getService", ServiceReference.class).invoke(bc, o);
+                o = bundleContext.getClass().getMethod("getService", ServiceReference.class)
+                    .invoke(bundleContext, o);
                 lst.add(type.cast(o));
             }
         } catch (NoSuchMethodException e) {

@@ -103,7 +103,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
         
         for (Map.Entry<String, Extension> ext : ExtensionRegistry.getRegisteredExtensions().entrySet()) {
-            if (all.containsKey(ext.getKey())) {
+            if (!all.containsKey(ext.getKey())) {
                 all.put(ext.getKey(), ext.getValue());
             }
         }
