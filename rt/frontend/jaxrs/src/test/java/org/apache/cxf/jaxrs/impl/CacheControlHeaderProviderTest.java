@@ -19,11 +19,13 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.core.CacheControl;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -96,6 +98,54 @@ public class CacheControlHeaderProviderTest extends Assert {
         CacheControl cc = new CacheControl();
         cc.setNoCache(false);
         assertEquals("no-transform", cc.toString());
+    }
+    
+    @Test
+    public void testMultiplePrivateFields() {
+        CacheControl cc = new CacheControl();
+        cc.setPrivate(true);
+        cc.getPrivateFields().add("a");
+        cc.getPrivateFields().add("b");
+        assertTrue(cc.toString().contains("private=\"a,b\""));
+    }
+    
+    @Test
+    public void testMultipleNoCacheFields() {
+        CacheControl cc = new CacheControl();
+        cc.setNoCache(true);
+        cc.getNoCacheFields().add("c");
+        cc.getNoCacheFields().add("d");
+        assertTrue(cc.toString().contains("no-cache=\"c,d\""));
+    }
+     
+    @Test
+    public void testReadMultiplePrivateAndNoCacheFields() {
+        String s = "private=\"foo1,foo2\",no-store,no-transform,"
+            + "must-revalidate,proxy-revalidate,max-age=2,s-maxage=3,no-cache=\"bar1,bar2\","
+            + "ext=1";
+        CacheControl cc = CacheControl.valueOf(s);
+        
+        assertTrue(cc.isPrivate());
+        List<String> privateFields = cc.getPrivateFields();
+        assertEquals(2, privateFields.size());
+        assertEquals("foo1", privateFields.get(0));
+        assertEquals("foo2", privateFields.get(1));
+        assertTrue(cc.isNoCache());
+        List<String> noCacheFields = cc.getNoCacheFields();
+        assertEquals(2, noCacheFields.size());
+        assertEquals("bar1", noCacheFields.get(0));
+        assertEquals("bar2", noCacheFields.get(1));
+        
+        assertTrue(cc.isNoStore());
+        assertTrue(cc.isNoTransform());
+        assertTrue(cc.isMustRevalidate());
+        assertTrue(cc.isProxyRevalidate());
+        assertEquals(2, cc.getMaxAge());
+        assertEquals(3, cc.getSMaxAge());
+        
+        Map<String, String> exts = cc.getCacheExtension();
+        assertEquals(1, exts.size());
+        assertEquals("1", exts.get("ext"));
     }
     
     @Test
