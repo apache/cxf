@@ -20,9 +20,12 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -35,6 +38,11 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
     public static final String CACHE_CONTROL_SEPARATOR_PROPERTY =
         "org.apache.cxf.http.cache-control.separator";
     private static final String DEFAULT_SEPARATOR = ",";
+    
+    private static final String COMPLEX_HEADER_EXPRESSION = 
+        "(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w]+)|([\\w-]+))";
+    private static final Pattern COMPLEX_HEADER_PATTERN =
+        Pattern.compile(COMPLEX_HEADER_EXPRESSION);
     
     private static final String PUBLIC = "public";
     private static final String PRIVATE = "private";
@@ -57,10 +65,9 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         boolean proxyRevalidate = false;
         int maxAge = -1;
         int sMaxAge = -1;
-       
-        String separator = getSeparator();
+        Map<String, String> extensions = new HashMap<String, String>();
         
-        String[] tokens = c.split(separator);
+        String[] tokens = getTokens(c);
         for (String rawToken : tokens) {
             String token = rawToken.trim();
             if (token.startsWith(MAX_AGE)) {
@@ -83,6 +90,10 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             }  else if (token.startsWith(NO_CACHE)) {
                 noCache = true;
                 addFields(noCacheFields, token);
+            } else {
+                String[] extPair = token.split("=");
+                String value = extPair.length == 2 ? extPair[1] : "";
+                extensions.put(extPair[0], value);
             }
         }
         
@@ -97,10 +108,28 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         cc.getNoCacheFields().addAll(noCacheFields);
         cc.setNoStore(noStore);
         cc.setNoTransform(noTransform);
+        cc.getCacheExtension().putAll(extensions);
         
         return cc;
     }
 
+    private String[] getTokens(String c) {
+        if (c.contains("\"")) {
+            List<String> values = new ArrayList<String>(4);
+            Matcher m = COMPLEX_HEADER_PATTERN.matcher(c);
+            while (m.find()) {
+                String val = m.group().trim();
+                if (val.length() > 0) {
+                    values.add(val);
+                }
+            }
+            return values.toArray(new String[]{});
+        } else {
+            String separator = getSeparator();
+            return c.split(separator);
+        }
+    }
+    
     public String toString(CacheControl c) {
         String separator = getSeparator();
         
@@ -152,19 +181,22 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
     }
     
     private static void addFields(List<String> fields, String token) {
-        String f = null;
         int i = token.indexOf('=');
         if (i != -1) {
-            f = i == token.length()  + 1 ? "" : token.substring(i + 1);
+            String f = i == token.length() + 1 ? "" : token.substring(i + 1);
             if (f.length() < 2 || !f.startsWith("\"") || !f.endsWith("\"")) {
-                f = "";
+                return;
             } else {
                 f = f.length() == 2 ? "" : f.substring(1, f.length() - 1);
+                if (f.length() > 0) {
+                    String[] values = f.split(",");
+                    for (String v : values) {
+                        fields.add(v.trim());
+                    }
+                }
             }
         }
-        if (f != null) {
-            fields.add(f);
-        }
+        
     }
 
     private static void handleFields(List<String> fields, StringBuilder sb) {
@@ -172,12 +204,14 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             return;
         }
         sb.append('=');
+        sb.append('\"');
         for (Iterator<String> it = fields.iterator(); it.hasNext();) {
-            sb.append('\"').append(it.next()).append('\"');
+            sb.append(it.next());
             if (it.hasNext()) {
                 sb.append(',');
             }
         }
+        sb.append('\"');
     }
     
     protected String getSeparator() {
