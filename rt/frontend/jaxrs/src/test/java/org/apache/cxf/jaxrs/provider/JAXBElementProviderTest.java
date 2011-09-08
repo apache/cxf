@@ -323,6 +323,19 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteWithCustomPrefixes() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setNamespacePrefixes(
+            Collections.singletonMap("http://tags", "prefix"));
+        TagVO2 tag = new TagVO2("a", "b");
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        assertTrue(bos.toString().contains("prefix:thetag"));
+    }
+    
+    @Test
     public void testWriteWithoutXmlRootElement() throws Exception {
         doTestWriteWithoutXmlRootElement("SuperBook", false, false);
     }
