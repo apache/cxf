@@ -470,6 +470,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                                 = (SecurityContextToken)wser
                                     .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
                             message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
+                            byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                            if (secret != null) {
+                                SecurityToken token = new SecurityToken(tok.getIdentifier());
+                                token.setToken(tok.getElement());
+                                token.setSecret(secret);
+                                token.setTokenType(WSConstants.WSC_SCT);
+                                message.getExchange().put(SecurityConstants.TOKEN, token);
+                            }
                             found = true;
                         }
                     }
