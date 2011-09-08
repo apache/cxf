@@ -79,11 +79,15 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                     Marshaller.JAXB_SCHEMA_LOCATION});
     
     private Map<String, Object> mProperties = Collections.emptyMap();
+    private Map<String, String> nsPrefixes = Collections.emptyMap();
     
     public JAXBElementProvider() {
         
     }
     
+    public void setNamespacePrefixes(Map<String, String> prefixes) {
+        nsPrefixes = prefixes;
+    }
     
     @Override
     protected boolean canBeReadAsJaxbElement(Class<?> type) {
@@ -320,14 +324,19 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         ms.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         if (ns.length() > 0) {
             Map<String, String> map = Collections.singletonMap(ns, "ns1");
-            NamespaceMapper nsMapper = new NamespaceMapper(map);
-            try {
-                ms.setProperty("com.sun.xml.bind.namespacePrefixMapper", nsMapper);
-            } catch (PropertyException ex) {
-                ms.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", nsMapper);
-            }
+            map.putAll(nsPrefixes);
+            setNamespaceMapper(ms, map);
         }
         marshal(obj, cls, genericType, enc, os, mt, ms);
+    }
+    
+    protected static void setNamespaceMapper(Marshaller ms, Map<String, String> map) throws Exception {
+        NamespaceMapper nsMapper = new NamespaceMapper(map);
+        try {
+            ms.setProperty("com.sun.xml.bind.namespacePrefixMapper", nsMapper);
+        } catch (PropertyException ex) {
+            ms.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", nsMapper);
+        }
     }
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
@@ -338,6 +347,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
+        if (!nsPrefixes.isEmpty()) {
+            setNamespaceMapper(ms, nsPrefixes);
+        }
         addAttachmentMarshaller(ms);
         marshal(obj, cls, genericType, enc, os, mt, ms);
     }
