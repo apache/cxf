@@ -20,12 +20,19 @@
 package org.apache.cxf.systest.jaxrs.security.saml;
 
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.common.CryptoLoader;
+import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
@@ -33,6 +40,7 @@ import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean.Decision;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
@@ -78,7 +86,25 @@ public class SamlCallbackHandler implements CallbackHandler {
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
-                // SubjectConfirmationData - not possible to set yet
+                if (SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
+                    
+                    Message m = PhaseInterceptorChain.getCurrentMessage();
+                    try {
+                        CryptoLoader loader = new CryptoLoader();
+                        Crypto crypto = loader.getCrypto(m, 
+                                                         SecurityConstants.SIGNATURE_CRYPTO,
+                                                         SecurityConstants.SIGNATURE_PROPERTIES);
+                        X509Certificate cert = 
+                            SecurityUtils.getCertificates(crypto, 
+                                SecurityUtils.getUserName(m, crypto, "ws-security.signature.username"))[0];
+                        
+                        KeyInfoBean keyInfo = new KeyInfoBean();
+                        keyInfo.setCertificate(cert);
+                        subjectBean.setKeyInfo(keyInfo);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
                 callback.setSubject(subjectBean);
                 
                 ConditionsBean conditions = new ConditionsBean();

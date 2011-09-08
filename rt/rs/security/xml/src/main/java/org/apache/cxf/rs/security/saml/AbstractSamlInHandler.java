@@ -25,7 +25,6 @@ import java.io.InputStreamReader;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -34,7 +33,7 @@ import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -96,8 +95,9 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     protected void validateToken(Message message, Element tokenElement) {
         try {
             AssertionWrapper assertion = new AssertionWrapper(tokenElement);
+            
+            RequestData data = new RequestData();
             if (assertion.isSigned()) {
-                RequestData data = new RequestData();
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
                 data.setWssConfig(cfg);
                 data.setCallbackHandler(SecurityUtils.getCallbackHandler(message, this.getClass()));
@@ -112,31 +112,32 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
                 assertion.verifySignature(data, null);
                 assertion.parseHOKSubject(data, null);
+            }
+            if (samlValidator != null) {
                 Credential credential = new Credential();
                 credential.setAssertion(assertion);
-                if (samlValidator != null) {
-                    samlValidator.validate(credential, data);
-                }
-                
-                Certificate[] tlsCerts = getTLSCertificates(message);
-                if (!checkHolderOfKey(message, assertion, tlsCerts)) {
-                    throwFault("Holder Of Key claim fails", null);
-                }
-                if (!checkSenderVouches(message, assertion, tlsCerts)) {
-                    throwFault("Sender vouchers claim fails", null);
-                }
-                if (!checkBearer(assertion, tlsCerts)) {
-                    throwFault("Bearer claim fails", null);
-                }
-            } else if (getTLSCertificates(message) == null) {
-                // alternatively ensure that the unsigned assertion inherits the signature
-                // from the xml-sig envelope which this assertion must be contained in 
-                throwFault("Unsigned Assertion can only be validated with two-way TLS", null);
+                samlValidator.validate(credential, data);
             }
+                
+            
+            checkSubjectConfirmationData(message, assertion);
             setSecurityContext(message, assertion);
             
         } catch (Exception ex) {
             throwFault("Assertion can not be validated", ex);
+        }
+    }
+    
+    protected void checkSubjectConfirmationData(Message message, AssertionWrapper assertion) {
+        Certificate[] tlsCerts = getTLSCertificates(message);
+        if (!checkHolderOfKey(message, assertion, tlsCerts)) {
+            throwFault("Holder Of Key claim fails", null);
+        }
+        if (!checkSenderVouches(message, assertion, tlsCerts)) {
+            throwFault("Sender vouchers claim fails", null);
+        }
+        if (!checkBearer(assertion, tlsCerts)) {
+            throwFault("Bearer claim fails", null);
         }
     }
     
@@ -164,7 +165,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
      * Check the sender-vouches requirements against the received assertion. The SAML
      * Assertion and the request body must be signed by the same signature.
      */
-    private boolean checkSenderVouches(
+    protected boolean checkSenderVouches(
         Message message,
         AssertionWrapper assertionWrapper,
         Certificate[] tlsCerts
@@ -182,16 +183,24 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
         for (String confirmationMethod : confirmationMethods) {
             if (OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
-                XMLSignature sig = message.getContent(XMLSignature.class);
-                if (sig == null) {
-                    return false;
-                }
-                try {
-                    byte[] sigValue1 = sig.getSignatureValue();
-                    byte[] sigValue2 = assertionWrapper.getSignatureValue();
-                    return Arrays.equals(sigValue1, sigValue2);
-                } catch (Exception ex) {
-                    return false;
+                
+                Element signedElement = message.getContent(Element.class);
+                Node assertionParent = assertionWrapper.getElement().getParentNode();
+                
+                // if we have a shared parent signed node then we can assume both 
+                // this SAML assertion and the main payload have been signed by the same
+                // signature
+                if (assertionParent != signedElement) {
+                    // if not then try to compare if the same cert/key was used to sign SAML token
+                    // and the payload
+                    XMLSignature signature = message.getContent(XMLSignature.class);
+                    if (signature == null) {
+                        return false;
+                    }
+                    SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSignatureKeyInfo();
+                    if (!compareCredentials(subjectKeyInfo, signature, tlsCerts)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -200,7 +209,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     
     
     
-    public boolean checkHolderOfKey(Message message,
+    protected boolean checkHolderOfKey(Message message,
                                     AssertionWrapper assertionWrapper,
                                     Certificate[] tlsCerts) {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
@@ -267,13 +276,14 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         return false;
     }
     
-    private boolean checkBearer(AssertionWrapper assertionWrapper, Certificate[] tlsCerts) {
+    protected boolean checkBearer(AssertionWrapper assertionWrapper, Certificate[] tlsCerts) {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
         for (String confirmationMethod : confirmationMethods) {
-            if (isMethodBearer(confirmationMethod)) {
-                // do some more validation - time based, etc
-                return true;
-            }
+            boolean isBearer = isMethodBearer(confirmationMethod);
+            if (isBearer && !assertionWrapper.isSigned() && (tlsCerts == null || tlsCerts.length == 0)) {
+                return false;
+            } 
+            // do some more validation - time based, etc
         }
         return true;
     }

@@ -67,8 +67,8 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         }
 
         Element root = doc.getDocumentElement();
-        Element sigElement = getSignatureElement(root);
-        if (sigElement == null) {
+        Element signatureElement = getSignatureElement(root);
+        if (signatureElement == null) {
             throwFault("XML Signature is not available", null);
         }
         
@@ -89,7 +89,7 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         boolean valid = false;
         Reference ref = null;
         try {
-            XMLSignature signature = new XMLSignature(sigElement, "");    
+            XMLSignature signature = new XMLSignature(signatureElement, "");    
             // See also WSS4J SAMLUtil.getCredentialFromKeyInfo 
             KeyInfo keyInfo = signature.getKeyInfo();
             
@@ -104,13 +104,14 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
             }
             // is this call redundant given that signature.checkSignatureValue uses References ?
             ref = getReference(signature);
-            validateReference(root, ref);
+            Element signedElement = validateReference(root, ref);
             
             // validate trust 
             new TrustValidator().validateTrust(crypto, cert, keyInfo.getPublicKey());
             
             if (persistSignature) {
-                message.put(XMLSignature.class, signature);
+                message.setContent(XMLSignature.class, signature);
+                message.setContent(Element.class, signedElement);
             }
         } catch (Exception ex) {
             throwFault("Signature validation failed", ex);
@@ -122,7 +123,7 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
             if (!isEnveloping(root)) {
                 Element signedEl = getSignedElement(root, ref);
                 signedEl.removeAttribute("ID");
-                root.removeChild(sigElement);
+                root.removeChild(signatureElement);
             } else {
                 Element actualBody = getActualBody(root);
                 Document newDoc = DOMUtils.createDocument();
@@ -180,26 +181,22 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         return null;
     }
     
-    protected void validateReference(Element root, Reference ref) {
-        boolean detached = false;
-        if (!isEnveloping(root)) {
-            String rootId = root.getAttribute("ID");
-            String refId = ref.getURI();
-            if (refId.length() == 0 && rootId.length() == 0) {
-                // or fragment must be expected ?
-                return;
-            }
-            if (!refId.startsWith("#") || refId.length() <= 1) {
-                throwFault("Only local Signature References are supported", null);
-            }
-            
-            Element signedEl = getSignedElement(root, ref);
-            if (signedEl != null) {
-                detached = signedEl != root;
-            } else {
-                throwFault("Signature Reference ID is invalid", null);
-            }
+    protected Element validateReference(Element root, Reference ref) {
+        boolean enveloped = false;
+        
+        String refId = ref.getURI();
+        
+        if (!refId.startsWith("#") || refId.length() <= 1) {
+            throwFault("Only local Signature References are supported", null);
         }
+        
+        Element signedEl = getSignedElement(root, ref);
+        if (signedEl != null) {
+            enveloped = signedEl == root;
+        } else {
+            throwFault("Signature Reference ID is invalid", null);
+        }
+        
         
         Transforms transforms = null;
         try {
@@ -207,7 +204,7 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
         } catch (XMLSecurityException ex) {
             throwFault("Signature transforms can not be obtained", ex);
         }
-        if (!isEnveloping(root) && !detached) {
+        if (enveloped) {
             boolean isEnveloped = false;
             for (int i = 0; i < transforms.getLength(); i++) {
                 try {
@@ -224,6 +221,7 @@ public class XmlSigInHandler extends AbstractXmlSecInHandler implements RequestH
                 throwFault("Only enveloped signatures are currently supported", null);
             }
         }
+        return signedEl;
     }
     
     private Element getSignedElement(Element root, Reference ref) {

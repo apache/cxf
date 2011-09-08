@@ -59,6 +59,6 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
         // parse/decipher subject name id, or check attributes like 
         // givenName, email, firstName, etc
         
-        // this can be overidden, but consider also introducing dedicated handlers 
+        // this can be overridden, but consider also introducing dedicated handlers 
     }
 }
