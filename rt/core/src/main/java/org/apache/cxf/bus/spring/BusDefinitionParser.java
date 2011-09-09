@@ -54,6 +54,10 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         String bus = element.getAttribute("bus");        
         if (StringUtils.isEmpty(bus)) {
             bus = element.getAttribute("name");
+            if (StringUtils.isEmpty(bus)) {
+                element.setAttribute("bus", bus);
+                element.removeAttribute("name");
+            }
         }
         if (StringUtils.isEmpty(bus)) {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY);
