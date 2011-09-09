@@ -74,6 +74,7 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeLater;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -223,6 +224,28 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         
     }
     @Test
+    @Ignore
+    public void testSOAPMessageInvokeToOneWay() throws Exception {
+        SOAPService service = new SOAPService(null, SERVICE_NAME);
+        service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + greeterPort 
+                        + "/SOAPDispatchService/SoapDispatchPort");
+        assertNotNull(service);
+        
+        Dispatch<SOAPMessage> disp = service
+            .createDispatch(PORT_NAME, SOAPMessage.class, Service.Mode.MESSAGE);
+
+        //message is "one way", but there really isn't a way for us to know that
+        //as we don't have a wsdl or other source of operation information to
+        //compare the payload to.
+        InputStream is1 = getClass().getResourceAsStream("resources/GreetMe1WDocLiteralReq2.xml");
+        SOAPMessage soapReqMsg1 = MessageFactory.newInstance().createMessage(null, is1);
+        assertNotNull(soapReqMsg1);
+        
+        //we'll just call invoke
+        disp.invoke(soapReqMsg1);
+    }
+    @Test
     public void testSOAPMessage() throws Exception {
 
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
@@ -250,7 +273,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             .getTextContent().trim());
 
         // Test oneway
-        InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq1.xml");
+        InputStream is1 = getClass().getResourceAsStream("resources/GreetMe1WDocLiteralReq2.xml");
         SOAPMessage soapReqMsg1 = MessageFactory.newInstance().createMessage(null, is1);
         assertNotNull(soapReqMsg1);
         disp.invokeOneWay(soapReqMsg1);
