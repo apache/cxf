@@ -241,9 +241,25 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMe1WDocLiteralReq2.xml");
         SOAPMessage soapReqMsg1 = MessageFactory.newInstance().createMessage(null, is1);
         assertNotNull(soapReqMsg1);
-        
+
+        //Version 1:
         //we'll just call invoke
-        disp.invoke(soapReqMsg1);
+        //disp.invoke(soapReqMsg1);
+        
+        
+        //Version 2:
+        //We want to handle things asynchronously
+        AsyncHandler<SOAPMessage> callback = new AsyncHandler<SOAPMessage>() {
+            public void handleResponse(Response<SOAPMessage> res) {
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+        };
+        synchronized (callback) {
+            disp.invokeAsync(soapReqMsg1, callback);
+            callback.wait();
+        }
     }
     @Test
     public void testSOAPMessage() throws Exception {
