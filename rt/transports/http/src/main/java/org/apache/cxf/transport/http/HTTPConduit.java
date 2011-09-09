@@ -2266,6 +2266,13 @@ public class HTTPConduit
         protected void handleResponseInternal() throws IOException {
             Exchange exchange = outMessage.getExchange();
             int responseCode = connection.getResponseCode();
+            // handling the particalResponse by default
+            boolean handlingParticalResponse = true;
+            // this option will be set to false when we leverage the CXF transport to send stream message
+            if (Boolean.FALSE.equals(outMessage.get(Message.HANDLING_PARTIAL_RESPONSE_MESSAGE))) {
+                handlingParticalResponse = false;
+            }
+            
             if (outMessage != null && exchange != null) {
                 exchange.put(Message.RESPONSE_CODE, responseCode);
             }
@@ -2304,7 +2311,8 @@ public class HTTPConduit
 
             InputStream in = null;
             // oneway or decoupled twoway calls may expect HTTP 202 with no content
-            if (isOneway(exchange) || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
+            if (isOneway(exchange) 
+                || (HttpURLConnection.HTTP_ACCEPTED == responseCode && handlingParticalResponse)) {
                 in = getPartialResponse(connection, responseCode);
                 if (in == null) {
                     // oneway operation or decoupled MEP without 
