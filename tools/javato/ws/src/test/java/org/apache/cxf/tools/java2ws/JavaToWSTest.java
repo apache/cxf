@@ -112,7 +112,20 @@ public class JavaToWSTest extends ToolTestBase {
         assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
                    str.indexOf("helloString/Name") > -1);
     }
-
+    @Test
+    public void testCXF1450() throws Exception {
+        String[] args = new String[] {
+            "-wsdl", "-wrapperbean",
+            "-s", output.getPath(), 
+            "-o", output.getPath() + "/tmp.wsdl", 
+            "org.apache.cxf.tools.fortest.cxf1450.WebParamService"
+        };
+        JavaToWS.main(args);
+        File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf1450/jaxws/HelloStringResponse.java");
+        String str = FileUtils.getStringFromFile(wrapper);
+        assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
+                   str.indexOf("helloString/Name") > -1);
+    }
     private void checkStdErr() {
         String err = getStdErr();
         if (err != null) {
