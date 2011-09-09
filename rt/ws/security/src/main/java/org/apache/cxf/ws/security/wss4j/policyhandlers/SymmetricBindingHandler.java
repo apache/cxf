@@ -402,7 +402,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 // 7.7 Encrypted Key reference
                 SecurityTokenReference tokenRef = new SecurityTokenReference(saaj.getSOAPPart());
                 tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
-                tokenRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                String tokenType = encrTok.getTokenType();
+                if (tokenType == null) {
+                    tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+                }
+                tokenRef.addTokenType(tokenType);
                 dkEncr.setExternalKey(encrTok.getSecret(), tokenRef.getElement());
             } else {
                 if (attached) {
@@ -424,8 +428,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             
             if (encrTok.getSHA1() != null) {
-                dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                        + WSConstants.ENC_KEY_VALUE_TYPE);
+                String tokenType = encrTok.getTokenType();
+                if (tokenType == null) {
+                    tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+                }
+                dkEncr.setCustomValueType(tokenType);
             } else {
                 String tokenType = encrTok.getTokenType();
                 if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
@@ -599,7 +606,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             SecurityTokenReference tokenRef = new SecurityTokenReference(doc);
             if (tok.getSHA1() != null) {
                 tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
-                tokenRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                String tokenType = tok.getTokenType();
+                if (tokenType == null) {
+                    tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+                }
+                tokenRef.addTokenType(tokenType);
             }
             dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
         } else {
@@ -614,7 +625,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         dkSign.setDerivedKeyLength(sbinding.getAlgorithmSuite().getSignatureDerivedKeyLength() / 8);
         if (tok.getSHA1() != null) {
             //Set the value type of the reference
-            dkSign.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+            String tokenType = tok.getTokenType();
+            if (tokenType == null) {
+                tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+            }
+            dkSign.setCustomValueType(tokenType);
         } else {
             String tokenType = tok.getTokenType();
             if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)

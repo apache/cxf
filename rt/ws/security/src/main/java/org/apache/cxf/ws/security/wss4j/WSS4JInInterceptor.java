@@ -483,7 +483,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 
                 String id = pc.getIdentifier();
                 
-                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getType())) {
+                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getType())
+                    || WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(pc.getType())) {
                     for (SecurityToken token : store.getValidTokens()) {
                         if (id.equals(token.getSHA1())) {
                             pc.setKey(token.getSecret());

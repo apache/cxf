@@ -32,6 +32,8 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.KerberosSecurity;
+import org.apache.ws.security.util.Base64;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * A class that obtains a ticket from a KDC and wraps it in a SecurityToken object.
@@ -120,6 +122,8 @@ public class KerberosClient implements Configurable {
         if (secretKey != null) {
             token.setSecret(secretKey.getEncoded());
         }
+        String sha1 = Base64.encode(WSSecurityUtil.generateDigest(bst.getToken()));
+        token.setSHA1(sha1);
         token.setTokenType(bst.getValueType());
 
         return token;
