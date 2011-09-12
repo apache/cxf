@@ -136,6 +136,11 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                 // context
                 seq.nextMessageNumber(inSeqId, inMessageNumber, isLastMessage);
                 
+                if (Boolean.TRUE.equals(msg.getContextualProperty(RMManager.WSRM_LAST_MESSAGE_PROPERTY))) {
+                    // mark the message as the last one
+                    seq.setLastMessage(true);
+                }
+                
                 rmpsOut.setSequence(seq);
 
                 // if this was the last message in the sequence, reset the

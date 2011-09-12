@@ -331,8 +331,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
                                                  RM10Constants.TERMINATE_SEQUENCE_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", null, null, "1", null}, true);
-        // TODO: temporarily commented-out until WS-RM last message support added back in
-//        mf.verifyLastMessage(new boolean[] {false, true, false, false, true, false}, true);
+        mf.verifyLastMessage(new boolean[] {false, true, false, false, true, false}, true);
 
         // createSequenceResponse message plus partial responses to
         // greetMeOneWay and terminateSequence ||: 2
@@ -347,6 +346,55 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, null, null, null}, false);
         mf.verifyLastMessage(new boolean[] {false, false, false, false}, false);
         mf.verifyAcknowledgements(new boolean[] {false, true, false, true}, false);
+    }
+
+    @Test
+    public void testOnewayAnonymousAcksClientSequenceDemarcation() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
+        greeter.greetMeOneWay("once");
+
+        ((BindingProvider)greeter).getRequestContext().
+            put(RMManager.WSRM_LAST_MESSAGE_PROPERTY, Boolean.TRUE);
+        greeter.greetMeOneWay("twice");
+
+        ((BindingProvider)greeter).getRequestContext().
+            remove(RMManager.WSRM_LAST_MESSAGE_PROPERTY);
+        greeter.greetMeOneWay("thrice");
+
+        // three application messages plus two createSequence plus one
+        // terminateSequence
+
+        awaitMessages(6, 5);
+        
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
+            inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
+        
+        mf.verifyMessages(6, true);
+        String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION, 
+                                                 GREETMEONEWAY_ACTION,
+                                                 GREETMEONEWAY_ACTION,
+                                                 RM10Constants.TERMINATE_SEQUENCE_ACTION,
+                                                 RM10Constants.CREATE_SEQUENCE_ACTION, 
+                                                 GREETMEONEWAY_ACTION};
+
+        mf.verifyActions(expectedActions, true);
+        mf.verifyMessageNumbers(new String[] {null, "1", "2", null, null, "1"}, true);
+        mf.verifyLastMessage(new boolean[] {false, false, true, false, false, false}, true);
+
+        // createSequenceResponse message plus partial responses to
+        // greetMeOneWay and terminateSequence ||: 2
+
+        mf.verifyMessages(5, false);
+
+        expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
+                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION, 
+                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION, 
+                                        RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION, 
+                                        RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
+        mf.verifyActions(expectedActions, false);
+        mf.verifyMessageNumbers(new String[] {null, null, null, null, null}, false);
+        mf.verifyLastMessage(new boolean[] {false, false, false, false, false}, false);
+        mf.verifyAcknowledgements(new boolean[] {false, true, true, false, true}, false);
     }
    
     @Test
