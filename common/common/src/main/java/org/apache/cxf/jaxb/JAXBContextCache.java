@@ -158,7 +158,9 @@ public final class JAXBContextCache {
         if (cachedContextAndSchemas != null) {
             context = cachedContextAndSchemas.getContext();
             if (context ==  null) {
-                JAXBCONTEXT_CACHE.remove(cachedContextAndSchemas.getClasses());
+                synchronized (JAXBCONTEXT_CACHE) {
+                    JAXBCONTEXT_CACHE.remove(cachedContextAndSchemas.getClasses());
+                }
                 cachedContextAndSchemas = null;
             }
         }
