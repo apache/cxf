@@ -29,6 +29,7 @@ public class SamlToken extends Token {
     private boolean useSamlVersion11Profile10;
     private boolean useSamlVersion11Profile11;
     private boolean useSamlVersion20Profile11;
+    private boolean requireKeyIdentifierReference;
 
     public SamlToken(SPConstants version) {
         super(version);
@@ -56,6 +57,14 @@ public class SamlToken extends Token {
 
     public void setUseSamlVersion20Profile11(boolean useSamlVersion20Profile11) {
         this.useSamlVersion20Profile11 = useSamlVersion20Profile11;
+    }
+    
+    public boolean isRequireKeyIdentifierReference() {
+        return requireKeyIdentifierReference;
+    }
+
+    public void setRequireKeyIdentifierReference(boolean requireKeyIdentifierReference) {
+        this.requireKeyIdentifierReference = requireKeyIdentifierReference;
     }
     
     public QName getName() {
@@ -106,8 +115,24 @@ public class SamlToken extends Token {
                 // <sp:WssSamlV11Token11 />
                 writer.writeStartElement(prefix, SPConstants.SAML_11_TOKEN_11, namespaceURI);
             } else {
-               // <sp:WssSamlV20Token11 />
+                // <sp:WssSamlV20Token11 />
                 writer.writeStartElement(prefix, SPConstants.SAML_20_TOKEN_11, namespaceURI);
+            }
+            
+            if (isDerivedKeys()) {
+                writer.writeStartElement(prefix, SPConstants.REQUIRE_DERIVED_KEYS, namespaceURI);
+                writer.writeEndElement();
+            } else if (isExplicitDerivedKeys()) {
+                writer.writeStartElement(prefix, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS, namespaceURI);
+                writer.writeEndElement();
+            } else if (isImpliedDerivedKeys()) {
+                writer.writeStartElement(prefix, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS, namespaceURI);
+                writer.writeEndElement();
+            }
+            
+            if (isRequireKeyIdentifierReference()) {
+                writer.writeStartElement(prefix, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE, namespaceURI);
+                writer.writeEndElement();
             }
 
             writer.writeEndElement();

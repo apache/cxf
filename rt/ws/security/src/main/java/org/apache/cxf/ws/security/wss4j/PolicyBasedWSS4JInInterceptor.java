@@ -73,6 +73,7 @@ import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.AlgorithmSuitePolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
@@ -617,9 +618,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         assertHeadersExists(aim, msg, soapHeader);
         
-        assertAsymetricBinding(aim, msg, prots, hasDerivedKeys);
-        assertSymetricBinding(aim, msg, prots, hasDerivedKeys);
-        assertTransportBinding(aim);
+        assertAsymetricBinding(aim, msg, prots, results, hasDerivedKeys);
+        assertSymmetricBinding(aim, msg, prots, results, hasDerivedKeys);
+        assertTransportBinding(aim, results);
         
         X509TokenPolicyValidator x509Validator = new X509TokenPolicyValidator(msg, results);
         x509Validator.validatePolicy(aim);
@@ -689,9 +690,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
     }
 
-    private boolean assertSymetricBinding(AssertionInfoMap aim, 
+    private boolean assertSymmetricBinding(AssertionInfoMap aim, 
                                            SoapMessage message,
                                            Protections prots,
+                                           List<WSSecurityEngineResult> results,
                                            Boolean derived) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
         if (ais == null) {
@@ -706,12 +708,20 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     if (prots == Protections.ENCRYPT_SIGN
                         || prots == Protections.SIGN_ENCRYPT) {
                         ai.setNotAsserted("Not encrypted before signed and then protected");
+                        return false;
                     }
                 } else if (prots == Protections.SIGN_ENCRYPT) {
-                    ai.setNotAsserted("Not encrypted before signed");                    
+                    ai.setNotAsserted("Not encrypted before signed");
+                    return false;
                 }
             } else if (prots == Protections.ENCRYPT_SIGN) {
-                ai.setNotAsserted("Not signed before encrypted");                                    
+                ai.setNotAsserted("Not signed before encrypted");
+                return false;
+            }
+            
+            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
+            if (!algorithmValidator.validatePolicy(ai, abinding.getAlgorithmSuite())) {
+                return false;
             }
             
             if (abinding.getEncryptionToken() != null) {
@@ -732,6 +742,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private boolean assertAsymetricBinding(AssertionInfoMap aim, 
                                            SoapMessage message,
                                            Protections prots,
+                                           List<WSSecurityEngineResult> results,
                                            Boolean derived) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
         if (ais == null) {                       
@@ -745,13 +756,22 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     if (prots == Protections.ENCRYPT_SIGN
                         || prots == Protections.SIGN_ENCRYPT) {
                         ai.setNotAsserted("Not encrypted before signed and then protected");
+                        return false;
                     }
                 } else if (prots == Protections.SIGN_ENCRYPT) {
-                    ai.setNotAsserted("Not encrypted before signed");                    
+                    ai.setNotAsserted("Not encrypted before signed");
+                    return false;
                 }
             } else if (prots == Protections.ENCRYPT_SIGN) {
-                ai.setNotAsserted("Not signed before encrypted");                                    
+                ai.setNotAsserted("Not signed before encrypted");
+                return false;
             }
+            
+            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
+            if (!algorithmValidator.validatePolicy(ai, abinding.getAlgorithmSuite())) {
+                return false;
+            }
+            
             if (abinding.getInitiatorToken() != null) {
                 assertPolicy(aim, abinding.getInitiatorToken());
                 assertPolicy(aim, abinding.getInitiatorToken().getToken(), derived);
@@ -763,7 +783,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
         return true;
     }
-    private boolean assertTransportBinding(AssertionInfoMap aim) {
+    private boolean assertTransportBinding(AssertionInfoMap aim, List<WSSecurityEngineResult> results) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
         if (ais == null) {                       
             return true;
@@ -775,6 +795,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             if (binding.getTransportToken() != null) {
                 assertPolicy(aim, binding.getTransportToken());
                 assertPolicy(aim, binding.getTransportToken().getToken());
+            }
+            
+            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
+            if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
+                return false;
             }
         }
         

@@ -69,12 +69,21 @@ public class SamlTokenBuilder implements AssertionBuilder<Element> {
                         if (policyChild instanceof Element) {
                             QName qname = 
                                 new QName(policyChild.getNamespaceURI(), policyChild.getLocalName());
-                            if (SPConstants.SAML_11_TOKEN_10.equals(qname.getLocalPart())) {
+                            String localname = qname.getLocalPart();
+                            if (SPConstants.SAML_11_TOKEN_10.equals(localname)) {
                                 samlToken.setUseSamlVersion11Profile10(true);
-                            } else if (SPConstants.SAML_11_TOKEN_11.equals(qname.getLocalPart())) {
+                            } else if (SPConstants.SAML_11_TOKEN_11.equals(localname)) {
                                 samlToken.setUseSamlVersion11Profile11(true);
-                            } else if (SPConstants.SAML_20_TOKEN_11.equals(qname.getLocalPart())) {
+                            } else if (SPConstants.SAML_20_TOKEN_11.equals(localname)) {
                                 samlToken.setUseSamlVersion20Profile11(true);
+                            } else if (SPConstants.REQUIRE_DERIVED_KEYS.equals(localname)) {
+                                samlToken.setDerivedKeys(true);
+                            } else if (SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS.equals(localname)) {
+                                samlToken.setExplicitDerivedKeys(true);
+                            } else if (SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS.equals(localname)) {
+                                samlToken.setImpliedDerivedKeys(true);
+                            } else if (SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE.equals(localname)) {
+                                samlToken.setRequireKeyIdentifierReference(true);
                             }
                         }
                     }
