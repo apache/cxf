@@ -44,6 +44,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.MessageInfo;
@@ -334,7 +335,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (accessType != XmlAccessType.PROPERTY) {   // only look for fields if we are instructed to
             //fields are accessible even if not public, must look at the declared fields
             //then walk to parents declared fields, etc...
-            Field fields[] = cls.getDeclaredFields(); 
+            Field fields[] = ReflectionUtil.getDeclaredFields(cls); 
             for (Field f : fields) {
                 if (isFieldAccepted(f, accessType)) {
                     addType(f.getGenericType());
@@ -344,7 +345,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
 
         if (accessType != XmlAccessType.FIELD) {   // only look for methods if we are instructed to
-            Method methods[] = cls.getDeclaredMethods(); 
+            Method methods[] = ReflectionUtil.getDeclaredMethods(cls); 
             for (Method m : methods) {
                 if (isMethodAccepted(m, accessType)) {
                     addType(m.getGenericReturnType());

@@ -19,6 +19,7 @@
 package org.apache.cxf.bus.extension;
 
 import java.io.InputStream;
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import org.apache.cxf.binding.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.NullConfigurer;
@@ -179,7 +181,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
         }
 
         // next check system properties
-        busId = System.getProperty(BUS_ID_PROPERTY_NAME);
+        busId = AccessController.doPrivileged(new SystemPropertyAction(BUS_ID_PROPERTY_NAME));
         if (null != busId && !"".equals(busId)) {
             return busId;
         }

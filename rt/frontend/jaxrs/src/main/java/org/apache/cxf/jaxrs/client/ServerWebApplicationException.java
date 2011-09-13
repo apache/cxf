@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.ext.MessageBodyReader;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -107,7 +108,7 @@ public class ServerWebApplicationException extends WebApplicationException {
     
     @Override
     public String toString() {
-        String lineSep = System.getProperty("line.separator");
+        String lineSep = SystemPropertyAction.getProperty("line.separator");
         
         StringBuilder sb = new StringBuilder();
         sb.append("Status : " + getStatus()).append(lineSep);

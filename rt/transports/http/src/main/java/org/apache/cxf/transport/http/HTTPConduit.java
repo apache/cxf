@@ -45,6 +45,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -1632,7 +1633,7 @@ public class HTTPConduit
                 LOG.fine("Content length: " + connection.getContentLength());
                 Map<String, List<String>> headerFields = connection.getHeaderFields();
                 if (null != headerFields) {
-                    String newLine = System.getProperty("line.separator");
+                    String newLine = SystemPropertyAction.getProperty("line.separator");
                     StringBuilder buf = new StringBuilder();
                     buf.append("Header fields: " + newLine);
                     for (String headerKey : headerFields.keySet()) {

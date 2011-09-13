@@ -29,6 +29,8 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
@@ -62,10 +64,10 @@ public class ChainInitiationObserver implements MessageObserver {
     public void onMessage(Message m) {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             InterceptorChain phaseChain = null;
             
@@ -122,7 +124,9 @@ public class ChainInitiationObserver implements MessageObserver {
             
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
         }
     }
     private void addToChain(InterceptorChain chain, Message m) {

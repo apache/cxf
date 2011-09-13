@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
@@ -179,7 +180,7 @@ public final class PolicyUtils {
     }
     
     private static void nl(StringBuilder buf) {
-        buf.append(System.getProperty("line.separator"));
+        buf.append(SystemPropertyAction.getProperty("line.separator"));
     }
     
     private static String typeToString(short type) {

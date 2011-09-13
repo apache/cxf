@@ -30,6 +30,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -72,6 +75,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -357,12 +361,12 @@ public final class JAXBEncoderDecoder {
             } else {
                 LOG.warning("Schema associated with " + namespace + " is null");
             }
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ReflectionUtil.getDeclaredFields(cls)) {
                 if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
                     XmlAttribute at = f.getAnnotation(XmlAttribute.class);
                     if (at == null) {
                         QName fname = new QName(namespace, f.getName());
-                        f.setAccessible(true);
+                        ReflectionUtil.setAccessible(f);
                         if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
                             writeArrayObject(marshaller, writer, fname, f.get(elValue));
                         } else {
@@ -465,10 +469,8 @@ public final class JAXBEncoderDecoder {
             while (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
                 QName q = reader.getName();
                 try {
-                    Field f =  null;
-                    try {
-                        f = cls.getDeclaredField(q.getLocalPart());
-                    } catch (NoSuchFieldException nsf) {
+                    Field f = ReflectionUtil.getDeclaredField(cls, q.getLocalPart());
+                    if (f == null) {
                         f = cls.getField(q.getLocalPart());
                     }
                     Type type = f.getGenericType();
@@ -738,63 +740,84 @@ public final class JAXBEncoderDecoder {
         return false;
     }
 
-    public static Object unmarshall(Unmarshaller u, Object source, QName elName,
-                                    Class<?> clazz, boolean unwrap) {
+    private static Object doUnmarshal(final Unmarshaller u,
+                                      final Object source,
+                                      final QName elName,
+                                      final Class<?> clazz,
+                                      final boolean unwrap) throws Exception {
+        
         Object obj = null;
+        boolean unmarshalWithClass = true;
+
+        if (clazz == null
+            || (!clazz.isPrimitive() 
+                && !clazz.isArray() 
+                && !clazz.isEnum() 
+                && !clazz.equals(Calendar.class)
+                && (Modifier.isAbstract(clazz.getModifiers()) 
+                    || Modifier.isInterface(clazz.getModifiers())))) {
+            unmarshalWithClass = false;
+        }
+
+        if (clazz != null
+            && (clazz.getName().equals("javax.xml.datatype.XMLGregorianCalendar") 
+                || clazz.getName().equals("javax.xml.datatype.Duration"))) {
+            // special treat two jaxb defined built-in abstract types
+            unmarshalWithClass = true;
+        }
+        if (source instanceof Node) {
+            obj = unmarshalWithClass ? u.unmarshal((Node)source, clazz) 
+                : u.unmarshal((Node)source);
+        } else if (source instanceof DepthXMLStreamReader) {
+            // JAXB optimizes a ton of stuff depending on the StreamReader impl. Thus,
+            // we REALLY want to pass the original reader in.   This is OK with JAXB
+            // as it doesn't read beyond the end so the DepthXMLStreamReader state
+            // would be OK when it returns.   The main winner is FastInfoset where parsing
+            // a testcase I have goes from about 300/sec to well over 1000.
+            
+            DepthXMLStreamReader dr = (DepthXMLStreamReader)source;
+            XMLStreamReader reader = dr.getReader();
+            if (u.getSchema() != null) {
+                //validating, but we may need more namespaces
+                reader = findExtraNamespaces(reader);
+            }
+            obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
+                .unmarshal(dr.getReader());
+        } else if (source instanceof XMLStreamReader) {
+            XMLStreamReader reader = (XMLStreamReader)source;
+            if (u.getSchema() != null) {
+                //validating, but we may need more namespaces
+                reader = findExtraNamespaces(reader);
+            }
+            obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
+                .unmarshal((XMLStreamReader)source);
+        } else if (source instanceof XMLEventReader) {
+            obj = unmarshalWithClass ? u.unmarshal((XMLEventReader)source, clazz) : u
+                .unmarshal((XMLEventReader)source);
+        } else if (source == null) {
+            throw new Fault(new Message("UNKNOWN_SOURCE", LOG, "null"));
+        } else {
+            throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
+        }
+        return unwrap ? getElementValue(obj) : obj;
+    }
+    public static Object unmarshall(final Unmarshaller u,
+                                    final Object source,
+                                    final QName elName,
+                                    final Class<?> clazz,
+                                    final boolean unwrap) {
         try {
-            boolean unmarshalWithClass = true;
-
-            if (clazz == null
-                || (!clazz.isPrimitive() 
-                    && !clazz.isArray() 
-                    && !clazz.isEnum() 
-                    && !clazz.equals(Calendar.class)
-                    && (Modifier.isAbstract(clazz.getModifiers()) 
-                        || Modifier.isInterface(clazz.getModifiers())))) {
-                unmarshalWithClass = false;
-            }
-
-            if (clazz != null
-                && (clazz.getName().equals("javax.xml.datatype.XMLGregorianCalendar") || clazz.getName()
-                    .equals("javax.xml.datatype.Duration"))) {
-                // special treat two jaxb defined built-in abstract types
-                unmarshalWithClass = true;
-            }
-            if (source instanceof Node) {
-                obj = unmarshalWithClass ? u.unmarshal((Node)source, clazz) : u.unmarshal((Node)source);
-            } else if (source instanceof DepthXMLStreamReader) {
-                // JAXB optimizes a ton of stuff depending on the StreamReader impl. Thus,
-                // we REALLY want to pass the original reader in.   This is OK with JAXB
-                // as it doesn't read beyond the end so the DepthXMLStreamReader state
-                // would be OK when it returns.   The main winner is FastInfoset where parsing
-                // a testcase I have goes from about 300/sec to well over 1000.
-                
-                DepthXMLStreamReader dr = (DepthXMLStreamReader)source;
-                XMLStreamReader reader = dr.getReader();
-                if (u.getSchema() != null) {
-                    //validating, but we may need more namespaces
-                    reader = findExtraNamespaces(reader);
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                public Object run() throws Exception {
+                    return doUnmarshal(u, source, elName, clazz, unwrap);
                 }
-                obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
-                    .unmarshal(dr.getReader());
-            } else if (source instanceof XMLStreamReader) {
-                XMLStreamReader reader = (XMLStreamReader)source;
-                if (u.getSchema() != null) {
-                    //validating, but we may need more namespaces
-                    reader = findExtraNamespaces(reader);
-                }
-                obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
-                    .unmarshal((XMLStreamReader)source);
-            } else if (source instanceof XMLEventReader) {
-                obj = unmarshalWithClass ? u.unmarshal((XMLEventReader)source, clazz) : u
-                    .unmarshal((XMLEventReader)source);
-            } else {
-                throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
+            });
+        } catch (PrivilegedActionException e) {
+            Exception ex = e.getException();
+            if (ex instanceof Fault) {
+                ex.fillInStackTrace();
+                throw (Fault)ex;
             }
-        } catch (Fault ex) {
-            ex.fillInStackTrace();
-            throw ex;
-        } catch (Throwable ex) {
             if (ex instanceof javax.xml.bind.UnmarshalException) {
                 javax.xml.bind.UnmarshalException unmarshalEx = (javax.xml.bind.UnmarshalException)ex;
                 if (unmarshalEx.getLinkedException() != null) {
@@ -804,11 +827,9 @@ public final class JAXBEncoderDecoder {
                     throw new Fault(new Message("UNMARSHAL_ERROR", LOG, 
                                                 unmarshalEx.getMessage()), ex);                    
                 }
-            } else {
-                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
-        }
-        return unwrap ? getElementValue(obj) : obj;
+            throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
+        }        
     }
     
     private static XMLStreamReader findExtraNamespaces(XMLStreamReader source) {
@@ -848,7 +869,7 @@ public final class JAXBEncoderDecoder {
                 } catch (Throwable t) {
                     //ignore
                 }
-                Field f = c.getClass().getDeclaredField("mNamespaces");
+                Field f = ReflectionUtil.getDeclaredField(c.getClass(), "mNamespaces");
                 f.setAccessible(true);
                 String ns[] = (String[])f.get(c);
                 for (int x = 0; x < ns.length; x += 2) {
@@ -858,7 +879,7 @@ public final class JAXBEncoderDecoder {
         } catch (Throwable t) {
             //internal JDK/xerces version
             try {
-                Field f = c.getClass().getDeclaredField("fNamespaceContext");
+                Field f =  ReflectionUtil.getDeclaredField(c.getClass(), "fNamespaceContext");
                 f.setAccessible(true);
                 Object c2 = f.get(c);
                 Enumeration enm = (Enumeration)c2.getClass().getMethod("getAllPrefixes").invoke(c2);

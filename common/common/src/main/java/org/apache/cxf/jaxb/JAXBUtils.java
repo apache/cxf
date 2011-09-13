@@ -73,7 +73,9 @@ import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.JavaUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
@@ -512,15 +514,9 @@ public final class JAXBUtils {
             if (cls.getName().equals("javax.xml.ws.wsaddressing.W3CEndpointReference")) {
                 return cls;
             }
-            Constructor cons = null;
-            try {
-                cons = cls.getDeclaredConstructor(new Class[0]);
-            } catch (NoSuchMethodException ex) {
-                try {
-                    cons = cls.getConstructor(new Class[0]);
-                } catch (NoSuchMethodException ex2) {
-                    cons = null;
-                }
+            Constructor cons = ReflectionUtil.getDeclaredConstructor(cls);
+            if (cons == null) {
+                cons = ReflectionUtil.getConstructor(cls);
             }
             if (cons == null) {
                 cls = null;
@@ -537,7 +533,7 @@ public final class JAXBUtils {
             } catch (Exception t2) {
                 //couldn't find either, probably cause tools.jar isn't on 
                 //the classpath.   Let's see if we can find the tools jar
-                String s = System.getProperty("java.home");
+                String s = SystemPropertyAction.getProperty("java.home");
                 if (!StringUtils.isEmpty(s)) {
                     File home = new File(s);
                     File jar = new File(home, "lib/tools.jar");

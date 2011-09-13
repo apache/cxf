@@ -21,6 +21,8 @@ package org.apache.cxf.common.commands;
 
 import java.io.File;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
+
 public final class JavaHelper {
 
     private JavaHelper() {
@@ -34,7 +36,7 @@ public final class JavaHelper {
      *
      */
     public static String getJavaCommand() { 
-        String javaHome = System.getProperty("java.home");
+        String javaHome = SystemPropertyAction.getProperty("java.home");
         if (null != javaHome) { 
             return javaHome + File.separator + "bin"  
                 + File.separator  + "java" + ForkedCommand.EXE_SUFFIX; 

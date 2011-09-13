@@ -40,6 +40,7 @@ import org.apache.cxf.common.annotation.AbstractAnnotationVisitor;
 import org.apache.cxf.common.annotation.AnnotationProcessor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
@@ -94,7 +95,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             for (String s : njsr.unlessNull()) {
                 try {
                     Field f = getField(cls, s);
-                    f.setAccessible(true);
+                    ReflectionUtil.setAccessible(f);
                     if (f.get(o) == null) {
                         return true;
                     }
@@ -281,7 +282,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
 
     private void invokeSetter(Method method, Object resource) { 
         try {
-            method.setAccessible(true);
+            ReflectionUtil.setAccessible(method);
             if (method.getDeclaringClass().isAssignableFrom(getTarget().getClass())) {
                 method.invoke(getTarget(), resource);
             } else { // deal with the proxy setter method
@@ -321,15 +322,15 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
 
         boolean accessible = field.isAccessible(); 
         try {
-            if (field.getType().isAssignableFrom(resource.getClass())) { 
-                field.setAccessible(true); 
+            if (field.getType().isAssignableFrom(resource.getClass())) {
+                ReflectionUtil.setAccessible(field);
                 field.set(ClassHelper.getRealObject(getTarget()), resource);
             }
         } catch (IllegalAccessException e) { 
             e.printStackTrace();
             LOG.severe("FAILED_TO_INJECT_FIELD"); 
         } finally {
-            field.setAccessible(accessible); 
+            ReflectionUtil.setAccessible(field, accessible);
         }
     } 
 
@@ -341,14 +342,14 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             PostConstruct pc = method.getAnnotation(PostConstruct.class);
             if (pc != null) {
                 try {
-                    method.setAccessible(true);
+                    ReflectionUtil.setAccessible(method);
                     method.invoke(target);
                 } catch (IllegalAccessException e) {
                     LOG.log(Level.WARNING, "INJECTION_COMPLETE_NOT_VISIBLE", method);
                 } catch (InvocationTargetException e) {
                     LOG.log(Level.WARNING, "INJECTION_COMPLETE_THREW_EXCEPTION", e);
                 } finally {
-                    method.setAccessible(accessible); 
+                    ReflectionUtil.setAccessible(method, accessible);
                 }
             }
         }
@@ -361,14 +362,14 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             PreDestroy pd = method.getAnnotation(PreDestroy.class);
             if (pd != null) {
                 try {
-                    method.setAccessible(true);
+                    ReflectionUtil.setAccessible(method);
                     method.invoke(target);
                 } catch (IllegalAccessException e) {
                     LOG.log(Level.WARNING, "PRE_DESTROY_NOT_VISIBLE", method);
                 } catch (InvocationTargetException e) {
                     LOG.log(Level.WARNING, "PRE_DESTROY_THREW_EXCEPTION", e);
                 } finally {
-                    method.setAccessible(accessible); 
+                    ReflectionUtil.setAccessible(method, accessible);
                 }
             }
         }

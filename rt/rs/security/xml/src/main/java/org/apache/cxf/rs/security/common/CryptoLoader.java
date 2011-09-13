@@ -27,6 +27,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
@@ -58,7 +59,7 @@ public class CryptoLoader {
             return crypto;
         }
         
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder orig = null;
         try {
             URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
             if (url == null) {
@@ -66,7 +67,7 @@ public class CryptoLoader {
                         .getBus().getExtension(ResourceManager.class);
                 ClassLoader loader = manager.resolveResource("", ClassLoader.class);
                 if (loader != null) {
-                    Thread.currentThread().setContextClassLoader(loader);
+                    orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
                 url = manager.resolveResource((String)o, URL.class);
             }
@@ -82,7 +83,9 @@ public class CryptoLoader {
             getCryptoCache(message).put(o, crypto);
             return crypto;
         } finally {
-            Thread.currentThread().setContextClassLoader(orig);
+            if (orig != null) {
+                orig.reset();
+            }
         }
     }
     

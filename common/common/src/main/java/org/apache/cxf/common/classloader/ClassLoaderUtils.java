@@ -22,6 +22,8 @@ package org.apache.cxf.common.classloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -36,6 +38,27 @@ public final class ClassLoaderUtils {
     
     private ClassLoaderUtils() {
     }
+    
+    public static class ClassLoaderHolder {
+        ClassLoader loader;
+        ClassLoaderHolder(ClassLoader c) {
+            loader = c;
+        }
+        
+        public void reset() {
+            ClassLoaderUtils.setThreadContextClassloader(loader);
+        }
+    }
+    public static ClassLoaderHolder setThreadContextClassloader(final ClassLoader newLoader) {
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoaderHolder>() {
+            public ClassLoaderHolder run() {
+                ClassLoader l = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(newLoader);
+                return new ClassLoaderHolder(l);
+            }
+        });
+    }
+    
     
     /**
      * Load a given resource. <p/> This method will try to load the resource

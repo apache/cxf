@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -174,7 +175,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         String propFilename, 
         RequestData reqData
     ) throws WSSecurityException {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder orig = null;
         try {
             try {
                 URL url = ClassLoaderUtils.getResource(propFilename, this.getClass());
@@ -183,7 +184,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                             .getBus().getExtension(ResourceManager.class);
                     ClassLoader loader = manager.resolveResource("", ClassLoader.class);
                     if (loader != null) {
-                        Thread.currentThread().setContextClassLoader(loader);
+                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                     }
                     url = manager.resolveResource(propFilename, URL.class);
                 }
@@ -200,7 +201,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             } 
             return CryptoFactory.getInstance(propFilename, this.getClassLoader(reqData.getMsgContext()));
         } finally {
-            Thread.currentThread().setContextClassLoader(orig);
+            if (orig != null) {
+                orig.reset();
+            }
         }
     }
 

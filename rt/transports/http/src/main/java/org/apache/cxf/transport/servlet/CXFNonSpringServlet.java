@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -105,16 +107,18 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
     @Override
     protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             BusFactory.setThreadDefaultBus(bus);
             controller.invoke(request, response);
         } finally {
             BusFactory.setThreadDefaultBus(null);
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
         }
     }
 

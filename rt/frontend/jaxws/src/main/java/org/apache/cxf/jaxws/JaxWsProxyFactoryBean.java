@@ -27,6 +27,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.endpoint.Client;
@@ -139,12 +141,12 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
      */
     @Override
     public synchronized Object create() {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder orig = null;
         try {
             if (getBus() != null) {
                 ClassLoader loader = getBus().getExtension(ClassLoader.class);
                 if (loader != null) {
-                    Thread.currentThread().setContextClassLoader(loader);
+                    orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
             }
             
@@ -160,7 +162,9 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
             }
             return obj;
         } finally {
-            Thread.currentThread().setContextClassLoader(orig);
+            if (orig != null) {
+                orig.reset();
+            }
         }
     }
     

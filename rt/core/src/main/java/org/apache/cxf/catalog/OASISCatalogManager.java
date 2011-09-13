@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import javax.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.xml.resolver.Catalog;
 import org.apache.xml.resolver.CatalogManager;
 import org.apache.xml.resolver.tools.CatalogResolver;
@@ -47,7 +49,8 @@ public class OASISCatalogManager {
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(OASISCatalogManager.class);
-    private static final String DEBUG_LEVEL = System.getProperty(CATALOG_DEBUG_KEY);
+    private static final String DEBUG_LEVEL 
+        = AccessController.doPrivileged(new SystemPropertyAction(CATALOG_DEBUG_KEY));
     
 
     private Object resolver;

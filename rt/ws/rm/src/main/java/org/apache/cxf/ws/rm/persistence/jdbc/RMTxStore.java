@@ -42,6 +42,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
 import org.apache.cxf.ws.rm.ProtocolVariation;
@@ -642,7 +643,8 @@ public class RMTxStore implements RMStore {
     public synchronized void init() {
         
         if (null == connection) {
-            LOG.log(Level.FINE, "Using derby.system.home: {0}", System.getProperty("derby.system.home"));
+            LOG.log(Level.FINE, "Using derby.system.home: {0}", 
+                    SystemPropertyAction.getProperty("derby.system.home"));
             assert null != url;
             assert null != driverClassName;
             try {
@@ -692,7 +694,7 @@ public class RMTxStore implements RMStore {
     }
     
     public static void deleteDatabaseFiles(String dbName, boolean now) {
-        String dsh = System.getProperty("derby.system.home");
+        String dsh = SystemPropertyAction.getProperty("derby.system.home");
        
         File root = null;  
         File log = null;

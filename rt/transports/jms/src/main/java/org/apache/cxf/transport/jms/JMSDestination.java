@@ -41,6 +41,8 @@ import javax.jms.TextMessage;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.continuations.ContinuationProvider;
@@ -183,10 +185,10 @@ public class JMSDestination extends AbstractMultiplexDestination
         onMessage(message, null);
     }
     public void onMessage(javax.jms.Message message, Session session) {
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             getLogger().log(Level.FINE, "server received request: ", message);
              // Build CXF message from JMS message
@@ -254,7 +256,9 @@ public class JMSDestination extends AbstractMultiplexDestination
             getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
         } finally {
             BusFactory.setThreadDefaultBus(null);
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) { 
+                origLoader.reset();
+            }
         }
     }
 

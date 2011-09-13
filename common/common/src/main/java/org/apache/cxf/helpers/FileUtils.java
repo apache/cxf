@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
+
 public final class FileUtils {
     private static final int RETRY_SLEEP_MILLIS = 10;
     private static File defaultTempDir;
@@ -49,7 +51,7 @@ public final class FileUtils {
         
         String s = null;
         try {
-            s = System.getProperty(FileUtils.class.getName() + ".TempDirectory");
+            s = SystemPropertyAction.getProperty(FileUtils.class.getName() + ".TempDirectory");
         } catch (SecurityException e) {
             //Ignorable, we'll use the default
         }
@@ -62,7 +64,7 @@ public final class FileUtils {
         }
         if (defaultTempDir == null) {
             int x = (int)(Math.random() * 1000000);
-            s = System.getProperty("java.io.tmpdir");
+            s = SystemPropertyAction.getProperty("java.io.tmpdir");
             File checkExists = new File(s);
             if (!checkExists.exists() || !checkExists.isDirectory()) {
                 throw new RuntimeException("The directory " 
@@ -171,7 +173,7 @@ public final class FileUtils {
     }
 
     private static boolean isWindows() {
-        String osName = System.getProperty("os.name").toLowerCase(Locale.US);
+        String osName = SystemPropertyAction.getProperty("os.name").toLowerCase(Locale.US);
         return osName.indexOf("windows") > -1;
     }
 

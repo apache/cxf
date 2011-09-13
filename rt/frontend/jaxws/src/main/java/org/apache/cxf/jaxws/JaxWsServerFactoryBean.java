@@ -29,6 +29,8 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.binding.soap.Soap12;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
@@ -190,12 +192,12 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     }
     
     public Server create() {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder orig = null;
         try {
             if (bus != null) {
                 ClassLoader loader = bus.getExtension(ClassLoader.class);
                 if (loader != null) {
-                    Thread.currentThread().setContextClassLoader(loader);
+                    orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
             }
 
@@ -205,7 +207,9 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             
             return server;
         } finally {
-            Thread.currentThread().setContextClassLoader(orig);
+            if (orig != null) {
+                orig.reset();
+            }
         }
     }
     

@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 
 
 public class ForkedCommand extends Thread {
@@ -42,7 +43,7 @@ public class ForkedCommand extends Thread {
     private boolean joinErrOut = true;
 
     static {
-        if (System.getProperty("os.name").startsWith("Windows")) {
+        if (SystemPropertyAction.getProperty("os.name").startsWith("Windows")) {
             EXE_SUFFIX = ".exe";
         } else {
             EXE_SUFFIX = "";

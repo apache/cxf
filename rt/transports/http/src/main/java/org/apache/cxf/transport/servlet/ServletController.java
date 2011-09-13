@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
@@ -164,14 +166,14 @@ public class ServletController {
             } else {
                 EndpointInfo ei = d.getEndpointInfo();
                 Bus bus = d.getBus();
-                ClassLoader orig = Thread.currentThread().getContextClassLoader();
+                ClassLoaderHolder orig = null;
                 try {
                     ResourceManager manager = bus.getExtension(ResourceManager.class);
                     if (manager != null) {
                         ClassLoader loader = manager.resolveResource("", ClassLoader.class);
                         if (loader != null) {
                             //need to set the context classloader to the loader of the bundle
-                            Thread.currentThread().setContextClassLoader(loader);
+                            orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                         }
                     }
                     QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
@@ -199,7 +201,9 @@ public class ServletController {
                     }
                     invokeDestination(request, res, d);
                 } finally {
-                    Thread.currentThread().setContextClassLoader(orig);
+                    if (orig != null) { 
+                        orig.reset();
+                    }
                 }
                 
             }

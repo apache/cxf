@@ -23,6 +23,8 @@ import java.util.List;
 
 
 import org.apache.cxf.BusException;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -129,13 +131,13 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     
 
     public Server create() {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder orig = null;
         try {
             try {
                 if (bus != null) {
                     ClassLoader loader = bus.getExtension(ClassLoader.class);
                     if (loader != null) {
-                        Thread.currentThread().setContextClassLoader(loader);
+                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                     }
                 }
     
@@ -203,22 +205,26 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             }
             return server;
         } finally {
-            Thread.currentThread().setContextClassLoader(orig);
+            if (orig != null) {
+                orig.reset();
+            }
         }            
     }
     public void init() {
         if (getServer() == null) {
-            ClassLoader orig = Thread.currentThread().getContextClassLoader();
+            ClassLoaderHolder orig = null;
             try {
                 if (bus != null) {
                     ClassLoader loader = bus.getExtension(ClassLoader.class);
                     if (loader != null) {
-                        Thread.currentThread().setContextClassLoader(loader);
+                        orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                     }
                 }
                 create();
             } finally {
-                Thread.currentThread().setContextClassLoader(orig);
+                if (orig != null) {
+                    orig.reset();
+                }
             }
         }
     }

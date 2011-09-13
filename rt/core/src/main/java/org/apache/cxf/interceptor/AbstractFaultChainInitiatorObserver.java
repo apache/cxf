@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -54,10 +56,10 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
         
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             
             Exchange exchange = message.getExchange();
@@ -109,7 +111,9 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
             }
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
         }
     }
 

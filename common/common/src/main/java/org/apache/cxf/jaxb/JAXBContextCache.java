@@ -24,6 +24,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,7 +119,7 @@ public final class JAXBContextCache {
         return getCachedContextAndSchemas(classes, null, props, null, true);
     }
     
-    public static CachedContextAndSchemas getCachedContextAndSchemas(Set<Class<?>> classes,
+    public static CachedContextAndSchemas getCachedContextAndSchemas(final Set<Class<?>> classes,
                                                                      String defaultNs,
                                                                      Map<String, Object> props,
                                                                      Collection<Object> typeRefs,
@@ -172,10 +175,13 @@ public final class JAXBContextCache {
                 boolean added = addJaxbObjectFactory(ex, classes);
                 while (cachedContextAndSchemas == null && added) {
                     try {
-                        context = JAXBContext.newInstance(classes
-                                                      .toArray(new Class[classes.size()]), null);
-                    } catch (JAXBException e) {
-                        //second attempt failed as well, rethrow the original exception
+                        context = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
+                            public JAXBContext run() throws Exception {
+                                return JAXBContext.newInstance(classes
+                                                              .toArray(new Class[classes.size()]), null);
+                            }
+                        });
+                    } catch (PrivilegedActionException e) {
                         throw ex;
                     }
                 }
@@ -208,8 +214,8 @@ public final class JAXBContextCache {
     }
     
     
-    private static JAXBContext createContext(Set<Class<?>> classes,
-                                      Map<String, Object> map,
+    private static JAXBContext createContext(final Set<Class<?>> classes,
+                                      final Map<String, Object> map,
                                       Collection<Object> typeRefs)
         throws JAXBException {
         JAXBContext ctx;
@@ -257,16 +263,25 @@ public final class JAXBContextCache {
             }
         }
         try {
-            ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
-        } catch (JAXBException ex) {
-            if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")
-                && ex.getMessage() != null
-                && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
-                map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
-                        map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
-                ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+            ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
+                public JAXBContext run() throws Exception {
+                    return JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+                }
+            });
+        } catch (PrivilegedActionException e2) {
+            if (e2.getException() instanceof JAXBException) {
+                JAXBException ex = (JAXBException)e2.getException();
+                if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")
+                    && ex.getMessage() != null
+                    && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
+                    map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
+                            map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
+                    ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+                } else {
+                    throw ex;
+                }
             } else {
-                throw ex;
+                throw new RuntimeException(e2.getException());
             }
         }
         return ctx;

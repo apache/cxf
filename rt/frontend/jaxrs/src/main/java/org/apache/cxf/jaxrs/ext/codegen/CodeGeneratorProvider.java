@@ -42,6 +42,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -178,7 +179,7 @@ public class CodeGeneratorProvider implements RequestHandler {
     private String getLineSep() {
         String os = ui.getQueryParameters().getFirst(OS_QUERY);
         if (os == null) {
-            return System.getProperty(SourceGenerator.LINE_SEP_PROPERTY);
+            return SystemPropertyAction.getProperty(SourceGenerator.LINE_SEP_PROPERTY);
         }
         return "unix".equals(os) ? "\r" : "\r\n";
     }
@@ -186,7 +187,7 @@ public class CodeGeneratorProvider implements RequestHandler {
     private String getFileSep() {
         String os = ui.getQueryParameters().getFirst(OS_QUERY);
         if (os == null) {
-            return System.getProperty(SourceGenerator.FILE_SEP_PROPERTY);
+            return SystemPropertyAction.getProperty(SourceGenerator.FILE_SEP_PROPERTY);
         }
         return "unix".equals(os) ? "/" : "\\";
     }

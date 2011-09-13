@@ -29,6 +29,8 @@ import javax.ws.rs.core.Application;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.Server;
@@ -131,12 +133,12 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @return the server
      */
     public Server create() {
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             Bus bus = getBus();
             ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             serviceFactory.setBus(bus);
             checkResources(true);
@@ -191,7 +193,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         } catch (Exception e) {
             throw new ServiceConstructionException(e);
         } finally {
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
         }
 
         return server;

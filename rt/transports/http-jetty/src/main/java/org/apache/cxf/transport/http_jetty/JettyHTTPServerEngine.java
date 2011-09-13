@@ -33,6 +33,7 @@ import javax.servlet.ServletContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
@@ -216,9 +217,11 @@ public class JettyHTTPServerEngine
         //this is most often seen in our unit/system tests that 
         //test things in the same VM.
         
-        String s = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort." + port);
+        String s = SystemPropertyAction
+                .getProperty("org.apache.cxf.transports.http_jetty.DontClosePort." + port);
         if (s == null) {
-            s = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
+            s = SystemPropertyAction
+                .getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
         }
         return !Boolean.valueOf(s);
     }

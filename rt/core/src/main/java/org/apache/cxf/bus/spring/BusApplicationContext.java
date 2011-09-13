@@ -25,6 +25,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessControlException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,8 +39,10 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.util.SystemUtils;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.interceptor.Fault;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.BeansDtdResolver;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
@@ -88,19 +95,44 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         super(new String[0], false, parent);
         cfgFiles = cf;
         includeDefaults = include;
-        refresh();
+        try {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+                public Boolean run() throws Exception {
+                    refresh();
+                    return Boolean.TRUE;
+                }
+                
+            });
+        } catch (PrivilegedActionException e) {
+            if (e.getException() instanceof RuntimeException) {
+                throw (RuntimeException)e.getException();
+            }
+            throw new Fault(e);
+        }
     }
     
     public BusApplicationContext(URL[] url, boolean include, ApplicationContext parent) {
         super(new String[0], false, parent);
         cfgFileURLs = url;
         includeDefaults = include;
-        refresh();
+        try {
+            AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+                public Boolean run() throws Exception {
+                    refresh();
+                    return Boolean.TRUE;
+                }
+                
+            });
+        } catch (PrivilegedActionException e) {
+            if (e.getException() instanceof RuntimeException) {
+                throw (RuntimeException)e.getException();
+            }
+            throw new Fault(e);
+        }
     } 
     
     @Override
     protected Resource[] getConfigResources() {
-  
         List<Resource> resources = new ArrayList<Resource>();
        
         if (includeDefaults) {
@@ -131,7 +163,8 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         
         boolean usingDefault = false;
         if (null == cfgFiles) {
-            String cfgFile = System.getProperty(Configurer.USER_CFG_FILE_PROPERTY_NAME);
+            String cfgFile = AccessController
+                .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_NAME));
             if (cfgFile != null) {
                 cfgFiles = new String[] {cfgFile};
             }
@@ -141,8 +174,14 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             usingDefault = true;
         }
         for (String cfgFile : cfgFiles) {
-            Resource cpr = findResource(cfgFile);
-            if (cpr != null && cpr.exists()) {
+            final Resource cpr = findResource(cfgFile);
+            boolean exists = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                public Boolean run() {
+                    return cpr != null && cpr.exists();
+                }
+                
+            });
+            if (exists) {
                 resources.add(cpr);
                 LogUtils.log(LOG, Level.INFO, "USER_CFG_FILE_IN_USE", cfgFile);
             } else {
@@ -165,7 +204,8 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             }
         } 
         
-        String sysCfgFileUrl = System.getProperty(Configurer.USER_CFG_FILE_PROPERTY_URL);
+        String sysCfgFileUrl = AccessController
+            .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_URL));
         if (null != sysCfgFileUrl) {
             try {
                 UrlResource ur = new UrlResource(sysCfgFileUrl);
@@ -191,34 +231,43 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         return res;
     }
     
-    public static Resource findResource(String cfgFile) {
-        Resource cpr = new ClassPathResource(cfgFile);
-        if (cpr.exists()) {
-            return cpr;
-        }
+    public static Resource findResource(final String cfgFile) {
         try {
-            //see if it's a URL
-            URL url = new URL(cfgFile);
-            cpr = new UrlResource(url);
-            if (cpr.exists()) {
-                return cpr;
-            }
-        } catch (MalformedURLException e) {
-            //ignore
+            return AccessController.doPrivileged(new PrivilegedAction<Resource>() {
+                public Resource run() {
+                    Resource cpr = new ClassPathResource(cfgFile);
+                    if (cpr.exists()) {
+                        return cpr;
+                    }
+                    try {
+                        //see if it's a URL
+                        URL url = new URL(cfgFile);
+                        cpr = new UrlResource(url);
+                        if (cpr.exists()) {
+                            return cpr;
+                        }
+                    } catch (MalformedURLException e) {
+                        //ignore
+                    }
+                    //try loading it our way
+                    URL url = ClassLoaderUtils.getResource(cfgFile, BusApplicationContext.class);
+                    if (url != null) {
+                        cpr = new UrlResource(url);
+                        if (cpr.exists()) {
+                            return cpr;
+                        }
+                    }
+                    cpr = new FileSystemResource(cfgFile);
+                    if (cpr.exists()) {
+                        return cpr;
+                    }
+                    return null;
+                }
+            });
+        } catch (AccessControlException ex) {
+            //cannot read the user config file
+            return null;
         }
-        //try loading it our way
-        URL url = ClassLoaderUtils.getResource(cfgFile, BusApplicationContext.class);
-        if (url != null) {
-            cpr = new UrlResource(url);
-            if (cpr.exists()) {
-                return cpr;
-            }
-        }
-        cpr = new FileSystemResource(cfgFile);
-        if (cpr.exists()) {
-            return cpr;
-        }
-        return null;
     }
     
     @Override

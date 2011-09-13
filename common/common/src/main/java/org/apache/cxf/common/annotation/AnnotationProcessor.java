@@ -25,8 +25,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.logging.Logger;
 
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 
 
 /** Process instance of an annotated class.  This is a visitable
@@ -80,7 +82,7 @@ public  class AnnotationProcessor {
         if (targetClass.getSuperclass() != null) {
             processMethods(visitor, targetClass.getSuperclass());
         }
-        for (Method element : targetClass.getDeclaredMethods()) {
+        for (Method element : ReflectionUtil.getDeclaredMethods(targetClass)) {
             for (Class<? extends Annotation> clz : annotationTypes) {
                 Annotation ann = element.getAnnotation(clz); 
                 if (ann != null) {
@@ -94,7 +96,7 @@ public  class AnnotationProcessor {
         if (targetClass.getSuperclass() != null) {
             processFields(visitor, targetClass.getSuperclass());
         }
-        for (Field element : targetClass.getDeclaredFields()) {
+        for (Field element : ReflectionUtil.getDeclaredFields(targetClass)) {
             for (Class<? extends Annotation> clz : annotationTypes) {
                 Annotation ann = element.getAnnotation(clz); 
                 if (ann != null) {

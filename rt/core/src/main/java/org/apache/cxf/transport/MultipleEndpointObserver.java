@@ -25,6 +25,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
@@ -50,20 +52,21 @@ public class MultipleEndpointObserver implements MessageObserver {
     protected List<Interceptor<? extends Message>> routingInterceptors
         = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
     private Set<Endpoint> endpoints = new CopyOnWriteArraySet<Endpoint>();
+    private ClassLoader loader;
     
     public MultipleEndpointObserver(Bus bus) {
         super();
         this.bus = bus;
+        this.loader = bus.getExtension(ClassLoader.class);
     }
 
     public void onMessage(Message message) {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
-            ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             Exchange exchange = message.getExchange();
             if (exchange == null) {
@@ -96,7 +99,9 @@ public class MultipleEndpointObserver implements MessageObserver {
             chain.doIntercept(message);
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
         }
     }
 

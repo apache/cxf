@@ -60,6 +60,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.AbstractWrapperHelper;
@@ -699,7 +700,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                 if (el != null
                     && (partName.equals(el.name())
                         || "##default".equals(el.name()))) {
-                    elField.setAccessible(true);
+                    ReflectionUtil.setAccessible(elField);
                     fields.add(elField);
                 } else {
                     if (getMethod == null && setMethod == null) {

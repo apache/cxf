@@ -30,6 +30,8 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -118,12 +120,12 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
      * @return the proxy. You must cast the returned object to the appropriate class before using it.
      */
     public synchronized Object create() {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder orig = null;
         try {
             if (getBus() != null) {
                 ClassLoader loader = getBus().getExtension(ClassLoader.class);
                 if (loader != null) {
-                    Thread.currentThread().setContextClassLoader(loader);
+                    orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
             }
             configureObject();
@@ -176,7 +178,9 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
                                                classes, handler, obj);
             return obj;
         } finally {
-            Thread.currentThread().setContextClassLoader(orig);
+            if (orig != null) {
+                orig.reset();
+            }
         }
     }
 

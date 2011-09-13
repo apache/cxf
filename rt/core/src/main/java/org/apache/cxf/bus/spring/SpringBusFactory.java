@@ -20,6 +20,8 @@
 package org.apache.cxf.bus.spring;
 
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +30,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.Configurer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -92,11 +95,23 @@ public class SpringBusFactory extends BusFactory {
     
     public Bus createBus(String cfgFiles[], boolean includeDefaults) {
         try {
-            String userCfgFile = System.getProperty(Configurer.USER_CFG_FILE_PROPERTY_NAME);
-            String sysCfgFileUrl = System.getProperty(Configurer.USER_CFG_FILE_PROPERTY_URL);
-            Resource r = BusApplicationContext.findResource(Configurer.DEFAULT_USER_CFG_FILE);
+            String userCfgFile = AccessController
+                .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_NAME));
+            String sysCfgFileUrl = AccessController
+                .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_URL));
+            final Resource r = BusApplicationContext.findResource(Configurer.DEFAULT_USER_CFG_FILE);
+
+            boolean exists = true;
+            if (r != null) {
+                exists = AccessController
+                    .doPrivileged(new PrivilegedAction<Boolean>() {
+                        public Boolean run() {
+                            return r.exists();
+                        }
+                    });
+            }
             if (context == null && userCfgFile == null && cfgFiles == null && sysCfgFileUrl == null 
-                && (r == null || !r.exists()) && includeDefaults) {
+                && (r == null || !exists) && includeDefaults) {
                 return new org.apache.cxf.bus.CXFBusFactory().createBus();
             }
             return finishCreatingBus(createApplicationContext(cfgFiles, includeDefaults));

@@ -47,6 +47,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
@@ -246,12 +247,12 @@ public final class SSLUtils {
         if (keyStoreLocation != null) {
             logMsg = "KEY_STORE_SET";
         } else {
-            keyStoreLocation = System.getProperty("javax.net.ssl.keyStore");
+            keyStoreLocation = SystemPropertyAction.getProperty("javax.net.ssl.keyStore");
             if (keyStoreLocation != null) {
                 logMsg = "KEY_STORE_SYSTEM_PROPERTY_SET";
             } else {
                 keyStoreLocation =
-                    System.getProperty("user.home") + "/.keystore";
+                    SystemPropertyAction.getProperty("user.home") + "/.keystore";
                 logMsg = "KEY_STORE_NOT_SET";
             }
         }
@@ -278,7 +279,7 @@ public final class SSLUtils {
             logMsg = "KEY_STORE_PASSWORD_SET";
         } else {
             keyStorePassword =
-                System.getProperty("javax.net.ssl.keyStorePassword");
+                SystemPropertyAction.getProperty("javax.net.ssl.keyStorePassword");
             logMsg = keyStorePassword != null
                      ? "KEY_STORE_PASSWORD_SYSTEM_PROPERTY_SET"
                      : "KEY_STORE_PASSWORD_NOT_SET";
@@ -293,7 +294,7 @@ public final class SSLUtils {
             logMsg = "KEY_PASSWORD_SET";
         } else {
             keyPassword =
-                System.getProperty("javax.net.ssl.keyStorePassword");
+                SystemPropertyAction.getProperty("javax.net.ssl.keyStorePassword");
             logMsg = keyPassword != null
                      ? "KEY_PASSWORD_SYSTEM_PROPERTY_SET"
                      : "KEY_PASSWORD_NOT_SET";
@@ -458,12 +459,12 @@ public final class SSLUtils {
         if (trustStoreLocation != null) {
             logMsg = "TRUST_STORE_SET";
         } else {            
-            trustStoreLocation = System.getProperty("javax.net.ssl.trustStore");
+            trustStoreLocation = SystemPropertyAction.getProperty("javax.net.ssl.trustStore");
             if (trustStoreLocation != null) {
                 logMsg = "TRUST_STORE_SYSTEM_PROPERTY_SET";
             } else {
                 trustStoreLocation =
-                    System.getProperty("java.home") + "/lib/security/cacerts";
+                    SystemPropertyAction.getProperty("java.home") + "/lib/security/cacerts";
                 logMsg = "TRUST_STORE_NOT_SET";
             }
         }

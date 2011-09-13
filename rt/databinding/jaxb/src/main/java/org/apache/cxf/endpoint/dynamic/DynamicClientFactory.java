@@ -54,10 +54,12 @@ import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.EndpointImplFactory;
@@ -96,7 +98,7 @@ public class DynamicClientFactory {
 
     private Bus bus;
 
-    private String tmpdir = System.getProperty("java.io.tmpdir");
+    private String tmpdir = SystemPropertyAction.getProperty("java.io.tmpdir");
 
     private boolean simpleBindingEnabled = true;
     private boolean allowRefs;
@@ -363,7 +365,7 @@ public class DynamicClientFactory {
         ServiceInfo svcfo = client.getEndpoint().getEndpointInfo().getService();
 
         // Setup the new classloader!
-        Thread.currentThread().setContextClassLoader(cl);
+        ClassLoaderUtils.setThreadContextClassloader(cl);
 
         TypeClassInitializer visitor = new TypeClassInitializer(svcfo, 
                                                                 intermediateModel,
@@ -492,7 +494,7 @@ public class DynamicClientFactory {
                 }
                 if (f2.exists()) {
                     classPath.append(f2.getAbsolutePath());
-                    classPath.append(System.getProperty("path.separator"));
+                    classPath.append(SystemPropertyAction.getProperty("path.separator"));
                 }
             }
         }         
@@ -543,7 +545,7 @@ public class DynamicClientFactory {
                     Method method = tcl.getClass().getMethod("getClassPath");
                     Object weblogicClassPath = method.invoke(tcl);
                     classPath.append(weblogicClassPath)
-                        .append(System.getProperty("path.separator")); 
+                        .append(SystemPropertyAction.getProperty("path.separator")); 
                 } catch (Exception e) {
                     LOG.log(Level.FINE, "unsuccessfully tried getClassPath method", e);
                 }

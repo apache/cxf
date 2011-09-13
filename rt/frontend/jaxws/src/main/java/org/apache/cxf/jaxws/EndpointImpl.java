@@ -48,6 +48,8 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
@@ -311,12 +313,12 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         
         ServerImpl serv = null;
         
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder loader = null;
         try {
             if (bus != null) {
                 ClassLoader newLoader = bus.getExtension(ClassLoader.class);
                 if (newLoader != null) {
-                    Thread.currentThread().setContextClassLoader(newLoader);
+                    loader = ClassLoaderUtils.setThreadContextClassloader(newLoader);
                 }
             }
             serv = getServer(addr);
@@ -349,7 +351,9 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             
             throw new WebServiceException(ex);
         } finally {
-            Thread.currentThread().setContextClassLoader(loader);
+            if (loader != null) {
+                loader.reset();
+            }
         }
     }
     
@@ -361,12 +365,12 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         if (server == null) {
             checkProperties();
 
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            ClassLoaderHolder loader = null;
             try {
                 if (bus != null) {
                     ClassLoader newLoader = bus.getExtension(ClassLoader.class);
                     if (newLoader != null) {
-                        Thread.currentThread().setContextClassLoader(newLoader);
+                        loader = ClassLoaderUtils.setThreadContextClassloader(newLoader);
                     }
                 }
     
@@ -466,7 +470,9 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                     endpointName = endpoint.getEndpointInfo().getName();
                 }
             } finally {
-                Thread.currentThread().setContextClassLoader(loader);
+                if (loader != null) {
+                    loader.reset();
+                }
             }
         }
         return (ServerImpl) server;

@@ -22,6 +22,7 @@ package org.apache.cxf;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.AccessController;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 
 /**
  * Factory to create CXF Bus objects.
@@ -258,7 +260,8 @@ public abstract class BusFactory {
         String busFactoryCondition = null;
 
         // next check system properties
-        busFactoryClass = System.getProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);
+        busFactoryClass = AccessController
+            .doPrivileged(new SystemPropertyAction(BusFactory.BUS_FACTORY_PROPERTY_NAME));
         if (isValidBusFactoryClass(busFactoryClass)) {
             return busFactoryClass;
         }

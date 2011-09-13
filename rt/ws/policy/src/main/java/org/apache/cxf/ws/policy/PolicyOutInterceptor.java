@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
@@ -94,7 +95,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
                 if (LOG.isLoggable(Level.FINEST)) {
                     StringBuilder buf = new StringBuilder();
                     buf.append("Chosen alternative: ");
-                    String nl = System.getProperty("line.separator");
+                    String nl = SystemPropertyAction.getProperty("line.separator");
                     buf.append(nl);
                     for (Assertion a : assertions) {
                         PolicyUtils.printPolicyComponent(a, buf, 1);
@@ -125,7 +126,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
                 if (LOG.isLoggable(Level.FINEST)) {
                     StringBuilder buf = new StringBuilder();
                     buf.append("Chosen alternative: ");
-                    String nl = System.getProperty("line.separator");
+                    String nl = SystemPropertyAction.getProperty("line.separator");
                     buf.append(nl);
                     for (Assertion a : assertions) {
                         PolicyUtils.printPolicyComponent(a, buf, 1);

@@ -23,31 +23,34 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * Utility class for checking well-known system properties
- *
+ * 
  */
-public final class SystemUtils {
-    
-    public static final String SPRING_VALIDATION_MODE = "org.apache.cxf.spring.validation.mode";
-    
-    private SystemUtils() {
-        
+public class SystemPropertyAction implements PrivilegedAction<String> {
+    final String property;
+    final String def;
+    public SystemPropertyAction(String name) {
+        property = name;
+        def = null;
     }
-
-    /**
-     * Gets org.apache.cxf.spring.validation.mode property value if available 
-     * @return Spring validation mode
+    public SystemPropertyAction(String name, String d) {
+        property = name;
+        def = d;
+    }
+    
+    /* (non-Javadoc)
+     * @see java.security.PrivilegedAction#run()
      */
-    public static String getSpringValidationMode() {
-        return AccessController.doPrivileged(new PrivilegedAction<String>() {
-            public String run() {
-                String mode = SystemPropertyAction.getProperty(SPRING_VALIDATION_MODE);
-                if (mode == null) {
-                    mode = SystemPropertyAction.getProperty("spring.validation.mode");
-                }
-                return mode;
-            }
-        });
+    public String run() {
+        if (def != null) {
+            return System.getProperty(property, def);
+        }
+        return System.getProperty(property);
     }
     
+    public static String getProperty(String name) {
+        return AccessController.doPrivileged(new SystemPropertyAction(name));
+    }
+    public static String getProperty(String name, String def) {
+        return AccessController.doPrivileged(new SystemPropertyAction(name, def));
+    }
 }

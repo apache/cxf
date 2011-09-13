@@ -83,7 +83,7 @@ public class Compiler {
         }
         
         if (StringUtils.isEmpty(classPath)) {
-            String javaClasspath = System.getProperty("java.class.path");
+            String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
             boolean classpathSetted = javaClasspath != null ? true : false;
             if (!classpathSetted) {
                 File f = new File(getClass().getClassLoader().getResource(".").getFile());
@@ -117,7 +117,7 @@ public class Compiler {
         return compileFiles(f.toArray(new String[files.size()]));
     }
     public boolean compileFiles(String[] files) {
-        String endorsed = System.getProperty("java.endorsed.dirs");
+        String endorsed = SystemPropertyAction.getProperty("java.endorsed.dirs");
         if (!forceFork) {
             try { 
                 Class.forName("javax.tools.JavaCompiler");
@@ -130,21 +130,21 @@ public class Compiler {
         List<String> list = new ArrayList<String>();
 
         // Start of honoring java.home for used javac
-        String fsep = System.getProperty("file.separator");
+        String fsep = SystemPropertyAction.getProperty("file.separator");
         String javacstr = "javac";
         String platformjavacname = "javac";
 
-        if (System.getProperty("os.name").toLowerCase().indexOf("windows") > -1) {
+        if (SystemPropertyAction.getProperty("os.name").toLowerCase().indexOf("windows") > -1) {
             platformjavacname = "javac.exe";
         }
 
-        if (new File(System.getProperty("java.home") + fsep + platformjavacname).exists()) {
+        if (new File(SystemPropertyAction.getProperty("java.home") + fsep + platformjavacname).exists()) {
             // check if java.home is jdk home
-            javacstr = System.getProperty("java.home") + fsep + platformjavacname;
-        } else if (new File(System.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
+            javacstr = SystemPropertyAction.getProperty("java.home") + fsep + platformjavacname;
+        } else if (new File(SystemPropertyAction.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
                             + platformjavacname).exists()) {
             // check if java.home is jre home
-            javacstr = System.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
+            javacstr = SystemPropertyAction.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
                        + platformjavacname;
         }
 
@@ -214,7 +214,8 @@ public class Compiler {
                         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6198196
                         //
                         if (args[i].indexOf("package-info.java") > -1
-                            && System.getProperty("os.name").toLowerCase().indexOf("windows") > -1) {
+                            && SystemPropertyAction.getProperty("os.name")
+                                .toLowerCase().indexOf("windows") > -1) {
                             out.println("\"" + args[i].replaceAll("/", "\\\\\\\\") + "\"");
                         } else {
                             out.println("\"" + args[i] + "\"");
@@ -233,7 +234,7 @@ public class Compiler {
                 System.arraycopy(args, 0, cmdArray, 0, args.length);
             }
 
-            if (System.getProperty("os.name").toLowerCase().indexOf("windows") > -1) {
+            if (SystemPropertyAction.getProperty("os.name").toLowerCase().indexOf("windows") > -1) {
                 for (int i = 0; i < cmdArray.length; i++) {
                     if (cmdArray[i].indexOf("package-info") == -1) {
                         cmdArray[i] = cmdArray[i].replace('\\', '/');

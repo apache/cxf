@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
@@ -278,16 +280,18 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
 
         // REVISIT: service on executor if associated with endpoint
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             BusFactory.setThreadDefaultBus(bus); 
             serviceRequest(context, req, resp);
         } finally {
             BusFactory.setThreadDefaultBus(null);
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) { 
+                origLoader.reset();
+            }
         }    
     }
 

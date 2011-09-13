@@ -30,6 +30,10 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
+
+
 public class XPathUtils {
     private XPath xpath;
 
@@ -51,14 +55,16 @@ public class XPathUtils {
     }
 
     public Object getValue(String xpathExpression, Node node, QName type) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder loader 
+            = ClassLoaderUtils.setThreadContextClassloader(xpath.getClass().getClassLoader());
         try {
-            Thread.currentThread().setContextClassLoader(xpath.getClass().getClassLoader());
             return xpath.evaluate(xpathExpression, node, type);
         } catch (Exception e) {
             return null;
         } finally {
-            Thread.currentThread().setContextClassLoader(loader);
+            if (loader != null) {
+                loader.reset();
+            }
         }
     }
     public NodeList getValueList(String xpathExpression, Node node) {

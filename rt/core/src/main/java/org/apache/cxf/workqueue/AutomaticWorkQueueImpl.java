@@ -40,6 +40,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.management.JMException;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.management.InstrumentationManager;
 
@@ -261,11 +263,16 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
             if (group.isDestroyed()) {
                 group = new ThreadGroup(group.getParent(), name + "-workqueue");
             }
-            Thread t = new Thread(group, 
+            final Thread t = new Thread(group, 
                                   r, 
                                   name + "-workqueue-" + threadNumber.getAndIncrement(),
                                   0);
-            t.setContextClassLoader(loader);
+            AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                public Boolean run() {
+                    t.setContextClassLoader(loader);
+                    return true;
+                }
+            });
             t.setDaemon(true);
             if (t.getPriority() != Thread.NORM_PRIORITY) {
                 t.setPriority(Thread.NORM_PRIORITY);
@@ -347,12 +354,13 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Runnable r = new Runnable() {
             public void run() {
-                ClassLoader orig = Thread.currentThread().getContextClassLoader();
+                ClassLoaderHolder orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 try {
-                    Thread.currentThread().setContextClassLoader(loader);
                     command.run();
                 } finally {
-                    Thread.currentThread().setContextClassLoader(orig);
+                    if (orig != null) {
+                        orig.reset();
+                    }
                 }
             }
         };

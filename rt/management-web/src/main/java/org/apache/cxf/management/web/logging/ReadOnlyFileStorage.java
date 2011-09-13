@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
 /**
@@ -48,7 +49,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
     
     public static final String DATE_ONLY_FORMAT = "yyyy-MM-dd";
         
-    private static final String LINE_SEP = System.getProperty("line.separator"); 
+    private static final String LINE_SEP = SystemPropertyAction.getProperty("line.separator"); 
     private static final String DEFAULT_COLUMN_SEP = "|";
     
     private String columnSep = DEFAULT_COLUMN_SEP;
@@ -391,7 +392,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         String realPath = null;
         if (indexOpen == 0 && indexClose != -1) {
             String property = location.substring(1, indexClose);
-            String resolvedPath = System.getProperty(property);
+            String resolvedPath = SystemPropertyAction.getProperty(property);
             if (resolvedPath == null) {
                 throw new IllegalArgumentException("System property " + property + " can not be resolved");
             }

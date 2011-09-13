@@ -23,9 +23,14 @@ import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.*;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -38,7 +43,81 @@ public final class ReflectionUtil {
     private ReflectionUtil() {
         // intentionally empty
     }
+    
+    public static Field getDeclaredField(final Class<?> cls, final String name) {
+        return AccessController.doPrivileged(new PrivilegedAction<Field>() {
+            public Field run() {
+                try {
+                    return cls.getDeclaredField(name);
+                } catch (SecurityException e) {
+                    return null;
+                } catch (NoSuchFieldException e) {
+                    return null;
+                }
+            }
+        });
+    }
 
+    public static Constructor getDeclaredConstructor(final Class<?> cls, final Class<?> ... args) {
+        return AccessController.doPrivileged(new PrivilegedAction<Constructor>() {
+            public Constructor run() {
+                try {
+                    return cls.getDeclaredConstructor(args);
+                } catch (SecurityException e) {
+                    return null;
+                } catch (NoSuchMethodException e) {
+                    return null;
+                }
+            }
+        });
+        
+    }
+    public static Constructor getConstructor(final Class<?> cls, final Class<?> ... args) {
+        return AccessController.doPrivileged(new PrivilegedAction<Constructor>() {
+            public Constructor run() {
+                try {
+                    return cls.getConstructor(args);
+                } catch (SecurityException e) {
+                    return null;
+                } catch (NoSuchMethodException e) {
+                    return null;
+                }
+            }
+        });
+        
+    }
+    
+    public static Method[] getDeclaredMethods(final Class<?> cls) {
+        return AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
+            public Method[] run() {
+                return cls.getDeclaredMethods();
+            }
+        });
+    }
+    public static Field[] getDeclaredFields(final Class<?> cls) {
+        return AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
+            public Field[] run() {
+                return cls.getDeclaredFields();
+            }
+        });
+    }
+
+    public static void setAccessible(final AccessibleObject o) {
+        AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            public Boolean run() {
+                o.setAccessible(true);
+                return true;
+            }
+        });
+    }
+    public static void setAccessible(final AccessibleObject o, final boolean b) {
+        AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            public Boolean run() {
+                o.setAccessible(b);
+                return true;
+            }
+        });
+    }
     public static List<String> getPackagesFromJar(File jarFile) throws IOException {
         List<String> packageNames = new ArrayList<String>();
         if (jarFile.isDirectory()) {

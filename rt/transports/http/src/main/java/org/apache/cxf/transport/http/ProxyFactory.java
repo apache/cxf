@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
 
@@ -61,7 +62,7 @@ public class ProxyFactory {
     private static HTTPClientPolicy createSystemProxyConfiguration() {
         // Retrieve system properties (if any)
         HTTPClientPolicy systemProxyConfiguration = null;
-        String proxyHost = System.getProperty(HTTP_PROXY_HOST);
+        String proxyHost = SystemPropertyAction.getProperty(HTTP_PROXY_HOST);
         if (proxyHost != null) {
             // System is configured with a proxy, use it
 
@@ -70,11 +71,11 @@ public class ProxyFactory {
             systemProxyConfiguration.setProxyServerType(ProxyServerType.HTTP);
 
             // 8080 is the default proxy port value as per some documentation
-            String proxyPort = System.getProperty(HTTP_PROXY_PORT, "8080");
+            String proxyPort = SystemPropertyAction.getProperty(HTTP_PROXY_PORT, "8080");
             systemProxyConfiguration.setProxyServerPort(Integer.valueOf(proxyPort));
 
             // Load non proxy hosts
-            String nonProxyHosts = System.getProperty(HTTP_NON_PROXY_HOSTS);
+            String nonProxyHosts = SystemPropertyAction.getProperty(HTTP_NON_PROXY_HOSTS);
             if (!StringUtils.isEmpty(nonProxyHosts)) {
                 systemProxyConfiguration.setNonProxyHosts(nonProxyHosts);
             }

@@ -38,6 +38,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 
@@ -145,17 +146,17 @@ public class URIResolver {
                 try {
                     HttpURLConnection huc = (HttpURLConnection)url.openConnection();
 
-                    String host = System.getProperty("http.proxyHost");
+                    String host = SystemPropertyAction.getProperty("http.proxyHost");
                     if (host != null) {
                         //comment out unused port to pass pmd check
-                        /*String ports = System.getProperty("http.proxyPort");
+                        /*String ports = SystemPropertyAction.getProperty("http.proxyPort");
                         int port = 80;
                         if (ports != null) {
                             port = Integer.parseInt(ports);
                         }*/
 
-                        String username = System.getProperty("http.proxy.user");
-                        String password = System.getProperty("http.proxy.password");
+                        String username = SystemPropertyAction.getProperty("http.proxy.user");
+                        String password = SystemPropertyAction.getProperty("http.proxy.password");
 
                         if (username != null && password != null) {
                             String encoded = Base64Utility.encode((username + ":" + password).getBytes());

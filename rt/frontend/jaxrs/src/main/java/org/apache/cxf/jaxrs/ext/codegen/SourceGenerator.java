@@ -72,6 +72,7 @@ import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -157,12 +158,12 @@ public class SourceGenerator {
     
     private String getLineSep() {
         String value = properties.get(LINE_SEP_PROPERTY);
-        return value == null ? System.getProperty(LINE_SEP_PROPERTY) : value;
+        return value == null ? SystemPropertyAction.getProperty(LINE_SEP_PROPERTY) : value;
     }
     
     private String getFileSep() {
         String value = properties.get(FILE_SEP_PROPERTY);
-        return value == null ? System.getProperty(FILE_SEP_PROPERTY) : value;
+        return value == null ? SystemPropertyAction.getProperty(FILE_SEP_PROPERTY) : value;
     }
     
     public void generateSource(String wadl, File srcDir, String codeType) {

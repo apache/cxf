@@ -48,7 +48,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
         WrapReturn wr = method.getAnnotation(WrapReturn.class);
         try {
             Method m = target.getClass().getMethod(method.getName(), method.getParameterTypes());
-            m.setAccessible(true);
+            ReflectionUtil.setAccessible(m);
             return wrapReturn(wr, m.invoke(target, args));                
         } catch (NoSuchMethodException e) {
             for (Method m2 : target.getClass().getMethods()) {
@@ -62,7 +62,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
                         }
                     }
                     if (found) {
-                        m2.setAccessible(true);
+                        ReflectionUtil.setAccessible(m2);
                         return wrapReturn(wr, m2.invoke(target, args));                            
                     }
                 }

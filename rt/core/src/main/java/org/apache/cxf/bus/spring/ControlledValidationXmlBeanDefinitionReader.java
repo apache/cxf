@@ -22,6 +22,9 @@ package org.apache.cxf.bus.spring;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -30,6 +33,7 @@ import org.w3c.dom.Document;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -82,7 +86,8 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
         super(beanFactory);
         tunedDocumentLoader = new TunedDocumentLoader();
         this.setDocumentLoader(tunedDocumentLoader);
-        noFastinfoset = System.getProperty("org.apache.cxf.nofastinfoset") != null 
+        noFastinfoset = AccessController
+            .doPrivileged(new SystemPropertyAction("org.apache.cxf.nofastinfoset")) != null 
             || !TunedDocumentLoader.hasFastInfoSet();
     }
 
@@ -118,7 +123,8 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
     }
 
     @Override
-    public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
+    public int loadBeanDefinitions(final EncodedResource encodedResource)
+        throws BeanDefinitionStoreException {
         if (!noFastinfoset) {
             try {
                 return fastInfosetLoadBeanDefinitions(encodedResource);
@@ -128,6 +134,22 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
                 //ignore - just call the super to load them
             }
         }
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Integer>() {
+                public Integer run() throws Exception {
+                    return internalLoadBeanDefinitions(encodedResource);
+                }
+                
+            });
+        } catch (PrivilegedActionException e) {
+            if (e.getException() instanceof RuntimeException) {
+                throw (RuntimeException)e.getException();
+            }
+            throw (BeanDefinitionStoreException)e.getException();
+        }
+    }
+    
+    private int internalLoadBeanDefinitions(EncodedResource encodedResource) {
         return super.loadBeanDefinitions(encodedResource);
     }
     

@@ -33,6 +33,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
@@ -155,11 +157,11 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
 
         Object result = null;
-        ClassLoader contextLoader = null;
+        ClassLoaderHolder contextLoader = null;
         try {
             if (setServiceLoaderAsContextLoader(exchange.getInMessage())) {
-                contextLoader = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(resourceObject.getClass().getClassLoader());
+                contextLoader = ClassLoaderUtils
+                    .setThreadContextClassloader(resourceObject.getClass().getClassLoader());
             }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
@@ -190,7 +192,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         } finally {
             exchange.put(LAST_SERVICE_OBJECT, resourceObject);
             if (contextLoader != null) {
-                Thread.currentThread().setContextClassLoader(contextLoader);
+                contextLoader.reset();
             }
         }
         ClassResourceInfo subCri = null;

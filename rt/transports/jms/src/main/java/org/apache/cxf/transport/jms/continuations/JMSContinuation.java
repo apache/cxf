@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Message;
@@ -109,17 +111,19 @@ public class JMSContinuation implements Continuation {
     
     protected void doResume() {
         updateContinuations(true);
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             BusFactory.setThreadDefaultBus(bus);
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             incomingObserver.onMessage(inMessage);
         } finally {
             isPending = false;
             BusFactory.setThreadDefaultBus(null);
-            Thread.currentThread().setContextClassLoader(origLoader);            
+            if (origLoader != null) { 
+                origLoader.reset();
+            }
         }
     }
 

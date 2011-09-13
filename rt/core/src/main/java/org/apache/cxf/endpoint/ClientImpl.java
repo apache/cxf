@@ -43,6 +43,8 @@ import com.ibm.wsdl.extensions.soap.SOAPBindingImpl;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -469,12 +471,12 @@ public class ClientImpl
                               Map<String, Object> context,
                               Exchange exchange) throws Exception {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             BusFactory.setThreadDefaultBus(bus);
             ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             if (exchange == null) {
                 exchange = new ExchangeImpl();
@@ -542,7 +544,9 @@ public class ClientImpl
                 return processResult(message, exchange, oi, resContext);
             }
         } finally {
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
             BusFactory.setThreadDefaultBus(origBus);
         }
     }

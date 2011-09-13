@@ -31,6 +31,8 @@ import javax.xml.transform.Source;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
@@ -59,10 +61,10 @@ public class ColocMessageObserver extends ChainInitiationObserver {
 
     public void onMessage(Message m) {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
-                Thread.currentThread().setContextClassLoader(loader);
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             BusFactory.setThreadDefaultBus(bus);
             if (LOG.isLoggable(Level.FINER)) {
@@ -130,7 +132,9 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             setOutBoundMessage(ex, m.getExchange());
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
-            Thread.currentThread().setContextClassLoader(origLoader);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
         }
     }
     

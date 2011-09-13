@@ -31,6 +31,7 @@ import java.lang.reflect.TypeVariable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -65,6 +66,7 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
@@ -2508,7 +2510,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     private boolean isValidate() {
-        return validate || System.getProperty("cxf.validateServiceSchemas", "false").equals("true");
+        return validate 
+            || AccessController.doPrivileged(new SystemPropertyAction("cxf.validateServiceSchemas",
+                                                                      "false")).equals("true");
     }
 
     /**
