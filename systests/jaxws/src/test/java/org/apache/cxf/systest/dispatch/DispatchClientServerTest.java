@@ -74,7 +74,6 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeLater;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -223,8 +222,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         }
         
     }
+    
     @Test
-    @Ignore
     public void testSOAPMessageInvokeToOneWay() throws Exception {
         SOAPService service = new SOAPService(null, SERVICE_NAME);
         service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING,
@@ -244,8 +243,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         //Version 1:
         //we'll just call invoke
-        //disp.invoke(soapReqMsg1);
-        
+        disp.invoke(soapReqMsg1);
         
         //Version 2:
         //We want to handle things asynchronously

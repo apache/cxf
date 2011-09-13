@@ -600,6 +600,18 @@ public class ClientImpl
             }
             throw ex;
         }
+        
+        //REVISIT 
+        // - use a protocol neutral no-content marker instead of 202?
+        // - move the decoupled destination property name into api 
+        Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
+        if (null != responseCode && 202 == responseCode) {
+            Endpoint ep = exchange.getEndpoint();
+            if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
+                getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
+                return null;
+            }
+        }
 
         // Wait for a response if we need to
         if (oi != null && !oi.getOperationInfo().isOneWay()) {
