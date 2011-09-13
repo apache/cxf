@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -261,6 +264,8 @@ public final class EndpointReferenceUtils {
     
     
     private static final Set<Class<?>> ADDRESSING_CLASSES = new HashSet<Class<?>>();
+    private static final AtomicReference<Reference<JAXBContext>> ADDRESSING_CONTEXT 
+        = new AtomicReference<Reference<JAXBContext>>(new SoftReference<JAXBContext>(null));
     static {
         ADDRESSING_CLASSES.add(WSA_WSDL_OBJECT_FACTORY.getClass());
         ADDRESSING_CLASSES.add(WSAEndpointReferenceUtils.WSA_OBJECT_FACTORY.getClass());
@@ -1013,12 +1018,29 @@ public final class EndpointReferenceUtils {
         return id;
     }
     
+
+    private static synchronized JAXBContext createContextForEPR() throws JAXBException {
+        Reference<JAXBContext> rctx = ADDRESSING_CONTEXT.get();
+        JAXBContext ctx = rctx.get();
+        if (ctx == null) {
+            ctx = JAXBContextCache.getCachedContextAndSchemas(ADDRESSING_CLASSES,
+                                                              null, null, null,
+                                                              true).getContext();
+            ADDRESSING_CONTEXT.set(new SoftReference<JAXBContext>(ctx));
+        }    
+        return ctx;
+    }
+    private static JAXBContext getJAXBContextForEPR() throws JAXBException {
+        Reference<JAXBContext> rctx = ADDRESSING_CONTEXT.get();
+        JAXBContext ctx = rctx.get();
+        if (ctx == null) {
+            ctx = createContextForEPR();
+        }
+        return ctx;
+    }
     public static Source convertToXML(EndpointReferenceType epr) {
         try {
-            JAXBContext jaxbContext = JAXBContextCache.getCachedContextAndSchemas(ADDRESSING_CLASSES,
-                                                                                  null, null, null,
-                                                                                  false).getContext();
-            javax.xml.bind.Marshaller jm = jaxbContext.createMarshaller();
+            javax.xml.bind.Marshaller jm = getJAXBContextForEPR().createMarshaller();
             jm.setProperty(Marshaller.JAXB_FRAGMENT, true);
             QName qname = new QName("http://www.w3.org/2005/08/addressing", "EndpointReference");
             JAXBElement<EndpointReferenceType> 

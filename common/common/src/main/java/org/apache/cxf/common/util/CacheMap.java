@@ -46,6 +46,10 @@ public class CacheMap<K, V> implements Map<K, V> {
     Map<K, V> mainDataMap = new WeakHashMap<K, V>();
     Map<K, V> extraKeyMap = new WeakIdentityHashMap<K, V>();
 
+    public CacheMap() {
+        
+    }
+    
     public void clear() {
         mainDataMap.clear();
         extraKeyMap.clear();
