@@ -96,12 +96,6 @@ public class RMManager {
     public static final String WSRM_LAST_MESSAGE_PROPERTY = 
         "org.apache.cxf.ws.rm.last-message";
 
-    /**
-     * Message contextual property for setting the replyTo header
-     */
-    public static final String WSRM_REPLY_TO_PROPERTY = 
-        "org.apache.cxf.ws.rm.reply-to";
-    
     private static final Logger LOG = LogUtils.getL7dLogger(RMManager.class);
 
 
