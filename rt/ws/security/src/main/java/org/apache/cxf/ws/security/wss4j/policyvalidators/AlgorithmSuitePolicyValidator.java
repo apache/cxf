@@ -19,7 +19,10 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -28,7 +31,6 @@ import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey,
@@ -36,24 +38,24 @@ import org.apache.ws.security.util.WSSecurityUtil;
  */
 public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator {
     
-    private List<WSSecurityEngineResult> algorithmResults;
+    private List<WSSecurityEngineResult> results;
 
     public AlgorithmSuitePolicyValidator(
         List<WSSecurityEngineResult> results
     ) {
-        algorithmResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, algorithmResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR, algorithmResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.DKT, algorithmResults);
+        this.results = results;
     }
     
     public boolean validatePolicy(
         AssertionInfo aiBinding, AlgorithmSuite algorithmPolicy
     ) {
-        for (WSSecurityEngineResult result : algorithmResults) {
+        for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (WSConstants.SIGN == actInt 
                 && !checkSignatureAlgorithms(result, algorithmPolicy, aiBinding)) {
+                return false;
+            } else if (WSConstants.ENCR == actInt 
+                && !checkEncryptionAlgorithms(result, algorithmPolicy, aiBinding)) {
                 return false;
             }
         }
@@ -96,6 +98,121 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
                 );
                 return false;
             }
+        }
+        
+        if (!checkKeyLengths(result, algorithmPolicy, ai)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Check the Encryption Algorithms
+     */
+    private boolean checkEncryptionAlgorithms(
+        WSSecurityEngineResult result, 
+        AlgorithmSuite algorithmPolicy,
+        AssertionInfo ai
+    ) {
+        String transportMethod = 
+            (String)result.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD);
+        if (transportMethod != null 
+            && !algorithmPolicy.getSymmetricKeyWrap().equals(transportMethod)
+            && !algorithmPolicy.getAsymmetricKeyWrap().equals(transportMethod)) {
+            ai.setNotAsserted(
+                "The Key transport method does not match the requirement"
+            );
+            return false;
+        }
+        
+        List<WSDataRef> dataRefs = 
+            CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+        if (dataRefs != null) {
+            for (WSDataRef dataRef : dataRefs) {
+                String encryptionAlgorithm = dataRef.getAlgorithm();
+                if (!algorithmPolicy.getEncryption().equals(encryptionAlgorithm)) {
+                    ai.setNotAsserted(
+                        "The encryption algorithm does not match the requirement"
+                    );
+                    return false;
+                }
+            }
+        }
+        
+        if (!checkKeyLengths(result, algorithmPolicy, ai)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Check the key lengths of the secret and public keys.
+     */
+    private boolean checkKeyLengths(
+        WSSecurityEngineResult result, 
+        AlgorithmSuite algorithmPolicy,
+        AssertionInfo ai
+    ) {
+        /*
+         * TODO
+        byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+        if (secret != null 
+            && (secret.length < (algorithmPolicy.getMinimumSymmetricKeyLength() / 8)
+                || secret.length > (algorithmPolicy.getMaximumSymmetricKeyLength() / 8))) {
+            ai.setNotAsserted(
+                "The symmetric key length does not match the requirement"
+            );
+            return false;
+        }
+        */
+
+        PublicKey publicKey = (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+        if (publicKey != null && !checkPublicKeyLength(publicKey, algorithmPolicy, ai)) {
+            return false;
+        }
+        
+        X509Certificate x509Cert = 
+            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        if (x509Cert != null && !checkPublicKeyLength(x509Cert.getPublicKey(), algorithmPolicy, ai)) {
+            return false;
+        }
+        
+        return true;
+    }
+        
+    /**
+     * Check the public key lengths
+     */
+    private boolean checkPublicKeyLength(
+        PublicKey publicKey, 
+        AlgorithmSuite algorithmPolicy,
+        AssertionInfo ai
+    ) {
+        if (publicKey instanceof RSAPublicKey) {
+            int modulus = ((RSAPublicKey)publicKey).getModulus().bitLength();
+            if (modulus < algorithmPolicy.getMinimumAsymmetricKeyLength()
+                || modulus > algorithmPolicy.getMaximumAsymmetricKeyLength()) {
+                ai.setNotAsserted(
+                    "The asymmetric key length does not match the requirement"
+                );
+                return false;
+            }
+        } else if (publicKey instanceof DSAPublicKey) {
+            int length = ((DSAPublicKey)publicKey).getParams().getP().bitLength();
+            if (length < algorithmPolicy.getMinimumAsymmetricKeyLength()
+                || length > algorithmPolicy.getMaximumAsymmetricKeyLength()) {
+                ai.setNotAsserted(
+                    "The asymmetric key length does not match the requirement"
+                );
+                return false;
+            }
+        } else {
+            ai.setNotAsserted(
+                "An unknown public key was provided"
+            );
+            return false;
         }
         
         return true;
