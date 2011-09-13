@@ -20,7 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
+//import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
