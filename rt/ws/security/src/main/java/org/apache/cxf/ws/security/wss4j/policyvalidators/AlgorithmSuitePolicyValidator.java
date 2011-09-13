@@ -173,11 +173,13 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
             return false;
         }
         
+        /*
         X509Certificate x509Cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         if (x509Cert != null && !checkPublicKeyLength(x509Cert.getPublicKey(), algorithmPolicy, ai)) {
             return false;
         }
+        */
         
         return true;
     }
