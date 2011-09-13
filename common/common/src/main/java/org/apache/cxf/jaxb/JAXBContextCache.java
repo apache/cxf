@@ -22,7 +22,6 @@ package org.apache.cxf.jaxb;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -47,12 +46,12 @@ import org.apache.cxf.common.util.StringUtils;
  */
 public final class JAXBContextCache {
     public static final class CachedContextAndSchemas {
-        private SoftReference<JAXBContext> context;
+        private WeakReference<JAXBContext> context;
         private WeakReference<Set<Class<?>>> classes;
         private Collection<DOMSource> schemas;
 
         CachedContextAndSchemas(JAXBContext context, Set<Class<?>> classes) {
-            this.context = new SoftReference<JAXBContext>(context);
+            this.context = new WeakReference<JAXBContext>(context);
             this.classes = new WeakReference<Set<Class<?>>>(classes);
         }
 
