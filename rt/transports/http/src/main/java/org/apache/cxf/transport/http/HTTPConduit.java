@@ -59,6 +59,8 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
+import org.apache.cxf.endpoint.ClientCallback;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
@@ -2318,6 +2320,15 @@ public class HTTPConduit
                     // oneway operation or decoupled MEP without 
                     // partial response
                     connection.getInputStream().close();
+                    ClientCallback cc = exchange.get(ClientCallback.class);
+                    if (null != cc) {
+                        //REVISIT move the decoupled destination property name into api
+                        Endpoint ep = exchange.getEndpoint();
+                        if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
+                            getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
+                            cc.handleResponse(null, null);
+                        }
+                    }
                     return;
                 }
             } else {
