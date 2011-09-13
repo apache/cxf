@@ -199,7 +199,12 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             }
             return super.loadInterface(cl);
         }
-       
+        public Extension cloneNoObject() {
+            OSGiExtension ext = new OSGiExtension(this, bundle);
+            ext.obj = null;
+            return ext;
+        }
+
     }
 
 }
