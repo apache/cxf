@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -31,6 +30,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.SpnegoContextToken;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Constants;
 import org.apache.neethi.builders.AssertionBuilder;
@@ -48,7 +48,7 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
         return new QName[]{SP11Constants.SPNEGO_CONTEXT_TOKEN, SP12Constants.SPNEGO_CONTEXT_TOKEN};
     }
     
-    public PolicyAssertion build(Element element, AssertionBuilderFactory factory)
+    public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
                 ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
