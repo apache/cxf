@@ -26,6 +26,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -564,7 +565,10 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (cls instanceof Class) {
             return ((Class)cls).isArray();
         } else if (cls instanceof ParameterizedType) {
-            return true;
+            ParameterizedType pt = (ParameterizedType)cls;
+            return pt.getActualTypeArguments().length == 1
+                && pt.getRawType() instanceof Class
+                && Collection.class.isAssignableFrom((Class)pt.getRawType());
         } else if (cls instanceof GenericArrayType) {
             return true;
         }

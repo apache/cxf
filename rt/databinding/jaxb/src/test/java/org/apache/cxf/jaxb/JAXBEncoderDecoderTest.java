@@ -26,6 +26,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
@@ -79,6 +80,9 @@ public class JAXBEncoderDecoderTest extends Assert {
     RequestWrapper wrapperAnnotation;
     JAXBContext context;
     Schema schema;
+    Map<String, String> mapField;
+    String arrayField[];
+    List<String> listField;
     
     @Before
     public void setUp() throws Exception {
@@ -100,6 +104,24 @@ public class JAXBEncoderDecoderTest extends Assert {
         assertNotNull(schema);
     }
 
+    
+    private Type getFieldType(String name) throws Exception {
+        return this.getClass()
+            .getDeclaredField(name)
+            .getGenericType();
+    }
+    
+    @Test
+    public void testCXF3611() throws Exception {
+        Map<String, String> foo = new HashMap<String, String>();
+        
+        assertTrue(JAXBSchemaInitializer.isArray(getFieldType("arrayField")));
+        assertTrue(JAXBSchemaInitializer.isArray(getFieldType("listField")));
+
+        assertFalse(JAXBSchemaInitializer.isArray(foo.getClass()));
+        assertFalse(JAXBSchemaInitializer.isArray(getFieldType("mapField")));
+    }
+    
     @Test
     public void testMarshallIntoDOM() throws Exception {
         String str = new String("Hello");
