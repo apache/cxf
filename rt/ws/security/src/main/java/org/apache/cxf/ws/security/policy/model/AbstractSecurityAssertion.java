@@ -18,15 +18,11 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
-import java.util.Collection;
-
-import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 
-public abstract class AbstractSecurityAssertion implements PolicyAssertion {
+public abstract class AbstractSecurityAssertion implements Assertion {
     protected final SPConstants constants;
 
     private boolean isOptional;
@@ -74,14 +70,5 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
     public PolicyComponent normalize() {
         return this;
     }
-    
-    public boolean isAsserted(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ail = aim.getAssertionInfo(getName());
-        for (AssertionInfo ai : ail) {
-            if (ai.isAsserted() && ai.getAssertion() == this) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 }

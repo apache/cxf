@@ -19,17 +19,17 @@
 package org.apache.cxf.ws.security.policy.model;
 
 
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyContainingAssertion;
 
 public abstract class TokenWrapper extends AbstractSecurityAssertion 
-    implements PolicyAssertion, PolicyContainingAssertion {
+    implements Assertion, PolicyContainingAssertion {
     protected PolicyBuilder builder;
     protected Token token;
 

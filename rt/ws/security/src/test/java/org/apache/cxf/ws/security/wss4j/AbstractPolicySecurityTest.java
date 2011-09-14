@@ -55,7 +55,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -195,8 +194,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                     Collection<AssertionInfo> ais = aim.get(assertionType);
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
-                        assertTrue(assertionType + " policy erroneously failed.",
-                                ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
+                        checkAssertion(aim, assertionType, ai, true);
                     }
                 }
             }
@@ -206,11 +204,29 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                     Collection<AssertionInfo> ais = aim.get(assertionType);
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
-                        assertFalse(assertionType + " policy erroneously asserted.",
-                                    ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
+                        checkAssertion(aim, assertionType, ai, false);
                     }
                 }
             }
+        }
+    }
+    
+    private void checkAssertion(AssertionInfoMap aim, 
+                                QName name,
+                                AssertionInfo inf,
+                                boolean asserted) {
+        boolean pass = true;
+        Collection<AssertionInfo> ail = aim.getAssertionInfo(name);
+        for (AssertionInfo ai : ail) {
+            if (ai.getAssertion().equal(inf.getAssertion())
+                && !ai.isAsserted() && !inf.getAssertion().isOptional()) {
+                pass = false;                    
+            }
+        }
+        if (asserted) {
+            assertTrue(name + " policy erroneously failed.", pass);
+        } else {
+            assertFalse(name + " policy erroneously asserted.", pass);            
         }
     }
     
@@ -269,8 +285,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                     Collection<AssertionInfo> ais = aim.get(assertionType);
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
-                        assertTrue(assertionType + " policy erroneously failed.",
-                                   ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
+                        checkAssertion(aim, assertionType, ai, true);
                     }
                 }
             }
@@ -280,8 +295,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                     Collection<AssertionInfo> ais = aim.get(assertionType);
                     assertNotNull(ais);
                     for (AssertionInfo ai : ais) {
-                        assertFalse(assertionType + " policy erroneously asserted.",
-                                    ((PolicyAssertion)ai.getAssertion()).isAsserted(aim));
+                        checkAssertion(aim, assertionType, ai, false);
                     }
                 }
             }
