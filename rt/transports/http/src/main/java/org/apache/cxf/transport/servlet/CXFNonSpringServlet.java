@@ -128,5 +128,10 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
             }
         }
         destinationRegistry = null;
+        destroyBus();
+    }
+    
+    public void destroyBus() {
+        bus.shutdown(true);
     }
 }
