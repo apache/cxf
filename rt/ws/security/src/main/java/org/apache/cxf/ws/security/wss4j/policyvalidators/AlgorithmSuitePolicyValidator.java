@@ -19,8 +19,9 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.security.Principal;
 import java.security.PublicKey;
-//import java.security.cert.X509Certificate;
+// import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -30,11 +31,12 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityEngineResult;
 
 /**
- * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey,
- * EncryptedData or DerivedKey structure against an AlgorithmSuite policy.
+ * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey or
+ * EncryptedData structure against an AlgorithmSuite policy.
  */
 public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator {
     
@@ -100,7 +102,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
             }
         }
         
-        if (!checkKeyLengths(result, algorithmPolicy, ai)) {
+        if (!checkKeyLengths(result, algorithmPolicy, ai, true)) {
             return false;
         }
         
@@ -140,7 +142,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
             }
         }
         
-        if (!checkKeyLengths(result, algorithmPolicy, ai)) {
+        if (!checkKeyLengths(result, algorithmPolicy, ai, false)) {
             return false;
         }
         
@@ -153,21 +155,9 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
     private boolean checkKeyLengths(
         WSSecurityEngineResult result, 
         AlgorithmSuite algorithmPolicy,
-        AssertionInfo ai
+        AssertionInfo ai,
+        boolean signature
     ) {
-        /*
-         * TODO
-        byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-        if (secret != null 
-            && (secret.length < (algorithmPolicy.getMinimumSymmetricKeyLength() / 8)
-                || secret.length > (algorithmPolicy.getMaximumSymmetricKeyLength() / 8))) {
-            ai.setNotAsserted(
-                "The symmetric key length does not match the requirement"
-            );
-            return false;
-        }
-        */
-
         PublicKey publicKey = (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
         if (publicKey != null && !checkPublicKeyLength(publicKey, algorithmPolicy, ai)) {
             return false;
@@ -180,6 +170,34 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
             return false;
         }
         */
+        
+        byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+        if (signature) {
+            Principal principal = (Principal)result.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+            if (principal instanceof WSDerivedKeyTokenPrincipal) {
+                int requiredLength = algorithmPolicy.getSignatureDerivedKeyLength();
+                if (secret == null || secret.length != (requiredLength / 8)) {
+                    ai.setNotAsserted(
+                        "The signature derived key length does not match the requirement"
+                    );
+                    return false;
+                }
+            } else if (secret != null 
+                && (secret.length < (algorithmPolicy.getMinimumSymmetricKeyLength() / 8)
+                    || secret.length > (algorithmPolicy.getMaximumSymmetricKeyLength() / 8))) {
+                ai.setNotAsserted(
+                    "The symmetric key length does not match the requirement"
+                );
+                return false;
+            }
+        } else if (secret != null 
+            && (secret.length < (algorithmPolicy.getMinimumSymmetricKeyLength() / 8)
+                || secret.length > (algorithmPolicy.getMaximumSymmetricKeyLength() / 8))) {
+            ai.setNotAsserted(
+                "The symmetric key length does not match the requirement"
+            );
+            return false;
+        }
         
         return true;
     }
