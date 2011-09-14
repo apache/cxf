@@ -277,8 +277,14 @@ public final class ContextUtils {
         LOG.log(Level.FINE,
                 "retrieving MAPs from context property {0}",
                 mapProperty);
+        
         AddressingPropertiesImpl maps =
             (AddressingPropertiesImpl)message.get(mapProperty);
+        if (maps == null && isOutbound && !isRequestor
+            && message.getExchange() != null && message.getExchange().getInMessage() != null) { 
+            maps = (AddressingPropertiesImpl)message.getExchange().getInMessage().get(mapProperty); 
+        }
+        
         if (maps != null) {
             LOG.log(Level.FINE, "current MAPs {0}", maps);
         } else if (!isProviderContext) {
