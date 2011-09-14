@@ -43,6 +43,7 @@ import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.SessionIdManager;
 import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -407,7 +408,21 @@ public class JettyHTTPServerEngine
             if (sessionManager == null) {
                 sessionManager = new HashSessionManager();
                 HashSessionIdManager idManager = new HashSessionIdManager();
-                sessionManager.setIdManager(idManager);
+                
+                try {
+                    //for JETTY 7.5
+                    sessionManager.getClass().getMethod("setSessionIdManager", SessionIdManager.class)
+                        .invoke(sessionManager, idManager);
+                } catch (Exception e) {
+                    //for JETTY <=7.4.x
+                    try {
+                        sessionManager.getClass().getMethod("setIdManager", SessionIdManager.class)
+                            .invoke(sessionManager, idManager);
+                    } catch (Exception e1) {
+                        throw new Fault(new Message("START_UP_SERVER_FAILED_MSG", LOG,
+                                                    e.getMessage(), port), e);                        
+                    }
+                }
             }
             SessionHandler sessionHandler = new SessionHandler(sessionManager);
             if (securityHandler != null) {
