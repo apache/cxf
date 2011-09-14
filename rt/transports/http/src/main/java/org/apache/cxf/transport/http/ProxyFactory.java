@@ -62,7 +62,7 @@ public class ProxyFactory {
     private static HTTPClientPolicy createSystemProxyConfiguration() {
         // Retrieve system properties (if any)
         HTTPClientPolicy systemProxyConfiguration = null;
-        String proxyHost = SystemPropertyAction.getProperty(HTTP_PROXY_HOST);
+        String proxyHost = SystemPropertyAction.getPropertyOrNull(HTTP_PROXY_HOST);
         if (proxyHost != null) {
             // System is configured with a proxy, use it
 
@@ -75,7 +75,7 @@ public class ProxyFactory {
             systemProxyConfiguration.setProxyServerPort(Integer.valueOf(proxyPort));
 
             // Load non proxy hosts
-            String nonProxyHosts = SystemPropertyAction.getProperty(HTTP_NON_PROXY_HOSTS);
+            String nonProxyHosts = SystemPropertyAction.getPropertyOrNull(HTTP_NON_PROXY_HOSTS);
             if (!StringUtils.isEmpty(nonProxyHosts)) {
                 systemProxyConfiguration.setNonProxyHosts(nonProxyHosts);
             }

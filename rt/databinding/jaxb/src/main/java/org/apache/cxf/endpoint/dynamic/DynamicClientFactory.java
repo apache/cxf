@@ -494,7 +494,7 @@ public class DynamicClientFactory {
                 }
                 if (f2.exists()) {
                     classPath.append(f2.getAbsolutePath());
-                    classPath.append(SystemPropertyAction.getProperty("path.separator"));
+                    classPath.append(File.pathSeparator);
                 }
             }
         }         
@@ -545,7 +545,7 @@ public class DynamicClientFactory {
                     Method method = tcl.getClass().getMethod("getClassPath");
                     Object weblogicClassPath = method.invoke(tcl);
                     classPath.append(weblogicClassPath)
-                        .append(SystemPropertyAction.getProperty("path.separator")); 
+                        .append(File.pathSeparator); 
                 } catch (Exception e) {
                     LOG.log(Level.FINE, "unsuccessfully tried getClassPath method", e);
                 }

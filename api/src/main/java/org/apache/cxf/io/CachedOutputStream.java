@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,17 +44,15 @@ public class CachedOutputStream extends OutputStream {
     private static final File DEFAULT_TEMP_DIR;
     private static final int DEFAULT_THRESHOLD;
     static {
-        String s = AccessController
-            .doPrivileged(new SystemPropertyAction("org.apache.cxf.io.CachedOutputStream.Threshold",
-                                                   "-1"));
+        String s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold",
+                                                   "-1");
         int i = Integer.parseInt(s);
         if (i <= 0) {
             i = 64 * 1024;
         }
         DEFAULT_THRESHOLD = i;
         
-        s = AccessController
-            .doPrivileged(new SystemPropertyAction("org.apache.cxf.io.CachedOutputStream.OutputDirectory"));
+        s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
         if (s != null) {
             File f = new File(s);
             if (f.exists() && f.isDirectory()) {

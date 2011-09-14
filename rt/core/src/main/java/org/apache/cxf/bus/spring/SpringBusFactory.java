@@ -95,10 +95,10 @@ public class SpringBusFactory extends BusFactory {
     
     public Bus createBus(String cfgFiles[], boolean includeDefaults) {
         try {
-            String userCfgFile = AccessController
-                .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_NAME));
-            String sysCfgFileUrl = AccessController
-                .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_URL));
+            String userCfgFile 
+                = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_NAME);
+            String sysCfgFileUrl 
+                = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_URL);
             final Resource r = BusApplicationContext.findResource(Configurer.DEFAULT_USER_CFG_FILE);
 
             boolean exists = true;

@@ -45,7 +45,7 @@ public final class SAAJFactoryResolver {
 
     public static MessageFactory createMessageFactory(SoapVersion version) throws SOAPException {
         MessageFactory messageFactory;
-        String messageFactoryClassName = SystemPropertyAction.getProperty(MESSAGE_FACTORY_KEY);
+        String messageFactoryClassName = SystemPropertyAction.getPropertyOrNull(MESSAGE_FACTORY_KEY);
         if (messageFactoryClassName != null) {
             messageFactory = newInstanceCxfSAAJFactory(messageFactoryClassName,
                                                           MessageFactory.class);
@@ -69,7 +69,7 @@ public final class SAAJFactoryResolver {
 
     public static SOAPFactory createSOAPFactory(SoapVersion version) throws SOAPException {
         SOAPFactory soapFactory;
-        String soapFactoryClassName = SystemPropertyAction.getProperty(SOAP_FACTORY_KEY);
+        String soapFactoryClassName = SystemPropertyAction.getPropertyOrNull(SOAP_FACTORY_KEY);
         if (soapFactoryClassName != null) {
             soapFactory = newInstanceCxfSAAJFactory(soapFactoryClassName,
                                                        SOAPFactory.class);

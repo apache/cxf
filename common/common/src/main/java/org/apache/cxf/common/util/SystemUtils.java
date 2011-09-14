@@ -41,9 +41,9 @@ public final class SystemUtils {
     public static String getSpringValidationMode() {
         return AccessController.doPrivileged(new PrivilegedAction<String>() {
             public String run() {
-                String mode = SystemPropertyAction.getProperty(SPRING_VALIDATION_MODE);
+                String mode = SystemPropertyAction.getPropertyOrNull(SPRING_VALIDATION_MODE);
                 if (mode == null) {
-                    mode = SystemPropertyAction.getProperty("spring.validation.mode");
+                    mode = SystemPropertyAction.getPropertyOrNull("spring.validation.mode");
                 }
                 return mode;
             }

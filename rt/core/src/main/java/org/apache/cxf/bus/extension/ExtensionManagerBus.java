@@ -19,7 +19,6 @@
 package org.apache.cxf.bus.extension;
 
 import java.io.InputStream;
-import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -181,7 +180,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
         }
 
         // next check system properties
-        busId = AccessController.doPrivileged(new SystemPropertyAction(BUS_ID_PROPERTY_NAME));
+        busId = SystemPropertyAction.getPropertyOrNull(BUS_ID_PROPERTY_NAME);
         if (null != busId && !"".equals(busId)) {
             return busId;
         }

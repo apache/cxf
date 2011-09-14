@@ -130,7 +130,7 @@ public class Compiler {
         List<String> list = new ArrayList<String>();
 
         // Start of honoring java.home for used javac
-        String fsep = SystemPropertyAction.getProperty("file.separator");
+        String fsep = File.separator;
         String javacstr = "javac";
         String platformjavacname = "javac";
 

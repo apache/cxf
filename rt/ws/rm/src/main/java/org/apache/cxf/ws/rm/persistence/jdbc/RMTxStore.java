@@ -694,7 +694,7 @@ public class RMTxStore implements RMStore {
     }
     
     public static void deleteDatabaseFiles(String dbName, boolean now) {
-        String dsh = SystemPropertyAction.getProperty("derby.system.home");
+        String dsh = SystemPropertyAction.getPropertyOrNull("derby.system.home");
        
         File root = null;  
         File log = null;

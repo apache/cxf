@@ -49,12 +49,7 @@ public final class FileUtils {
             return defaultTempDir;
         }
         
-        String s = null;
-        try {
-            s = SystemPropertyAction.getProperty(FileUtils.class.getName() + ".TempDirectory");
-        } catch (SecurityException e) {
-            //Ignorable, we'll use the default
-        }
+        String s = SystemPropertyAction.getPropertyOrNull(FileUtils.class.getName() + ".TempDirectory");
         if (s != null) {
             //assume someone outside of us will manage the directory
             File f = new File(s);

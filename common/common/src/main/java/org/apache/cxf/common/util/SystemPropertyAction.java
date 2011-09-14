@@ -21,18 +21,23 @@ package org.apache.cxf.common.util;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * 
  */
-public class SystemPropertyAction implements PrivilegedAction<String> {
+public final class SystemPropertyAction implements PrivilegedAction<String> {
+    private static final Logger LOG = LogUtils.getL7dLogger(SystemPropertyAction.class);
     final String property;
     final String def;
-    public SystemPropertyAction(String name) {
+    private SystemPropertyAction(String name) {
         property = name;
         def = null;
     }
-    public SystemPropertyAction(String name, String d) {
+    private SystemPropertyAction(String name, String d) {
         property = name;
         def = d;
     }
@@ -50,7 +55,28 @@ public class SystemPropertyAction implements PrivilegedAction<String> {
     public static String getProperty(String name) {
         return AccessController.doPrivileged(new SystemPropertyAction(name));
     }
+    
     public static String getProperty(String name, String def) {
-        return AccessController.doPrivileged(new SystemPropertyAction(name, def));
+        try {
+            return AccessController.doPrivileged(new SystemPropertyAction(name, def));
+        } catch (SecurityException ex) {
+            LOG.log(Level.FINE, "SecurityException raised getting property " + name, ex);
+            return def;
+        }
+    }
+
+    /**
+     * Get the system propery via the AccessController, but if a SecurityException is 
+     * raised, just return null;
+     * @param name
+     * @return
+     */
+    public static String getPropertyOrNull(String name) {
+        try {
+            return AccessController.doPrivileged(new SystemPropertyAction(name));
+        } catch (SecurityException ex) {
+            LOG.log(Level.FINE, "SecurityException raised getting property " + name, ex);
+            return null;
+        }
     }
 }

@@ -86,8 +86,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
         super(beanFactory);
         tunedDocumentLoader = new TunedDocumentLoader();
         this.setDocumentLoader(tunedDocumentLoader);
-        noFastinfoset = AccessController
-            .doPrivileged(new SystemPropertyAction("org.apache.cxf.nofastinfoset")) != null 
+        noFastinfoset = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.nofastinfoset") != null 
             || !TunedDocumentLoader.hasFastInfoSet();
     }
 

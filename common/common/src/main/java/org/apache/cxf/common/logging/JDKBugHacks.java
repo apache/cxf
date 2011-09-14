@@ -27,6 +27,9 @@ import java.net.URLConnection;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
+
 /**
  * This is called from LogUtils as LogUtils is almost always one of the VERY
  * first classes loaded in CXF so we can try and register to hacks/workarounds
@@ -46,11 +49,11 @@ final class JDKBugHacks {
     
     public static void doHacks() {
         try {
-            ClassLoader orig = Thread.currentThread().getContextClassLoader();
+            // Use the system classloader as the victim for all this
+            // ClassLoader pinning we're about to do.
+            ClassLoaderHolder orig = ClassLoaderUtils
+                .setThreadContextClassloader(ClassLoader.getSystemClassLoader());
             try {
-                // Use the system classloader as the victim for all this
-                // ClassLoader pinning we're about to do.
-                Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
                 
                 try {
                     //Trigger a call to sun.awt.AppContext.getAppContext()
@@ -122,7 +125,9 @@ final class JDKBugHacks {
                 // to the web application class loader.
                 java.security.Security.getProviders();
             } finally {
-                Thread.currentThread().setContextClassLoader(orig);
+                if (orig != null) {
+                    orig.reset();
+                }
             }
         } catch (Throwable t) {
             //ignore

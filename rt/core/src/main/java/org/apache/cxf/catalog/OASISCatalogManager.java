@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.AccessController;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -50,7 +49,7 @@ public class OASISCatalogManager {
     private static final Logger LOG =
         LogUtils.getL7dLogger(OASISCatalogManager.class);
     private static final String DEBUG_LEVEL 
-        = AccessController.doPrivileged(new SystemPropertyAction(CATALOG_DEBUG_KEY));
+        = SystemPropertyAction.getPropertyOrNull(CATALOG_DEBUG_KEY);
     
 
     private Object resolver;

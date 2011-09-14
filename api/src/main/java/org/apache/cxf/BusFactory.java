@@ -22,7 +22,6 @@ package org.apache.cxf;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.AccessController;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -260,8 +259,7 @@ public abstract class BusFactory {
         String busFactoryCondition = null;
 
         // next check system properties
-        busFactoryClass = AccessController
-            .doPrivileged(new SystemPropertyAction(BusFactory.BUS_FACTORY_PROPERTY_NAME));
+        busFactoryClass = SystemPropertyAction.getPropertyOrNull(BusFactory.BUS_FACTORY_PROPERTY_NAME);
         if (isValidBusFactoryClass(busFactoryClass)) {
             return busFactoryClass;
         }

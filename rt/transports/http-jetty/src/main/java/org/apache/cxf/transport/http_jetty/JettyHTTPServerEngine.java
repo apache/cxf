@@ -218,10 +218,10 @@ public class JettyHTTPServerEngine
         //test things in the same VM.
         
         String s = SystemPropertyAction
-                .getProperty("org.apache.cxf.transports.http_jetty.DontClosePort." + port);
+                .getPropertyOrNull("org.apache.cxf.transports.http_jetty.DontClosePort." + port);
         if (s == null) {
             s = SystemPropertyAction
-                .getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
+                .getPropertyOrNull("org.apache.cxf.transports.http_jetty.DontClosePort");
         }
         return !Boolean.valueOf(s);
     }

@@ -67,7 +67,7 @@ public final class LogUtils {
         JDKBugHacks.doHacks();
         
         try {
-            String cname = SystemPropertyAction.getProperty(KEY);
+            String cname = SystemPropertyAction.getPropertyOrNull(KEY);
             if (StringUtils.isEmpty(cname)) {
                 InputStream ins = Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream("META-INF/cxf/" + KEY);

@@ -146,7 +146,7 @@ public class URIResolver {
                 try {
                     HttpURLConnection huc = (HttpURLConnection)url.openConnection();
 
-                    String host = SystemPropertyAction.getProperty("http.proxyHost");
+                    String host = SystemPropertyAction.getPropertyOrNull("http.proxyHost");
                     if (host != null) {
                         //comment out unused port to pass pmd check
                         /*String ports = SystemPropertyAction.getProperty("http.proxyPort");
@@ -155,8 +155,8 @@ public class URIResolver {
                             port = Integer.parseInt(ports);
                         }*/
 
-                        String username = SystemPropertyAction.getProperty("http.proxy.user");
-                        String password = SystemPropertyAction.getProperty("http.proxy.password");
+                        String username = SystemPropertyAction.getPropertyOrNull("http.proxy.user");
+                        String password = SystemPropertyAction.getPropertyOrNull("http.proxy.password");
 
                         if (username != null && password != null) {
                             String encoded = Base64Utility.encode((username + ":" + password).getBytes());

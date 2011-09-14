@@ -163,8 +163,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         
         boolean usingDefault = false;
         if (null == cfgFiles) {
-            String cfgFile = AccessController
-                .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_NAME));
+            String cfgFile = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_NAME);
             if (cfgFile != null) {
                 cfgFiles = new String[] {cfgFile};
             }
@@ -204,8 +203,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             }
         } 
         
-        String sysCfgFileUrl = AccessController
-            .doPrivileged(new SystemPropertyAction(Configurer.USER_CFG_FILE_PROPERTY_URL));
+        String sysCfgFileUrl = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_URL);
         if (null != sysCfgFileUrl) {
             try {
                 UrlResource ur = new UrlResource(sysCfgFileUrl);
