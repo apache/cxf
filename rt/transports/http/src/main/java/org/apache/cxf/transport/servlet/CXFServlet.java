@@ -31,7 +31,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 public class CXFServlet extends CXFNonSpringServlet {
-
+    private boolean busCreated;
+    private XmlWebApplicationContext createdContext; 
+    
     public CXFServlet() {
     }
 
@@ -57,6 +59,7 @@ public class CXFServlet extends CXFNonSpringServlet {
         if (wac != null) {
             setBus(wac.getBean("cxf", Bus.class));
         } else {
+            busCreated = true;
             setBus(BusFactory.newInstance().createBus());
         }
     }
@@ -75,6 +78,7 @@ public class CXFServlet extends CXFNonSpringServlet {
                                                    ServletConfig sc,
                                                    String location) {
         XmlWebApplicationContext ctx2 = new XmlWebApplicationContext();
+        createdContext = ctx2;
         ctx2.setServletConfig(sc);
 
         Resource r = ctx2.getResource(location);
@@ -109,10 +113,20 @@ public class CXFServlet extends CXFNonSpringServlet {
             }
         } else {
             ctx2.setConfigLocations(new String[] {"classpath:/META-INF/cxf/cxf.xml",
-                                                  location});            
+                                                  location});
+            createdContext = ctx2;
         }
         ctx2.refresh();
         return ctx2;
+    }
+    public void destroyBus() {
+        if (busCreated) {
+            //if we created the Bus, we need to destroy it.  Otherwise, spring will handleit.
+            getBus().shutdown(true);
+        }
+        if (createdContext != null) {
+            createdContext.close();
+        }
     }
 
 }
