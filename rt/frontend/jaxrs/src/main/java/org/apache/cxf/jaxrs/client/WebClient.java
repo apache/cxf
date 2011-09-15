@@ -565,6 +565,21 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Replaces the header value with the new values.
+     * @param headerName headerValues
+     * @param value new values, null is equivalent to removing the header
+     * @return updated WebClient
+     */
+    public WebClient replaceHeader(String headerName, String value) {
+        MultivaluedMap<String, String> headers = getState().getRequestHeaders();
+        headers.remove(headerName);
+        if (value != null) {
+            headers.add(headerName, value);
+        }
+        return this;
+    }
+    
+    /**
      * Replaces the current query with the new value.
      * @param queryString the new value, providing a null is
      *        equivalent to calling resetQuery().  

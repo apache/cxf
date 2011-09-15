@@ -31,6 +31,25 @@ import org.junit.Test;
 public class WebClientTest extends Assert {
 
     @Test
+    public void testReplaceHeader() {
+        WebClient wc = WebClient.create("http://foo").header("a", "b");
+        assertEquals(1, wc.getHeaders().size());
+        assertEquals("b", wc.getHeaders().getFirst("a"));
+        wc.replaceHeader("a", "c");
+        assertEquals(1, wc.getHeaders().size());
+        assertEquals("c", wc.getHeaders().getFirst("a"));
+    }
+    
+    @Test
+    public void testRemoveHeader() {
+        WebClient wc = WebClient.create("http://foo").header("a", "b");
+        assertEquals(1, wc.getHeaders().size());
+        assertEquals("b", wc.getHeaders().getFirst("a"));
+        wc.replaceHeader("a", null);
+        assertEquals(0, wc.getHeaders().size());
+    }
+    
+    @Test
     public void testEncoding() {
         URI u = WebClient.create("http://foo").path("bar+ %2B").matrix("a", "value+ ")
             .query("b", "bv+ %2B").getCurrentURI();
