@@ -80,6 +80,9 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
 
     @SuppressWarnings("unchecked")
     public void execute() throws ToolException {
+        if (hasInfoOption()) {
+            return;
+        }
         buildToolContext();
         validate(context);
 
