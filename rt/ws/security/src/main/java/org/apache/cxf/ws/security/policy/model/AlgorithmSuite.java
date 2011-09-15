@@ -33,45 +33,45 @@ import org.apache.cxf.ws.security.policy.WSSPolicyException;
 public class AlgorithmSuite extends AbstractSecurityAssertion {
     private static final Logger LOG = LogUtils.getL7dLogger(AlgorithmSuite.class);
     
-    private String algoSuiteString;
+    protected String algoSuiteString;
 
-    private String symmetricSignature = SPConstants.HMAC_SHA1;
+    protected String symmetricSignature = SPConstants.HMAC_SHA1;
 
-    private String asymmetricSignature = SPConstants.RSA_SHA1;
+    protected String asymmetricSignature = SPConstants.RSA_SHA1;
 
-    private String computedKey = SPConstants.P_SHA1;
+    protected String computedKey = SPConstants.P_SHA1;
 
-    private int maximumSymmetricKeyLength = 256;
+    protected int maximumSymmetricKeyLength = 256;
 
-    private int minimumAsymmetricKeyLength = 1024;
+    protected int minimumAsymmetricKeyLength = 1024;
 
-    private int maximumAsymmetricKeyLength = 4096;
+    protected int maximumAsymmetricKeyLength = 4096;
 
-    private String digest;
+    protected String digest;
 
-    private String encryption;
+    protected String encryption;
 
-    private String symmetricKeyWrap;
+    protected String symmetricKeyWrap;
 
-    private String asymmetricKeyWrap;
+    protected String asymmetricKeyWrap;
 
-    private String encryptionKeyDerivation;
+    protected String encryptionKeyDerivation;
 
-    private int encryptionDerivedKeyLength;
+    protected int encryptionDerivedKeyLength;
 
-    private String signatureKeyDerivation;
+    protected String signatureKeyDerivation;
 
-    private int signatureDerivedKeyLength;
+    protected int signatureDerivedKeyLength;
 
-    private int minimumSymmetricKeyLength;
+    protected int minimumSymmetricKeyLength;
 
-    private String c14n = SPConstants.EX_C14N;
+    protected String c14n = SPConstants.EX_C14N;
 
-    private String soapNormalization;
+    protected String soapNormalization;
 
-    private String strTransform;
+    protected String strTransform;
 
-    private String xPath;
+    protected String xPath;
 
     public AlgorithmSuite(SPConstants version) {
         super(version);

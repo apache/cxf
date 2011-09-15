@@ -21,7 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.Principal;
 import java.security.PublicKey;
-// import java.security.cert.X509Certificate;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -163,13 +163,11 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
             return false;
         }
         
-        /*
         X509Certificate x509Cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         if (x509Cert != null && !checkPublicKeyLength(x509Cert.getPublicKey(), algorithmPolicy, ai)) {
             return false;
         }
-        */
         
         byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         if (signature) {

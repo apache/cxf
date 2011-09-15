@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -40,8 +41,10 @@ import org.apache.neethi.builders.AssertionBuilder;
 public class TransportBindingBuilder implements AssertionBuilder<Element> {
     
     PolicyBuilder builder;
-    public TransportBindingBuilder(PolicyBuilder b) {
+    Bus bus;
+    public TransportBindingBuilder(PolicyBuilder b, Bus bus) {
         builder = b;
+        this.bus = bus;
     }
     
     public Assertion build(Element element, AssertionBuilderFactory factory)
@@ -72,7 +75,7 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
                 while (child != null) {
                     String name = child.getLocalName();
                     if (name.equals(SPConstants.ALGO_SUITE)) {
-                        parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder()
+                        parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder(bus)
                             .build(child, factory));
                     } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
                         parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)

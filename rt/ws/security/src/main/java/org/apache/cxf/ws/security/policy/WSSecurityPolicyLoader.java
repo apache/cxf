@@ -93,7 +93,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             return;
         }
         PolicyBuilder pbuild = bus.getExtension(PolicyBuilder.class);
-        reg.registerBuilder(new AlgorithmSuiteBuilder());
+        reg.registerBuilder(new AlgorithmSuiteBuilder(bus));
         reg.registerBuilder(new AsymmetricBindingBuilder(pbuild));
         reg.registerBuilder(new ContentEncryptedElementsBuilder());
         reg.registerBuilder(new EncryptedElementsBuilder());
@@ -115,7 +115,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new SupportingTokens12Builder(pbuild));
         reg.registerBuilder(new SupportingTokensBuilder(pbuild));
         reg.registerBuilder(new SymmetricBindingBuilder(pbuild));
-        reg.registerBuilder(new TransportBindingBuilder(pbuild));
+        reg.registerBuilder(new TransportBindingBuilder(pbuild, bus));
         reg.registerBuilder(new TransportTokenBuilder(pbuild));
         reg.registerBuilder(new Trust10Builder());
         reg.registerBuilder(new Trust13Builder());
