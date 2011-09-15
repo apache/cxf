@@ -638,7 +638,11 @@ public class WSDLToCorbaHelper {
             name = createQNameCorbaNamespace(schematypeName.getLocalPart());
         }
 
-        if (stype.getContent() instanceof XmlSchemaSimpleTypeRestriction) {
+        if (stype.getParent().getTargetNamespace().equals(W3CConstants.NU_SCHEMA_XSD)) {
+            // built in types
+            QName stypeName = createQNameXmlSchemaNamespace(stype.getName());
+            corbaTypeImpl = getLocalType(stypeName);
+        } else if (stype.getContent() instanceof XmlSchemaSimpleTypeRestriction) {
             corbaTypeImpl = processSimpleRestrictionType(stype, name, schematypeName, anonymous);
         } else if (stype.getContent() instanceof XmlSchemaSimpleTypeList) {
             XmlSchemaSimpleTypeList ltype = (XmlSchemaSimpleTypeList)stype.getContent();
