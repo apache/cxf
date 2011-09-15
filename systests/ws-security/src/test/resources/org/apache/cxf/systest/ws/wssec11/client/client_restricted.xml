@@ -38,6 +38,12 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <bean id="restrictedPolicyLoader"
+          class="org.apache.cxf.systest.ws.wssec11.RestrictedAlgorithmSuiteLoader" >
+          <constructor-arg ref="cxf"/>
+    </bean>
+   
     <!-- -->
     <!-- Scenario 4.1 -->
     <!-- -->

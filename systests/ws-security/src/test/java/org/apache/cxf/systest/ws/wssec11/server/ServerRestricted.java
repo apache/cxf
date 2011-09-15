@@ -24,6 +24,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.ws.wssec11.RestrictedAlgorithmSuiteLoader;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 
@@ -36,6 +37,10 @@ public class ServerRestricted extends AbstractBusTestServerBase {
     
     protected ServerRestricted(String baseUrl) throws Exception {
         
+        Bus bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server/server.xml");
+        new RestrictedAlgorithmSuiteLoader(bus);
+        BusFactory.setDefaultBus(bus);
+        setBus(bus);
         
         doPublish(baseUrl + "/APingService", new APingService());
         doPublish(baseUrl + "/A-NoTimestampPingService", new ANoTimestampPingService());
@@ -65,11 +70,6 @@ public class ServerRestricted extends AbstractBusTestServerBase {
     }
     
     protected void run()  {
-        Bus busLocal = new SpringBusFactory().createBus(
-            "org/apache/cxf/systest/ws/wssec11/server/server.xml");
-        BusFactory.setDefaultBus(busLocal);
-        setBus(busLocal);
-
         try {
             new ServerRestricted("http://localhost:" + PORT);
         } catch (Exception e) {
@@ -78,7 +78,6 @@ public class ServerRestricted extends AbstractBusTestServerBase {
     }
     
     public static void main(String args[]) throws Exception {
-        new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server/server.xml");
         new ServerRestricted("http://localhost:" + PORT);
         System.out.println("Server ready...");
 

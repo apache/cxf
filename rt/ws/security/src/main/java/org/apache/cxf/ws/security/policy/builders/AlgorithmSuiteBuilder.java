@@ -24,11 +24,14 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.WSSPolicyException;
+import org.apache.cxf.ws.security.policy.custom.AlgorithmSuiteLoader;
+import org.apache.cxf.ws.security.policy.custom.DefaultAlgorithmSuiteLoader;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
@@ -37,19 +40,35 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
     
+    private Bus bus;
+
+    public AlgorithmSuiteBuilder(Bus bus) {
+        this.bus = bus;
+    }
+    
     public Assertion build(Element element, AssertionBuilderFactory factory)
         throws IllegalArgumentException {
         
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
-        AlgorithmSuite algorithmSuite = new AlgorithmSuite(consts);
-
-        Element policyElem = DOMUtils.getFirstElement(element);
+        AlgorithmSuiteLoader loader = bus.getExtension(AlgorithmSuiteLoader.class);
+        if (loader == null) {
+            loader = new DefaultAlgorithmSuiteLoader();
+        } 
+        Element policyElement = DOMUtils.getFirstElement(element);
+        AlgorithmSuite algorithmSuite = null;
         try {
-            algorithmSuite.setAlgorithmSuite(DOMUtils.getFirstElement(policyElem).getLocalName());
+            algorithmSuite = loader.getAlgorithmSuite(policyElement, consts);
         } catch (WSSPolicyException e) {
             throw new IllegalArgumentException(e);
+        }
+        
+        if (algorithmSuite == null) {
+            String algorithmSuiteName = DOMUtils.getFirstElement(policyElement).getLocalName();
+            throw new IllegalArgumentException(
+                "Algorithm suite \"" + algorithmSuiteName + "\" is not registered"
+            );
         }
 
         return algorithmSuite;
