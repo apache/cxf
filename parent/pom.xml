@@ -127,7 +127,7 @@
         <cxf.servicemix.specs.version>1.8.0</cxf.servicemix.specs.version>
         <cxf.javax.mail.version>1.4.3</cxf.javax.mail.version>
         <cxf.jaxb.bundle.version>2.2.1.1_1</cxf.jaxb.bundle.version>
-        <cxf.saaj-impl.bundle.version>1.3.2_2</cxf.saaj-impl.bundle.version>
+        <cxf.saaj-impl.bundle.version>1.3.9_1</cxf.saaj-impl.bundle.version>
         <cxf.asm.bundle.version>3.3_2</cxf.asm.bundle.version>
         <cxf.wsdl4j.bundle.version>1.6.2_3</cxf.wsdl4j.bundle.version>
         <cxf.xmlsec.bundle.version>1.4.5_1</cxf.xmlsec.bundle.version>

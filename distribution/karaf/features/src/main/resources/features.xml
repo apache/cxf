@@ -17,10 +17,6 @@
       limitations under the License.
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-${project.version}">
-    <feature name="jaxp-ri" version="1.4.4_2"  resolver='(obr)'>
-        <!-- just needed on IBM JDK for SAAJ to work, but not needed otherwise -->
-        <bundle start-level='25'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxp-ri/1.4.4_2</bundle>    
-    </feature>
     <feature name="saaj-impl" version="${cxf.saaj.impl.version}"  resolver='(obr)'>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level='25'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${cxf.saaj-impl.bundle.version}</bundle>
