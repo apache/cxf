@@ -25,19 +25,16 @@ import org.springframework.transaction.TransactionStatus;
 
 public class DummyPlatformTransactionManager implements PlatformTransactionManager {
 
-    @Override
     public void commit(TransactionStatus arg0) throws TransactionException {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public TransactionStatus getTransaction(TransactionDefinition arg0) throws TransactionException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public void rollback(TransactionStatus arg0) throws TransactionException {
         // TODO Auto-generated method stub
 
