@@ -81,13 +81,24 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 new ArrayList<CoverageType>());
     }
 
-    // TODO this test does not follow the traditional pattern as no server-side enforcement
-    // of algorithm suites yet exists.  This support is blocked on WSS4J patches.  In the interim
-    // the outbound side is tested ONLY.
     @Test
     public void testAsymmetricBindingAlgorithmSuitePolicy() throws Exception {
-        runOutInterceptorAndValidateAsymmetricBinding("signed_elements_policy.xml");
-        runOutInterceptorAndValidateAsymmetricBinding("signed_elements_Basic256Sha256_policy.xml");
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_elements_policy.xml",
+                Arrays.asList(SP12Constants.ASYMMETRIC_BINDING),
+                null,
+                Arrays.asList(SP12Constants.ASYMMETRIC_BINDING),
+                null,
+                Arrays.asList(CoverageType.SIGNED));
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_elements_Basic256Sha256_policy.xml",
+                Arrays.asList(SP12Constants.ASYMMETRIC_BINDING),
+                null,
+                Arrays.asList(SP12Constants.ASYMMETRIC_BINDING),
+                null,
+                Arrays.asList(CoverageType.SIGNED));
     }
     
     // TODO this test does not follow the traditional pattern as no server-side enforcement
