@@ -73,7 +73,7 @@
     
     <bean id="kerberosValidator"
         class="org.apache.ws.security.validate.KerberosTokenValidator">
-        <property name="jaasLoginModuleName" value="bob"/>
+        <property name="contextName" value="bob"/>
         <property name="serviceName" value="bob@service.ws.apache.org"/>
     </bean> 
     
