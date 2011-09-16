@@ -290,23 +290,6 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         return msg.getContent(SOAPMessage.class).getSOAPPart();
     }
     
-    // TODO: This method can be removed when testAsymmetricBindingAlgorithmSuitePolicy
-    // is cleaned up by adding server side enforcement of signature related algorithms.
-    protected void runOutInterceptorAndValidateAsymmetricBinding(String policyDoc) throws Exception {
-        final Document originalDoc = this.readDocument("wsse-request-clean.xml");
-        
-        final Element outPolicyElement = 
-                this.readDocument(policyDoc).getDocumentElement();
-       
-        final Policy outPolicy = this.policyBuilder.getPolicy(outPolicyElement);
-        final AssertionInfoMap aim = new AssertionInfoMap(outPolicy);
-        
-        final Document signedDoc = this.runOutInterceptorAndValidate(
-                originalDoc, outPolicy, Arrays.asList(SP12Constants.ASYMMETRIC_BINDING), null);
-        
-        this.verifySignatureAlgorithms(signedDoc, aim);
-    }
-      
     // TODO: This method can be removed or reduced when testSignedElementsWithIssuedSAMLToken is
     // cleaned up.
     protected void runOutInterceptorAndValidateSamlTokenAttached(String policyDoc) throws Exception {
