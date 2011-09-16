@@ -233,6 +233,14 @@ wsdl2service -transport http -e servicename -p portname -n bindingname HelloWorl
 				<switch>quiet</switch>
 				<switch>q</switch>
 		    </option>
+                    <option id="validate" maxOccurs="1">
+                        <annotation>
+                            To validate the wsdl before generating the wsdl service part.  Usage of
+                            this option is highly recommended.
+                        </annotation>
+                        <switch>validate</switch>
+                    </option>
+
 		</optionGroup>
 		
 		<argument id="wsdlurl" minOccurs="1" maxOccurs="1">

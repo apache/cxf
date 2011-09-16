@@ -350,4 +350,30 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
             }
         }
     }
+    
+    @Test
+    public void testWSDLValidation() throws Exception {
+        //intend to use a wsdl which will break WSIBPValidator
+        
+        WSDLToServiceProcessor processor = new WSDLToServiceProcessor();
+
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/misctools_wsdl/hello_world_mixed_style.wsdl"));
+        env.put(ToolConstants.CFG_TRANSPORT, new String("soap"));
+        env.put(ToolConstants.CFG_BINDING_ATTR, new String("Greeter_SOAPBinding"));
+        env.put(ToolConstants.CFG_SERVICE, new String("serviceins"));
+        env.put(ToolConstants.CFG_PORT, new String("portins"));
+        env.put(ToolConstants.CFG_VALIDATE_WSDL, ToolConstants.CFG_VALIDATE_WSDL);
+        processor.setEnvironment(env);
+        
+        try {
+            processor.process();
+            fail("Do not catch expected tool exception for breaking WSIBPValidator!");
+        } catch (Exception e) {
+            if (!(e instanceof ToolException && e.toString()
+                .indexOf("Mixed style, invalid WSDL") >= 0)) {
+                fail("Do not catch tool exception for breaking WSIBPValidator!, "
+                     + "catch other unexpected exception!");
+            }
+        }
+    }
 }

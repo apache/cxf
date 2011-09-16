@@ -115,6 +115,9 @@ public class AbstractWSDLToProcessor implements Processor {
         }
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(bus);
         wsdlDefinition = builder.build(wsdlURL);
+        if (env.optionSet(ToolConstants.CFG_VALIDATE_WSDL)) {
+            validate(wsdlDefinition, env, bus);
+        }
         WSDLManager mgr = bus.getExtension(WSDLManager.class);
         mgr.removeDefinition(wsdlDefinition);
         
@@ -193,6 +196,10 @@ public class AbstractWSDLToProcessor implements Processor {
         if (this.env.isVerbose()) {
             System.err.println("Parsing schema warning " + exception.toString());
         }
+    }
+    
+    public boolean validate(final Definition def, ToolContext context, Bus bus) throws ToolException {
+        return new WSDL11Validator(def, context, bus).isValid();
     }
 
 }
