@@ -82,6 +82,7 @@ wsdlvalidator -s http://cxf.apache.org/schemas -s http://mycompany/schemas Greet
 			<annotation>
 			    Display the version of the tool.
 			</annotation>
+			    <switch>version</switch>
 				<switch>v</switch>
 		    </option>
 	
@@ -99,6 +100,7 @@ wsdlvalidator -s http://cxf.apache.org/schemas -s http://mycompany/schemas Greet
 			</annotation>
 				<switch>quiet</switch>
 				<switch>q</switch>
+				<switch>Q</switch>
 		    </option>
 
 		</optionGroup>

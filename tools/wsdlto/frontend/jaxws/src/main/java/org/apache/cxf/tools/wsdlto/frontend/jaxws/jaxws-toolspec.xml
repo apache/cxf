@@ -385,6 +385,7 @@ Examples:
             <option id="version">
                 <annotation>
                     Display the version of the tool.</annotation>
+                <switch>version</switch>
                 <switch>v</switch>
             </option>
 
@@ -400,6 +401,7 @@ Examples:
                     Specifies that the generator runs in quiet mode.</annotation>
                 <switch>quiet</switch>
                 <switch>q</switch>
+                <switch>Q</switch>
             </option>
 
 	        <option id="wsdlList" maxOccurs="1">
