@@ -58,7 +58,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
@@ -74,7 +74,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
@@ -90,7 +90,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
@@ -111,7 +111,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
@@ -124,7 +124,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
@@ -145,7 +145,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
@@ -161,7 +161,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
@@ -177,7 +177,7 @@
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
                    <constructor-arg ref="cxf"/>
-                   <property name="jaasLoginModuleName" value="alice"/>
+                   <property name="contextName" value="alice"/>
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 

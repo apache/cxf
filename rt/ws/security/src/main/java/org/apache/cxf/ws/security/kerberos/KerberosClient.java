@@ -46,7 +46,7 @@ public class KerberosClient implements Configurable {
     
     private String serviceName;
     private CallbackHandler callbackHandler;
-    private String jaasLoginModuleName;
+    private String contextName;
     private WSSConfig wssConfig = WSSConfig.getNewInstance();
     
     public KerberosClient(Bus b) {
@@ -58,19 +58,37 @@ public class KerberosClient implements Configurable {
     }
     
     /**
+     * Get the JAAS Login context name to use.
+     * @return the JAAS Login context name to use
+     */
+    public String getContextName() {
+        return contextName;
+    }
+
+    /**
+     * Set the JAAS Login context name to use.
+     * @param contextName the JAAS Login context name to use
+     */
+    public void setContextName(String contextName) {
+        this.contextName = contextName;
+    }
+    
+    /**
+     * @deprecated
      * Get the JAAS Login module name to use.
      * @return the JAAS Login module name to use
      */
     public String getJaasLoginModuleName() {
-        return jaasLoginModuleName;
+        return contextName;
     }
 
     /**
+     * @deprecated
      * Set the JAAS Login module name to use.
      * @param jaasLoginModuleName the JAAS Login module name to use
      */
     public void setJaasLoginModuleName(String jaasLoginModuleName) {
-        this.jaasLoginModuleName = jaasLoginModuleName;
+        this.contextName = jaasLoginModuleName;
     }
 
     /**
@@ -108,10 +126,10 @@ public class KerberosClient implements Configurable {
     public SecurityToken requestSecurityToken() throws Exception {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Requesting Kerberos ticket for " + serviceName 
-                    + " using JAAS Login Module: " + jaasLoginModuleName);
+                    + " using JAAS Login Module: " + getContextName());
         }
         KerberosSecurity bst = new KerberosSecurity(DOMUtils.createDocument());
-        bst.retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName);
+        bst.retrieveServiceTicket(getContextName(), callbackHandler, serviceName);
         bst.addWSUNamespace();
         bst.setID(wssConfig.getIdAllocator().createSecureId("BST-", bst));
         
