@@ -88,6 +88,7 @@ xsd2wsdl -t http://org.apache/invoice -n Invoice Invoice.xsd
 			  <annotation>
 			    Display the version of the tool.
 			  </annotation>
+			    <switch>version</switch>
 				<switch>v</switch>
 		    </option>
 	
@@ -105,6 +106,7 @@ xsd2wsdl -t http://org.apache/invoice -n Invoice Invoice.xsd
 			   </annotation>
 				<switch>quiet</switch>
 				<switch>q</switch>
+				<switch>Q</switch>
 		    </option>
 
 		</optionGroup>

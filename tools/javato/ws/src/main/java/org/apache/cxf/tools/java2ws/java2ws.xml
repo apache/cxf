@@ -227,6 +227,7 @@
 				<annotation>
 					Display the version of the tool.
 				</annotation>
+				<switch>version</switch>
 				<switch>v</switch>
 			</option>
 
@@ -244,6 +245,7 @@
 				</annotation>
 				<switch>quiet</switch>
 				<switch>q</switch>
+				<switch>Q</switch>
 			</option>
 		</optionGroup>
 

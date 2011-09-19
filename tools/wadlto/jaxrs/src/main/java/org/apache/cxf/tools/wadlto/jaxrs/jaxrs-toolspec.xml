@@ -266,6 +266,7 @@ TODO: consider implementing most of the following options
             <option id="version">
                 <annotation>
                     Display the version of the tool.</annotation>
+                <switch>version</switch>
                 <switch>v</switch>
             </option>
 
@@ -281,6 +282,7 @@ TODO: consider implementing most of the following options
                     Specifies that the generator runs in quiet mode.</annotation>
                 <switch>quiet</switch>
                 <switch>q</switch>
+                <switch>Q</switch>
             </option>
         </optionGroup>
         <argument id="wadl" minOccurs="1" maxOccurs="1">
