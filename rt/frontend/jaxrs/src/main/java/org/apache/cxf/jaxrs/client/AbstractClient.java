@@ -67,6 +67,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseChainCache;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
@@ -84,6 +85,7 @@ public abstract class AbstractClient implements Client, Retryable {
     protected static final String RESPONSE_CONTEXT = "ResponseContext";
     protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
     
+    private static final String PROXY_PROPERTY = "jaxrs.proxy";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
     
@@ -488,10 +490,11 @@ public abstract class AbstractClient implements Client, Retryable {
     protected URI calculateNewRequestURI(Map<String, Object> reqContext) {
         URI newBaseURI = URI.create(reqContext.get(Message.ENDPOINT_ADDRESS).toString());
         URI requestURI = URI.create(reqContext.get(Message.REQUEST_URI).toString());
-        return calculateNewRequestURI(newBaseURI, requestURI);
+        return calculateNewRequestURI(newBaseURI, requestURI,
+                MessageUtils.isTrue(reqContext.get(PROXY_PROPERTY)));
     }
     
-    private URI calculateNewRequestURI(URI newBaseURI, URI requestURI) {
+    private URI calculateNewRequestURI(URI newBaseURI, URI requestURI, boolean proxy) {
         String baseURIPath = newBaseURI.getRawPath();
         String reqURIPath = requestURI.getRawPath();
         
@@ -501,7 +504,8 @@ public abstract class AbstractClient implements Client, Retryable {
         URI newRequestURI = builder.replaceQuery(requestURI.getRawQuery()).build();
         
         resetBaseAddress(newBaseURI);
-        resetCurrentBuilder(newRequestURI);
+        URI current = proxy ? newBaseURI : newRequestURI; 
+        resetCurrentBuilder(current);
         
         return newRequestURI;
     }
@@ -675,7 +679,7 @@ public abstract class AbstractClient implements Client, Retryable {
     // invocation thus it is also important to have baseURI and currentURI 
     // synched up with the latest endpoint address, after a successful proxy 
     // or web client invocation has returned
-    protected void prepareConduitSelector(Message message, URI currentURI) {
+    protected void prepareConduitSelector(Message message, URI currentURI, boolean proxy) {
         try {
             cfg.prepareConduitSelector(message);
             
@@ -688,7 +692,8 @@ public abstract class AbstractClient implements Client, Retryable {
         String address = (String)message.get(Message.ENDPOINT_ADDRESS);
         // custom conduits may override the initial/current address
         if (!address.equals(currentURI.toString())) {
-            currentURI = calculateNewRequestURI(URI.create(address), currentURI);
+            URI baseAddress = URI.create(address);
+            currentURI = calculateNewRequestURI(baseAddress, currentURI, proxy);
             message.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
             message.put(Message.REQUEST_URI, currentURI.toString());
         }
@@ -717,7 +722,8 @@ public abstract class AbstractClient implements Client, Retryable {
                                     MultivaluedMap<String, String> headers,
                                     URI currentURI,
                                     Exchange exchange,
-                                    Map<String, Object> invocationContext) {
+                                    Map<String, Object> invocationContext,
+                                    boolean proxy) {
         Message m = cfg.getConduitSelector().getEndpoint().getBinding().createMessage();
         m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
@@ -744,10 +750,11 @@ public abstract class AbstractClient implements Client, Retryable {
         exchange.put(Retryable.class, this);
         
         // context
-        setContexts(m, exchange, invocationContext);
+        setContexts(m, exchange, invocationContext, proxy);
         
         //setup conduit selector
-        prepareConduitSelector(m, currentURI);
+        prepareConduitSelector(m, currentURI, proxy);
+        
         return m;
     }
     
@@ -775,7 +782,7 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     protected void setContexts(Message message, Exchange exchange, 
-                               Map<String, Object> context) {
+                               Map<String, Object> context, boolean proxy) {
         Map<String, Object> reqContext = null;
         Map<String, Object> resContext = null;
         if (context == null) {
@@ -790,6 +797,7 @@ public abstract class AbstractClient implements Client, Retryable {
         reqContext.put(Message.PROTOCOL_HEADERS, message.get(Message.PROTOCOL_HEADERS));
         reqContext.put(Message.REQUEST_URI, message.get(Message.REQUEST_URI));
         reqContext.put(Message.ENDPOINT_ADDRESS, message.get(Message.ENDPOINT_ADDRESS));
+        reqContext.put(PROXY_PROPERTY, proxy);
         
         if (resContext == null) {
             resContext = new HashMap<String, Object>();

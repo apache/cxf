@@ -82,14 +82,21 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     public void testSequentialStrategy() throws Exception {
         FailoverFeature feature = 
             getFeature(false, false, Server.ADDRESS2, Server.ADDRESS3); 
-        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, null, false, false);
+        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, null, false, false, false);
     }
     
     @Test    
     public void testSequentialStrategyWithCustomTargetSelector() throws Exception {
         FailoverFeature feature = 
             getFeature(true, false, Server.ADDRESS2, Server.ADDRESS3); 
-        strategyTest("resolver://info", feature, Server.ADDRESS3, null, false, false);
+        strategyTest("resolver://info", feature, Server.ADDRESS3, null, false, false, false);
+    }
+    
+    @Test    
+    public void testSequentialStrategyWithCustomTargetSelector2() throws Exception {
+        FailoverFeature feature = 
+            getFeature(true, false, Server.ADDRESS2, Server.ADDRESS3); 
+        strategyTest("resolver://info", feature, Server.ADDRESS3, null, false, false, true);
     }
     
     @Test
@@ -110,28 +117,41 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     public void testRandomStrategy() throws Exception {
         FailoverFeature feature = 
             getFeature(false, true, Server.ADDRESS2, Server.ADDRESS3); 
-        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, false, true);
+        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, false, true, true);
+    }
+    
+    @Test    
+    public void testRandomStrategy2() throws Exception {
+        FailoverFeature feature = 
+            getFeature(false, true, Server.ADDRESS2, Server.ADDRESS3); 
+        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, false, true, false);
     }
     
     @Test    
     public void testSequentialStrategyWithDiffBaseAddresses() throws Exception {
         FailoverFeature feature = 
             getFeature(false, false, Server.ADDRESS3, null); 
-        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false);
+        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false, false);
+    }
+    
+    public void testSequentialStrategyWithDiffBaseAddresses2() throws Exception {
+        FailoverFeature feature = 
+            getFeature(false, false, Server.ADDRESS3, null); 
+        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false, true);
     }
     
     @Test(expected = ServerWebApplicationException.class)
     public void testSequentialStrategyWithServerException() throws Exception {
         FailoverFeature feature = 
             getFeature(false, false, Server.ADDRESS2, Server.ADDRESS3); 
-        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, true, false);
+        strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, true, false, false);
     }
     
     @Test(expected = ClientWebApplicationException.class)    
     public void testSequentialStrategyFailure() throws Exception {
         FailoverFeature feature = 
             getFeature(false, false, "http://localhost:8080/non-existent"); 
-        strategyTest(Server.ADDRESS1, feature, null, null, false, false);
+        strategyTest(Server.ADDRESS1, feature, null, null, false, false, false);
     }
 
     private FailoverFeature getFeature(boolean custom, boolean random, String ...address) {
@@ -187,11 +207,20 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                                 String activeReplica1,
                                 String activeReplica2,
                                 boolean expectServerException,
-                                boolean expectRandom) throws Exception {
+                                boolean expectRandom,
+                                boolean singleProxy) throws Exception {
         boolean randomized = false;
         String prevEndpoint = null;
+        BookStore bookStore = null;
+        
+        if (singleProxy) {
+            bookStore = getBookStore(inactiveReplica, feature);
+        } 
+        
         for (int i = 0; i < 20; i++) {
-            BookStore bookStore = getBookStore(inactiveReplica, feature);
+            if (!singleProxy) {
+                bookStore = getBookStore(inactiveReplica, feature);
+            }
             verifyStrategy(bookStore, expectRandom 
                               ? RandomStrategy.class
                               : SequentialStrategy.class);
@@ -226,9 +255,11 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             }
             prevEndpoint = currEndpoint;
         }
-        assertEquals("unexpected random/sequential distribution of failovers",
-                     expectRandom,
-                     randomized);
+        if (!singleProxy) {
+            assertEquals("unexpected random/sequential distribution of failovers",
+                         expectRandom,
+                         randomized);
+        }
     }
     
     protected void strategyTestWebClient(String inactiveReplica,

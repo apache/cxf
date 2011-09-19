@@ -452,7 +452,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                        Map<String, Object> invocationContext) throws Throwable {
         
         Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
-                                           exchange, invocationContext);
+                                           exchange, invocationContext, true);
         
         outMessage.getExchange().setOneWay(ori.isOneway());
         outMessage.setContent(OperationResourceInfo.class, ori);
