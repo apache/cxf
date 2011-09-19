@@ -114,6 +114,7 @@ under the License.
 		<annotation>
 		    Display the version of the tool.
 		</annotation>
+		<switch>version</switch>
 		<switch>v</switch>
 	    </option>
 
@@ -131,6 +132,7 @@ under the License.
 		</annotation>
 		<switch>quiet</switch>
 		<switch>q</switch>
+		<switch>Q</switch>
 	    </option>
 	</optionGroup>
 

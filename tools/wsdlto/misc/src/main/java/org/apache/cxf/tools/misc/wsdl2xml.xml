@@ -120,6 +120,7 @@ wsdl2xml -i GreetPortType -a address TestGreeting.wsdl
 		        <annotation>
 		            Display the version of the tool.
 		        </annotation>
+		        <switch>version</switch>
 				<switch>v</switch>
 		    </option>
 	
@@ -137,6 +138,7 @@ wsdl2xml -i GreetPortType -a address TestGreeting.wsdl
 		        </annotation>
 				<switch>quiet</switch>
 				<switch>q</switch>
+				<switch>Q</switch>
 		    </option>
 
 		</optionGroup>

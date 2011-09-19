@@ -201,6 +201,7 @@
 	    
 	    <option id="version">
 		<annotation>Display the version of the tool.</annotation>
+		<switch>version</switch>
 		<switch>v</switch>
 	    </option>
 
@@ -214,6 +215,7 @@
 		<annotation>Quiet mode</annotation>
 		<switch>quiet</switch>
 		<switch>q</switch>
+		<switch>Q</switch>
 	    </option>
 
 

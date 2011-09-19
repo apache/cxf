@@ -130,6 +130,7 @@ wsdl2soap -i GreetPortType -n http://apache.org/hello_world_doc_lit -o Greeting.
 		         <annotation>
 		            Display the version of the tool.
 		         </annotation>
+		        <switch>version</switch>
 				<switch>v</switch>
 		    </option>
 	
@@ -147,6 +148,7 @@ wsdl2soap -i GreetPortType -n http://apache.org/hello_world_doc_lit -o Greeting.
 			   </annotation>
 				<switch>quiet</switch>
 				<switch>q</switch>
+				<switch>Q</switch>
 		    </option>
 
 		</optionGroup>
