@@ -708,7 +708,8 @@ public class WebClient extends AbstractClient {
                                            Map<String, Object> invContext) {
     //CHECKSTYLE:ON    
         URI uri = getCurrentURI();
-        Message m = createMessage(body, httpMethod, headers, uri, exchange, invContext);
+        Message m = createMessage(body, httpMethod, headers, uri, exchange, 
+                invContext, false);
         
         Map<String, Object> reqContext = getRequestContext(m);
         reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
