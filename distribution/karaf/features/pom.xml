@@ -31,7 +31,7 @@
     <artifactId>apache-cxf</artifactId>
     <packaging>pom</packaging>
     <name>CXF :: Apache Karaf :: Features</name>
-
+    <description>CXF :: Apache Karaf :: Features</description>
     <!-- some of the bundles is located at: http://repo1.maven.org/maven2/org/apache/servicemix/bundles/ -->
     <properties>
       <abdera-bundle-version>0.4.0-incubating_3</abdera-bundle-version>

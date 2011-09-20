@@ -22,6 +22,7 @@
     <artifactId>aegis</artifactId>
     <name>CXF sample using code first POJO's and the Aegis Binding</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>CXF sample using code first POJO's and the Aegis Binding</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

@@ -28,6 +28,7 @@
     <artifactId>cxf-parent</artifactId>
     <version>2.3.7-SNAPSHOT</version>
     <name>Apache CXF Parent</name>
+    <description>Apache CXF Parent POM</description>
     <url>http://cxf.apache.org</url>
 
     <packaging>pom</packaging>

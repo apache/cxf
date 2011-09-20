@@ -22,6 +22,7 @@
     <artifactId>wssec_sign_enc</artifactId>
     <name>CXF WS-Security Sign Encoding Demo</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>CXF WS-Security Sign Encoding Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

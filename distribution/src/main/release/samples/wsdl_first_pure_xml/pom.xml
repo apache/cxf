@@ -22,6 +22,7 @@
     <artifactId>wsdl_first_pure_xml</artifactId>
     <name>WSDL first demo using BARE Style in XML Binding (pure XML over HTTP)</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>WSDL first demo using BARE Style in XML Binding (pure XML over HTTP)</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

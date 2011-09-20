@@ -22,6 +22,7 @@
     <artifactId>callback</artifactId>
     <name>CXF sample using a callbak object</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>CXF sample using a callbak object</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

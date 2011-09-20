@@ -24,6 +24,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Bundle Jar</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>Apache CXF Bundle Jar</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

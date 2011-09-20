@@ -22,6 +22,7 @@
     <artifactId>restful_http_binding</artifactId>
     <name>RESTful HTTP Binding Demo</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>RESTful HTTP Binding Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

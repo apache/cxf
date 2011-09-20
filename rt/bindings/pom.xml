@@ -21,6 +21,7 @@
     <artifactId>cxf-rt-bindings</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF Runtime Bindings</name>
+    <description>Apache CXF Runtime Bindings</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

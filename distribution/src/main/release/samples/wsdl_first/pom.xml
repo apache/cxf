@@ -23,6 +23,7 @@
     <packaging>war</packaging>
     <name>WSDL first demo using Document/Literal Style</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>WSDL first demo using Document/Literal Style</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

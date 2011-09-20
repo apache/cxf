@@ -24,6 +24,7 @@
     <packaging>pom</packaging>
     <name>Apache CXF Bundle Parent</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>Apache CXF Bundle Parent</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

@@ -22,6 +22,7 @@
     <artifactId>jaxws_dispatch_provider</artifactId>
     <name>JAX-WS Dispatch/Provider Demo</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>JAX-WS Dispatch/Provider Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

@@ -29,6 +29,7 @@
     <artifactId>cxf-systests-jaxws</artifactId>
     <name>Apache CXF JAX-WS System Tests</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>Apache CXF JAX-WS System Tests</description>
     <url>http://cxf.apache.org</url>
 
     <build>

@@ -24,6 +24,7 @@
     <packaging>jar</packaging>
     <name>Apache CXF Manifest Jar</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>Apache CXF Manifest Jar</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

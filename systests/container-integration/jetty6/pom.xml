@@ -11,6 +11,7 @@
     <artifactId>cxf-systests-ci-jetty6</artifactId>
     <name>Apache CXF Container Integration Test Jetty6</name>
     <version>2.3.3-SNAPSHOT</version>
+    <description>Apache CXF Container Integration Test Jetty6</description>
     <build>
         <plugins>
             <plugin>

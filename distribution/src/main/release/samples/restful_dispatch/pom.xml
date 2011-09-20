@@ -22,6 +22,7 @@
     <artifactId>restful_dispatch</artifactId>
     <name>RESTful Hello World Demo</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>RESTful Hello World Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

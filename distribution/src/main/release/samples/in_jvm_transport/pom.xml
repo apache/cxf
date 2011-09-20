@@ -22,6 +22,7 @@
     <artifactId>in_jvm_transport</artifactId>
     <name>Colocated Demo using Document/Literal Style</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>Colocated Demo using Document/Literal Style</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

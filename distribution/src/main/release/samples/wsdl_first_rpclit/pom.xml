@@ -22,6 +22,7 @@
     <artifactId>wsdl_first_rpclit</artifactId>
     <name>WSDL first demo using RPC-Literal Style</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>WSDL first demo using RPC-Literal Style</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

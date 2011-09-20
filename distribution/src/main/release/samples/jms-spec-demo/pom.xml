@@ -22,6 +22,7 @@
     <artifactId>jms_spec_demo</artifactId>
     <name>SOAP/JMS Transport Specification Demo using Document-Literal Style</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>SOAP/JMS Transport Specification Demo using Document-Literal Style</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

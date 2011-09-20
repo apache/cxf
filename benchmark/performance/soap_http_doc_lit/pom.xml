@@ -23,6 +23,7 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>Apache CXF Benchmark SOAP/HTTP/Doc/Lit</name>
+    <description>Apache CXF Benchmark SOAP/HTTP/Doc/Lit</description>
     <url>http://cxf.apache.org</url>
 
     <properties>

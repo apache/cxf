@@ -22,6 +22,7 @@
     <artifactId>jms_pubsub</artifactId>
     <name>JMS Transport Publish/Subscribe Demo using Document-Literal Style</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>JMS Transport Publish/Subscribe Demo using Document-Literal Style</description>
    <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

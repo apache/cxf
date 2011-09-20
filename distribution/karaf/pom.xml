@@ -32,6 +32,7 @@
     <packaging>pom</packaging>
     <version>2.3.7-SNAPSHOT</version>
     <name>CXF :: Apache Karaf</name>
+    <description>CXF :: Apache Karaf</description>
 
     <properties>
       <karaf-version>2.1.4</karaf-version>

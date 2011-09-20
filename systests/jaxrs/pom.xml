@@ -29,6 +29,7 @@
     <artifactId>cxf-systests-jaxrs</artifactId>
     <name>Apache CXF JAX-RS System Tests</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>Apache CXF JAX-RS System Tests</description>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>

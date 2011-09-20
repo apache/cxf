@@ -29,6 +29,7 @@
     <artifactId>cxf-systests-transports</artifactId>
     <name>Apache CXF Transport System Tests</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>Apache CXF Transport System Tests</description>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>

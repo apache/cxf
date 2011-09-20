@@ -22,6 +22,7 @@
     <artifactId>wsdl_first_soap12</artifactId>
     <name>WSDL first demo using SOAP12 in Document/Literal Style</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>WSDL first demo using SOAP12 in Document/Literal Style</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

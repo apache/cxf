@@ -22,6 +22,7 @@
     <artifactId>cxf-rt-bindings-corba</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime CORBA Binding</name>
+    <description>Apache CXF Runtime CORBA Binding</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

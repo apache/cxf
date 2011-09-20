@@ -22,6 +22,7 @@
     <artifactId>ws_addressing</artifactId>
     <name>WS-Addressing Demo</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>WS-Addressing Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

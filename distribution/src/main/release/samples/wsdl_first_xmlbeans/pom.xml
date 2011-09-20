@@ -22,6 +22,7 @@
     <artifactId>wsdl_first_xmlbeans</artifactId>
     <name>WSDL first demo using Document/Literal Style and XMLBeans DataBinding</name>
     <version>2.3.7-SNAPSHOT</version>
+    <description>WSDL first demo using Document/Literal Style and XMLBeans DataBinding</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
