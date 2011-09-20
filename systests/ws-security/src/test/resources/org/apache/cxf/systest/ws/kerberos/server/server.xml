@@ -71,10 +71,14 @@
         </httpj:engine>
     </httpj:engine-factory>
     
+    <!--<bean id="kerberosTicketDecoderImpl" 
+          class="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenDecoderImpl"/>-->
+    
     <bean id="kerberosValidator"
         class="org.apache.ws.security.validate.KerberosTokenValidator">
         <property name="contextName" value="bob"/>
         <property name="serviceName" value="bob@service.ws.apache.org"/>
+        <!--<property name="kerberosTokenDecoder" ref="kerberosTicketDecoderImpl"/>-->
     </bean> 
     
     <jaxws:endpoint 

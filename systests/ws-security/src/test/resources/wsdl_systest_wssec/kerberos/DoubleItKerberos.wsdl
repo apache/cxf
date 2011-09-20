@@ -330,7 +330,7 @@
                   <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:Basic256/>
+                        <sp:Basic128/>
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                </wsp:Policy>
@@ -381,7 +381,7 @@
                   <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:Basic256/>
+                        <sp:Basic128/>
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                </wsp:Policy>
@@ -443,7 +443,7 @@
                   <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:Basic256/>
+                        <sp:Basic128/>
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                </wsp:Policy>
@@ -542,7 +542,7 @@
                   <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:Basic256/>
+                        <sp:Basic128/>
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                </wsp:Policy>
@@ -592,7 +592,7 @@
                   <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:Basic256/>
+                        <sp:Basic128/>
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                </wsp:Policy>
@@ -633,7 +633,7 @@
                   <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:Basic256/>
+                        <sp:Basic128/>
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                </wsp:Policy>
