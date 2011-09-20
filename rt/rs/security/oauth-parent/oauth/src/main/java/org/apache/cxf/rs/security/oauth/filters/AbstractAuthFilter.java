@@ -145,7 +145,6 @@ public class AbstractAuthFilter {
                 return new SimplePrincipal(info.getClient().getLoginName());
             }
 
-            @Override
             public boolean isUserInRole(String role) {
                 List<String> roles = info.getRoles();
                 for (String authority : roles) {
