@@ -23,7 +23,6 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.validate.Validator;
 
@@ -39,10 +38,7 @@ public class CustomProcessor implements Processor {
         final WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         final WSSecurityEngineResult result = 
-            new WSSecurityEngineResult(
-                WSConstants.SIGN, 
-                (SecurityContextToken) null
-            );
+            new WSSecurityEngineResult(WSConstants.SIGN);
         result.put("foo", this);
         return java.util.Collections.singletonList(result);
     }
