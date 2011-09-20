@@ -33,7 +33,6 @@
         <cxf.version>${project.version}</cxf.version>
     </properties>
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

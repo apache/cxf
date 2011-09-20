@@ -34,7 +34,6 @@
     </properties>
 
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -75,7 +74,7 @@
 	    	        </goals>
 	    	        <configuration>
 	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/mtom/client/me.bmp" todir="${basedir}/target/classes/demo/mtom/client" />
+	    	               <copy file="${basedir}/src/main/java/demo/mtom/client/me.bmp" todir="${basedir}/target/classes/demo/mtom/client" />
 	    	            </tasks>
 	    	        </configuration>
 	    	    </execution>

@@ -33,7 +33,6 @@
     </properties>
 
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -74,7 +73,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/handlers/common/demo_handlers.xml" todir="${basedir}/target/classes/demo/handlers/common" />
+                                <copy file="${basedir}/src/main/java/demo/handlers/common/demo_handlers.xml" todir="${basedir}/target/classes/demo/handlers/common" />
                             </tasks>
                         </configuration>
                     </execution>
