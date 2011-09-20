@@ -135,6 +135,7 @@ public class SourceGenerator {
     private List<InputSource> schemaPackageFiles = Collections.emptyList();
     private List<String> compilerArgs = new ArrayList<String>();
     private Map<String, String> schemaPackageMap = Collections.emptyMap();
+    private Map<String, String> schemaTypesMap = Collections.emptyMap();
     private Bus bus;
     
     public SourceGenerator() {
@@ -718,7 +719,12 @@ public class SourceGenerator {
                 String clsName = getSchemaClassName(packageName, gInfo, pair[1], typeClassNames);
                 if (clsName != null) {
                     addImport(imports, clsName);
-                    return clsName.substring(packageName.length() + 1);
+                    int index = clsName.lastIndexOf(".");
+                    if (index != -1) {
+                        return clsName.substring(index + 1);
+                    } else {
+                        return clsName;
+                    }
                 }
             }
         }
@@ -731,6 +737,9 @@ public class SourceGenerator {
         if (clsName == null && gInfo != null) {
             clsName = matchClassName(typeClassNames, packageName, 
                                    gInfo.getElementTypeMap().get(localName));
+        }
+        if (clsName == null && schemaTypesMap != null) {
+            clsName = schemaTypesMap.get(packageName + "." + localName);
         }
         return clsName;
     }
@@ -1007,6 +1016,10 @@ public class SourceGenerator {
 
     public void setSchemaPackageMap(Map<String, String> map) {
         this.schemaPackageMap = map;
+    }
+    
+    public void setSchemaTypesMap(Map<String, String> map) {
+        this.schemaTypesMap = map;
     }
     
     public void setBus(Bus bus) {
