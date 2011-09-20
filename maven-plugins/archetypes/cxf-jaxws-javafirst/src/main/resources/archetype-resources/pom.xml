@@ -22,6 +22,7 @@
   <version>$version</version>
   <packaging>war</packaging>
   <name>Simple CXF project using spring configuration</name>
+    <description>Simple CXF project using spring configuration</description>
   <dependencies>
     <dependency>
       <groupId>org.apache.cxf</groupId>

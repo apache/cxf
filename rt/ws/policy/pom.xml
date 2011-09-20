@@ -21,6 +21,7 @@
     <artifactId>cxf-rt-ws-policy</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime WS Policy</name>
+    <description>Apache CXF Runtime WS Policy</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

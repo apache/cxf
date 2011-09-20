@@ -23,6 +23,7 @@
     <packaging>pom</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Command Line Tools JavaTo</name>
+    <description>Apache CXF Command Line Tools JavaTo</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

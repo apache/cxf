@@ -21,6 +21,7 @@
     <artifactId>cxf-rt-databinding-jaxb</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime JAXB DataBinding</name>
+    <description>Apache CXF Runtime JAXB DataBinding</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

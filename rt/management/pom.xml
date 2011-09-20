@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Runtime Management</name>
+    <description>Apache CXF Runtime Management</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

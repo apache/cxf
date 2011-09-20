@@ -23,6 +23,7 @@
     <packaging>pom</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
+    <description>Apache CXF Samples</description>
     <url>http://cxf.apache.org</url>
 
     <properties>

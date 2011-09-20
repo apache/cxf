@@ -22,6 +22,7 @@
     <artifactId>cxf-api</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF API</name>
+    <description>Apache CXF API</description>
     <version>2.5.0-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
 

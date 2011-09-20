@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Command Line Tools WADLTo JAXRS Frontend</name>
+    <description>Apache CXF Command Line Tools WADLTo JAXRS Frontend</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

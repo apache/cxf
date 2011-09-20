@@ -25,6 +25,7 @@
     <version>2.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache CXF Runtime RS Security OAuth Parent</name>
+    <description>Apache CXF Runtime RS Security OAuth Parent</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

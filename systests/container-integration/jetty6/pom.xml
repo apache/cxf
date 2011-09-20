@@ -10,6 +10,7 @@
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-ci-jetty6</artifactId>
     <name>Apache CXF Container Integration Test Jetty6</name>
+    <description>Apache CXF Container Integration Test Jetty6</description>
     <version>2.4.0-SNAPSHOT</version>
     <build>
         <plugins>

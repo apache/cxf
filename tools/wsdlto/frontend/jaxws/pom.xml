@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Command Line Tools WSDLTo JAXWS Frontend</name>
+    <description>Apache CXF Command Line Tools WSDLTo JAXWS Frontend</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

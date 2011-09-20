@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Runtime Simple Frontend</name>
+    <description>Apache CXF Runtime Simple Frontend</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

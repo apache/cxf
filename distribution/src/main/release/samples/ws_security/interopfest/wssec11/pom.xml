@@ -20,6 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples.interopfest</groupId>
     <name>CXF Interopfest WS-SEC11 Demo</name>
+    <description>CXF Interopfest WS-SEC11 Demo</description>
     <artifactId>ws-sec11</artifactId>
     <version>2.5.0-SNAPSHOT</version>
 

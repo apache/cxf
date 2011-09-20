@@ -24,6 +24,7 @@
     <packaging>pom</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Maven Archetypes</name>
+    <description>Apache CXF Maven Archetypes</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

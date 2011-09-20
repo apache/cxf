@@ -28,6 +28,7 @@
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-databinding</artifactId>
     <name>Apache CXF Databinding System Tests</name>
+    <description>Apache CXF Databinding System Tests</description>
     <version>2.5.0-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
 

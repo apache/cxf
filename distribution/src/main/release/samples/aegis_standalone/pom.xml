@@ -21,6 +21,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>aegis-standalone</artifactId>
     <name>CXF sample using the Aegis Binding without any webservice</name>
+    <description>CXF sample using the Aegis Binding without any webservice</description>
     <version>2.5.0-SNAPSHOT</version>
 
     <parent>

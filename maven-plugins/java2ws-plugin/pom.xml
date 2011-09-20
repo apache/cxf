@@ -24,6 +24,7 @@
     <packaging>maven-plugin</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Java2WS Maven2 Plugin</name>
+    <description>Apache CXF Java2WS Maven2 Plugin</description>
     <url>http://cxf.apache.org</url>
 
 

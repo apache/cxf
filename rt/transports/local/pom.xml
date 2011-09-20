@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Runtime Local Transport</name>
+    <description>Apache CXF Runtime Local Transport</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

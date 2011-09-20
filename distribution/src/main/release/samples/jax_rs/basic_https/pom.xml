@@ -21,6 +21,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jax_rs_basic_https</artifactId>
     <name>JAX-RS Basic Demo With HTTPS communications</name>
+    <description>JAX-RS Basic Demo With HTTPS communications</description>
     <version>2.5.0-SNAPSHOT</version>
 
     <parent>

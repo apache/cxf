@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Test Utilities</name>
+    <description>Apache CXF Test Utilities</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

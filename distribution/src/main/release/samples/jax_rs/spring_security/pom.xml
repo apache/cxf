@@ -21,6 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <name>JAX-RS Spring Security Demo</name>
+    <description>JAX-RS Spring Security Demo</description>
     <artifactId>jax_rs_spring_security</artifactId>
     <version>2.5.0-SNAPSHOT</version>
 

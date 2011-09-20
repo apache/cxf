@@ -24,6 +24,7 @@
   <packaging>jar</packaging>
   <version>2.5.0-SNAPSHOT</version>
   <name>Apache CXF XML Schema Validation with Xerces</name>
+    <description>Apache CXF XML Schema Validation with Xerces</description>
   <url>http://cxf.apache.org</url>
   <parent>
     <groupId>org.apache.cxf</groupId>

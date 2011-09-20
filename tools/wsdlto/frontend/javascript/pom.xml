@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Command Line Tools WSDL to JavaScript Front End</name>
+    <description>Apache CXF Command Line Tools WSDL to JavaScript Front End</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

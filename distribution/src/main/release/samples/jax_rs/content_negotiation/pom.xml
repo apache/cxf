@@ -21,6 +21,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jax_rs_content_negotiation</artifactId>
     <name>JAX-RS Content Negotiation Demo</name>
+    <description>JAX-RS Content Negotiation Demo</description>
     <version>2.5.0-SNAPSHOT</version>
 
     <parent>

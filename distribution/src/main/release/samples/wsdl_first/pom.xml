@@ -22,6 +22,7 @@
     <artifactId>wsdl_first</artifactId>
     <packaging>war</packaging>
     <name>WSDL first demo using Document/Literal Style</name>
+    <description>WSDL first demo using Document/Literal Style</description>
     <version>2.5.0-SNAPSHOT</version>
 
     <parent>

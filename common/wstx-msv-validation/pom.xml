@@ -24,6 +24,7 @@
     <packaging>jar</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF Woodstox/MSV Schema Validation</name>
+    <description>Apache CXF Woodstox/MSV Schema Validation</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>

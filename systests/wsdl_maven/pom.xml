@@ -23,6 +23,7 @@
     <packaging>pom</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF System Tests for Maven Plugins</name>
+    <description>Apache CXF System Tests for Maven Plugins</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

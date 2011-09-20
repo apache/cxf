@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>Apache CXF Benchmark Base</name>
+    <description>Apache CXF Benchmark Base</description>
     <url>http://cxf.apache.org</url>
     <properties>
         <cxf.version>2.5.0-SNAPSHOT</cxf.version>

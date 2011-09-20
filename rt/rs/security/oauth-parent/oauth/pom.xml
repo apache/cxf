@@ -26,6 +26,7 @@
 
     <packaging>jar</packaging>
     <name>Apache CXF Runtime OAuth 1.0a</name>
+    <description>Apache CXF Runtime OAuth 1.0a</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

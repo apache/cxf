@@ -21,6 +21,7 @@
     <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime XmlBeans DataBinding</name>
+    <description>Apache CXF Runtime XmlBeans DataBinding</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

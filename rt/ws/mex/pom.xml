@@ -22,6 +22,7 @@
     <artifactId>cxf-rt-ws-mex</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime WS MetadataExchange</name>
+    <description>Apache CXF Runtime WS MetadataExchange</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

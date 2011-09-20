@@ -21,6 +21,7 @@
     <artifactId>cxf-rt-databinding-sdo</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime SDO DataBinding</name>
+    <description>Apache CXF Runtime SDO DataBinding</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

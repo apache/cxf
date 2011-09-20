@@ -21,6 +21,7 @@
     <artifactId>cxf-rt-ws-addr</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime WS Addressing</name>
+    <description>Apache CXF Runtime WS Addressing</description>
     <url>http://cxf.apache.org</url>
 
     <parent>
