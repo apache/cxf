@@ -574,13 +574,17 @@
                         <artifactId>wstx-asl</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
+                        <groupId>woodstox</groupId>
                         <artifactId>wstx-asl</artifactId>
                     </exclusion>
- 
-
-
-
+                    <exclusion>
+                        <groupId>wsdl4j</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.woodstox</groupId>
+                        <artifactId>woodstox-core-asl</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
