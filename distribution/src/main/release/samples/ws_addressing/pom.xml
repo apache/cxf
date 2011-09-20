@@ -33,7 +33,6 @@
         <cxf.version>${project.version}</cxf.version>
     </properties>
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -74,8 +73,8 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/ws_addressing/client/client.xml" todir="${basedir}/target/classes/demo/ws_addressing/client" />
-                                <copy file="${basedir}/src/demo/ws_addressing/server/server.xml" todir="${basedir}/target/classes/demo/ws_addressing/server" />
+                                <copy file="${basedir}/src/main/java/demo/ws_addressing/client/client.xml" todir="${basedir}/target/classes/demo/ws_addressing/client" />
+                                <copy file="${basedir}/src/main/java/demo/ws_addressing/server/server.xml" todir="${basedir}/target/classes/demo/ws_addressing/server" />
                             </tasks>
                         </configuration>
                     </execution>

@@ -32,7 +32,6 @@
         <cxf.version>${project.version}</cxf.version>
     </properties>
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -95,7 +94,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/callback/client/callback_infoset.xml" todir="${basedir}/target/classes/demo/callback/client" />
+                                <copy file="${basedir}/src/main/java/demo/callback/client/callback_infoset.xml" todir="${basedir}/target/classes/demo/callback/client" />
                             </tasks>
                         </configuration>
                     </execution>

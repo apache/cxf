@@ -33,7 +33,6 @@
         <httpclient.version>3.1</httpclient.version>
     </properties>
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -53,9 +52,9 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/restful/client/CustomerJohnReq.xml" todir="${basedir}/target/classes/demo/restful/client" />
-                                <copy file="${basedir}/src/demo/restful/server/CustomerJohnResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
-                                <copy file="${basedir}/src/demo/restful/server/CustomerAllResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
+                                <copy file="${basedir}/src/main/java/demo/restful/client/CustomerJohnReq.xml" todir="${basedir}/target/classes/demo/restful/client" />
+                                <copy file="${basedir}/src/main/java/demo/restful/server/CustomerJohnResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
+                                <copy file="${basedir}/src/main/java/demo/restful/server/CustomerAllResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
                             </tasks>
                         </configuration>
                     </execution>
