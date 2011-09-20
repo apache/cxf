@@ -22,8 +22,10 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.xml.sax.InputSource;
@@ -41,8 +43,15 @@ import org.apache.cxf.tools.wadlto.WadlToolConstants;
 import org.apache.cxf.tools.wadlto.jaxb.CustomizationParser;
 
 public class JAXRSContainer extends AbstractCXFToolContainer {
-    
+    private static final Map<String, String> DEFAULT_TYPES_MAP;
     private static final String TOOL_NAME = "wadl2java";
+    
+    static {
+        // Should we have a common code which checks W3C EPR bindings in tools-common ?
+        DEFAULT_TYPES_MAP = Collections.singletonMap("org.w3._2005._08.addressing.EndpointReference", 
+                "javax.xml.ws.wsaddressing.W3CEndpointReference");
+    }
+    
     
     public JAXRSContainer(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);
@@ -123,6 +132,10 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setSchemaPackageFiles(schemaPackageFiles);
         sg.setSchemaPackageMap(context.getNamespacePackageMap());
         // sg.setSchemaPackageName((String)context.get(WadlToolConstants.CFG_TOOLS_PACKAGENAME)));
+        
+        // TODO: consider introducing an option too for users be able to
+        //       supply custom type mappings
+        sg.setSchemaTypesMap(DEFAULT_TYPES_MAP);
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
