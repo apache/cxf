@@ -67,6 +67,7 @@ public class DefaultInMemoryTokenStore implements STSTokenStore {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<String> getTokenIdentifiers() {
         return cache.getKeys();
     }
@@ -76,6 +77,7 @@ public class DefaultInMemoryTokenStore implements STSTokenStore {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<SecurityToken> getValidTokens() {
         return cache.getAllWithLoader(cache.getKeysWithExpiryCheck(), null).values();
     }
