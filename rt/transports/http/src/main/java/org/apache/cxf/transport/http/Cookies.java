@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class Cookies {
     /**
@@ -48,8 +49,8 @@ public class Cookies {
     
     public void writeToMessageHeaders(Message message) {
         //Do we need to maintain a session?
-        maintainSession = Boolean.TRUE.equals((Boolean)message.get(Message.MAINTAIN_SESSION));
-
+        maintainSession = MessageUtils.getContextualBoolean(message, Message.MAINTAIN_SESSION, false);
+        
         //If we have any cookies and we are maintaining sessions, then use them        
         if (maintainSession && sessionCookies.size() > 0) {
             new Headers(message).writeSessionCookies(sessionCookies);
