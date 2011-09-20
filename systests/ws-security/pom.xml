@@ -29,6 +29,7 @@
     <artifactId>cxf-systests-ws-security</artifactId>
     <name>Apache CXF WS-Security System Tests</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF WS-Security System Tests</description>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>

@@ -22,6 +22,7 @@
     <artifactId>soap_header</artifactId>
     <name>Sample using SOAP Headers</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Sample using SOAP Headers</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

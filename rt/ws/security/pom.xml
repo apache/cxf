@@ -22,6 +22,7 @@
     <artifactId>cxf-rt-ws-security</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime WS Security</name>
+    <description>Apache CXF Runtime WS Security</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

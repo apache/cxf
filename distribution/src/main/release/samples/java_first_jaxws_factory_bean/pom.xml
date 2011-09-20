@@ -22,6 +22,7 @@
     <artifactId>java_first_jaxws_factory_bean</artifactId>
     <name>Java First demo service using the JAXWSFactoryBeans</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Java First demo service using the JAXWSFactoryBeans</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

@@ -22,6 +22,7 @@
     <artifactId>sample-issue-operation</artifactId>
     <packaging>war</packaging>
     <name>Apache CXF STS issue operation</name>
+    <description>Apache CXF STS issue operation</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

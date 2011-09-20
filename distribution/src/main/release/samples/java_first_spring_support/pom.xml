@@ -22,6 +22,7 @@
     <artifactId>java_first_spring_support</artifactId>
     <name>Spring HTTP Sample</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Spring HTTP Sample</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

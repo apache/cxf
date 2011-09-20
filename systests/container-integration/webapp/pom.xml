@@ -11,6 +11,7 @@
     <artifactId>cxf-systests-ci-webapp</artifactId>
     <name>Apache CXF Container Integration Test Webapp</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF Container Integration Test Webapp</description>
     <packaging>war</packaging>
     <dependencies>
         <dependency>

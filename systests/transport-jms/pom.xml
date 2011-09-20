@@ -29,6 +29,7 @@
     <artifactId>cxf-systests-transport-jms</artifactId>
     <name>Apache CXF Transport System Tests JMS</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF Transport System Tests JMS</description>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>

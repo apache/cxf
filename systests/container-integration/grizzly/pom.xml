@@ -11,6 +11,7 @@
     <artifactId>cxf-systests-ci-grizzly</artifactId>
     <name>Apache CXF Container Integration Test Grizzly</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF Container Integration Test Grizzly</description>
 
     <repositories>
         <repository>

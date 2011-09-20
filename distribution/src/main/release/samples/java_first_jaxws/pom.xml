@@ -22,6 +22,7 @@
     <artifactId>java_first_jaxws</artifactId>
     <name>Java First demo using JAX-WS APIs</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Java First demo using JAX-WS APIs</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

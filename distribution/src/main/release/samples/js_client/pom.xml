@@ -22,6 +22,7 @@
     <artifactId>js_client</artifactId>
     <name>Hello World Client Demo using JavaScript</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Hello World Client Demo using JavaScript</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

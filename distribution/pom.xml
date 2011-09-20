@@ -23,6 +23,7 @@
     <packaging>pom</packaging>
     <name>Apache CXF Distribution</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF Distribution</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

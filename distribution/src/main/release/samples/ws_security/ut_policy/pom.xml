@@ -22,6 +22,7 @@
     <artifactId>wssec_ut_policy</artifactId>
     <name>WS-Security UT Policy Demo</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>WS-Security UT Policy Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

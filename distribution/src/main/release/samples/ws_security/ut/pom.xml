@@ -22,6 +22,7 @@
     <artifactId>wssec_ut</artifactId>
     <name>CXF WS-Security UT Demo</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>CXF WS-Security UT Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

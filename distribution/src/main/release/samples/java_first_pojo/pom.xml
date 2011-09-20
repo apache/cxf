@@ -22,6 +22,7 @@
     <artifactId>java_first_pojo</artifactId>
     <name>Java First POJO Sample</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Java First POJO Sample</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

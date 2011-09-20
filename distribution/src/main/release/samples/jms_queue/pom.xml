@@ -22,6 +22,7 @@
     <artifactId>jms_queue</artifactId>
     <name>JMS Transport Queue Demo using Document-Literal Style</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>JMS Transport Queue Demo using Document-Literal Style</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

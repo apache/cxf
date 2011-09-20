@@ -22,6 +22,7 @@
     <artifactId>wssec_ut_sign</artifactId>
     <name>WS-Security UT Sign Demo</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>WS-Security UT Sign Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

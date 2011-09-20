@@ -29,6 +29,7 @@
     <artifactId>cxf-systests-databinding</artifactId>
     <name>Apache CXF Databinding System Tests</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF Databinding System Tests</description>
     <url>http://cxf.apache.org</url>
 
 

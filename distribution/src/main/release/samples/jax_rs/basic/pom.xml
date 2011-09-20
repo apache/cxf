@@ -22,6 +22,7 @@
     <artifactId>jax_rs_basic</artifactId>
     <name>JAX-RS Basic Demo</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>JAX-RS Basic Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

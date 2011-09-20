@@ -23,6 +23,7 @@
     <packaging>jar</packaging>
     <name>Apache CXF API</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF API</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

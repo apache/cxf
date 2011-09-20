@@ -24,6 +24,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Bundle Jar</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF JAX-RS Bundle Jar</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

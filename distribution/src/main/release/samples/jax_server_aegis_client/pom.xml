@@ -22,6 +22,7 @@
     <artifactId>jax_service_aegis_client</artifactId>
     <name>Sample of JAX-* Service Using an Aegis Client</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Sample of JAX-* Service Using an Aegis Client</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

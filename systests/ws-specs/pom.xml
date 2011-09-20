@@ -29,6 +29,7 @@
     <artifactId>cxf-systests-ws-specs</artifactId>
     <name>Apache CXF WS-* Specifications System Tests</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>Apache CXF WS-* Specifications System Tests</description>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>

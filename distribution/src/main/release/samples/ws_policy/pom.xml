@@ -22,6 +22,7 @@
     <artifactId>ws_policy</artifactId>
     <name>WS-Policy Demo</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>WS-Policy Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

@@ -22,6 +22,7 @@
     <artifactId>ws_rm</artifactId>
     <name>WS-RM Demo</name>
     <version>2.4.3-SNAPSHOT</version>
+    <description>WS-RM Demo</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

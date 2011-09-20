@@ -21,6 +21,7 @@
     <artifactId>cxf-rt-databinding-jibx</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime JiBX DataBinding</name>
+    <description>Apache CXF Runtime JiBX DataBinding</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

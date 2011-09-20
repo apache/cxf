@@ -3,6 +3,7 @@
     <artifactId>cxf-rt-javascript</artifactId>
     <packaging>jar</packaging>
     <name>Apache CXF Runtime JavaScript Client Generator</name>
+    <description>Apache CXF Runtime JavaScript Client Generator</description>
     <url>http://cxf.apache.org/</url>
 
 
