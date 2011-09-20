@@ -1,0 +1,219 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.cxf.sts.operation;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
+
+import org.apache.cxf.jaxws.context.WebServiceContextImpl;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.sts.QNameConstants;
+import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
+import org.apache.cxf.sts.token.provider.TokenProvider;
+import org.apache.cxf.sts.token.validator.TokenValidator;
+import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.StatusType;
+import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
+import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
+import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
+import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.ws.security.util.DOM2Writer;
+
+/**
+ * In this test, a token (UsernameToken) is validated and transformed into a SAML Assertion.
+ */
+public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
+    
+    public static final QName REQUESTED_SECURITY_TOKEN = 
+        QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
+    private static final QName QNAME_WST_STATUS = 
+        QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
+    
+    /**
+     * Test to successfully validate a UsernameToken and transform it into a SAML Assertion.
+     */
+    @org.junit.Test
+    public void testUsernameTokenTransformation() throws Exception {
+        TokenValidateOperation validateOperation = new TokenValidateOperation();
+        
+        // Add Token Validator
+        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        validatorList.add(new UsernameTokenValidator());
+        validateOperation.setTokenValidators(validatorList);
+
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        providerList.add(new SAMLTokenProvider());
+        validateOperation.setTokenProviders(providerList);
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        validateOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        
+        // Create a UsernameToken
+        JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
+        ValidateTargetType validateTarget = new ValidateTargetType();
+        validateTarget.setAny(usernameTokenType);
+        
+        JAXBElement<ValidateTargetType> validateTargetType = 
+            new JAXBElement<ValidateTargetType>(
+                QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
+            );
+        request.getAny().add(validateTargetType);
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Validate a token
+        RequestSecurityTokenResponseType response = 
+            validateOperation.validate(request, webServiceContext);
+        assertTrue(validateResponse(response));
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : response.getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+    }
+    
+    
+    /*
+     * Create a security context object
+     */
+    private SecurityContext createSecurityContext(final Principal p) {
+        return new SecurityContext() {
+            public Principal getUserPrincipal() {
+                return p;
+            }
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+        };
+    }
+    
+    /**
+     * Return true if the response has a valid status, false otherwise
+     */
+    private boolean validateResponse(RequestSecurityTokenResponseType response) {
+        assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
+        
+        for (Object requestObject : response.getAny()) {
+            if (requestObject instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
+                if (QNAME_WST_STATUS.equals(jaxbElement.getName())) {
+                    StatusType status = (StatusType)jaxbElement.getValue();
+                    if (STSConstants.VALID_CODE.equals(status.getCode())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private Properties getEncryptionProperties() {
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+        );
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        
+        return properties;
+    }
+    
+    private JAXBElement<UsernameTokenType> createUsernameToken(String name, String password) {
+        UsernameTokenType usernameToken = new UsernameTokenType();
+        AttributedString username = new AttributedString();
+        username.setValue(name);
+        usernameToken.setUsername(username);
+        
+        // Add a password
+        PasswordString passwordString = new PasswordString();
+        passwordString.setValue(password);
+        passwordString.setType(WSConstants.PASSWORD_TEXT);
+        JAXBElement<PasswordString> passwordType = 
+            new JAXBElement<PasswordString>(
+                QNameConstants.PASSWORD, PasswordString.class, passwordString
+            );
+        usernameToken.getAny().add(passwordType);
+        
+        JAXBElement<UsernameTokenType> tokenType = 
+            new JAXBElement<UsernameTokenType>(
+                QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
+            );
+        
+        return tokenType;
+    }
+    
+}

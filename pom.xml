@@ -180,6 +180,7 @@
         <module>integration</module>
         <module>maven-plugins</module>
 	<!--module>test-samples</module-->
+        <module>services</module>
         <module>systests</module>
     </modules>
 
