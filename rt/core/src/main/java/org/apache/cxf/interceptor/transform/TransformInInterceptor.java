@@ -47,11 +47,25 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public TransformInInterceptor() {
         this(Phase.POST_STREAM);
+        addBefore(StaxInInterceptor.class.getName());
     }
     
     public TransformInInterceptor(String phase) {
         super(phase);
-        addBefore(StaxInInterceptor.class.getName());
+    }
+    
+    public TransformInInterceptor(String phase, List<String> after) {
+        super(phase);
+        if (after != null) {
+            addAfter(after);
+        }
+    }
+    
+    public TransformInInterceptor(String phase, List<String> before, List<String> after) {
+        this(phase, after);
+        if (before != null) {
+            addBefore(before);
+        }
     }
     
     public void handleMessage(Message message) {
