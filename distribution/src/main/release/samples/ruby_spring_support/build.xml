@@ -43,7 +43,7 @@
         
     <target name="server" description="run demo server" depends="build">
         <copy todir="build/classes/demo/spring">
-          <fileset dir="src/demo/spring" excludes="**/*.java"/>
+          <fileset dir="src/main/java/demo/spring" excludes="**/*.java"/>
         </copy>
         <cxfrun classname="demo.spring.servlet.Server"/>
     </target>
