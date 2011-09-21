@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -62,9 +63,9 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
-
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
@@ -208,9 +209,13 @@ public class SourceGenerator {
         for (int i = 0; i < resourceEls.size(); i++) {
             Element resource = getResourceElement(app, resourceEls.get(i), gInfo, typeClassNames, 
                                                   resourceEls.get(i).getAttribute("type"), src);
-            writeResourceClass(app, resource, typeClassNames, gInfo, src, true, generateInterfaces);
+            writeResourceClass(app, resource, 
+                               new ContextInfo(typeClassNames, gInfo, generateInterfaces), 
+                               src, true);
             if (generateInterfaces && generateImpl) {
-                writeResourceClass(app, resource, typeClassNames, gInfo, src, true, false);
+                writeResourceClass(app, resource, 
+                                   new ContextInfo(typeClassNames, gInfo, false), 
+                                   src, true);
             }
             if (resourceName != null) {
                 break;
@@ -295,9 +300,9 @@ public class SourceGenerator {
         
     }
     
-    private void writeResourceClass(Application app, Element rElement, Set<String> typeClassNames, 
-                                    GrammarInfo gInfo, File src, boolean isRoot,
-                                    boolean interfaceIsGenerated) {
+    private void writeResourceClass(Application app, Element rElement,
+                                    ContextInfo info, 
+                                    File src, boolean isRoot) {
         String resourceId = resourceName != null 
             ? resourceName : rElement.getAttribute("id");
         if (resourceId.length() == 0) {
@@ -307,7 +312,8 @@ public class SourceGenerator {
         QName qname = convertToQName(resourceId, expandedQName);
         String namespaceURI = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
         
-        if (getSchemaClassName(namespaceURI, gInfo, qname.getLocalPart(), typeClassNames) != null) {
+        if (getSchemaClassName(namespaceURI, info.getGrammarInfo(), qname.getLocalPart(), 
+                              info.getTypeClassNames()) != null) {
             return; 
         }
         
@@ -316,47 +322,46 @@ public class SourceGenerator {
         Set<String> imports = createImports();
         
         final String classPackage = getClassPackageName(namespaceURI);
-        final String className = getClassName(qname.getLocalPart(), interfaceIsGenerated);
+        final String className = getClassName(qname.getLocalPart(), 
+                info.isInterfaceGenerated(), info.getTypeClassNames());
         
         sbImports.append(getClassComment()).append(getLineSep());
         sbImports.append("package " + classPackage)
             .append(";").append(getLineSep()).append(getLineSep());
         
-        if (isRoot && writeAnnotations(interfaceIsGenerated)) {
+        if (isRoot && writeAnnotations(info.isInterfaceGenerated())) {
             String path = rElement.getAttribute("path");
             writeAnnotation(sbCode, imports, Path.class, path, true, false);
         }
                 
-        sbCode.append("public " + getClassType(interfaceIsGenerated) + " " + className);
-        writeImplementsInterface(sbCode, qname.getLocalPart(), interfaceIsGenerated);              
+        sbCode.append("public " + getClassType(info.interfaceIsGenerated) + " " + className);
+        writeImplementsInterface(sbCode, qname.getLocalPart(), info.isInterfaceGenerated());              
         sbCode.append(" {" + getLineSep() + getLineSep());
         
-        writeMethods(rElement, imports, sbCode, typeClassNames, gInfo, isRoot, interfaceIsGenerated);
+        writeMethods(rElement, imports, sbCode, info, resourceId, isRoot, "");
         
-        List<Element> childEls = DOMUtils.getChildrenWithName(rElement, 
-            WadlGenerator.WADL_NS, "resource");
-        for (Element childEl : childEls) {
-            if (childEl.getAttribute("id").length() == 0) {
-                writeMethods(childEl, imports, sbCode, typeClassNames, gInfo, false, interfaceIsGenerated);
-            } else {
-                writeResourceMethod(childEl, imports, sbCode, typeClassNames, gInfo, 
-                                    false, interfaceIsGenerated);
-            }
-        }
         sbCode.append("}");
         writeImports(sbImports, imports, classPackage);
         
         createJavaSourceFile(src, new QName(classPackage, className), sbCode, sbImports);
         
+        writeSubresourceClasses(app, rElement, info, src, isRoot, resourceId);
+    }
+    
+    private void writeSubresourceClasses(Application app, Element rElement, ContextInfo info, 
+            File src, boolean isRoot, String resourceId) {
+
+        List<Element> childEls = DOMUtils.getChildrenWithName(rElement, 
+            WadlGenerator.WADL_NS, "resource");
         for (Element subEl : childEls) {
             String id = subEl.getAttribute("id");
             if (id.length() > 0 && !resourceId.equals(id) && !id.startsWith("{java")
                 && !id.startsWith("java")) {
-                writeResourceClass(app, 
-                                   getResourceElement(app, subEl, gInfo, typeClassNames, 
-                                                      subEl.getAttribute("type"), src), 
-                                   typeClassNames, gInfo, src, false, interfaceIsGenerated);
+                Element subElement = getResourceElement(app, subEl, info.getGrammarInfo(), 
+                    info.getTypeClassNames(), subEl.getAttribute("type"), src);
+                writeResourceClass(app, subElement, info, src, false);
             }
+            writeSubresourceClasses(app, subEl, info, src, false, resourceId);
         }
     }
     
@@ -377,13 +382,24 @@ public class SourceGenerator {
         return interfaceIsGenerated ? "interface" : "class";
     }
     
-    private String getClassName(String clsName, boolean interfaceIsGenerated) {
+    private String getClassName(String clsName, boolean interfaceIsGenerated, Set<String> typeClassNames) {
+        String name = null;
         if (interfaceIsGenerated) {
-            return clsName;
+            name = clsName;
         } else {
-            return generateInterfaces ? clsName + "Impl" : clsName;
+            name = generateInterfaces ? clsName + "Impl" : clsName;
         }
-        
+        StringBuilder sb = new StringBuilder();
+        sb.append(Character.toUpperCase(name.charAt(0)));
+        name = name.length() > 1 ? sb.append(name.substring(1)).toString() : sb.toString();
+        for (String typeName : typeClassNames) {
+            String localName = typeName.contains(".") 
+                ? typeName.substring(typeName.lastIndexOf('.') + 1) : typeName;
+            if (name.equalsIgnoreCase(localName)) {
+                name += "Resource";
+            }
+        }
+        return name;
     }
     
     private boolean writeAnnotations(boolean interfaceIsGenerated) {
@@ -409,15 +425,28 @@ public class SourceGenerator {
     
     private void writeMethods(Element rElement,  
                               Set<String> imports, StringBuilder sbCode, 
-                              Set<String> typeClassNames, GrammarInfo gInfo,
+                              ContextInfo info,
+                              String resourceId,
                               boolean isRoot,
-                              boolean interfaceIsGenerated) {
+                              String currentPath) {
         List<Element> methodEls = DOMUtils.getChildrenWithName(rElement, 
             WadlGenerator.WADL_NS, "method");
        
         for (Element methodEl : methodEls) {
-            writeResourceMethod(methodEl, imports, sbCode, typeClassNames, gInfo, 
-                                isRoot, interfaceIsGenerated);    
+            writeResourceMethod(methodEl, imports, sbCode, info, isRoot, currentPath);    
+        }
+        
+        List<Element> childEls = DOMUtils.getChildrenWithName(rElement, 
+                WadlGenerator.WADL_NS, "resource");
+        for (Element childEl : childEls) {
+            String path = childEl.getAttribute("path");
+            String newPath = (currentPath + path).replace("//", "/");
+            String id = childEl.getAttribute("id");
+            if (id.length() == 0) {
+                writeMethods(childEl, imports, sbCode, info, id, false, newPath);
+            } else {
+                writeResourceMethod(childEl, imports, sbCode, info, false, newPath);
+            }
         }
     }
     
@@ -459,10 +488,11 @@ public class SourceGenerator {
     }
     
     private void writeResourceMethod(Element methodEl, 
-                                     Set<String> imports, StringBuilder sbCode, 
-                                     Set<String> typeClassNames, GrammarInfo gInfo,
+                                     Set<String> imports,
+                                     StringBuilder sbCode,
+                                     ContextInfo info,
                                      boolean isRoot,
-                                     boolean interfaceIsGenerated) {
+                                     String currentPath) {
         Element resourceEl = "resource".equals(methodEl.getLocalName()) 
             ? methodEl : (Element)methodEl.getParentNode();
         
@@ -479,7 +509,7 @@ public class SourceGenerator {
                                                                 WadlGenerator.WADL_NS, "request");
         
         
-        if (writeAnnotations(interfaceIsGenerated)) {
+        if (writeAnnotations(info.isInterfaceGenerated())) {
             sbCode.append(TAB);
             
             if (methodNameLowerCase.length() > 0) {
@@ -492,29 +522,30 @@ public class SourceGenerator {
                 writeFormatAnnotations(requestEls, sbCode, imports, true);
                 writeFormatAnnotations(responseEls, sbCode, imports, false);
             }
-            if (!isRoot) {
-                String path = resourceEl.getAttribute("path");
-                writeAnnotation(sbCode, imports, Path.class, path, true, true);
+            if (!isRoot && !"/".equals(currentPath)) {
+                writeAnnotation(sbCode, imports, Path.class, currentPath, true, true);
             }
         } else {
             sbCode.append(getLineSep()).append(TAB);
         }
         
-        if (!interfaceIsGenerated) {
+        if (!info.isInterfaceGenerated()) {
             sbCode.append("public ");
         }
         boolean responseTypeAvailable = true;
         if (methodNameLowerCase.length() > 0) {
-            responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, typeClassNames, gInfo);
+            responseTypeAvailable = writeResponseType(responseEls, sbCode, imports,
+                    info.getTypeClassNames(), info.getGrammarInfo());
             sbCode.append(id);
         } else {
             boolean expandedQName = id.startsWith("{");
             QName qname = convertToQName(id, expandedQName);
             String packageName = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
             
-            String clsSimpleName = getSchemaClassName(packageName, gInfo, qname.getLocalPart(), 
-                                                      typeClassNames);
-            String localName = clsSimpleName == null ? qname.getLocalPart() 
+            String clsSimpleName = getSchemaClassName(packageName, info.getGrammarInfo(), 
+                    qname.getLocalPart(), info.getTypeClassNames());
+            String localName = clsSimpleName == null 
+                ? getClassName(qname.getLocalPart(), true, info.getTypeClassNames()) 
                 : clsSimpleName.substring(packageName.length() + 1);
             String subResponseNs = clsSimpleName == null ? getClassPackageName(packageName) 
                 : clsSimpleName.substring(0, packageName.length());
@@ -531,10 +562,9 @@ public class SourceGenerator {
         List<Element> inParamElements = new LinkedList<Element>();
         inParamElements.addAll(DOMUtils.getChildrenWithName(resourceEl, 
                                                             WadlGenerator.WADL_NS, "param"));
-        writeRequestTypes(requestEls, inParamElements, sbCode, imports, typeClassNames, gInfo,
-                          interfaceIsGenerated);
+        writeRequestTypes(requestEls, inParamElements, sbCode, imports, info);
         sbCode.append(")");
-        if (interfaceIsGenerated) {
+        if (info.isInterfaceGenerated()) {
             sbCode.append(";");
         } else {
             generateEmptyMethodBody(sbCode, responseTypeAvailable);
@@ -579,29 +609,25 @@ public class SourceGenerator {
     private boolean writeResponseType(List<Element> responseEls, StringBuilder sbCode,
                                    Set<String> imports, Set<String> typeClassNames, 
                                    GrammarInfo gInfo) {
-        List<Element> repElements = null;
-        if (responseEls.size() >= 1) {
-            Element okResponse = null;
-            if (responseEls.size() > 1) {
-                for (int i = 0; i < responseEls.size(); i++) {
-                    String statusValue = responseEls.get(i).getAttribute("status");
-                    try {
-                        int status = statusValue.length() == 0 ? 200 : Integer.valueOf(statusValue);
-                        if (status == 200) {
-                            okResponse = responseEls.get(i);
-                            break;
-                        }
-                    } catch (NumberFormatException ex) {
-                        // ignore
-                    }
-                }
-            } else {
-                okResponse = responseEls.get(0);
+        
+        Element okResponse = null;
+        for (int i = 0; i < responseEls.size(); i++) {
+            String statusValue = responseEls.get(i).getAttribute("status");
+            if (statusValue.length() == 0 
+                || Arrays.asList(statusValue.split("\\s")).contains("200")) {
+                okResponse = responseEls.get(i);
+                break;
             }
-            repElements = DOMUtils.getChildrenWithName(okResponse, WadlGenerator.WADL_NS, "representation");
+        }
+        
+        List<Element> repElements = null;
+        if (okResponse != null) {
+            repElements = 
+                DOMUtils.getChildrenWithName(okResponse, WadlGenerator.WADL_NS, "representation");    
         } else {
             repElements = CastUtils.cast(Collections.emptyList(), Element.class);
         }
+        
         if (repElements.size() == 0) {    
             sbCode.append("void ");
             return false;
@@ -628,9 +654,7 @@ public class SourceGenerator {
                                    List<Element> inParamEls, 
                                    StringBuilder sbCode, 
                                    Set<String> imports, 
-                                   Set<String> typeClassNames, 
-                                   GrammarInfo gInfo,
-                                   boolean interfaceIsGenerated) {
+                                   ContextInfo info) {
         
         boolean form = false;
         boolean formParamsAvailbale = false;
@@ -651,7 +675,7 @@ public class SourceGenerator {
             Element paramEl = inParamEls.get(i);
 
             String name = paramEl.getAttribute("name");
-            if (writeAnnotations(interfaceIsGenerated)) {
+            if (writeAnnotations(info.isInterfaceGenerated())) {
                 Class<?> paramAnnotation = form ? FormParam.class 
                     : PARAM_ANNOTATIONS.get(paramEl.getAttribute("style"));
                 writeAnnotation(sbCode, imports, paramAnnotation, name, false, false);
@@ -662,7 +686,7 @@ public class SourceGenerator {
                 addImport(imports, List.class.getName());
                 type = "List<" + type + ">";
             }
-            sbCode.append(type).append(" ").append(name.replace('.', '_'));
+            sbCode.append(type).append(" ").append(name.replaceAll("[\\.\\-]", "_"));
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
                 if (i + 1 >= 4 && ((i + 1) % 4) == 0) {
@@ -677,7 +701,8 @@ public class SourceGenerator {
                 ? DOMUtils.getChildrenWithName(requestEls.get(0), WadlGenerator.WADL_NS, "representation")
                 : CastUtils.cast(Collections.emptyList(), Element.class);
             if (repElements.size() > 0) {    
-                elementName = getElementRefName(repElements, typeClassNames, gInfo, imports);
+                elementName = getElementRefName(repElements, info.getTypeClassNames(), 
+                        info.getGrammarInfo(), imports);
             }
             if (elementName != null) {
                 if (inParamEls.size() > 0) {
@@ -1109,5 +1134,28 @@ public class SourceGenerator {
         public String getWadlPath() {
             return wadlPath;
         }
+    }
+    
+    private static class ContextInfo {
+        private boolean interfaceIsGenerated;
+        private Set<String> typeClassNames;
+        private GrammarInfo gInfo;
+        
+        public ContextInfo(Set<String> typeClassNames, GrammarInfo gInfo, boolean interfaceIsGenerated) {
+            this.interfaceIsGenerated = interfaceIsGenerated;
+            this.typeClassNames = typeClassNames;
+            this.gInfo = gInfo;
+        }
+        public boolean isInterfaceGenerated() {
+            return interfaceIsGenerated;
+        }
+        public Set<String> getTypeClassNames() {
+            return typeClassNames;
+        }
+        public GrammarInfo getGrammarInfo() {
+            return gInfo;
+        }
+        
+        
     }
 }

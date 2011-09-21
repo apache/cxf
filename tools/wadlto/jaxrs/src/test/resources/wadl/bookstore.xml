@@ -151,63 +151,71 @@
     <param name="mid" style="matrix" type="xs:int"/>
    </resource>
 
-   <resource path="/booksubresource" id="{http://superbooks}thebook">
-    <doc>Book subresource</doc>
-    <param name="id" style="template" type="xs:int"/>
-    <param name="mid" style="matrix" type="xs:int"/>
-    
-    <resource path="/book">
-     <method name="GET" id="getIt">
-      <doc>Get the book</doc>
-      <response>
-       <representation mediaType="application/xml" element="prefix1:thebook"></representation>
-       <representation mediaType="application/json"></representation>
-      </response>
-     </method>
-    </resource>
    
-    <resource path="/form1">
-     <method name="POST" id="form1">
-     <request>
-      <representation mediaType="application/x-www-form-urlencoded"/>
-     </request>
-     <response status="204"></response>
-    </method>
-   </resource>
-   
-   <resource path="/form2">
-    <method name="POST" id="form2">
-     <request>
-      <representation mediaType="application/x-www-form-urlencoded">
-       <param name="field1" style="query" type="xs:string"/>
-       <param name="field2" style="query" type="xs:string"/>
-      </representation>
-     </request>
-     <response>
-      <representation mediaType="text/plain">
-       <param name="result" style="plain" type="xs:string"/>
-      </representation>
-     </response>
-    </method>
-   </resource>
-
-   <resource path="/chapter/{cid}" id="{http://superbooks}thechapter">
-    <doc>Chapter subresource</doc>
-    <param name="cid" style="template" type="xs:int"/>
-    
-    <resource path="/id">
-     <method name="GET" id="getIt">
-      <doc>Get the chapter</doc>
-      <response>
-       <representation mediaType="application/xml" element="prefix1:thechapter"></representation>
-       <representation mediaType="application/json"></representation>
-      </response>
-     </method>
-    </resource>
-   </resource>
+  <resource path="/booksubresource" id="{http://superbooks}thebook">
+	    <doc>Book subresource</doc>
+	    <param name="id" style="template" type="xs:int"/>
+	    <param name="mid" style="matrix" type="xs:int"/>
+	    
+	    <resource path="/book">
+	     <method name="GET" id="getIt">
+	      <doc>Get the book</doc>
+	      <response>
+	       <representation mediaType="application/xml" element="prefix1:thebook"></representation>
+	       <representation mediaType="application/json"></representation>
+	      </response>
+	     </method>
+	    </resource>
+	   
+	    <resource path="/form1">
+	     <method name="POST" id="form1">
+	     <request>
+	      <representation mediaType="application/x-www-form-urlencoded"/>
+	     </request>
+	     <response status="204"></response>
+	    </method>
+	   </resource>
+	   
+	   <resource path="/form2">
+	    <method name="POST" id="form2">
+	     <request>
+	      <representation mediaType="application/x-www-form-urlencoded">
+	       <param name="field1" style="query" type="xs:string"/>
+	       <param name="field2" style="query" type="xs:string"/>
+	      </representation>
+	     </request>
+	     <response>
+	      <representation mediaType="text/plain">
+	       <param name="result" style="plain" type="xs:string"/>
+	      </representation>
+	     </response>
+	    </method>
+	   </resource>
+	
+	   <resource path="/chapter/{cid}" id="{http://superbooks}thechapter">
+	    <doc>Chapter subresource</doc>
+	    <param name="cid" style="template" type="xs:int"/>
+	    
+	    <resource path="/id">
+	     <method name="GET" id="getIt">
+	      <doc>Get the chapter</doc>
+	      <response>
+	       <representation mediaType="application/xml" element="prefix1:thechapter"></representation>
+	       <representation mediaType="application/json"></representation>
+	      </response>
+	     </method>
+	    </resource>
+	   </resource>
  </resource>
- 
- <resource path="/form" id="org.apache.cxf.jaxrs.model.wadl.FormInterface">
+ <resource path="/a">
+   <resource path="/b">
+    <method name="GET" id="getChapter3">
+      <response>
+         <representation mediaType="application/xml" element="prefix1:thechapter"/>
+      </response>
+    </method>
+   
+  <resource path="/form" id="org.apache.cxf.jaxrs.model.wadl.FormInterface">
   
   <resource path="/form1">
    <method name="POST" id="form1">
@@ -232,6 +240,9 @@
       </representation>
     </response></method>
   </resource>
+  
+ </resource>
+ </resource>
  </resource>
 
  <!-- Recursive subresource -->
