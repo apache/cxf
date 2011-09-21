@@ -78,6 +78,7 @@
                 <exclude>**/target</exclude>
                 <exclude>**/build/**/*</exclude>
                 <exclude>**/target/**/*</exclude>
+                <exclude>**/interopfest/**</exclude>
             </excludes>
         </fileSet>
         <fileSet>
