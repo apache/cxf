@@ -42,6 +42,8 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryCache;
 import org.apache.cxf.sts.cache.STSCache;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.common.TestUtils;
+import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SCTProvider;
@@ -70,6 +72,12 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(null).getName();
     
     private static STSCache cache = new DefaultInMemoryCache();
+    
+    private static boolean unrestrictedPoliciesInstalled;
+    
+    static {
+        unrestrictedPoliciesInstalled = TestUtils.checkUnrestrictedPoliciesInstalled();
+    };
     
     /**
      * Test to successfully issue a SecurityContextToken
@@ -160,6 +168,11 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        if (!unrestrictedPoliciesInstalled) {
+            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        }
+        service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
         
         // Add STSProperties object

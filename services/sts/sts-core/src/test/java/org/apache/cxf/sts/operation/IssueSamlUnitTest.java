@@ -42,6 +42,8 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.common.TestUtils;
+import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
@@ -76,6 +78,12 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         QNameConstants.WS_TRUST_FACTORY.createRequestedAttachedReference(null).getName();
     public static final QName UNATTACHED_REFERENCE = 
         QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(null).getName();
+        
+    private static boolean unrestrictedPoliciesInstalled;
+        
+    static {
+        unrestrictedPoliciesInstalled = TestUtils.checkUnrestrictedPoliciesInstalled();
+    };
     
     /**
      * Test to successfully issue a Saml 1.1 token.
@@ -237,6 +245,11 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        if (!unrestrictedPoliciesInstalled) {
+            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        }
+        service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
         
         // Add STSProperties object

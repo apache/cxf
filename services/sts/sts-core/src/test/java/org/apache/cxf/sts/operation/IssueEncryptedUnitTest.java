@@ -36,6 +36,7 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
@@ -53,6 +54,12 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
  */
 public class IssueEncryptedUnitTest extends org.junit.Assert {
     
+    private static boolean unrestrictedPoliciesInstalled;
+    
+    static {
+        unrestrictedPoliciesInstalled = TestUtils.checkUnrestrictedPoliciesInstalled();
+    };
+    
     /**
      * Test to successfully issue a (dummy) encrypted token.
      */
@@ -69,6 +76,11 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        if (!unrestrictedPoliciesInstalled) {
+            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        }
+        service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
         
         // Add STSProperties object
@@ -117,6 +129,11 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        if (!unrestrictedPoliciesInstalled) {
+            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        }
+        service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
         
         // Add STSProperties object
@@ -148,7 +165,6 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
             // expected
         }
         
-        EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
         service.setEncryptionProperties(encryptionProperties);
         
@@ -310,6 +326,9 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
+        if (!unrestrictedPoliciesInstalled) {
+            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        }
         encryptionProperties.setKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOEP);
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -369,6 +388,9 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
+        if (!unrestrictedPoliciesInstalled) {
+            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
         
@@ -441,6 +463,9 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
+        if (!unrestrictedPoliciesInstalled) {
+            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        }
         encryptionProperties.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -515,10 +540,13 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
             "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
         );
         properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        if (unrestrictedPoliciesInstalled) {
+            properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        } else {
+            properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "restricted/stsstore.jks");
+        }
         
         return properties;
     }
-    
     
 }
