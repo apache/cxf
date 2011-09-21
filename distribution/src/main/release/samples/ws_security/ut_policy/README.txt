@@ -29,11 +29,11 @@ set the environment by running the script.
 
 The samples in this directory use STRONG encryption.  The default encryption algorithms
 included in a JRE is not adequate for these samples.   The Java Cryptography Extension
-(JCE) Unlimited Strength Jurisdiction Policy Files available on Sun's JDK download
+(JCE) Unlimited Strength Jurisdiction Policy Files available on Oracle's JDK download
 page[3] *must* be installed for the examples to work.   If you get errors about invalid
 key lengths, the Unlimited Strength files are not installed.
 
-[3] http://java.sun.com/javase/downloads/index.jsp
+[3] http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 
 Building and running the demo using Maven
