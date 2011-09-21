@@ -82,13 +82,9 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         
         // This will fail as the encoding type is not set
         TokenValidatorResponse validatorResponse = null;
-        try {
-            validatorResponse = x509TokenValidator.validateToken(validatorParameters);
-            assertTrue(validatorResponse != null);
-            assertFalse(validatorResponse.isValid());
-        } catch (RuntimeException ex) {
-            // needed due to a bug in WSS4J 1.6.2
-        }
+        validatorResponse = x509TokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertFalse(validatorResponse.isValid());
         
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
         

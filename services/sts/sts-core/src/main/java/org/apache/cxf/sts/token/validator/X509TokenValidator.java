@@ -36,16 +36,12 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.processor.BinarySecurityTokenProcessor;
-import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SignatureTrustValidator;
 import org.apache.ws.security.validate.Validator;
@@ -58,8 +54,20 @@ public class X509TokenValidator implements TokenValidator {
     
     public static final String X509_V3_TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
     
+    public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(X509TokenValidator.class);
+    
+    private Validator validator = new SignatureTrustValidator();
 
+    /**
+     * Set the WSS4J Validator instance to use to validate the token.
+     * @param validator the WSS4J Validator instance to use to validate the token
+     */
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+    
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument.
@@ -87,55 +95,53 @@ public class X509TokenValidator implements TokenValidator {
 
         RequestData requestData = new RequestData();
         requestData.setSigCrypto(sigCrypto);
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, BSTValidator.class);
-        requestData.setWssConfig(wssConfig);
+        requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setCallbackHandler(callbackHandler);
 
         TokenValidatorResponse response = new TokenValidatorResponse();
         response.setValid(false);
         
-        if (validateTarget != null && validateTarget.isBinarySecurityToken()) {
-            BinarySecurityTokenType binarySecurityType = 
-                (BinarySecurityTokenType)validateTarget.getToken();
-            //
-            // Turn the received JAXB object into a DOM element
-            //
-            Document doc = DOMUtils.createDocument();
-            BinarySecurity binarySecurity = new X509Security(doc);
-            binarySecurity.setEncodingType(binarySecurityType.getEncodingType());
-            String data = binarySecurityType.getValue();
-            ((Text)binarySecurity.getElement().getFirstChild()).setData(data);
-            
-            //
-            // Process and Validate the token
-            //
-            Processor processor = new BinarySecurityTokenProcessor();
-            try {
-                processor.handleToken(
-                    binarySecurity.getElement(), requestData, new WSDocInfo(doc)
-                );
-                X509Certificate cert = ((X509Security) binarySecurity).getX509Certificate(sigCrypto);
-                response.setPrincipal(cert.getSubjectX500Principal());
-                response.setValid(true);
-            } catch (WSSecurityException ex) {
-                LOG.log(Level.WARNING, "", ex);
+        if (validateTarget == null || !validateTarget.isBinarySecurityToken()) {
+            return response;
+        }
+
+        BinarySecurityTokenType binarySecurityType = (BinarySecurityTokenType)validateTarget.getToken();
+
+        // Test the encoding type
+        String encodingType = binarySecurityType.getEncodingType();
+        if (!BASE64_ENCODING.equals(encodingType)) {
+            LOG.fine("Bad encoding type attribute specified: " + encodingType);
+            return response;
+        }
+
+        //
+        // Turn the received JAXB object into a DOM element
+        //
+        Document doc = DOMUtils.createDocument();
+        BinarySecurity binarySecurity = new X509Security(doc);
+        binarySecurity.setEncodingType(encodingType);
+        binarySecurity.setValueType(binarySecurityType.getValueType());
+        String data = binarySecurityType.getValue();
+        ((Text)binarySecurity.getElement().getFirstChild()).setData(data);
+
+        //
+        // Validate the token
+        //
+        try {
+            Credential credential = new Credential();
+            credential.setBinarySecurityToken(binarySecurity);
+            if (sigCrypto != null) {
+                X509Certificate cert = ((X509Security)binarySecurity).getX509Certificate(sigCrypto);
+                credential.setCertificates(new X509Certificate[]{cert});
             }
+
+            Credential returnedCredential = validator.validate(credential, requestData);
+            response.setPrincipal(returnedCredential.getCertificates()[0].getSubjectX500Principal());
+            response.setValid(true);
+        } catch (WSSecurityException ex) {
+            LOG.log(Level.WARNING, "", ex);
         }
         return response;
-    }
-    
-    /**
-     * A Custom Validator for a BinarySecurityToken - it just sends the BinarySecurityToken
-     * to the SignatureTrustValidator for validation.
-     */
-    public static class BSTValidator implements Validator {
-
-        public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-            Validator delegate = new SignatureTrustValidator();
-            return delegate.validate(credential, data);
-        }
-        
     }
     
 }

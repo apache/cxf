@@ -16,40 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.sts.token.validator;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 
-import org.apache.cxf.ws.security.sts.provider.model.secext.EncodedString;
-import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.Validator;
 
 /**
  * This class validates a wsse UsernameToken.
@@ -57,6 +56,16 @@ import org.apache.ws.security.message.token.UsernameToken;
 public class UsernameTokenValidator implements TokenValidator {
     
     private static final Logger LOG = LogUtils.getL7dLogger(UsernameTokenValidator.class);
+    
+    private Validator validator = new org.apache.ws.security.validate.UsernameTokenValidator();
+    
+    /**
+     * Set the WSS4J Validator instance to use to validate the token.
+     * @param validator the WSS4J Validator instance to use to validate the token
+     */
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
     
     /**
      * Return true if this TokenValidator implementation is capable of validating the
@@ -89,109 +98,60 @@ public class UsernameTokenValidator implements TokenValidator {
         TokenValidatorResponse response = new TokenValidatorResponse();
         response.setValid(false);
         
-        if (validateTarget != null && validateTarget.isUsernameToken()) {
-            //
-            // Parse the JAXB object
-            //
-            String passwordType = null;
-            String passwordValue = null;
-            String nonce = null;
-            String created = null;
-            UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
-            for (Object any : usernameTokenType.getAny()) {
-                if (any instanceof JAXBElement<?>) {
-                    JAXBElement<?> anyElement = (JAXBElement<?>) any;
-                    if (QNameConstants.PASSWORD.equals(anyElement.getName())) {
-                        PasswordString passwordString = 
-                            (PasswordString)anyElement.getValue();
-                        passwordType = passwordString.getType();
-                        passwordValue = passwordString.getValue();
-                    } else if (QNameConstants.NONCE.equals(anyElement.getName())) {
-                        EncodedString nonceES = (EncodedString)anyElement.getValue();
-                        nonce = nonceES.getValue();
-                        // Encoding Type must be equal to Base64Binary
-                        if (!BinarySecurity.BASE64_ENCODING.equals(nonceES.getEncodingType())) {
-                            String errorMsg = "The UsernameToken nonce element has a bad encoding type";
-                            LOG.log(Level.WARNING, errorMsg + " : " + nonceES.getEncodingType());
-                            return response;
-                        }
-                    }
-                } else if (any instanceof Element) {
-                    Element element = (Element)any;
-                    if (WSConstants.WSU_NS.equals(element.getNamespaceURI()) 
-                        && WSConstants.CREATED_LN.equals(element.getLocalName())) {
-                        created = element.getTextContent();
-                    }
-                }
-            }
-            
-            //
-            // Validate the token
-            //
-            try {
-                boolean valid = 
-                    verifyPassword(
-                        usernameTokenType.getUsername().getValue(), passwordValue, passwordType, 
-                        nonce, created, requestData
-                    );
-                response.setValid(valid);
-                if (valid) {
-                    Principal principal = 
-                        createPrincipal(
-                            usernameTokenType.getUsername().getValue(), passwordValue, passwordType, 
-                            nonce, created
-                        );
-                    response.setPrincipal(principal);
-                }
-            } catch (WSSecurityException ex) {
-                LOG.log(Level.WARNING, "", ex);
-            }
+        if (validateTarget == null || !validateTarget.isUsernameToken()) {
+            return response;
         }
-            
-        return response;
-    }
-    
-    private boolean verifyPassword(
-        String username,
-        String passwordValue,
-        String passwordType,
-        String nonce,
-        String createdTime,
-        RequestData requestData
-    ) throws WSSecurityException {
-        WSPasswordCallback pwCb = 
-            new WSPasswordCallback(
-                username, null, passwordType, WSPasswordCallback.USERNAME_TOKEN, requestData
-            );
+        
+        //
+        // Turn the JAXB UsernameTokenType into a DOM Element for validation
+        //
+        UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
+        Element rootElement = null;
         try {
-            requestData.getCallbackHandler().handle(new Callback[]{pwCb});
-        } catch (IOException e) {
-            LOG.log(Level.WARNING, "", e);
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_AUTHENTICATION, null, null, e
-            );
-        } catch (UnsupportedCallbackException e) {
-            LOG.log(Level.WARNING, "", e);
-            throw new WSSecurityException(
-                WSSecurityException.FAILED_AUTHENTICATION, null, null, e
-            );
+            JAXBContext jaxbContext = 
+                JAXBContext.newInstance("org.apache.cxf.ws.security.sts.provider.model");
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            Document doc = DOMUtils.createDocument();
+            rootElement = doc.createElement("root-element");
+            JAXBElement<UsernameTokenType> tokenType = 
+                new JAXBElement<UsernameTokenType>(
+                    QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameTokenType
+                );
+            marshaller.marshal(tokenType, rootElement);
+        } catch (JAXBException ex) {
+            LOG.log(Level.WARNING, "", ex);
+            return response;
         }
-        String origPassword = pwCb.getPassword();
-        if (origPassword == null) {
-            LOG.fine("Callback supplied no password for: " + username);
-            return false;
-        }
-        if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
-            String passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
-            if (!passDigest.equals(passwordValue)) {
-                return false;
+        
+        //
+        // Validate the token
+        //
+        try {
+            boolean allowNamespaceQualifiedPasswordTypes = 
+                wssConfig.getAllowNamespaceQualifiedPasswordTypes();
+            boolean bspCompliant = wssConfig.isWsiBSPCompliant();
+            Element usernameTokenElement = (Element)rootElement.getFirstChild();
+            
+            UsernameToken ut = 
+                new UsernameToken(usernameTokenElement, allowNamespaceQualifiedPasswordTypes, bspCompliant);
+            if (ut.getPassword() == null) {
+                return response;
             }
-        } else {
-            if (!origPassword.equals(passwordValue)) {
-                return false;
-            }
+            Credential credential = new Credential();
+            credential.setUsernametoken(ut);
+            validator.validate(credential, requestData);
+            
+            Principal principal = 
+                createPrincipal(
+                    ut.getName(), ut.getPassword(), ut.getPasswordType(), ut.getNonce(), ut.getCreated()
+                );
+            response.setPrincipal(principal);
+            response.setValid(true);
+        } catch (WSSecurityException ex) {
+            LOG.log(Level.WARNING, "", ex);
         }
-        return true;
+        
+        return response;
     }
     
     /**
