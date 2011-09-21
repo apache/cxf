@@ -57,27 +57,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
         
-    @Test    
-    public void testCodeComplexWADL() {
-        try {
-            JAXRSContainer container = new JAXRSContainer(null);
-
-            ToolContext context = new ToolContext();
-            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/rackspace.wadl"));
-            context.put(WadlToolConstants.CFG_COMPILE, "true");
-
-            container.setContext(context);
-            container.execute();
-
-            assertNotNull(output.list());
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-    
+        
     @Test    
     public void testCodeGenInterfacesWithBinding() {
         try {
