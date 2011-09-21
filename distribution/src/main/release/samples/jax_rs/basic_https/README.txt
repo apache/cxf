@@ -62,6 +62,17 @@ Using either UNIX or Windows:
 To remove the code generated from the WSDL file and the .class
 files, run "ant clean".
 
+Building and running the demo using Maven
+-----------------------------------------
+
+Using either UNIX or Windows:
+
+   mvn -Pserver (from one command line window)
+   mvn -Pclient (from a second command line window)
+
+
+To remove the code generated from the WSDL file and the .class
+files, run "mvn clean".
 
 Building the demo using wsdl2java and javac
 -------------------------------------------
