@@ -56,6 +56,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String OUT_INTERCEPTORS_PARAM = "jaxrs.outInterceptors";
     private static final String IN_INTERCEPTORS_PARAM = "jaxrs.inInterceptors";
     private static final String SERVICE_SCOPE_PARAM = "jaxrs.scope";
+    private static final String EXTENSIONS_PARAM = "jaxrs.extensions";
+    private static final String LANGUAGES_PARAM = "jaxrs.languages";
     private static final String SCHEMAS_PARAM = "jaxrs.schemaLocations";
     private static final String SERVICE_SCOPE_SINGLETON = "singleton";
     private static final String SERVICE_SCOPE_REQUEST = "prototype";
@@ -98,9 +100,37 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         for (Map.Entry<Class, ResourceProvider> entry : resourceProviders.entrySet()) {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
+        setExtensions(bean, servletConfig);
+        
         bean.create();
     }
 
+    protected void setExtensions(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
+        doSetExtensions(bean, servletConfig, EXTENSIONS_PARAM);
+        doSetExtensions(bean, servletConfig, LANGUAGES_PARAM);
+    }
+    
+    protected void doSetExtensions(JAXRSServerFactoryBean bean, ServletConfig servletConfig, 
+            String extParamName) {
+        String extParam = servletConfig.getInitParameter(extParamName);
+        if (extParam != null) {
+            Map<Object, Object> extensions = new HashMap<Object, Object>();
+            String[] pairs = extParam.split(" ");
+            for (String pair : pairs) {
+                String[] value = pair.split(":");
+                if (value.length == 2) {
+                    extensions.put(value[0].trim(), value[1].trim());
+                }
+            }
+            if (EXTENSIONS_PARAM.equals(extParamName)) {
+                bean.setExtensionMappings(extensions);
+            } else {
+                bean.setLanguageMappings(extensions);
+            }
+        }
+        
+    }
+    
     protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
         setInterceptors(bean, servletConfig, OUT_INTERCEPTORS_PARAM);
         setInterceptors(bean, servletConfig, IN_INTERCEPTORS_PARAM);
@@ -265,6 +295,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, MessageUtils.isTrue(ignoreParam));
         setAllInterceptors(bean, servletConfig);
+        setExtensions(bean, servletConfig);
         bean.create();
     }
     
