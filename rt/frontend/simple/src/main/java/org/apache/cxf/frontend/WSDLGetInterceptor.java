@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
@@ -124,8 +125,19 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
                                   ctx,
                                   message.getExchange().getEndpoint().getEndpointInfo(),
                                   os);
-                    os.close();
                     message.getInterceptorChain().abort();
+                    try {
+                        os.flush();
+                        os.close();
+                    } catch (IOException ex) {
+                        LOG.log(Level.FINE, "Failure writing full wsdl to the stream", ex);
+                        //we can ignore this.   Likely, whatever has requested the WSDL
+                        //has closed the connection before reading the entire wsdl.  
+                        //WSDL4J has a tendency to not read the closing tags and such
+                        //and thus can sometimes hit this.   In anycase, it's 
+                        //pretty much ignorable and nothing we can do about it (cannot
+                        //send a fault or anything anyway
+                    }
                 } catch (IOException e) {
                     throw new Fault(e);
                 } finally {
