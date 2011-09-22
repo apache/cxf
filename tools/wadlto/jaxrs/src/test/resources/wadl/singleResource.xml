@@ -31,17 +31,17 @@
       </response>
     </method>
     <resource path="/books">
-     <method name="GET">
-      <response status="200">
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-      <response status="400">
-        <representation mediaType="application/json"/>
-      </response>
-    </method>
-   </resource>
+       <method name="GET">
+	      <response status="200 201">
+	       <representation mediaType="text/plain">
+	        <param name="result" style="plain" type="xs:string"/>
+	       </representation>
+	      </response>
+	      <response status="400">
+	        <representation mediaType="application/json"/>
+	      </response>
+	   </method>
+     </resource>
     
    </resource>
  </resources>  
