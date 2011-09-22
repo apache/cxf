@@ -43,7 +43,7 @@
     </target> 
         
     <target name="server" description="run demo server" depends="build">
-        <cxfrun classname="org.apache.cxf.js.rhino.ServerApp" param1="-v" param2="-b" param3="http://localhost:9000/SoapContext" param4="${basedir}/impl.jsx" param5="${basedir}/impl.js"/>
+        <cxfrun classname="org.apache.cxf.js.rhino.ServerApp" param1="-v" param2="-b" param3="http://localhost:9000/SoapContext" param4="${basedir}/src/main/resources/impl.jsx" param5="${basedir}/src/main/resources/impl.js"/>
     </target>
         
     <target name="generate.code">

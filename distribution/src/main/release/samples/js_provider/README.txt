@@ -87,10 +87,22 @@ compilation, there is no server-side java code requiring compilation.
 Finally, copy resource files into the build/classes directory with the commands:
 
 For UNIX:    
-  cp ./src/demo/hwDispatch/client/*.xml ./build/classes/demo/hwDispatch/client
+  cp ./src/main/java/demo/hwDispatch/client/*.xml ./build/classes/demo/hwDispatch/client
 
 For Windows:
-  copy src\demo\hwDispatch\client\*.xml build\classes\demo\hwDispatch\client
+  copy src\main\java\demo\hwDispatch\client\*.xml build\classes\demo\hwDispatch\client
+
+
+Running the demo using maven
+----------------------------
+
+From the base directory of this sample (i.e., where this README file is
+located) run the commands, entered on a single command line:
+
+Using either UNIX or Windows:
+
+  mvn -Pserver  (from one command line window)
+  mvn -Pclient  (from a second command line window)
 
 
 Running the demo using java
