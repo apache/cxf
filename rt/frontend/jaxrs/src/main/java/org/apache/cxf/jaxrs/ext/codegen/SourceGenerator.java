@@ -188,7 +188,7 @@ public class SourceGenerator {
                 generateClassesFromSchema(codeModel, srcDir);
             }
         }
-        return getGrammarInfo(app.getAppElement(), schemaElements);
+        return getGrammarInfo(app, schemaElements);
     }
     
     private void generateResourceClasses(Application app, GrammarInfo gInfo, 
@@ -265,14 +265,14 @@ public class SourceGenerator {
         
     }
     
-    private GrammarInfo getGrammarInfo(Element appElement, List<SchemaInfo> schemaElements) {
+    private GrammarInfo getGrammarInfo(Application app, List<SchemaInfo> schemaElements) {
         
         if (schemaElements == null || schemaElements.isEmpty()) {
             return new GrammarInfo();
         }
         
         Map<String, String> nsMap = new HashMap<String, String>();
-        NamedNodeMap attrMap = appElement.getAttributes();
+        NamedNodeMap attrMap = app.getAppElement().getAttributes();
         for (int i = 0; i < attrMap.getLength(); i++) {
             Node node = attrMap.item(i);
             String nodeName = node.getNodeName();
@@ -283,17 +283,31 @@ public class SourceGenerator {
         }
         Map<String, String> elementTypeMap = new HashMap<String, String>();
         for (SchemaInfo schemaEl : schemaElements) {
-            List<Element> elementEls = DOMUtils.getChildrenWithName(schemaEl.getElement(), 
-                 XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
-            for (Element el : elementEls) {
-                String type = el.getAttribute("type");
-                if (type.length() > 0) {
-                    String[] pair = type.split(":");
-                    elementTypeMap.put(el.getAttribute("name"), pair.length == 1 ? pair[0] : pair[1]);
-                }
-            }
+            populateElementTypeMap(app, schemaEl.getElement(), schemaEl.getSystemId(), elementTypeMap);
         }
         return new GrammarInfo(nsMap, elementTypeMap);
+    }
+    
+    private void populateElementTypeMap(Application app, Element schemaEl, 
+            String systemId, Map<String, String> elementTypeMap) {
+        List<Element> elementEls = DOMUtils.getChildrenWithName(schemaEl, 
+                XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
+        for (Element el : elementEls) {
+            String type = el.getAttribute("type");
+            if (type.length() > 0) {
+                String[] pair = type.split(":");
+                elementTypeMap.put(el.getAttribute("name"), pair.length == 1 ? pair[0] : pair[1]);
+            }
+        }
+        Element includeEl = DOMUtils.getFirstChildWithName(schemaEl, 
+                XmlSchemaConstants.XSD_NAMESPACE_URI, "include");
+        if (includeEl != null) {
+            int ind = systemId.lastIndexOf("/");
+            if (ind != -1) {
+                String schemaURI = systemId.substring(0, ind + 1) + includeEl.getAttribute("schemaLocation");
+                populateElementTypeMap(app, readIncludedDocument(schemaURI), schemaURI, elementTypeMap);
+            }
+        }
     }
     
     public void generateMainClass(Element resourcesEl, File src) {
