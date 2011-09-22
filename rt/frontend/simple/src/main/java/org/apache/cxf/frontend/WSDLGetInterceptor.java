@@ -22,6 +22,7 @@ package org.apache.cxf.frontend;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -124,9 +125,21 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
                     XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os,
                                                                              enc);
                     StaxUtils.writeNode(doc, writer, true);
-                    writer.flush();
-                    os.close();
                     message.getInterceptorChain().abort();
+                    try {
+                        writer.flush();
+                        writer.close();
+                        os.flush();
+                        os.close();
+                    } catch (IOException ex) {
+                        LOG.log(Level.FINE, "Failure writing full wsdl to the stream", ex);
+                        //we can ignore this.   Likely, whatever has requested the WSDL
+                        //has closed the connection before reading the entire wsdl.  
+                        //WSDL4J has a tendency to not read the closing tags and such
+                        //and thus can sometimes hit this.   In anycase, it's 
+                        //pretty much ignorable and nothing we can do about it (cannot
+                        //send a fault or anything anyway
+                    }
                 } catch (IOException e) {
                     throw new Fault(e);
                 } catch (XMLStreamException e) {
