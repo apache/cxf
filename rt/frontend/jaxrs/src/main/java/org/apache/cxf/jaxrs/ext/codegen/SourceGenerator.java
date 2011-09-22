@@ -317,13 +317,19 @@ public class SourceGenerator {
             return; 
         }
         
+        
+        final String className = getClassName(qname.getLocalPart(), 
+                info.isInterfaceGenerated(), info.getTypeClassNames());
+        if (info.getResourceClassNames().contains(className)) {
+            return;
+        }
+        info.getResourceClassNames().add(className);
+        final String classPackage = getClassPackageName(namespaceURI);
+        
         StringBuilder sbImports = new StringBuilder();
         StringBuilder sbCode = new StringBuilder();
         Set<String> imports = createImports();
         
-        final String classPackage = getClassPackageName(namespaceURI);
-        final String className = getClassName(qname.getLocalPart(), 
-                info.isInterfaceGenerated(), info.getTypeClassNames());
         
         sbImports.append(getClassComment()).append(getLineSep());
         sbImports.append("package " + classPackage)
@@ -361,7 +367,7 @@ public class SourceGenerator {
                     info.getTypeClassNames(), subEl.getAttribute("type"), src);
                 writeResourceClass(app, subElement, info, src, false);
             }
-            writeSubresourceClasses(app, subEl, info, src, false, resourceId);
+            writeSubresourceClasses(app, subEl, info, src, false, id);
         }
     }
     
@@ -507,7 +513,7 @@ public class SourceGenerator {
                                                                  WadlGenerator.WADL_NS, "response");
         List<Element> requestEls = DOMUtils.getChildrenWithName(methodEl, 
                                                                 WadlGenerator.WADL_NS, "request");
-        
+        Element firstRequestEl = requestEls.size() >= 1 ? requestEls.get(0) : null;
         
         if (writeAnnotations(info.isInterfaceGenerated())) {
             sbCode.append(TAB);
@@ -519,8 +525,9 @@ public class SourceGenerator {
                 } else {
                     // TODO : write a custom annotation class name based on HttpMethod    
                 }
-                writeFormatAnnotations(requestEls, sbCode, imports, true);
-                writeFormatAnnotations(responseEls, sbCode, imports, false);
+                writeFormatAnnotations(firstRequestEl, 
+                        sbCode, imports, true);
+                writeFormatAnnotations(getOKResponse(responseEls), sbCode, imports, false);
             }
             if (!isRoot && !"/".equals(currentPath)) {
                 writeAnnotation(sbCode, imports, Path.class, currentPath, true, true);
@@ -552,9 +559,6 @@ public class SourceGenerator {
             String parentId = ((Element)resourceEl.getParentNode()).getAttribute("id");
             writeSubResponseType(id.equals(parentId), subResponseNs, localName, sbCode, imports);
             
-            // TODO : we need to take care of multiple subresource locators with diff @Path
-            // returning the same type; also we might have ids like "{org.apache.cxf}Book#getName" 
-            
             sbCode.append("get" + localName);
         }
         
@@ -562,7 +566,7 @@ public class SourceGenerator {
         List<Element> inParamElements = new LinkedList<Element>();
         inParamElements.addAll(DOMUtils.getChildrenWithName(resourceEl, 
                                                             WadlGenerator.WADL_NS, "param"));
-        writeRequestTypes(requestEls, inParamElements, sbCode, imports, info);
+        writeRequestTypes(firstRequestEl, inParamElements, sbCode, imports, info);
         sbCode.append(")");
         if (info.isInterfaceGenerated()) {
             sbCode.append(";");
@@ -610,15 +614,7 @@ public class SourceGenerator {
                                    Set<String> imports, Set<String> typeClassNames, 
                                    GrammarInfo gInfo) {
         
-        Element okResponse = null;
-        for (int i = 0; i < responseEls.size(); i++) {
-            String statusValue = responseEls.get(i).getAttribute("status");
-            if (statusValue.length() == 0 
-                || Arrays.asList(statusValue.split("\\s")).contains("200")) {
-                okResponse = responseEls.get(i);
-                break;
-            }
-        }
+        Element okResponse = getOKResponse(responseEls);
         
         List<Element> repElements = null;
         if (okResponse != null) {
@@ -642,6 +638,17 @@ public class SourceGenerator {
         return true;
     }
     
+    private Element getOKResponse(List<Element> responseEls) {
+        for (int i = 0; i < responseEls.size(); i++) {
+            String statusValue = responseEls.get(i).getAttribute("status");
+            if (statusValue.length() == 0 
+                || Arrays.asList(statusValue.split("\\s")).contains("200")) {
+                return responseEls.get(i);
+            }
+        }
+        return null;
+    }
+    
     private void writeSubResponseType(boolean recursive, String ns, String localName,
                                       StringBuilder sbCode, Set<String> imports) {
         if (!recursive && ns.length() > 0) {
@@ -650,23 +657,23 @@ public class SourceGenerator {
         sbCode.append(localName).append(" ");
     }
     
-    private void writeRequestTypes(List<Element> requestEls,
+    private void writeRequestTypes(Element requestEl,
                                    List<Element> inParamEls, 
                                    StringBuilder sbCode, 
                                    Set<String> imports, 
                                    ContextInfo info) {
         
         boolean form = false;
-        boolean formParamsAvailbale = false;
-        if (requestEls.size() == 1 && inParamEls.size() == 0) {
-            inParamEls.addAll(DOMUtils.getChildrenWithName(requestEls.get(0), 
+        boolean formParamsAvailable = false;
+        if (requestEl != null) {
+            inParamEls.addAll(DOMUtils.getChildrenWithName(requestEl, 
                  WadlGenerator.WADL_NS, "param"));
             int currentSize = inParamEls.size();
-            form = addFormParameters(inParamEls, requestEls.get(0));
-            formParamsAvailbale = currentSize < inParamEls.size(); 
+            form = addFormParameters(inParamEls, requestEl);
+            formParamsAvailable = currentSize < inParamEls.size(); 
         }
                   
-        if (form && !formParamsAvailbale) {
+        if (form && !formParamsAvailable) {
             addImport(imports, MultivaluedMap.class.getName());
             sbCode.append("MultivaluedMap map");
         } 
@@ -697,8 +704,8 @@ public class SourceGenerator {
         if (!form) {
             String elementName = null;
             
-            List<Element> repElements = requestEls.size() == 1 
-                ? DOMUtils.getChildrenWithName(requestEls.get(0), WadlGenerator.WADL_NS, "representation")
+            List<Element> repElements = requestEl != null 
+                ? DOMUtils.getChildrenWithName(requestEl, WadlGenerator.WADL_NS, "representation")
                 : CastUtils.cast(Collections.emptyList(), Element.class);
             if (repElements.size() > 0) {    
                 elementName = getElementRefName(repElements, info.getTypeClassNames(), 
@@ -753,6 +760,13 @@ public class SourceGenerator {
                     }
                 }
             }
+        } else {
+            for (Element el : repElements) {
+                Element param = DOMUtils.getFirstChildWithName(el, WadlGenerator.WADL_NS, "param");
+                if (param != null) {
+                    return getPrimitiveType(param);
+                }
+            }    
         }
         return null;
     }
@@ -785,10 +799,10 @@ public class SourceGenerator {
     
     
     
-    private void writeFormatAnnotations(List<Element> parentEls, StringBuilder sbCode, 
+    private void writeFormatAnnotations(Element parentEl, StringBuilder sbCode, 
                                         Set<String> imports, boolean inRep) {
-        List<Element> repElements = parentEls.size() == 1 
-            ? DOMUtils.getChildrenWithName(parentEls.get(0), WadlGenerator.WADL_NS, "representation")
+        List<Element> repElements = parentEl != null 
+            ? DOMUtils.getChildrenWithName(parentEl, WadlGenerator.WADL_NS, "representation")
             : CastUtils.cast(Collections.emptyList(), Element.class);
         if (repElements.size() == 0) {    
             return;
@@ -1140,6 +1154,7 @@ public class SourceGenerator {
         private boolean interfaceIsGenerated;
         private Set<String> typeClassNames;
         private GrammarInfo gInfo;
+        private Set<String> resourceClassNames = new HashSet<String>();
         
         public ContextInfo(Set<String> typeClassNames, GrammarInfo gInfo, boolean interfaceIsGenerated) {
             this.interfaceIsGenerated = interfaceIsGenerated;
@@ -1154,6 +1169,9 @@ public class SourceGenerator {
         }
         public GrammarInfo getGrammarInfo() {
             return gInfo;
+        }
+        public Set<String> getResourceClassNames() {
+            return resourceClassNames;
         }
         
         

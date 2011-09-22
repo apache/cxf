@@ -47,16 +47,14 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
             
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
     }
-    
-        
         
     @Test    
     public void testCodeGenInterfacesWithBinding() {
@@ -74,8 +72,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,8 +96,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,8 +186,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -213,8 +211,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -238,8 +236,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -321,8 +319,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "custom.books");
-            verifyFiles("class", true, false, "superbooks", "custom.books");
+            verifyFiles("java", true, false, "superbooks", "custom.books", 10);
+            verifyFiles("class", true, false, "superbooks", "custom.books", 10);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -347,8 +345,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "custom.books.schema", "custom.books.service");
-            verifyFiles("class", true, false, "custom.books.schema", "custom.books.service");
+            verifyFiles("java", true, false, "custom.books.schema", "custom.books.service", 10);
+            verifyFiles("class", true, false, "custom.books.schema", "custom.books.service", 10);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -372,8 +370,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -397,8 +395,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
-            verifyFiles("class", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl");
+            verifyFiles("java", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 11);
+            verifyFiles("class", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 11);
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -429,9 +427,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
-                             String schemaPackage, String resourcePackage) {    
+                             String schemaPackage, String resourcePackage, int expectedCount) {    
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
-        int size = interfacesAndImpl ? 9 : 7;
+        int size = interfacesAndImpl ? expectedCount : expectedCount - 2;
         if (!subresourceExpected) {
             size--;
         }
@@ -439,11 +437,13 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         doVerifyTypes(files, schemaPackage, ext);
         if (subresourceExpected) {
             assertTrue(checkContains(files, resourcePackage + ".FormInterface." + ext));
+            assertTrue(checkContains(files, resourcePackage + ".FormInterface2." + ext));
         }
         assertTrue(checkContains(files, resourcePackage + ".BookStore." + ext));
         if (interfacesAndImpl) {
             if (subresourceExpected) {
                 assertTrue(checkContains(files, resourcePackage + ".FormInterfaceImpl." + ext));
+                assertTrue(checkContains(files, resourcePackage + ".FormInterface2Impl." + ext));
             }
             assertTrue(checkContains(files, resourcePackage + ".BookStoreImpl." + ext));
         }

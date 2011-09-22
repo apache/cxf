@@ -216,7 +216,20 @@
     </method>
    
   <resource path="/form" id="org.apache.cxf.jaxrs.model.wadl.FormInterface">
-  
+    <resource path="/recursive" id="org.apache.cxf.jaxrs.model.wadl.FormInterface"/>
+    <resource path="/c">
+      <resource path="/formSub" id="org.apache.cxf.jaxrs.model.wadl.FormInterface2">
+        <resource path="/recursive" id="org.apache.cxf.jaxrs.model.wadl.FormInterface"/>
+        <resource path="/subform1">
+	      <method name="POST" id="form1">
+	        <request>
+	           <representation mediaType="application/x-www-form-urlencoded"/>
+	        </request>
+	        <response status="204"></response>
+	      </method>
+	    </resource>
+	  </resource> 
+   </resource>
   <resource path="/form1">
    <method name="POST" id="form1">
     <request>
@@ -238,7 +251,8 @@
       <representation mediaType="text/plain">
        <param name="result" style="plain" type="xs:string"/>
       </representation>
-    </response></method>
+    </response>
+   </method>
   </resource>
   
  </resource>
