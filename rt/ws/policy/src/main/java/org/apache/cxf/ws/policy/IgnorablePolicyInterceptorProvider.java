@@ -59,7 +59,8 @@ public class IgnorablePolicyInterceptorProvider extends AbstractPolicyIntercepto
         getOutFaultInterceptors().add(interceptor);
     }
     
-    private class IgnorableAssertionsInterceptor <T extends Message> extends AbstractPhaseInterceptor<T> {
+    private class IgnorableAssertionsInterceptor 
+        extends AbstractPhaseInterceptor<Message> {
 
         public IgnorableAssertionsInterceptor() {
             // somewhat irrelevant 
