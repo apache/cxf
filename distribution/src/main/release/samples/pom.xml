@@ -63,6 +63,9 @@
         <module>ws_rm</module>
         <module>configuration_interceptor</module>
         <module>java_first_spring_support</module>
+        <module>ruby_spring_support</module>
+        <module>groovy_spring_support</module>
+        <module>js_provider</module>
         <module>ws_security/ut</module>
         <module>ws_security/ut_sign</module>
         <module>ws_security/sign_enc</module>
