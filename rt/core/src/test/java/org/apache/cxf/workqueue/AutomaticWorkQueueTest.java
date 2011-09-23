@@ -147,7 +147,7 @@ public class AutomaticWorkQueueTest extends Assert {
                 }
             }
 
-            while (workqueue.getActiveCount() < INITIAL_SIZE) {
+            while (workqueue.getActiveCount() < 0) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ex) {
