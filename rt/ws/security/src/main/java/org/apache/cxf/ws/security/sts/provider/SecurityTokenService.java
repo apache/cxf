@@ -68,10 +68,22 @@ public interface SecurityTokenService {
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
+    
+    @WebResult(name = "RequestSecurityTokenResponse",
+              targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
+              partName = "response")
+    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue", 
+            output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal")
+    @WebMethod(operationName = "Issue")
+    RequestSecurityTokenResponseType issueSingle(
+        @WebParam(partName = "request",
+                  name = "RequestSecurityToken", 
+                  targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
+        RequestSecurityTokenType request
+    );
 
     @WebResult(name = "RequestSecurityTokenResponse", 
                targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
-               
                partName = "response")
     @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel", 
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/CancelFinal")

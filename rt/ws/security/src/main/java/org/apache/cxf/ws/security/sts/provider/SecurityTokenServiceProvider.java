@@ -51,6 +51,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.CancelOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.KeyExchangeTokenOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.RequestCollectionOperation;
@@ -118,6 +119,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     
     private CancelOperation cancelOperation;
     private IssueOperation issueOperation;
+    private IssueSingleOperation issueSingleOperation;
     private KeyExchangeTokenOperation keyExchangeTokenOperation;
     private RenewOperation renewOperation;
     private RequestCollectionOperation requestCollectionOperation;
@@ -146,6 +148,24 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     public void setIssueOperation(IssueOperation issueOperation) {
         this.issueOperation = issueOperation;
         operationMap.put(WSTRUST_REQUESTTYPE_ISSUE, issueOperation);
+    }
+    
+    /**
+     * Setting an IssueSingleOperation instance will override the default behaviour of issuing
+     * a token in a RequestSecurityTokenResponseCollection
+     */
+    public void setIssueSingleOperation(IssueSingleOperation issueSingleOperation) {
+        this.issueSingleOperation = issueSingleOperation;
+        Method m;
+        try {
+            m = IssueSingleOperation.class.getDeclaredMethod("issueSingle", 
+                    RequestSecurityTokenType.class, 
+                    WebServiceContext.class);
+            OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_ISSUE, m);
+            operationMap.put(WSTRUST_REQUESTTYPE_ISSUE, issueSingleOperation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setKeyExchangeTokenOperation(
@@ -270,6 +290,10 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
 
     public IssueOperation getIssueOperation() {
         return issueOperation;
+    }
+    
+    public IssueSingleOperation getIssueSingleOperation() {
+        return issueSingleOperation;
     }
 
     public KeyExchangeTokenOperation getKeyExchangeTokenOperation() {
