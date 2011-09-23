@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.tokenstore;
 
+import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -39,7 +40,10 @@ import org.apache.ws.security.util.XmlSchemaDateFormat;
 /**
  * 
  */
-public class SecurityToken {
+public class SecurityToken implements Serializable {
+    
+    private static final long serialVersionUID = -8023092932997444513L;
+
     public enum State {
         UNKNOWN,
         ISSUED, 
@@ -142,7 +146,7 @@ public class SecurityToken {
 
     private X509Certificate x509cert;
 
-    private Crypto crypto;
+    private transient Crypto crypto;
     
     public SecurityToken() {
         
