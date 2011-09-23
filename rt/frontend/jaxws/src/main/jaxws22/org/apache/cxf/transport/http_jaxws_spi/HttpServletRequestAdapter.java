@@ -333,15 +333,20 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         StringBuffer sb = new StringBuffer();
         sb.append(exchange.getScheme());
         sb.append("://");
-        InetSocketAddress la = exchange.getLocalAddress();
-        if (la != null) {
-            sb.append(la.getHostName());
-            if (la.getPort() > 0) {
-                sb.append(":");
-                sb.append(la.getPort());
-            }
+        String host = this.getHeader("Host");
+        if (host != null) {
+            sb.append(host);
         } else {
-            sb.append("localhost");
+            InetSocketAddress la = exchange.getLocalAddress();
+            if (la != null) {
+                sb.append(la.getHostName());
+                if (la.getPort() > 0) {
+                    sb.append(":");
+                    sb.append(la.getPort());
+                }
+            } else {
+                sb.append("localhost");
+            }
         }
         sb.append(exchange.getContextPath());
         sb.append(context.getPath());
