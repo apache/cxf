@@ -84,6 +84,7 @@ import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
+import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
@@ -487,6 +488,7 @@ public abstract class AbstractBindingBuilder {
             } else if (isRequestor() 
                 && (token instanceof IssuedToken
                     || token instanceof SecureConversationToken
+                    || token instanceof SecurityContextToken
                     || token instanceof KerberosToken)) {
                 //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();

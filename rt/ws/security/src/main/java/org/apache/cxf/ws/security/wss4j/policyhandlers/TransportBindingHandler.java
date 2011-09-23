@@ -42,6 +42,7 @@ import org.apache.cxf.ws.security.policy.model.KerberosToken;
 import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
+import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
@@ -166,6 +167,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         for (Token token : sgndSuppTokens.getTokens()) {
                             if (token instanceof IssuedToken
                                 || token instanceof SecureConversationToken
+                                || token instanceof SecurityContextToken
                                 || token instanceof KeyValueToken
                                 || token instanceof KerberosToken) {
                                 addSig(signatureValues, doIssuedTokenSignature(token, signdParts,
@@ -203,6 +205,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         for (Token token : endSuppTokens.getTokens()) {
                             if (token instanceof IssuedToken
                                 || token instanceof SecureConversationToken
+                                || token instanceof SecurityContextToken
                                 || token instanceof KerberosToken) {
                                 addSig(signatureValues, doIssuedTokenSignature(token, 
                                                                                endSuppTokens

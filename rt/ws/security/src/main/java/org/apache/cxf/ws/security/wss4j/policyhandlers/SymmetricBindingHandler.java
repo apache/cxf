@@ -42,6 +42,7 @@ import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
+import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
@@ -156,7 +157,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 SecurityToken tok = null;
                 if (encryptionToken instanceof IssuedToken || encryptionToken instanceof KerberosToken) {
                     tok = getSecurityToken();
-                } else if (encryptionToken instanceof SecureConversationToken) {
+                } else if (encryptionToken instanceof SecureConversationToken
+                    || encryptionToken instanceof SecurityContextToken) {
                     tok = getSecurityToken();
                 } else if (encryptionToken instanceof X509Token) {
                     if (isRequestor()) {
@@ -268,7 +270,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         try {
             SecurityToken sigTok = null;
             if (sigToken != null) {
-                if (sigToken instanceof SecureConversationToken) {
+                if (sigToken instanceof SecureConversationToken
+                    || sigToken instanceof SecurityContextToken) {
                     sigTok = getSecurityToken();
                 } else if (sigToken instanceof IssuedToken || sigToken instanceof KerberosToken) {
                     sigTok = getSecurityToken();
@@ -411,7 +414,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 if (attached) {
                     String id = encrTok.getWsuId();
-                    if (id == null && encrToken instanceof SecureConversationToken) {
+                    if (id == null 
+                        && (encrToken instanceof SecureConversationToken 
+                            || encrToken instanceof SecurityContextToken)) {
                         dkEncr.setTokenIdDirectId(true);
                         id = encrTok.getId();
                     } else if (id == null) {
@@ -488,7 +493,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     String encrTokId = encrTok.getId();
                     if (attached) {
                         encrTokId = encrTok.getWsuId();
-                        if (encrTokId == null && encrToken instanceof SecureConversationToken) {
+                        if (encrTokId == null 
+                            && (encrToken instanceof SecureConversationToken
+                                || encrToken instanceof SecurityContextToken)) {
                             encr.setEncKeyIdDirectId(true);
                             encrTokId = encrTok.getId();
                         } else if (encrTokId == null) {
@@ -614,7 +621,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
         } else {
-            if (!attached || policyToken instanceof SecureConversationToken) {
+            if (!attached || policyToken instanceof SecureConversationToken 
+                || policyToken instanceof SecurityContextToken) {
                 dkSign.setTokenIdDirectId(true);
             }
             dkSign.setExternalKey(tok.getSecret(), tok.getId());
@@ -745,7 +753,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (included) {
                 sigTokId = tok.getWsuId();
                 if (sigTokId == null) {
-                    if (policyToken instanceof SecureConversationToken) {
+                    if (policyToken instanceof SecureConversationToken
+                        || policyToken instanceof SecurityContextToken) {
                         sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING_DIRECT);
                     }
                     sigTokId = tok.getId();                    
