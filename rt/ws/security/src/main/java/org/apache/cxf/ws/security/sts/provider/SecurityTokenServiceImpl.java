@@ -33,6 +33,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.CancelOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.KeyExchangeTokenOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.RequestCollectionOperation;
@@ -43,6 +44,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
 
     private CancelOperation cancelOperation;
     private IssueOperation issueOperation;
+    private IssueSingleOperation issueSingleOperation;
     private KeyExchangeTokenOperation keyExchangeTokenOperation;
     private RenewOperation renewOperation;
     private RequestCollectionOperation requestCollectionOperation;
@@ -57,6 +59,10 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
 
     public void setIssueOperation(IssueOperation issueOperation) {
         this.issueOperation = issueOperation;
+    }
+    
+    public void setIssueSingleOperation(IssueSingleOperation issueSingleOperation) {
+        this.issueSingleOperation = issueSingleOperation;
     }
 
     public void setKeyExchangeTokenOperation(
@@ -108,6 +114,14 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
             throwUnsupportedOperation("Issue");
         }
         return issueOperation.issue(request, context);
+    }
+    
+    public RequestSecurityTokenResponseType issueSingle(
+            RequestSecurityTokenType request) {
+        if (issueSingleOperation == null) {
+            throwUnsupportedOperation("IssueSingle");
+        }
+        return issueSingleOperation.issueSingle(request, context);
     }
 
     public RequestSecurityTokenResponseType cancel(
