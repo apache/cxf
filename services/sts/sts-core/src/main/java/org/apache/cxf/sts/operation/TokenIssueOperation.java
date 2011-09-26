@@ -52,12 +52,13 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedProofTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
 import org.apache.ws.security.WSSecurityException;
 
 /**
  * An implementation of the IssueOperation interface.
  */
-public class TokenIssueOperation extends AbstractOperation implements IssueOperation {
+public class TokenIssueOperation extends AbstractOperation implements IssueOperation, IssueSingleOperation {
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenIssueOperation.class);
 
@@ -71,7 +72,19 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         this.claimsManager = claimsManager;
     }
         
+    
     public RequestSecurityTokenResponseCollectionType issue(
+        RequestSecurityTokenType request,
+        WebServiceContext context
+    ) {
+        RequestSecurityTokenResponseType response = issueSingle(request, context);
+        RequestSecurityTokenResponseCollectionType responseCollection = 
+            QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
+        responseCollection.getRequestSecurityTokenResponse().add(response);
+        return responseCollection;
+    }
+    
+    public RequestSecurityTokenResponseType issueSingle(
         RequestSecurityTokenType request,
         WebServiceContext context
     ) {
@@ -135,10 +148,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                 createResponse(
                     encryptionProperties, tokenResponse, tokenRequirements, keyRequirements, context
                 );
-            RequestSecurityTokenResponseCollectionType responseCollection = 
-                QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
-            responseCollection.getRequestSecurityTokenResponse().add(response);
-            return responseCollection;
+            return response;
         } catch (Throwable ex) {
             LOG.log(Level.WARNING, "", ex);
             throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);

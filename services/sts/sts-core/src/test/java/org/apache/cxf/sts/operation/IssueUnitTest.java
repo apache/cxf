@@ -352,6 +352,47 @@ public class IssueUnitTest extends org.junit.Assert {
         assertTrue(!securityTokenResponse.isEmpty());
     }
     
+    /**
+     * Test to successfully issue a single (dummy) token.
+     */
+    @org.junit.Test
+    public void testIssueSingleToken() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        providerList.add(new DummyTokenProvider());
+        issueOperation.setTokenProviders(providerList);
+        
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        issueOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Issue a token
+        RequestSecurityTokenResponseType response = 
+            issueOperation.issueSingle(request, webServiceContext);
+        assertTrue(!response.getAny().isEmpty());
+    }
+    
     
     /*
      * Mock up an AppliesTo element using the supplied address
