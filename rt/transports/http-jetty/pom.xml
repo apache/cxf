@@ -87,7 +87,7 @@
         </dependency>
         <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
-            <artifactId>${cxf.servlet-api.artifact}</artifactId>
+            <artifactId>${cxf.servlet-api-2.5.artifact}</artifactId>
         </dependency>
 
         <dependency>

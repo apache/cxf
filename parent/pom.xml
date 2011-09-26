@@ -81,6 +81,8 @@
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
+        <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
+        <cxf.servlet-api-2.5.version>1.1.2</cxf.servlet-api-2.5.version>
         <cxf.spring.version>3.0.6.RELEASE</cxf.spring.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
@@ -1075,6 +1077,11 @@
                 <groupId>${cxf.servlet-api.group}</groupId>
                 <artifactId>${cxf.servlet-api.artifact}</artifactId>
                 <version>${cxf.servlet-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${cxf.servlet-api.group}</groupId>
+                <artifactId>${cxf.servlet-api-2.5.artifact}</artifactId>
+                <version>${cxf.servlet-api-2.5.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
