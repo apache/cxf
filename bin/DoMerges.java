@@ -16,9 +16,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /* dkulp - Stupid little program I use to help merge changes from 
@@ -266,7 +267,6 @@ public class DoMerges {
         System.out.println("Merging versions (" + verList.size() + "): " + verList);
 
 
-
         String root = null;
 
         p = Runtime.getRuntime().exec(new String[] {"svn", "info"});
@@ -283,18 +283,35 @@ public class DoMerges {
 
         List<String> blocks = new ArrayList<String>();
         List<String> records = new ArrayList<String>();
+        List<String> jiras = new ArrayList<String>();
+        Pattern jiraPattern = Pattern.compile("([A-Z]{2,10}+-\\d+)");
 
         for (int cur = 0; cur < verList.size(); cur++) {
+            jiras.clear();
             String ver = verList.get(cur);
             System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
+            System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
+
             p = Runtime.getRuntime().exec(new String[] {"svn", "log", "-r" , ver, root});
             reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             line = reader.readLine();
+            StringWriter swriter = new StringWriter();
+            BufferedWriter writer = new BufferedWriter(swriter);
             while (line != null) {
-                System.out.println(line);
+                writer.write(line);
+                writer.newLine();
+                Matcher m = jiraPattern.matcher(line);
+                while (m.find()) {
+                    jiras.add(m.group());
+                }
                 line = reader.readLine();
             }
             p.waitFor();
+            writer.flush();
+            for (String s : jiras) {
+                System.out.println("https://issues.apache.org/jira/browse/" + s);
+            }
+            System.out.println(swriter.toString());
 
             while (System.in.available() > 0) {
                 System.in.read();
