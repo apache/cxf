@@ -4,7 +4,7 @@ cxf-utils.js: The utilities code is a fixed set of JavaScript that provides some
 
 ejb_servants.properties: This file is used in java connection adapter for configuration of Apache CXF J2EE connector inbound connections. You may need to update the file when you build resource adapter (.rar) file.
 
-logging.properties: This file is used as the j.u.l log configure file when you run the example.
+logging.properties: This file is used as the j.u.l log configure file when you run the example with ant.
 
 ra.xml: The resource adapter configure file which is used in the JCA example. 
 
