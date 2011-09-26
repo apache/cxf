@@ -50,21 +50,21 @@ public class SamlCallbackHandler implements CallbackHandler {
     private SubjectBean subjectBean;
     
     /**
-     * Set the list of AttributeBeans.
+     * Set the list of AttributeStatementBeans.
      */
     public void setAttributeBeans(List<AttributeStatementBean> attributeBeanList) {
         this.attributeBeans = attributeBeanList;
     }
     
     /**
-     * Set the list of AuthenticationBeans.
+     * Set the list of AuthenticationStatementBeans.
      */
     public void setAuthenticationBeans(List<AuthenticationStatementBean> authBeanList) {
         this.authBeans = authBeanList;
     }
     
     /**
-     * Set the list of AuthDecisionBeans.
+     * Set the list of AuthDecisionStatementBeans.
      */
     public void setAuthDecisionStatementBeans(List<AuthDecisionStatementBean> authDecisionBeanList) {
         this.authDecisionBeans = authDecisionBeanList;
