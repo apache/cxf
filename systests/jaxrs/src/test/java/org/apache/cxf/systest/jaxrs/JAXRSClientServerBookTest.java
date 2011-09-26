@@ -73,6 +73,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testMalformedAcceptType() {
+        WebClient wc = 
+            WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
+        wc.accept("application");
+        Response r = wc.get();
+        assertEquals(406, r.getStatus());
+    }
+    
     public void testGetBookWithCustomHeader() throws Exception {
         
         String endpointAddress =
