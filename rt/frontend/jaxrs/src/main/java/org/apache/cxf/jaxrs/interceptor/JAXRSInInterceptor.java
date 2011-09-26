@@ -131,7 +131,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             acceptTypes = "*/*";
             message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
         }
-        List<MediaType> acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+        List<MediaType> acceptContentTypes = null;
+        try {
+            JAXRSUtils.sortMediaTypes(acceptTypes);
+        } catch (IllegalArgumentException ex) {
+            throw new WebApplicationException(406);
+        }
         message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
