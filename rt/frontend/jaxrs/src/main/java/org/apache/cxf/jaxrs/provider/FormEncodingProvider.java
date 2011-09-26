@@ -89,6 +89,9 @@ public class FormEncodingProvider implements
         Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
+        if (is == null) {
+            return null;
+        }
         try {
             if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
                 MultipartBody body = AttachmentUtils.getMultipartBody(mc);
