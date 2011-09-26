@@ -65,8 +65,16 @@ Form </xsl:text>
 	      <xsl:text>[ </xsl:text>
 	    </xsl:if>
 
-	    <xsl:text>-</xsl:text>
-	    <xsl:value-of select="ts:switch"/>
+	   	    
+	    <xsl:for-each select="ts:switch">
+	        <xsl:if test="position() > 1">
+	            <xsl:text>|</xsl:text>
+	        </xsl:if>
+	        <xsl:text>-</xsl:text>
+            <xsl:value-of select="text()"/>
+        </xsl:for-each>
+	    
+	    
 
 	    <xsl:if test="ts:associatedArgument[@placement='afterSpace']">
 	      <xsl:text> </xsl:text>
