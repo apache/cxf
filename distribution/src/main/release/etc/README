@@ -1,0 +1,13 @@
+This directory includes some file which can be used for example or tools.
+
+cxf-utils.js: The utilities code is a fixed set of JavaScript that provides some browser compatibility and XML management. You can find more information about it here http://cxf.apache.org/docs/javascript-client-code.html.
+
+ejb_servants.properties: This file is used in java connection adapter for configuration of Apache CXF J2EE connector inbound connections. You may need to update the file when you build resource adapter (.rar) file.
+
+logging.properties: This file is used as the j.u.l log configure file when you run the example.
+
+ra.xml: The resource adapter configure file which is used in the JCA example. 
+
+version.properties: This file has the version info of CXF kit.
+
+web.xml: This file is used to load the CXFServlet when you deploy the CXF example application as a war file. When you build the war file of example, ant or maven will put this web.xml into the war file.
