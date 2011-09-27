@@ -37,8 +37,8 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
-import org.apache.cxf.sts.cache.DefaultInMemoryCache;
-import org.apache.cxf.sts.cache.STSCache;
+import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
+import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -69,7 +69,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
     private static final QName QNAME_WST_STATUS = 
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
     
-    private static STSCache cache = new DefaultInMemoryCache();
+    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Test to successfully validate a SecurityContextToken
@@ -77,7 +77,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testValidateSCT() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        validateOperation.setCache(cache);
+        validateOperation.setTokenStore(tokenStore);
         
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
@@ -132,7 +132,8 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
         assertTrue(validateResponse(response));
         
         // Now remove the token from the cache before validating again
-        assertTrue(cache.remove(providerResponse.getTokenId()));
+        tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()));
+        assertNull(tokenStore.getToken(providerResponse.getTokenId()));
         response = validateOperation.validate(request, webServiceContext);
         assertFalse(validateResponse(response));
     }
@@ -206,7 +207,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
-        parameters.setCache(cache);
+        parameters.setTokenStore(tokenStore);
         
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context

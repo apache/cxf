@@ -41,7 +41,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.cache.STSCache;
+import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.RequestParser;
@@ -86,7 +86,7 @@ public abstract class AbstractOperation {
     protected List<ServiceMBean> services;
     protected List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
     protected boolean returnReferences = true;
-    protected STSCache cache;
+    protected STSTokenStore tokenStore;
     
     public boolean isReturnReferences() {
         return returnReferences;
@@ -96,12 +96,12 @@ public abstract class AbstractOperation {
         this.returnReferences = returnReferences;
     }
     
-    public STSCache getCache() {
-        return cache;
+    public STSTokenStore getTokenStore() {
+        return tokenStore;
     }
 
-    public void setCache(STSCache cache) {
-        this.cache = cache;
+    public void setTokenStore(STSTokenStore tokenStore) {
+        this.tokenStore = tokenStore;
     }
 
     public void setStsProperties(STSPropertiesMBean stsProperties) {
@@ -400,7 +400,7 @@ public abstract class AbstractOperation {
         providerParameters.setStsProperties(stsProperties);
         providerParameters.setPrincipal(context.getUserPrincipal());
         providerParameters.setWebServiceContext(context);
-        providerParameters.setCache(getCache());
+        providerParameters.setTokenStore(getTokenStore());
         
         KeyRequirements keyRequirements = requestParser.getKeyRequirements();
         TokenRequirements tokenRequirements = requestParser.getTokenRequirements();

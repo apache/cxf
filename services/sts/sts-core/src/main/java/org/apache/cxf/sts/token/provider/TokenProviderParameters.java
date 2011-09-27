@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.cache.STSCache;
+import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -49,14 +49,14 @@ public class TokenProviderParameters {
     private String appliesToAddress;
     private ClaimsManager claimsManager;
     private Map<String, Object> additionalProperties;
-    private STSCache cache;
+    private STSTokenStore tokenStore;
     
-    public STSCache getCache() {
-        return cache;
+    public STSTokenStore getTokenStore() {
+        return tokenStore;
     }
 
-    public void setCache(STSCache cache) {
-        this.cache = cache;
+    public void setTokenStore(STSTokenStore tokenStore) {
+        this.tokenStore = tokenStore;
     }
 
     public ClaimsManager getClaimsManager() {

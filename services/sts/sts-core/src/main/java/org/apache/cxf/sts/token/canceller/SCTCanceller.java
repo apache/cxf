@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityContextToken;
@@ -68,7 +69,7 @@ public class SCTCanceller implements TokenCanceller {
         TokenCancellerResponse response = new TokenCancellerResponse();
         response.setTokenCancelled(false);
         
-        if (tokenParameters.getCache() == null) {
+        if (tokenParameters.getTokenStore() == null) {
             LOG.log(Level.FINE, "A cache must be configured to use the SCTCanceller");
             return response;
         }
@@ -78,12 +79,12 @@ public class SCTCanceller implements TokenCanceller {
                 Element cancelTargetElement = (Element)cancelTarget.getToken();
                 SecurityContextToken sct = new SecurityContextToken(cancelTargetElement);
                 String identifier = sct.getIdentifier();
-                byte[] secret = (byte[])tokenParameters.getCache().get(identifier);
-                if (secret == null) {
+                SecurityToken token = tokenParameters.getTokenStore().getToken(identifier);
+                if (token == null) {
                     LOG.fine("Identifier: " + identifier + " is not found in the cache");
                     return response;
                 }
-                tokenParameters.getCache().remove(identifier);
+                tokenParameters.getTokenStore().remove(token);
                 response.setTokenCancelled(true);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);

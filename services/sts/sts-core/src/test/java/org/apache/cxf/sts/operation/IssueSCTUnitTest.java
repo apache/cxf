@@ -39,8 +39,8 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
-import org.apache.cxf.sts.cache.DefaultInMemoryCache;
-import org.apache.cxf.sts.cache.STSCache;
+import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
+import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.service.EncryptionProperties;
@@ -71,7 +71,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
     public static final QName UNATTACHED_REFERENCE = 
         QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(null).getName();
     
-    private static STSCache cache = new DefaultInMemoryCache();
+    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     private static boolean unrestrictedPoliciesInstalled;
     
@@ -85,7 +85,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testIssueSCT() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        issueOperation.setCache(cache);
+        issueOperation.setTokenStore(tokenStore);
         
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<TokenProvider>();
@@ -157,7 +157,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testIssueEncryptedSCT() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        issueOperation.setCache(cache);
+        issueOperation.setTokenStore(tokenStore);
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
@@ -236,7 +236,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testIssueSCTNoReferences() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        issueOperation.setCache(cache);
+        issueOperation.setTokenStore(tokenStore);
         issueOperation.setReturnReferences(false);
         
         // Add Token Provider

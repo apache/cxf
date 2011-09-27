@@ -26,8 +26,8 @@ import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.StaticSTSProperties;
-import org.apache.cxf.sts.cache.DefaultInMemoryCache;
-import org.apache.cxf.sts.cache.STSCache;
+import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
+import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -46,7 +46,7 @@ import org.apache.ws.security.util.DOM2Writer;
  */
 public class SCTProviderTest extends org.junit.Assert {
     
-    private static STSCache cache = new DefaultInMemoryCache();
+    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Create a SecurityContextToken
@@ -132,8 +132,8 @@ public class SCTProviderTest extends org.junit.Assert {
         Element token = providerResponse.getToken();
         SecurityContextToken sctToken = new SecurityContextToken(token);
         String identifier = sctToken.getIdentifier();
-        assertNotNull(cache.get(identifier));
-        assertNull(cache.get(identifier + "1234"));
+        assertNotNull(tokenStore.getToken(identifier));
+        assertNull(tokenStore.getToken(identifier + "1234"));
     }
     
     /**
@@ -176,7 +176,7 @@ public class SCTProviderTest extends org.junit.Assert {
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
-        parameters.setCache(cache);
+        parameters.setTokenStore(tokenStore);
         
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context

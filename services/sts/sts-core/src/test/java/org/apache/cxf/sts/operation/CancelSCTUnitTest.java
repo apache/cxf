@@ -36,8 +36,8 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
-import org.apache.cxf.sts.cache.DefaultInMemoryCache;
-import org.apache.cxf.sts.cache.STSCache;
+import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
+import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -68,7 +68,7 @@ public class CancelSCTUnitTest extends org.junit.Assert {
     private static final QName QNAME_REQ_TOKEN_CANCELLED = 
         QNameConstants.WS_TRUST_FACTORY.createRequestedTokenCancelled(null).getName();
     
-    private static STSCache cache = new DefaultInMemoryCache();
+    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Test to successfully cancel a SecurityContextToken
@@ -76,7 +76,7 @@ public class CancelSCTUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testCancelSCT() throws Exception {
         TokenCancelOperation cancelOperation = new TokenCancelOperation();
-        cancelOperation.setCache(cache);
+        cancelOperation.setTokenStore(tokenStore);
         
         // Add Token Canceller
         List<TokenCanceller> cancellerList = new ArrayList<TokenCanceller>();
@@ -198,7 +198,7 @@ public class CancelSCTUnitTest extends org.junit.Assert {
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
-        parameters.setCache(cache);
+        parameters.setTokenStore(tokenStore);
         
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context

@@ -84,7 +84,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
         cancellerParameters.setStsProperties(stsProperties);
         cancellerParameters.setPrincipal(context.getUserPrincipal());
         cancellerParameters.setWebServiceContext(context);
-        cancellerParameters.setCache(getCache());
+        cancellerParameters.setTokenStore(getTokenStore());
         
         cancellerParameters.setKeyRequirements(keyRequirements);
         cancellerParameters.setTokenRequirements(tokenRequirements);   

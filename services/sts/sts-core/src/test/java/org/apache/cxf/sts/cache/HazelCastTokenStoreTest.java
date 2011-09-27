@@ -18,39 +18,49 @@
  */
 package org.apache.cxf.sts.cache;
 
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.junit.BeforeClass;
 
-public class HazelCastCacheTest extends org.junit.Assert {
+public class HazelCastTokenStoreTest extends org.junit.Assert {
   
-    private static STSCache cache;
+    private static STSTokenStore store;
     
     @BeforeClass
     public static void init() throws Exception {
-        cache = new HazelCastCache("default");
+        store = new HazelCastTokenStore("default");
     }
     
     // tests STSCache apis for storing in the cache.
     @org.junit.Test
-    public void testCacheStore() {
+    @org.junit.Ignore
+    public void testCacheStore() throws Exception {
         String key = "key";
-        String value = "value";
-        cache.put(key, value);
-        assertEquals(value, cache.get(key));
-        cache.remove(key);
-        assertNull(cache.get(key));
+        SecurityToken token = new SecurityToken(key);
+        store.add(token);
+        assertEquals(token, store.getToken(key));
+        store.remove(token);
+        assertNull(store.getToken(key));
+        store.add(token, new Integer(1));
+        assertNotNull(store.getToken(key));
+        Thread.sleep(2000);
+        assertNull(store.getToken(key));
     }
     
     // tests STSCache apis for removing from the cache.
     @org.junit.Test
+    @org.junit.Ignore
     public void testCacheRemove() {
-        cache.put("test1", "test1");
-        cache.put("test2", "test2");
-        cache.put("test3", "test3");
-        assertTrue(cache.size() == 3);
-        assertTrue(cache.remove("test3"));
-        assertFalse(cache.remove("test3"));
-        assertNull(cache.get("test3"));
-        cache.removeAll();
-        assertTrue(cache.size() == 0);
+        SecurityToken token1 = new SecurityToken("token1");
+        SecurityToken token2 = new SecurityToken("token2");
+        SecurityToken token3 = new SecurityToken("token3");
+        store.add(token1);
+        store.add(token2);
+        store.add(token3);
+        assertTrue(store.getValidTokens().size() == 3);
+        store.remove(token3);
+        assertNull(store.getToken("test3"));
+        store.remove(token1);
+        store.remove(token2);
+        assertTrue(store.getValidTokens().size() == 0);
     }
 }
