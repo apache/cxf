@@ -29,6 +29,11 @@ import org.apache.cxf.sts.request.ReceivedToken;
 public interface TokenCanceller {
 
     /**
+     * boolean for enabling/disabling verification of proof of possession.
+     */
+    void setVerifyProofOfPossession(boolean verifyProofOfPossession);
+    
+    /**
      * Return true if this TokenCanceller implementation is able to cancel a token
      * that corresponds to the given token.
      */

@@ -59,6 +59,7 @@ public class SCTCancellerTest extends org.junit.Assert {
     @org.junit.Test
     public void testCancelToken() throws Exception {
         TokenCanceller sctCanceller = new SCTCanceller();
+        sctCanceller.setVerifyProofOfPossession(false);
         TokenCancellerParameters cancellerParameters = createCancellerParameters();
         TokenRequirements tokenRequirements = cancellerParameters.getTokenRequirements();
         
@@ -85,6 +86,7 @@ public class SCTCancellerTest extends org.junit.Assert {
     @org.junit.Test
     public void testCancelInvalidToken() throws Exception {
         TokenCanceller sctCanceller = new SCTCanceller();
+        sctCanceller.setVerifyProofOfPossession(false);
         TokenCancellerParameters cancellerParameters = createCancellerParameters();
         TokenRequirements tokenRequirements = cancellerParameters.getTokenRequirements();
         

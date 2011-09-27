@@ -32,12 +32,12 @@ public class HazelCastTokenStoreTest extends org.junit.Assert {
     
     // tests STSCache apis for storing in the cache.
     @org.junit.Test
-    @org.junit.Ignore
     public void testCacheStore() throws Exception {
         String key = "key";
         SecurityToken token = new SecurityToken(key);
         store.add(token);
-        assertEquals(token, store.getToken(key));
+        SecurityToken cachedToken = store.getToken(key);
+        assertEquals(token.getId(), cachedToken.getId());
         store.remove(token);
         assertNull(store.getToken(key));
         store.add(token, new Integer(1));
@@ -48,7 +48,6 @@ public class HazelCastTokenStoreTest extends org.junit.Assert {
     
     // tests STSCache apis for removing from the cache.
     @org.junit.Test
-    @org.junit.Ignore
     public void testCacheRemove() {
         SecurityToken token1 = new SecurityToken("token1");
         SecurityToken token2 = new SecurityToken("token2");
