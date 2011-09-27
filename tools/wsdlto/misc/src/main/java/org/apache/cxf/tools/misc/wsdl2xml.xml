@@ -78,7 +78,8 @@ wsdl2xml -i GreetPortType -a address TestGreeting.wsdl
 		            Specifies the value used in the address element of the port
 		        </annotation>
 				<switch>a</switch>
-				<associatedArgument placement="afterSpace">
+				<switch>address</switch>
+                                <associatedArgument placement="afterSpace">
 				    <annotation>address</annotation>
 				</associatedArgument>
 		    </option>
@@ -98,6 +99,7 @@ wsdl2xml -i GreetPortType -a address TestGreeting.wsdl
 		            The wsdl output file name.
 			</annotation>
 				<switch>o</switch>
+                                <switch>output</switch>
 				<associatedArgument placement="afterSpace">
 				  	<annotation>output-file</annotation>
 				</associatedArgument>

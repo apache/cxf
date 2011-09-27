@@ -68,6 +68,7 @@ xsd2wsdl -t http://org.apache/invoice -n Invoice Invoice.xsd
 			    The wsdl output file name.
 			  </annotation>
 				<switch>o</switch>
+                                <switch>output</switch>
 				<associatedArgument placement="afterSpace">
 				  	<annotation>output-file</annotation>
 				</associatedArgument>
