@@ -75,6 +75,7 @@ wsdl2soap -i GreetPortType -n http://apache.org/hello_world_doc_lit -o Greeting.
 			    The output wsdl file name.
 			 </annotation>
 				<switch>o</switch>
+                                <switch>output</switch>
 				<associatedArgument placement="afterSpace">
 				  	<annotation>output-file</annotation>
 				</associatedArgument>

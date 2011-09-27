@@ -48,6 +48,7 @@
             <option id="outputdir" maxOccurs="1">
                 <annotation>The wsdl output directory.</annotation>
                 <switch>o</switch>
+                <switch>output</switch>
                 <associatedArgument placement="afterSpace">
                     <annotation>output-directory</annotation>
                 </associatedArgument>
@@ -56,6 +57,7 @@
             <option id="address" maxOccurs="1">
                 <annotation>Specify the value to be used for the corba:address location attribute.</annotation>
                 <switch>a</switch>
+                <switch>address</switch>
                 <associatedArgument placement="afterSpace">
                     <annotation>corba-address</annotation>
                 </associatedArgument>

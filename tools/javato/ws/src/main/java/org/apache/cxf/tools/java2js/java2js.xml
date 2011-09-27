@@ -37,6 +37,7 @@ under the License.
 		    Specify the data binding (aegis or jaxb). Default is jaxb for jaxws 
 		    frontend, and aegis for simple frontend.
 		</annotation>
+                <switch>db</switch>
 		<switch>databinding</switch>
 		<associatedArgument placement="afterSpace">
 		    <annotation>jaxb or aegis</annotation>
@@ -55,6 +56,7 @@ under the License.
 		    Specify the output wsdl file name
 		</annotation>
 		<switch>o</switch>
+                <switch>output</switch>
 		<associatedArgument placement="afterSpace">
 		    <annotation>output-file</annotation>
 		</associatedArgument>
@@ -86,6 +88,7 @@ under the License.
 		    directories and zip/jar files
 		</annotation>
 		<switch>cp</switch>
+                <switch>classpath</switch>
 		<associatedArgument placement="afterSpace">
 		    <annotation>class-path</annotation>
 		</associatedArgument>

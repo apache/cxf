@@ -73,6 +73,7 @@
       <option id="outputfile" maxOccurs="2">
         <annotation>The wsdl/idl output file name.(can be specified twice)</annotation>
         <switch>o</switch>
+        <switch>output</switch>
         <associatedArgument placement="afterSpace">
           <annotation>output-file</annotation>
         </associatedArgument>

@@ -81,6 +81,7 @@
       <option id="idloutputfile" maxOccurs="1">
         <annotation>The idl output file name.</annotation>
         <switch>o</switch>
+        <switch>output</switch>
         <associatedArgument placement="afterSpace">
           <annotation>idl-output-file</annotation>
         </associatedArgument>
@@ -103,6 +104,7 @@ te parameters.</annotation>
     <option id="address" maxOccurs="1">
         <annotation>Specify the value to be used for the corba:address location attribute.</annotation>
         <switch>a</switch>
+        <switch>address</switch>
         <associatedArgument placement="afterSpace">
             <annotation>corba-address</annotation>
         </associatedArgument>
