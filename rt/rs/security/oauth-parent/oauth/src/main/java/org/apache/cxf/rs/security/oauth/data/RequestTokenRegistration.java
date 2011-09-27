@@ -23,8 +23,8 @@ import java.util.List;
 public class RequestTokenRegistration {
     private Client client; 
     private String state;
+    private List<String> uris;
     private List<String> scopes;
-    private List<String> permissions;
     private long lifetime;
     
     public void setClient(Client client) {
@@ -39,17 +39,17 @@ public class RequestTokenRegistration {
     public String getState() {
         return state;
     }
+    public void setUris(List<String> uris) {
+        this.uris = uris;
+    }
+    public List<String> getUris() {
+        return uris;
+    }
     public void setScopes(List<String> scopes) {
         this.scopes = scopes;
     }
     public List<String> getScopes() {
         return scopes;
-    }
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
-    }
-    public List<String> getPermissions() {
-        return permissions;
     }
     public void setLifetime(long lifetime) {
         this.lifetime = lifetime;

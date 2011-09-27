@@ -68,8 +68,8 @@ public class AuthorizationRequestHandler {
             OAuthAuthorizationData secData = new OAuthAuthorizationData();
             if (!compareRequestSessionTokens(request)) {
                 secData.setPermissions(
-                        dataProvider.getPermissionsInfo(token.getPermissions()));
-                secData.setScopes(token.getScopes());
+                        dataProvider.getPermissionsInfo(token.getScopes()));
+                secData.setUris(token.getUris());
                 addAuthenticityTokenToSession(secData, request);
                 return Response.ok(addAdditionalParams(secData, token)).build();
             }

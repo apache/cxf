@@ -28,8 +28,8 @@ public final class OAuthConstants {
     public static final String VERIFIER_INVALID = "verifier_invalid";
 
     public static final String AUTHENTICITY_TOKEN = "session_authenticity_token";
+    public static final String X_OAUTH_URI = "x_oauth_uri";
     public static final String X_OAUTH_SCOPE = "x_oauth_scope";
-    public static final String X_OAUTH_PERMISSION = "x_oauth_permission";
 
     public static final String AUTHORIZATION_DECISION_KEY = "oauthDecision";
     public static final String AUTHORIZATION_DECISION_ALLOW = "allow";

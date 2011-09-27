@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.oauth.test;
+package demo.oauth.server.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +43,11 @@ import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 
 public class MemoryOAuthDataProvider implements OAuthDataProvider {
 
+    public static final String CALLBACK = "http://www.example.com/callback";
+    public static final String APPLICATION_NAME = "Test Oauth 1.0 application";
+    public static final String CLIENT_ID = "12345678";
+    public static final String CLIENT_SECRET = "secret";
+
     private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS = 
         new ConcurrentHashMap<String, OAuthPermission>();
 
@@ -67,10 +72,9 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     protected DefaultOAuthValidator validator = new DefaultOAuthValidator();
 
     public MemoryOAuthDataProvider() {
-        Client client = new Client(OAuthTestUtils.CLIENT_ID, OAuthTestUtils.CLIENT_ID, 
-            OAuthTestUtils.CLIENT_SECRET,
-            OAuthTestUtils.CALLBACK, OAuthTestUtils.APPLICATION_NAME);
-        clientAuthInfo.put(OAuthTestUtils.CLIENT_ID, client);
+        Client client = new Client(CLIENT_ID, CLIENT_ID, 
+            CLIENT_SECRET, CALLBACK, APPLICATION_NAME);
+        clientAuthInfo.put(CLIENT_ID, client);
     }
     
     public List<OAuthPermission> getPermissionsInfo(List<String> requestPermissions) {

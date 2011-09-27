@@ -44,7 +44,7 @@ public class OAuthInfo {
     
     public List<String> getRoles() {
         List<OAuthPermission> permissions = provider.getPermissionsInfo(
-            token != null ? token.getPermissions() : client.getPermissions());
+            token != null ? token.getScopes() : client.getScopes());
         List<String> authorities = new ArrayList<String>();
         if (permissions != null) {
             for (OAuthPermission permission : permissions) {

@@ -82,7 +82,7 @@ public class AbstractAuthFilter {
                 throw new OAuthProblemException();
             }
             //check valid scope
-            if (!checkScopes(req, accessToken.getScopes())) {
+            if (!checkRequestURI(req, accessToken.getUris())) {
                 throw new OAuthProblemException();
             }
             if (accessToken.getHttpVerbs() != null 
@@ -94,7 +94,7 @@ public class AbstractAuthFilter {
         } else {
             String consumerKey = oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY);
             authInfo = dataProvider.getClient(consumerKey);
-            if (!checkScopes(req, authInfo.getScopes())) {
+            if (!checkRequestURI(req, authInfo.getUris())) {
                 throw new OAuthProblemException();
             }
         }
@@ -105,21 +105,21 @@ public class AbstractAuthFilter {
         
     }
 
-    protected boolean checkScopes(HttpServletRequest request, List<String> scopes) {
-        if (scopes == null) {
+    protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
+        if (uris == null) {
             return true;
         }
         String servletPath = request.getPathInfo();
         boolean foundValidScope = false;
-        for (String scope : scopes) {
-            boolean wildcard = scope.endsWith("*");
+        for (String uri : uris) {
+            boolean wildcard = uri.endsWith("*");
             if (wildcard) {
-                if (servletPath.startsWith(scope.substring(0, scope.length() - 1))) {
+                if (servletPath.startsWith(uri.substring(0, uri.length() - 1))) {
                     foundValidScope = true;
                     break;
                 }
             } else {
-                if (scope.equals(servletPath)) {
+                if (uri.equals(servletPath)) {
                     foundValidScope = true;
                     break;
                 }

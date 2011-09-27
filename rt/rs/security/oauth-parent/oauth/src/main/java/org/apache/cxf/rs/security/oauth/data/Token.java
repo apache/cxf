@@ -28,8 +28,8 @@ public abstract class Token {
     protected long issuedAt = -1;
     protected long lifetime = -1;
     protected Client client;
-    protected List<String> permissions;
     protected List<String> scopes;
+    protected List<String> uris;
     private List<String> httpVerbs;
     
     protected Token(Client client, String tokenString,
@@ -70,20 +70,21 @@ public abstract class Token {
         return lifetime;
     }
 
-    public List<String> getPermissions() {
-        return permissions == null || permissions.isEmpty() ? client.getPermissions() : permissions;
-    }
-
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
-    }
-
     public List<String> getScopes() {
         return scopes == null || scopes.isEmpty() ? client.getScopes() : scopes;
     }
 
     public void setScopes(List<String> scopes) {
         this.scopes = scopes;
+    }
+       
+
+    public List<String> getUris() {
+        return uris == null || uris.isEmpty() ? client.getUris() : uris;
+    }
+
+    public void setUris(List<String> uris) {
+        this.uris = uris;
     }
 
     public void setHttpVerbs(List<String> httpVerbs) {

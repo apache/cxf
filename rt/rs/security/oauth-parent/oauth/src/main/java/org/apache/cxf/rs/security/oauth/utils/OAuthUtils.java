@@ -143,12 +143,12 @@ public final class OAuthUtils {
         return scopeList;
     }
 
-    public static List<String> parsePermissionsFromRequest(OAuthMessage message) throws IOException {
-        return parseParamFromRequest(message.getParameter(OAuthConstants.X_OAUTH_PERMISSION));
-    }
-    
     public static List<String> parseScopesFromRequest(OAuthMessage message) throws IOException {
         return parseParamFromRequest(message.getParameter(OAuthConstants.X_OAUTH_SCOPE));
+    }
+    
+    public static List<String> parseUrisFromRequest(OAuthMessage message) throws IOException {
+        return parseParamFromRequest(message.getParameter(OAuthConstants.X_OAUTH_URI));
     }
 
     /**

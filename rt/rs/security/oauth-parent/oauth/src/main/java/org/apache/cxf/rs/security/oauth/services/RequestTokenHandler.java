@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +54,6 @@ public class RequestTokenHandler {
         };
     
     private long tokenLifetime = 3600L;
-    private String defaultPermission;
-    private String defaultScope;
     
     public Response handle(HttpServletRequest request, OAuthDataProvider dataProvider) {
         try {
@@ -80,20 +77,14 @@ public class RequestTokenHandler {
             String callback = oAuthMessage.getParameter(OAuth.OAUTH_CALLBACK);
             validateCallbackURL(client, callback);
 
-            List<String> permissions = OAuthUtils.parsePermissionsFromRequest(oAuthMessage);
-            if (permissions.isEmpty() && defaultPermission != null) {
-                permissions = Collections.singletonList(defaultPermission);
-            }
             List<String> scopes = OAuthUtils.parseScopesFromRequest(oAuthMessage);
-            if (scopes.isEmpty() && defaultScope != null) {
-                scopes = Collections.singletonList(defaultScope);    
-            }
+            List<String> uris = OAuthUtils.parseUrisFromRequest(oAuthMessage);
             
             RequestTokenRegistration reg = new RequestTokenRegistration();
             reg.setClient(client);
             reg.setState(oAuthMessage.getParameter("state"));
+            reg.setUris(uris);
             reg.setScopes(scopes);
-            reg.setPermissions(permissions);
             reg.setLifetime(tokenLifetime);
             
             RequestToken requestToken = dataProvider.createRequestToken(reg);
@@ -146,13 +137,5 @@ public class RequestTokenHandler {
     public void setTokenLifetime(long tokenLifetime) {
         this.tokenLifetime = tokenLifetime;
     }
-
-    public void setDefaultPermission(String defaultPermission) {
-        this.defaultPermission = defaultPermission;
-    }
-    
-    public void setDefaultScope(String defaultScope) {
-        this.defaultScope = defaultScope;
-    }
-        
+            
 }

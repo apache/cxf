@@ -28,18 +28,18 @@ public class Client {
     private String callbackURL;
     private String applicationURI;
     private String applicationName;
+    private List<String> uris = Collections.emptyList();
     private List<String> scopes = Collections.emptyList();
-    private List<String> permissions = Collections.emptyList();
 
     public Client(String loginName,
             String consumerKey, String secretKey, String callbackURL,
-            String applicationName, List<String> scopes) {
+            String applicationName, List<String> uris) {
         this.loginName = loginName;
         this.consumerKey = consumerKey;
         this.secretKey = secretKey;
         this.callbackURL = callbackURL;
         this.applicationName = applicationName;
-        this.scopes = scopes;
+        this.uris = uris;
     }
     
     public Client(String loginName, String consumerKey, String secretKey, String callbackURL,
@@ -60,8 +60,8 @@ public class Client {
         return loginName;
     }
     
-    public List<String> getScopes() {
-        return scopes;
+    public List<String> getUris() {
+        return uris;
     }
     
     public String getConsumerKey() {
@@ -96,12 +96,12 @@ public class Client {
         this.applicationURI = applicationURI;
     }
 
-    public List<String> getPermissions() {
-        return permissions;
+    public List<String> getScopes() {
+        return scopes;
     }
 
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
+    public void setScopes(List<String> scopes) {
+        this.scopes = scopes;
     }
     
     @Override

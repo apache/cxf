@@ -33,7 +33,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String callback;
     private String oauthVerifier;
     private List<? extends Permission> permissions;
-    private List<String> scopes;
+    private List<String> uris;
 
     public OAuthAuthorizationData() {
     }
@@ -90,12 +90,12 @@ public class OAuthAuthorizationData implements Serializable {
         this.permissions = permissions;
     }
 
-    public void setScopes(List<String> scopes) {
-        this.scopes = scopes;
+    public void setUris(List<String> uris) {
+        this.uris = uris;
     }
 
-    public List<String> getScopes() {
-        return scopes;
+    public List<String> getUris() {
+        return uris;
     }
 
     public void setAuthenticityToken(String authenticityToken) {
