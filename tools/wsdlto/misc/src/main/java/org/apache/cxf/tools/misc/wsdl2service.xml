@@ -83,6 +83,7 @@ wsdl2service -transport http -e servicename -p portname -n bindingname HelloWorl
 			    Specifies the value used in the address element of the port
 			</annotation>
 				<switch>a</switch>
+                                <switch>address</switch>
 				<associatedArgument placement="afterSpace">
 				    <annotation>address</annotation>
 				</associatedArgument>
@@ -184,6 +185,7 @@ wsdl2service -transport http -e servicename -p portname -n bindingname HelloWorl
 		            Specify output wsdl file name
 		    </annotation>
 				<switch>o</switch>
+                                <switch>output</switch>
 		        <associatedArgument placement="afterSpace">
 		        	<annotation>output-file</annotation>
 		        </associatedArgument>

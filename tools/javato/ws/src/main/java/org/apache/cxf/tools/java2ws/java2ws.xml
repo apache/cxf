@@ -41,6 +41,7 @@
 				    Specify the data binding (aegis, jaxb, xmlbeans, etc...). Default is jaxb for jaxws 
 				    frontend, and aegis for simple frontend.
 				</annotation>
+                                <switch>db</switch>
 				<switch>databinding</switch>
 				<associatedArgument placement="afterSpace">
 				  <annotation>databinding name</annotation>
@@ -51,6 +52,7 @@
 					Specify the frontend to use.  jaxws and the simple frontend are supported.
 				</annotation>
 				<switch>frontend</switch>
+                                <switch>fe</switch>
 				<associatedArgument placement="afterSpace">
 					<annotation>jaxws or simple</annotation>
 				</associatedArgument>
@@ -96,6 +98,7 @@
 					Specify the output wsdl file name
 				</annotation>
 				<switch>o</switch>
+                                <switch>output</switch>
 				<associatedArgument placement="afterSpace">
 					<annotation>output-file</annotation>
 				</associatedArgument>
@@ -140,6 +143,7 @@
 					directories and zip/jar files
 				</annotation>
 				<switch>cp</switch>
+                                <switch>classpath</switch>
 				<associatedArgument placement="afterSpace">
 					<annotation>class-path</annotation>
 				</associatedArgument>
@@ -196,6 +200,7 @@
 				<annotation>
 					Specify the port address 
 				</annotation>
+                                <switch>a</switch>
 				<switch>address</switch>
 				<associatedArgument placement="afterSpace">
 					<annotation>address</annotation>
