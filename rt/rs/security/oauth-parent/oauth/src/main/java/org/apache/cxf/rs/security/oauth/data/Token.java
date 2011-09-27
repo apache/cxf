@@ -30,7 +30,6 @@ public abstract class Token {
     protected Client client;
     protected List<String> scopes;
     protected List<String> uris;
-    private List<String> httpVerbs;
     
     protected Token(Client client, String tokenString,
                     String tokenSecret, long lifetime) {
@@ -86,14 +85,5 @@ public abstract class Token {
     public void setUris(List<String> uris) {
         this.uris = uris;
     }
-
-    public void setHttpVerbs(List<String> httpVerbs) {
-        this.httpVerbs = httpVerbs;
-    }
-
-    public List<String> getHttpVerbs() {
-        return httpVerbs;
-    }
-    
     
 }

@@ -24,16 +24,15 @@ import java.util.List;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
-import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 
 public class OAuthInfo {
     private Client client;
     private AccessToken token;
-    private OAuthDataProvider provider;
-    public OAuthInfo(Client client, AccessToken token, OAuthDataProvider provider) {
+    private List<OAuthPermission> permissions;
+    public OAuthInfo(Client client, AccessToken token, List<OAuthPermission> permissions) {
         this.client = client;
         this.token = token;
-        this.provider = provider;
+        this.permissions = permissions;
     }
     public Client getClient() {
         return client;
@@ -43,8 +42,6 @@ public class OAuthInfo {
     }
     
     public List<String> getRoles() {
-        List<OAuthPermission> permissions = provider.getPermissionsInfo(
-            token != null ? token.getScopes() : client.getScopes());
         List<String> authorities = new ArrayList<String>();
         if (permissions != null) {
             for (OAuthPermission permission : permissions) {

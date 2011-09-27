@@ -34,6 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
+import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -81,12 +82,8 @@ public class AbstractAuthFilter {
             if (accessToken == null) {
                 throw new OAuthProblemException();
             }
-            //check valid scope
+            //check valid URI
             if (!checkRequestURI(req, accessToken.getUris())) {
-                throw new OAuthProblemException();
-            }
-            if (accessToken.getHttpVerbs() != null 
-                && !accessToken.getHttpVerbs().contains(req.getMethod())) {
                 throw new OAuthProblemException();
             }
             authInfo = accessToken.getClient(); 
@@ -94,6 +91,9 @@ public class AbstractAuthFilter {
         } else {
             String consumerKey = oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY);
             authInfo = dataProvider.getClient(consumerKey);
+            if (authInfo == null) {
+                throw new OAuthProblemException();
+            }
             if (!checkRequestURI(req, authInfo.getUris())) {
                 throw new OAuthProblemException();
             }
@@ -101,7 +101,19 @@ public class AbstractAuthFilter {
 
         OAuthUtils.validateMessage(oAuthMessage, authInfo, accessToken);
 
-        return new OAuthInfo(authInfo, accessToken, dataProvider);
+        List<OAuthPermission> permissions = dataProvider.getPermissionsInfo(
+                accessToken != null ? accessToken.getScopes() : authInfo.getScopes());
+        boolean matched = false;
+        for (OAuthPermission perm : permissions) {
+            if (perm.getHttpVerbs() == null 
+                    || perm.getHttpVerbs().contains(req.getMethod())) {
+                matched = true;
+            }
+        }
+        if (!matched) {
+            throw new OAuthProblemException();
+        }
+        return new OAuthInfo(authInfo, accessToken, permissions);
         
     }
 
