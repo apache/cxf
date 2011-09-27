@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
@@ -39,9 +41,15 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class BinaryDataProvider extends AbstractConfigurableProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
+    
+    private static final String HTTP_RANGE_PROPERTY = "http.range.support";
     
     private static final int BUFFER_SIZE = 4096;
 
@@ -67,6 +75,8 @@ public class BinaryDataProvider extends AbstractConfigurableProvider
     }
 
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+        // TODO: if it's a range request, then we should probably always return -1 and set 
+        // Content-Length and Content-Range in handleRangeRequest
         if (byte[].class.isAssignableFrom(t.getClass())) {
             return ((byte[])t).length;
         }
@@ -86,12 +96,12 @@ public class BinaryDataProvider extends AbstractConfigurableProvider
         throws IOException {
         
         if (InputStream.class.isAssignableFrom(o.getClass())) {
-            IOUtils.copyAndCloseInput((InputStream)o, os);
+            copyInputToOutput((InputStream)o, os, headers);
         } else if (File.class.isAssignableFrom(o.getClass())) {
-            IOUtils.copyAndCloseInput(new BufferedInputStream(
-                                         new FileInputStream((File)o)), os);
+            copyInputToOutput(new BufferedInputStream(
+                    new FileInputStream((File)o)), os, headers);
         } else if (byte[].class.isAssignableFrom(o.getClass())) {
-            os.write((byte[])o);
+            copyInputToOutput(new ByteArrayInputStream((byte[])o), os, headers);
         } else if (Reader.class.isAssignableFrom(o.getClass())) {
             try {
                 Writer writer = new OutputStreamWriter(os, getEncoding(type));
@@ -116,5 +126,36 @@ public class BinaryDataProvider extends AbstractConfigurableProvider
         return enc == null ? "UTF-8" : enc;
     }
     
+    protected void copyInputToOutput(InputStream is, OutputStream os,
+            MultivaluedMap<String, Object> outHeaders) throws IOException {
+        if (isRangeSupported()) {
+            Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
+            handleRangeRequest(is, os, new HttpHeadersImpl(inMessage), outHeaders);
+        } else {
+            IOUtils.copyAndCloseInput(is, os);
+        }
+    }
+    
+    protected void handleRangeRequest(InputStream is, 
+                                      OutputStream os,
+                                      HttpHeaders inHeaders, 
+                                      MultivaluedMap<String, Object> outHeaders) throws IOException {
+        String range = inHeaders.getRequestHeaders().getFirst("Range"); 
+        if (range == null) {
+            IOUtils.copyAndCloseInput(is, os);    
+        } else {
+            // implement
+        }
+           
+    }
+    
+    protected boolean isRangeSupported() {
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (message != null) {
+            return MessageUtils.isTrue(message.get(HTTP_RANGE_PROPERTY));
+        } else {
+            return false;
+        }
+    }
 
 }
