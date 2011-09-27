@@ -33,7 +33,6 @@ import javax.ws.rs.core.Response;
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
-import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -49,27 +48,24 @@ import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 public class AuthorizationRequestHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AuthorizationRequestHandler.class);
-
+    private static final String[] REQUIRED_PARAMETERS = 
+        new String[] {
+            OAuth.OAUTH_TOKEN
+        };
+    
     public Response handle(HttpServletRequest request, OAuthDataProvider dataProvider) {
 
         try {
-            LOG.log(Level.INFO, "Resource Owner Authorization Endpoint invoked");
-
-            //create security token that is passed to sign in page and validate it in confirmation service
-            OAuthAuthorizationData secData = new OAuthAuthorizationData();
-
-            OAuthMessage oAuthMessage = OAuthServlet.getMessage(request, request.getRequestURL().toString()
-            );
-            OAuthUtils.addParametersIfNeeded(request, oAuthMessage);
-            oAuthMessage.requireParameters(OAuth.OAUTH_TOKEN);
-            new DefaultOAuthValidator().checkParameters(oAuthMessage);
-
+            OAuthMessage oAuthMessage = 
+                OAuthUtils.getOAuthMessage(request, REQUIRED_PARAMETERS);
+            new DefaultOAuthValidator().checkSingleParameter(oAuthMessage);
 
             RequestToken token = dataProvider.getRequestToken(oAuthMessage.getToken());
             if (token == null) {
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
             
+            OAuthAuthorizationData secData = new OAuthAuthorizationData();
             if (!compareRequestSessionTokens(request)) {
                 secData.setPermissions(
                         dataProvider.getPermissionsInfo(token.getPermissions()));

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,18 +28,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
 import net.oauth.OAuth;
-import net.oauth.OAuthAccessor;
-import net.oauth.OAuthConsumer;
-import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
-import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
-import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
-import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
@@ -49,19 +42,21 @@ import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 public class AccessTokenHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AccessTokenHandler.class);
-
+    private static final String[] REQUIRED_PARAMETERS = 
+        new String[] {
+            OAuth.OAUTH_CONSUMER_KEY,
+            OAuth.OAUTH_TOKEN,
+            OAuth.OAUTH_SIGNATURE_METHOD,
+            OAuth.OAUTH_SIGNATURE,
+            OAuth.OAUTH_TIMESTAMP,
+            OAuth.OAUTH_NONCE,
+            OAuth.OAUTH_VERIFIER
+        };
+    
     public Response handle(HttpServletRequest request, OAuthDataProvider dataProvider) {
-        OAuthMessage oAuthMessage = OAuthServlet.getMessage(request, request.getRequestURL().toString());
-
         try {
-            OAuthUtils.addParametersIfNeeded(request, oAuthMessage);
-            oAuthMessage.requireParameters(OAuth.OAUTH_CONSUMER_KEY,
-                OAuth.OAUTH_TOKEN,
-                OAuth.OAUTH_SIGNATURE_METHOD,
-                OAuth.OAUTH_SIGNATURE,
-                OAuth.OAUTH_TIMESTAMP,
-                OAuth.OAUTH_NONCE,
-                OAuth.OAUTH_VERIFIER);
+            OAuthMessage oAuthMessage = 
+                OAuthUtils.getOAuthMessage(request, REQUIRED_PARAMETERS);
 
             RequestToken requestToken = dataProvider.getRequestToken(oAuthMessage.getToken());
             if (requestToken == null) {
@@ -72,17 +67,7 @@ public class AccessTokenHandler {
                 throw new OAuthProblemException(OAuthConstants.VERIFIER_INVALID);
             }
             
-            Client authInfo = requestToken.getClient();
-            OAuthConsumer consumer = new OAuthConsumer(authInfo.getCallbackURL(), authInfo.getConsumerKey(),
-                authInfo.getSecretKey(), null);
-            OAuthAccessor accessor = new OAuthAccessor(consumer);
-            accessor.requestToken = requestToken.getTokenString();
-            accessor.tokenSecret = requestToken.getTokenSecret();
-            try {
-                new DefaultOAuthValidator().validateMessage(oAuthMessage, accessor);
-            } catch (URISyntaxException e) {
-                throw new OAuthException(e);
-            }
+            OAuthUtils.validateMessage(oAuthMessage, requestToken.getClient(), requestToken);
 
             AccessToken accessToken = dataProvider.createAccessToken(requestToken);
 

@@ -36,14 +36,19 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import net.oauth.OAuth;
+import net.oauth.OAuthAccessor;
+import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
+import org.apache.cxf.rs.security.oauth.data.Token;
 import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 
@@ -55,6 +60,35 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static void validateMessage(OAuthMessage oAuthMessage, Client client, Token token) 
+        throws Exception {
+        OAuthConsumer consumer = new OAuthConsumer(client.getCallbackURL(), client.getConsumerKey(),
+            client.getSecretKey(), null);
+        OAuthAccessor accessor = new OAuthAccessor(consumer);
+        if (token != null) {
+            if (token instanceof RequestToken) {
+                accessor.requestToken = token.getTokenString(); 
+            } else {
+                accessor.accessToken = token.getTokenString();
+            }
+            accessor.tokenSecret = token.getTokenSecret();
+        }
+        
+        DefaultOAuthValidator validator = new DefaultOAuthValidator(); 
+        validator.validateMessage(oAuthMessage, accessor);
+        if (token != null) {
+            validator.validateToken(token);
+        }
+    }
+    
+    public static OAuthMessage getOAuthMessage(HttpServletRequest request,
+                                               String[] requiredParams) throws Exception {
+        OAuthMessage oAuthMessage = OAuthServlet.getMessage(request, request.getRequestURL().toString());
+        OAuthUtils.addParametersIfNeeded(request, oAuthMessage);
+        oAuthMessage.requireParameters(requiredParams);
+        return oAuthMessage;
+    }
+    
     public static void addParametersIfNeeded(HttpServletRequest request,
             OAuthMessage oAuthMessage) throws IOException {
         if (oAuthMessage.getParameters().isEmpty() 

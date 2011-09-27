@@ -26,8 +26,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 import net.oauth.OAuth;
-import net.oauth.OAuthAccessor;
-import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.server.OAuthServlet;
@@ -36,17 +34,24 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
-import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
+import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
 
 public class AbstractAuthFilter {
 
-    public static final String OAUTH_AUTHORITIES = "oauth_authorities";
-
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthFilter.class);
-
+    private static final String[] REQUIRED_PARAMETERS = 
+        new String[] {
+            OAuth.OAUTH_CONSUMER_KEY,
+            OAuth.OAUTH_TOKEN,
+            OAuth.OAUTH_SIGNATURE_METHOD,
+            OAuth.OAUTH_SIGNATURE,
+            OAuth.OAUTH_TIMESTAMP,
+            OAuth.OAUTH_NONCE
+        };
+    
     private OAuthDataProvider dataProvider;
 
     protected AbstractAuthFilter() {
@@ -68,12 +73,7 @@ public class AbstractAuthFilter {
         
         OAuthMessage oAuthMessage = OAuthServlet.getMessage(req, req.getRequestURL().toString());
         if (oAuthMessage.getParameter(OAuth.OAUTH_TOKEN) != null) {
-            oAuthMessage.requireParameters(OAuth.OAUTH_CONSUMER_KEY,
-                OAuth.OAUTH_TOKEN,
-                OAuth.OAUTH_SIGNATURE_METHOD,
-                OAuth.OAUTH_SIGNATURE,
-                OAuth.OAUTH_TIMESTAMP,
-                OAuth.OAUTH_NONCE);
+            oAuthMessage.requireParameters(REQUIRED_PARAMETERS);
 
             accessToken = dataProvider.getAccessToken(oAuthMessage.getToken());
 
@@ -98,16 +98,8 @@ public class AbstractAuthFilter {
                 throw new OAuthProblemException();
             }
         }
-        
 
-        OAuthConsumer consumer = new OAuthConsumer(authInfo.getCallbackURL(),
-            authInfo.getConsumerKey(),
-            authInfo.getSecretKey(), null);
-
-        OAuthAccessor accessor = new OAuthAccessor(consumer);
-        accessor.accessToken = accessToken.getTokenString();
-        accessor.tokenSecret = accessToken.getTokenSecret();
-        new DefaultOAuthValidator().validateMessage(oAuthMessage, accessor);
+        OAuthUtils.validateMessage(oAuthMessage, authInfo, accessToken);
 
         return new OAuthInfo(authInfo, accessToken, dataProvider);
         

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -31,25 +30,29 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
 import net.oauth.OAuth;
-import net.oauth.OAuthAccessor;
-import net.oauth.OAuthConsumer;
-import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
-import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
-import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 
 public class RequestTokenHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RequestTokenHandler.class);
+    private static final String[] REQUIRED_PARAMETERS = 
+        new String[] {
+            OAuth.OAUTH_CONSUMER_KEY,
+            OAuth.OAUTH_SIGNATURE_METHOD,
+            OAuth.OAUTH_SIGNATURE,
+            OAuth.OAUTH_TIMESTAMP,
+            OAuth.OAUTH_NONCE,
+            OAuth.OAUTH_CALLBACK
+        };
     
     private long tokenLifetime = 3600L;
     private String defaultPermission;
@@ -57,22 +60,8 @@ public class RequestTokenHandler {
     
     public Response handle(HttpServletRequest request, OAuthDataProvider dataProvider) {
         try {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Temporary Service Credentials service invoked by host: {0}",
-                    new Object[] {request.getRemoteHost()});
-            }
-            OAuthMessage oAuthMessage = OAuthServlet.getMessage(request, request.getRequestURL().toString());
-            OAuthUtils.addParametersIfNeeded(request, oAuthMessage);
-            oAuthMessage.requireParameters(OAuth.OAUTH_CONSUMER_KEY,
-                OAuth.OAUTH_SIGNATURE_METHOD,
-                OAuth.OAUTH_SIGNATURE,
-                OAuth.OAUTH_TIMESTAMP,
-                OAuth.OAUTH_NONCE,
-                OAuth.OAUTH_CALLBACK);
-
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "All required OAuth parameters are present");
-            }
+            OAuthMessage oAuthMessage = 
+                OAuthUtils.getOAuthMessage(request, REQUIRED_PARAMETERS);
 
             Client client = dataProvider
                 .getClient(oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY));
@@ -86,17 +75,7 @@ public class RequestTokenHandler {
                 throw problemEx;
             }
 
-            OAuthConsumer consumer = new OAuthConsumer(oAuthMessage.getParameter(OAuth.OAUTH_CALLBACK),
-                client.getConsumerKey(), client.getSecretKey(), null);
-
-            OAuthAccessor accessor = new OAuthAccessor(consumer);
-
-            //validate message
-            try {
-                new DefaultOAuthValidator().validateMessage(oAuthMessage, accessor);
-            } catch (URISyntaxException e) {
-                throw new OAuthException(e);
-            }
+            OAuthUtils.validateMessage(oAuthMessage, client, null);
 
             String callback = oAuthMessage.getParameter(OAuth.OAUTH_CALLBACK);
             validateCallbackURL(client, callback);

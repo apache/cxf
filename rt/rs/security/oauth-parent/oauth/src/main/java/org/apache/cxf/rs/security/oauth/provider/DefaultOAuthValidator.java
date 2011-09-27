@@ -36,7 +36,8 @@ public class DefaultOAuthValidator extends SimpleOAuthValidator {
     public DefaultOAuthValidator() {
     }
 
-    public void checkParameters(OAuthMessage message) throws OAuthException, IOException, URISyntaxException {
+    public void checkSingleParameter(OAuthMessage message) throws OAuthException, IOException, 
+        URISyntaxException {
         super.checkSingleParameters(message);
     }
 
