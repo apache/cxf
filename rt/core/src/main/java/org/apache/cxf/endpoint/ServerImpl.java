@@ -146,6 +146,9 @@ public class ServerImpl implements Server {
     public boolean isStopped() {
         return stopped;
     }
+    public boolean isStarted() {
+        return !stopped;
+    }
 
     public void stop() {
         if (stopped) {
@@ -158,11 +161,6 @@ public class ServerImpl implements Server {
             slcMgr.stopServer(this);
         }
         
-        if (null != serverRegistry) {
-            LOG.fine("unregister the server to serverRegistry ");
-            serverRegistry.unregister(this);
-        }
-
         MessageObserver mo = getDestination().getMessageObserver();
         if (mo instanceof MultipleEndpointObserver) {
             ((MultipleEndpointObserver)mo).getEndpoints().remove(endpoint);
@@ -177,7 +175,12 @@ public class ServerImpl implements Server {
     
     public void destroy() {
         stop();
-        
+
+        if (null != serverRegistry) {
+            LOG.fine("unregister the server to serverRegistry ");
+            serverRegistry.unregister(this);
+        }
+
         if (iMgr != null) {   
             try {
                 iMgr.unregister(mep);

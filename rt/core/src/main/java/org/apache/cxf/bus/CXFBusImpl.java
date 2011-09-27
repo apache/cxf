@@ -145,12 +145,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
 
     public void run() {
         synchronized (this) {
-            if (state == BusState.RUNNING) {
-                // REVISIT
-                return;
-            }
             state = BusState.RUNNING;
-
             while (state == BusState.RUNNING) {
 
                 try {
@@ -163,9 +158,20 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     }
 
     public void initialize() {
-        initializeFeatures();
+        setState(BusState.INITIALIZING);
+        doInitializeInternal();
+        
+        BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
+        if (null != lifeCycleManager) {
+            lifeCycleManager.initComplete();
+        }    
+        setState(BusState.RUNNING);
     }
 
+    protected void doInitializeInternal() {
+        initializeFeatures();
+    }
+    
     protected void initializeFeatures() {
         if (features != null) {
             for (AbstractFeature f : features) {
@@ -208,7 +214,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         BusFactory.clearDefaultBusForAnyThread(this);
     }
 
-    protected BusState getState() {
+    public BusState getState() {
         return state;
     }
 

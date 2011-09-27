@@ -103,6 +103,7 @@
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/${cxf.jdom.bundle.version}</bundle>
 
         <bundle>mvn:org.apache.cxf/cxf-bundle/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf.karaf/cxf-karaf-commands/${project.version}</bundle>
     </feature>
 
 </features>

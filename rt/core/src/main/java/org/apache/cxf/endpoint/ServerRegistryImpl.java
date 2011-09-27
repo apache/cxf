@@ -19,8 +19,8 @@
 
 package org.apache.cxf.endpoint;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
@@ -33,15 +33,15 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 @NoJSR250Annotations(unlessNull = "bus")
 public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener {
     
-    List<Server> serversList;
+    CopyOnWriteArrayList<Server> serversList;
     Bus bus;
     BusLifeCycleManager lifeCycleManager;
     
     public ServerRegistryImpl() {
-        serversList = new ArrayList<Server>();
+        serversList = new CopyOnWriteArrayList<Server>();
     }
     public ServerRegistryImpl(Bus b) {
-        serversList = new ArrayList<Server>();
+        serversList = new CopyOnWriteArrayList<Server>();
         setBus(b);
     }
 
@@ -62,7 +62,7 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
     }
     
     public void register(Server server) {
-        serversList.add(server);        
+        serversList.addIfAbsent(server);        
     }
 
     public void unregister(Server server) {

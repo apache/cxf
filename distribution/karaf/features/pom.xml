@@ -72,19 +72,7 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>java.net.maven2</id>
-            <url>http://download.java.net/maven/2</url>
-            <name>java.net maven 2 repo</name>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
+
     <build>
         <resources>
             <resource>
@@ -141,7 +129,7 @@
                     <plugin>
                         <groupId>org.apache.karaf.tooling</groupId>
                         <artifactId>features-maven-plugin</artifactId>
-                        <version>${karaf-version}</version>
+                        <version>${cxf.karaf.version}</version>
                         <configuration>
                             <file>${project.build.directory}/classes/features.xml</file>
                             <karafConfig>${project.build.directory}/classes/config.properties</karafConfig>

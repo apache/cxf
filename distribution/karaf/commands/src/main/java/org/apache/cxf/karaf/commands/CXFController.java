@@ -16,8 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.bus;
 
-public enum BusState {
-    INITIAL, INITIALIZING, RUNNING, SHUTTING_DOWN, SHUTDOWN;
+package org.apache.cxf.karaf.commands;
+
+import java.util.List;
+
+import org.apache.cxf.Bus;
+
+/**
+ * 
+ */
+public interface CXFController {
+
+    List<Bus> getBusses();
+
+    Bus getBus(String name);
+
 }

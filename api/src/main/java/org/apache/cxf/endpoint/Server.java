@@ -29,6 +29,8 @@ public interface Server  {
     
     void destroy();
     
+    boolean isStarted();
+    
     Destination getDestination();
     
     Endpoint getEndpoint();

@@ -26,7 +26,6 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.CXFBusImpl;
-import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
@@ -144,15 +143,9 @@ public class ExtensionManagerBus extends CXFBusImpl {
         this(null, null, Thread.currentThread().getContextClassLoader());
     }
     @Override
-    public void initialize() {
+    public void doInitializeInternal() {
         extensionManager.initialize();
-
-        initializeFeatures();
-
-        BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
-        if (null != lifeCycleManager) {
-            lifeCycleManager.initComplete();
-        }        
+        super.doInitializeInternal();
     }
     protected void destroyBeans() {
         extensionManager.destroyBeans();

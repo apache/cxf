@@ -54,4 +54,8 @@ public class DummyServer implements Server {
     public MessageObserver getMessageObserver() {
         return null;
     }
+
+    public boolean isStarted() {
+        return false;
+    }
 }
