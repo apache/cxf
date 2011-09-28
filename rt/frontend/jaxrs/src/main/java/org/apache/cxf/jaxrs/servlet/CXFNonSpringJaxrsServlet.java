@@ -244,7 +244,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     private String getClassNameAndProperties(String cName, Map<String, String> props) {
         String theName = cName.trim();
-        int ind = theName.lastIndexOf("(");
+        int ind = theName.indexOf("(");
         if (ind != -1 && theName.endsWith(")")) {
             props.putAll(CastUtils.cast(handleMapSequence(theName.substring(ind + 1, theName.length() - 1)),
                     String.class, String.class));
@@ -322,7 +322,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                            + entry.getKey().substring(1));
             if (m != null) {
                 Class<?> type = m.getParameterTypes()[0];
-                Object value = PrimitiveUtils.read(entry.getValue(), type);
+                Object value = entry.getValue();
+                if (InjectionUtils.isPrimitive(type)) {
+                    value = PrimitiveUtils.read(entry.getValue(), type);
+                } else if (List.class.isAssignableFrom(type)) {
+                    value = Collections.singletonList(value);
+                } 
                 InjectionUtils.injectThroughMethod(instance, m, value);
             }
         }
