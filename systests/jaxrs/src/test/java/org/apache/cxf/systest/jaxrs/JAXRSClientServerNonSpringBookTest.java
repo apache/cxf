@@ -125,10 +125,11 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     
     @Test
     public void testGetBook123ApplicationSingleton() throws Exception {
-        getAndCompareAsStrings("http://localhost:" + PORT + "/application/bookstore/books/123",
-                               "resources/expected_get_book123.txt",
-                               "application/xml", 200);
-        
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/application/bookstore/default");
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals("default", book.getName());
+        assertEquals(543L, book.getId());
     }
     
     @Test
