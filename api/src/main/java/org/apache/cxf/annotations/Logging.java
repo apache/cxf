@@ -48,7 +48,6 @@ public @interface Logging {
     
     /**
      * For XML content, turn on pretty printing in the logs
-     * @return
      */
     boolean pretty() default false;
 }

@@ -179,7 +179,7 @@ public class Fault extends UncheckedException {
     /**
      * Set http header status code on this fault.
      * 
-     * @param status code.
+     * @param statusCode
      */
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
