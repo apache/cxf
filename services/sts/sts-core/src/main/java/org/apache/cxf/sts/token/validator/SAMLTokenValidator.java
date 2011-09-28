@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.sts.token.validator;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.token.realm.SAMLRealm;
 
 import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
@@ -52,6 +55,8 @@ public class SAMLTokenValidator implements TokenValidator {
     
     private Validator validator = new SignatureTrustValidator();
     
+    private Map<String, SAMLRealm> realmMap = new HashMap<String, SAMLRealm>();
+    
     /**
      * Set the WSS4J Validator instance to use to validate the token.
      * @param validator the WSS4J Validator instance to use to validate the token
@@ -65,6 +70,18 @@ public class SAMLTokenValidator implements TokenValidator {
      * ReceivedToken argument.
      */
     public boolean canHandleToken(ReceivedToken validateTarget) {
+        return canHandleToken(validateTarget, null);
+    }
+    
+    /**
+     * Return true if this TokenValidator implementation is capable of validating the
+     * ReceivedToken argument.
+     */
+    public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
+        if (realm != null && !realmMap.containsKey(realm)) {
+            return false;
+        }
+        
         Object token = validateTarget.getToken();
         if (token instanceof Element) {
             Element tokenElement = (Element)token;
@@ -88,7 +105,6 @@ public class SAMLTokenValidator implements TokenValidator {
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         Crypto sigCrypto = stsProperties.getSignatureCrypto();
         CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
-        String issuer = stsProperties.getIssuer();
 
         RequestData requestData = new RequestData();
         requestData.setSigCrypto(sigCrypto);
@@ -123,13 +139,24 @@ public class SAMLTokenValidator implements TokenValidator {
 
             validator.validate(trustCredential, requestData);
 
-            // Finally check the issuer
+            // Finally check that the issuer is trusted
+            String trustedIssuer = null;
             String assertionIssuer = assertion.getIssuerString();
-
-            if (issuer.equals(assertionIssuer)) {
+            for (String realm : realmMap.keySet()) {
+                SAMLRealm samlRealm = realmMap.get(realm);
+                if (samlRealm.getIssuer().equals(assertionIssuer)) {
+                    trustedIssuer = realm;
+                    break;
+                }
+            }
+            if (trustedIssuer == null && assertionIssuer.equals(stsProperties.getIssuer())) {
+                trustedIssuer = stsProperties.getIssuer();
+            }
+            if (trustedIssuer != null) {
                 response.setValid(true);
                 SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
                 response.setPrincipal(samlPrincipal);
+                response.setTokenRealm(trustedIssuer);
             }
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
@@ -138,5 +165,20 @@ public class SAMLTokenValidator implements TokenValidator {
         return response;
     }
     
+    /**
+     * Set the map of realm->SAMLRealm for this token provider
+     * @param realms the map of realm->SAMLRealm for this token provider
+     */
+    public void setRealmMap(Map<String, SAMLRealm> realms) {
+        this.realmMap = realms;
+    }
+    
+    /**
+     * Get the map of realm->SAMLRealm for this token provider
+     * @return the map of realm->SAMLRealm for this token provider
+     */
+    public Map<String, SAMLRealm> getRealmMap() {
+        return realmMap;
+    }
     
 }

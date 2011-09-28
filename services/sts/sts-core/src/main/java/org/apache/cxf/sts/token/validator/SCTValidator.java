@@ -51,9 +51,17 @@ public class SCTValidator implements TokenValidator {
 
     /**
      * Return true if this TokenValidator implementation is capable of validating the
-     * ReceivedToken argument.
+     * ReceivedToken argument. The realm is ignored in this token Validator.
      */
     public boolean canHandleToken(ReceivedToken validateTarget) {
+        return canHandleToken(validateTarget, null);
+    }
+    
+    /**
+     * Return true if this TokenValidator implementation is capable of validating the
+     * ReceivedToken argument. The realm is ignored in this token Validator.
+     */
+    public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
         Object token = validateTarget.getToken();
         if (token instanceof Element) {
             Element tokenElement = (Element)token;

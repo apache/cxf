@@ -29,6 +29,7 @@ public class TokenValidatorResponse {
     private boolean valid;
     private Principal principal;
     private Map<String, Object> additionalProperties;
+    private String realm;
     
     public void setValid(boolean valid) {
         this.valid = valid;
@@ -52,6 +53,14 @@ public class TokenValidatorResponse {
     
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
+    }
+    
+    public void setTokenRealm(String tokenRealm) {
+        this.realm = tokenRealm;
+    }
+    
+    public String getTokenRealm() {
+        return realm;
     }
     
 }

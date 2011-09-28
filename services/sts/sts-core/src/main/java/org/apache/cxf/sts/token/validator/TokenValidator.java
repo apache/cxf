@@ -30,6 +30,12 @@ public interface TokenValidator {
      * ReceivedToken argument.
      */
     boolean canHandleToken(ReceivedToken validateTarget);
+    
+    /**
+     * Return true if this TokenValidator implementation is capable of validating the
+     * ReceivedToken argument in the given realm.
+     */
+    boolean canHandleToken(ReceivedToken validateTarget, String realm);
 
     /**
      * Validate a Token using the given TokenValidatorParameters.

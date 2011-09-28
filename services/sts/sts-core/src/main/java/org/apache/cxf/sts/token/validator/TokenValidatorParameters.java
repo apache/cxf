@@ -41,6 +41,7 @@ public class TokenValidatorParameters {
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private STSTokenStore tokenStore;
+    private String realm;
     
     public STSTokenStore getTokenStore() {
         return tokenStore;
@@ -88,6 +89,14 @@ public class TokenValidatorParameters {
     
     public Principal getPrincipal() {
         return principal;
+    }
+    
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
+    
+    public String getRealm() {
+        return realm;
     }
     
 }

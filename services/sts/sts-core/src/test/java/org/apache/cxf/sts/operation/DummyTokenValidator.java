@@ -44,6 +44,9 @@ public class DummyTokenValidator implements TokenValidator {
         return false;
     }
     
+    public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
+        return canHandleToken(validateTarget);
+    }
 
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
