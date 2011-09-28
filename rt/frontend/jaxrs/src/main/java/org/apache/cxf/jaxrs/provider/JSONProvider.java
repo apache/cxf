@@ -52,12 +52,15 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.provider.AbstractJAXBProvider.CollectionWrapper;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.SimpleConverter;
 import org.codehaus.jettison.mapped.TypeConverter;
@@ -178,18 +181,27 @@ public class JSONProvider extends AbstractJAXBProvider  {
         this.namespaceMap.putAll(namespaceMap);
     }
 
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        return super.isReadable(type, genericType, anns, mt) || Document.class.isAssignableFrom(type);    
+    }
+    
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         
         try {
+            InputStream realStream = getInputStream(type, genericType, is);
+            if (Document.class.isAssignableFrom(type)) {
+                W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+                copyReaderToWriter(createReader(type, realStream, false), writer);
+                return writer.getDocument();
+            }
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
             Class<?> theType = getActualType(theGenericType, genericType, anns);
             
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
-            
-            InputStream realStream = getInputStream(type, genericType, is);
             XMLStreamReader xsr = createReader(type, realStream, isCollection);
             
             Object response = null;
@@ -291,6 +303,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
         return "{\"" + name + "\":";
     }
     
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        
+        return super.isWriteable(type, genericType, anns, mt)
+            || Document.class.isAssignableFrom(type);
+    }
+    
     public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
@@ -305,10 +323,14 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
         try {
             
-            String encoding = HttpUtils.getSetEncoding(m, headers, "UTF-8");
-            
+            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            if (Document.class.isAssignableFrom(cls)) {
+                XMLStreamWriter writer = createWriter(obj, cls, genericType, enc, os, false);
+                copyReaderToWriter(StaxUtils.createXMLStreamReader((Document)obj), writer);
+                return;
+            }
             if (InjectionUtils.isSupportedCollectionOrArray(cls)) {
-                marshalCollection(cls, obj, genericType, encoding, os, m, anns);
+                marshalCollection(cls, obj, genericType, enc, os, m, anns);
             } else {
                 Object actualObject = checkAdapter(obj, cls, anns, true);
                 Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
@@ -316,7 +338,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
                     genericType = actualClass;
                 }
                 
-                marshal(actualObject, actualClass, genericType, encoding, os);
+                marshal(actualObject, actualClass, genericType, enc, os);
             }
             
         } catch (JAXBException e) {
@@ -328,6 +350,13 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
     }
 
+    protected void copyReaderToWriter(XMLStreamReader reader, XMLStreamWriter writer) 
+        throws Exception {
+        writer.writeStartDocument();
+        StaxUtils.copy(reader, writer);
+        writer.writeEndDocument();
+    }
+    
     protected void marshalCollection(Class<?> originalCls, Object collection, 
                                      Type genericType, String encoding, 
                                      OutputStream os, MediaType m, Annotation[] anns) 
@@ -411,11 +440,11 @@ public class JSONProvider extends AbstractJAXBProvider  {
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         
+        QName qname = getQName(actualClass, genericType, actualObject, true);
+        
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             return JSONUtils.createBadgerFishWriter(os);
         }
-        
-        QName qname = getQName(actualClass, genericType, actualObject, true);
         
         Configuration config = 
             JSONUtils.createConfiguration(namespaceMap, 
