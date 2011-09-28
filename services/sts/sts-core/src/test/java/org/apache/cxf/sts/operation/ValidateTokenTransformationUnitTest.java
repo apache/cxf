@@ -20,7 +20,9 @@ package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBElement;
@@ -39,8 +41,10 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
+import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
+import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
@@ -146,6 +150,97 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
     }
     
+    /**
+     * Test to successfully validate a UsernameToken in Realm "B" and transform it into a 
+     * SAML Assertion in Realm "A".
+     */
+    @org.junit.Test
+    public void testUsernameTokenTransformationRealm() throws Exception {
+        TokenValidateOperation validateOperation = new TokenValidateOperation();
+        
+        // Add Token Validator
+        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        validatorList.add(new UsernameTokenValidator());
+        validateOperation.setTokenValidators(validatorList);
+
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        providerList.add(samlTokenProvider);
+        validateOperation.setTokenProviders(providerList);
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        stsProperties.setRealmParser(new CustomRealmParser());
+        stsProperties.setIdentityMapper(new CustomIdentityMapper());
+        validateOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        
+        // Create a UsernameToken
+        JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
+        ValidateTargetType validateTarget = new ValidateTargetType();
+        validateTarget.setAny(usernameTokenType);
+        
+        JAXBElement<ValidateTargetType> validateTargetType = 
+            new JAXBElement<ValidateTargetType>(
+                QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
+            );
+        request.getAny().add(validateTargetType);
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        msgCtx.put("url", "https");
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Validate a token - this will fail as the tokenProvider doesn't understand how to handle
+        // realm "B"
+        try {
+            validateOperation.validate(request, webServiceContext);
+        } catch (STSException ex) {
+            // expected
+        }
+        
+        samlTokenProvider.setRealmMap(getSamlRealms());
+        RequestSecurityTokenResponseType response = validateOperation.validate(request, webServiceContext);
+        assertTrue(validateResponse(response));
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : response.getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("ALICE"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+    }
     
     /*
      * Create a security context object
@@ -159,6 +254,18 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
                 return false;
             }
         };
+    }
+    
+    private Map<String, SAMLRealm> getSamlRealms() {
+        // Create Realms
+        Map<String, SAMLRealm> samlRealms = new HashMap<String, SAMLRealm>();
+        SAMLRealm samlRealm = new SAMLRealm();
+        samlRealm.setIssuer("A-Issuer");
+        samlRealms.put("A", samlRealm);
+        samlRealm = new SAMLRealm();
+        samlRealm.setIssuer("B-Issuer");
+        samlRealms.put("B", samlRealm);
+        return samlRealms;
     }
     
     /**
