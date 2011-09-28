@@ -29,6 +29,10 @@ import javax.ws.rs.core.Context;
 @ApplicationPath("/thebooks")
 public class BookApplication extends Application {
 
+    private String defaultName;
+    private long defaultId;
+    
+    
     public BookApplication(@Context ServletContext sc) {
         if (sc == null) {
             throw new IllegalArgumentException("ServletContext is null");
@@ -50,12 +54,21 @@ public class BookApplication extends Application {
     @Override 
     public Set<Object> getSingletons() {
         Set<Object> classes = new HashSet<Object>();
-        classes.add(new org.apache.cxf.systest.jaxrs.BookStore());
+        org.apache.cxf.systest.jaxrs.BookStore store = 
+            new org.apache.cxf.systest.jaxrs.BookStore();
+        store.setDefaultNameAndId(defaultName, defaultId);
+        classes.add(store);
         BookExceptionMapper mapper = new org.apache.cxf.systest.jaxrs.BookExceptionMapper();
         mapper.setToHandle(true);
         classes.add(mapper);
         return classes;
     }
     
+    public void setDefaultName(String name) {
+        defaultName = name;
+    }
     
+    public void setDefaultId(long id) {
+        defaultId = id;
+    }
 }

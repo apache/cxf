@@ -51,7 +51,10 @@
 		</servlet-class>
 		<init-param>
 		      <param-name>javax.ws.rs.Application</param-name>
-		      <param-value>org.apache.cxf.systest.jaxrs.BookApplication</param-value>    
+		      <param-value>
+		        org.apache.cxf.systest.jaxrs.BookApplication
+		        (defaultName=default defaultId=543)
+		      </param-value>    
 		</init-param>
 		<init-param>
 		      <param-name>jaxrs.application.address.ignore</param-name>
