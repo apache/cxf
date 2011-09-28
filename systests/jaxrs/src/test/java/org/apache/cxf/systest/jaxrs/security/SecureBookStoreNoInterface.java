@@ -35,6 +35,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
@@ -66,7 +67,7 @@ public class SecureBookStoreNoInterface {
     @RolesAllowed({"ROLE_USER", "ROLE_ADMIN" })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Book getBookFromHttpRequestParams(@Context HttpServletRequest request) {
-        Map<String, String[]> params = request.getParameterMap();
+        Map<String, String[]> params = CastUtils.cast(request.getParameterMap());
         String name = params.get("name")[0];
         Long id = Long.valueOf(params.get("id")[0]);
         if (name == null || id == 0) {
