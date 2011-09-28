@@ -30,8 +30,8 @@
     <groupId>org.apache.cxf.karaf</groupId>
     <artifactId>cxf-karaf-commands</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF :: Apache Karaf :: Commands</name>
-    <description>CXF :: Apache Karaf :: Commands</description>
+    <name>Apache CXF Karaf Commands</name>
+    <description>Apache CXF Karaf Commands</description>
 
     <dependencies>
         <!-- cxf -->

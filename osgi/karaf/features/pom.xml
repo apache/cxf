@@ -30,8 +30,8 @@
     <groupId>org.apache.cxf.karaf</groupId>
     <artifactId>apache-cxf</artifactId>
     <packaging>pom</packaging>
-    <name>CXF :: Apache Karaf :: Features</name>
-    <description>CXF :: Apache Karaf :: Features</description>
+    <name>Apache CXF Karaf Features</name>
+    <description>Apache CXF Karaf Features</description>
     
     <!-- The validate plugin will export these provided dependencies bundles' export packages first -->
     <dependencies>

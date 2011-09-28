@@ -31,8 +31,8 @@
     <artifactId>karaf-parent</artifactId>
     <packaging>pom</packaging>
     <version>2.5.0-SNAPSHOT</version>
-    <name>CXF :: Apache Karaf</name>
-    <description>CXF :: Apache Karaf</description>
+    <name>Apache CXF Karaf Parent</name>
+    <description>Apache CXF Karaf Parent</description>
 
     <modules>
       <module>features</module>
