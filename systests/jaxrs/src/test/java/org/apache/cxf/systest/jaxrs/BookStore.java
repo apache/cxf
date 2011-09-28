@@ -89,6 +89,9 @@ public class BookStore {
     private long bookId = 123;
     private long cdId = 123;
     
+    private String defaultName;
+    private long defaultId;
+    
     private String currentBookId;
     @PathParam("CDId")
     private String currentCdId;
@@ -111,6 +114,13 @@ public class BookStore {
     @PreDestroy
     public void preDestroy() {
         //System.out.println("PreDestroy called");
+    }
+    
+    @GET
+    @Path("/default")
+    @Produces("application/xml")
+    public Book getDefaultBook() {
+        return new Book(defaultName, defaultId);
     }
     
     @GET
@@ -636,6 +646,11 @@ public class BookStore {
     @PathParam("bookId")
     public void setBookId(String id) {
         currentBookId = id;
+    }
+    
+    public void setDefaultNameAndId(String name, long id) {
+        defaultName = name;
+        defaultId = id;
     }
     
     @GET
