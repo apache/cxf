@@ -106,4 +106,12 @@
         <bundle>mvn:org.apache.cxf.karaf/cxf-karaf-commands/${project.version}</bundle>
     </feature>
 
+    <feature name="cxf-sts" version="${project.version}" resolver='(obr)'>
+        <feature version="${project.version}">cxf</feature>
+
+        <bundle dependency="true">mvn:com.hazelcast/hazelcast/${cxf.hazelcast.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/${cxf.ehcache.bundle.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf.services.sts/cxf-services-sts-core/${project.version}</bundle>
+    </feature>
 </features>

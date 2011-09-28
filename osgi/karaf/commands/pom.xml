@@ -74,6 +74,8 @@
               org.apache.karaf.shell.console,
               *
                         </Import-Package>
+                        <_nouses>true</_nouses>
+                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>
                 </configuration>
             </plugin>
