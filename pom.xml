@@ -179,6 +179,8 @@
         <module>rt</module>
         <module>integration</module>
         <module>maven-plugins</module>
+        <module>osgi/karaf</module>
+        <module>osgi/bundle</module>
         <module>systests</module>
     </modules>
 

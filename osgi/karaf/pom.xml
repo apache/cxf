@@ -31,41 +31,11 @@
     <artifactId>karaf-parent</artifactId>
     <packaging>pom</packaging>
     <version>2.4.3-SNAPSHOT</version>
-    <name>CXF :: Apache Karaf</name>
-    <description>CXF :: Apache Karaf</description>
-
-    <properties>
-      <karaf-version>2.2.3</karaf-version>
-    </properties>
+    <name>Apache CXF Karaf Parent</name>
+    <description>Apache CXF Karaf Parent</description>
 
     <modules>
       <module>features</module>
     </modules>
-
-     <repositories>
-          <repository>
-              <id>apache.snapshots</id>
-              <url>http://repository.apache.org/snapshots/</url>
-              <name>Apache Snapshot Repo</name>
-             <snapshots>
-                 <enabled>true</enabled>
-             </snapshots>
-             <releases>
-                 <enabled>false</enabled>
-             </releases>
-         </repository>
-     </repositories>
-    <pluginRepositories>
-         <pluginRepository>
-             <id>apache.snapshots</id>
-             <url>http://repository.apache.org/snapshots/</url>
-             <snapshots>
-                 <enabled>true</enabled>
-             </snapshots>
-             <releases>
-                 <enabled>false</enabled>
-             </releases>
-         </pluginRepository>
-     </pluginRepositories>
 
 </project>
