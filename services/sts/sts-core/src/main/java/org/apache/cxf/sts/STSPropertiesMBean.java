@@ -26,7 +26,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 
 /**
  * This MBean represents the properties associated with the STS. It contains a single operation
- * "loadProperties()" which allows subclasses to perform any custom loading/processing of the 
+ * "configureProperties()" which allows subclasses to perform any custom loading/processing of the 
  * properties.
  */
 public interface STSPropertiesMBean {
@@ -122,5 +122,28 @@ public interface STSPropertiesMBean {
      */
     SignatureProperties getSignatureProperties();
     
+    /**
+     * Set the RealmParser object to use.
+     * @param realmParser the RealmParser object to use.
+     */
+    void setRealmParser(RealmParser realmParser);
+
+    /**
+     * Get the RealmParser object to use.
+     * @return the RealmParser object to use.
+     */
+    RealmParser getRealmParser();
+
+    /**
+     * Set the IdentityMapper object to use.
+     * @param identityMapper the IdentityMapper object to use.
+     */
+    void setIdentityMapper(IdentityMapper identityMapper);
+
+    /**
+     * Get the IdentityMapper object to use.
+     * @return the IdentityMapper object to use.
+     */
+    IdentityMapper getIdentityMapper();
     
 }

@@ -26,9 +26,15 @@ public interface TokenProvider {
     
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
-     * that corresponds to the given TokenType.
+     * that corresponds to the given TokenType
      */
     boolean canHandleToken(String tokenType);
+    
+    /**
+     * Return true if this TokenProvider implementation is capable of providing a token
+     * that corresponds to the given TokenType in a given realm
+     */
+    boolean canHandleToken(String tokenType, String realm);
 
     /**
      * Create a token given a TokenProviderParameters

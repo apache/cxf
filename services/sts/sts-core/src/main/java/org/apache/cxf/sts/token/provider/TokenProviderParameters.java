@@ -50,6 +50,7 @@ public class TokenProviderParameters {
     private ClaimsManager claimsManager;
     private Map<String, Object> additionalProperties;
     private STSTokenStore tokenStore;
+    private String realm;
     
     public STSTokenStore getTokenStore() {
         return tokenStore;
@@ -137,6 +138,14 @@ public class TokenProviderParameters {
     
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
+    }
+    
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
+    
+    public String getRealm() {
+        return realm;
     }
     
 }

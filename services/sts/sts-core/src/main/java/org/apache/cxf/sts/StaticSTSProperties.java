@@ -54,6 +54,8 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     private String encryptionUsername;
     private String issuer;
     private SignatureProperties signatureProperties = new SignatureProperties();
+    private RealmParser realmParser;
+    private IdentityMapper identityMapper;
 
     /**
      * Load the CallbackHandler, Crypto objects, if necessary.
@@ -240,6 +242,38 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public SignatureProperties getSignatureProperties() {
         return signatureProperties;
+    }
+    
+    /**
+     * Set the RealmParser object to use.
+     * @param realmParser the RealmParser object to use.
+     */
+    public void setRealmParser(RealmParser realmParser) {
+        this.realmParser = realmParser;
+    }
+    
+    /**
+     * Get the RealmParser object to use.
+     * @return the RealmParser object to use.
+     */
+    public RealmParser getRealmParser() {
+        return realmParser;
+    }
+    
+    /**
+     * Set the IdentityMapper object to use.
+     * @param identityMapper the IdentityMapper object to use.
+     */
+    public void setIdentityMapper(IdentityMapper identityMapper) {
+        this.identityMapper = identityMapper;
+    }
+    
+    /**
+     * Get the IdentityMapper object to use.
+     * @return the IdentityMapper object to use.
+     */
+    public IdentityMapper getIdentityMapper() {
+        return identityMapper;
     }
     
     private static Properties getProps(Object o) {

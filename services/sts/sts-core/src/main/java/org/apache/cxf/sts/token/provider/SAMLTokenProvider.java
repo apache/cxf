@@ -20,7 +20,9 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +35,7 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 
 import org.apache.ws.security.WSConstants;
@@ -59,12 +62,24 @@ public class SAMLTokenProvider implements TokenProvider {
     private SubjectProvider subjectProvider = new DefaultSubjectProvider();
     private ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
     private boolean signToken = true;
+    private Map<String, SAMLRealm> realmMap = new HashMap<String, SAMLRealm>();
     
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
      * that corresponds to the given TokenType.
      */
     public boolean canHandleToken(String tokenType) {
+        return canHandleToken(tokenType, null);
+    }
+    
+    /**
+     * Return true if this TokenProvider implementation is capable of providing a token
+     * that corresponds to the given TokenType in a given realm.
+     */
+    public boolean canHandleToken(String tokenType, String realm) {
+        if (realm != null && !realmMap.containsKey(realm)) {
+            return false;
+        }
         if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
             || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType)) {
             return true;
@@ -211,11 +226,33 @@ public class SAMLTokenProvider implements TokenProvider {
     public void setSignToken(boolean signToken) {
         this.signToken = signToken;
     }
+    
+    /**
+     * Set the map of realm->SAMLRealm for this token provider
+     * @param realms the map of realm->SAMLRealm for this token provider
+     */
+    public void setRealmMap(Map<String, SAMLRealm> realms) {
+        this.realmMap = realms;
+    }
+    
+    /**
+     * Get the map of realm->SAMLRealm for this token provider
+     * @return the map of realm->SAMLRealm for this token provider
+     */
+    public Map<String, SAMLRealm> getRealmMap() {
+        return realmMap;
+    }
 
     private AssertionWrapper createSamlToken(
         TokenProviderParameters tokenParameters, byte[] secret, Document doc
     ) throws Exception {
-        SamlCallbackHandler handler = createCallbackHandler(tokenParameters, secret, doc);
+        String realm = tokenParameters.getRealm();
+        SAMLRealm samlRealm = null;
+        if (realm != null && realmMap.containsKey(realm)) {
+            samlRealm = realmMap.get(realm);
+        }
+        
+        SamlCallbackHandler handler = createCallbackHandler(tokenParameters, secret, samlRealm, doc);
         
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(handler);
@@ -224,7 +261,13 @@ public class SAMLTokenProvider implements TokenProvider {
         if (signToken) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
             
-            String alias = stsProperties.getSignatureUsername();
+            String alias = null;
+            if (samlRealm != null) {
+                alias = samlRealm.getSignatureAlias();
+            }
+            if (alias == null || "".equals(alias)) {
+                alias = stsProperties.getSignatureUsername();
+            }
             if (alias == null || "".equals(alias)) {
                 Crypto signatureCrypto = stsProperties.getSignatureCrypto();
                 if (signatureCrypto != null) {
@@ -247,7 +290,7 @@ public class SAMLTokenProvider implements TokenProvider {
     }
     
     public SamlCallbackHandler createCallbackHandler(
-        TokenProviderParameters tokenParameters, byte[] secret, Document doc
+        TokenProviderParameters tokenParameters, byte[] secret, SAMLRealm samlRealm, Document doc
     ) throws Exception {
         // Parse the AttributeStatements
         List<AttributeStatementBean> attrBeanList = null;
@@ -326,6 +369,10 @@ public class SAMLTokenProvider implements TokenProvider {
         handler.setAttributeBeans(attrBeanList);
         handler.setAuthenticationBeans(authBeanList);
         handler.setAuthDecisionStatementBeans(authDecisionBeanList);
+        
+        if (samlRealm != null) {
+            handler.setIssuer(samlRealm.getIssuer());
+        }
         
         return handler;
     }

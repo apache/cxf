@@ -39,6 +39,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 
 import org.apache.cxf.sts.QNameConstants;
+import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.cache.STSTokenStore;
@@ -411,6 +412,13 @@ public abstract class AbstractOperation {
         String address = extractAddressFromAppliesTo(tokenRequirements.getAppliesTo());
         LOG.fine("The AppliesTo address that has been received is: " + address);
         providerParameters.setAppliesToAddress(address);
+        
+        // Get the realm of the request
+        if (stsProperties.getRealmParser() != null) {
+            RealmParser realmParser = stsProperties.getRealmParser();
+            String realm = realmParser.parseRealm(context);
+            providerParameters.setRealm(realm);
+        }
         
         // Set the requested Claims
         RequestClaimCollection claims = tokenRequirements.getClaims();

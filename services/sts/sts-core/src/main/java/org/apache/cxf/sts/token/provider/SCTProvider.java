@@ -65,6 +65,15 @@ public class SCTProvider implements TokenProvider {
      * that corresponds to the given TokenType.
      */
     public boolean canHandleToken(String tokenType) {
+        return canHandleToken(tokenType, null);
+    }
+
+    /**
+     * Return true if this TokenProvider implementation is capable of providing a token
+     * that corresponds to the given TokenType in a given realm. The realm is ignored in this 
+     * token provider.
+     */
+    public boolean canHandleToken(String tokenType, String realm) {
         if (STSUtils.TOKEN_TYPE_SCT_05_02.equals(tokenType) 
             || STSUtils.TOKEN_TYPE_SCT_05_12.equals(tokenType)) {
             return true;

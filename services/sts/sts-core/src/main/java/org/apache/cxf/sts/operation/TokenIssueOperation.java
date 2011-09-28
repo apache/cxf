@@ -119,8 +119,9 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
         String tokenType = tokenRequirements.getTokenType();
         TokenProviderResponse tokenResponse = null;
+        String realm = providerParameters.getRealm();
         for (TokenProvider tokenProvider : tokenProviders) {
-            if (tokenProvider.canHandleToken(tokenType)) {
+            if (tokenProvider.canHandleToken(tokenType, realm)) {
                 try {
                     tokenResponse = tokenProvider.createToken(providerParameters);
                 } catch (STSException ex) {

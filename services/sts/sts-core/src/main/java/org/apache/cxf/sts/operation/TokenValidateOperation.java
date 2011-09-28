@@ -138,8 +138,9 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             if (additionalProperties != null) {
                 providerParameters.setAdditionalProperties(additionalProperties);
             }
+            String realm = providerParameters.getRealm();
             for (TokenProvider tokenProvider : tokenProviders) {
-                if (tokenProvider.canHandleToken(tokenType)) {
+                if (tokenProvider.canHandleToken(tokenType, realm)) {
                     try {
                         tokenProviderResponse = tokenProvider.createToken(providerParameters);
                     } catch (STSException ex) {

@@ -46,6 +46,10 @@ public class DummyTokenProvider implements TokenProvider {
         return false;
     }
     
+    public boolean canHandleToken(String tokenType, String realm) {
+        return canHandleToken(tokenType);
+    }
+    
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
             Document doc = DOMUtils.createDocument();

@@ -48,6 +48,7 @@ public class SamlCallbackHandler implements CallbackHandler {
     private List<AuthDecisionStatementBean> authDecisionBeans;
     private ConditionsBean conditionsBean;
     private SubjectBean subjectBean;
+    private String issuer;
     
     /**
      * Set the list of AttributeStatementBeans.
@@ -91,6 +92,13 @@ public class SamlCallbackHandler implements CallbackHandler {
         this.tokenParameters = tokenProviderParameters;
     }
     
+    /**
+     * Set the issuer name
+     */
+    public void setIssuer(String issuerName) {
+        this.issuer = issuerName;
+    }
+    
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
@@ -113,8 +121,12 @@ public class SamlCallbackHandler implements CallbackHandler {
                 }
                 
                 // Set the issuer
-                STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
-                callback.setIssuer(stsProperties.getIssuer());
+                if (issuer == null) {
+                    STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
+                    callback.setIssuer(stsProperties.getIssuer());
+                } else {
+                    callback.setIssuer(issuer);
+                }
 
                 // Set the statements
                 if (attributeBeans != null && !attributeBeans.isEmpty()) {
