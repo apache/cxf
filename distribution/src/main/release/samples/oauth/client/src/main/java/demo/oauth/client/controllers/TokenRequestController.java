@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import demo.oauth.client.model.Common;
-import demo.oauth.client.model.OAuthParams;
-
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
@@ -35,11 +31,14 @@ import net.oauth.OAuthServiceProvider;
 import net.oauth.client.OAuthClient;
 import net.oauth.client.URLConnectionClient;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import demo.oauth.client.model.Common;
+import demo.oauth.client.model.OAuthParams;
+
 
 @Controller
 public class TokenRequestController {

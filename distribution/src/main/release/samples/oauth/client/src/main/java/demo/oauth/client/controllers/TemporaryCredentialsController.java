@@ -24,8 +24,6 @@ import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import demo.oauth.client.model.OAuthParams;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
@@ -35,11 +33,12 @@ import net.oauth.ParameterStyle;
 import net.oauth.client.OAuthClient;
 import net.oauth.client.URLConnectionClient;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import demo.oauth.client.model.OAuthParams;
 
 @Controller
 public class TemporaryCredentialsController {

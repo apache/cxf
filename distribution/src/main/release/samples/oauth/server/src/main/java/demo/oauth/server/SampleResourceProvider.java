@@ -18,7 +18,6 @@
  */
 package demo.oauth.server;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -39,7 +38,7 @@ public class SampleResourceProvider {
     @GET
     @Produces("text/html")
     @Path("/person/get/{name}")
-    @Secured ({"ROLE_USER"})
+    @Secured({"ROLE_USER" })
     public Response getInfo(@PathParam("name") String name, @Context HttpServletRequest request) {
         return Response.ok("Successfully accessed OAuth protected person: " + name).build();
     }
@@ -47,7 +46,7 @@ public class SampleResourceProvider {
     @POST
     @Produces("text/html")
     @Path("/person/modify/{name}")
-    @Secured( {"ROLE_ADMIN"})
+    @Secured({"ROLE_ADMIN" })
     public Response modifyInfo(@PathParam("name") String name, @Context HttpServletRequest request) {
         return Response.ok("Successfully modified OAuth protected person: " + name).build();
     }

@@ -20,9 +20,6 @@ package demo.oauth.client.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import demo.oauth.client.model.Common;
-import demo.oauth.client.model.OAuthParams;
-
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
@@ -32,6 +29,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import demo.oauth.client.model.Common;
+import demo.oauth.client.model.OAuthParams;
+
 
 
 @Controller

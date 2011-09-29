@@ -53,8 +53,7 @@ public class AuthenticationSuccessfullHandler extends SavedRequestAwareAuthentic
             return super.determineTargetUrl(request, response);
         }
 
-        StringBuffer url = new StringBuffer(confirmationUrl).append("?").append(OAuth.OAUTH_TOKEN).append
-                ("=")
+        StringBuffer url = new StringBuffer(confirmationUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
                 .append(oauthToken).append("&").append(OAuthConstants.AUTHENTICITY_TOKEN)
                 .append("=")
                 .append(authToken);
@@ -70,8 +69,7 @@ public class AuthenticationSuccessfullHandler extends SavedRequestAwareAuthentic
         }
 
         if (!StringUtils.isEmpty(xScope)) {
-            url.append("&").append(OAuthConstants.X_OAUTH_SCOPE).append("=").append
-                (xScope);
+            url.append("&").append(OAuthConstants.X_OAUTH_SCOPE).append("=").append(xScope);
         }
 
         return url.toString();

@@ -20,11 +20,12 @@ package demo.oauth.client.controllers;
 
 import javax.servlet.http.HttpServletResponse;
 
-import demo.oauth.client.model.OAuthParams;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import demo.oauth.client.model.OAuthParams;
+
 
 @Controller
 public class AuthorizeResourceOwnerController {
@@ -45,7 +46,7 @@ public class AuthorizeResourceOwnerController {
 
         response
             .sendRedirect(
-                new StringBuilder().append(resourceOwnerAuthorizationEndpoint).append
-                    ("?oauth_token=").append(oauthToken).toString());
+                new StringBuilder().append(resourceOwnerAuthorizationEndpoint).
+                    append("?oauth_token=").append(oauthToken).toString());
     }
 }

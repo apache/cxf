@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.rs.security.oauth.data.Client;
-import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.Token;
 
 public class SampleOAuthDataProvider extends MemoryOAuthDataProvider

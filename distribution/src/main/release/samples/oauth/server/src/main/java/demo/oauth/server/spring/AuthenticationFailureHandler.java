@@ -51,8 +51,7 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
         }
 
         if (!StringUtils.isEmpty(xScope)) {
-            url.append("&").append(OAuthConstants.X_OAUTH_SCOPE).append("=").append
-                (xScope);
+            url.append("&").append(OAuthConstants.X_OAUTH_SCOPE).append("=").append(xScope);
         }
 
         setDefaultFailureUrl(url.toString());

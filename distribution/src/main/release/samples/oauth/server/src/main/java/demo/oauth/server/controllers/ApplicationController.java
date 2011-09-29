@@ -24,12 +24,11 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import demo.oauth.server.ClientApp;
 import org.apache.cxf.common.util.StringUtils;
 
 import org.apache.cxf.rs.security.oauth.data.Client;
-import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.provider.MD5TokenGenerator;
+import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
+
+import demo.oauth.server.ClientApp;
 
 @Controller
 public class ApplicationController implements ServletContextAware {
