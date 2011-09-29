@@ -22,6 +22,8 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.lang.annotation.Annotation;
 import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
@@ -38,6 +40,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -102,6 +105,22 @@ public class SourceProviderTest extends Assert {
         TransformerFactory.newInstance().newTransformer()
             .transform(source, new StreamResult(bos));
         assertTrue(bos.toString().contains("test2"));
+    }
+    
+    @Test
+    public void testWriteToDocument() throws Exception {
+        SourceProvider p = new SourceProvider();
+        
+        Document doc = DOMUtils.readXml(new StringReader("<test/>"));
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(doc, Document.class, Document.class, 
+                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                  new MetadataMap<String, Object>(), os);
+        String s = os.toString();
+        assertEquals("<test/>", s);
+           
     }
     
     @Test

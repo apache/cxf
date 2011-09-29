@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -48,8 +49,12 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
+import org.w3c.dom.Document;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.JAXBElementProviderTest.TagVO2Holder;
@@ -60,6 +65,7 @@ import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -264,6 +270,46 @@ public class JSONProviderTest extends Assert {
         String s = os.toString();
         assertEquals("{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}", s);
         
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testCopyReaderToDocument() throws Exception {
+        String s = "{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}";
+        
+        ByteArrayInputStream is = new ByteArrayInputStream(s.getBytes());
+        
+        Document doc = (Document)new JSONProvider().readFrom((Class)Document.class, Document.class, 
+                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                  new MetadataMap<String, String>(), is);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os);
+        StaxUtils.copy(doc, writer);
+        writer.writeEndDocument();
+        String s2 = os.toString();
+        assertTrue(s2.contains("<group>b</group><name>a</name>"));
+    }
+    
+    @Test
+    public void testWriteDocumentToWriter() throws Exception {
+        TagVO tag = createTag("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        new JAXBElementProvider().writeTo(tag, (Class)TagVO.class, TagVO.class, 
+                  TagVO.class.getAnnotations(), MediaType.APPLICATION_XML_TYPE, 
+                  new MetadataMap<String, Object>(), os);
+        Document doc = DOMUtils.readXml(new StringReader(os.toString()));
+         
+        
+        ByteArrayOutputStream os2 = new ByteArrayOutputStream();
+        
+        new JSONProvider().writeTo(
+                  doc, Document.class, Document.class, 
+                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                  new MetadataMap<String, Object>(), os2);
+        String s = os2.toString();
+        assertEquals("{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}", s);
     }
     
     @Test

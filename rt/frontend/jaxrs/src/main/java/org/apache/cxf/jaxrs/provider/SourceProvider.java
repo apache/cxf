@@ -55,7 +55,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
 public class SourceProvider extends AbstractConfigurableProvider implements 
-    MessageBodyReader<Object>, MessageBodyWriter<Source> {
+    MessageBodyReader<Object>, MessageBodyWriter<Object> {
 
     private static final String PREFERRED_FORMAT = "source-preferred-format";
     @Context
@@ -63,7 +63,8 @@ public class SourceProvider extends AbstractConfigurableProvider implements
     
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return Source.class.isAssignableFrom(type);
+        return Source.class.isAssignableFrom(type)
+            || Document.class.isAssignableFrom(type);
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -148,13 +149,15 @@ public class SourceProvider extends AbstractConfigurableProvider implements
         }
     }
     
-    public void writeTo(Source source, Class<?> clazz, Type genericType, Annotation[] annotations,  
+    public void writeTo(Object source, Class<?> clazz, Type genericType, Annotation[] annotations,  
         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         
         String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
         
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(source);
+        XMLStreamReader reader = 
+            source instanceof Source ? StaxUtils.createXMLStreamReader((Source)source) 
+                    : StaxUtils.createXMLStreamReader((Document)source);
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, encoding);
         try {
             StaxUtils.copy(reader, writer);
@@ -174,7 +177,7 @@ public class SourceProvider extends AbstractConfigurableProvider implements
         }
     }
     
-    public long getSize(Source source, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(Object source, Class<?> type, Type genericType, Annotation[] annotations, 
                         MediaType mt) {
         return -1;
     }
