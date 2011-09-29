@@ -43,6 +43,7 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.ServiceModelVisitor;
@@ -462,7 +463,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         XmlType xmlTypeAnno = cls.getAnnotation(XmlType.class);
         boolean respectXmlTypeNS = false;
         XmlSchema faultBeanSchema = null;
-        if (xmlTypeAnno != null && !xmlTypeAnno.namespace().isEmpty() 
+        if (xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.namespace()) 
             && !xmlTypeAnno.namespace().equals(part.getElementQName().getNamespaceURI())) {
             respectXmlTypeNS = true;
             NamespaceMap nsMap = new NamespaceMap();
@@ -487,7 +488,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         // Before updating everything, make sure we haven't added this
         // type yet.  Multiple methods that throw the same exception
         // types will cause duplicates.
-        String faultTypeName = xmlTypeAnno != null && !xmlTypeAnno.name().isEmpty() ? xmlTypeAnno.name() 
+        String faultTypeName = xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.name()) ? xmlTypeAnno.name() 
             :  part.getElementQName().getLocalPart();
         XmlSchemaType existingType = schema.getTypeByName(faultTypeName);
         if (existingType != null) {
