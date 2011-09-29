@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.tokenstore;
 
 import java.io.Serializable;
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -147,6 +148,11 @@ public class SecurityToken implements Serializable {
     private X509Certificate x509cert;
 
     private transient Crypto crypto;
+    
+    /**
+     * The principal of this SecurityToken
+     */
+    private Principal principal;
     
     public SecurityToken() {
         
@@ -470,6 +476,22 @@ public class SecurityToken implements Serializable {
      */
     public int getAssociatedHash() {
         return associatedHash;
+    }
+    
+    /**
+     * Set the principal associated with this SecurityToken
+     * @param principal the principal associated with this SecurityToken
+     */
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
+    }
+    
+    /**
+     * Get the principal associated with this SecurityToken
+     * @return the principal associated with this SecurityToken
+     */
+    public Principal getPrincipal() {
+        return principal;
     }
     
     /**
