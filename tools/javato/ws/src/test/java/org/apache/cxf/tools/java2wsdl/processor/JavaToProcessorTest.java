@@ -654,4 +654,28 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlContent.indexOf("<soap:fault name=\"Exception\" use=\"literal\"/>") != -1);
 
     }
+    
+    //CXF-1509
+    @Test
+    public void testWebFaultWithXmlType() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/cxf1519.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.cxf1519.EndpointImpl");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        File wsdlFile = new File(output, "cxf1519.wsdl");
+        assertTrue(wsdlFile.exists());
+        // schema element
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        assertTrue(wsdlContent.indexOf("xmlns:tns=\"http://cxf.apache.org/cxf1519/exceptions\"") != -1);
+        assertTrue(wsdlContent.indexOf("xmlns:tns=\"http://cxf.apache.org/cxf1519/faults\"") != -1);
+        assertTrue(wsdlContent.indexOf("<xsd:complexType name=\"UserException\">") != -1);
+        assertTrue(wsdlContent.indexOf("<xsd:element name=\"UserExceptionFault\"") != -1);
+        
+    }
 }

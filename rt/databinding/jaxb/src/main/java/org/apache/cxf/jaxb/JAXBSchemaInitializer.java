@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -448,8 +449,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         }
     }
-
-
+    
+    
     private void buildExceptionType(MessagePartInfo part, Class<?> cls) {
         SchemaInfo schemaInfo = null;
         for (SchemaInfo s : serviceInfo.getSchemas()) {
@@ -458,44 +459,53 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 break;
             }
         }
-        XmlSchema schema;
-        if (schemaInfo == null) {
-            schema = schemas.newXmlSchemaInCollection(part.getElementQName().getNamespaceURI());
-
-            if (qualifiedSchemas) {
-                schema.setElementFormDefault(XmlSchemaForm.QUALIFIED);
-            }
-
+        XmlType xmlTypeAnno = cls.getAnnotation(XmlType.class);
+        boolean respectXmlTypeNS = false;
+        XmlSchema faultBeanSchema = null;
+        if (xmlTypeAnno != null && !xmlTypeAnno.namespace().isEmpty() 
+            && !xmlTypeAnno.namespace().equals(part.getElementQName().getNamespaceURI())) {
+            respectXmlTypeNS = true;
             NamespaceMap nsMap = new NamespaceMap();
-            nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, schema.getTargetNamespace());
+            nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, xmlTypeAnno.namespace());
             nsMap.add(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
-            schema.setNamespaceContext(nsMap);
-
-
-            schemaInfo = new SchemaInfo(part.getElementQName().getNamespaceURI());
-            schemaInfo.setSchema(schema);
-            serviceInfo.addSchema(schemaInfo);
-        } else {
-            schema = schemaInfo.getSchema();
+            
+            SchemaInfo faultBeanSchemaInfo = createSchemaIfNeeded(xmlTypeAnno.namespace(), nsMap);
+            faultBeanSchema = faultBeanSchemaInfo.getSchema();            
         }
+        
+        XmlSchema schema = null;
+        if (schemaInfo == null) {
+            NamespaceMap nsMap = new NamespaceMap();
+            nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, part.getElementQName().getNamespaceURI());
+            nsMap.add(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
+            schemaInfo = createSchemaIfNeeded(part.getElementQName().getNamespaceURI(), nsMap);
+
+        } 
+        schema = schemaInfo.getSchema();
+       
 
         // Before updating everything, make sure we haven't added this
         // type yet.  Multiple methods that throw the same exception
         // types will cause duplicates.
-        String partLocalName = part.getElementQName().getLocalPart();
-        XmlSchemaType existingType = schema.getTypeByName(partLocalName);
+        String faultTypeName = xmlTypeAnno != null && !xmlTypeAnno.name().isEmpty() ? xmlTypeAnno.name() 
+            :  part.getElementQName().getLocalPart();
+        XmlSchemaType existingType = schema.getTypeByName(faultTypeName);
         if (existingType != null) {
             return;
         }
 
-        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, true);
-        ct.setName(partLocalName);
-
         XmlSchemaElement el = new XmlSchemaElement(schema, true);
-        el.setName(partLocalName);
+        el.setName(part.getElementQName().getLocalPart());
         part.setXmlSchema(el);
-
         schemaInfo.setElement(null);
+        
+        if (respectXmlTypeNS) {
+            schema = faultBeanSchema; //create complexType in the new created schema for xmlType
+        }
+        
+        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, true);
+        ct.setName(faultTypeName);
+
         el.setSchemaTypeName(ct.getQName());
 
         XmlSchemaSequence seq = new XmlSchemaSequence();
@@ -542,6 +552,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             seq.getItems().add(exEle);
 
         }
+        schemas.addCrossImports();
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
 
@@ -591,7 +602,24 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
         seq.getItems().add(el);
     }
+    
+    private SchemaInfo createSchemaIfNeeded(String namespace, NamespaceMap nsMap) {
+        SchemaInfo schemaInfo = serviceInfo.getSchema(namespace);
+        if (schemaInfo == null) {
+            XmlSchema xmlSchema = schemas.newXmlSchemaInCollection(namespace);
 
+            if (qualifiedSchemas) {
+                xmlSchema.setElementFormDefault(XmlSchemaForm.QUALIFIED);
+            }
+
+            xmlSchema.setNamespaceContext(nsMap);
+
+            schemaInfo = new SchemaInfo(namespace);
+            schemaInfo.setSchema(xmlSchema);
+            serviceInfo.addSchema(schemaInfo);
+        }
+        return schemaInfo;
+    }
 
     private boolean isExistSchemaElement(XmlSchema schema, QName qn) {
         return schema.getElementByName(qn) != null;
