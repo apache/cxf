@@ -488,8 +488,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         // Before updating everything, make sure we haven't added this
         // type yet.  Multiple methods that throw the same exception
         // types will cause duplicates.
-        String faultTypeName = xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.name()) ? xmlTypeAnno.name() 
-            :  part.getElementQName().getLocalPart();
+        String faultTypeName = xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.name()) 
+               ? xmlTypeAnno.name()  :  part.getElementQName().getLocalPart();
         XmlSchemaType existingType = schema.getTypeByName(faultTypeName);
         if (existingType != null) {
             return;
