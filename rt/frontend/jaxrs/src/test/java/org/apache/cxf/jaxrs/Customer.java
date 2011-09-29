@@ -337,8 +337,10 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void testQueryAsList(
         @DefaultValue("default") @QueryParam("query") List<String> queryString,
         @QueryParam("query2") List<String> queryString2,
-        @QueryParam("query3") List<String> queryString3,
-        @QueryParam("query4") List<String> queryString4) {
+        @QueryParam("query3") List<Integer> queryString3,
+        @QueryParam("query3") Integer[] queryString3Array,
+        @QueryParam("query4") List<String> queryString4,
+        @QueryParam("query5") List<String> queryString5) {
         // complete
     }
     
