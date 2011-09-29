@@ -30,9 +30,15 @@ import org.eclipse.jetty.server.AbstractConnector;
 public final class JettySslConnectorFactory implements JettyConnectorFactory {
     
     TLSServerParameters tlsServerParameters;
+    int maxIdleTime;
     
     public JettySslConnectorFactory(TLSServerParameters params) {
         tlsServerParameters = params;
+    }
+    
+    public JettySslConnectorFactory(TLSServerParameters params, int maxIdle) {
+        this(params);
+        this.maxIdleTime = maxIdle;
     }
     /**
      * Create a Listener.
@@ -58,6 +64,9 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
             secureConnector.setHost(host);
         }
         secureConnector.setPort(port);
+        if (maxIdleTime > 0) {
+            secureConnector.setMaxIdleTime(maxIdleTime);
+        }
         decorateCXFJettySslSocketConnector(secureConnector);
         return secureConnector;
     }

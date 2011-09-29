@@ -95,6 +95,7 @@ public class JettyHTTPServerEngine
     private Boolean isSessionSupport = false;
     private Boolean isReuseAddress = true;
     private Boolean continuationsEnabled = true;
+    private int maxIdleTime = 200000;
     private int servantCount;
     private Server server;
     private Connector connector;
@@ -279,6 +280,14 @@ public class JettyHTTPServerEngine
     
     public void setReuseAddress(boolean reuse) {
         isReuseAddress = reuse;
+    }
+    
+    public int getMaxIdleTime() {
+        return maxIdleTime;
+    }
+    
+    public void setMaxIdleTime(int maxIdel) {
+        maxIdleTime = maxIdel;
     }
     
     /**
@@ -640,6 +649,9 @@ public class JettyHTTPServerEngine
                     result.setHost(hosto);
                 }
                 result.setPort(porto);
+                if (getMaxIdleTime() > 0) {
+                    result.setMaxIdleTime(getMaxIdleTime());
+                }
                 return result;
             }
         };
@@ -651,7 +663,7 @@ public class JettyHTTPServerEngine
     protected JettyConnectorFactory getHTTPSConnectorFactory(
             TLSServerParameters tlsParams
     ) {
-        return new JettySslConnectorFactory(tlsParams);
+        return new JettySslConnectorFactory(tlsParams, getMaxIdleTime());
     }
     
     /**

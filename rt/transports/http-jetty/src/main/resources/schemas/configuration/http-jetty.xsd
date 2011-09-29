@@ -144,8 +144,13 @@
        <xs:attribute name="continuationsEnabled" type="ptp:ParameterizedBoolean">
            <xs:annotation>
                 <xs:documentation>Specifies if Jetty Continuations will be explicitly supported
-                by Jetty destinations. Continuations will be checked if this attribute is set to true or                            omitted, ignored otherwise</xs:documentation>
+                by Jetty destinations. Continuations will be checked if this attribute is set to true or omitted, ignored otherwise.</xs:documentation>
              </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="maxIdleTime" type="ptp:ParameterizedInt">
+           <xs:annotation>  
+                <xs:documentation>Set the maximum Idle time for a connection, the timer will be reset if there is any read and write option on the under layer stream.</xs:documentation> 
+           </xs:annotation>
        </xs:attribute>
     </xs:complexType>
     

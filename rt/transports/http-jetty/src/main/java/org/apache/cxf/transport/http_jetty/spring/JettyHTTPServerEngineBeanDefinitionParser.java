@@ -70,6 +70,11 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         if (continuationsStr != null && continuationsStr.length() > 0) {
             bean.addPropertyValue("continuationsEnabled", continuationsStr);
         }
+        
+        String maxIdleTimeStr = element.getAttribute("maxIdleTime");
+        if (maxIdleTimeStr != null && !"".equals(maxIdleTimeStr.trim())) {
+            bean.addPropertyValue("maxIdleTime", maxIdleTimeStr);
+        }
         ValueHolder busValue = ctx.getContainingBeanDefinition()
             .getConstructorArgumentValues().getArgumentValue(0, Bus.class);
         bean.addPropertyValue("bus", busValue.getValue());

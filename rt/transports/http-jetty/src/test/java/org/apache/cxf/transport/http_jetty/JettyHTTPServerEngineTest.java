@@ -103,18 +103,22 @@ public class JettyHTTPServerEngineTest extends Assert {
                 "http".equals(engine.getProtocol()));
 
         engine = new JettyHTTPServerEngine();
+        engine.setJettyHTTPServerEngineFactory(factory);
         engine.setPort(9235);
+        engine.setMaxIdleTime(30000);
         engine.setTlsServerParameters(new TLSServerParameters());
         engine.finalizeConfig();
 
         List<JettyHTTPServerEngine> list = new ArrayList<JettyHTTPServerEngine>();
         list.add(engine);
         factory.setEnginesList(list);
-
         engine = factory.createJettyHTTPServerEngine(9235, "https");
-
+        JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
+        // need to create a servant to create the connector
+        engine.addServant(new URL("https://localhost:9235/test"), handler1);
         assertTrue("Protocol must be https",
                 "https".equals(engine.getProtocol()));
+        assertEquals("Get the wrong maxIdleTime.", 30000, engine.getConnector().getMaxIdleTime());
 
         factory.setTLSServerParametersForPort(9234, new TLSServerParameters());
         engine = factory.createJettyHTTPServerEngine(9234, "https");
@@ -172,9 +176,12 @@ public class JettyHTTPServerEngineTest extends Assert {
         String urlStr2 = "http://localhost:9234/hello233/test";
         JettyHTTPServerEngine engine =
             factory.createJettyHTTPServerEngine(9234, "http");
+        engine.setMaxIdleTime(30000);
         JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
         JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
         engine.addServant(new URL(urlStr), handler1);
+        assertEquals("Get the wrong maxIdleTime.", 30000, engine.getConnector().getMaxIdleTime());
+        
         String response = null;
         response = getResponse(urlStr);
         assertEquals("The jetty http handler did not take effect", response, "string1");
