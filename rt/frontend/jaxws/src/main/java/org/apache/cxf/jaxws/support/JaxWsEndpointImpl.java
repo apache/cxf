@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
@@ -30,7 +31,9 @@ import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Binding;
+import javax.xml.ws.RespectBindingFeature;
 import javax.xml.ws.Service.Mode;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.AddressingFeature;
@@ -46,6 +49,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.feature.AbstractFeature;
@@ -95,6 +99,8 @@ import org.apache.neethi.Constants;
  *
  */
 public class JaxWsEndpointImpl extends EndpointImpl {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(JaxWsEndpointImpl.class);
 
     private Binding jaxwsBinding;
     private JaxWsImplementorInfo implInfo; 
@@ -109,7 +115,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     private SOAPHandlerFaultOutInterceptor soapFaultOutInterceptor;
     private LogicalHandlerFaultInInterceptor logicalFaultInInterceptor;
     private SOAPHandlerFaultInInterceptor soapFaultInInterceptor;
-    
+        
     public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei) throws EndpointException {
         this(bus, s, ei, null, null, null, true);
     }
@@ -198,6 +204,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             = endpoint.getBinding().getExtensors(ExtensibilityElement.class);
         List<ExtensibilityElement> portExtensors 
             = endpoint.getExtensors(ExtensibilityElement.class);
+        checkRespectBindingFeature(bindingExtensors);
         if (hasUsingAddressing(bindingExtensors) || hasUsingAddressing(portExtensors)) {
             WSAddressingFeature feature = new WSAddressingFeature();
             if (addressingRequired(bindingExtensors)
@@ -209,6 +216,27 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         extractWsdlEprs(endpoint);
     }
     
+    private void checkRespectBindingFeature(List<ExtensibilityElement> bindingExtensors) {
+        if (bindingExtensors != null) {
+            Iterator<ExtensibilityElement> extensionElements = bindingExtensors.iterator();
+            while (extensionElements.hasNext()) {
+                ExtensibilityElement ext = (ExtensibilityElement)extensionElements.next();
+                if (ext instanceof UnknownExtensibilityElement && Boolean.TRUE.equals(ext.getRequired())) {
+                    for (WebServiceFeature feature : this.wsFeatures) {
+                        if (feature instanceof RespectBindingFeature && feature.isEnabled()) {
+                            
+                            org.apache.cxf.common.i18n.Message message = 
+                                new org.apache.cxf.common.i18n.Message("UNKONW_REQUIRED_WSDL_BINDING", LOG);
+                            LOG.severe(message.toString());
+                            throw new WebServiceException(message.toString());
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+        
     private void extractWsdlEprs(EndpointInfo endpoint) {
         //parse the EPR in wsdl
         List<ExtensibilityElement> portExtensors = endpoint.getExtensors(ExtensibilityElement.class);
