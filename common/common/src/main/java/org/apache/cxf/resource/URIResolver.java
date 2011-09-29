@@ -29,6 +29,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -127,16 +128,32 @@ public class URIResolver {
         try {
             URI relative;
 
+            String orig = uriStr;
+            
             // It is possible that spaces have been encoded.  We should decode them first.
             uriStr = uriStr.replaceAll("%20", " ");
 
             File uriFile = new File(uriStr);
+            
+            
             uriFile = new File(uriFile.getAbsolutePath());
-
-            if (uriFile.exists()) {
-                relative = uriFile.toURI();
+            if (!uriFile.exists()) {
+                try {
+                    URI urif = new URI(URLDecoder.decode(orig, "ASCII"));
+                    if ("file".equals(urif.getScheme()) && urif.isAbsolute()) {
+                        File f2 = new File(urif);
+                        if (f2.exists()) {
+                            uriFile = f2;
+                        }
+                    }
+                } catch (URISyntaxException ex) {
+                    //ignore
+                }
+            }
+            if (!uriFile.exists()) {
+                relative =  new URI(uriStr.replaceAll(" ", "%20"));
             } else {
-                relative = new URI(uriStr.replaceAll(" ", "%20"));
+                relative = uriFile.getAbsoluteFile().toURI();
             }
             
             if (relative.isAbsolute()) {
