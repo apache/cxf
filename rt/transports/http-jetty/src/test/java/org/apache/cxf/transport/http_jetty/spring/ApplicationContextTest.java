@@ -126,6 +126,7 @@ public class ApplicationContextTest extends Assert {
                 getEndpointInfo("foo", "bar", "http://localhost:9001"));
         
         engine = (JettyHTTPServerEngine)jd2.getEngine();
+        assertEquals(40000, engine.getMaxIdleTime());
         assertEquals(99, engine.getThreadingParameters().getMinThreads());
         assertEquals(777, engine.getThreadingParameters().getMaxThreads());
         assertTrue("The engine should support session manager", engine.isSessionSupport());
