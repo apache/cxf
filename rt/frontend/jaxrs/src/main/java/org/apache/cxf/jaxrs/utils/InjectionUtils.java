@@ -650,7 +650,8 @@ public final class InjectionUtils {
      //CHECKSTYLE:ON    
         Class<?> type = getCollectionType(rawType);
 
-        Class<?> realType = InjectionUtils.getActualType(genericType);
+        Class<?> realType = rawType.isArray() ? rawType.getComponentType() 
+                : InjectionUtils.getActualType(genericType);
         
         Object theValues = null;
         if (type != null) {
