@@ -22,6 +22,11 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+  <bean id="placeholderConfig"
+	      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	  <property name="location" value="org/apache/cxf/configuration/spring/bean.properties"/>
+	</bean>
+
   <bean name="*2" abstract="true" class="org.apache.cxf.configuration.spring.ConfigurerImplTest$SimpleBean">
       <property name="stringAttr" value="StarHallo"/>
   </bean>
@@ -42,7 +47,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
       <property name="integerAttr" value="10"/>
   </bean>
     
-  <bean id="simple" lazy-init="true">
+  <bean id="simple" name="${simple.name}" lazy-init="true">
       <property name="stringAttr" value="hallo"/>
       <property name="booleanAttr" value="false"/>
       <property name="integerAttr" value="10"/>

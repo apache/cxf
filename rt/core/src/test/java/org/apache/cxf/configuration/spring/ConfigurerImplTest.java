@@ -117,7 +117,16 @@ public class ConfigurerImplTest extends Assert {
     
     @Test
     public void testConfigureSimple() {
-        SimpleBean sb = new SimpleBean("simple");
+        // Try to configure the bean with id 
+        verifyConfigureSimple("simple");
+        // Try to configure the bean with an alias name
+        verifyConfigureSimple("simpleValueBean");
+    }
+    
+    
+    public void verifyConfigureSimple(String beanName) {
+        
+        SimpleBean sb = new SimpleBean(beanName);
         BusApplicationContext ac = 
             new BusApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml",
                                       false);
@@ -146,30 +155,6 @@ public class ConfigurerImplTest extends Assert {
                      new Double(17D), sb.getDoubleAttr());
         assertEquals("Unexpected value for attribute byteAttr", 
                      new Byte((byte)18), sb.getByteAttr());
-           
-        /*
-        QName qn = sb.getQnameAttr();
-        assertEquals("Unexpected value for attribute qnameAttrNoDefault", 
-                     "string", qn.getLocalPart());
-        assertEquals("Unexpected value for attribute qnameAttrNoDefault",
-                     "http://www.w3.org/2001/XMLSchema", qn.getNamespaceURI());
-        */
-        
-        /*
-        byte[] expected = DatatypeConverter.parseBase64Binary("wxyz");
-        byte[] val = sb.getBase64BinaryAttr(); 
-        assertEquals("Unexpected value for attribute base64BinaryAttrNoDefault", expected.length, val.length);
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals("Unexpected value for attribute base64BinaryAttrNoDefault", expected[i], val[i]);
-        }
-
-        expected = new HexBinaryAdapter().unmarshal("bbbb");
-        val = sb.getHexBinaryAttr();
-        assertEquals("Unexpected value for attribute hexBinaryAttrNoDefault", expected.length, val.length);
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals("Unexpected value for attribute hexBinaryAttrNoDefault", expected[i], val[i]);
-        }
-        */
         
         assertEquals("Unexpected value for attribute unsignedIntAttrNoDefault", 
                      new Long(19L), sb.getUnsignedIntAttr());
