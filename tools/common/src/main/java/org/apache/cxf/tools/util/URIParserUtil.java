@@ -22,6 +22,7 @@ package org.apache.cxf.tools.util;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -287,16 +288,16 @@ public final class URIParserUtil {
         }
 
         try {
-            URL url = new URL(normalize(arg));
-            if (url.toURI().isOpaque()
-                && "file".equalsIgnoreCase(url.getProtocol())) {
-                return new File("").toURI().resolve(url.getPath()).toString();
+            URI uri = new URI(arg);
+            if ("file".equalsIgnoreCase(uri.getScheme())) {
+                if (!uri.isOpaque()) {
+                    return uri.toString();
+                }
+                return new File("").toURI().resolve(uri.getPath()).toString();
             } else {
                 return normalize(arg);
             }
-        } catch (MalformedURLException e1) {
-            return normalize(arg);
-        } catch (URISyntaxException e2) {
+        } catch (Exception e2) {
             return normalize(arg);
         }
     }

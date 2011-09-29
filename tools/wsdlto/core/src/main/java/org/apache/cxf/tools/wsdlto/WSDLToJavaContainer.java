@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -426,14 +426,14 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             throw new ToolException(msg);
         }
 
-        env.put(ToolConstants.CFG_WSDLURL, URIParserUtil.normalize(wsdl));
+        env.put(ToolConstants.CFG_WSDLURL, URIParserUtil.getAbsoluteURI(wsdl));
         if (!env.containsKey(ToolConstants.CFG_WSDLLOCATION)) {
             //make sure the "raw" form is used for the wsdlLocation
             //instead of the absolute URI that normalize may return
             try {
-                URL url = new URL(wsdl);
-                wsdl = url.toString();
-            } catch (MalformedURLException e) {
+                URI uri = new URI(wsdl);
+                wsdl = uri.toString();
+            } catch (Exception e) {
                 //not a URL, assume file
                 if (wsdl.indexOf(":") != -1 && !wsdl.startsWith("/")) {
                     wsdl = "file:/" + wsdl;
@@ -441,9 +441,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     wsdl = "file:" + wsdl;
                 }
                 try {
-                    URL url = new URL(wsdl);
-                    wsdl = url.toString();
-                } catch (MalformedURLException e1) {
+                    URI uri = new URI(wsdl);
+                    wsdl = uri.toString();
+                } catch (Exception e1) {
                     //ignore... 
                 }
             }
