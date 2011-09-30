@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.cache;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -102,7 +103,14 @@ public class DefaultInMemoryTokenStore implements STSTokenStore {
     }
 
     public SecurityToken getTokenByAssociatedHash(int hashCode) {
-        // TODO Auto-generated method stub
+        @SuppressWarnings("unchecked")
+        Iterator<String> ids = cache.getKeys().iterator();
+        while (ids.hasNext()) {
+            SecurityToken securityToken = getToken(ids.next());
+            if (hashCode == securityToken.getAssociatedHash()) {
+                return securityToken;
+            }
+        }
         return null;
     }
 

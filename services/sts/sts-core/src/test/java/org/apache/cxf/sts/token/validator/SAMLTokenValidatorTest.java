@@ -34,6 +34,8 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
+import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -49,12 +51,20 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.junit.BeforeClass;
 
 
 /**
  * Some unit tests for validating a SAML token via the SAMLTokenValidator.
  */
 public class SAMLTokenValidatorTest extends org.junit.Assert {
+    
+    private static STSTokenStore tokenStore;
+    
+    @BeforeClass
+    public static void init() {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
     
     /**
      * Test a valid SAML 1.1 Assertion
@@ -140,6 +150,9 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
         
+        // Set tokenstore to null so that issued token is not found in the cache
+        validatorParameters.setTokenStore(null);
+        
         // Change the issuer and so validation should fail
         validatorParameters.getStsProperties().setIssuer("NewSTS");
         
@@ -170,7 +183,10 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         tokenRequirements.setValidateTarget(validateTarget);
         
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
+ 
+        // Set tokenstore to null so that issued token is not found in the cache
+        validatorParameters.setTokenStore(null);
+
         // Change the issuer and so validation should fail
         validatorParameters.getStsProperties().setIssuer("NewSTS");
         
@@ -202,6 +218,9 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
         
+        // Set tokenstore to null so that issued token is not found in the cache
+        validatorParameters.setTokenStore(null);
+
         TokenValidatorResponse validatorResponse = 
             samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
@@ -230,6 +249,9 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
         
+        // Set tokenstore to null so that issued token is not found in the cache
+        validatorParameters.setTokenStore(null);
+
         TokenValidatorResponse validatorResponse = 
             samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
@@ -263,6 +285,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
+        parameters.setTokenStore(tokenStore);
         
         return parameters;
     }
@@ -314,7 +337,8 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         parameters.setStsProperties(stsProperties);
 
         parameters.setEncryptionProperties(new EncryptionProperties());
-
+        parameters.setTokenStore(tokenStore);
+        
         return parameters;
     }
     

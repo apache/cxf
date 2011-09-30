@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.token.validator;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 
 import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
@@ -105,13 +107,7 @@ public class SAMLTokenValidator implements TokenValidator {
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         Crypto sigCrypto = stsProperties.getSignatureCrypto();
         CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
-
-        RequestData requestData = new RequestData();
-        requestData.setSigCrypto(sigCrypto);
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        requestData.setWssConfig(wssConfig);
-        requestData.setCallbackHandler(callbackHandler);
-
+        
         TokenValidatorResponse response = new TokenValidatorResponse();
         response.setValid(false);
         
@@ -122,41 +118,65 @@ public class SAMLTokenValidator implements TokenValidator {
         try {
             Element validateTargetElement = (Element)validateTarget.getToken();
             AssertionWrapper assertion = new AssertionWrapper(validateTargetElement);
-            if (!assertion.isSigned()) {
-                LOG.log(Level.WARNING, "The received assertion is not signed, and therefore not trusted");
-                return response;
-            }
-            // Verify the signature
-            assertion.verifySignature(
-                requestData, new WSDocInfo(validateTargetElement.getOwnerDocument())
-            );
-
-            // Now verify trust on the signature
-            Credential trustCredential = new Credential();
-            SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
-            trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
-            trustCredential.setCertificates(samlKeyInfo.getCerts());
-
-            validator.validate(trustCredential, requestData);
-
-            // Finally check that the issuer is trusted
-            String trustedIssuer = null;
-            String assertionIssuer = assertion.getIssuerString();
-            for (String realm : realmMap.keySet()) {
-                SAMLRealm samlRealm = realmMap.get(realm);
-                if (samlRealm.getIssuer().equals(assertionIssuer)) {
-                    trustedIssuer = realm;
-                    break;
+            
+            SecurityToken secToken = null;
+            if (tokenParameters.getTokenStore() != null) {
+                int hash = 0;
+                byte[] signatureValue = assertion.getSignatureValue();
+                if (signatureValue != null && signatureValue.length > 0) {
+                    hash = Arrays.hashCode(signatureValue);
+                    secToken = tokenParameters.getTokenStore().getTokenByAssociatedHash(hash);
                 }
             }
-            if (trustedIssuer == null && assertionIssuer.equals(stsProperties.getIssuer())) {
-                trustedIssuer = stsProperties.getIssuer();
-            }
-            if (trustedIssuer != null) {
+            if (secToken == null) {
+                if (!assertion.isSigned()) {
+                    LOG.log(Level.WARNING, "The received assertion is not signed, and therefore not trusted");
+                    return response;
+                }
+                
+                RequestData requestData = new RequestData();
+                requestData.setSigCrypto(sigCrypto);
+                WSSConfig wssConfig = WSSConfig.getNewInstance();
+                requestData.setWssConfig(wssConfig);
+                requestData.setCallbackHandler(callbackHandler);
+                
+                // Verify the signature
+                assertion.verifySignature(
+                    requestData, new WSDocInfo(validateTargetElement.getOwnerDocument())
+                );
+
+                // Now verify trust on the signature
+                Credential trustCredential = new Credential();
+                SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
+                trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
+                trustCredential.setCertificates(samlKeyInfo.getCerts());
+    
+                validator.validate(trustCredential, requestData);
+
+                // Finally check that the issuer is trusted
+                String trustedIssuer = null;
+                String assertionIssuer = assertion.getIssuerString();
+                for (String realm : realmMap.keySet()) {
+                    SAMLRealm samlRealm = realmMap.get(realm);
+                    if (samlRealm.getIssuer().equals(assertionIssuer)) {
+                        trustedIssuer = realm;
+                        break;
+                    }
+                }
+                if (trustedIssuer == null && assertionIssuer.equals(stsProperties.getIssuer())) {
+                    trustedIssuer = stsProperties.getIssuer();
+                }
+                if (trustedIssuer != null) {
+                    response.setValid(true);
+                    SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
+                    response.setPrincipal(samlPrincipal);
+                    response.setTokenRealm(trustedIssuer);
+                }
+            } else {
                 response.setValid(true);
                 SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
                 response.setPrincipal(samlPrincipal);
-                response.setTokenRealm(trustedIssuer);
+                response.setTokenRealm(assertion.getIssuerString());
             }
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);

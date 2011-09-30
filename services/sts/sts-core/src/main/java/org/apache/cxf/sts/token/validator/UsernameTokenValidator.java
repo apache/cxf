@@ -39,6 +39,7 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -114,23 +115,33 @@ public class UsernameTokenValidator implements TokenValidator {
         // Turn the JAXB UsernameTokenType into a DOM Element for validation
         //
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
-        Element rootElement = null;
-        try {
-            JAXBContext jaxbContext = 
-                JAXBContext.newInstance("org.apache.cxf.ws.security.sts.provider.model");
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            Document doc = DOMUtils.createDocument();
-            rootElement = doc.createElement("root-element");
-            JAXBElement<UsernameTokenType> tokenType = 
-                new JAXBElement<UsernameTokenType>(
-                    QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameTokenType
-                );
-            marshaller.marshal(tokenType, rootElement);
-        } catch (JAXBException ex) {
-            LOG.log(Level.WARNING, "", ex);
-            return response;
+        SecurityToken secToken = null;
+        if (tokenParameters.getTokenStore() != null) {
+            secToken = tokenParameters.getTokenStore().getToken(usernameTokenType.getId());
         }
         
+        Element rootElement = null;
+        Element usernameTokenElement = null;
+        if (secToken == null) {
+            try {
+                JAXBContext jaxbContext = 
+                    JAXBContext.newInstance("org.apache.cxf.ws.security.sts.provider.model");
+                Marshaller marshaller = jaxbContext.createMarshaller();
+                Document doc = DOMUtils.createDocument();
+                rootElement = doc.createElement("root-element");
+                JAXBElement<UsernameTokenType> tokenType = 
+                    new JAXBElement<UsernameTokenType>(
+                        QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameTokenType
+                    );
+                marshaller.marshal(tokenType, rootElement);
+            } catch (JAXBException ex) {
+                LOG.log(Level.WARNING, "", ex);
+                return response;
+            }
+            usernameTokenElement = (Element)rootElement.getFirstChild();
+        } else {
+            usernameTokenElement = secToken.getToken();
+        }
         //
         // Validate the token
         //
@@ -138,17 +149,17 @@ public class UsernameTokenValidator implements TokenValidator {
             boolean allowNamespaceQualifiedPasswordTypes = 
                 wssConfig.getAllowNamespaceQualifiedPasswordTypes();
             boolean bspCompliant = wssConfig.isWsiBSPCompliant();
-            Element usernameTokenElement = (Element)rootElement.getFirstChild();
-            
             UsernameToken ut = 
                 new UsernameToken(usernameTokenElement, allowNamespaceQualifiedPasswordTypes, bspCompliant);
             if (ut.getPassword() == null) {
                 return response;
             }
-            Credential credential = new Credential();
-            credential.setUsernametoken(ut);
-            validator.validate(credential, requestData);
             
+            if (secToken == null || (secToken.getAssociatedHash() != ut.hashCode())) {
+                Credential credential = new Credential();
+                credential.setUsernametoken(ut);
+                validator.validate(credential, requestData);
+            }
             Principal principal = 
                 createPrincipal(
                     ut.getName(), ut.getPassword(), ut.getPasswordType(), ut.getNonce(), ut.getCreated()

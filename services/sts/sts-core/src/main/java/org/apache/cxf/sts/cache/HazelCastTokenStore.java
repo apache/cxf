@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.cache;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import com.hazelcast.core.Hazelcast;
@@ -90,7 +91,13 @@ public class HazelCastTokenStore implements STSTokenStore {
     }
 
     public SecurityToken getTokenByAssociatedHash(int hashCode) {
-        // TODO Auto-generated method stub
+        Iterator<Object> ids = cacheMap.keySet().iterator();
+        while (ids.hasNext()) {
+            SecurityToken securityToken = getToken((String)ids.next());
+            if (hashCode == securityToken.getAssociatedHash()) {
+                return securityToken;
+            }
+        }
         return null;
     }
 
