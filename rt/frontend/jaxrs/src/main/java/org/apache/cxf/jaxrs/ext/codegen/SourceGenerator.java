@@ -105,6 +105,7 @@ public class SourceGenerator {
     private static final Map<String, Class<?>> HTTP_METHOD_ANNOTATIONS;
     private static final Map<String, Class<?>> PARAM_ANNOTATIONS;
     private static final Set<String> RESOURCE_LEVEL_PARAMS;
+    private static final Map<String, String> AUTOBOXED_PRIMITIVES_MAP;
     
     static {
         HTTP_METHOD_ANNOTATIONS = new HashMap<String, Class<?>>();
@@ -124,6 +125,15 @@ public class SourceGenerator {
         RESOURCE_LEVEL_PARAMS = new HashSet<String>();
         RESOURCE_LEVEL_PARAMS.add("template");
         RESOURCE_LEVEL_PARAMS.add("matrix");
+        
+        AUTOBOXED_PRIMITIVES_MAP = new HashMap<String, String>();
+        AUTOBOXED_PRIMITIVES_MAP.put(byte.class.getSimpleName(), Byte.class.getSimpleName());
+        AUTOBOXED_PRIMITIVES_MAP.put(short.class.getSimpleName(), Short.class.getSimpleName());
+        AUTOBOXED_PRIMITIVES_MAP.put(int.class.getSimpleName(), Integer.class.getSimpleName());
+        AUTOBOXED_PRIMITIVES_MAP.put(long.class.getSimpleName(), Long.class.getSimpleName());
+        AUTOBOXED_PRIMITIVES_MAP.put(float.class.getSimpleName(), Float.class.getSimpleName());
+        AUTOBOXED_PRIMITIVES_MAP.put(double.class.getSimpleName(), Double.class.getSimpleName());
+        AUTOBOXED_PRIMITIVES_MAP.put(boolean.class.getSimpleName(), Boolean.class.getSimpleName());
     }
 
     private Comparator<String> importsComparator;
@@ -718,8 +728,14 @@ public class SourceGenerator {
                 writeAnnotation(sbCode, imports, paramAnn, name, false, false);
                 sbCode.append(" ");
             }
+            boolean isRepeating = Boolean.valueOf(paramEl.getAttribute("repeating"));
             String type = getPrimitiveType(paramEl);
-            if (Boolean.valueOf(paramEl.getAttribute("repeating"))) {
+            if (paramAnn == QueryParam.class
+                && (isRepeating || !Boolean.valueOf(paramEl.getAttribute("required")))    
+                && AUTOBOXED_PRIMITIVES_MAP.containsKey(type)) {
+                type = AUTOBOXED_PRIMITIVES_MAP.get(type);
+            }
+            if (isRepeating) {
                 addImport(imports, List.class.getName());
                 type = "List<" + type + ">";
             }
