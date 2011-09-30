@@ -98,8 +98,7 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
         final javax.jms.Message message = template.receive("queue:test");
         requestMessageId = message.getJMSMessageID();
         template.send(message.getJMSReplyTo(), new MessageCreator() {
-            
-            @Override
+
             public javax.jms.Message createMessage(Session session) throws JMSException {
                 TextMessage replyMessage =  session.createTextMessage("Result");
                 replyMessage.setJMSCorrelationID(message.getJMSMessageID());
