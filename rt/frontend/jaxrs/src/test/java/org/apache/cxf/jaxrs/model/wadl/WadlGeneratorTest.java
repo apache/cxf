@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -36,7 +40,9 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.provider.JSONProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -47,6 +53,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +66,42 @@ public class WadlGeneratorTest extends Assert {
     public void setUp() {
         control = EasyMock.createNiceControl();
         control.makeThreadSafe(true);
+    }
+    
+    @Test
+    public void testWadlInJsonFormat() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setUseJaxbContextForQnames(false);
+        wg.setIgnoreMessageWriters(false);
+        
+        wg.setExternalLinks(Collections.singletonList("json.schema"));
+        
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        headers.put("Accept", Collections.singletonList("application/json"));
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        Response r = wg.handleRequest(m, cri);
+        assertEquals("application/json",
+                r.getMetadata().getFirst("Content-Type").toString());
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        new JSONProvider().writeTo(
+                (Document)r.getEntity(), Document.class, Document.class, 
+                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                  new MetadataMap<String, Object>(), os);
+        String s = os.toString();
+        String expected1 = 
+            "{\"application\":{\"grammars\":{\"include\":{\"@href\":\"http:\\/\\/localhost:8080\\/baz"
+            + "\\/json.schema\"}},\"resources\":{\"@base\":\"http:\\/\\/localhost:8080\\/baz\","
+            + "\"resource\":{\"@path\":\"\\/bookstore\\/{id}\"";
+        assertTrue(s.startsWith(expected1));
+        String expected2 =
+            "\"response\":{\"representation\":[{\"@mediaType\":\"application\\/xml\"},"
+            + "{\"@element\":\"Chapter\",\"@mediaType\":\"application\\/json\"}]}";
+        assertTrue(s.contains(expected2));
     }
     
     @Test

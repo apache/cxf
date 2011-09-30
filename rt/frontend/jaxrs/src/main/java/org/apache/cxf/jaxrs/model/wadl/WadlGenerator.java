@@ -181,17 +181,24 @@ public class WadlGenerator implements RequestHandler {
         }
 
         HttpHeaders headers = new HttpHeadersImpl(m);
-        MediaType type = headers.getAcceptableMediaTypes().contains(MediaType.APPLICATION_XML_TYPE)
-            ? MediaType.APPLICATION_XML_TYPE : WADL_TYPE;
+        List<MediaType> accepts = headers.getAcceptableMediaTypes();
+        MediaType type = accepts.contains(MediaType.APPLICATION_XML_TYPE)
+            ? MediaType.APPLICATION_XML_TYPE : accepts.contains(MediaType.APPLICATION_JSON_TYPE) 
+                ? MediaType.APPLICATION_JSON_TYPE : WADL_TYPE;
         
         Response response = getExistingWadl(m, ui, type);
         if (response != null) {
             return response;
         }
         
+        boolean isJson = type == MediaType.APPLICATION_JSON_TYPE; 
+                
         StringBuilder sbMain = new StringBuilder();
-        sbMain.append("<application xmlns=\"").append(getNamespace())
-              .append("\" xmlns:xs=\"").append(XmlSchemaConstants.XSD_NAMESPACE_URI).append("\"");
+        sbMain.append("<application");
+        if (!isJson) {
+            sbMain.append(" xmlns=\"").append(getNamespace())
+                  .append("\" xmlns:xs=\"").append(XmlSchemaConstants.XSD_NAMESPACE_URI).append("\"");
+        }
         StringBuilder sbGrammars = new StringBuilder();
         sbGrammars.append("<grammars>");
 
@@ -213,12 +220,12 @@ public class WadlGenerator implements RequestHandler {
         Set<ClassResourceInfo> visitedResources = new HashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
             startResourceTag(sbResources, cri.getServiceClass(), cri.getURITemplate().getValue());
-            handleDocs(cri.getServiceClass().getAnnotations(), sbResources, DocTarget.RESOURCE, true);
-            handleResource(sbResources, allTypes, qnameResolver, clsMap, cri, visitedResources);
+            handleDocs(cri.getServiceClass().getAnnotations(), sbResources, DocTarget.RESOURCE, true, isJson);
+            handleResource(sbResources, allTypes, qnameResolver, clsMap, cri, visitedResources, isJson);
             sbResources.append("</resource>");
         }
         sbResources.append("</resources>");
-
+        
         handleGrammars(sbMain, sbGrammars, schemaWriter, clsMap);
 
         sbGrammars.append("</grammars>");
@@ -229,9 +236,21 @@ public class WadlGenerator implements RequestHandler {
         sbMain.append("</application>");
 
         m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, ignoreMessageWriters);
-        return Response.ok().type(type).entity(sbMain.toString()).build();
+        return Response.ok().type(type).entity(
+                createResponseEntity(sbMain.toString(), isJson)).build();
     }
 
+    private Object createResponseEntity(String entity, boolean isJson) {
+        if (!isJson) {
+            return entity;
+        }
+        try {
+            return DOMUtils.readXml(new StringReader(entity));
+        }  catch (Exception ex) {
+            throw new WebApplicationException(ex, 500);
+        }
+    }
+    
     private String getBaseURI(UriInfo ui) {
         return ui.getBaseUri().toString();
     }
@@ -258,7 +277,8 @@ public class WadlGenerator implements RequestHandler {
     private void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                 ElementQNameResolver qnameResolver,
                                 Map<Class<?>, QName> clsMap, ClassResourceInfo cri,
-                                Set<ClassResourceInfo> visitedResources) {
+                                Set<ClassResourceInfo> visitedResources,
+                                boolean isJson) {
         visitedResources.add(cri);
         Map<Parameter, Object> classParams = getClassParameters(cri);
         
@@ -274,19 +294,20 @@ public class WadlGenerator implements RequestHandler {
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
                 if (subcri != null && !visitedResources.contains(subcri)) {
                     startResourceTag(sb, subcri.getServiceClass(), ori.getURITemplate().getValue());
-                    handleDocs(subcri.getServiceClass().getAnnotations(), sb, DocTarget.RESOURCE, true);
-                    handlePathAndMatrixParams(sb, ori);
+                    handleDocs(subcri.getServiceClass().getAnnotations(), sb, DocTarget.RESOURCE, true, 
+                            isJson);
+                    handlePathAndMatrixParams(sb, ori, isJson);
                     handleResource(sb, jaxbTypes, qnameResolver, clsMap, subcri,
-                                   visitedResources);
+                                   visitedResources, isJson);
                     sb.append("</resource>");
                 } else {
-                    handleDynamicSubresource(sb, jaxbTypes, qnameResolver, clsMap, ori, subcri);
+                    handleDynamicSubresource(sb, jaxbTypes, qnameResolver, clsMap, ori, subcri, isJson);
                 }
                 continue;
             }
             OperationResourceInfo nextOp = i + 1 < sortedOps.size() ? sortedOps.get(i + 1) : null;
             resourceTagOpened = handleOperation(sb, jaxbTypes, qnameResolver, clsMap, ori, 
-                                                classParams, nextOp, resourceTagOpened, i);
+                                                classParams, nextOp, resourceTagOpened, isJson, i);
         }
     }
 
@@ -344,6 +365,7 @@ public class WadlGenerator implements RequestHandler {
                                  Map<Parameter, Object> classParams,
                                  OperationResourceInfo nextOp,
                                  boolean resourceTagOpened,
+                                 boolean isJson,
                                  int index) {
         Annotation[] anns = getMethod(ori).getAnnotations();
     //CHECKSTYLE:ON
@@ -360,25 +382,26 @@ public class WadlGenerator implements RequestHandler {
                 }
             }
             sb.append("<resource path=\"").append(getPath(path)).append("\">");
-            handleDocs(anns, sb, DocTarget.RESOURCE, false);
-            handlePathAndMatrixClassParams(sb, classParams);
-            handlePathAndMatrixParams(sb, ori);
+            handleDocs(anns, sb, DocTarget.RESOURCE, false, isJson);
+            handlePathAndMatrixClassParams(sb, classParams, isJson);
+            handlePathAndMatrixParams(sb, ori, isJson);
         } else if (index == 0) {
-            handlePathAndMatrixClassParams(sb, classParams);
-            handlePathAndMatrixParams(sb, ori);
+            handlePathAndMatrixClassParams(sb, classParams, isJson);
+            handlePathAndMatrixParams(sb, ori, isJson);
         }
 
         startMethodTag(sb, ori);
-        handleDocs(anns, sb, DocTarget.METHOD, true);
+        handleDocs(anns, sb, DocTarget.METHOD, true, isJson);
         if (getMethod(ori).getParameterTypes().length != 0 || classParams.size() != 0) {
             sb.append("<request>");
-            handleDocs(anns, sb, DocTarget.REQUEST, false);
+            handleDocs(anns, sb, DocTarget.REQUEST, false, isJson);
             if (isFormRequest(ori)) {
-                handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori));
+                handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori), 
+                        isJson);
             } else {
-                doHandleClassParams(sb, classParams, ParameterType.QUERY, ParameterType.HEADER);
+                doHandleClassParams(sb, classParams, isJson, ParameterType.QUERY, ParameterType.HEADER);
                 for (Parameter p : ori.getParameters()) {
-                    handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p);
+                    handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p, isJson);
                 }
             }
             sb.append("</request>");
@@ -391,10 +414,10 @@ public class WadlGenerator implements RequestHandler {
             sb.append(" status=\"" + (oneway ? 202 : 204) + "\"");
         }
         sb.append(">");
-        handleDocs(anns, sb, DocTarget.RESPONSE, false);
+        handleDocs(anns, sb, DocTarget.RESPONSE, false, isJson);
         if (!isVoid) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori,
-                                 returnType, false);
+                                 returnType, isJson, false);
         }
         sb.append("</response>");
 
@@ -444,26 +467,28 @@ public class WadlGenerator implements RequestHandler {
 
     protected void handleDynamicSubresource(StringBuilder sb, Set<Class<?>> jaxbTypes,
                  ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
-                 ClassResourceInfo subcri) {
-
-        if (subcri != null) {
-            sb.append("<!-- Recursive subresource -->");
-        } else {
-            sb.append("<!-- Dynamic subresource -->");
+                 ClassResourceInfo subcri, boolean isJson) {
+        if (!isJson) {
+            if (subcri != null) {
+                sb.append("<!-- Recursive subresource -->");
+            } else {
+                sb.append("<!-- Dynamic subresource -->");
+            }
         }
         startResourceTag(sb, subcri != null ? subcri.getServiceClass() : Object.class,
             ori.getURITemplate().getValue());
-        handlePathAndMatrixParams(sb, ori);
+        handlePathAndMatrixParams(sb, ori, isJson);
         sb.append("</resource>");
     }
 
-    private void handlePathAndMatrixClassParams(StringBuilder sb, Map<Parameter, Object> params) {
-        doHandleClassParams(sb, params, ParameterType.PATH);
-        doHandleClassParams(sb, params, ParameterType.MATRIX);
+    private void handlePathAndMatrixClassParams(StringBuilder sb, Map<Parameter, Object> params,
+            boolean isJson) {
+        doHandleClassParams(sb, params, isJson, ParameterType.PATH);
+        doHandleClassParams(sb, params, isJson, ParameterType.MATRIX);
     }
     
     private void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params,
-                                                  ParameterType... pType) {
+                                     boolean isJson, ParameterType... pType) {
         Set<ParameterType> pTypes = new HashSet<ParameterType>(Arrays.asList(pType));
         for (Map.Entry<Parameter, Object> entry : params.entrySet()) {
             Parameter pm = entry.getKey();
@@ -475,38 +500,40 @@ public class WadlGenerator implements RequestHandler {
                     ? ((Method)obj).getGenericParameterTypes()[0] : ((Field)obj).getGenericType();    
                 Annotation[] ann = obj instanceof Method 
                     ? ((Method)obj).getParameterAnnotations()[0] : ((Field)obj).getAnnotations();
-                doWriteParam(sb, pm, cls, type, pm.getName(), ann);        
+                doWriteParam(sb, pm, cls, type, pm.getName(), ann, isJson);        
             }
         }
     }
     
-    private void handlePathAndMatrixParams(StringBuilder sb, OperationResourceInfo ori) {
-        handleParams(sb, ori, ParameterType.PATH);
-        handleParams(sb, ori, ParameterType.MATRIX);
+    private void handlePathAndMatrixParams(StringBuilder sb, OperationResourceInfo ori, boolean isJson) {
+        handleParams(sb, ori, ParameterType.PATH, isJson);
+        handleParams(sb, ori, ParameterType.MATRIX, isJson);
     }
 
 
     private void handleParameter(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                  ElementQNameResolver qnameResolver,
-                                 Map<Class<?>, QName> clsMap, OperationResourceInfo ori, Parameter pm) {
+                                 Map<Class<?>, QName> clsMap, OperationResourceInfo ori, Parameter pm,
+                                 boolean isJson) {
         Class<?> cls = getMethod(ori).getParameterTypes()[pm.getIndex()];
         if (pm.getType() == ParameterType.REQUEST_BODY) {
-            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, cls, true);
+            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, cls, isJson, true);
             return;
         }
         if (pm.getType() == ParameterType.PATH || pm.getType() == ParameterType.MATRIX) {
             return;
         }
         if (pm.getType() == ParameterType.HEADER || pm.getType() == ParameterType.QUERY) {
-            writeParam(sb, pm, ori);
+            writeParam(sb, pm, ori, isJson);
         }
 
     }
 
-    private void handleParams(StringBuilder sb, OperationResourceInfo ori, ParameterType type) {
+    private void handleParams(StringBuilder sb, OperationResourceInfo ori, ParameterType type, 
+            boolean isJson) {
         for (Parameter pm : ori.getParameters()) {
             if (pm.getType() == type) {
-                writeParam(sb, pm, ori);
+                writeParam(sb, pm, ori, isJson);
             }
         }
     }
@@ -525,18 +552,20 @@ public class WadlGenerator implements RequestHandler {
         }
     }
 
-    private void writeParam(StringBuilder sb, Parameter pm, OperationResourceInfo ori) {
+    private void writeParam(StringBuilder sb, Parameter pm, OperationResourceInfo ori, boolean isJson) {
         Method method = getMethod(ori);
         Class<?> type = method.getParameterTypes()[pm.getIndex()];
         if (!"".equals(pm.getName())) {
             doWriteParam(sb, pm, type, method.getGenericParameterTypes()[pm.getIndex()],
-                         pm.getName(), method.getParameterAnnotations()[pm.getIndex()]);
+                         pm.getName(), method.getParameterAnnotations()[pm.getIndex()],
+                         isJson);
         } else {
-            doWriteBeanParam(sb, type, pm, null);
+            doWriteBeanParam(sb, type, pm, null, isJson);
         }
     }
 
-    private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName) {
+    private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName, 
+            boolean isJson) {
         Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType(), true);
         for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {
             String name = entry.getKey().getName();
@@ -546,15 +575,15 @@ public class WadlGenerator implements RequestHandler {
             Class<?> paramCls = entry.getValue();
             boolean isPrimitive = InjectionUtils.isPrimitive(paramCls);
             if (isPrimitive || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
-                doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[]{});
+                doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[]{}, isJson);
             } else {
-                doWriteBeanParam(sb, paramCls, entry.getKey(), name);
+                doWriteBeanParam(sb, paramCls, entry.getKey(), name, isJson);
             }
         }
     }
 
     protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, 
-                                Type genericType, String paramName, Annotation[] anns) {
+                                Type genericType, String paramName, Annotation[] anns, boolean isJson) {
         sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template"
                        : ParameterType.FORM == pm.getType() ? "query"
@@ -574,15 +603,18 @@ public class WadlGenerator implements RequestHandler {
             value = "xs:string";
         }
         if (value != null) {
+            if (isJson) {
+                value = value.substring(3);
+            }
             sb.append(" type=\"").append(value).append("\"");
         }
         if (type.isEnum()) {
             sb.append(">");
-            handleDocs(anns, sb, DocTarget.PARAM, true);
+            handleDocs(anns, sb, DocTarget.PARAM, true, isJson);
             setEnumOptions(sb, type);
             sb.append("</param>");
         } else {
-            addDocsAndCloseElement(sb, anns, "param", DocTarget.PARAM, true);
+            addDocsAndCloseElement(sb, anns, "param", DocTarget.PARAM, true, isJson);
         }
     }
 
@@ -602,10 +634,10 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private void addDocsAndCloseElement(StringBuilder sb, Annotation[] anns, String elementName,
-                                        String category, boolean allowDefault) {
+                                        String category, boolean allowDefault, boolean isJson) {
         if (isDocAvailable(anns)) {
             sb.append(">");
-            handleDocs(anns, sb, category, allowDefault);
+            handleDocs(anns, sb, category, allowDefault, isJson);
             sb.append("</" + elementName + ">");
         } else {
             sb.append("/>");
@@ -616,11 +648,13 @@ public class WadlGenerator implements RequestHandler {
         return AnnotationUtils.getAnnotation(anns, Description.class) != null
                    || AnnotationUtils.getAnnotation(anns, Descriptions.class) != null;
     }
-    
+    //TODO: Collapse multiple parameters into a holder
+    //CHECKSTYLE:OFF
     private void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                       ElementQNameResolver qnameResolver,
                                       Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
-                                      Class<?> type, boolean inbound) {
+                                      Class<?> type, boolean isJson, boolean inbound) {
+    //CHECKSTYLE:ON
         List<MediaType> types = inbound ? ori.getConsumeTypes() : ori.getProduceTypes();
         if (MultivaluedMap.class.isAssignableFrom(type)) {
             types = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
@@ -634,7 +668,12 @@ public class WadlGenerator implements RequestHandler {
             
             sb.append("<representation");
             sb.append(" mediaType=\"").append(mt.toString()).append("\"");
-
+            if (isJson && !mt.equals(MediaType.APPLICATION_JSON_TYPE)) {
+                sb.append("/>");
+                continue;
+            }
+            
+            
             boolean allowDefault = true;
             String docCategory;
             Annotation[] anns;
@@ -651,15 +690,18 @@ public class WadlGenerator implements RequestHandler {
                 sb.append(">");    
                 Parameter p = inbound ? getRequestBodyParam(ori) 
                     : new Parameter(ParameterType.REQUEST_BODY, 0, "result"); 
-                doWriteParam(sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns);
+                doWriteParam(sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns, isJson);
                 sb.append("</representation>");
             } else  { 
                 type = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
-                if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
+                if (isJson) {
+                    sb.append(" element=\"").append(type.getSimpleName()).append("\"");
+                } else if (qnameResolver != null && mt.getSubtype().contains("xml") 
+                        && jaxbTypes.contains(type)) {
                     generateQName(sb, qnameResolver, clsMap, type,
                                   getBodyAnnotations(ori, inbound));
                 }
-                addDocsAndCloseElement(sb, anns, "representation", docCategory, allowDefault);
+                addDocsAndCloseElement(sb, anns, "representation", docCategory, allowDefault, isJson);
             }
         }
         
@@ -681,21 +723,27 @@ public class WadlGenerator implements RequestHandler {
     private void handleFormRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                       ElementQNameResolver qnameResolver,
                                       Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
-                                      Class<?> type) {
+                                      Class<?> type,
+                                      boolean isJson) {
         if (type != null) {
-            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, type, true);
+            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, type, false, true);
         } else {
             List<MediaType> types = ori.getConsumeTypes();
             MediaType formType = isWildcard(types) ? MediaType.APPLICATION_FORM_URLENCODED_TYPE 
                 : types.get(0); 
             sb.append("<representation");
-            sb.append(" mediaType=\"").append(formType).append("\">");
-            for (Parameter pm : ori.getParameters()) {
-                if (pm.getType() == ParameterType.FORM) {
-                    writeParam(sb, pm, ori);
+            sb.append(" mediaType=\"").append(formType).append("\"");
+            if (isJson) {
+                sb.append("/>");
+            } else {
+                sb.append(">");
+                for (Parameter pm : ori.getParameters()) {
+                    if (pm.getType() == ParameterType.FORM) {
+                        writeParam(sb, pm, ori, false);
+                    }
                 }
+                sb.append("</representation>");
             }
-            sb.append("</representation>");
         }
     }
 
@@ -758,7 +806,7 @@ public class WadlGenerator implements RequestHandler {
                         
                     }
                 } catch (Exception ex) {
-                    throw new WebApplicationException(ex, 400);
+                    throw new WebApplicationException(ex, 500);
                 }
             }
         }
@@ -1028,11 +1076,12 @@ public class WadlGenerator implements RequestHandler {
         }
     }
     
-    private void handleDocs(Annotation[] anns, StringBuilder sb, String category, boolean allowDefault) {
+    private void handleDocs(Annotation[] anns, StringBuilder sb, String category, boolean allowDefault,
+            boolean isJson) {
         for (Annotation a : anns) {
             if (a.annotationType() == Descriptions.class) {
                 Descriptions ds = (Descriptions)a;
-                handleDocs(ds.value(), sb, category, allowDefault);
+                handleDocs(ds.value(), sb, category, allowDefault, isJson);
                 return;
             }
             if (a.annotationType() == Description.class) {
@@ -1043,7 +1092,7 @@ public class WadlGenerator implements RequestHandler {
                 }
                 
                 sb.append("<doc");
-                if (d.lang().length() > 0) {
+                if (!isJson && d.lang().length() > 0) {
                     sb.append(" xml:lang=\"" + d.lang() + "\"");
                 }
                 if (d.title().length() > 0) {
