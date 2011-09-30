@@ -105,6 +105,7 @@ public class SourceGenerator {
     
     private static final Map<String, Class<?>> HTTP_METHOD_ANNOTATIONS;
     private static final Map<String, Class<?>> PARAM_ANNOTATIONS;
+    private static final Set<String> RESOURCE_LEVEL_PARAMS;
     
     static {
         HTTP_METHOD_ANNOTATIONS = new HashMap<String, Class<?>>();
@@ -120,6 +121,10 @@ public class SourceGenerator {
         PARAM_ANNOTATIONS.put("header", HeaderParam.class);
         PARAM_ANNOTATIONS.put("query", QueryParam.class);
         PARAM_ANNOTATIONS.put("matrix", MatrixParam.class);
+        
+        RESOURCE_LEVEL_PARAMS = new HashSet<String>();
+        RESOURCE_LEVEL_PARAMS.add("template");
+        RESOURCE_LEVEL_PARAMS.add("matrix");
     }
 
     private Comparator<String> importsComparator;
@@ -255,7 +260,7 @@ public class SourceGenerator {
                 GrammarInfo gInfoBase = generateSchemaCodeAndInfo(refApp, typeClassNames, srcDir);
                 if (gInfoBase != null) {
                     gInfo.getElementTypeMap().putAll(gInfoBase.getElementTypeMap());
-                    gInfo.getNsMap().putAll(gInfo.getNsMap());
+                    gInfo.getNsMap().putAll(gInfoBase.getNsMap());
                 }
                 return getResourceElement(refApp, resElement, gInfo, typeClassNames, 
                                           "#" + wadlRef.getFragment(), srcDir);
@@ -513,8 +518,8 @@ public class SourceGenerator {
                                      ContextInfo info,
                                      boolean isRoot,
                                      String currentPath) {
-        Element resourceEl = "resource".equals(methodEl.getLocalName()) 
-            ? methodEl : (Element)methodEl.getParentNode();
+        boolean isResourceElement = "resource".equals(methodEl.getLocalName());
+        Element resourceEl = isResourceElement ? methodEl : (Element)methodEl.getParentNode();
         
         String methodName = methodEl.getAttribute("name");
         String methodNameLowerCase = methodName.toLowerCase();
@@ -577,9 +582,10 @@ public class SourceGenerator {
         }
         
         sbCode.append("(");
-        List<Element> inParamElements = new LinkedList<Element>();
-        inParamElements.addAll(DOMUtils.getChildrenWithName(resourceEl, 
-                                                            WadlGenerator.WADL_NS, "param"));
+        
+        List<Element> inParamElements = getParameters(resourceEl, 
+                    !isRoot && !isResourceElement && resourceEl.getAttribute("id").length() > 0);
+        
         writeRequestTypes(firstRequestEl, inParamElements, sbCode, imports, info);
         sbCode.append(")");
         if (info.isInterfaceGenerated()) {
@@ -590,6 +596,20 @@ public class SourceGenerator {
         sbCode.append(getLineSep()).append(getLineSep());
     }
 
+    private List<Element> getParameters(Element resourceEl, boolean isSubresourceMethod) {
+        List<Element> inParamElements = new LinkedList<Element>();
+        List<Element> allParamElements = DOMUtils.getChildrenWithName(resourceEl, 
+                                              WadlGenerator.WADL_NS, "param");
+        for (Element el : allParamElements) {
+            if (isSubresourceMethod && RESOURCE_LEVEL_PARAMS.contains(el.getAttribute("style"))) {
+                continue;
+            }
+            inParamElements.add(el);
+        }
+        return inParamElements;
+    }
+
+    
     private String possiblyConvertNamespaceURI(String nsURI, boolean expandedQName) {
         return expandedQName ? getPackageFromNamespace(nsURI) : nsURI;
     }
@@ -687,19 +707,16 @@ public class SourceGenerator {
             formParamsAvailable = currentSize < inParamEls.size(); 
         }
                   
-        if (form && !formParamsAvailable) {
-            addImport(imports, MultivaluedMap.class.getName());
-            sbCode.append("MultivaluedMap map");
-        } 
         for (int i = 0; i < inParamEls.size(); i++) {
     
             Element paramEl = inParamEls.get(i);
-
+            Class<?> paramAnn = PARAM_ANNOTATIONS.get(paramEl.getAttribute("style"));
+            if (paramAnn == QueryParam.class && form) {
+                paramAnn = FormParam.class; 
+            } 
             String name = paramEl.getAttribute("name");
             if (writeAnnotations(info.isInterfaceGenerated())) {
-                Class<?> paramAnnotation = form ? FormParam.class 
-                    : PARAM_ANNOTATIONS.get(paramEl.getAttribute("style"));
-                writeAnnotation(sbCode, imports, paramAnnotation, name, false, false);
+                writeAnnotation(sbCode, imports, paramAnn, name, false, false);
                 sbCode.append(" ");
             }
             String type = getPrimitiveType(paramEl);
@@ -715,24 +732,30 @@ public class SourceGenerator {
                 }
             }
         }
+        String elementParamType = null;
+        String elementParamName = null;
         if (!form) {
-            String elementName = null;
-            
             List<Element> repElements = requestEl != null 
                 ? DOMUtils.getChildrenWithName(requestEl, WadlGenerator.WADL_NS, "representation")
                 : CastUtils.cast(Collections.emptyList(), Element.class);
             if (repElements.size() > 0) {    
-                elementName = getElementRefName(repElements, info.getTypeClassNames(), 
+                elementParamType = getElementRefName(repElements, info.getTypeClassNames(), 
                         info.getGrammarInfo(), imports);
-            }
-            if (elementName != null) {
-                if (inParamEls.size() > 0) {
-                    sbCode.append(", ");
+                if (elementParamType != null) {
+                    elementParamName = elementParamType.toLowerCase();
                 }
-                sbCode.append(elementName).append(" ").append(elementName.toLowerCase());
             }
+        } else if (!formParamsAvailable) {
+            addImport(imports, MultivaluedMap.class.getName());
+            elementParamType = MultivaluedMap.class.getSimpleName();
+            elementParamName = "map";
         }
-        
+        if (elementParamType != null) {
+            if (inParamEls.size() > 0) {
+                sbCode.append(", ");
+            }
+            sbCode.append(elementParamType).append(" ").append(elementParamName);
+        }
     }
     
     private String getPrimitiveType(Element paramEl) {
