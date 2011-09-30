@@ -120,6 +120,7 @@ public class SAMLTokenProvider implements TokenProvider {
             if (tokenParameters.getTokenStore() != null) {
                 SecurityToken securityToken = new SecurityToken(assertion.getId());
                 securityToken.setToken(token);
+                securityToken.setPrincipal(tokenParameters.getPrincipal());
                 int hash = 0;
                 byte[] signatureValue = assertion.getSignatureValue();
                 if (signatureValue != null && signatureValue.length > 0) {

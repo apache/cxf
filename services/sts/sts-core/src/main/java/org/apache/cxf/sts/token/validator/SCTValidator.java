@@ -110,6 +110,7 @@ public class SCTValidator implements TokenValidator {
                 Map<String, Object> properties = new HashMap<String, Object>();
                 properties.put(SCT_VALIDATOR_SECRET, secret);
                 response.setAdditionalProperties(properties);
+                response.setPrincipal(token.getPrincipal());
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
             }

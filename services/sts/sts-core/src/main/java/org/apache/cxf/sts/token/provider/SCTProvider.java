@@ -130,6 +130,7 @@ public class SCTProvider implements TokenProvider {
             // putting the secret key into the cache
             SecurityToken token = new SecurityToken(sct.getIdentifier());
             token.setSecret(keyHandler.getSecret());
+            token.setPrincipal(tokenParameters.getPrincipal());
             if (lifetime > 0) {
                 Integer lifetimeInteger = new Integer(Long.valueOf(lifetime).intValue());
                 tokenParameters.getTokenStore().add(token, lifetimeInteger);
