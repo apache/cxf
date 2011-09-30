@@ -97,9 +97,9 @@
        <param name="hid" style="header" type="xs:int">
         <doc>header param</doc>
        </param>
-       <param name="provider.bar" style="query" type="xs:int"/>
+       <param name="provider.bar" style="query" required="true" type="xs:int"/>
        <param name="a" style="query" repeating="true" type="xs:string"/>
-
+       <param name="b" style="query" repeating="true" type="xs:long"/> 
        <representation mediaType="application/xml" element="prefix1:theBook2">
         <doc>InputBook</doc>
        </representation>
