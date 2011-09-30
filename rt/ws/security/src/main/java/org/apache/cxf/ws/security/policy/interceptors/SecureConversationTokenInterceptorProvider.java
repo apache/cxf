@@ -35,6 +35,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
@@ -104,14 +105,18 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
     }
     
     static final TokenStore getTokenStore(Message message) {
-        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-        if (tokenStore == null) {
-            tokenStore = new MemoryTokenStore();
-            message.getExchange().get(Endpoint.class).getEndpointInfo()
-                .setProperty(TokenStore.class.getName(), tokenStore);
-            message.getExchange().put(TokenStore.class.getName(), tokenStore);
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            if (tokenStore == null) {
+                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+            }
+            if (tokenStore == null) {
+                tokenStore = new MemoryTokenStore();
+                info.setProperty(TokenStore.class.getName(), tokenStore);
+            }
+            return tokenStore;
         }
-        return tokenStore;
     }
     
     static Assertion getAddressingPolicy(AssertionInfoMap aim, boolean optional) {

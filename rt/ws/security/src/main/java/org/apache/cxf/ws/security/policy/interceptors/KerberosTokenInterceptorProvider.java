@@ -30,6 +30,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -73,13 +74,18 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
     
     
     static final TokenStore getTokenStore(Message message) {
-        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-        if (tokenStore == null) {
-            tokenStore = new MemoryTokenStore();
-            message.getExchange().get(Endpoint.class).getEndpointInfo()
-                .setProperty(TokenStore.class.getName(), tokenStore);
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            if (tokenStore == null) {
+                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+            }
+            if (tokenStore == null) {
+                tokenStore = new MemoryTokenStore();
+                info.setProperty(TokenStore.class.getName(), tokenStore);
+            }
+            return tokenStore;
         }
-        return tokenStore;
     }
 
     static class KerberosTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {

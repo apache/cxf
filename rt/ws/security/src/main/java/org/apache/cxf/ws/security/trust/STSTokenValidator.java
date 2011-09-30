@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -120,13 +121,18 @@ public class STSTokenValidator implements Validator {
     }
     
     static final TokenStore getTokenStore(Message message) {
-        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-        if (tokenStore == null) {
-            tokenStore = new MemoryTokenStore();
-            message.getExchange().get(Endpoint.class).getEndpointInfo()
-                .setProperty(TokenStore.class.getName(), tokenStore);
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            if (tokenStore == null) {
+                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+            }
+            if (tokenStore == null) {
+                tokenStore = new MemoryTokenStore();
+                info.setProperty(TokenStore.class.getName(), tokenStore);
+            }
+            return tokenStore;
         }
-        return tokenStore;
     }
     
     protected boolean isValidatedLocally(Credential credential, RequestData data) 

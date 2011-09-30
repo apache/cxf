@@ -353,8 +353,7 @@ public abstract class AbstractBindingBuilder {
     protected final TokenStore getTokenStore() {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = 
-                (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
             if (tokenStore == null) {
                 tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
             }
