@@ -123,7 +123,7 @@ public class WadlGenerator implements RequestHandler {
     private boolean ignoreForwardSlash;
     private boolean addResourceAndMethodIds;
     private boolean ignoreRequests;
-    
+    private boolean linkJsonToXmlSchema;
     private boolean useJaxbContextForQnames = true;
 
     private List<String> externalSchemasCache;
@@ -668,7 +668,7 @@ public class WadlGenerator implements RequestHandler {
             
             sb.append("<representation");
             sb.append(" mediaType=\"").append(mt.toString()).append("\"");
-            if (isJson && !mt.equals(MediaType.APPLICATION_JSON_TYPE)) {
+            if (isJson && !mt.getSubtype().contains("json")) {
                 sb.append("/>");
                 continue;
             }
@@ -696,7 +696,9 @@ public class WadlGenerator implements RequestHandler {
                 type = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
                 if (isJson) {
                     sb.append(" element=\"").append(type.getSimpleName()).append("\"");
-                } else if (qnameResolver != null && mt.getSubtype().contains("xml") 
+                } else if (qnameResolver != null 
+                        && (mt.getSubtype().contains("xml")
+                                || linkJsonToXmlSchema && mt.getSubtype().contains("json"))
                         && jaxbTypes.contains(type)) {
                     generateQName(sb, qnameResolver, clsMap, type,
                                   getBodyAnnotations(ori, inbound));
@@ -1137,6 +1139,9 @@ public class WadlGenerator implements RequestHandler {
         this.useSingleSlashResource = useSingleSlashResource;
     }
 
+    public void setLinkJsonToXmlSchema(boolean link) {
+        linkJsonToXmlSchema = link;
+    }
     public void setSchemaLocations(List<String> locations) {
 
         externalQnamesMap = new HashMap<String, List<String>>();
