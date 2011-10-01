@@ -226,7 +226,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                         if (feature instanceof RespectBindingFeature && feature.isEnabled()) {
                             
                             org.apache.cxf.common.i18n.Message message = 
-                                new org.apache.cxf.common.i18n.Message("UNKONW_REQUIRED_WSDL_BINDING", LOG);
+                                new org.apache.cxf.common.i18n.Message("UNKONWN_REQUIRED_WSDL_BINDING", LOG);
                             LOG.severe(message.toString());
                             throw new WebServiceException(message.toString());
                         }
