@@ -283,8 +283,8 @@ public class JettyHTTPServerEngine
         return maxIdleTime;
     }
     
-    public void setMaxIdleTime(int maxIdel) {
-        maxIdleTime = maxIdel;
+    public void setMaxIdleTime(int maxIdle) {
+        maxIdleTime = maxIdle;
     }
     
     /**
