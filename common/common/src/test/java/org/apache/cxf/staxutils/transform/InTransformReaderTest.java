@@ -55,6 +55,41 @@ public class InTransformReaderTest extends Assert {
     }
     
     @Test
+    public void testReplaceSimpleElement() throws Exception {
+        InputStream is = new ByteArrayInputStream(
+                "<ns:test xmlns:ns=\"http://bar\"><ns:a>1</ns:a></ns:test>".getBytes());
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        reader = new InTransformReader(reader, 
+                                        null,
+                                        Collections.singletonMap("{http://bar}a", "{http://bar}a:1 2 3"),
+                                        null, 
+                                        null, false);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        StaxUtils.copy(reader, bos);
+        String value = bos.toString();
+        assertEquals("<ns:test xmlns:ns=\"http://bar\"><ns:a>1 2 3</ns:a></ns:test>", value);        
+    }
+    
+    @Test
+    public void testTransformAndReplaceSimpleElement() throws Exception {
+        InputStream is = new ByteArrayInputStream(
+                "<ns:test xmlns:ns=\"http://bar\"><ns:a>1</ns:a></ns:test>".getBytes());
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        reader = new InTransformReader(reader, 
+                                       Collections.singletonMap("{http://bar}*", "{http://foo}*"),
+                                       Collections.singletonMap("{http://bar}a", "{http://bar}a:1 2 3"),
+                                       null, 
+                                       null, false);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        StaxUtils.copy(reader, bos);
+        String value = bos.toString();
+        assertEquals(
+                "<ps1:test xmlns:ps1=\"http://foo\"><ps1:a>1 2 3</ps1:a></ps1:test>", value);        
+    }
+    
+    @Test
     public void testReadWithParentDefaultNamespace() throws Exception {
         InputStream is = new ByteArrayInputStream(
             "<test xmlns=\"http://bar\"><ns:subtest xmlns:ns=\"http://bar1\"/></test>".getBytes());
@@ -211,7 +246,7 @@ public class InTransformReaderTest extends Assert {
     
     
     @Test
-    public void testReadWithRepaceAppend() throws Exception {
+    public void testReadWithReplaceAppend() throws Exception {
         Map<String, String> transformElements = new HashMap<String, String>();
         transformElements.put("requestValue",
                               "{http://cxf.apache.org/hello_world_soap_http/types}requestType");

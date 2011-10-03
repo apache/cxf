@@ -49,6 +49,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     private QName currentQName;
     private QName pushBackQName;
     private QName pushAheadQName;
+    private String replaceText;
     private String currentText;
     private String pushAheadText;
     private List<Integer> attributesIndexes = new ArrayList<Integer>(); 
@@ -110,8 +111,11 @@ public class InTransformReader extends DepthXMLStreamReader {
                 attributesIndexed = false;
                 final QName theName = super.getName();
                 final ElementProperty appendProp = inAppendMap.remove(theName);
+                final boolean replaced = appendProp != null && theName.equals(appendProp.getName());
+                
                 final boolean dropped = inDropSet.contains(theName);
-                if (appendProp != null) {
+                if (appendProp != null && !replaced) {
+                    
                     if (appendProp.isChild()) {
                         // append-post-*
                         pushAheadQName = appendProp.getName();
@@ -149,12 +153,16 @@ public class InTransformReader extends DepthXMLStreamReader {
                 if (appendProp != null && appendProp.isChild()) {
                     // append-post-*
                     currentQName = expected;
-                } else if (appendProp != null && !appendProp.isChild()) {
+                } else if (appendProp != null && !appendProp.isChild()
+                           && !replaced) {
                     // append-pre-*
                     pushBackQName = expected;
                 } else {
                     // no append
                     currentQName = expected;
+                    if (replaced) {
+                        replaceText = appendProp.getText();
+                    }
                     pushElement();
                 }
             } else if (event == XMLStreamConstants.END_ELEMENT) {
@@ -363,14 +371,24 @@ public class InTransformReader extends DepthXMLStreamReader {
         if (currentText != null) {
             return currentText;
         }
-        return super.getText();
+        String superText = super.getText();
+        if (replaceText != null) {
+            superText = replaceText;
+            replaceText = null;
+        }
+        return superText;
     }
 
     public char[] getTextCharacters() {
         if (currentText != null) {
             return currentText.toCharArray();
         }
-        return super.getTextCharacters();
+        char[] superChars = super.getTextCharacters();
+        if (replaceText != null) {
+            superChars = replaceText.toCharArray();
+            replaceText = null;
+        }
+        return superChars;
     }
 
     public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) 
