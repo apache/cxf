@@ -283,7 +283,7 @@ public class DoMerges {
 
         List<String> blocks = new ArrayList<String>();
         List<String> records = new ArrayList<String>();
-        List<String> jiras = new ArrayList<String>();
+        Set<String> jiras = new TreeSet<String>();
         Pattern jiraPattern = Pattern.compile("([A-Z]{2,10}+-\\d+)");
 
         for (int cur = 0; cur < verList.size(); cur++) {
