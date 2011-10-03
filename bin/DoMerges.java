@@ -16,9 +16,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /* dkulp - Stupid little program I use to help merge changes from 
@@ -58,6 +59,9 @@ import java.util.*;
    problem) before it's complete.  That way subsequent runs of DoMerges 
    won't go through the blocked/recorded items again.  (Flushes occur
    automatically when DoMerges is finished running.)
+
+   [C]hanges will display the changes in the commit to help you decide the 
+   appropriate action to take.
 
 */
 
@@ -130,127 +134,35 @@ public class DoMerges {
             System.exit(1);
         }
     }   
+    public static void changes(String ver, String root) throws Exception {
+        Process p;
+        BufferedReader reader;
+        String line;
 
-    public static void main (String args[]) throws Exception {
-        if (args.length > 0 && "-auto".equals(args[0])) { 
-            auto = true;
-        }
-
-        System.out.println("Updating directory");
-
-        Process p = Runtime.getRuntime().exec(new String[] {"svn", "up", "-r", "head", "."});
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line = reader.readLine();
+        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "diff", "-c", ver, root}));
+        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        line = reader.readLine();
         while (line != null) {
             System.out.println(line);
             line = reader.readLine();
         }
-        p.waitFor();
-
-
-        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svnmerge.py", "avail"}));
-
-        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        line = reader.readLine();
-        List<String> verList = new ArrayList<String>();
-        while (line != null) {
-            String vers[] = line.split(",");
-            for (String s : vers) {
-                if (s.indexOf("-") != -1) {
-                    String s1 = s.substring(0, s.indexOf("-"));
-                    String s2 = s.substring(s.indexOf("-") + 1);
-                    int i1 = Integer.parseInt(s1);
-                    int i2 = Integer.parseInt(s2);
-                    for (int x = i1; x <= i2; x++) {
-                        verList.add(Integer.toString(x));
-                    }                
-                } else {
-                    verList.add(s);
-                } 
-            }
-            line = reader.readLine();
-        }
-        p.waitFor();
-        System.out.println("Merging versions (" + verList.size() + "): " + verList);
-
-
-
-
-        String root = null;
-
-        p = Runtime.getRuntime().exec(new String[] {"svn", "info"});
-        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        line = reader.readLine();
-        while (line != null) {
-            if (line.startsWith("Repository Root: ")) {
-                root = line.substring("Repository Root: ".length()).trim();
-            }
-            line = reader.readLine();
-        }
-        System.out.println("Root: " + root);
-        p.waitFor();
-
-        List<String> blocks = new ArrayList<String>();
-        List<String> records = new ArrayList<String>();
-
-        int count = 1;
-        for (String ver : verList) {
-            System.out.println("Merging: " + ver + " (" + (count++) + "/" + verList.size() + ")");
-            p = Runtime.getRuntime().exec(new String[] {"svn", "log", "-r" , ver, root});
-            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        if (p.waitFor() != 0) {
+            System.out.println("ERROR!");
+            reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             line = reader.readLine();
             while (line != null) {
                 System.out.println(line);
                 line = reader.readLine();
             }
-            p.waitFor();
-
-            while (System.in.available() > 0) {
-                System.in.read();
-            }
-            char c = auto ? 'M' : 0;
-            while (c != 'M'
-                   && c != 'B'
-                   && c != 'I'
-                   && c != 'R') {
-                System.out.print("[M]erge, [B]lock, or [I]gnore, [R]ecord only? ");
-                int i = System.in.read();
-                c = Character.toUpperCase((char)i);
-            }
-
-            switch (c) {
-            case 'M':
-                p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svnmerge.py", "merge", "-r", ver}));
-                reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                line = reader.readLine();
-                while (line != null) {
-                    System.out.println(line);
-                    line = reader.readLine();
-                }
-                if (p.waitFor() != 0) {
-                    System.out.println("ERROR!");
-                    reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                    line = reader.readLine();
-                    while (line != null) {
-                        System.out.println(line);
-                        line = reader.readLine();
-                    }
-                    System.exit(1);
-                }
-                removeSvnMergeInfo();
-                doCommit();
-                break;
-            case 'B':
-                blocks.add(ver);
-                break;
-            case 'R':
-                records.add(ver);
-                break;
-            case 'I':
-                System.out.println("Ignoring");
-                break;
-            }
+            System.exit(1);
         }
+    }
+
+    public static void flush(List<String> blocks, List<String> records) throws Exception {
+        Process p;
+        BufferedReader reader;
+        String line;
+
         if (!records.isEmpty()) {
             StringBuilder ver = new StringBuilder();
             for (String s : records) {
@@ -308,6 +220,156 @@ public class DoMerges {
             }
             doCommit();
         }
+        blocks.clear();
+        records.clear();
+    }
+
+    public static void main (String args[]) throws Exception {
+        if (args.length > 0 && "-auto".equals(args[0])) { 
+            auto = true;
+        }
+
+        System.out.println("Updating directory");
+
+        Process p = Runtime.getRuntime().exec(new String[] {"svn", "up", "-r", "head", "."});
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = reader.readLine();
+        while (line != null) {
+            System.out.println(line);
+            line = reader.readLine();
+        }
+        p.waitFor();
+
+
+        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svnmerge.py", "avail"}));
+
+        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        line = reader.readLine();
+        List<String> verList = new ArrayList<String>();
+        while (line != null) {
+            String vers[] = line.split(",");
+            for (String s : vers) {
+                if (s.indexOf("-") != -1) {
+                    String s1 = s.substring(0, s.indexOf("-"));
+                    String s2 = s.substring(s.indexOf("-") + 1);
+                    int i1 = Integer.parseInt(s1);
+                    int i2 = Integer.parseInt(s2);
+                    for (int x = i1; x <= i2; x++) {
+                        verList.add(Integer.toString(x));
+                    }                
+                } else {
+                    verList.add(s);
+                } 
+            }
+            line = reader.readLine();
+        }
+        p.waitFor();
+        System.out.println("Merging versions (" + verList.size() + "): " + verList);
+
+
+        String root = null;
+
+        p = Runtime.getRuntime().exec(new String[] {"svn", "info"});
+        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        line = reader.readLine();
+        while (line != null) {
+            if (line.startsWith("Repository Root: ")) {
+                root = line.substring("Repository Root: ".length()).trim();
+            }
+            line = reader.readLine();
+        }
+        System.out.println("Root: " + root);
+        p.waitFor();
+
+        List<String> blocks = new ArrayList<String>();
+        List<String> records = new ArrayList<String>();
+        Set<String> jiras = new TreeSet<String>();
+        Pattern jiraPattern = Pattern.compile("([A-Z]{2,10}+-\\d+)");
+
+        for (int cur = 0; cur < verList.size(); cur++) {
+            jiras.clear();
+            String ver = verList.get(cur);
+            System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
+            System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
+
+            p = Runtime.getRuntime().exec(new String[] {"svn", "log", "-r" , ver, root});
+            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            line = reader.readLine();
+            StringWriter swriter = new StringWriter();
+            BufferedWriter writer = new BufferedWriter(swriter);
+            while (line != null) {
+                writer.write(line);
+                writer.newLine();
+                Matcher m = jiraPattern.matcher(line);
+                while (m.find()) {
+                    jiras.add(m.group());
+                }
+                line = reader.readLine();
+            }
+            p.waitFor();
+            writer.flush();
+            for (String s : jiras) {
+                System.out.println("https://issues.apache.org/jira/browse/" + s);
+            }
+            System.out.println(swriter.toString());
+
+            while (System.in.available() > 0) {
+                System.in.read();
+            }
+            char c = auto ? 'M' : 0;
+            while (c != 'M'
+                   && c != 'B'
+                   && c != 'I'
+                   && c != 'R'
+                   && c != 'F'
+                   && c != 'C') {
+                System.out.print("[M]erge, [B]lock, or [I]gnore, [R]ecord only, [F]lush, [C]hanges? ");
+                int i = System.in.read();
+                c = Character.toUpperCase((char)i);
+            }
+
+            switch (c) {
+            case 'M':
+                p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svnmerge.py", "merge", "-r", ver}));
+                reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                line = reader.readLine();
+                while (line != null) {
+                    System.out.println(line);
+                    line = reader.readLine();
+                }
+                if (p.waitFor() != 0) {
+                    System.out.println("ERROR!");
+                    reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                    line = reader.readLine();
+                    while (line != null) {
+                        System.out.println(line);
+                        line = reader.readLine();
+                    }
+                    System.exit(1);
+                }
+                removeSvnMergeInfo();
+                doCommit();
+                break;
+            case 'B':
+                blocks.add(ver);
+                break;
+            case 'R':
+                records.add(ver);
+                break;
+            case 'F':
+                flush(blocks, records);
+                cur--;
+                break;
+            case 'C':
+                changes(ver, root);
+                cur--;
+                break;
+            case 'I':
+                System.out.println("Ignoring");
+                break;
+            }
+        }
+        flush(blocks, records);
     }
 
     private static String[] getCommandLine(String[] args) {
