@@ -201,7 +201,8 @@ public final class JSONUtils {
         
         public void writeAttribute(String prefix, String uri,
                                    String local, String value) throws XMLStreamException {
-            if (!writeXsiType && "type".equals(local) && "xsi".equals(prefix)) {
+            if (!writeXsiType && "xsi".equals(prefix)
+                    && ("type".equals(local) || "nil".equals(local))) {
                 return;
             }
             super.writeAttribute(prefix, uri, local, value);
