@@ -29,7 +29,7 @@
     <artifactId>cxf-jaxws-javafirst</artifactId>
     <name>Apache CXF Archetype - Simple JAX-WS Java First</name>
     <version>2.4.3-SNAPSHOT</version>
-    <description>Apache CXF Archetype - Simple JAX-WS Java First</description>
+    <description>Creates a project for developing a Web service starting from Java code</description>
     <url>http://cxf.apache.org</url>
     <properties>
         <maven.test.skip>true</maven.test.skip>
