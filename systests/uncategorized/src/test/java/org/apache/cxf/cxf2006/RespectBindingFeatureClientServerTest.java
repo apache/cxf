@@ -47,8 +47,8 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             fail("WebServiceException is expected");
         } catch (Exception ex) {
             assertTrue("WebServiceException is expected", ex instanceof javax.xml.ws.WebServiceException);
-            assertTrue("RespectBindingFeature message is expceted",
-                       ex.getMessage().indexOf("extensions that have the required=true attribute") > -1);
+            assertTrue("RespectBindingFeature message is expceted: " + ex.getMessage(),
+                       ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }
     }
 
