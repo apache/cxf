@@ -127,7 +127,7 @@ public final class TransformUtils {
                 
                 // if the content delimiter is present in the value, extract the content
                 int d = value.indexOf('}');
-                d = value.indexOf(':', d < 0 ? 0 : d);
+                d = value.indexOf('=', d < 0 ? 0 : d);
                 if (d > 0) {
                     text = value.substring(d + 1);
                     value = value.substring(0, d);
