@@ -61,7 +61,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
         reader = new InTransformReader(reader, 
                                         null,
-                                        Collections.singletonMap("{http://bar}a", "{http://bar}a:1 2 3"),
+                                        Collections.singletonMap("{http://bar}a", "{http://bar}a=1 2 3"),
                                         null, 
                                         null, false);
         
@@ -78,7 +78,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
         reader = new InTransformReader(reader, 
                                        Collections.singletonMap("{http://bar}*", "{http://foo}*"),
-                                       Collections.singletonMap("{http://bar}a", "{http://bar}a:1 2 3"),
+                                       Collections.singletonMap("{http://bar}a", "{http://bar}a=1 2 3"),
                                        null, 
                                        null, false);
         
@@ -307,7 +307,7 @@ public class InTransformReaderTest extends Assert {
     public void testReadWithAppendPreInclude1() throws Exception {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
-                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         transformStreamAndCompare("../resources/amazonIn1.xml", "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
@@ -317,7 +317,7 @@ public class InTransformReaderTest extends Assert {
     public void testReadWithAppendPreInclude2() throws Exception {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
-                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         transformStreamAndCompare("../resources/amazonIn1nospace.xml", "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
@@ -351,7 +351,7 @@ public class InTransformReaderTest extends Assert {
     public void testReadWithAppendPostInclude1() throws Exception {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
-                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         transformStreamAndCompare("../resources/amazonIn1.xml", "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
@@ -361,7 +361,7 @@ public class InTransformReaderTest extends Assert {
     public void testReadWithAppendPostInclude2() throws Exception {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
-                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType:ASIN");
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         transformStreamAndCompare("../resources/amazonIn1nospace.xml", "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         

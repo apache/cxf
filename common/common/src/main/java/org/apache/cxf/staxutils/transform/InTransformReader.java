@@ -111,10 +111,10 @@ public class InTransformReader extends DepthXMLStreamReader {
                 attributesIndexed = false;
                 final QName theName = super.getName();
                 final ElementProperty appendProp = inAppendMap.remove(theName);
-                final boolean replaced = appendProp != null && theName.equals(appendProp.getName());
+                final boolean replaceContent = appendProp != null && theName.equals(appendProp.getName());
                 
                 final boolean dropped = inDropSet.contains(theName);
-                if (appendProp != null && !replaced) {
+                if (appendProp != null && !replaceContent) {
                     
                     if (appendProp.isChild()) {
                         // append-post-*
@@ -150,17 +150,16 @@ public class InTransformReader extends DepthXMLStreamReader {
                     return XMLStreamConstants.END_ELEMENT;
                 }
                 
-                if (appendProp != null && appendProp.isChild()) {
+                if (appendProp != null && appendProp.isChild() && !replaceContent) {
                     // append-post-*
                     currentQName = expected;
-                } else if (appendProp != null && !appendProp.isChild()
-                           && !replaced) {
+                } else if (appendProp != null && !appendProp.isChild() && !replaceContent) {
                     // append-pre-*
                     pushBackQName = expected;
                 } else {
                     // no append
                     currentQName = expected;
-                    if (replaced) {
+                    if (replaceContent) {
                         replaceText = appendProp.getText();
                     }
                     pushElement();
