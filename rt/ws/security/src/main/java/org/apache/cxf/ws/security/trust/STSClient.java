@@ -616,7 +616,12 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (enableAppliesTo) {
             addAppliesTo(writer, appliesTo);
         }
-        addOnBehalfOf(writer);
+        Element onBehalfOfToken = getOnBehalfOfToken();
+        if (onBehalfOfToken != null) {
+            writer.writeStartElement("wst", "OnBehalfOf", namespace);
+            StaxUtils.copy(onBehalfOfToken, writer);
+            writer.writeEndElement();
+        }
         if (sptt == null) {
             addTokenType(writer);
         }
@@ -651,8 +656,13 @@ public class STSClient implements Configurable, InterceptorProvider {
             StaxUtils.copy(el, writer);
             writer.writeEndElement();
         }
-        
-        addActAs(writer);
+
+        Element actAsSecurityToken = getActAsToken();
+        if (actAsSecurityToken != null) {
+            writer.writeStartElement(STSUtils.WST_NS_08_02, "ActAs");
+            StaxUtils.copy(actAsSecurityToken, writer);
+            writer.writeEndElement();
+        }
         
         writer.writeEndElement();
 
@@ -670,6 +680,42 @@ public class STSClient implements Configurable, InterceptorProvider {
             }
         }
         return token;
+    }
+    
+    /**
+     * Get the "OnBehalfOf" element to be sent to the STS.
+     */
+    public Element getOnBehalfOfToken() throws Exception {
+        return getDelegationSecurityToken(this.onBehalfOf);
+    }
+    
+    /**
+     * Get the "ActAs" element to be sent to the STS.
+     */
+    public Element getActAsToken() throws Exception {
+        return getDelegationSecurityToken(this.actAs);
+    }
+    
+    private Element getDelegationSecurityToken(Object delegationObject) throws Exception {
+        if (delegationObject != null) {
+            final boolean isString = delegationObject instanceof String;
+            final boolean isElement = delegationObject instanceof Element; 
+            final boolean isCallbackHandler = delegationObject instanceof CallbackHandler;
+            if (isString || isElement || isCallbackHandler) {
+                if (isString) {
+                    final Document doc =
+                        DOMUtils.readXml(new StringReader((String) delegationObject));
+                    return doc.getDocumentElement();
+                } else if (isElement) {
+                    return (Element) delegationObject;
+                } else {
+                    DelegationCallback callback = new DelegationCallback(message);
+                    ((CallbackHandler)delegationObject).handle(new Callback[]{callback});
+                    return callback.getToken();
+                }
+            }
+        }
+        return null;
     }
     
     private byte[] writeElementsForRSTSymmetricKey(W3CDOMStreamWriter writer,
@@ -741,35 +787,6 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + requestType);
         writer.writeEndElement();
-    }
-    
-    private void addOnBehalfOf(W3CDOMStreamWriter writer) throws Exception {
-        if (this.onBehalfOf != null) {
-            final boolean isString = this.onBehalfOf instanceof String;
-            final boolean isElement = this.onBehalfOf instanceof Element; 
-            final boolean isCallbackHandler = this.onBehalfOf instanceof CallbackHandler;
-            if (isString || isElement || isCallbackHandler) {
-                final Element tokenElement;
-                
-                if (isString) {
-                    final Document acAsDoc =
-                        DOMUtils.readXml(new StringReader((String) this.onBehalfOf));
-                    tokenElement = acAsDoc.getDocumentElement();
-                } else if (isElement) {
-                    tokenElement = (Element)this.onBehalfOf;
-                } else {
-                    DelegationCallback callback = new DelegationCallback(message);
-                    ((CallbackHandler)onBehalfOf).handle(new Callback[]{callback});
-                    tokenElement = callback.getToken();
-                }
-                
-                if (tokenElement != null) {
-                    writer.writeStartElement("wst", "OnBehalfOf", namespace);
-                    StaxUtils.copy(tokenElement, writer);
-                    writer.writeEndElement();
-                }
-            }
-        }
     }
     
     private Element getDocumentElement(DOMSource ds) {
@@ -1078,35 +1095,6 @@ public class STSClient implements Configurable, InterceptorProvider {
             writer.writeStartElement("wst", "TokenType", namespace);
             writer.writeCharacters(tokenType);
             writer.writeEndElement();
-        }
-    }
-
-    private void addActAs(W3CDOMStreamWriter writer) throws Exception {
-        if (this.actAs != null) {
-            final boolean isString = this.actAs instanceof String;
-            final boolean isElement = this.actAs instanceof Element; 
-            final boolean isCallbackHandler = this.actAs instanceof CallbackHandler;
-            if (isString || isElement || isCallbackHandler) {
-                final Element tokenElement;
-                
-                if (isString) {
-                    final Document acAsDoc =
-                        DOMUtils.readXml(new StringReader((String) this.actAs));
-                    tokenElement = acAsDoc.getDocumentElement();
-                } else if (isElement) {
-                    tokenElement = (Element) this.actAs;
-                } else {
-                    DelegationCallback callback = new DelegationCallback(message);
-                    ((CallbackHandler)actAs).handle(new Callback[]{callback});
-                    tokenElement = callback.getToken();
-                }
-                
-                if (tokenElement != null) {
-                    writer.writeStartElement(STSUtils.WST_NS_08_02, "ActAs");
-                    StaxUtils.copy(tokenElement, writer);
-                    writer.writeEndElement();
-                }
-            }
         }
     }
 
