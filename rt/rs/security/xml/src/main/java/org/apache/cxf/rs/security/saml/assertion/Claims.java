@@ -23,11 +23,20 @@ import java.util.List;
 public class Claims {
 
     private List<Claim> claims;
+    private String realm;
     
     public Claims(List<Claim> claims) {
         this.claims = claims;
     }
+    
+    public Claims(List<Claim> claims, String realm) {
+        this.claims = claims;
+        this.realm = realm;
+    }
 
+    public String getRealm() {
+        return realm;
+    }
     public List<Claim> getClaims() {
         return claims;
     }

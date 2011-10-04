@@ -25,8 +25,6 @@ public class Subject {
     private String spQualifier;
     private String spId;
     
-    private String alternateName;
-    
     public Subject() {
         
     }
@@ -73,13 +71,5 @@ public class Subject {
 
     public String getSpQualifier() {
         return spQualifier;
-    }
-
-    public void setAlternateName(String alternateName) {
-        this.alternateName = alternateName;
-    }
-
-    public String getAlternateName() {
-        return alternateName;
     }
 }

@@ -28,21 +28,14 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 public class SecurityContextProviderImpl implements SecurityContextProvider {
 
-    private static final String DEFAULT_NAME_ROLE_PROPERTY = "org.apache.cxf.saml.claims.role";
-    private static final String DEFAULT_NAMEFORMAT_PROPERTY = "org.apache.cxf.saml.claims.format";
+    private static final String ROLE_QUALIFIER_PROPERTY = "org.apache.cxf.saml.claims.role.qualifier";
+    private static final String ROLE_NAMEFORMAT_PROPERTY = "org.apache.cxf.saml.claims.role.nameformat";
     
     public SecurityContext getSecurityContext(Message message,
             AssertionWrapper wrapper) {
         Claims claims = getClaims(wrapper);
         Subject subject = getSubject(message, wrapper, claims);
-        
-        String defaultName = (String)message.getContextualProperty(DEFAULT_NAME_ROLE_PROPERTY);
-        String defaultNameFormat = (String)message.getContextualProperty(DEFAULT_NAMEFORMAT_PROPERTY);
-        SecurityContext sc = new SAMLSecurityContext(new SubjectPrincipal(subject),
-                claims,
-                defaultName == null ? Claim.DEFAULT_ROLE_NAME : defaultName,
-                defaultNameFormat == null ? Claim.DEFAULT_NAME_FORMAT : defaultNameFormat);
-        return sc;
+        return doGetSecurityContext(message, subject, claims);
     }
 
     protected Claims getClaims(AssertionWrapper wrapper) {
@@ -50,15 +43,33 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
     }
     
     protected Subject getSubject(Message message, AssertionWrapper wrapper, Claims claims) {
-        Subject subj = SAMLUtils.getSubject(message, wrapper);
-        setSubjectPrincipalName(subj, claims);
-        return subj;
+        return SAMLUtils.getSubject(message, wrapper);
     }
     
-    protected void setSubjectPrincipalName(Subject sub, Claims claims) {
-        // parse/decipher subject name id, or check attributes like 
-        // givenName, email, firstName, etc
+    protected SecurityContext doGetSecurityContext(Message message, Subject subject, Claims claims) {
+        String defaultRoleName = (String)message.getContextualProperty(ROLE_QUALIFIER_PROPERTY);
+        String defaultNameFormat = (String)message.getContextualProperty(ROLE_NAMEFORMAT_PROPERTY);
         
-        // this can be overridden, but consider also introducing dedicated handlers 
+        String subjectPrincipalName = getSubjectPrincipalName(subject, claims);
+        SubjectPrincipal subjectPrincipal = 
+            new SubjectPrincipal(subjectPrincipalName, subject);
+        
+        SecurityContext sc = new SAMLSecurityContext(subjectPrincipal,
+                claims,
+                defaultRoleName == null ? Claim.DEFAULT_ROLE_NAME : defaultRoleName,
+                defaultNameFormat == null ? Claim.DEFAULT_NAME_FORMAT : defaultNameFormat);
+        return sc;
+    }
+    
+    //TODO: This can be overridden, but consider also introducing dedicated handlers
+    protected String getSubjectPrincipalName(Subject subject, Claims claims) {
+        // parse/decipher subject name, or check claims such as 
+        // givenName, email, firstName
+        // and use it to authenticate with the external system if needed
+
+        // Or if STS has been used to validate the SAML token on the server side then
+        // whatever name the subject has provided can probably be used as a principal name
+        // as IDP must've confirmed that this subject indeed got authenticated and such... 
+        return subject.getName();
     }
 }

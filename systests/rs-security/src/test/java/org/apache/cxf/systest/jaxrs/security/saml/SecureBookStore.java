@@ -17,17 +17,32 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.saml.authorization;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.apache.cxf.systest.jaxrs.security.saml;
 
 
-@Target({ElementType.TYPE, ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Claims {
-    String realm() default "";
-    Claim[] value();
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.apache.cxf.systest.jaxrs.security.Book;
+
+@Path("/bookstore")
+public class SecureBookStore {
+    
+    public SecureBookStore() {
+    }
+    
+    @POST
+    @Path("/books")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    @RolesAllowed({"admin" })
+    public Book addBook(Book book) {
+        return book;
+    }
+    
 }
+
+

@@ -16,18 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.jaxrs.security.saml;
 
-package org.apache.cxf.rs.security.saml.authorization;
+import org.apache.cxf.rs.security.saml.assertion.Claims;
+import org.apache.cxf.rs.security.saml.assertion.Subject;
+import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-
-@Target({ElementType.TYPE, ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Claims {
-    String realm() default "";
-    Claim[] value();
+public class CustomSecurityContextProvider extends SecurityContextProviderImpl {
+    @Override
+    protected String getSubjectPrincipalName(Subject subject, Claims claims) {
+        int index = subject.getName().indexOf("@");
+        return index == -1 
+            ? super.getSubjectPrincipalName(subject, claims)
+            : subject.getName().substring(0, index);    
+    }
+    
 }

@@ -16,19 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.security;
+package org.apache.cxf.rs.security.saml.authorization;
+
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.interceptor.security.AbstractAuthorizingInInterceptor;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 
-public class SimpleAuthorizingFilter implements RequestHandler {
+public class ClaimsAuthorizingFilter implements RequestHandler {
 
-    private AbstractAuthorizingInInterceptor interceptor;
+    private ClaimsAuthorizingInterceptor interceptor;
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         try {
@@ -39,7 +41,23 @@ public class SimpleAuthorizingFilter implements RequestHandler {
         }
     }
 
-    public void setInterceptor(AbstractAuthorizingInInterceptor in) {
-        interceptor = in;
+    public void setClaims(Map<String, List<ClaimBean>> claimsMap) {
+        checkInterceptor();
+        ClaimsAuthorizingInterceptor simple = new ClaimsAuthorizingInterceptor();
+        simple.setClaims(claimsMap);
+        interceptor = simple; 
+    }
+    
+    public void setSecuredObject(Object securedObject) {
+        checkInterceptor();
+        ClaimsAuthorizingInterceptor simple = new ClaimsAuthorizingInterceptor();
+        simple.setSecuredObject(securedObject);
+        interceptor = simple; 
+    }
+    
+    private void checkInterceptor() {
+        if (interceptor != null) {
+            throw new IllegalStateException("Filter has already been initialized");
+        }
     }
 }

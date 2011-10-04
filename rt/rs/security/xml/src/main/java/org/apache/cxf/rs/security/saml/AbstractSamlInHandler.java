@@ -144,7 +144,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     protected void setSecurityContext(Message message, AssertionWrapper wrapper) {
         if (scProvider != null) {
             SecurityContext sc = scProvider.getSecurityContext(message, wrapper);
-            message.setContent(SecurityContext.class, sc);
+            message.put(SecurityContext.class, sc);
         }
     }
     

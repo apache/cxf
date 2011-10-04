@@ -25,12 +25,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.security.SecurityContext;
+
 
 public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInInterceptor {
 
-    private Map<String, List<String>> methodRolesMap = Collections.emptyMap();
+    private Map<String, List<String>> methodRolesMap = new HashMap<String, List<String>>();
+    private Map<String, List<String>> userRolesMap = Collections.emptyMap();
     private List<String> globalRoles = Collections.emptyList();
     
+    @Override 
+    protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
+        if (!super.isUserInRole(sc, roles, deny)) {
+            return false;
+        }
+        // Additional check.
+        if (!userRolesMap.isEmpty()) {
+            List<String> userRoles = userRolesMap.get(sc.getUserPrincipal().getName());    
+            if (userRoles == null) {
+                return false;
+            }
+            for (String role : roles) {
+                if (userRoles.contains(role)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
     
     @Override
     protected List<String> getExpectedRoles(Method method) {
@@ -42,20 +66,23 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     }
 
 
-
     public void setMethodRolesMap(Map<String, String> rolesMap) {
-        methodRolesMap = new HashMap<String, List<String>>();
-        for (Map.Entry<String, String> entry : rolesMap.entrySet()) {
-            methodRolesMap.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
-        }
+        methodRolesMap.putAll(parseRolesMap(rolesMap)); 
+    }
+    
+    public void setUserRolesMap(Map<String, String> rolesMap) {
+        userRolesMap = parseRolesMap(rolesMap);
     }
     
     public void setGlobalRoles(String roles) {
         globalRoles = Arrays.asList(roles.split(" "));
     }
-
-
-
     
-
+    private static Map<String, List<String>> parseRolesMap(Map<String, String> rolesMap) {
+        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        for (Map.Entry<String, String> entry : rolesMap.entrySet()) {
+            map.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
+        }
+        return map;
+    }
 }

@@ -16,19 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.authorization;
 
-import org.apache.cxf.common.security.SimplePrincipal;
-import org.apache.cxf.rs.security.saml.assertion.Subject;
+package org.apache.cxf.systest.jaxrs.security.saml;
 
-public class SubjectPrincipal extends SimplePrincipal {
-    private Subject subject;
-    public SubjectPrincipal(String principalName, Subject subject) {
-        super(principalName);
-        this.subject = subject;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.apache.cxf.rs.security.saml.authorization.Claim;
+import org.apache.cxf.rs.security.saml.authorization.Claims;
+import org.apache.cxf.systest.jaxrs.security.Book;
+
+@Path("/bookstore")
+public class SecureClaimBookStore {
+    
+    public SecureClaimBookStore() {
     }
     
-    public Subject getSubject() {
-        return subject;
+    @POST
+    @Path("/books")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    @Claims({ 
+        @Claim({"admin" }),
+        @Claim(name = "http://claims/authentication", 
+               format = "http://claims/authentication-format", 
+               value = {"fingertip", "smartcard" })
+    })
+    public Book addBook(Book book) {
+        return book;
     }
+    
 }
+
+

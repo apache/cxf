@@ -90,7 +90,7 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         return false;
     }
     
-    private boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
+    protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
         
         if (roles.size() == 1 && ALL_ROLES.equals(roles.get(0))) {
             return !deny;
@@ -120,4 +120,5 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     protected List<String> getDenyRoles(Method method) {
         return Collections.emptyList();
     }
+    
 }

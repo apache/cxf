@@ -33,7 +33,7 @@ public class SAMLSecurityContext implements SecurityContext {
     private Claim rolesClaim;
     
     public SAMLSecurityContext(Subject subject, List<Claim> claims) {
-        this(new SubjectPrincipal(subject), new Claims(claims));
+        this(new SubjectPrincipal(subject.getName(), subject), new Claims(claims));
     }
     
     public SAMLSecurityContext(SubjectPrincipal p, Claims claims) {

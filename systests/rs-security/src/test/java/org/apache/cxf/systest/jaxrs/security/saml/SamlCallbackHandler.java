@@ -21,16 +21,20 @@ package org.apache.cxf.systest.jaxrs.security.saml;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.SAMLCallback;
@@ -67,6 +71,8 @@ public class SamlCallbackHandler implements CallbackHandler {
     }
     
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
@@ -77,7 +83,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 }
                 callback.setIssuer("https://idp.example.org/SAML2");
                 
-                String subjectName = "uid=sts-client,o=mock-sts.com";
+                String subjectName = (String)m.getContextualProperty("saml.subject.name");
+                if (subjectName == null) {
+                    subjectName = "uid=sts-client,o=mock-sts.com";
+                }
                 String subjectQualifier = "www.mock-sts.com";
                 if (!saml2 && SAML2Constants.CONF_SENDER_VOUCHES.equals(confirmationMethod)) {
                     confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
@@ -88,7 +97,6 @@ public class SamlCallbackHandler implements CallbackHandler {
                     );
                 if (SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
                     
-                    Message m = PhaseInterceptorChain.getCurrentMessage();
                     try {
                         CryptoLoader loader = new CryptoLoader();
                         Crypto crypto = loader.getCrypto(m, 
@@ -128,11 +136,30 @@ public class SamlCallbackHandler implements CallbackHandler {
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 attrBean.setSubject(subjectBean);
                 
-                AttributeBean attributeBean = new AttributeBean();
-                attributeBean.setSimpleName("subject-role");
-                attributeBean.setQualifiedName("urn:oid:1.3.6.1.4.1.5923.1.1.1.1");
-                attributeBean.setAttributeValues(Collections.singletonList("system-user"));
-                attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
+                List<String> roles = CastUtils.cast((List)m.getContextualProperty("saml.roles"));
+                if (roles == null) {
+                    roles = Collections.singletonList("user");
+                }
+                List<AttributeBean> claims = new ArrayList<AttributeBean>();
+                AttributeBean roleClaim = new AttributeBean();
+                roleClaim.setSimpleName("subject-role");
+                roleClaim.setQualifiedName(Claim.DEFAULT_ROLE_NAME);
+                roleClaim.setNameFormat(Claim.DEFAULT_NAME_FORMAT);
+                roleClaim.setAttributeValues(roles);
+                claims.add(roleClaim);
+                
+                List<String> authMethods = CastUtils.cast((List)m.getContextualProperty("saml.auth"));
+                if (authMethods == null) {
+                    authMethods = Collections.singletonList("password");
+                }
+                
+                AttributeBean authClaim = new AttributeBean();
+                authClaim.setQualifiedName("http://claims/authentication");
+                authClaim.setNameFormat("http://claims/authentication-format");
+                authClaim.setAttributeValues(authMethods);
+                claims.add(authClaim);
+                
+                attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
             }
         }
