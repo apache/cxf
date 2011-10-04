@@ -30,7 +30,7 @@ import org.apache.cxf.message.Message;
 
 public class ClaimsAuthorizingFilter implements RequestHandler {
 
-    private ClaimsAuthorizingInterceptor interceptor;
+    private ClaimsAuthorizingInterceptor interceptor = new ClaimsAuthorizingInterceptor();
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         try {
@@ -42,22 +42,12 @@ public class ClaimsAuthorizingFilter implements RequestHandler {
     }
 
     public void setClaims(Map<String, List<ClaimBean>> claimsMap) {
-        checkInterceptor();
-        ClaimsAuthorizingInterceptor simple = new ClaimsAuthorizingInterceptor();
-        simple.setClaims(claimsMap);
-        interceptor = simple; 
+        interceptor.setClaims(claimsMap);
     }
     
     public void setSecuredObject(Object securedObject) {
-        checkInterceptor();
-        ClaimsAuthorizingInterceptor simple = new ClaimsAuthorizingInterceptor();
-        simple.setSecuredObject(securedObject);
-        interceptor = simple; 
+        interceptor.setSecuredObject(securedObject);
     }
     
-    private void checkInterceptor() {
-        if (interceptor != null) {
-            throw new IllegalStateException("Filter has already been initialized");
-        }
-    }
+    
 }
