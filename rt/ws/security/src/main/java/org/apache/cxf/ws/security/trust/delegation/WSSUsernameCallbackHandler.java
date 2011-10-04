@@ -26,13 +26,12 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.message.WSSecUsernameToken;
+import org.apache.ws.security.message.token.UsernameToken;
 
 /**
  * This CallbackHandler implementation obtains a username via the jaxws property 
@@ -58,8 +57,8 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
                     } else {
                         doc = DOMUtils.createDocument();
                     }
-                    Element token = createWSSEUsernameToken(username, doc);
-                    callback.setToken(token);
+                    UsernameToken usernameToken = createWSSEUsernameToken(username, doc);
+                    callback.setToken(usernameToken.getElement());
                 }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
@@ -67,12 +66,14 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
         }
     }
     
-    private Element createWSSEUsernameToken(String username, Document doc) {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setPasswordType(null);
-        builder.setUserInfo(username, null);
-        builder.prepare(doc);
-        return builder.getUsernameTokenElement();
+    private UsernameToken createWSSEUsernameToken(String username, Document doc) {
+        UsernameToken usernameToken = new UsernameToken(true, doc, null);
+        usernameToken.setName(username);
+        usernameToken.addWSUNamespace();
+        usernameToken.addWSSENamespace();
+        usernameToken.setID("id-" + username);
+        
+        return usernameToken;
     }
     
 }

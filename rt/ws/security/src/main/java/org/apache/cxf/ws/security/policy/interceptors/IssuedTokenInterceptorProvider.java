@@ -24,11 +24,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -64,6 +68,9 @@ import org.apache.ws.security.util.WSSecurityUtil;
  * 
  */
 public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
+    
+    private static final String ASSOCIATED_TOKEN = 
+        IssuedTokenInterceptorProvider.class.getName() + "-" + "Associated_Token";
 
     public IssuedTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN));
@@ -112,13 +119,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (isRequestor(message)) {
                     IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
                     
-                    SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-                    if (tok == null) {
-                        String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                        if (tokId != null) {
-                            tok = getTokenStore(message).getToken(tokId);
-                        }
-                    }
+                    SecurityToken tok = retrieveCachedToken(message);
                     if (tok == null) {
                         STSClient client = STSUtils.getClient(message, "sts");
                         AddressingProperties maps =
@@ -141,23 +142,29 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                 if (token != null) {
                                     client.setOnBehalfOf(token);
                                 }
-
+                                
+                                Object o = message.getContextualProperty(SecurityConstants.STS_APPLIES_TO);
+                                String appliesTo = o == null ? null : o.toString();
+                                appliesTo = appliesTo == null 
+                                    ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
+                                        : appliesTo;
+                                boolean enableAppliesTo = client.isEnableAppliesTo();
+                                
                                 client.setMessage(message);
-                                client.setTrust(getTrust10(aim));
-                                client.setTrust(getTrust13(aim));
-                                client.setTemplate(itok.getRstTemplate());
-                                if (maps == null) {
-                                    tok = client.requestSecurityToken();
-                                } else {
-                                    Object o = message
-                                        .getContextualProperty(SecurityConstants.STS_APPLIES_TO);
-                                    String s = o == null ? null : o.toString();
-                                    s = s == null 
-                                        ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
-                                            : s;
-                                    client.setAddressingNamespace(maps.getNamespaceURI());
-                                    tok = client.requestSecurityToken(s);
+                                Element onBehalfOfToken = client.getOnBehalfOfToken();
+                                Element actAsToken = client.getActAsToken();
+                                
+                                SecurityToken secToken = 
+                                    handleDelegation(
+                                        message, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
+                                    );
+                                if (secToken == null) {
+                                    secToken = getTokenFromSTS(message, client, aim, maps, itok, appliesTo);
                                 }
+                                tok = secToken;
+                                storeDelegationTokens(
+                                    message, tok, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
+                                );
                             } catch (RuntimeException e) {
                                 throw e;
                             } catch (Exception e) {
@@ -176,10 +183,17 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         for (AssertionInfo ai : ais) {
                             ai.setAsserted(true);
                         }
-                        message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
-                                                                      tok.getId());
-                        message.getExchange().put(SecurityConstants.TOKEN_ID, 
-                                                  tok.getId());
+                        boolean cacheIssuedToken = 
+                            MessageUtils.getContextualBoolean(
+                                message, SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true
+                            );
+                        if (cacheIssuedToken) {
+                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
+                                                                          tok.getId());
+                            message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
+                        } else {
+                            message.put(SecurityConstants.TOKEN_ID, tok.getId());
+                        }
                         getTokenStore(message).add(tok);
                     }
                 } else {
@@ -203,6 +217,156 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 return null;
             }
             return (Trust13)ais.iterator().next().getAssertion();
+        }
+        
+        private SecurityToken retrieveCachedToken(Message message) {
+            boolean cacheIssuedToken = 
+                MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true
+                );
+            SecurityToken tok = null;
+            if (cacheIssuedToken) {
+                tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
+                if (tok == null) {
+                    String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                    if (tokId != null) {
+                        tok = getTokenStore(message).getToken(tokId);
+                    }
+                }
+            }
+            return tok;
+        }
+        
+        /**
+         * Parse ActAs/OnBehalfOf appropriately. See if the required token is stored in the cache.
+         */
+        private SecurityToken handleDelegation(
+            Message message, 
+            Element onBehalfOfToken,
+            Element actAsToken,
+            String appliesTo,
+            boolean enableAppliesTo
+        ) throws Exception {
+            TokenStore tokenStore = getTokenStore(message);
+            String key = appliesTo;
+            if (!enableAppliesTo || key == null || "".equals(key)) {
+                key = ASSOCIATED_TOKEN;
+            }
+            // See if the token corresponding to the OnBehalfOf Token is stored in the cache
+            // and if it points to an issued token
+            if (onBehalfOfToken != null) {
+                String id = getIdFromToken(onBehalfOfToken);
+                SecurityToken cachedToken = tokenStore.getToken(id);
+                if (cachedToken != null) {
+                    Properties properties = cachedToken.getProperties();
+                    if (properties != null && properties.containsKey(key)) {
+                        String associatedToken = properties.getProperty(key);
+                        SecurityToken issuedToken = tokenStore.getToken(associatedToken);
+                        if (issuedToken != null) {
+                            return issuedToken;
+                        }
+                    }
+                }
+            }
+            
+            // See if the token corresponding to the ActAs Token is stored in the cache
+            // and if it points to an issued token
+            if (actAsToken != null) {
+                String id = getIdFromToken(actAsToken);
+                SecurityToken cachedToken = tokenStore.getToken(id);
+                if (cachedToken != null) {
+                    Properties properties = cachedToken.getProperties();
+                    if (properties != null && properties.containsKey(key)) {
+                        String associatedToken = properties.getProperty(key);
+                        SecurityToken issuedToken = tokenStore.getToken(associatedToken);
+                        if (issuedToken != null) {
+                            return issuedToken;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        
+        private String getIdFromToken(Element token) {
+            if (token != null) {
+                // Try to find the "Id" on the token.
+                if (token.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
+                    return token.getAttributeNS(WSConstants.WSU_NS, "Id");
+                } else if (token.hasAttributeNS(null, "ID")) {
+                    return token.getAttributeNS(null, "ID");
+                } else if (token.hasAttributeNS(null, "AssertionID")) {
+                    return token.getAttributeNS(null, "AssertionID");
+                }
+            }
+            return "";
+        }
+        
+        private void storeDelegationTokens(
+            Message message,
+            SecurityToken issuedToken,
+            Element onBehalfOfToken,
+            Element actAsToken,
+            String appliesTo,
+            boolean enableAppliesTo
+        ) throws Exception {
+            if (issuedToken == null) {
+                return;
+            }
+            TokenStore tokenStore = getTokenStore(message);
+            String key = appliesTo;
+            if (!enableAppliesTo || key == null || "".equals(key)) {
+                key = ASSOCIATED_TOKEN;
+            }
+            if (onBehalfOfToken != null) {
+                String id = getIdFromToken(onBehalfOfToken);
+                SecurityToken cachedToken = tokenStore.getToken(id);
+                if (cachedToken == null) {
+                    cachedToken = new SecurityToken(id);
+                    cachedToken.setToken(onBehalfOfToken);
+                }
+                Properties properties = cachedToken.getProperties();
+                if (properties == null) {
+                    properties = new Properties();
+                    cachedToken.setProperties(properties);
+                }
+                properties.put(key, issuedToken.getId());
+                tokenStore.add(cachedToken);
+            }
+            if (actAsToken != null) {
+                String id = getIdFromToken(actAsToken);
+                SecurityToken cachedToken = tokenStore.getToken(id);
+                if (cachedToken == null) {
+                    cachedToken = new SecurityToken(id);
+                    cachedToken.setToken(actAsToken);
+                }
+                Properties properties = cachedToken.getProperties();
+                if (properties == null) {
+                    properties = new Properties();
+                    cachedToken.setProperties(properties);
+                }
+                properties.put(key, issuedToken.getId());
+                tokenStore.add(cachedToken);
+            }
+        }
+        
+        private SecurityToken getTokenFromSTS(
+            Message message,
+            STSClient client,
+            AssertionInfoMap aim,
+            AddressingProperties maps,
+            IssuedToken itok,
+            String appliesTo
+        ) throws Exception {
+            client.setTrust(getTrust10(aim));
+            client.setTrust(getTrust13(aim));
+            client.setTemplate(itok.getRstTemplate());
+            if (maps == null) {
+                return client.requestSecurityToken();
+            } else {
+                client.setAddressingNamespace(maps.getNamespaceURI());
+                return client.requestSecurityToken(appliesTo);
+            }
         }
         
     }

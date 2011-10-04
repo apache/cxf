@@ -111,6 +111,14 @@ public final class SecurityConstants {
     
     public static final String KERBEROS_CLIENT = "ws-security.kerberos.client";
     
+    /**
+     * Set this to "false" to not cache a SecurityToken per proxy object in the 
+     * IssuedTokenInterceptorProvider. This should be done if a token is being retrieved
+     * from an STS in an intermediary. The default value is "true".
+     */
+    public static final String CACHE_ISSUED_TOKEN_IN_ENDPOINT = 
+        "ws-security.cache.issued.token.in.endpoint";
+    
     public static final Set<String> ALL_PROPERTIES;
     
     static {
@@ -124,7 +132,7 @@ public final class SecurityConstants {
             SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
             SIGNATURE_TOKEN_VALIDATOR, IS_BSP_COMPLIANT, TIMESTAMP_FUTURE_TTL,
             BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER, STS_TOKEN_ON_BEHALF_OF,
-            KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR
+            KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
