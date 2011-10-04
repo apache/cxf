@@ -112,11 +112,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <bean id="securedObjectWithInterface" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore"/>
   
   <bean id="authorizationFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
-        <property name="methodRolesMap" ref="rolesMap"/>
+        <property name="interceptor" ref="authorizationInterceptor"/>
   </bean>
   
   <bean id="annotationsFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
-        <property name="securedObject" ref="securedObject"/>
+        <property name="interceptor" ref="annotationsInterceptor"/>
   </bean>
   
   <util:map id="rolesMap">
