@@ -368,7 +368,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         Document doc = DOMUtils.createDocument();
         Element el = doc.createElementNS(ns,
                                          "wsp:" + PolicyConstants.POLICYREFERENCE_ELEM_NAME);
-        Attr att = doc.createAttribute("URI");
+        Attr att = doc.createAttributeNS(null, "URI");
         att.setValue(uri);
         el.setAttributeNodeNS(att);
         return el;
