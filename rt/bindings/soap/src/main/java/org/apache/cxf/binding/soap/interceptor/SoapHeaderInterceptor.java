@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
@@ -57,6 +58,7 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
 
     public void handleMessage(Message m) throws Fault {
         SoapMessage message = (SoapMessage) m;
+        SoapVersion soapVersion = message.getVersion();
         Exchange exchange = message.getExchange();
 
         MessageContentsList parameters = MessageContentsList.getContentsList(message);
@@ -99,6 +101,16 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
                     
                     if (param.getDataBinding() == null) {
                         Node source = (Node)param.getObject();
+                        if (source instanceof Element) {
+                            //need to remove these attributes as they
+                            //would cause validation failures
+                            Element el = (Element)source;
+                            
+                            el.removeAttributeNS(soapVersion.getNamespace(),
+                                              soapVersion.getAttrNameMustUnderstand());
+                            el.removeAttributeNS(soapVersion.getNamespace(),
+                                               soapVersion.getAttrNameRole());
+                        }
                         if (supportsNode) {
                             object = getNodeDataReader(message).read(mpi, source);
                         } else {
