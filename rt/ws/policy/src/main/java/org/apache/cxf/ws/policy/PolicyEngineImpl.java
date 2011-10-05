@@ -213,19 +213,29 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
 
     public EffectivePolicy getEffectiveServerResponsePolicy(EndpointInfo ei,
                                                             BindingOperationInfo boi,
-                                                            Destination d) {
-        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_SERVER);
-        if (null == effectivePolicy) {
-            EffectivePolicyImpl epi = createOutPolicyInfo();
-            Assertor assertor = null;
-            if (d instanceof Assertor) {
-                assertor = (Assertor)d;
-            }
-            epi.initialise(ei, boi, this, assertor, false, false);
-            boi.setProperty(POLICY_INFO_RESPONSE_SERVER, epi);
-            effectivePolicy = epi;
+                                                            Destination d,
+                                                            List<List<Assertion>> incoming) {
+        if (incoming == null) {
+            EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_SERVER);
+            if (null == effectivePolicy) {
+                EffectivePolicyImpl epi = createOutPolicyInfo();
+                Assertor assertor = null;
+                if (d instanceof Assertor) {
+                    assertor = (Assertor)d;
+                }
+                epi.initialise(ei, boi, this, assertor, false, false, incoming);
+                boi.setProperty(POLICY_INFO_RESPONSE_SERVER, epi);
+                effectivePolicy = epi;
+            } 
+            return effectivePolicy;
         }
-        return effectivePolicy;
+        EffectivePolicyImpl epi = createOutPolicyInfo();
+        Assertor assertor = null;
+        if (d instanceof Assertor) {
+            assertor = (Assertor)d;
+        }
+        epi.initialise(ei, boi, this, assertor, false, false, incoming);
+        return epi;
     }
 
     public void setEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, 

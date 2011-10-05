@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -33,6 +34,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.neethi.Assertion;
 
 /**
  * 
@@ -96,7 +98,10 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
             }
         }
         try {
-            aim.checkEffectivePolicy(effectivePolicy.getPolicy());
+            List<List<Assertion>> usedAlternatives = aim.checkEffectivePolicy(effectivePolicy.getPolicy());
+            if (usedAlternatives != null && !usedAlternatives.isEmpty() && message.getExchange() != null) {
+                message.getExchange().put("ws-policy.validated.alternatives", usedAlternatives);
+            }
         } catch (PolicyException ex) {
             //To check if there is ws addressing policy violation and throw WSA specific 
             //exception to pass jaxws2.2 tests

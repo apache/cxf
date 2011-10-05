@@ -164,7 +164,7 @@ public class EndpointPolicyImplTest extends Assert {
         epi.setPolicy(policy);        
         
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
-        EasyMock.expect(selector.selectAlternative(policy, engine, assertor)).andReturn(null);
+        EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null)).andReturn(null);
         
         control.replay();
         try {
@@ -178,7 +178,7 @@ public class EndpointPolicyImplTest extends Assert {
         control.reset();        
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
         Collection<Assertion> alternative = new ArrayList<Assertion>();
-        EasyMock.expect(selector.selectAlternative(policy, engine, assertor)).andReturn(alternative);
+        EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null)).andReturn(alternative);
         control.replay();        
         epi.chooseAlternative();
         Collection<Assertion> choice = epi.getChosenAlternative();

@@ -151,11 +151,11 @@ public class PolicyEngineTest extends Assert {
         AssertingDestination destination = control.createMock(AssertingDestination.class);
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, destination, false, false);
+        epi.initialise(ei, boi, engine, destination, false, false, null);
         EasyMock.expectLastCall();
         control.replay();
-        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination));
-        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination));
+        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination, null));
+        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination, null));
         control.verify();
     }
     
@@ -168,7 +168,7 @@ public class PolicyEngineTest extends Assert {
         control.replay();
         engine.setEffectiveServerResponsePolicy(ei, boi, effectivePolicy);
         assertSame(effectivePolicy, 
-                   engine.getEffectiveServerResponsePolicy(ei, boi, (Destination)null));
+                   engine.getEffectiveServerResponsePolicy(ei, boi, (Destination)null, null));
         control.verify();
     }
    

@@ -72,7 +72,7 @@ public class PolicyVerificationOutInterceptorTest extends Assert {
 
         aim.checkEffectivePolicy(null);
         
-        EasyMock.expectLastCall();
+        EasyMock.expectLastCall().andReturn(null);
         
         control.replay();        
         interceptor.handleMessage(message);       

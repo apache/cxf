@@ -75,7 +75,7 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         
         control.replay();        
         Collection<Assertion> choice = 
-            selector.selectAlternative(policy, engine, assertor); 
+            selector.selectAlternative(policy, engine, assertor, null); 
         assertEquals(0, choice.size());
         control.verify();
     }
@@ -104,7 +104,7 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(minAlternative, assertor)).andReturn(true);
         
         control.replay();        
-        Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor); 
+        Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor, null); 
         assertEquals(1, choice.size());
         assertSame(a1, choice.iterator().next());
         control.verify();

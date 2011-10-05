@@ -83,9 +83,21 @@ public class EffectivePolicyImpl implements EffectivePolicy {
                     BindingOperationInfo boi, 
                     PolicyEngineImpl engine, 
                     Assertor assertor,
-                    boolean requestor, boolean request) {
+                    boolean requestor,
+                    boolean request) {
         initialisePolicy(ei, boi, engine, requestor, request, assertor);
         chooseAlternative(engine, assertor);
+        initialiseInterceptors(engine, false);  
+    }
+    void initialise(EndpointInfo ei, 
+                    BindingOperationInfo boi, 
+                    PolicyEngineImpl engine, 
+                    Assertor assertor,
+                    boolean requestor,
+                    boolean request,
+                    List<List<Assertion>> incoming) {
+        initialisePolicy(ei, boi, engine, requestor, request, assertor);
+        chooseAlternative(engine, assertor, incoming);
         initialiseInterceptors(engine, false);  
     }
     void initialise(EndpointInfo ei, 
@@ -148,8 +160,11 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     }
 
     void chooseAlternative(PolicyEngineImpl engine, Assertor assertor) {
+        chooseAlternative(engine, assertor, null);
+    }
+    void chooseAlternative(PolicyEngineImpl engine, Assertor assertor, List<List<Assertion>> incoming) {
         Collection<Assertion> alternative = engine.getAlternativeSelector()
-            .selectAlternative(policy, engine, assertor);
+            .selectAlternative(policy, engine, assertor, incoming);
         if (null == alternative) {
             PolicyUtils.logPolicy(LOG, Level.FINE, "No alternative supported.", getPolicy());
             throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE));

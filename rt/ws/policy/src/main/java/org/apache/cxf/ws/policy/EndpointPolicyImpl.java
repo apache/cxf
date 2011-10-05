@@ -157,7 +157,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     void chooseAlternative() {
         Collection<Assertion> alternative = null;
         if (requestor) {
-            alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor);
+            alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor, null);
         } else {
             alternative = getSupportedAlternatives();
         }

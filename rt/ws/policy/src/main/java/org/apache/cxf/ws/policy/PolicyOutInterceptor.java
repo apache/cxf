@@ -138,7 +138,10 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             }
         } else {
             Destination destination = exchange.getDestination();
-            EffectivePolicy effectivePolicy = pe.getEffectiveServerResponsePolicy(ei, boi, destination);
+            @SuppressWarnings("unchecked")
+            List<List<Assertion>> incoming = (List)exchange.get("ws-policy.validated.alternatives");
+            EffectivePolicy effectivePolicy 
+                = pe.getEffectiveServerResponsePolicy(ei, boi, destination, incoming);
             msg.put(EffectivePolicy.class, effectivePolicy);
             
             List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();

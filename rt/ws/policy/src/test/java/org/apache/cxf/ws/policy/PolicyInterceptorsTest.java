@@ -190,7 +190,7 @@ public class PolicyInterceptorsTest extends Assert {
         control.reset();
         setupMessage(false, false, true, true, true, true);
         EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(pe.getEffectiveServerResponsePolicy(ei, boi, destination))
+        EasyMock.expect(pe.getEffectiveServerResponsePolicy(ei, boi, destination, null))
             .andReturn(effectivePolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         EasyMock.expect(effectivePolicy.getInterceptors())

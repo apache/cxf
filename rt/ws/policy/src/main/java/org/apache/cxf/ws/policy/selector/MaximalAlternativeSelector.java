@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.neethi.Assertion;
@@ -32,17 +31,30 @@ import org.apache.neethi.Policy;
 /**
  * 
  */
-public class MaximalAlternativeSelector implements AlternativeSelector {
+public class MaximalAlternativeSelector extends BaseAlternativeSelector {
 
     public Collection<Assertion> selectAlternative(
-        Policy policy, PolicyEngine engine, Assertor assertor) {
+        Policy policy, PolicyEngine engine, 
+        Assertor assertor,
+        List<List<Assertion>> request) {
         Collection<Assertion> choice = null;
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> alternative = alternatives.next();
             if (engine.supportsAlternative(alternative, assertor) 
+                && isCompatibleWithRequest(alternative, request)
                 && (null == choice || alternative.size() > choice.size())) {
                 choice = alternative;
+            }
+        }
+        if (choice == null) {
+            alternatives = policy.getAlternatives();
+            while (alternatives.hasNext()) {
+                List<Assertion> alternative = alternatives.next();
+                if (engine.supportsAlternative(alternative, assertor) 
+                    && (null == choice || alternative.size() > choice.size())) {
+                    choice = alternative;
+                }
             }
         }
         return choice;

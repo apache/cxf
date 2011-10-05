@@ -69,13 +69,13 @@ public class FirstAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(false);
         control.replay();
         
-        assertNull(selector.selectAlternative(policy, engine, assertor));  
+        assertNull(selector.selectAlternative(policy, engine, assertor, null));  
         control.verify();
         
         control.reset();        
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(true);
         control.replay();         
-        Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor); 
+        Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor, null); 
         assertSame(1, chosen.size());
         assertSame(chosen.size(), firstAlternative.size());
         assertSame(chosen.iterator().next(), firstAlternative.iterator().next());
@@ -91,7 +91,7 @@ public class FirstAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(secondAlternative, assertor)).andReturn(true);
         control.replay();        
       
-        chosen = selector.selectAlternative(policy, engine, assertor); 
+        chosen = selector.selectAlternative(policy, engine, assertor, null); 
         assertSame(1, chosen.size());
         assertSame(chosen.size(), secondAlternative.size());
         assertSame(chosen.iterator().next(), secondAlternative.iterator().next());

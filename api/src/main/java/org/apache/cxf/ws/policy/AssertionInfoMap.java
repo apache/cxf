@@ -130,14 +130,18 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         return pass;
     }
     
-    public void checkEffectivePolicy(Policy policy) {
+    public List<List<Assertion>> checkEffectivePolicy(Policy policy) {
+        List<List<Assertion>> validated = new ArrayList<List<Assertion>>(4);       
         List<QName> errors = new ArrayList<QName>();
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> pc = alternatives.next();
             if (supportsAlternative(pc, errors)) {
-                return;
+                validated.add(pc);
             }
+        }
+        if (!validated.isEmpty()) {
+            return validated;
         }
         
         Set<String> msgs = new LinkedHashSet<String>();

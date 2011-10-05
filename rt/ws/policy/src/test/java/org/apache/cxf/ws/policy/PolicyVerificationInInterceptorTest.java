@@ -102,7 +102,7 @@ public class PolicyVerificationInInterceptorTest extends Assert {
         Policy policy = control.createMock(Policy.class);
         EasyMock.expect(effectivePolicy.getPolicy()).andReturn(policy);
         aim.checkEffectivePolicy(policy);
-        EasyMock.expectLastCall();
+        EasyMock.expectLastCall().andReturn(null);
         control.replay();
         interceptor.handleMessage(message);
         control.verify();
@@ -118,7 +118,7 @@ public class PolicyVerificationInInterceptorTest extends Assert {
         policy = control.createMock(Policy.class);
         EasyMock.expect(effectivePolicy.getPolicy()).andReturn(policy);
         aim.checkEffectivePolicy(policy);
-        EasyMock.expectLastCall();
+        EasyMock.expectLastCall().andReturn(null);
         control.replay();
         interceptor.handleMessage(message);
         control.verify();
