@@ -118,6 +118,15 @@
       </response>
      </method>
 
+     <method name="POST" id="addBookOrBook2">
+      <request>
+       <representation mediaType="application/xml" element="prefix1:thebook"/>
+       <representation mediaType="application/xml" element="prefix1:theBook2"/>
+       <representation mediaType="application/json"/>
+      </request>
+      <response status="201"/>
+     </method>
+
      <method name="PUT" id="addBook">
       <doc>Update the book</doc>
       <request>

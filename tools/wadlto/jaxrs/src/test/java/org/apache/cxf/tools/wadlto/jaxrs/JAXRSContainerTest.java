@@ -55,6 +55,31 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             fail();
         }
     }
+    
+    @Test    
+    public void testCodeGenInterfacesMultipleInXmlReps() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_MULTIPLE_XML_REPS, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
         
     @Test    
     public void testCodeGenInterfacesWithBinding() {
