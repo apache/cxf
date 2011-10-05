@@ -37,6 +37,8 @@ public final class WadlToolConstants {
     public static final String CFG_SCHEMA_PACKAGENAME = "schemaPackagename";
     public static final String CFG_RESOURCENAME = "resourcename";
     
+    public static final String CFG_MULTIPLE_XML_REPS = "supportMultipleXmlReps";
+    
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;
     public static final String CFG_BINDING = ToolConstants.CFG_BINDING;
     

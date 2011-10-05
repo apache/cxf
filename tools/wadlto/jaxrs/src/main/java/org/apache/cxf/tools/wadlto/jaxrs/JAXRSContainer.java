@@ -117,6 +117,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
 
+        sg.setSupportMultipleXmlReps(context.optionSet(WadlToolConstants.CFG_MULTIPLE_XML_REPS));
         // set the base path
         sg.setWadlPath(wadlURL);
                 
