@@ -103,7 +103,7 @@
        <representation mediaType="application/xml" element="prefix1:theBook2">
         <doc>InputBook</doc>
        </representation>
-       <representation mediaType="application/json">
+       <representation mediaType="application/json" element="prefix1:theBook2">
         <doc>InputBook</doc>
        </representation>
       </request>
