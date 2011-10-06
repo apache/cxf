@@ -40,6 +40,24 @@ import org.junit.Test;
 
 public class ResponseBuilderImplTest extends Assert {
 
+    @Test
+    public void testValidStatus() {
+        assertEquals(100, Response.status(100).build().getStatus());
+        assertEquals(101, Response.status(101).build().getStatus());
+        assertEquals(200, Response.status(200).build().getStatus());
+        assertEquals(599, Response.status(599).build().getStatus());
+        assertEquals(598, Response.status(598).build().getStatus());
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testIllegalsStatus1() {
+        Response.status(99).build();
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testIllegalsStatus2() {
+        Response.status(600).build();
+    }
      
     @Test
     public void testAbsoluteLocation() {
