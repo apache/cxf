@@ -65,6 +65,8 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     DelayQueue<DelayedTaskWrapper> delayQueue;
     WatchDog watchDog;
     
+    boolean shared;
+    
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
     }    
@@ -101,6 +103,10 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         this.lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
         this.dequeueTimeout = dequeueTimeout;
         this.name = name;
+    }
+    
+    public void setShared(boolean b) {
+        shared = b;
     }
     
     protected synchronized ThreadPoolExecutor getExecutor() {
@@ -412,7 +418,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     // AutomaticWorkQueue interface
     
     public void shutdown(boolean processRemainingWorkItems) {
-        if (executor != null) {
+        if (executor != null && !shared) {
             if (!processRemainingWorkItems) {
                 executor.getQueue().clear();
             }

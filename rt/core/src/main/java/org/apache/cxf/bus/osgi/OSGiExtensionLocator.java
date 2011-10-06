@@ -39,14 +39,20 @@ import org.apache.cxf.bus.extension.ExtensionRegistry;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ManagedService;
 
 /**
  * 
@@ -58,6 +64,11 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     private long id;
     private Extension listener;
 
+    static class WorkQueueList {
+        List<AutomaticWorkQueueImpl> list = new CopyOnWriteArrayList<AutomaticWorkQueueImpl>();
+    };
+    private WorkQueueList workQueues = new WorkQueueList();
+    
     /** {@inheritDoc}*/
     public void bundleChanged(BundleEvent event) {
         if (event.getType() == BundleEvent.RESOLVED && id != event.getBundle().getBundleId()) {
@@ -85,6 +96,43 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                 register(bundle);
             }
         }
+        ServiceReference configAdminServiceRef =  
+            context.getServiceReference(ConfigurationAdmin.class.getName());  
+              
+        if (configAdminServiceRef != null) {  
+            ConfigurationAdmin configAdmin = (ConfigurationAdmin)  
+                    context.getService(configAdminServiceRef);  
+              
+            Configuration config = configAdmin.getConfiguration("org.apache.cxf.workqueues");
+            Dictionary d = config.getProperties();
+            if (d != null) {
+                Properties props = new Properties();
+                props.put(Constants.SERVICE_PID, "org.apache.cxf.workqueues");  
+                String s = (String)d.get("org.apache.cxf.workqueue.names");
+                String s2[] = s.split(",");
+                for (String name : s2) {
+                    name = name.trim();
+                    OSGiAutomaticWorkQueue wq = new OSGiAutomaticWorkQueue(name);
+                    wq.updated(d);
+                    wq.setShared(true);
+                    workQueues.list.add(wq);
+                    
+                    context.registerService(ManagedService.class.getName(),  
+                                            wq, props); 
+                }
+            }
+            if (!workQueues.list.isEmpty()) {
+                Extension ext = new Extension(WorkQueueList.class) {
+                    public Object getLoadedObject() {
+                        return workQueues;
+                    }
+                    public Extension cloneNoObject() {
+                        return this;
+                    }
+                };
+                ExtensionRegistry.addExtensions(Collections.singletonList(ext));
+            }
+        }
     }
 
     /** {@inheritDoc}*/
@@ -94,6 +142,11 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         while (!extensions.isEmpty()) {
             unregister(extensions.keySet().iterator().next());
         }
+        for (AutomaticWorkQueueImpl wq : workQueues.list) {
+            wq.setShared(false);
+            wq.shutdown(true);
+        }
+        workQueues.list.clear();
     }
     private void registerBusListener() {
         listener = new Extension(OSGIBusListener.class);
@@ -155,6 +208,16 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         }
  
         public void initComplete() {
+            WorkQueueManager m = bus.getExtension(WorkQueueManager.class);
+            WorkQueueList l = bus.getExtension(WorkQueueList.class);
+            if (l != null && m != null) {
+                for (AutomaticWorkQueueImpl wq : l.list) {
+                    if (m.getNamedWorkQueue(wq.getName()) == null) {
+                        m.addNamedWorkQueue(wq.getName(), wq);
+                    }
+                }
+            }
+            
             BundleContext context = bus.getExtension(BundleContext.class);
             if (context != null) {
                 Properties props = new Properties();
