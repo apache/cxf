@@ -64,7 +64,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     public ResponseBuilder status(int s) {
-        if (status < 100 || status > 599) {
+        if (s < 100 || s > 599) {
             throw new IllegalArgumentException("Illegal status value : " + s);
         }
         status = s;
