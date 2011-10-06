@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.claims;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -55,12 +56,13 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
         while (claimIterator.hasNext()) {
             Claim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
+            URI name = claim.getNamespace().relativize(claim.getClaimType());
             if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                 || WSConstants.SAML2_NS.equals(tokenType)) {
-                attributeBean.setQualifiedName(claim.getClaimType().toString());
+                attributeBean.setQualifiedName(name.toString());
                 attributeBean.setNameFormat(claim.getNamespace().toString());
             } else {
-                attributeBean.setSimpleName(claim.getClaimType().toString());
+                attributeBean.setSimpleName(name.toString());
                 attributeBean.setQualifiedName(claim.getNamespace().toString());
             }
             attributeBean.setAttributeValues(Collections.singletonList(claim.getValue()));
