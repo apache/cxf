@@ -35,9 +35,12 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
     private static final String TYPE_VALUE = "WorkQueues";
     
     private AutomaticWorkQueueImpl aWorkQueue;
+    private WorkQueueManager manager;
     
-    public WorkQueueImplMBeanWrapper(AutomaticWorkQueueImpl wq) {
-        aWorkQueue = wq;        
+    public WorkQueueImplMBeanWrapper(AutomaticWorkQueueImpl wq,
+                                     WorkQueueManager mgr) {
+        aWorkQueue = wq;
+        manager = mgr;
     }
       
     @ManagedAttribute(description = "The WorkQueueMaxSize",
@@ -98,10 +101,9 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
     }
 
     public ObjectName getObjectName() throws JMException {
-        WorkQueueManager mgr = aWorkQueue.getManager();
         String busId = "cxf";
-        if (mgr instanceof WorkQueueManagerImpl) {
-            busId = ((WorkQueueManagerImpl)mgr).getBus().getId();
+        if (manager instanceof WorkQueueManagerImpl) {
+            busId = ((WorkQueueManagerImpl)manager).getBus().getId();
         }
         StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");

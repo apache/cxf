@@ -21,13 +21,17 @@
   xmlns:beans="http://www.springframework.org/schema/beans"
   xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ptp="http://cxf.apache.org/configuration/parameterized-types" 
+  
   targetNamespace="http://cxf.apache.org/core" 
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
 
   <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
   <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
-
+  <xsd:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+             schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
+             
   <xsd:annotation>
     <xsd:documentation>
       This schema defines beans representing the CXF bus and its core features.
@@ -59,6 +63,22 @@
     <xsd:complexType>
       <xsd:sequence />
       <xsd:attribute name="force" type="xsd:boolean" use="optional" default="false"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="workqueue">
+    <xsd:annotation>
+      <xsd:documentation>
+        Configuration for workqueues that CXF uses   
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence />
+      <xsd:attribute name="highWaterMark" type="ptp:ParameterizedInt" use="optional"/>
+      <xsd:attribute name="lowWaterMark" type="ptp:ParameterizedInt" use="optional"/>
+      <xsd:attribute name="initialSize" type="ptp:ParameterizedInt" use="optional"/>
+      <xsd:attribute name="queueSize" type="ptp:ParameterizedInt" use="optional"/>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="dequeueTimeout" type="ptp:ParameterizedLong" use="optional"/>
     </xsd:complexType>
   </xsd:element>
   

@@ -129,6 +129,9 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
                                                           String value) {
                     return false;
                 }
+                public <T> T getBeanOfType(String name, Class<T> type) {
+                    return null;
+                }
             };
             this.setExtension(loc, ConfiguredBeanLocator.class);
         }

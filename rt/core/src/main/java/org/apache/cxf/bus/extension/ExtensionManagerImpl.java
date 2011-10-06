@@ -262,6 +262,16 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
         return ret;
     }
+    public synchronized <T> T getBeanOfType(String name, Class<T> type) {
+        Extension ex = all.get(name); 
+        if (ex != null) {
+            if (ex.getLoadedObject() == null) {
+                loadAndRegister(ex);
+            }
+            return type.cast(ex.getLoadedObject());
+        }
+        return null;
+    }
     public synchronized <T> Collection<? extends T> getBeansOfType(Class<T> type) {
         List<T> ret = new LinkedList<T>();
         for (Extension ex : all.values()) {

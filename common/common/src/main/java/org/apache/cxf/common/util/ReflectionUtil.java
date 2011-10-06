@@ -102,19 +102,19 @@ public final class ReflectionUtil {
         });
     }
 
-    public static void setAccessible(final AccessibleObject o) {
-        AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
-            public Boolean run() {
+    public static <T extends AccessibleObject> T setAccessible(final T o) {
+        return AccessController.doPrivileged(new PrivilegedAction<T>() {
+            public T run() {
                 o.setAccessible(true);
-                return true;
+                return o;
             }
         });
     }
-    public static void setAccessible(final AccessibleObject o, final boolean b) {
-        AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
-            public Boolean run() {
+    public static <T extends AccessibleObject> T setAccessible(final T o, final boolean b) {
+        return AccessController.doPrivileged(new PrivilegedAction<T>() {
+            public T run() {
                 o.setAccessible(b);
-                return true;
+                return o;
             }
         });
     }

@@ -73,13 +73,20 @@ public class InstrumentationManagerTest extends Assert {
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
                                          + ":type=WorkQueues,*");
         Set s = mbs.queryNames(name, null);
-        assertTrue(s.size() == 1);
+        assertEquals(2, s.size());
         Iterator it = s.iterator();
         while (it.hasNext()) {
-            ObjectName n = (ObjectName)it.next();            
+            ObjectName n = (ObjectName)it.next();
             Long result = 
-                (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);            
+                (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
             assertEquals(result, Long.valueOf(256));
+            Integer hwm = 
+                (Integer)mbs.invoke(n, "getHighWaterMark", new Object[0], new String[0]);
+            if (n.getCanonicalName().contains("test-wq")) {
+                assertEquals(10, hwm.intValue());
+            } else {
+                assertEquals(15, hwm.intValue());
+            }
         }
 
         bus.shutdown(true);

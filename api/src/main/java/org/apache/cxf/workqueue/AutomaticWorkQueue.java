@@ -20,6 +20,12 @@ package org.apache.cxf.workqueue;
 
 public interface AutomaticWorkQueue extends WorkQueue {
     /**
+     * Get's the name of the workqueue
+     * @return the name
+     */
+    String getName();
+    
+    /**
      * Initiates an orderly shutdown. 
      * If <code>processRemainingWorkItems</code>
      * is true, waits for all active items to finish execution before returning, otherwise returns 

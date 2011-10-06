@@ -19,6 +19,7 @@
 
 package org.apache.cxf.workqueue;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -30,6 +31,7 @@ import javax.management.JMException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.management.InstrumentationManager;
 
 @NoJSR250Annotations(unlessNull = "bus")
@@ -40,7 +42,9 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
 
     Map<String, AutomaticWorkQueue> namedQueues 
         = new ConcurrentHashMap<String, AutomaticWorkQueue>();
+    
     boolean inShutdown;
+    InstrumentationManager imanager;
     Bus bus;  
     
     public WorkQueueManagerImpl() {
@@ -59,12 +63,28 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         this.bus = bus;
         if (null != bus) {
             bus.setExtension(this, WorkQueueManager.class);
-            InstrumentationManager manager = bus.getExtension(InstrumentationManager.class);
-            if (null != manager) {
+            imanager = bus.getExtension(InstrumentationManager.class);
+            if (null != imanager) {
                 try {
-                    manager.register(new WorkQueueManagerImplMBeanWrapper(this));
+                    imanager.register(new WorkQueueManagerImplMBeanWrapper(this));
                 } catch (JMException jmex) {
                     LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                }
+            }
+            ConfiguredBeanLocator locator = bus.getExtension(ConfiguredBeanLocator.class);
+            Collection<? extends AutomaticWorkQueue> q = locator
+                    .getBeansOfType(AutomaticWorkQueue.class);
+            if (q != null) {
+                for (AutomaticWorkQueue awq : q) {
+                    addNamedWorkQueue(awq.getName(), awq);
+                }
+            }
+            
+            if (!namedQueues.containsKey("default")) {
+                AutomaticWorkQueue defaultQueue 
+                    = locator.getBeanOfType("cxf.default.workqueue", AutomaticWorkQueue.class);
+                if (defaultQueue != null) {
+                    addNamedWorkQueue("default", defaultQueue);
                 }
             }
         }
@@ -117,15 +137,21 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     public AutomaticWorkQueue getNamedWorkQueue(String name) {
         return namedQueues.get(name);
     }
-    public void addNamedWorkQueue(String name, AutomaticWorkQueue q) {
+    public final void addNamedWorkQueue(String name, AutomaticWorkQueue q) {
         namedQueues.put(name, q);
+        if (imanager != null && q instanceof AutomaticWorkQueueImpl) {
+            try {
+                imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
+            } catch (JMException jmex) {
+                LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+            }
+        }
     }
     
     private AutomaticWorkQueue createAutomaticWorkQueue() {        
-        AutomaticWorkQueueImpl impl = new AutomaticWorkQueueImpl("default");
-        impl.setManager(this);
-        impl.register();
-        return impl;       
+        AutomaticWorkQueue q = new AutomaticWorkQueueImpl("default");
+        addNamedWorkQueue("default", q);
+        return q;
     }
 
 }

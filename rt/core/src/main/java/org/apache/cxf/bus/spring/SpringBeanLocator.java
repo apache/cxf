@@ -37,6 +37,7 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.Mergeable;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.context.ApplicationContext;
@@ -95,6 +96,18 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         }
     }
     
+    public <T> T getBeanOfType(String name, Class<T> type) {
+        T t = null;
+        try {
+            t = context.getBean(name, type);
+        } catch (NoSuchBeanDefinitionException nsbde) {
+            //ignore
+        }
+        if (t == null) {
+            t = orig.getBeanOfType(name, type);
+        }
+        return t;
+    }
     
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {

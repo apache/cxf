@@ -59,7 +59,20 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         }
     }
     
-    
+    public <T> T getBeanOfType(String name, Class<T> type) {
+        ExecutionContext origContext 
+            = ExecutionContext.Holder.setContext((ExecutionContext)container.getRepository());
+        try {
+            Recipe r = container.getRepository().getRecipe(name);
+            if (r instanceof BeanRecipe && ((BeanRecipe)r).getType() != null
+                && type.isAssignableFrom(((BeanRecipe)r).getType())) {
+                return type.cast(container.getComponentInstance(name));
+            }
+        } finally {
+            ExecutionContext.Holder.setContext(origContext);
+        }
+        return orig.getBeanOfType(name, type);
+    }
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
         Set<String> names = new LinkedHashSet<String>();

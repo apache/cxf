@@ -35,6 +35,15 @@ public interface ConfiguredBeanLocator {
      */
     List<String> getBeanNamesOfType(Class<?> type);
     
+    
+    /**
+     * Gets the bean of the given name and type
+     * @param name
+     * @param type
+     * @return the bean
+     */
+    <T> T getBeanOfType(String name, Class<T> type);
+    
     /**
      * Gets all the configured beans of the specific types.  Causes them
      * all to be loaded. 

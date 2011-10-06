@@ -27,9 +27,11 @@ import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.feature.FastInfosetFeature;
 import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
@@ -57,6 +59,23 @@ public class CXFCoreNamespaceHandler implements NamespaceHandler {
         } else if ("fastinfoset".equals(s)) {
             //fastinfosetfeature
             return new SimpleBPBeanDefinitionParser(FastInfosetFeature.class).parse(element, context);
+        } else if ("workqueue".equals(s)) {
+            //fastinfosetfeature
+            return new SimpleBPBeanDefinitionParser(AutomaticWorkQueueImpl.class) {
+                public String getId(Element element, ParserContext context) {
+                    String id = element.hasAttribute("id") ? element.getAttribute("id") : null;
+                    if (id == null) {
+                        id = "cxf.workqueue."; 
+                        id += element.hasAttribute("name") ? element.getAttribute("name") : "def";
+                    }
+                    return super.getId(element, context);
+                }
+
+                protected void processNameAttribute(Element element, ParserContext ctx,
+                                                    MutableBeanMetadata bean, String val) {
+                    bean.addProperty("name", createValue(ctx, val));
+                }
+            } .parse(element, context);
         }
         return null;
     }

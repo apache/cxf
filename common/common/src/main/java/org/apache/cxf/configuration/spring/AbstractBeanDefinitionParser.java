@@ -63,6 +63,9 @@ public abstract class AbstractBeanDefinitionParser
     private JAXBContext context;
     private Set<Class<?>> classes;
 
+    public AbstractBeanDefinitionParser() {
+    }
+    
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         boolean setBus = parseAttributes(element, ctx, bean);        
@@ -93,7 +96,9 @@ public abstract class AbstractBeanDefinitionParser
                 bean.setAbstract(true);
             } else if ("depends-on".equals(name)) {
                 bean.addDependsOn(val);
-            } else if (!"id".equals(name) && !"name".equals(name) && isAttribute(pre, name)) {
+            } else if ("name".equals(name)) {
+                processNameAttribute(element, ctx, bean, val);
+            } else if (!"id".equals(name) && isAttribute(pre, name)) {
                 if ("bus".equals(name)) {                                     
                     if (val != null && val.trim().length() > 0 
                         && ctx.getRegistry().containsBeanDefinition(val)) {
@@ -106,6 +111,13 @@ public abstract class AbstractBeanDefinitionParser
             }
         } 
         return setBus;
+    }
+
+    protected void processNameAttribute(Element element,
+                                        ParserContext ctx,
+                                        BeanDefinitionBuilder bean,
+                                        String val) {
+        //nothing
     }
 
     private boolean isNamespace(String name, String prefix) {

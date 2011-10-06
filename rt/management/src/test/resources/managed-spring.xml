@@ -35,4 +35,6 @@
         <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi" />
     </bean> 
  
+    <cxf:workqueue name="default" highWaterMark="15" lowWaterMark="5"/>
+    <cxf:workqueue name="test-wq" highWaterMark="10" lowWaterMark="2"/>
 </beans>

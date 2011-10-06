@@ -19,3 +19,4 @@
 #
 #
 http\://cxf.apache.org/schemas/configuration/cxf-beans.xsd=schemas/configuration/cxf-beans.xsd
+http\://cxf.apache.org/configuration/parameterized-types=schemas/configuration/parameterized-types.xsd

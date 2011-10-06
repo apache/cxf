@@ -18,10 +18,15 @@
  */
 package org.apache.cxf.bus.spring;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.configuration.spring.SimpleBeanDefinitionParser;
 import org.apache.cxf.feature.FastInfosetFeature;
 import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.beans.factory.xml.ParserContext;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
@@ -31,5 +36,22 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
                                      new SimpleBeanDefinitionParser(LoggingFeature.class));
         registerBeanDefinitionParser("fastinfoset",
                                      new SimpleBeanDefinitionParser(FastInfosetFeature.class));
+        
+        registerBeanDefinitionParser("workqueue",
+                                     new SimpleBeanDefinitionParser(AutomaticWorkQueueImpl.class) {
+
+                protected void processNameAttribute(Element element,
+                                                ParserContext ctx,
+                                                BeanDefinitionBuilder bean,
+                                                String val) {
+                    bean.addPropertyValue("name", val);
+                    element.removeAttribute("name");
+                    if (!element.hasAttribute("id")) {
+                        val = "cxf.workqueue." + val;
+                        element.setAttribute("id", val);
+                    }
+                    
+                }
+            });
     }
 }

@@ -91,13 +91,14 @@ public class AutomaticWorkQueueTest extends Assert {
 
         // We haven't enqueued anything yet, so should be zero
         assertEquals(0, workqueue.getSize());
-        assertEquals(INITIAL_SIZE, workqueue.getPoolSize());
+        assertEquals(0, workqueue.getPoolSize());
 
         // Check that no threads are working yet, as we haven't enqueued
         // anything yet.
         assertEquals(0, workqueue.getActiveCount());
 
         workqueue.execute(new TestWorkItem(), TIMEOUT);
+        assertEquals(INITIAL_SIZE, workqueue.getPoolSize());
 
         // Give threads a chance to dequeue (5sec max)
         int i = 0;
@@ -129,7 +130,7 @@ public class AutomaticWorkQueueTest extends Assert {
         // initial size and no threads should be working
         //
         assertEquals(0, workqueue.getSize());
-        assertEquals(INITIAL_SIZE, workqueue.getPoolSize());
+        assertEquals(0, workqueue.getPoolSize());
         assertEquals(0, workqueue.getActiveCount());
 
         BlockingWorkItem[] workItems = new BlockingWorkItem[DEFAULT_HIGH_WATER_MARK];

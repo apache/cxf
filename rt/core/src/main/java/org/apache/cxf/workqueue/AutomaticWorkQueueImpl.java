@@ -36,31 +36,35 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.management.JMException;
-
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.common.util.ReflectionUtil;
 
-public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements AutomaticWorkQueue {
+@NoJSR250Annotations
+public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
     static final int DEFAULT_MAX_QUEUE_SIZE = 256;
     private static final Logger LOG =
         LogUtils.getL7dLogger(AutomaticWorkQueueImpl.class);
     
-    int maxQueueSize;
-    DelayQueue<DelayedTaskWrapper> delayQueue = new DelayQueue<DelayedTaskWrapper>();
-    WatchDog watchDog = new WatchDog(delayQueue);
-    
-    WorkQueueManagerImpl manager;
-    String name = "default";
-    final int corePoolSize;
-    final int maxPoolSize;
-    final ReentrantLock mainLock;
 
+    String name = "default";
+    int maxQueueSize;
+    int initialThreads;
+    int lowWaterMark;
+    int highWaterMark; 
+    long dequeueTimeout;
+
+    ThreadPoolExecutor executor;
+    AWQThreadFactory threadFactory;
+    ReentrantLock mainLock;
+    
+    
+    DelayQueue<DelayedTaskWrapper> delayQueue;
+    WatchDog watchDog;
+    
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
     }    
@@ -91,63 +95,76 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
                                   int lowWaterMark,
                                   long dequeueTimeout,
                                   String name) {
-        
-        super(-1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark, 
-            -1 == highWaterMark ? Integer.MAX_VALUE : highWaterMark,
-                TimeUnit.MILLISECONDS.toMillis(dequeueTimeout), TimeUnit.MILLISECONDS, 
-                mqs == -1 ? new LinkedBlockingQueue<Runnable>(DEFAULT_MAX_QUEUE_SIZE)
-                    : new LinkedBlockingQueue<Runnable>(mqs),
-            createThreadFactory(name));
-        
-        maxQueueSize = mqs == -1 ? DEFAULT_MAX_QUEUE_SIZE : mqs;
-        
-        
-        lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
-        highWaterMark = -1 == highWaterMark ? Integer.MAX_VALUE : highWaterMark;
-                
-        StringBuilder buf = new StringBuilder();
-        buf.append("Constructing automatic work queue with:\n");
-        buf.append("max queue size: " + maxQueueSize + "\n");
-        buf.append("initialThreads: " + initialThreads + "\n");
-        buf.append("lowWaterMark: " + lowWaterMark + "\n");
-        buf.append("highWaterMark: " + highWaterMark + "\n");
-        LOG.fine(buf.toString());
-
-        if (initialThreads > highWaterMark) {
-            initialThreads = highWaterMark;
-        }
-
-        // as we cannot prestart more core than corePoolSize initial threads, we temporarily
-        // change the corePoolSize to the number of initial threads
-        // this is important as otherwise these threads will be created only when the queue has filled up, 
-        // potentially causing problems with starting up under heavy load
-        if (initialThreads < Integer.MAX_VALUE && initialThreads > 0) {
-            setCorePoolSize(initialThreads);
-            int started = prestartAllCoreThreads();
-            if (started < initialThreads) {
-                LOG.log(Level.WARNING, "THREAD_START_FAILURE_MSG", new Object[] {started, initialThreads});
-            }
-            setCorePoolSize(lowWaterMark);
-        }
-        
-        // start the watch dog thread
-        watchDog.setDaemon(true);
-        watchDog.start();
-        
-        corePoolSize = this.getCorePoolSize();
-        maxPoolSize = this.getMaximumPoolSize(); 
-        
-        ReentrantLock l = null;
-        try {
-            Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
-            f.setAccessible(true);
-            l = (ReentrantLock)f.get(this);
-        } catch (Throwable t) {
-            l = new ReentrantLock();
-        }
-        mainLock = l;
+        this.maxQueueSize = mqs == -1 ? DEFAULT_MAX_QUEUE_SIZE : mqs;
+        this.initialThreads = initialThreads;
+        this.highWaterMark = -1 == highWaterMark ? Integer.MAX_VALUE : highWaterMark;
+        this.lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
+        this.dequeueTimeout = dequeueTimeout;
+        this.name = name;
     }
-    private static ThreadFactory createThreadFactory(final String name) {
+    
+    protected synchronized ThreadPoolExecutor getExecutor() {
+        if (executor == null) {
+            threadFactory = createThreadFactory(name);
+            executor = new ThreadPoolExecutor(lowWaterMark, 
+                                              highWaterMark,
+                                              TimeUnit.MILLISECONDS.toMillis(dequeueTimeout), 
+                                              TimeUnit.MILLISECONDS, 
+                                              new LinkedBlockingQueue<Runnable>(maxQueueSize),
+                                              threadFactory) {
+                @Override
+                protected void terminated() {
+                    ThreadFactory f = executor.getThreadFactory();
+                    if (f instanceof AWQThreadFactory) {
+                        ((AWQThreadFactory)f).shutdown();
+                    }
+                    if (watchDog != null) {
+                        watchDog.shutdown();
+                    }
+                }
+            };
+            
+                    
+            StringBuilder buf = new StringBuilder();
+            buf.append("Constructing automatic work queue with:\n");
+            buf.append("max queue size: " + maxQueueSize + "\n");
+            buf.append("initialThreads: " + initialThreads + "\n");
+            buf.append("lowWaterMark: " + lowWaterMark + "\n");
+            buf.append("highWaterMark: " + highWaterMark + "\n");
+            LOG.fine(buf.toString());
+    
+            if (initialThreads > highWaterMark) {
+                initialThreads = highWaterMark;
+            }
+    
+            // as we cannot prestart more core than corePoolSize initial threads, we temporarily
+            // change the corePoolSize to the number of initial threads
+            // this is important as otherwise these threads will be created only when 
+            // the queue has filled up, 
+            // potentially causing problems with starting up under heavy load
+            if (initialThreads < Integer.MAX_VALUE && initialThreads > 0) {
+                executor.setCorePoolSize(initialThreads);
+                int started = executor.prestartAllCoreThreads();
+                if (started < initialThreads) {
+                    LOG.log(Level.WARNING, "THREAD_START_FAILURE_MSG",
+                            new Object[] {started, initialThreads});
+                }
+                executor.setCorePoolSize(lowWaterMark);
+            }
+    
+            ReentrantLock l = null;
+            try {
+                Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
+                ReflectionUtil.setAccessible(f);
+                l = (ReentrantLock)f.get(executor);
+            } catch (Throwable t) {
+                l = new ReentrantLock();
+            }
+            mainLock = l;
+        }
+        return executor;
+    }
+    private static AWQThreadFactory createThreadFactory(final String name) {
         ThreadGroup group;
         try { 
             //Try and find the highest level ThreadGroup that we're allowed to use.
@@ -294,40 +311,16 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         }
     }
     
-    @Resource(name = "org.apache.cxf.workqueue.WorkQueueManager")
-    public void setManager(WorkQueueManager mgr) {
-        manager = (WorkQueueManagerImpl)mgr;
-    }
-    public WorkQueueManager getManager() {
-        return manager;
-    }
-
     public void setName(String s) {
         name = s;
-        ThreadFactory factory = this.getThreadFactory();
-        if (factory instanceof AWQThreadFactory) {
-            ((AWQThreadFactory)factory).setName(s);
+        if (threadFactory != null) {
+            threadFactory.setName(s);
         }
     }
     public String getName() {
         return name;
     }
-    
-    @PostConstruct
-    public void register() {
-        if (manager != null) {
-            manager.addNamedWorkQueue(name, this);
-            InstrumentationManager imanager = manager.getBus().getExtension(InstrumentationManager.class);
-            if (null != imanager) {
-                try {
-                    imanager.register(new WorkQueueImplMBeanWrapper(this));
-                } catch (JMException jmex) {
-                    LOG.log(Level.WARNING , jmex.getMessage(), jmex);
-                }
-            }
-        }
-    }
-    
+
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
@@ -371,21 +364,21 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         //of threads.   Thus, we'll set the core size to the max,
         //add the runnable, and set back.  That will cause the
         //threads to be created as needed.
-        super.execute(r);
-        if (!getQueue().isEmpty() && this.getPoolSize() < maxPoolSize) {
+        ThreadPoolExecutor ex = getExecutor();
+        ex.execute(r);
+        if (!ex.getQueue().isEmpty() && this.getPoolSize() < highWaterMark) {
             mainLock.lock();
             try {
                 int ps = this.getPoolSize();
-                int sz = getQueue().size();
+                int sz = executor.getQueue().size();
                 int sz2 = this.getActiveCount();
                 
                 if ((sz + sz2) > ps) {
                     Method m = ThreadPoolExecutor.class.getDeclaredMethod("addIfUnderMaximumPoolSize",
                                                                           Runnable.class);
-                    m.setAccessible(true);
-                    m.invoke(this, new Object[1]);
+                    ReflectionUtil.setAccessible(m).invoke(this, new Object[1]);
                 }
-            } catch (Exception ex) {
+            } catch (Exception exc) {
                 //ignore
             } finally {
                 mainLock.unlock();
@@ -399,33 +392,34 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
             execute(work);
         } catch (RejectedExecutionException ree) {
             try {
-                getQueue().offer(work, timeout, TimeUnit.MILLISECONDS);
+                getExecutor().getQueue().offer(work, timeout, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ie) {
                 throw new RejectedExecutionException(ie);
             }
         }    
     }
 
-    public void schedule(final Runnable work, final long delay) {
+    public synchronized void schedule(final Runnable work, final long delay) {
+        if (delayQueue == null) {
+            delayQueue = new DelayQueue<DelayedTaskWrapper>();
+            watchDog = new WatchDog(delayQueue);
+            watchDog.setDaemon(true);
+            watchDog.start();
+        }
         delayQueue.put(new DelayedTaskWrapper(work, delay));
     }
     
     // AutomaticWorkQueue interface
     
     public void shutdown(boolean processRemainingWorkItems) {
-        if (!processRemainingWorkItems) {
-            getQueue().clear();
+        if (executor != null) {
+            if (!processRemainingWorkItems) {
+                executor.getQueue().clear();
+            }
+            executor.shutdown();
         }
-        shutdown();
     }
-    @Override
-    protected void terminated() {
-        ThreadFactory f = this.getThreadFactory();
-        if (f instanceof AWQThreadFactory) {
-            ((AWQThreadFactory)f).shutdown();
-        }
-        watchDog.shutdown();
-    }
+
 
     /**
      * Gets the maximum size (capacity) of the backing queue.
@@ -440,33 +434,76 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
      * @return the current size of the backing queue.
      */
     public long getSize() {
-        return getQueue().size();
+        return executor == null ? 0 : executor.getQueue().size();
     }
 
 
     public boolean isEmpty() {
-        return getQueue().size() == 0;
+        return executor == null ? true : executor.getQueue().size() == 0;
     }
 
     boolean isFull() {
-        return getQueue().remainingCapacity() == 0;
+        return executor == null ? false : executor.getQueue().remainingCapacity() == 0;
     }
 
     public int getHighWaterMark() {
-        int hwm = getMaximumPoolSize();
+        int hwm = executor == null ? highWaterMark : executor.getMaximumPoolSize();
         return hwm == Integer.MAX_VALUE ? -1 : hwm;
     }
 
     public int getLowWaterMark() {
-        int lwm = getCorePoolSize();
+        int lwm = executor == null ? lowWaterMark : executor.getCorePoolSize();
         return lwm == Integer.MAX_VALUE ? -1 : lwm;
     }
 
     public void setHighWaterMark(int hwm) {
-        setMaximumPoolSize(hwm < 0 ? Integer.MAX_VALUE : hwm);
+        highWaterMark = hwm < 0 ? Integer.MAX_VALUE : hwm;
+        if (executor != null) {
+            executor.setMaximumPoolSize(highWaterMark);
+        }
     }
 
     public void setLowWaterMark(int lwm) {
-        setCorePoolSize(lwm < 0 ? 0 : lwm);
+        lowWaterMark = lwm < 0 ? 0 : lwm;
+        if (executor != null) {
+            executor.setCorePoolSize(lowWaterMark);
+        }
+    }
+
+    public void setInitialSize(int initialSize) {
+        this.initialThreads = initialSize;
+    }
+    
+    public void setQueueSize(int size) {
+        this.maxQueueSize = size;
+    }
+    
+    public void setDequeueTimeout(long l) {
+        this.dequeueTimeout = l;
+    }
+    
+    public boolean isShutdown() {
+        if (executor == null) {
+            return false;
+        }
+        return executor.isShutdown();
+    }
+    public int getLargestPoolSize() {
+        if (executor == null) {
+            return 0;
+        }
+        return executor.getLargestPoolSize();
+    }
+    public int getPoolSize() {
+        if (executor == null) {
+            return 0;
+        }
+        return executor.getPoolSize();
+    }
+    public int getActiveCount() {
+        if (executor == null) {
+            return 0;
+        }
+        return executor.getActiveCount();
     }
 }
