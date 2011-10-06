@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1515,7 +1516,12 @@ public class HTTPConduit
                     outMessage.getExchange().put(Executor.class.getName() 
                                                  + ".USING_SPECIFIED", Boolean.TRUE);
                 }
-                ex.execute(runnable);
+                try {
+                    ex.execute(runnable);
+                } catch (RejectedExecutionException rex) {
+                    LOG.warning("EXECUTOR_FULL");
+                    handleResponseInternal();
+                }
             }
         }
 
