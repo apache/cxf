@@ -622,11 +622,13 @@ public class SourceGenerator {
     }
 
     private List<Element> getXmlReps(List<Element> repElements) {
+        Set<String> values = new HashSet<String>(repElements.size());
         List<Element> xmlReps = new ArrayList<Element>();
         for (Element el : repElements) {
             String value = el.getAttribute("element");
-            if (value.length() > 0 && value.contains(":")) {
+            if (value.length() > 0 && value.contains(":") && !values.contains(value)) {
                 xmlReps.add(el);
+                values.add(value);
             }
         }
         if (xmlReps.isEmpty()) {
