@@ -376,7 +376,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                 if ((sz + sz2) > ps) {
                     Method m = ThreadPoolExecutor.class.getDeclaredMethod("addIfUnderMaximumPoolSize",
                                                                           Runnable.class);
-                    ReflectionUtil.setAccessible(m).invoke(this, new Object[1]);
+                    ReflectionUtil.setAccessible(m).invoke(executor, new Object[1]);
                 }
             } catch (Exception exc) {
                 //ignore
