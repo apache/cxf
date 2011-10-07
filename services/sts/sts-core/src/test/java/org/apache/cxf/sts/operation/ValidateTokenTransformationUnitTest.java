@@ -151,8 +151,8 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
     }
     
     /**
-     * Test to successfully validate a UsernameToken in Realm "B" and transform it into a 
-     * SAML Assertion in Realm "A".
+     * Test to successfully validate a UsernameToken (which was issued in realm "A") and 
+     * transform it into a SAML Assertion in Realm "B".
      */
     @org.junit.Test
     public void testUsernameTokenTransformationRealm() throws Exception {
@@ -160,7 +160,9 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
-        validatorList.add(new UsernameTokenValidator());
+        UsernameTokenValidator validator = new UsernameTokenValidator();
+        validator.setUsernameTokenRealmCodec(new CustomUsernameTokenRealmCodec());
+        validatorList.add(validator);
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider

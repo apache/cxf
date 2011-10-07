@@ -37,6 +37,7 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.token.realm.UsernameTokenRealmCodec;
 
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -60,12 +61,23 @@ public class UsernameTokenValidator implements TokenValidator {
     
     private Validator validator = new org.apache.ws.security.validate.UsernameTokenValidator();
     
+    private UsernameTokenRealmCodec usernameTokenRealmCodec;
+    
     /**
      * Set the WSS4J Validator instance to use to validate the token.
      * @param validator the WSS4J Validator instance to use to validate the token
      */
     public void setValidator(Validator validator) {
         this.validator = validator;
+    }
+    
+    /**
+     * Set the UsernameTokenRealmCodec instance to use to return a realm from a validated token
+     * @param usernameTokenRealmCodec the UsernameTokenRealmCodec instance to use to return a 
+     *                                realm from a validated token
+     */
+    public void setUsernameTokenRealmCodec(UsernameTokenRealmCodec usernameTokenRealmCodec) {
+        this.usernameTokenRealmCodec = usernameTokenRealmCodec;
     }
     
     /**
@@ -115,6 +127,7 @@ public class UsernameTokenValidator implements TokenValidator {
         // Turn the JAXB UsernameTokenType into a DOM Element for validation
         //
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
+        
         SecurityToken secToken = null;
         if (tokenParameters.getTokenStore() != null) {
             secToken = tokenParameters.getTokenStore().getToken(usernameTokenType.getId());
@@ -142,6 +155,7 @@ public class UsernameTokenValidator implements TokenValidator {
         } else {
             usernameTokenElement = secToken.getToken();
         }
+        
         //
         // Validate the token
         //
@@ -154,7 +168,6 @@ public class UsernameTokenValidator implements TokenValidator {
             if (ut.getPassword() == null) {
                 return response;
             }
-            
             if (secToken == null || (secToken.getAssociatedHash() != ut.hashCode())) {
                 Credential credential = new Credential();
                 credential.setUsernametoken(ut);
@@ -164,7 +177,15 @@ public class UsernameTokenValidator implements TokenValidator {
                 createPrincipal(
                     ut.getName(), ut.getPassword(), ut.getPasswordType(), ut.getNonce(), ut.getCreated()
                 );
+            
+            // Get the realm of the UsernameToken
+            String tokenRealm = null;
+            if (usernameTokenRealmCodec != null) {
+                tokenRealm = usernameTokenRealmCodec.getRealmFromToken(ut);
+            }
+            
             response.setPrincipal(principal);
+            response.setTokenRealm(tokenRealm);
             response.setValid(true);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);

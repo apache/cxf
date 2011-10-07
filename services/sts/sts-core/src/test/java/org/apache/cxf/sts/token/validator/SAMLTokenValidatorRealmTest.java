@@ -43,6 +43,7 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
@@ -50,18 +51,17 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 
 /**
- * Some unit tests for validating a SAML token via the SAMLTokenValidator in different realms.
+ * Some unit tests for validating a SAML token in different realms via the SAMLTokenValidator.
  */
 public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
     
     /**
-     * Test a SAML 1.1 Assertion created in realm "A" and validated in realm "B".
+     * Test a SAML 1.1 Assertion created in realm "A".
      */
     @org.junit.Test
-    public void testDifferentRealms() throws Exception {
+    public void testRealmA() throws Exception {
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
-        validatorParameters.setRealm("B");
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
         
         // Create a ValidateTarget consisting of a SAML Assertion
@@ -75,22 +75,61 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         
-        // Token Validation should fail as the TokenValidator doesn't know about the realm "A"
+        // Validate the token - no realm is returned
         TokenValidatorResponse validatorResponse = 
             samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.isValid());
+        assertNull(validatorResponse.getTokenRealm());
 
-        // Now set the realms on the Validator and try to validate the token again
-        Map<String, SAMLRealm> samlRealms = getSamlRealms();
-        ((SAMLTokenValidator)samlTokenValidator).setRealmMap(samlRealms);
-        
-        assertTrue(samlTokenValidator.canHandleToken(validateTarget, "B"));
+        // Now set the SAMLRealmCodec implementation on the Validator
+        SAMLRealmCodec samlRealmCodec = new IssuerSAMLRealmCodec();
+        ((SAMLTokenValidator)samlTokenValidator).setSamlRealmCodec(samlRealmCodec);
         
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.isValid());
         assertTrue(validatorResponse.getTokenRealm().equals("A"));
+            
+        Principal principal = validatorResponse.getPrincipal();
+        assertTrue(principal != null && principal.getName() != null);
+    }
+    
+    /**
+     * Test a SAML 1.1 Assertion created in realm "B".
+     */
+    @org.junit.Test
+    public void testRealmB() throws Exception {
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a SAML Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, "B");
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        
+        // Validate the token - no realm is returned
+        TokenValidatorResponse validatorResponse = 
+            samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.isValid());
+        assertNull(validatorResponse.getTokenRealm());
+
+        // Now set the SAMLRealmCodec implementation on the Validator
+        SAMLRealmCodec samlRealmCodec = new IssuerSAMLRealmCodec();
+        ((SAMLTokenValidator)samlTokenValidator).setSamlRealmCodec(samlRealmCodec);
+        
+        validatorResponse = samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.isValid());
+        assertTrue(validatorResponse.getTokenRealm().equals("B"));
             
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);

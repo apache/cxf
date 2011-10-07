@@ -20,6 +20,8 @@ package org.apache.cxf.sts.token.validator;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.security.auth.callback.Callback;
@@ -129,74 +131,6 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
     }
     
     /**
-     * Test a SAML 1.1 Assertion with an invalid issuer
-     */
-    @org.junit.Test
-    public void testInvalidIssuerSAML1Assertion() throws Exception {
-        TokenValidator samlTokenValidator = new SAMLTokenValidator();
-        TokenValidatorParameters validatorParameters = createValidatorParameters();
-        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
-        // Create a ValidateTarget consisting of a SAML Assertion
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
-        Document doc = samlToken.getOwnerDocument();
-        samlToken = (Element)doc.appendChild(samlToken);
-        
-        ReceivedToken validateTarget = new ReceivedToken(samlToken);
-        tokenRequirements.setValidateTarget(validateTarget);
-        
-        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        // Set tokenstore to null so that issued token is not found in the cache
-        validatorParameters.setTokenStore(null);
-        
-        // Change the issuer and so validation should fail
-        validatorParameters.getStsProperties().setIssuer("NewSTS");
-        
-        TokenValidatorResponse validatorResponse = 
-            samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
-    }
-    
-    /**
-     * Test a SAML 2 Assertion with an invalid issuer
-     */
-    @org.junit.Test
-    public void testInvalidIssuerSAML2Assertion() throws Exception {
-        TokenValidator samlTokenValidator = new SAMLTokenValidator();
-        TokenValidatorParameters validatorParameters = createValidatorParameters();
-        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
-        // Create a ValidateTarget consisting of a SAML Assertion
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
-        Document doc = samlToken.getOwnerDocument();
-        samlToken = (Element)doc.appendChild(samlToken);
-        
-        ReceivedToken validateTarget = new ReceivedToken(samlToken);
-        tokenRequirements.setValidateTarget(validateTarget);
-        
-        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
- 
-        // Set tokenstore to null so that issued token is not found in the cache
-        validatorParameters.setTokenStore(null);
-
-        // Change the issuer and so validation should fail
-        validatorParameters.getStsProperties().setIssuer("NewSTS");
-        
-        TokenValidatorResponse validatorResponse = 
-            samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
-    }
-    
-    /**
      * Test a SAML 1.1 Assertion with an invalid signature
      */
     @org.junit.Test
@@ -254,6 +188,46 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse = 
             samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertFalse(validatorResponse.isValid());
+    }
+    
+    /**
+     * Test a SAML 1.1 Assertion using Certificate Constraints 
+     */
+    @org.junit.Test
+    public void testSAML1AssertionCertConstraints() throws Exception {
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        validatorParameters.setTokenStore(null);
+        
+        // Create a ValidateTarget consisting of a SAML Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+        List<String> certConstraints = new ArrayList<String>();
+        certConstraints.add("XYZ");
+        certConstraints.add(".*CN=www.sts.com.*");
+        ((SAMLTokenValidator)samlTokenValidator).setSubjectConstraints(certConstraints);
+        
+        TokenValidatorResponse validatorResponse = 
+            samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.isValid());
+        
+        certConstraints.clear();
+        certConstraints.add("XYZ");
+        ((SAMLTokenValidator)samlTokenValidator).setSubjectConstraints(certConstraints);
+        validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertFalse(validatorResponse.isValid());
     }

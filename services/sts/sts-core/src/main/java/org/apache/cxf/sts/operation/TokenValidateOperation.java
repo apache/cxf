@@ -135,12 +135,12 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             // Map the principal (if it exists)
             Principal responsePrincipal = tokenResponse.getPrincipal();
             if (responsePrincipal != null) {
-                String realm = providerParameters.getRealm();
-                String targetRealm = tokenResponse.getTokenRealm();
+                String targetRealm = providerParameters.getRealm();
+                String sourceRealm = tokenResponse.getTokenRealm();
                 IdentityMapper identityMapper = stsProperties.getIdentityMapper();
-                if (realm != null && !realm.equals(targetRealm) && identityMapper != null) {
+                if (sourceRealm != null && !sourceRealm.equals(targetRealm) && identityMapper != null) {
                     Principal targetPrincipal = 
-                        identityMapper.mapPrincipal(realm, responsePrincipal, targetRealm);
+                        identityMapper.mapPrincipal(sourceRealm, responsePrincipal, targetRealm);
                     providerParameters.setPrincipal(targetPrincipal);
                 } else {
                     providerParameters.setPrincipal(responsePrincipal);

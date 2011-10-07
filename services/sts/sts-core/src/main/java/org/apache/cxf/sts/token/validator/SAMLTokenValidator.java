@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.sts.token.validator;
 
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,9 +32,9 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.CertConstraintsParser;
+import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-
 import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
@@ -57,7 +57,17 @@ public class SAMLTokenValidator implements TokenValidator {
     
     private Validator validator = new SignatureTrustValidator();
     
-    private Map<String, SAMLRealm> realmMap = new HashMap<String, SAMLRealm>();
+    private CertConstraintsParser certConstraints = new CertConstraintsParser();
+    
+    private SAMLRealmCodec samlRealmCodec;
+    
+    /**
+     * Set a list of Strings corresponding to regular expression constraints on the subject DN
+     * of a certificate that was used to sign a received Assertion
+     */
+    public void setSubjectConstraints(List<String> subjectConstraints) {
+        certConstraints.setSubjectConstraints(subjectConstraints);
+    }
     
     /**
      * Set the WSS4J Validator instance to use to validate the token.
@@ -65,6 +75,14 @@ public class SAMLTokenValidator implements TokenValidator {
      */
     public void setValidator(Validator validator) {
         this.validator = validator;
+    }
+    
+    /**
+     * Set the SAMLRealmCodec instance to use to return a realm from a validated token
+     * @param samlRealmCodec the SAMLRealmCodec instance to use to return a realm from a validated token
+     */
+    public void setSamlRealmCodec(SAMLRealmCodec samlRealmCodec) {
+        this.samlRealmCodec = samlRealmCodec;
     }
     
     /**
@@ -77,13 +95,9 @@ public class SAMLTokenValidator implements TokenValidator {
     
     /**
      * Return true if this TokenValidator implementation is capable of validating the
-     * ReceivedToken argument.
+     * ReceivedToken argument. The realm is ignored in this Validator.
      */
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
-        if (realm != null && !realmMap.containsKey(realm)) {
-            return false;
-        }
-        
         Object token = validateTarget.getToken();
         if (token instanceof Element) {
             Element tokenElement = (Element)token;
@@ -153,52 +167,32 @@ public class SAMLTokenValidator implements TokenValidator {
     
                 validator.validate(trustCredential, requestData);
 
-                // Finally check that the issuer is trusted
-                String trustedIssuer = null;
-                String assertionIssuer = assertion.getIssuerString();
-                for (String realm : realmMap.keySet()) {
-                    SAMLRealm samlRealm = realmMap.get(realm);
-                    if (samlRealm.getIssuer().equals(assertionIssuer)) {
-                        trustedIssuer = realm;
-                        break;
-                    }
+                // Finally check that subject DN of the signing certificate matches a known constraint
+                X509Certificate cert = null;
+                if (trustCredential.getCertificates() != null) {
+                    cert = trustCredential.getCertificates()[0];
                 }
-                if (trustedIssuer == null && assertionIssuer.equals(stsProperties.getIssuer())) {
-                    trustedIssuer = stsProperties.getIssuer();
+                
+                if (!certConstraints.matches(cert)) {
+                    return response;
                 }
-                if (trustedIssuer != null) {
-                    response.setValid(true);
-                    SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
-                    response.setPrincipal(samlPrincipal);
-                    response.setTokenRealm(trustedIssuer);
-                }
-            } else {
-                response.setValid(true);
-                SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
-                response.setPrincipal(samlPrincipal);
-                response.setTokenRealm(assertion.getIssuerString());
             }
+            
+            // Get the realm of the SAML token
+            String tokenRealm = null;
+            if (samlRealmCodec != null) {
+                tokenRealm = samlRealmCodec.getRealmFromToken(assertion);
+            }
+            
+            response.setValid(true);
+            SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
+            response.setPrincipal(samlPrincipal);
+            response.setTokenRealm(tokenRealm);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }
 
         return response;
-    }
-    
-    /**
-     * Set the map of realm->SAMLRealm for this token provider
-     * @param realms the map of realm->SAMLRealm for this token provider
-     */
-    public void setRealmMap(Map<String, SAMLRealm> realms) {
-        this.realmMap = realms;
-    }
-    
-    /**
-     * Get the map of realm->SAMLRealm for this token provider
-     * @return the map of realm->SAMLRealm for this token provider
-     */
-    public Map<String, SAMLRealm> getRealmMap() {
-        return realmMap;
     }
     
 }

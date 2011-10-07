@@ -37,10 +37,10 @@ public class CustomIdentityMapper implements IdentityMapper {
      */
     public Principal mapPrincipal(String sourceRealm, Principal sourcePrincipal, String targetRealm) {
         if ("A".equals(sourceRealm)) {
-            String name = sourcePrincipal.getName().toLowerCase();
+            String name = sourcePrincipal.getName().toUpperCase();
             return new CustomTokenPrincipal(name);
         } else if ("B".equals(sourceRealm)) {
-            String name = sourcePrincipal.getName().toUpperCase();
+            String name = sourcePrincipal.getName().toLowerCase();
             return new CustomTokenPrincipal(name);
         }
         return null;
