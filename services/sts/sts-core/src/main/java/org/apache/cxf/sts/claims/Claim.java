@@ -19,14 +19,19 @@
 
 package org.apache.cxf.sts.claims;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.security.Principal;
 
 /**
  * This represents a Claim that has been processed by a ClaimsHandler instance.
  */
-public class Claim {
+public class Claim implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1856135937386473416L;
     private URI claimType;
     private String issuer;
     private String originalIssuer;

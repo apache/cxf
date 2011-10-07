@@ -26,6 +26,10 @@ import java.net.URI;
  */
 public class RequestClaimCollection extends java.util.ArrayList<RequestClaim> {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6013920740410651546L;
     private URI dialect;
     
     public URI getDialect() {

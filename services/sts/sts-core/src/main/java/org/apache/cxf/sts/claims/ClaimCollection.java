@@ -24,4 +24,9 @@ package org.apache.cxf.sts.claims;
  */
 public class ClaimCollection extends java.util.ArrayList<Claim> {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4630183900697336428L;
+
 }
