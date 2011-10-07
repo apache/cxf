@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +35,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.QNameConstants;
+import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -182,6 +184,16 @@ public class UsernameTokenValidator implements TokenValidator {
             String tokenRealm = null;
             if (usernameTokenRealmCodec != null) {
                 tokenRealm = usernameTokenRealmCodec.getRealmFromToken(ut);
+                // verify the realm against the cached token
+                if (secToken != null) {
+                    Properties props = secToken.getProperties();
+                    if (props != null) {
+                        String cachedRealm = props.getProperty(STSConstants.TOKEN_REALM);
+                        if (!tokenRealm.equals(cachedRealm)) {
+                            return response;
+                        }
+                    }
+                }
             }
             
             response.setPrincipal(principal);

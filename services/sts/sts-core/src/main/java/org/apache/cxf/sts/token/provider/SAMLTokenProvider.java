@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -126,6 +127,14 @@ public class SAMLTokenProvider implements TokenProvider {
                 if (signatureValue != null && signatureValue.length > 0) {
                     hash = Arrays.hashCode(signatureValue);
                     securityToken.setAssociatedHash(hash);
+                }
+                if (tokenParameters.getRealm() != null) {
+                    Properties props = securityToken.getProperties();
+                    if (props == null) {
+                        props = new Properties();
+                    }
+                    props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
+                    securityToken.setProperties(props);
                 }
                 Integer timeToLive = (int)(conditionsProvider.getLifetime() * 1000);
                 tokenParameters.getTokenStore().add(securityToken, timeToLive);

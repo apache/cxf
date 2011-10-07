@@ -19,6 +19,7 @@
 
 package org.apache.cxf.sts.token.provider;
 
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +27,7 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -131,6 +133,14 @@ public class SCTProvider implements TokenProvider {
             SecurityToken token = new SecurityToken(sct.getIdentifier());
             token.setSecret(keyHandler.getSecret());
             token.setPrincipal(tokenParameters.getPrincipal());
+            if (tokenParameters.getRealm() != null) {
+                Properties props = token.getProperties();
+                if (props == null) {
+                    props = new Properties();
+                }
+                props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
+                token.setProperties(props);
+            }
             if (lifetime > 0) {
                 Integer lifetimeInteger = new Integer(Long.valueOf(lifetime).intValue());
                 tokenParameters.getTokenStore().add(token, lifetimeInteger);

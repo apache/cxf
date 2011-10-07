@@ -124,6 +124,11 @@ public final class STSConstants {
     public static final String INVALID_REASON = 
         "The Trust service did not successfully validate the input";
     
+    /**
+     * Constant to store the realms in cached Security Token properties.
+     */
+    public static final String TOKEN_REALM = "org.apache.cxf.sts.token.realm";
+    
     private STSConstants() {
         // complete
     }
