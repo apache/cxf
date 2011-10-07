@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 public class JmsPullPoint extends AbstractPullPoint {
 
-    private final Logger logger = LoggerFactory.getLogger(JmsPullPoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JmsPullPoint.class);
 
     private JAXBContext jaxbContext;
 
@@ -86,18 +86,18 @@ public class JmsPullPoint extends AbstractPullPoint {
             Message message = session.createTextMessage(writer.toString());
             producer.send(message);
         } catch (JMSException e) {
-            logger.warn("Error storing message", e);
+            LOGGER.warn("Error storing message", e);
             if (session != null) {
                 try {
                     session.close();
                 } catch (JMSException inner) {
-                    logger.debug("Error closing session", inner);
+                    LOGGER.debug("Error closing session", inner);
                 } finally {
                     session = null;
                 }
             }
         } catch (JAXBException e) {
-            logger.warn("Error storing message", e);
+            LOGGER.warn("Error storing message", e);
         }
     }
 
@@ -122,12 +122,12 @@ public class JmsPullPoint extends AbstractPullPoint {
             }
             return messages;
         } catch (JMSException e) {
-            logger.info("Error retrieving messages", e);
+            LOGGER.info("Error retrieving messages", e);
             if (session != null) {
                 try {
                     session.close();
                 } catch (JMSException inner) {
-                    logger.debug("Error closing session", inner);
+                    LOGGER.debug("Error closing session", inner);
                 } finally {
                     session = null;
                 }
@@ -135,7 +135,7 @@ public class JmsPullPoint extends AbstractPullPoint {
             UnableToGetMessagesFaultType fault = new UnableToGetMessagesFaultType();
             throw new UnableToGetMessagesFault("Unable to retrieve messages", fault, e);
         } catch (JAXBException e) {
-            logger.info("Error retrieving messages", e);
+            LOGGER.info("Error retrieving messages", e);
             UnableToGetMessagesFaultType fault = new UnableToGetMessagesFaultType();
             throw new UnableToGetMessagesFault("Unable to retrieve messages", fault, e);
         }

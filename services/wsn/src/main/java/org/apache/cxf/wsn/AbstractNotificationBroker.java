@@ -76,7 +76,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
     public static final QName TOPIC_EXPRESSION_DIALECT_QNAME = new QName(NAMESPACE_URI, "TopicExpressionDialect", PREFIX);
     public static final QName TOPIC_SET_QNAME = new QName(NAMESPACE_URI, "TopicSet", PREFIX);
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractNotificationBroker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractNotificationBroker.class);
 
     private IdGenerator idGenerator;
 
@@ -117,7 +117,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
                       partName = "Notify")
             Notify notify) {
 
-        logger.debug("Notify");
+        LOGGER.debug("Notify");
         handleNotify(notify);
     }
 
@@ -170,7 +170,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
             SubscribeCreationFailedFault, TopicExpressionDialectUnknownFault, TopicNotSupportedFault,
             UnacceptableInitialTerminationTimeFault, UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault {
 
-        logger.debug("Subscribe");
+        LOGGER.debug("Subscribe");
         return handleSubscribe(subscribeRequest, null);
     }
 
@@ -197,7 +197,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
             success = true;
             return response;
         } catch (EndpointRegistrationException e) {
-            logger.warn("Unable to register new endpoint", e);
+            LOGGER.warn("Unable to register new endpoint", e);
             SubscribeCreationFailedFaultType fault = new SubscribeCreationFailedFaultType();
             throw new SubscribeCreationFailedFault("Unable to register new endpoint", fault, e);
         } finally {
@@ -206,7 +206,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
                 try {
                     subscription.unsubscribe();
                 } catch (UnableToDestroySubscriptionFault e) {
-                    logger.info("Error destroying subscription", e);
+                    LOGGER.info("Error destroying subscription", e);
                 }
             }
         }
@@ -242,7 +242,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
             MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, ResourceUnknownFault,
             TopicExpressionDialectUnknownFault, TopicNotSupportedFault {
 
-        logger.debug("GetCurrentMessage");
+        LOGGER.debug("GetCurrentMessage");
         NoCurrentMessageOnTopicFaultType fault = new NoCurrentMessageOnTopicFaultType();
         throw new NoCurrentMessageOnTopicFault("There is no current message on this topic.", fault);
     }
@@ -269,7 +269,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
             PublisherRegistrationFailedFault, PublisherRegistrationRejectedFault, ResourceUnknownFault,
             TopicNotSupportedFault {
 
-        logger.debug("RegisterPublisher");
+        LOGGER.debug("RegisterPublisher");
         return handleRegisterPublisher(registerPublisherRequest);
     }
 
@@ -287,7 +287,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
             success = true;
             return response;
         } catch (EndpointRegistrationException e) {
-            logger.warn("Unable to register new endpoint", e);
+            LOGGER.warn("Unable to register new endpoint", e);
             PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
             throw new PublisherRegistrationFailedFault("Unable to register new endpoint", fault, e);
         } finally {
@@ -295,7 +295,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
                 try {
                     publisher.destroy();
                 } catch (ResourceNotDestroyedFault e) {
-                    logger.info("Error destroying publisher", e);
+                    LOGGER.info("Error destroying publisher", e);
                 }
             }
         }
@@ -312,7 +312,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
         javax.xml.namespace.QName getResourcePropertyRequest
     ) throws ResourceUnavailableFault, ResourceUnknownFault, InvalidResourcePropertyQNameFault {
 
-        logger.debug("GetResourceProperty");
+        LOGGER.debug("GetResourceProperty");
         return handleGetResourceProperty(getResourcePropertyRequest);
     }
 

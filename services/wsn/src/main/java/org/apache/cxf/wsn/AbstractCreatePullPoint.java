@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint")
 public abstract class AbstractCreatePullPoint extends AbstractEndpoint implements CreatePullPoint {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractCreatePullPoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCreatePullPoint.class);
 
     private IdGenerator idGenerator;
 
@@ -68,7 +68,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
                       partName = "CreatePullPointRequest")
             org.oasis_open.docs.wsn.b_2.CreatePullPoint createPullPointRequest) throws UnableToCreatePullPointFault {
 
-        logger.debug("CreatePullEndpoint");
+        LOGGER.debug("CreatePullEndpoint");
         return handleCreatePullPoint(createPullPointRequest, null);
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
             success = true;
             return response;
         } catch (EndpointRegistrationException e) {
-            logger.warn("Unable to register new endpoint", e);
+            LOGGER.warn("Unable to register new endpoint", e);
             UnableToCreatePullPointFaultType fault = new UnableToCreatePullPointFaultType();
             throw new UnableToCreatePullPointFault("Unable to register new endpoint", fault, e);
         } finally {
@@ -100,7 +100,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
                 try {
                     pullPoint.destroy();
                 } catch (UnableToDestroyPullPointFault e) {
-                    logger.info("Error destroying pullPoint", e);
+                    LOGGER.info("Error destroying pullPoint", e);
                 }
             }
         }

@@ -53,15 +53,13 @@ import org.slf4j.LoggerFactory;
 
 public abstract class JmsPublisher extends AbstractPublisher implements ConsumerListener {
 
-    private final Logger logger = LoggerFactory.getLogger(JmsPublisher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JmsPublisher.class);
 
     private Connection connection;
 
     private JmsTopicExpressionConverter topicConverter;
 
     private JAXBContext jaxbContext;
-
-    private Topic jmsTopic;
 
     private List<ConsumerEventSource> advisories;
 
@@ -99,17 +97,17 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             Message message = session.createTextMessage(writer.toString());
             producer.send(message);
         } catch (JMSException e) {
-            logger.warn("Error dispatching message", e);
+            LOGGER.warn("Error dispatching message", e);
         } catch (JAXBException e) {
-            logger.warn("Error dispatching message", e);
+            LOGGER.warn("Error dispatching message", e);
         } catch (InvalidTopicException e) {
-            logger.warn("Error dispatching message", e);
+            LOGGER.warn("Error dispatching message", e);
         } finally {
             if (session != null) {
                 try {
                     session.close();
                 } catch (JMSException e) {
-                    logger.debug("Error closing session", e);
+                    LOGGER.debug("Error closing session", e);
                 }
             }
         }
@@ -121,7 +119,7 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             TopicNotSupportedFault {
         super.validatePublisher(registerPublisherRequest);
         try {
-            jmsTopic = topicConverter.toActiveMQTopic(topic);
+            topicConverter.toActiveMQTopic(topic);
         } catch (InvalidTopicException e) {
             InvalidTopicExpressionFaultType fault = new InvalidTopicExpressionFaultType();
             throw new InvalidTopicExpressionFault(e.getMessage(), fault);

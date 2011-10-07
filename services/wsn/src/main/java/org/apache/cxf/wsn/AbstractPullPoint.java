@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.PullPoint")
 public abstract class AbstractPullPoint extends AbstractEndpoint implements PullPoint, NotificationConsumer {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractPullPoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPullPoint.class);
 
     protected AbstractCreatePullPoint createPullPoint;
 
@@ -65,7 +65,7 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
                       partName = "Notify")
             Notify notify) {
 
-        logger.debug("Notify");
+        LOGGER.debug("Notify");
         for (NotificationMessageHolderType messageHolder : notify.getNotificationMessage()) {
             store(messageHolder);
         }
@@ -88,7 +88,7 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
                       partName = "GetMessagesRequest")
             GetMessages getMessagesRequest) throws ResourceUnknownFault, UnableToGetMessagesFault {
 
-        logger.debug("GetMessages");
+        LOGGER.debug("GetMessages");
         BigInteger max = getMessagesRequest.getMaximumNumber();
         List<NotificationMessageHolderType> messages = getMessages(max != null ? max.intValue() : 0);
         GetMessagesResponse response = new GetMessagesResponse();
@@ -113,7 +113,7 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
                       partName = "DestroyPullPointRequest")
             DestroyPullPoint destroyPullPointRequest) throws ResourceUnknownFault, UnableToDestroyPullPointFault {
 
-        logger.debug("Destroy");
+        LOGGER.debug("Destroy");
         createPullPoint.destroyPullPoint(getAddress());
         return new DestroyPullPointResponse();
     }

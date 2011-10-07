@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.PublisherRegistrationManager")
 public class JaxwsPublisher extends JmsPublisher {
 
-    private final Logger logger = LoggerFactory.getLogger(JaxwsPublisher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JaxwsPublisher.class);
 
     protected JaxwsNotificationBroker notificationBroker;
     private NotificationProducer notificationProducer;
@@ -66,7 +66,7 @@ public class JaxwsPublisher extends JmsPublisher {
             SubscribeResponse response = notificationProducer.subscribe(subscribeRequest);
             return WSNHelper.getPort(response.getSubscriptionReference(), SubscriptionManager.class);
         } catch (Exception e) {
-            logger.info("Error while subscribing on-demand publisher", e);
+            LOGGER.info("Error while subscribing on-demand publisher", e);
             return null;
         }
     }
@@ -76,7 +76,7 @@ public class JaxwsPublisher extends JmsPublisher {
         try {
             ((SubscriptionManager) sub).unsubscribe(new Unsubscribe());
         } catch (Exception e) {
-            logger.info("Error while unsubscribing on-demand publisher", e);
+            LOGGER.info("Error while unsubscribing on-demand publisher", e);
         }
     }
 

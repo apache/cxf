@@ -67,7 +67,7 @@ import org.w3c.dom.Element;
 
 public abstract class JmsSubscription extends AbstractSubscription implements MessageListener {
 
-    private final Logger logger = LoggerFactory.getLogger(JmsSubscription.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JmsSubscription.class);
 
     private Connection connection;
 
@@ -203,7 +203,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                 doNotify(notify);
             }
         } catch (Exception e) {
-            logger.warn("Error notifying consumer", e);
+            LOGGER.warn("Error notifying consumer", e);
         }
     }
 
@@ -219,7 +219,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                 Boolean ret = (Boolean) exp.evaluate(content, XPathConstants.BOOLEAN);
                 return ret.booleanValue();
             } catch (XPathExpressionException e) {
-                logger.warn("Could not filter notification", e);
+                LOGGER.warn("Could not filter notification", e);
             }
             return false;
         }
