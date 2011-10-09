@@ -168,7 +168,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warning("Exception has occurred: " + e.getClass().getName() 
+                    + ", message: " + e.getMessage());
             throw new WebApplicationException(e);        
         }
         // unreachable
