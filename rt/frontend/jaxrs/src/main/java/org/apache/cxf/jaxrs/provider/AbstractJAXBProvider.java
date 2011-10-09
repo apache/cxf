@@ -522,10 +522,14 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         packageContexts.clear();
     }
     
-    protected static void handleJAXBException(JAXBException e) {
+    protected static String getStackTrace(Exception ex) { 
         StringWriter sw = new StringWriter();
-        e.printStackTrace(new PrintWriter(sw));
-        LOG.warning(sw.toString());
+        ex.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
+    
+    protected static void handleJAXBException(JAXBException e) {
+        LOG.warning(getStackTrace(e));
         StringBuilder sb = new StringBuilder();
         if (e.getMessage() != null) {
             sb.append(e.getMessage()).append(". ");
