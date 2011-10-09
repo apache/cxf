@@ -80,7 +80,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
 
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     
