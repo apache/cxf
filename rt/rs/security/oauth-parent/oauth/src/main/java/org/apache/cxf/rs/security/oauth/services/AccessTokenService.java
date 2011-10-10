@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth.services;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
@@ -38,6 +39,12 @@ public class AccessTokenService extends AbstractOAuthService {
     }
     
     @GET
+    @Produces("application/x-www-form-urlencoded")
+    public Response getAccessTokenWithGET() {
+        return handler.handle(getHttpRequest(), getDataProvider());
+    }
+    
+    @POST
     @Produces("application/x-www-form-urlencoded")
     public Response getAccessToken() {
         return handler.handle(getHttpRequest(), getDataProvider());

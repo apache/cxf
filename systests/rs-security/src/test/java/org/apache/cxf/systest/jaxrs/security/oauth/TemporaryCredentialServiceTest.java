@@ -61,7 +61,7 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(OAuth.OAUTH_CALLBACK, OAuthTestUtils.CALLBACK);
         
-        //check all parameter transimssions
+        //check all parameter transmissions
         for (ParameterStyle style : ParameterStyle.values()) {
             //for all signing methods
             for (String signMethod : OAuthTestUtils.SIGN_METHOD) {
