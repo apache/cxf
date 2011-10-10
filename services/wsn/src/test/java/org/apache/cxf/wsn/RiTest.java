@@ -20,7 +20,7 @@ public class RiTest extends WsnBrokerTest {
 
     @Override
     public void setUp() throws Exception {
-        Thread.currentThread().setContextClassLoader(new FakeClassLoader(null));
+        Thread.currentThread().setContextClassLoader(new FakeClassLoader("com.sun.xml.ws.spi.ProviderImpl"));
         super.setUp();
     }
 }
