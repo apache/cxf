@@ -72,8 +72,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     protected DefaultOAuthValidator validator = new DefaultOAuthValidator();
 
     public MemoryOAuthDataProvider() {
-        Client client = new Client(CLIENT_ID, CLIENT_ID, 
-            CLIENT_SECRET, CALLBACK, APPLICATION_NAME);
+        Client client = new Client(CLIENT_ID, CLIENT_SECRET, APPLICATION_NAME, CALLBACK);
         clientAuthInfo.put(CLIENT_ID, client);
     }
     
@@ -99,7 +98,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
                                                  reg.getLifetime());
         reqToken.setScopes(reg.getScopes());
         reqToken.setUris(reg.getUris());
-        
+        reqToken.setCallback(reg.getCallback());
         oauthTokens.put(token, reqToken);
         return reqToken;
     }

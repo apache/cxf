@@ -22,62 +22,36 @@ import java.util.Collections;
 import java.util.List;
 
 public class Client {
-    private String loginName;
     private String consumerKey;
     private String secretKey;
-    private String callbackURL;
     private String applicationURI;
     private String applicationName;
+    
+    private String loginName;
+        
     private List<String> uris = Collections.emptyList();
     private List<String> scopes = Collections.emptyList();
 
-    public Client(String loginName,
-            String consumerKey, String secretKey, String callbackURL,
-            String applicationName, List<String> uris) {
-        this.loginName = loginName;
+    public Client(String consumerKey, 
+                  String secretKey,
+                  String applicationName,
+                  String applicationURI) {
         this.consumerKey = consumerKey;
         this.secretKey = secretKey;
-        this.callbackURL = callbackURL;
+        this.applicationURI = applicationURI;
         this.applicationName = applicationName;
-        this.uris = uris;
     }
     
-    public Client(String loginName, String consumerKey, String secretKey, String callbackURL,
-                      String applicationName) {
-        this(loginName, consumerKey, secretKey, callbackURL, applicationName, 
-             Collections.<String>emptyList());
+    public Client(String consumerKey, String secretKey) {
+        this(consumerKey, secretKey, null, null);
     }
 
-    public Client(String loginName, String consumerKey, String secretKey, String callbackURL) {
-        this(loginName, consumerKey, secretKey, callbackURL, null);
-    }
-
-    public Client(String loginName, String consumerKey, String secretKey) {
-        this(loginName, consumerKey, secretKey, null);
-    }
-
-    public String getLoginName() {
-        return loginName;
-    }
-    
-    public List<String> getUris() {
-        return uris;
-    }
-    
     public String getConsumerKey() {
         return consumerKey;
     }
 
     public String getSecretKey() {
         return secretKey;
-    }
-
-    public String getCallbackURL() {
-        return callbackURL;
-    }
-
-    public void setCallbackURL(String callbackURL) {
-        this.callbackURL = callbackURL;
     }
 
     public String getApplicationName() {
@@ -96,6 +70,22 @@ public class Client {
         this.applicationURI = applicationURI;
     }
 
+    public String getLoginName() {
+        return loginName == null ? consumerKey : loginName;
+    }
+    
+    public void setLoginName(String name) {
+        this.loginName = name;
+    }
+    
+    public List<String> getUris() {
+        return uris;
+    }
+    
+    public void setUris(List<String> uris) {
+        this.uris = uris;
+    }
+    
     public List<String> getScopes() {
         return scopes;
     }
@@ -115,13 +105,6 @@ public class Client {
 
         Client that = (Client)o;
 
-        if (applicationName != null ? !applicationName.equals(that.applicationName)
-            : that.applicationName != null) {
-            return false;
-        }
-        if (callbackURL != null ? !callbackURL.equals(that.callbackURL) : that.callbackURL != null) {
-            return false;
-        }
         if (!consumerKey.equals(that.consumerKey)) {
             return false;
         }
@@ -136,8 +119,6 @@ public class Client {
     public int hashCode() {
         int result = consumerKey.hashCode();
         result = 31 * result + secretKey.hashCode();
-        result = 31 * result + (callbackURL != null ? callbackURL.hashCode() : 0);
-        result = 31 * result + (applicationName != null ? applicationName.hashCode() : 0);
         return result;
     }
 }

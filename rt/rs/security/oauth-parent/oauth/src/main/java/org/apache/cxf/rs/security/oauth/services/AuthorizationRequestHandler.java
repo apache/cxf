@@ -36,7 +36,6 @@ import net.oauth.OAuthProblemException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
@@ -75,17 +74,17 @@ public class AuthorizationRequestHandler {
             }
             
             String decision = request.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
-            Client clientInfo = token.getClient();
             if (!OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision)) {
                 //user not authorized client
-                secData.setCallback(clientInfo.getCallbackURL());
+                secData.setCallback(token.getCallback());
                 return Response.ok(addAdditionalParams(secData, token)).build();
             }
 
             String verifier = dataProvider.createRequestTokenVerifier(token);
             
 
-            String callbackURL = clientInfo.getCallbackURL();
+            String callbackURL = getCallbackURI(token);
+            
 
             Map<String, String> queryParams = new HashMap<String, String>();
             queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
@@ -112,6 +111,17 @@ public class AuthorizationRequestHandler {
         }
     }
 
+    protected String getCallbackURI(RequestToken token) throws OAuthProblemException {
+        String callback = token.getCallback();
+        if (callback == null) {
+            callback = token.getClient().getApplicationURI();
+        }
+        if (callback == null) {
+            throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
+        }
+        return callback;
+    }
+    
     protected String buildCallbackUrl(String callbackURL, final Map<String, String> queryParams) {
 
         boolean containsQuestionMark = callbackURL.contains("?");

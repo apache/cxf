@@ -62,7 +62,7 @@ public final class OAuthUtils {
 
     public static void validateMessage(OAuthMessage oAuthMessage, Client client, Token token) 
         throws Exception {
-        OAuthConsumer consumer = new OAuthConsumer(client.getCallbackURL(), client.getConsumerKey(),
+        OAuthConsumer consumer = new OAuthConsumer(null, client.getConsumerKey(),
             client.getSecretKey(), null);
         OAuthAccessor accessor = new OAuthAccessor(consumer);
         if (token != null) {

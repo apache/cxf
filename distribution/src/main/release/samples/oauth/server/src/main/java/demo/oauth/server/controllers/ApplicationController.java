@@ -73,9 +73,9 @@ public class ApplicationController implements ServletContextAware {
 
         String secretKey = tokenGen.generateToken(new SecureRandom().generateSeed(20));
 
-        Client clientInfo = new Client(principal.getName(), consumerKey,
-            secretKey, clientApp.getCallbackURL(), clientApp.getClientName());
-
+        Client clientInfo = 
+new Client(consumerKey, secretKey, clientApp.getClientName(), clientApp.getCallbackURL());
+        clientInfo.setLoginName(principal.getName());
 
         Client authNInfo = clientManager.registerNewClient(consumerKey, clientInfo);
         if (authNInfo != null) {

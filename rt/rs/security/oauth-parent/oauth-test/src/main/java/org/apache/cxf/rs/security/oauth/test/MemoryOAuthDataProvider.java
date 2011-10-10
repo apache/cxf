@@ -67,9 +67,10 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     protected DefaultOAuthValidator validator = new DefaultOAuthValidator();
 
     public MemoryOAuthDataProvider() {
-        Client client = new Client(OAuthTestUtils.CLIENT_ID, OAuthTestUtils.CLIENT_ID, 
+        Client client = new Client(OAuthTestUtils.CLIENT_ID, 
             OAuthTestUtils.CLIENT_SECRET,
-            OAuthTestUtils.CALLBACK, OAuthTestUtils.APPLICATION_NAME);
+            OAuthTestUtils.APPLICATION_NAME,
+            OAuthTestUtils.CALLBACK);
         clientAuthInfo.put(OAuthTestUtils.CLIENT_ID, client);
     }
     

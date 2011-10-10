@@ -23,6 +23,7 @@ import java.util.List;
 public class RequestTokenRegistration {
     private Client client; 
     private String state;
+    private String callback;
     private List<String> uris;
     private List<String> scopes;
     private long lifetime;
@@ -33,6 +34,15 @@ public class RequestTokenRegistration {
     public Client getClient() {
         return client;
     }
+    
+    public void setCallback(String callback) {
+        this.callback = callback;
+    }
+
+    public String getCallback() {
+        return callback;
+    }
+    
     public void setState(String state) {
         this.state = state;
     }

@@ -82,6 +82,7 @@ public class RequestTokenHandler {
             
             RequestTokenRegistration reg = new RequestTokenRegistration();
             reg.setClient(client);
+            reg.setCallback(callback);
             reg.setState(oAuthMessage.getParameter("state"));
             reg.setUris(uris);
             reg.setScopes(scopes);
@@ -119,9 +120,7 @@ public class RequestTokenHandler {
     protected void validateCallbackURL(Client client,
                                        String oauthCallback) throws OAuthProblemException {
 
-        if (!StringUtils.isEmpty(client.getCallbackURL())
-            && !client.getCallbackURL().equals(oauthCallback)
-                || !StringUtils.isEmpty(client.getApplicationURI())
+        if (!StringUtils.isEmpty(client.getApplicationURI())
                     && !oauthCallback.startsWith(client.getApplicationURI())) {
             OAuthProblemException problemEx = new OAuthProblemException(
                 OAuth.Problems.PARAMETER_REJECTED + " - " + OAuth.OAUTH_CALLBACK);
