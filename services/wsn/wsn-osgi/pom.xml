@@ -65,6 +65,7 @@
                         <Private-Package>
                             org.apache.cxf.wsn.*
                         </Private-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
                         <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>
                 </configuration>
