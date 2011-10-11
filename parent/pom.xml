@@ -56,7 +56,10 @@
 
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.2</cxf.abdera.version>
+        <!-- Due to AMQ-3276, we need to keep the system tests at 5.4.2, but we
+             need the 5.5.0 features.xml. :-(  -->
         <cxf.activemq.version>5.4.2</cxf.activemq.version>
+        <cxf.osgi.activemq.version>5.5.0</cxf.osgi.activemq.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
 
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>

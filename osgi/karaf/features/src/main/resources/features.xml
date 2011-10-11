@@ -17,7 +17,7 @@
       limitations under the License.
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-${project.version}">
-    <repository>mvn:org.apache.activemq/activemq-karaf/${cxf.activemq.version}/xml/features</repository>
+    <repository>mvn:org.apache.activemq/activemq-karaf/${cxf.osgi.activemq.version}/xml/features</repository>
 
     <feature name="cxf-specs" version="${project.version}" resolver='(obr)'>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${cxf.servicemix.specs.version}</bundle>
