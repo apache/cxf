@@ -66,9 +66,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>${cxf.javax.mail.version}</version>
+            <groupId>org.apache.aries.blueprint</groupId>
+            <artifactId>org.apache.aries.blueprint</artifactId>
+            <version>${cxf.aries.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- The dependency for cxf karaf command console -->
+        <dependency>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <version>${cxf.karaf.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -121,8 +128,6 @@
 
     <profiles>
         <profile>
-            <!-- this profile doesn't work right now. Requires an update to the features plugin. -->
-            <!-- See https://issues.apache.org/jira/browse/KARAF-651 -->
             <id>validate</id>
             <build>
                 <plugins>
@@ -133,6 +138,7 @@
                         <configuration>
                             <file>${project.build.directory}/classes/features.xml</file>
                             <karafConfig>${project.build.directory}/classes/config.properties</karafConfig>
+                            <jreVersion>jre-1.6</jreVersion>
                         </configuration>
                         <executions>
                             <execution>
@@ -143,13 +149,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.slf4j</groupId>
-                                <artifactId>slf4j-simple</artifactId>
-                                <version>1.4.3</version>
-                            </dependency>
-                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
