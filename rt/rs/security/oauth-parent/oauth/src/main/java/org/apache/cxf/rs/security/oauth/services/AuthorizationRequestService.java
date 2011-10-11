@@ -26,6 +26,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.rs.security.oauth.data.OAuthAuthorizationData;
+
 
 /**
  * This resource handles the End User authorising
@@ -46,7 +48,12 @@ public class AuthorizationRequestService extends AbstractOAuthService {
     @Path("/authorize")
     @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
     public Response authorize() {
-        return handler.handle(getHttpRequest(), getDataProvider());
+        Response response = handler.handle(getHttpRequest(), getDataProvider());
+        if (response.getEntity() instanceof OAuthAuthorizationData) {
+            String replyTo = getUriInfo().getBaseUriBuilder().path("authorizeDecision").build().toString();
+            ((OAuthAuthorizationData)response.getEntity()).setReplyTo(replyTo);
+        }
+        return response;
     }
 
     @GET

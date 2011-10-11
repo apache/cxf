@@ -67,11 +67,9 @@ public class AuthorizationRequestHandler {
             
             OAuthAuthorizationData secData = new OAuthAuthorizationData();
             if (!compareRequestSessionTokens(request)) {
-                secData.setPermissions(
-                        dataProvider.getPermissionsInfo(token.getScopes()));
-                secData.setUris(token.getUris());
                 addAuthenticityTokenToSession(secData, request);
-                return Response.ok(addAdditionalParams(secData, token)).build();
+                return Response.ok(
+                        addAdditionalParams(secData, dataProvider, token)).build();
             }
             
             String decision = request.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
@@ -125,11 +123,16 @@ public class AuthorizationRequestHandler {
     }
     
     protected OAuthAuthorizationData addAdditionalParams(OAuthAuthorizationData secData,
+                                                         OAuthDataProvider dataProvider,
                                                          RequestToken token) {
         secData.setOauthToken(token.getTokenString());
         secData.setApplicationName(token.getClient().getApplicationName()); 
-        secData.setUserName(token.getClient().getLoginName());
-      
+        secData.setApplicationURI(token.getClient().getApplicationURI());
+        
+        secData.setPermissions(
+                dataProvider.getPermissionsInfo(token.getScopes()));
+        secData.setUris(token.getUris());
+        
         return secData;
     }
     
