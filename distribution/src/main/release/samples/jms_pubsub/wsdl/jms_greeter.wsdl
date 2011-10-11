@@ -56,7 +56,7 @@
         <soap:binding style="document" transport="http://cxf.apache.org/transports/jms"/>
        
         <wsdl:operation name="greetMeOneWay">
-            <soap:operation soapaction="" style="document"/>
+            <soap:operation style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
