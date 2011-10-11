@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth.filters;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import net.oauth.OAuthProblemException;
 
@@ -29,6 +30,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.SecurityContext;
 
+@Provider
 public class OAuthRequestFilter extends AbstractAuthFilter implements RequestHandler {
     @Context
     private MessageContext mc;
