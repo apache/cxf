@@ -91,7 +91,7 @@ public class JettyHTTPServerEngineTest extends Assert {
             "Engine references for the same port should point to the same instance",
             engine == factory.retrieveJettyHTTPServerEngine(9234));
 
-        factory.destroyForPort(1234);
+        JettyHTTPServerEngineFactory.destroyForPort(1234);
     }
 
     @Test
@@ -103,7 +103,6 @@ public class JettyHTTPServerEngineTest extends Assert {
                 "http".equals(engine.getProtocol()));
 
         engine = new JettyHTTPServerEngine();
-        engine.setJettyHTTPServerEngineFactory(factory);
         engine.setPort(9235);
         engine.setMaxIdleTime(30000);
         engine.setTlsServerParameters(new TLSServerParameters());
@@ -130,9 +129,9 @@ public class JettyHTTPServerEngineTest extends Assert {
         assertTrue("Protocol must be https",
                    "https".equals(engine.getProtocol()));
 
-        factory.destroyForPort(9234);
-        factory.destroyForPort(9235);
-        factory.destroyForPort(9236);
+        JettyHTTPServerEngineFactory.destroyForPort(9234);
+        JettyHTTPServerEngineFactory.destroyForPort(9235);
+        JettyHTTPServerEngineFactory.destroyForPort(9236);
     }
 
 
@@ -200,7 +199,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         response = getResponse(urlStr2);
         assertEquals("The jetty http handler did not take effect", response, "string2");
         // set the get request
-        factory.destroyForPort(9234);
+        JettyHTTPServerEngineFactory.destroyForPort(9234);
 
     }
     
@@ -247,8 +246,8 @@ public class JettyHTTPServerEngineTest extends Assert {
             queryNames(new ObjectName("org.eclipse.jetty.server:type=server,*"), null));
         assertEquals("Could not find 0 Jetty Server: " + s, 0, s.size());
         
-        factory.destroyForPort(9234);
-        factory.destroyForPort(9235);
+        JettyHTTPServerEngineFactory.destroyForPort(9234);
+        JettyHTTPServerEngineFactory.destroyForPort(9235);
     }
 
     @Test
@@ -259,7 +258,6 @@ public class JettyHTTPServerEngineTest extends Assert {
 
         JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
         engine.setPort(9235);
-        engine.setJettyHTTPServerEngineFactory(factory);
 
         List<Handler> handlers = new ArrayList<Handler>();
         handlers.add(handler1);
@@ -307,7 +305,7 @@ public class JettyHTTPServerEngineTest extends Assert {
             fail("Can't get the reponse from the server " + ex);
         }
         assertEquals("the jetty http handler did not take effect", response, "string2");
-        factory.destroyForPort(9234);
+        JettyHTTPServerEngineFactory.destroyForPort(9234);
     }
 
     @Test
@@ -340,7 +338,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         }
         assertEquals("the jetty http handler did not take effect", response, "test2");
 
-        factory.destroyForPort(9236);
+        JettyHTTPServerEngineFactory.destroyForPort(9236);
     }
 
     private String getResponse(String target) throws Exception {

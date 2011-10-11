@@ -27,10 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
@@ -71,13 +69,6 @@ public class JettyHTTPServerEngine
         LogUtils.getL7dLogger(JettyHTTPServerEngine.class);
    
     /**
-     * This is the Jetty HTTP Server Engine Factory. This factory caches some 
-     * engines based on port numbers.
-     */
-    protected JettyHTTPServerEngineFactory factory;
-    
-    
-    /**
      * This is the network port for which this engine is allocated.
      */
     private int port;
@@ -103,7 +94,7 @@ public class JettyHTTPServerEngine
     private List<Handler> handlers;
     private JettyConnectorFactory connectorFactory;
     private ContextHandlerCollection contexts;
-    
+    private Container.Listener mBeanContainer;
     private SessionManager sessionManager;
     
     /**
@@ -128,22 +119,18 @@ public class JettyHTTPServerEngine
      * This constructor is called by the JettyHTTPServerEngineFactory.
      */
     public JettyHTTPServerEngine(
-        JettyHTTPServerEngineFactory fac, 
+        Container.Listener mBeanContainer,
         String host,
         int port) {
-        this.factory = fac;
         this.host    = host;
         this.port    = port;
+        this.mBeanContainer = mBeanContainer;
     }
     
     public JettyHTTPServerEngine() {
         
     }
      
-    public void setJettyHTTPServerEngineFactory(JettyHTTPServerEngineFactory fac) {
-        factory = fac;
-    }
-    
     public void setPort(int p) {
         port = p;
     }
@@ -158,16 +145,6 @@ public class JettyHTTPServerEngine
     
     public boolean getContinuationsEnabled() {
         return continuationsEnabled;
-    }
-    
-    /**
-     * The bus.
-     */
-    @Resource(name = "cxf")
-    public void setBus(Bus bus) {
-        if (null != bus && null == factory) {
-            factory = bus.getExtension(JettyHTTPServerEngineFactory.class);
-        }        
     }
     
     /**
@@ -200,8 +177,8 @@ public class JettyHTTPServerEngine
      */
     public void shutdown() {
         if (shouldDestroyPort()) {
-            if (factory != null && servantCount == 0) {
-                factory.destroyForPort(port);
+            if (servantCount == 0) {
+                JettyHTTPServerEngineFactory.destroyForPort(port);
             } else {
                 LOG.log(Level.WARNING, "FAILED_TO_SHUTDOWN_ENGINE_MSG", port);
             }
@@ -306,7 +283,6 @@ public class JettyHTTPServerEngine
             // create a new jetty server instance if there is no server there            
             server = new Server();
             
-            Container.Listener mBeanContainer = factory.getMBeanContainer();
             if (mBeanContainer != null) {
                 server.getContainer().addEventListener(mBeanContainer);
             }

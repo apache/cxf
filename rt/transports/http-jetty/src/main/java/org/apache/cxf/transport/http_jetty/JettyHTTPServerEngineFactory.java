@@ -111,7 +111,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         
         JettyHTTPServerEngine ref = portMap.get(port);
         if (ref == null) {
-            ref = new JettyHTTPServerEngine(factory, host, port);
+            ref = new JettyHTTPServerEngine(factory.getMBeanContainer(), host, port);
             if (tlsParams != null) {
                 ref.setTlsServerParameters(tlsParams);
             }
@@ -282,7 +282,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     /**
      * This method removes the Server Engine from the port map and stops it.
      */
-    public synchronized void destroyForPort(int port) {
+    public static synchronized void destroyForPort(int port) {
         JettyHTTPServerEngine ref = portMap.remove(port);
         if (ref != null) {
             LOG.fine("Stopping Jetty HTTP Server Engine on port " + port + ".");
