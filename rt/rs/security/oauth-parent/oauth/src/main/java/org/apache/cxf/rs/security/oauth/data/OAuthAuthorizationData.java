@@ -30,8 +30,6 @@ public class OAuthAuthorizationData implements Serializable {
     private String authenticityToken;
     private String applicationName;
     private String userName;
-    private String callback;
-    private String oauthVerifier;
     private List<? extends Permission> permissions;
     private List<String> uris;
 
@@ -64,22 +62,6 @@ public class OAuthAuthorizationData implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getCallback() {
-        return callback;
-    }
-
-    public void setCallback(String callback) {
-        this.callback = callback;
-    }
-
-    public String getOauthVerifier() {
-        return oauthVerifier;
-    }
-
-    public void setOauthVerifier(String oauthVerifier) {
-        this.oauthVerifier = oauthVerifier;
     }
 
     public List<? extends Permission> getPermissions() {

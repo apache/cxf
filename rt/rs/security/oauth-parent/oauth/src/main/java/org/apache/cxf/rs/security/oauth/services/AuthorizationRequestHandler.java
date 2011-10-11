@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
@@ -74,29 +75,20 @@ public class AuthorizationRequestHandler {
             }
             
             String decision = request.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
-            if (!OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision)) {
-                //user not authorized client
-                secData.setCallback(token.getCallback());
-                return Response.ok(addAdditionalParams(secData, token)).build();
-            }
-
-            String verifier = dataProvider.createRequestTokenVerifier(token);
-            
-
-            String callbackURL = getCallbackURI(token);
-            
+            boolean allow = OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision);
 
             Map<String, String> queryParams = new HashMap<String, String>();
-            queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
+            if (allow) {
+                String verifier = dataProvider.createRequestTokenVerifier(token);
+                queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
+            }
             queryParams.put(OAuth.OAUTH_TOKEN, token.getTokenString());
             if (token.getState() != null) {
                 queryParams.put("state", token.getState());
             }
-            callbackURL = buildCallbackUrl(callbackURL, queryParams);
-
-
-            return Response.seeOther(URI.create(callbackURL))
-                    .build();
+            URI callback = buildCallbackURI(getCallbackURI(token), queryParams);
+            return Response.seeOther(callback).build();
+            
         } catch (OAuthProblemException e) {
             if (LOG.isLoggable(Level.WARNING)) {
                 LOG.log(Level.WARNING, "An OAuth related problem: {0}", new Object[]{e.fillInStackTrace()});
@@ -122,23 +114,14 @@ public class AuthorizationRequestHandler {
         return callback;
     }
     
-    protected String buildCallbackUrl(String callbackURL, final Map<String, String> queryParams) {
+    private URI buildCallbackURI(String callback, final Map<String, String> queryParams) {
 
-        boolean containsQuestionMark = callbackURL.contains("?");
-
-
-        StringBuffer query = new StringBuffer(OAuthUtils.format(queryParams.entrySet(), "UTF-8"));
-        StringBuffer url = new StringBuffer(callbackURL);
-
-        if (!StringUtils.isEmpty(url.toString())) {
-            if (containsQuestionMark) {
-                url.append("&").append(query);
-            } else {
-                url.append("?").append(query);
-            }
+        UriBuilder builder = UriBuilder.fromUri(callback);
+        for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+            builder.queryParam(entry.getKey(), entry.getValue());
         }
 
-        return url.toString();
+        return builder.build(); 
     }
     
     protected OAuthAuthorizationData addAdditionalParams(OAuthAuthorizationData secData,
