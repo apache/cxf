@@ -32,7 +32,7 @@ import javax.jws.WebService;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.wsn.util.DOMUtil;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.wsn.util.IdGenerator;
 import org.oasis_open.docs.wsn.b_2.CreatePullPointResponse;
 import org.oasis_open.docs.wsn.b_2.UnableToCreatePullPointFaultType;
@@ -119,7 +119,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
             Element el = (Element) it.next();
             if ("name".equals(el.getLocalName())
                     && "http://cxf.apache.org/wsn2005/1.0".equals(el.getNamespaceURI())) {
-                name = DOMUtil.getElementText(el).trim();
+                name = DOMUtils.getContent(el).trim();
             }
         }
         if (name == null) {

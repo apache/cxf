@@ -19,7 +19,6 @@
 package org.apache.cxf.wsn.util;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.Service;
@@ -28,6 +27,8 @@ import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import org.apache.cxf.helpers.DOMUtils;
 
 public abstract class WSNHelper {
 
@@ -54,16 +55,12 @@ public abstract class WSNHelper {
     }
 
     public static String getWSAAddress(W3CEndpointReference ref) {
-        try {
-            Element element = DOMUtil.newDocument().createElement("elem");
-            ref.writeTo(new DOMResult(element));
-            NodeList nl = element.getElementsByTagNameNS("http://www.w3.org/2005/08/addressing", "Address");
-            if (nl != null && nl.getLength() > 0) {
-                Element e = (Element) nl.item(0);
-                return DOMUtil.getElementText(e).trim();
-            }
-        } catch (ParserConfigurationException e) {
-            // Ignore
+        Element element = DOMUtils.createDocument().createElement("elem");
+        ref.writeTo(new DOMResult(element));
+        NodeList nl = element.getElementsByTagNameNS("http://www.w3.org/2005/08/addressing", "Address");
+        if (nl != null && nl.getLength() > 0) {
+            Element e = (Element) nl.item(0);
+            return DOMUtils.getContent(e).trim();
         }
         return null;
     }
