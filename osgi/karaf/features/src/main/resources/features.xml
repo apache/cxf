@@ -17,6 +17,8 @@
       limitations under the License.
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-${project.version}">
+    <repository>mvn:org.apache.activemq/activemq-karaf/${cxf.activemq.version}/xml/features</repository>
+
     <feature name="cxf-specs" version="${project.version}" resolver='(obr)'>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-annotation_1.0_spec/${cxf.geronimo.annotation.version}</bundle>
@@ -122,13 +124,8 @@
             cxf.wsn.port = 8182
         </config>
 
+        <feature version="[5.4,6)">activemq</feature>
         <feature version="${project.version}">cxf</feature>
-
-        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.transaction.version}</bundle>
-        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${cxf.geronimo.jms.version}</bundle>
-        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/${cxf.geronimo.j2ee.management.version}</bundle>
-        <bundle dependency="true">mvn:org.apache.activemq/kahadb/${cxf.activemq.version}</bundle>
-        <bundle dependency="true">mvn:org.apache.activemq/activemq-core/${cxf.activemq.version}</bundle>
 
         <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-osgi/${project.version}</bundle>
     </feature>
