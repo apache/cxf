@@ -169,11 +169,14 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             @WebParam(name = "Subscribe", 
                       targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
                       partName = "SubscribeRequest")
-            Subscribe subscribeRequest) throws InvalidFilterFault, InvalidMessageContentExpressionFault,
+            Subscribe subscribeRequest)
+        //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
+        throws InvalidFilterFault, InvalidMessageContentExpressionFault,
             InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault,
             SubscribeCreationFailedFault, TopicExpressionDialectUnknownFault, TopicNotSupportedFault,
             UnacceptableInitialTerminationTimeFault, UnsupportedPolicyRequestFault,
             UnrecognizedPolicyRequestFault {
+        //CHECKSTYLE:ON
 
         LOGGER.debug("Subscribe");
         return handleSubscribe(subscribeRequest, null);
@@ -181,11 +184,14 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
 
     public SubscribeResponse handleSubscribe(
                 Subscribe subscribeRequest, 
-                EndpointManager manager) throws InvalidFilterFault, InvalidMessageContentExpressionFault,
+                EndpointManager manager)
+        //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
+        throws InvalidFilterFault, InvalidMessageContentExpressionFault,
             InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault,
             SubscribeCreationFailedFault, TopicExpressionDialectUnknownFault,
             TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault,
             UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault {
+        //CHECKSTYLE:ON
         AbstractSubscription subscription = null;
         boolean success = false;
         try {
@@ -243,10 +249,12 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             @WebParam(name = "GetCurrentMessage", 
                       targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
                       partName = "GetCurrentMessageRequest")
-            GetCurrentMessage getCurrentMessageRequest) throws InvalidTopicExpressionFault,
+            GetCurrentMessage getCurrentMessageRequest)
+        //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
+        throws InvalidTopicExpressionFault,
             MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, ResourceUnknownFault,
             TopicExpressionDialectUnknownFault, TopicNotSupportedFault {
-
+        //CHECKSTYLE:ON
         LOGGER.debug("GetCurrentMessage");
         NoCurrentMessageOnTopicFaultType fault = new NoCurrentMessageOnTopicFaultType();
         throw new NoCurrentMessageOnTopicFault("There is no current message on this topic.", fault);

@@ -53,10 +53,10 @@ import org.slf4j.LoggerFactory;
  */
 public final class DOMUtil {
 
-    private final static Logger logger = LoggerFactory.getLogger(DOMUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DOMUtil.class);
 
     private static DocumentBuilderFactory dbf;
-    private static Queue builders = new ConcurrentLinkedQueue();
+    private static Queue<DocumentBuilder> builders = new ConcurrentLinkedQueue<DocumentBuilder>();
 
 
     private DOMUtil() {
@@ -206,8 +206,8 @@ public final class DOMUtil {
         try {
             answer = element.getAttribute(attributeName);
         } catch (Exception e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Caught exception looking up attribute: " + attributeName 
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Caught exception looking up attribute: " + attributeName 
                              + " on element: " + element + ". Cause: " + e, e);
             }
         }

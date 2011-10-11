@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.wsn.client;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
@@ -75,8 +73,6 @@ public class Publisher implements NotificationProducer, Referencable {
     private final String address;
     private final Endpoint endpoint;
     private final IdGenerator idGenerator = new IdGenerator();
-    private final Map<String, PublisherSubscription> subscriptions 
-        = new HashMap<String, PublisherSubscription>();
 
     public Publisher(Callback callback, String address) {
         this.callback = callback;
@@ -96,10 +92,12 @@ public class Publisher implements NotificationProducer, Referencable {
     public SubscribeResponse subscribe(
         @WebParam(partName = "SubscribeRequest", name = "Subscribe",
                   targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Subscribe subscribeRequest)
+        //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
         throws InvalidTopicExpressionFault, ResourceUnknownFault, InvalidProducerPropertiesExpressionFault,
-        UnrecognizedPolicyRequestFault, TopicExpressionDialectUnknownFault, NotifyMessageNotSupportedFault,
-        InvalidFilterFault, UnsupportedPolicyRequestFault, InvalidMessageContentExpressionFault,
-        SubscribeCreationFailedFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault {
+            UnrecognizedPolicyRequestFault, TopicExpressionDialectUnknownFault, NotifyMessageNotSupportedFault,
+            InvalidFilterFault, UnsupportedPolicyRequestFault, InvalidMessageContentExpressionFault,
+            SubscribeCreationFailedFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault {
+        //CHECKSYTLE:ON
         
         TopicExpressionType topic = null;
         if (subscribeRequest.getFilter() != null) {
@@ -137,8 +135,10 @@ public class Publisher implements NotificationProducer, Referencable {
             @WebParam(partName = "GetCurrentMessageRequest", name = "GetCurrentMessage", 
                       targetNamespace = "http://docs.oasis-open.org/wsn/b-2") 
                 GetCurrentMessage getCurrentMessageRequest) 
+        //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
         throws InvalidTopicExpressionFault, ResourceUnknownFault, TopicExpressionDialectUnknownFault, 
-        MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, TopicNotSupportedFault {
+            MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, TopicNotSupportedFault {
+        //CHECKSTYLE:ON
         
         NoCurrentMessageOnTopicFaultType fault = new NoCurrentMessageOnTopicFaultType();
         throw new NoCurrentMessageOnTopicFault("There is no current message on this topic.", fault);

@@ -154,7 +154,8 @@ public abstract class WsnBrokerTest extends TestCase {
         Subscription subscription = notificationBroker.subscribe(consumer, "myTopic");
 
         PublisherCallback publisherCallback = new PublisherCallback();
-        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2 + "/test/publisher");
+        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2 
+                                            + "/test/publisher");
         Registration registration = notificationBroker.registerPublisher(publisher, "myTopic");
 
         synchronized (consumerCallback.notifications) {
@@ -181,7 +182,8 @@ public abstract class WsnBrokerTest extends TestCase {
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
 
         PublisherCallback publisherCallback = new PublisherCallback();
-        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2 + "/test/publisher");
+        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" 
+            + port2 + "/test/publisher");
         Registration registration = notificationBroker.registerPublisher(publisher, 
                                                                          Arrays.asList("myTopic1", 
                                                                                        "myTopic2"), true);
@@ -207,7 +209,7 @@ public abstract class WsnBrokerTest extends TestCase {
 
     public static class TestConsumer implements Consumer.Callback {
 
-        public final List<NotificationMessageHolderType> notifications 
+        final List<NotificationMessageHolderType> notifications 
             = new ArrayList<NotificationMessageHolderType>();
 
         public void notify(NotificationMessageHolderType message) {
@@ -219,8 +221,8 @@ public abstract class WsnBrokerTest extends TestCase {
     }
 
     public static class PublisherCallback implements Publisher.Callback {
-        public final CountDownLatch subscribed = new CountDownLatch(1);
-        public final CountDownLatch unsubscribed = new CountDownLatch(1);
+        final CountDownLatch subscribed = new CountDownLatch(1);
+        final CountDownLatch unsubscribed = new CountDownLatch(1);
 
         public void subscribe(TopicExpressionType topic) {
             subscribed.countDown();

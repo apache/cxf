@@ -32,7 +32,27 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.oasis_open.docs.wsn.b_2.*;
+import org.oasis_open.docs.wsn.b_2.InvalidFilterFaultType;
+import org.oasis_open.docs.wsn.b_2.InvalidMessageContentExpressionFaultType;
+import org.oasis_open.docs.wsn.b_2.InvalidProducerPropertiesExpressionFaultType;
+import org.oasis_open.docs.wsn.b_2.InvalidTopicExpressionFaultType;
+import org.oasis_open.docs.wsn.b_2.PauseSubscription;
+import org.oasis_open.docs.wsn.b_2.PauseSubscriptionResponse;
+import org.oasis_open.docs.wsn.b_2.QueryExpressionType;
+import org.oasis_open.docs.wsn.b_2.Renew;
+import org.oasis_open.docs.wsn.b_2.RenewResponse;
+import org.oasis_open.docs.wsn.b_2.ResumeSubscription;
+import org.oasis_open.docs.wsn.b_2.ResumeSubscriptionResponse;
+import org.oasis_open.docs.wsn.b_2.Subscribe;
+import org.oasis_open.docs.wsn.b_2.SubscribeCreationFailedFaultType;
+import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
+import org.oasis_open.docs.wsn.b_2.UnableToDestroySubscriptionFaultType;
+import org.oasis_open.docs.wsn.b_2.UnacceptableInitialTerminationTimeFaultType;
+import org.oasis_open.docs.wsn.b_2.UnacceptableTerminationTimeFaultType;
+import org.oasis_open.docs.wsn.b_2.UnrecognizedPolicyRequestFaultType;
+import org.oasis_open.docs.wsn.b_2.Unsubscribe;
+import org.oasis_open.docs.wsn.b_2.UnsubscribeResponse;
+import org.oasis_open.docs.wsn.b_2.UseRaw;
 import org.oasis_open.docs.wsn.bw_2.InvalidFilterFault;
 import org.oasis_open.docs.wsn.bw_2.InvalidMessageContentExpressionFault;
 import org.oasis_open.docs.wsn.bw_2.InvalidProducerPropertiesExpressionFault;
@@ -260,11 +280,12 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
     }
 
     public void create(Subscribe subscribeRequest) 
+        //CHECKSTYLE:OFF
         throws InvalidFilterFault, InvalidMessageContentExpressionFault,
         InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault, SubscribeCreationFailedFault,
         TopicExpressionDialectUnknownFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault,
         UnrecognizedPolicyRequestFault, UnsupportedPolicyRequestFault {
-        
+        //CHECKSTYLE:ON
         
         validateSubscription(subscribeRequest);
         start();
@@ -287,11 +308,14 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         }
     }
 
-    protected void validateSubscription(Subscribe subscribeRequest) throws InvalidFilterFault,
+    protected void validateSubscription(Subscribe subscribeRequest)
+       //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
+       throws InvalidFilterFault,
             InvalidMessageContentExpressionFault, InvalidProducerPropertiesExpressionFault,
             InvalidTopicExpressionFault, SubscribeCreationFailedFault, TopicExpressionDialectUnknownFault,
             TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault, UnrecognizedPolicyRequestFault,
             UnsupportedPolicyRequestFault {
+        //CHECKSTYLE:ON
         // Check consumer reference
         consumerReference = subscribeRequest.getConsumerReference();
         // Check terminationTime

@@ -104,11 +104,14 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
     }
 
     @Override
-    protected void validateSubscription(Subscribe subscribeRequest) throws InvalidFilterFault,
+    protected void validateSubscription(Subscribe subscribeRequest)
+        //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
+        throws InvalidFilterFault,
             InvalidMessageContentExpressionFault, InvalidProducerPropertiesExpressionFault,
             InvalidTopicExpressionFault, SubscribeCreationFailedFault, TopicExpressionDialectUnknownFault,
             TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault,
             UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault {
+        //CHECKSTYLE:ON
         super.validateSubscription(subscribeRequest);
         try {
             jmsTopic = topicConverter.toActiveMQTopic(topic);

@@ -19,6 +19,8 @@
 package org.apache.cxf.wsn.jms;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.xml.bind.JAXBElement;
@@ -101,8 +103,13 @@ public abstract class JmsNotificationBroker extends AbstractNotificationBroker {
             // TODO
         } else if (TOPIC_EXPRESSION_DIALECT_QNAME.equals(property)) {
             GetResourcePropertyResponse r = new GetResourcePropertyResponse();
-            r.getAny().add(new JAXBElement(TOPIC_EXPRESSION_DIALECT_QNAME, 
-                    URI.class, JmsTopicExpressionConverter.SIMPLE_DIALECT));
+            try {
+                r.getAny().add(new JAXBElement<URI>(TOPIC_EXPRESSION_DIALECT_QNAME, 
+                        URI.class, new URI(JmsTopicExpressionConverter.SIMPLE_DIALECT)));
+            } catch (URISyntaxException e) {
+                r.getAny().add(new JAXBElement<String>(TOPIC_EXPRESSION_DIALECT_QNAME, 
+                    String.class, JmsTopicExpressionConverter.SIMPLE_DIALECT));               
+            }
             return r;
         } else if (TOPIC_SET_QNAME.equals(property)) {
             // TODO
