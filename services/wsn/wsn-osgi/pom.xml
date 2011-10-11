@@ -52,6 +52,9 @@
                             org.apache.activemq.activemq-core
                         </Require-Bundle>
                         <Import-Package>
+                            javax.xml.bind*;version="[0.0,3)",
+                            javax.jws*;version="[0.0,3)",
+                            javax.xml.ws*;version="[0.0,3)",
                             *
                         </Import-Package>
                         <Export-Package>
