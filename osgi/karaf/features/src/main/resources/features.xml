@@ -120,7 +120,7 @@
     <feature name="wsn" version="${project.version}" resolver="(obr)">
 
         <config name="org.apache.cxf.wsn">
-            cxf.wsn.activemq = vm:broker:(tcp://localhost)?persistent=false&amp;jmx=false
+            cxf.wsn.activemq = vm:localhost?persistent=false&amp;jmx=false
             cxf.wsn.port = 8182
         </config>
 
