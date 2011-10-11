@@ -122,6 +122,8 @@
             cxf.wsn.port = 8182
         </config>
 
+        <feature version="${project.version}">cxf</feature>
+
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.transaction.version}</bundle>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${cxf.geronimo.jms.version}</bundle>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/${cxf.geronimo.j2ee.management.version}</bundle>
@@ -129,6 +131,5 @@
         <bundle dependency="true">mvn:org.apache.activemq/activemq-core/${cxf.activemq.version}</bundle>
 
         <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-osgi/${project.version}</bundle>
-
     </feature>
 </features>
