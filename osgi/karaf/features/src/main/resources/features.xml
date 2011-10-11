@@ -114,4 +114,21 @@
 
         <bundle>mvn:org.apache.cxf.services.sts/cxf-services-sts-core/${project.version}</bundle>
     </feature>
+
+    <feature name="wsn" version="${project.version}" resolver="(obr)">
+
+        <config name="org.apache.cxf.wsn">
+            cxf.wsn.activemq = vm:broker:(tcp://localhost)?persistent=false&amp;jmx=false
+            cxf.wsn.port = 8182
+        </config>
+
+        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.transaction.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${cxf.geronimo.jms.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/${cxf.geronimo.j2ee.management.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.activemq/kahadb/${cxf.activemq.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.activemq/activemq-core/${cxf.activemq.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-osgi/${project.version}</bundle>
+
+    </feature>
 </features>
