@@ -1,18 +1,20 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.wsn;
 
@@ -27,8 +29,8 @@ import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.apache.cxf.wsn.util.WSNHelper;
 import org.apache.cxf.wsn.util.IdGenerator;
+import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessage;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessageResponse;
 import org.oasis_open.docs.wsn.b_2.NoCurrentMessageOnTopicFaultType;
@@ -67,13 +69,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker")
-public abstract class AbstractNotificationBroker extends AbstractEndpoint implements NotificationBroker, GetResourceProperty {
+public abstract class AbstractNotificationBroker extends AbstractEndpoint 
+    implements NotificationBroker, GetResourceProperty {
 
     public static final String NAMESPACE_URI = "http://docs.oasis-open.org/wsn/b-2";
     public static final String PREFIX = "wsnt";
     public static final QName TOPIC_EXPRESSION_QNAME = new QName(NAMESPACE_URI, "TopicExpression", PREFIX);
     public static final QName FIXED_TOPIC_SET_QNAME = new QName(NAMESPACE_URI, "FixedTopicSet", PREFIX);
-    public static final QName TOPIC_EXPRESSION_DIALECT_QNAME = new QName(NAMESPACE_URI, "TopicExpressionDialect", PREFIX);
+    public static final QName TOPIC_EXPRESSION_DIALECT_QNAME 
+        = new QName(NAMESPACE_URI, "TopicExpressionDialect", PREFIX);
     public static final QName TOPIC_SET_QNAME = new QName(NAMESPACE_URI, "TopicSet", PREFIX);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractNotificationBroker.class);
@@ -168,7 +172,8 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
             Subscribe subscribeRequest) throws InvalidFilterFault, InvalidMessageContentExpressionFault,
             InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault,
             SubscribeCreationFailedFault, TopicExpressionDialectUnknownFault, TopicNotSupportedFault,
-            UnacceptableInitialTerminationTimeFault, UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault {
+            UnacceptableInitialTerminationTimeFault, UnsupportedPolicyRequestFault,
+            UnrecognizedPolicyRequestFault {
 
         LOGGER.debug("Subscribe");
         return handleSubscribe(subscribeRequest, null);
@@ -273,8 +278,10 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
         return handleRegisterPublisher(registerPublisherRequest);
     }
 
-    public RegisterPublisherResponse handleRegisterPublisher(RegisterPublisher registerPublisherRequest) throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault,
-            PublisherRegistrationRejectedFault, ResourceUnknownFault, TopicNotSupportedFault {
+    public RegisterPublisherResponse handleRegisterPublisher(RegisterPublisher registerPublisherRequest) 
+        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault,
+        PublisherRegistrationRejectedFault, ResourceUnknownFault, TopicNotSupportedFault {
+        
         AbstractPublisher publisher = null;
         boolean success = false;
         try {
@@ -305,10 +312,14 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
 
     protected abstract AbstractSubscription createSubscription(String name);
 
-    @WebResult(name = "GetResourcePropertyResponse", targetNamespace = "http://docs.oasis-open.org/wsrf/rp-2", partName = "GetResourcePropertyResponse")
+    @WebResult(name = "GetResourcePropertyResponse", 
+               targetNamespace = "http://docs.oasis-open.org/wsrf/rp-2",
+               partName = "GetResourcePropertyResponse")
     @WebMethod(operationName = "GetResourceProperty")
     public GetResourcePropertyResponse getResourceProperty(
-        @WebParam(partName = "GetResourcePropertyRequest", name = "GetResourceProperty", targetNamespace = "http://docs.oasis-open.org/wsrf/rp-2")
+        @WebParam(partName = "GetResourcePropertyRequest", 
+                  name = "GetResourceProperty",
+                  targetNamespace = "http://docs.oasis-open.org/wsrf/rp-2")
         javax.xml.namespace.QName getResourcePropertyRequest
     ) throws ResourceUnavailableFault, ResourceUnknownFault, InvalidResourcePropertyQNameFault {
 
@@ -317,7 +328,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint implem
     }
 
     protected GetResourcePropertyResponse handleGetResourceProperty(QName property)
-            throws ResourceUnavailableFault, ResourceUnknownFault, InvalidResourcePropertyQNameFault {
+        throws ResourceUnavailableFault, ResourceUnknownFault, InvalidResourcePropertyQNameFault {
         InvalidResourcePropertyQNameFaultType fault = new InvalidResourcePropertyQNameFaultType();
         throw new InvalidResourcePropertyQNameFault("Invalid resource property QName: " + property, fault);
     }

@@ -1,18 +1,20 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.wsn;
 
@@ -178,25 +180,29 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         throws UnacceptableInitialTerminationTimeFault {
         XMLGregorianCalendar tt = parseTerminationTime(value);
         if (tt == null) {
-            UnacceptableInitialTerminationTimeFaultType fault = new UnacceptableInitialTerminationTimeFaultType();
-            throw new UnacceptableInitialTerminationTimeFault("Unable to parse initial termination time: '" + value
-                    + "'", fault);
+            UnacceptableInitialTerminationTimeFaultType fault 
+                = new UnacceptableInitialTerminationTimeFaultType();
+            throw new UnacceptableInitialTerminationTimeFault("Unable to parse initial termination time: '" 
+                + value + "'", fault);
         }
         XMLGregorianCalendar ct = getCurrentTime();
         int c = tt.compare(ct);
         if (c == DatatypeConstants.LESSER || c == DatatypeConstants.EQUAL) {
-            UnacceptableInitialTerminationTimeFaultType fault = new UnacceptableInitialTerminationTimeFaultType();
+            UnacceptableInitialTerminationTimeFaultType fault 
+                = new UnacceptableInitialTerminationTimeFaultType();
             fault.setMinimumTime(ct);
             throw new UnacceptableInitialTerminationTimeFault("Invalid initial termination time", fault);
         }
         return tt;
     }
 
-    protected XMLGregorianCalendar validateTerminationTime(String value) throws UnacceptableTerminationTimeFault {
+    protected XMLGregorianCalendar validateTerminationTime(String value) 
+        throws UnacceptableTerminationTimeFault {
         XMLGregorianCalendar tt = parseTerminationTime(value);
         if (tt == null) {
             UnacceptableTerminationTimeFaultType fault = new UnacceptableTerminationTimeFaultType();
-            throw new UnacceptableTerminationTimeFault("Unable to parse termination time: '" + value + "'", fault);
+            throw new UnacceptableTerminationTimeFault("Unable to parse termination time: '" 
+                + value + "'", fault);
         }
         XMLGregorianCalendar ct = getCurrentTime();
         int c = tt.compare(ct);
@@ -253,10 +259,13 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         this.terminationTime = terminationTime;
     }
 
-    public void create(Subscribe subscribeRequest) throws InvalidFilterFault, InvalidMessageContentExpressionFault,
-            InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault, SubscribeCreationFailedFault,
-            TopicExpressionDialectUnknownFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault,
-            UnrecognizedPolicyRequestFault, UnsupportedPolicyRequestFault {
+    public void create(Subscribe subscribeRequest) 
+        throws InvalidFilterFault, InvalidMessageContentExpressionFault,
+        InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault, SubscribeCreationFailedFault,
+        TopicExpressionDialectUnknownFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault,
+        UnrecognizedPolicyRequestFault, UnsupportedPolicyRequestFault {
+        
+        
         validateSubscription(subscribeRequest);
         start();
     }
@@ -310,8 +319,9 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
                     if (e != null && e.getName().equals(QNAME_PRODUCER_PROPERTIES)) {
                         InvalidProducerPropertiesExpressionFaultType fault = 
                             new InvalidProducerPropertiesExpressionFaultType();
-                        throw new InvalidProducerPropertiesExpressionFault("ProducerProperties are not supported",
-                                fault);
+                        throw new InvalidProducerPropertiesExpressionFault(
+                            "ProducerProperties are not supported",
+                            fault);
                     } else if (e != null && e.getName().equals(QNAME_MESSAGE_CONTENT)) {
                         if (contentFilter != null) {
                             InvalidMessageContentExpressionFaultType fault = 
@@ -326,11 +336,13 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
                         }
                     } else {
                         InvalidFilterFaultType fault = new InvalidFilterFaultType();
-                        throw new InvalidFilterFault("Unrecognized filter: " + (e != null ? e.getName() : f), fault);
+                        throw new InvalidFilterFault("Unrecognized filter: " 
+                            + (e != null ? e.getName() : f), fault);
                     }
                 } else {
                     InvalidFilterFaultType fault = new InvalidFilterFaultType();
-                    throw new InvalidFilterFault("Unrecognized filter: " + (e != null ? e.getName() : f), fault);
+                    throw new InvalidFilterFault("Unrecognized filter: " 
+                        + (e != null ? e.getName() : f), fault);
                 }
             }
         }
@@ -366,8 +378,10 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
                     + contentFilter.getDialect() + "'", fault);
         }
         if (terminationTime != null) {
-            UnacceptableInitialTerminationTimeFaultType fault = new UnacceptableInitialTerminationTimeFaultType();
-            throw new UnacceptableInitialTerminationTimeFault("InitialTerminationTime is not supported", fault);
+            UnacceptableInitialTerminationTimeFaultType fault 
+                = new UnacceptableInitialTerminationTimeFaultType();
+            throw new UnacceptableInitialTerminationTimeFault("InitialTerminationTime is not supported", 
+                                                              fault);
         }
     }
 

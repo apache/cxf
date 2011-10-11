@@ -1,18 +1,20 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.wsn;
 
@@ -72,7 +74,8 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
             @WebParam(name = "DestroyRegistration", 
                       targetNamespace = "http://docs.oasis-open.org/wsn/br-2", 
                       partName = "DestroyRegistrationRequest")
-            DestroyRegistration destroyRegistrationRequest) throws ResourceNotDestroyedFault, ResourceUnknownFault {
+            DestroyRegistration destroyRegistrationRequest)
+        throws ResourceNotDestroyedFault, ResourceUnknownFault {
 
         destroy();
         return new DestroyRegistrationResponse();
@@ -96,15 +99,17 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
         start();
     }
 
-    protected void validatePublisher(RegisterPublisher registerPublisherRequest) throws InvalidTopicExpressionFault,
-            PublisherRegistrationFailedFault, PublisherRegistrationRejectedFault, ResourceUnknownFault,
-            TopicNotSupportedFault {
+    protected void validatePublisher(RegisterPublisher registerPublisherRequest)
+        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault, 
+        PublisherRegistrationRejectedFault, ResourceUnknownFault, TopicNotSupportedFault {
+        
         // Check consumer reference
         publisherReference = registerPublisherRequest.getPublisherReference();
         // Check topic
         topic = registerPublisherRequest.getTopic();
         // Check demand based
-        demand = registerPublisherRequest.isDemand() != null ? registerPublisherRequest.isDemand().booleanValue()
+        demand = registerPublisherRequest.isDemand() != null 
+            ? registerPublisherRequest.isDemand().booleanValue()
                 : false;
         // Check all parameters
         if (publisherReference == null) {

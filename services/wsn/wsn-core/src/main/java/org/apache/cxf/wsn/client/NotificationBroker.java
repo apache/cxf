@@ -1,18 +1,20 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.wsn.client;
 
@@ -95,16 +97,32 @@ public class NotificationBroker implements Referencable {
         broker.notify(notify);
     }
 
-    public Subscription subscribe(Referencable consumer, String topic) throws TopicExpressionDialectUnknownFault, InvalidFilterFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault, UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, NotifyMessageNotSupportedFault, InvalidProducerPropertiesExpressionFault {
+    public Subscription subscribe(Referencable consumer, String topic) 
+        throws TopicExpressionDialectUnknownFault, InvalidFilterFault, TopicNotSupportedFault,
+        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, 
+        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
+        UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, 
+        NotifyMessageNotSupportedFault, InvalidProducerPropertiesExpressionFault {
+        
         return subscribe(consumer, topic, null, false);
     }
 
-    public Subscription subscribe(Referencable consumer, String topic, String xpath) throws TopicExpressionDialectUnknownFault, InvalidFilterFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault, UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, NotifyMessageNotSupportedFault, InvalidProducerPropertiesExpressionFault {
+    public Subscription subscribe(Referencable consumer, String topic, String xpath) 
+        throws TopicExpressionDialectUnknownFault, InvalidFilterFault, TopicNotSupportedFault, 
+        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, 
+        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
+        UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, NotifyMessageNotSupportedFault, 
+        InvalidProducerPropertiesExpressionFault {
         return subscribe(consumer, topic, xpath, false);
     }
 
     public Subscription subscribe(Referencable consumer, String topic,
-                                  String xpath, boolean raw) throws TopicNotSupportedFault, InvalidFilterFault, TopicExpressionDialectUnknownFault, UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, UnrecognizedPolicyRequestFault, UnsupportedPolicyRequestFault, ResourceUnknownFault, NotifyMessageNotSupportedFault, InvalidProducerPropertiesExpressionFault {
+                                  String xpath, boolean raw) 
+        throws TopicNotSupportedFault, InvalidFilterFault, TopicExpressionDialectUnknownFault, 
+        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, 
+        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, UnrecognizedPolicyRequestFault, 
+        UnsupportedPolicyRequestFault, ResourceUnknownFault, NotifyMessageNotSupportedFault, 
+        InvalidProducerPropertiesExpressionFault {
 
         Subscribe subscribeRequest = new Subscribe();
         subscribeRequest.setConsumerReference(consumer.getEpr());
@@ -132,7 +150,9 @@ public class NotificationBroker implements Referencable {
         return new Subscription(response.getSubscriptionReference());
     }
 
-    public List<Object> getCurrentMessage(String topic) throws TopicNotSupportedFault, TopicExpressionDialectUnknownFault, MultipleTopicsSpecifiedFault, InvalidTopicExpressionFault, ResourceUnknownFault, NoCurrentMessageOnTopicFault {
+    public List<Object> getCurrentMessage(String topic) 
+        throws TopicNotSupportedFault, TopicExpressionDialectUnknownFault, MultipleTopicsSpecifiedFault, 
+        InvalidTopicExpressionFault, ResourceUnknownFault, NoCurrentMessageOnTopicFault {
         GetCurrentMessage getCurrentMessageRequest = new GetCurrentMessage();
         if (topic != null) {
             TopicExpressionType topicExp = new TopicExpressionType();
@@ -143,18 +163,24 @@ public class NotificationBroker implements Referencable {
         return response.getAny();
     }
 
-    public Registration registerPublisher(Referencable publisher,
-                                          String topic) throws TopicNotSupportedFault, PublisherRegistrationFailedFault, UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault, PublisherRegistrationRejectedFault {
+    public Registration registerPublisher(Referencable publisher, String topic) 
+        throws TopicNotSupportedFault, PublisherRegistrationFailedFault, 
+        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, 
+        ResourceUnknownFault, PublisherRegistrationRejectedFault {
         return registerPublisher(publisher, topic, false);
     }
 
-    public Registration registerPublisher(Referencable publisher,
-                                       String topic, boolean demand) throws TopicNotSupportedFault, PublisherRegistrationFailedFault, UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault, PublisherRegistrationRejectedFault {
+    public Registration registerPublisher(Referencable publisher, String topic, boolean demand) 
+        throws TopicNotSupportedFault, PublisherRegistrationFailedFault, 
+        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
+        PublisherRegistrationRejectedFault {
         return registerPublisher(publisher, Collections.singletonList(topic), demand);
     }
 
-    public Registration registerPublisher(Referencable publisher,
-                                       List<String> topics, boolean demand) throws TopicNotSupportedFault, PublisherRegistrationFailedFault, UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault, PublisherRegistrationRejectedFault {
+    public Registration registerPublisher(Referencable publisher, List<String> topics, boolean demand)
+        throws TopicNotSupportedFault, PublisherRegistrationFailedFault, 
+        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
+        PublisherRegistrationRejectedFault {
 
         RegisterPublisher registerPublisherRequest = new RegisterPublisher();
         registerPublisherRequest.setPublisherReference(publisher.getEpr());

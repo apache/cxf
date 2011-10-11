@@ -1,18 +1,20 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.wsn.client;
 
@@ -73,7 +75,8 @@ public class Publisher implements NotificationProducer, Referencable {
     private final String address;
     private final Endpoint endpoint;
     private final IdGenerator idGenerator = new IdGenerator();
-    private final Map<String, PublisherSubscription> subscriptions = new HashMap<String, PublisherSubscription>();
+    private final Map<String, PublisherSubscription> subscriptions 
+        = new HashMap<String, PublisherSubscription>();
 
     public Publisher(Callback callback, String address) {
         this.callback = callback;
@@ -90,7 +93,14 @@ public class Publisher implements NotificationProducer, Referencable {
         return this.endpoint.getEndpointReference(W3CEndpointReference.class);
     }
 
-    public SubscribeResponse subscribe(@WebParam(partName = "SubscribeRequest", name = "Subscribe", targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Subscribe subscribeRequest) throws InvalidTopicExpressionFault, ResourceUnknownFault, InvalidProducerPropertiesExpressionFault, UnrecognizedPolicyRequestFault, TopicExpressionDialectUnknownFault, NotifyMessageNotSupportedFault, InvalidFilterFault, UnsupportedPolicyRequestFault, InvalidMessageContentExpressionFault, SubscribeCreationFailedFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault {
+    public SubscribeResponse subscribe(
+        @WebParam(partName = "SubscribeRequest", name = "Subscribe",
+                  targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Subscribe subscribeRequest)
+        throws InvalidTopicExpressionFault, ResourceUnknownFault, InvalidProducerPropertiesExpressionFault,
+        UnrecognizedPolicyRequestFault, TopicExpressionDialectUnknownFault, NotifyMessageNotSupportedFault,
+        InvalidFilterFault, UnsupportedPolicyRequestFault, InvalidMessageContentExpressionFault,
+        SubscribeCreationFailedFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault {
+        
         TopicExpressionType topic = null;
         if (subscribeRequest.getFilter() != null) {
             for (Object f : subscribeRequest.getFilter().getAny()) {
@@ -123,7 +133,13 @@ public class Publisher implements NotificationProducer, Referencable {
         callback.unsubscribe(topic);
     }
 
-    public GetCurrentMessageResponse getCurrentMessage(@WebParam(partName = "GetCurrentMessageRequest", name = "GetCurrentMessage", targetNamespace = "http://docs.oasis-open.org/wsn/b-2") GetCurrentMessage getCurrentMessageRequest) throws InvalidTopicExpressionFault, ResourceUnknownFault, TopicExpressionDialectUnknownFault, MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, TopicNotSupportedFault {
+    public GetCurrentMessageResponse getCurrentMessage(
+            @WebParam(partName = "GetCurrentMessageRequest", name = "GetCurrentMessage", 
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2") 
+                GetCurrentMessage getCurrentMessageRequest) 
+        throws InvalidTopicExpressionFault, ResourceUnknownFault, TopicExpressionDialectUnknownFault, 
+        MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, TopicNotSupportedFault {
+        
         NoCurrentMessageOnTopicFaultType fault = new NoCurrentMessageOnTopicFaultType();
         throw new NoCurrentMessageOnTopicFault("There is no current message on this topic.", fault);
     }
@@ -146,12 +162,20 @@ public class Publisher implements NotificationProducer, Referencable {
             return endpoint.getEndpointReference(W3CEndpointReference.class);
         }
 
-        public UnsubscribeResponse unsubscribe(@WebParam(partName = "UnsubscribeRequest", name = "Unsubscribe", targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Unsubscribe unsubscribeRequest) throws ResourceUnknownFault, UnableToDestroySubscriptionFault {
+        public UnsubscribeResponse unsubscribe(
+                @WebParam(partName = "UnsubscribeRequest", 
+                          name = "Unsubscribe", 
+                          targetNamespace = "http://docs.oasis-open.org/wsn/b-2")
+                    Unsubscribe unsubscribeRequest)
+            throws ResourceUnknownFault, UnableToDestroySubscriptionFault {
             Publisher.this.unsubscribe(topic);
             return new UnsubscribeResponse();
         }
 
-        public RenewResponse renew(@WebParam(partName = "RenewRequest", name = "Renew", targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Renew renewRequest) throws ResourceUnknownFault, UnacceptableTerminationTimeFault {
+        public RenewResponse renew(
+                @WebParam(partName = "RenewRequest", name = "Renew",
+                          targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Renew renewRequest) 
+            throws ResourceUnknownFault, UnacceptableTerminationTimeFault {
             throw new UnsupportedOperationException();
         }
     }
