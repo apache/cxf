@@ -25,9 +25,15 @@ import org.apache.cxf.wsn.EndpointRegistrationException;
 public class JaxwsEndpointManager implements EndpointManager {
 
     public Object register(String address, Object service) throws EndpointRegistrationException {
-        Endpoint endpoint = Endpoint.create(service);
-        endpoint.publish(address);
-        return endpoint;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(JaxwsEndpointManager.class.getClassLoader());
+            Endpoint endpoint = Endpoint.create(service);
+            endpoint.publish(address);
+            return endpoint;
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     public void unregister(Object endpoint) throws EndpointRegistrationException {

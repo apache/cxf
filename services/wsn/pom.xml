@@ -34,6 +34,7 @@
 
     <modules>
         <module>wsn-core</module>
+        <module>wsn-osgi</module>
     </modules>
 
 </project>
