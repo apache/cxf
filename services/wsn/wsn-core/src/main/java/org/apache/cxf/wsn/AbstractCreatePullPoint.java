@@ -21,6 +21,9 @@ package org.apache.cxf.wsn;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -28,6 +31,7 @@ import javax.jws.WebService;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.util.DOMUtil;
 import org.apache.cxf.wsn.util.IdGenerator;
 import org.oasis_open.docs.wsn.b_2.CreatePullPointResponse;
@@ -35,13 +39,11 @@ import org.oasis_open.docs.wsn.b_2.UnableToCreatePullPointFaultType;
 import org.oasis_open.docs.wsn.bw_2.CreatePullPoint;
 import org.oasis_open.docs.wsn.bw_2.UnableToCreatePullPointFault;
 import org.oasis_open.docs.wsn.bw_2.UnableToDestroyPullPointFault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint")
 public abstract class AbstractCreatePullPoint extends AbstractEndpoint implements CreatePullPoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCreatePullPoint.class);
+    private static final Logger LOGGER = LogUtils.getL7dLogger(AbstractCreatePullPoint.class);
 
     private IdGenerator idGenerator;
 
@@ -72,7 +74,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
             org.oasis_open.docs.wsn.b_2.CreatePullPoint createPullPointRequest)
         throws UnableToCreatePullPointFault {
 
-        LOGGER.debug("CreatePullEndpoint");
+        LOGGER.finest("CreatePullEndpoint");
         return handleCreatePullPoint(createPullPointRequest, null);
     }
 
@@ -95,7 +97,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
             success = true;
             return response;
         } catch (EndpointRegistrationException e) {
-            LOGGER.warn("Unable to register new endpoint", e);
+            LOGGER.log(Level.WARNING, "Unable to register new endpoint", e);
             UnableToCreatePullPointFaultType fault = new UnableToCreatePullPointFaultType();
             throw new UnableToCreatePullPointFault("Unable to register new endpoint", fault, e);
         } finally {
@@ -104,7 +106,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
                 try {
                     pullPoint.destroy();
                 } catch (UnableToDestroyPullPointFault e) {
-                    LOGGER.info("Error destroying pullPoint", e);
+                    LOGGER.log(Level.INFO, "Error destroying pullPoint", e);
                 }
             }
         }

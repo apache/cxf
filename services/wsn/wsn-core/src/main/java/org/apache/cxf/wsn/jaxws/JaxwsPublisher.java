@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.wsn.jaxws;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractSubscription;
 import org.apache.cxf.wsn.jms.JmsPublisher;
 import org.apache.cxf.wsn.util.WSNHelper;
@@ -32,13 +36,11 @@ import org.oasis_open.docs.wsn.b_2.Unsubscribe;
 import org.oasis_open.docs.wsn.brw_2.PublisherRegistrationFailedFault;
 import org.oasis_open.docs.wsn.bw_2.NotificationProducer;
 import org.oasis_open.docs.wsn.bw_2.SubscriptionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.PublisherRegistrationManager")
 public class JaxwsPublisher extends JmsPublisher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JaxwsPublisher.class);
+    private static final Logger LOGGER = LogUtils.getL7dLogger(JaxwsPublisher.class);
 
     protected JaxwsNotificationBroker notificationBroker;
     private NotificationProducer notificationProducer;
@@ -68,7 +70,7 @@ public class JaxwsPublisher extends JmsPublisher {
             SubscribeResponse response = notificationProducer.subscribe(subscribeRequest);
             return WSNHelper.getPort(response.getSubscriptionReference(), SubscriptionManager.class);
         } catch (Exception e) {
-            LOGGER.info("Error while subscribing on-demand publisher", e);
+            LOGGER.log(Level.INFO, "Error while subscribing on-demand publisher", e);
             return null;
         }
     }
@@ -78,7 +80,7 @@ public class JaxwsPublisher extends JmsPublisher {
         try {
             ((SubscriptionManager) sub).unsubscribe(new Unsubscribe());
         } catch (Exception e) {
-            LOGGER.info("Error while unsubscribing on-demand publisher", e);
+            LOGGER.log(Level.INFO, "Error while unsubscribing on-demand publisher", e);
         }
     }
 

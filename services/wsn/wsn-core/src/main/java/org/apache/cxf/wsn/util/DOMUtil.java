@@ -21,6 +21,8 @@ package org.apache.cxf.wsn.util;
 import java.io.StringWriter;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -40,9 +42,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.cxf.common.logging.LogUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -53,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DOMUtil {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DOMUtil.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(DOMUtil.class);
 
     private static DocumentBuilderFactory dbf;
     private static Queue<DocumentBuilder> builders = new ConcurrentLinkedQueue<DocumentBuilder>();
@@ -206,8 +207,8 @@ public final class DOMUtil {
         try {
             answer = element.getAttribute(attributeName);
         } catch (Exception e) {
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Caught exception looking up attribute: " + attributeName 
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST, "Caught exception looking up attribute: " + attributeName 
                              + " on element: " + element + ". Cause: " + e, e);
             }
         }

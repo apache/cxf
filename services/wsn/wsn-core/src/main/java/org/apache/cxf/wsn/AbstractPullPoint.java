@@ -20,6 +20,7 @@ package org.apache.cxf.wsn;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
@@ -27,6 +28,7 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.oasis_open.docs.wsn.b_2.CreatePullPoint;
 import org.oasis_open.docs.wsn.b_2.DestroyPullPoint;
 import org.oasis_open.docs.wsn.b_2.DestroyPullPointResponse;
@@ -41,13 +43,11 @@ import org.oasis_open.docs.wsn.bw_2.UnableToCreatePullPointFault;
 import org.oasis_open.docs.wsn.bw_2.UnableToDestroyPullPointFault;
 import org.oasis_open.docs.wsn.bw_2.UnableToGetMessagesFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.PullPoint")
 public abstract class AbstractPullPoint extends AbstractEndpoint implements PullPoint, NotificationConsumer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPullPoint.class);
+    private static final Logger LOGGER = LogUtils.getL7dLogger(AbstractPullPoint.class);
 
     protected AbstractCreatePullPoint createPullPoint;
 
@@ -67,7 +67,7 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
                       partName = "Notify")
             Notify notify) {
 
-        LOGGER.debug("Notify");
+        LOGGER.finest("Notify");
         for (NotificationMessageHolderType messageHolder : notify.getNotificationMessage()) {
             store(messageHolder);
         }
@@ -90,7 +90,7 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
                       partName = "GetMessagesRequest")
             GetMessages getMessagesRequest) throws ResourceUnknownFault, UnableToGetMessagesFault {
 
-        LOGGER.debug("GetMessages");
+        LOGGER.finest("GetMessages");
         BigInteger max = getMessagesRequest.getMaximumNumber();
         List<NotificationMessageHolderType> messages = getMessages(max != null ? max.intValue() : 0);
         GetMessagesResponse response = new GetMessagesResponse();
@@ -116,7 +116,7 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
             DestroyPullPoint destroyPullPointRequest) 
         throws ResourceUnknownFault, UnableToDestroyPullPointFault {
 
-        LOGGER.debug("Destroy");
+        LOGGER.finest("Destroy");
         createPullPoint.destroyPullPoint(getAddress());
         return new DestroyPullPointResponse();
     }

@@ -20,6 +20,9 @@ package org.apache.cxf.wsn.jms;
 
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -41,6 +44,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractSubscription;
 import org.oasis_open.docs.wsn.b_2.InvalidTopicExpressionFaultType;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
@@ -65,12 +69,10 @@ import org.oasis_open.docs.wsn.bw_2.UnacceptableInitialTerminationTimeFault;
 import org.oasis_open.docs.wsn.bw_2.UnacceptableTerminationTimeFault;
 import org.oasis_open.docs.wsn.bw_2.UnrecognizedPolicyRequestFault;
 import org.oasis_open.docs.wsn.bw_2.UnsupportedPolicyRequestFault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class JmsSubscription extends AbstractSubscription implements MessageListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JmsSubscription.class);
+    private static final Logger LOGGER = LogUtils.getL7dLogger(JmsSubscription.class);
 
     private Connection connection;
 
@@ -211,7 +213,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                 doNotify(notify);
             }
         } catch (Exception e) {
-            LOGGER.warn("Error notifying consumer", e);
+            LOGGER.log(Level.WARNING, "Error notifying consumer", e);
         }
     }
 
@@ -227,7 +229,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                 Boolean ret = (Boolean) exp.evaluate(content, XPathConstants.BOOLEAN);
                 return ret.booleanValue();
             } catch (XPathExpressionException e) {
-                LOGGER.warn("Could not filter notification", e);
+                LOGGER.log(Level.WARNING, "Could not filter notification", e);
             }
             return false;
         }

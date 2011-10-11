@@ -21,6 +21,9 @@ package org.apache.cxf.wsn;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -29,6 +32,7 @@ import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.util.IdGenerator;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessage;
@@ -65,8 +69,6 @@ import org.oasis_open.docs.wsrf.rpw_2.GetResourceProperty;
 import org.oasis_open.docs.wsrf.rpw_2.InvalidResourcePropertyQNameFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnavailableFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker")
 public abstract class AbstractNotificationBroker extends AbstractEndpoint 
@@ -80,7 +82,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
         = new QName(NAMESPACE_URI, "TopicExpressionDialect", PREFIX);
     public static final QName TOPIC_SET_QNAME = new QName(NAMESPACE_URI, "TopicSet", PREFIX);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractNotificationBroker.class);
+    private static final Logger LOGGER = LogUtils.getL7dLogger(AbstractNotificationBroker.class);
 
     private IdGenerator idGenerator;
 
@@ -121,7 +123,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
                       partName = "Notify")
             Notify notify) {
 
-        LOGGER.debug("Notify");
+        LOGGER.finest("Notify");
         handleNotify(notify);
     }
 
@@ -178,7 +180,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             UnrecognizedPolicyRequestFault {
         //CHECKSTYLE:ON
 
-        LOGGER.debug("Subscribe");
+        LOGGER.finest("Subscribe");
         return handleSubscribe(subscribeRequest, null);
     }
 
@@ -208,7 +210,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             success = true;
             return response;
         } catch (EndpointRegistrationException e) {
-            LOGGER.warn("Unable to register new endpoint", e);
+            LOGGER.log(Level.WARNING, "Unable to register new endpoint", e);
             SubscribeCreationFailedFaultType fault = new SubscribeCreationFailedFaultType();
             throw new SubscribeCreationFailedFault("Unable to register new endpoint", fault, e);
         } finally {
@@ -217,7 +219,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
                 try {
                     subscription.unsubscribe();
                 } catch (UnableToDestroySubscriptionFault e) {
-                    LOGGER.info("Error destroying subscription", e);
+                    LOGGER.log(Level.INFO, "Error destroying subscription", e);
                 }
             }
         }
@@ -255,7 +257,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, ResourceUnknownFault,
             TopicExpressionDialectUnknownFault, TopicNotSupportedFault {
         //CHECKSTYLE:ON
-        LOGGER.debug("GetCurrentMessage");
+        LOGGER.finest("GetCurrentMessage");
         NoCurrentMessageOnTopicFaultType fault = new NoCurrentMessageOnTopicFaultType();
         throw new NoCurrentMessageOnTopicFault("There is no current message on this topic.", fault);
     }
@@ -282,7 +284,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             PublisherRegistrationFailedFault, PublisherRegistrationRejectedFault, ResourceUnknownFault,
             TopicNotSupportedFault {
 
-        LOGGER.debug("RegisterPublisher");
+        LOGGER.finest("RegisterPublisher");
         return handleRegisterPublisher(registerPublisherRequest);
     }
 
@@ -302,7 +304,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             success = true;
             return response;
         } catch (EndpointRegistrationException e) {
-            LOGGER.warn("Unable to register new endpoint", e);
+            LOGGER.log(Level.WARNING, "Unable to register new endpoint", e);
             PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
             throw new PublisherRegistrationFailedFault("Unable to register new endpoint", fault, e);
         } finally {
@@ -310,7 +312,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
                 try {
                     publisher.destroy();
                 } catch (ResourceNotDestroyedFault e) {
-                    LOGGER.info("Error destroying publisher", e);
+                    LOGGER.log(Level.INFO, "Error destroying publisher", e);
                 }
             }
         }
@@ -331,7 +333,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
         javax.xml.namespace.QName getResourcePropertyRequest
     ) throws ResourceUnavailableFault, ResourceUnknownFault, InvalidResourcePropertyQNameFault {
 
-        LOGGER.debug("GetResourceProperty");
+        LOGGER.finest("GetResourceProperty");
         return handleGetResourceProperty(getResourcePropertyRequest);
     }
 

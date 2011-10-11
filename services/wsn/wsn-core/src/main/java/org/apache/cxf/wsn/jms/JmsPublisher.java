@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -36,6 +39,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.activemq.advisory.ConsumerEvent;
 import org.apache.activemq.advisory.ConsumerEventSource;
 import org.apache.activemq.advisory.ConsumerListener;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractPublisher;
 import org.oasis_open.docs.wsn.b_2.InvalidTopicExpressionFaultType;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
@@ -50,12 +54,10 @@ import org.oasis_open.docs.wsn.brw_2.ResourceNotDestroyedFault;
 import org.oasis_open.docs.wsn.bw_2.InvalidTopicExpressionFault;
 import org.oasis_open.docs.wsn.bw_2.TopicNotSupportedFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class JmsPublisher extends AbstractPublisher implements ConsumerListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JmsPublisher.class);
+    private static final Logger LOGGER = LogUtils.getL7dLogger(JmsPublisher.class);
 
     private Connection connection;
 
@@ -99,17 +101,17 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             Message message = session.createTextMessage(writer.toString());
             producer.send(message);
         } catch (JMSException e) {
-            LOGGER.warn("Error dispatching message", e);
+            LOGGER.log(Level.WARNING, "Error dispatching message", e);
         } catch (JAXBException e) {
-            LOGGER.warn("Error dispatching message", e);
+            LOGGER.log(Level.WARNING, "Error dispatching message", e);
         } catch (InvalidTopicException e) {
-            LOGGER.warn("Error dispatching message", e);
+            LOGGER.log(Level.WARNING, "Error dispatching message", e);
         } finally {
             if (session != null) {
                 try {
                     session.close();
                 } catch (JMSException e) {
-                    LOGGER.debug("Error closing session", e);
+                    LOGGER.log(Level.FINE, "Error closing session", e);
                 }
             }
         }
