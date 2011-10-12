@@ -85,13 +85,13 @@ public class OAuthDefaultServices {
     }
     
     @GET
-    @Path("/authorizeDecision")
+    @Path("/authorize/decision")
     public Response authorizeDecision() {
         return authorizeService.authorizeDecision();
     }
     
     @POST
-    @Path("/authorizeDecision")
+    @Path("/authorize/decision")
     @Consumes("application/x-www-form-urlencoded")
     public Response authorizeDecisionForm() {
         return authorizeService.authorizeDecision();

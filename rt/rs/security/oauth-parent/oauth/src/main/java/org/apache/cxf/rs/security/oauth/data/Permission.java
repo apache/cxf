@@ -23,6 +23,10 @@ public class Permission {
     private String permission;
     private String description;
     
+    public Permission() {
+        
+    }
+    
     public Permission(String permission, String description) {
         this.description = description;
         this.permission = permission;

@@ -28,7 +28,7 @@
     <beans:bean id="authenticationSuccHandler"
                 class="demo.oauth.server.spring.AuthenticationSuccessfullHandler">
         <beans:property name="defaultTargetUrl" value="/app/newClientForm.jsp"/>
-        <beans:property name="confirmationUrl" value="/auth/oauth/authorizeDecision"/>
+        <beans:property name="confirmationUrl" value="/auth/oauth/authorize/decision"/>
     </beans:bean>
 
     <beans:bean id="authenticationFailHandler"

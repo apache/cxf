@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,13 +67,13 @@ public class AuthorizationRequestHandler {
             }
             
             OAuthAuthorizationData secData = new OAuthAuthorizationData();
-            if (!compareRequestSessionTokens(request)) {
+            if (!compareRequestSessionTokens(request, oAuthMessage)) {
                 addAuthenticityTokenToSession(secData, request);
                 return Response.ok(
                         addAdditionalParams(secData, dataProvider, token)).build();
             }
             
-            String decision = request.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
+            String decision = oAuthMessage.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
             boolean allow = OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision);
 
             Map<String, String> queryParams = new HashMap<String, String>();
@@ -145,9 +146,15 @@ public class AuthorizationRequestHandler {
         session.setAttribute(OAuthConstants.AUTHENTICITY_TOKEN, value);
     }
     
-    private boolean compareRequestSessionTokens(HttpServletRequest request) {
+    private boolean compareRequestSessionTokens(HttpServletRequest request,
+            OAuthMessage oAuthMessage) {
         HttpSession session = request.getSession();
-        String requestToken = request.getParameter(OAuthConstants.AUTHENTICITY_TOKEN);
+        String requestToken = null; 
+        try {
+            requestToken = oAuthMessage.getParameter(OAuthConstants.AUTHENTICITY_TOKEN);
+        } catch (IOException ex) {
+            return false;
+        }
         String sessionToken = (String) session.getAttribute(OAuthConstants.AUTHENTICITY_TOKEN);
         
         if (StringUtils.isEmpty(requestToken) || StringUtils.isEmpty(sessionToken)) {

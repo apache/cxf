@@ -110,7 +110,7 @@ public class AbstractAuthFilter {
                 matched = true;
             }
         }
-        if (!matched) {
+        if (!matched && permissions.size() > 0) {
             throw new OAuthProblemException();
         }
         return new OAuthInfo(authInfo, accessToken, permissions);
@@ -118,7 +118,7 @@ public class AbstractAuthFilter {
     }
 
     protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
-        if (uris == null) {
+        if (uris == null || uris.isEmpty()) {
             return true;
         }
         String servletPath = request.getPathInfo();
