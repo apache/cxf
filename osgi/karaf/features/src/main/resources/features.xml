@@ -22,10 +22,10 @@
     <feature name="activemq" version="5.4.2">
         <!-- The ActiveMQ features.xml that is provided by 5.4.2 does not work with modern Karaf versions -->
         <!-- Thus, we'll duplicate the main activemq definition here with the 'karaf' stuff removed -->
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-annotation_1.0_spec/1.1.1</bundle>
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle> 
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle> 
-        <bundle>mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/1.0.1</bundle> 
+        <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-annotation_1.0_spec/${cxf.geronimo.annotation.version}</bundle>
+        <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle> 
+        <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle> 
+        <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/1.0.1</bundle> 
         <bundle>mvn:commons-pool/commons-pool/1.5.4</bundle>
         <bundle>mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
         <bundle>mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
@@ -50,7 +50,7 @@
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.geronimo.specs/geronimo-jaxws_2.2_spec/${cxf.specs.jaxws.api.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${cxf.servicemix.specs.version}</bundle>
-        <bundle>mvn:http://download.java.net/maven/2!javax.mail/mail/${cxf.javax.mail.version}</bundle>
+        <bundle start-level='10'>mvn:javax.mail/mail/${cxf.javax.mail.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1/${cxf.servicemix.specs.version}</bundle>
     </feature>
 
