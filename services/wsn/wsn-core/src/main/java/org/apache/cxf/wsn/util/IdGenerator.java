@@ -21,9 +21,10 @@ package org.apache.cxf.wsn.util;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * Generator for Globally unique Strings.
@@ -31,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class IdGenerator {
 
-    private static final Log LOG = LogFactory.getLog(IdGenerator.class);
+    private static final Logger LOGGER = LogUtils.getL7dLogger(IdGenerator.class);
 
     private static final String UNIQUE_STUB;
 
@@ -79,7 +80,7 @@ public class IdGenerator {
                 Thread.sleep(100);
                 ss.close();
             } catch (Exception ioe) {
-                LOG.warn("Could not generate unique stub", ioe);
+                LOGGER.log(Level.WARNING, "Could not generate unique stub", ioe);
             }
         } else {
             hostName = "localhost";

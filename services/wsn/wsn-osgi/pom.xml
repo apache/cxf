@@ -37,6 +37,12 @@
             <groupId>org.apache.cxf.services.wsn</groupId>
             <artifactId>cxf-services-wsn-core</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-common-utilities</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -52,6 +58,10 @@
                             org.apache.activemq.activemq-core
                         </Require-Bundle>
                         <Import-Package>
+                            !org.apache.cxf.*,
+                            !org.apache.activemq*,
+                            !org.apache.log4j.*,
+                            !org.slf4j.*,
                             javax.xml.bind*;version="[0.0,3)",
                             javax.jws*;version="[0.0,3)",
                             javax.xml.ws*;version="[0.0,3)",
@@ -63,7 +73,8 @@
                             org.apache.cxf.wsn.client;version=${project.version}
                         </Export-Package>
                         <Private-Package>
-                            org.apache.cxf.wsn.*
+                            org.apache.cxf.wsn.*,
+                            org.apache.cxf.common.logging
                         </Private-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>

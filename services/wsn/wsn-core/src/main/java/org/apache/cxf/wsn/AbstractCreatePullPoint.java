@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.wsn;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -29,10 +28,7 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
-import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.wsn.util.IdGenerator;
 import org.oasis_open.docs.wsn.b_2.CreatePullPointResponse;
 import org.oasis_open.docs.wsn.b_2.UnableToCreatePullPointFaultType;
@@ -113,20 +109,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
     }
 
     protected String createPullPointName(org.oasis_open.docs.wsn.b_2.CreatePullPoint createPullPointRequest) {
-        // Let the creator decide which pull point name to use
-        String name = null;
-        for (Iterator it = createPullPointRequest.getAny().iterator(); it.hasNext();) {
-            Element el = (Element) it.next();
-            if ("name".equals(el.getLocalName())
-                    && "http://cxf.apache.org/wsn2005/1.0".equals(el.getNamespaceURI())) {
-                name = DOMUtils.getContent(el).trim();
-            }
-        }
-        if (name == null) {
-            // If no name is given, just generate one
-            name = idGenerator.generateSanitizedId();
-        }
-        return name;
+        return idGenerator.generateSanitizedId();
     }
 
     public void destroyPullPoint(String address) throws UnableToDestroyPullPointFault {
