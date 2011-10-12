@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -52,6 +53,7 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
 /**
@@ -64,8 +66,27 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     private long id;
     private Extension listener;
 
-    static class WorkQueueList {
-        List<AutomaticWorkQueueImpl> list = new CopyOnWriteArrayList<AutomaticWorkQueueImpl>();
+    static class WorkQueueList implements ManagedService {
+        Map<String, OSGiAutomaticWorkQueue> queues 
+            = new ConcurrentHashMap<String, OSGiAutomaticWorkQueue>();
+
+        public void updated(Dictionary d) throws ConfigurationException {
+            String s = (String)d.get("org.apache.cxf.workqueue.names");
+            if (s != null) {
+                String s2[] = s.split(",");
+                for (String name : s2) {
+                    name = name.trim();
+                    if (queues.containsKey(name)) {
+                        queues.get(name).updated(d);
+                    } else {
+                        OSGiAutomaticWorkQueue wq = new OSGiAutomaticWorkQueue(name);
+                        wq.updated(d);
+                        wq.setShared(true);
+                        queues.put(name, wq);
+                    }
+                }
+            }
+        }
     };
     private WorkQueueList workQueues = new WorkQueueList();
     
@@ -97,7 +118,8 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             }
         }
         ServiceReference configAdminServiceRef =  
-            context.getServiceReference(ConfigurationAdmin.class.getName());  
+            context.getServiceReference(ConfigurationAdmin.class.getName());
+        
               
         if (configAdminServiceRef != null) {  
             ConfigurationAdmin configAdmin = (ConfigurationAdmin)  
@@ -105,33 +127,25 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
               
             Configuration config = configAdmin.getConfiguration("org.apache.cxf.workqueues");
             Dictionary d = config.getProperties();
+            
+            Properties props = new Properties();
+            props.put(Constants.SERVICE_PID, "org.apache.cxf.workqueues");  
+            context.registerService(ManagedService.class.getName(),  
+                                    workQueues, props); 
+
+            
             if (d != null) {
-                Properties props = new Properties();
-                props.put(Constants.SERVICE_PID, "org.apache.cxf.workqueues");  
-                String s = (String)d.get("org.apache.cxf.workqueue.names");
-                String s2[] = s.split(",");
-                for (String name : s2) {
-                    name = name.trim();
-                    OSGiAutomaticWorkQueue wq = new OSGiAutomaticWorkQueue(name);
-                    wq.updated(d);
-                    wq.setShared(true);
-                    workQueues.list.add(wq);
-                    
-                    context.registerService(ManagedService.class.getName(),  
-                                            wq, props); 
+                workQueues.updated(d);
+            }
+            Extension ext = new Extension(WorkQueueList.class) {
+                public Object getLoadedObject() {
+                    return workQueues;
                 }
-            }
-            if (!workQueues.list.isEmpty()) {
-                Extension ext = new Extension(WorkQueueList.class) {
-                    public Object getLoadedObject() {
-                        return workQueues;
-                    }
-                    public Extension cloneNoObject() {
-                        return this;
-                    }
-                };
-                ExtensionRegistry.addExtensions(Collections.singletonList(ext));
-            }
+                public Extension cloneNoObject() {
+                    return this;
+                }
+            };
+            ExtensionRegistry.addExtensions(Collections.singletonList(ext));
         }
     }
 
@@ -142,11 +156,11 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         while (!extensions.isEmpty()) {
             unregister(extensions.keySet().iterator().next());
         }
-        for (AutomaticWorkQueueImpl wq : workQueues.list) {
+        for (AutomaticWorkQueueImpl wq : workQueues.queues.values()) {
             wq.setShared(false);
             wq.shutdown(true);
         }
-        workQueues.list.clear();
+        workQueues.queues.clear();
     }
     private void registerBusListener() {
         listener = new Extension(OSGIBusListener.class);
@@ -211,7 +225,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             WorkQueueManager m = bus.getExtension(WorkQueueManager.class);
             WorkQueueList l = bus.getExtension(WorkQueueList.class);
             if (l != null && m != null) {
-                for (AutomaticWorkQueueImpl wq : l.list) {
+                for (AutomaticWorkQueueImpl wq : l.queues.values()) {
                     if (m.getNamedWorkQueue(wq.getName()) == null) {
                         m.addNamedWorkQueue(wq.getName(), wq);
                     }

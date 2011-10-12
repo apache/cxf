@@ -35,6 +35,7 @@ public class Extension {
     protected String interfaceName;
     protected boolean deferred;
     protected Collection<String> namespaces = new ArrayList<String>();
+    protected Object args[];
     protected Object obj;
     
     public Extension() {
@@ -62,6 +63,7 @@ public class Extension {
         clazz = ext.clazz;
         intf = ext.intf;
         classloader = ext.classloader;
+        args = ext.args;
     }
     
     public String getName() {
@@ -130,8 +132,6 @@ public class Extension {
     }
     
     
-    
-    
     public Class<?> getClassObject(ClassLoader cl) {
         if (clazz == null) {
             if (classloader != null) {
@@ -160,10 +160,29 @@ public class Extension {
             Class<?> cls = getClassObject(cl);
             try {
                 //if there is a Bus constructor, use it.
-                if (b != null) {
+                if (b != null && args == null) {
                     Constructor con = cls.getConstructor(Bus.class);
                     obj = con.newInstance(b);
                     return obj;
+                } else if (b != null && args != null) {
+                    Constructor con;
+                    boolean noBus = false;
+                    try {
+                        con = cls.getConstructor(Bus.class, Object[].class);
+                    } catch (Exception ex) {
+                        con = cls.getConstructor(Object[].class);
+                        noBus = true;
+                    }
+                    if (noBus) {
+                        obj = con.newInstance(args);
+                    } else {
+                        obj = con.newInstance(b, args);
+                    }
+                    return obj;                    
+                } else if (args != null) {
+                    Constructor con = cls.getConstructor(Object[].class);
+                    obj = con.newInstance(args);
+                    return obj;                    
                 }
             } catch (Exception ex) {
                 //ignore
@@ -174,7 +193,6 @@ public class Extension {
         } catch (InstantiationException ex) {
             throw new ExtensionException(ex);
         }
-        
         return obj;
     }
     

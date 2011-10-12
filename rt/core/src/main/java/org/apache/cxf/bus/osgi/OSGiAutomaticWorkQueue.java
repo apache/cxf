@@ -23,12 +23,11 @@ import java.util.Dictionary;
 
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 
 /**
  * 
  */
-public class OSGiAutomaticWorkQueue extends AutomaticWorkQueueImpl implements ManagedService {
+public class OSGiAutomaticWorkQueue extends AutomaticWorkQueueImpl {
     
     public OSGiAutomaticWorkQueue(String name) {
         super(name);
