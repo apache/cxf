@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth.data;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -28,8 +29,8 @@ public abstract class Token {
     protected long issuedAt = -1;
     protected long lifetime = -1;
     protected Client client;
-    protected List<String> scopes;
-    protected List<String> uris;
+    protected List<String> scopes = Collections.emptyList();
+    protected List<String> uris = Collections.emptyList();
     
     protected Token(Client client, String tokenString,
                     String tokenSecret, long lifetime) {
@@ -70,7 +71,7 @@ public abstract class Token {
     }
 
     public List<String> getScopes() {
-        return scopes == null || scopes.isEmpty() ? client.getScopes() : scopes;
+        return scopes;
     }
 
     public void setScopes(List<String> scopes) {
@@ -79,7 +80,7 @@ public abstract class Token {
        
 
     public List<String> getUris() {
-        return uris == null || uris.isEmpty() ? client.getUris() : uris;
+        return uris;
     }
 
     public void setUris(List<String> uris) {

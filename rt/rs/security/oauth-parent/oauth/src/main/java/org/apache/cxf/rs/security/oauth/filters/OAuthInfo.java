@@ -43,10 +43,8 @@ public class OAuthInfo {
     
     public List<String> getRoles() {
         List<String> authorities = new ArrayList<String>();
-        if (permissions != null) {
-            for (OAuthPermission permission : permissions) {
-                authorities.addAll(permission.getRoles());
-            }
+        for (OAuthPermission permission : permissions) {
+            authorities.addAll(permission.getRoles());
         }
         return authorities;
     }

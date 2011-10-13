@@ -22,9 +22,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class OAuthPermission extends Permission {
-    private List<String> roles;
-    private List<String> httpVerbs;
-
+    private List<String> roles = Collections.emptyList();
+    private List<String> httpVerbs = Collections.emptyList();
+    private String uri;
+    
     public OAuthPermission(String permission, String description, String role) {
         this(permission, description, Collections.singletonList(role));
     }
@@ -34,18 +35,25 @@ public class OAuthPermission extends Permission {
         this.roles = roles;
     }
     
-    public OAuthPermission(String permission, String description, 
-            List<String> roles, List<String> verbs) {
-        super(permission, description);
-        this.roles = roles;
-        this.httpVerbs = roles;
-    }
-    
     public List<String> getRoles() {
         return roles;
     }
-    
+
+    public void setHttpVerbs(List<String> httpVerbs) {
+        this.httpVerbs = httpVerbs;
+    }
+
     public List<String> getHttpVerbs() {
         return httpVerbs;
     }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+    
+    
 }

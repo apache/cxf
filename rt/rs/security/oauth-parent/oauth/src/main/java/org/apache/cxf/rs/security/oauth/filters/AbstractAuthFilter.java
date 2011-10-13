@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.oauth.filters;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +61,7 @@ public class AbstractAuthFilter {
         
     }
     
-    public void setOAuthDataProvider(OAuthDataProvider provider) {
+    public void setDataProvider(OAuthDataProvider provider) {
         dataProvider = provider;
     }
     
@@ -70,7 +72,7 @@ public class AbstractAuthFilter {
         }
         
         AccessToken accessToken = null;
-        Client authInfo = null;
+        Client client = null;
         
         OAuthMessage oAuthMessage = OAuthServlet.getMessage(req, req.getRequestURL().toString());
         if (oAuthMessage.getParameter(OAuth.OAUTH_TOKEN) != null) {
@@ -82,43 +84,60 @@ public class AbstractAuthFilter {
             if (accessToken == null) {
                 throw new OAuthProblemException();
             }
-            //check valid URI
-            if (!checkRequestURI(req, accessToken.getUris())) {
-                throw new OAuthProblemException();
-            }
-            authInfo = accessToken.getClient(); 
+            client = accessToken.getClient(); 
             
         } else {
             String consumerKey = oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY);
-            authInfo = dataProvider.getClient(consumerKey);
-            if (authInfo == null) {
-                throw new OAuthProblemException();
-            }
-            if (!checkRequestURI(req, authInfo.getUris())) {
+            client = dataProvider.getClient(consumerKey);
+            if (client == null) {
                 throw new OAuthProblemException();
             }
         }
 
-        OAuthUtils.validateMessage(oAuthMessage, authInfo, accessToken);
+        OAuthUtils.validateMessage(oAuthMessage, client, accessToken);
 
-        List<OAuthPermission> permissions = dataProvider.getPermissionsInfo(
-                accessToken != null ? accessToken.getScopes() : authInfo.getScopes());
-        boolean matched = false;
-        for (OAuthPermission perm : permissions) {
-            if (perm.getHttpVerbs() == null 
-                    || perm.getHttpVerbs().contains(req.getMethod())) {
-                matched = true;
-            }
-        }
-        if (!matched && permissions.size() > 0) {
+        //check valid URI
+        if (!checkRequestURI(req, getAllUris(client, accessToken))) {
             throw new OAuthProblemException();
         }
-        return new OAuthInfo(authInfo, accessToken, permissions);
         
+        List<OAuthPermission> permissions = dataProvider.getPermissionsInfo(
+                getAllScopes(client, accessToken));
+        for (OAuthPermission perm : permissions) {
+            if (perm.getUri() != null 
+                && !checkRequestURI(req, Collections.singletonList(perm.getUri()))) {
+                throw new OAuthProblemException();
+            }
+            if (!perm.getHttpVerbs().isEmpty() 
+                && !perm.getHttpVerbs().contains(req.getMethod())) {
+                throw new OAuthProblemException();
+            }
+        }
+        return new OAuthInfo(client, accessToken, permissions);
+        
+    }
+    
+    protected List<String> getAllScopes(Client client, AccessToken token) {
+        List<String> scopes = new LinkedList<String>();
+        if (token != null) {
+            scopes.addAll(token.getScopes());
+        }
+        scopes.addAll(client.getScopes());
+        return scopes;
+    }
+    
+    protected List<String> getAllUris(Client client, AccessToken token) {
+        List<String> uris = new LinkedList<String>();
+        if (token != null) {
+            uris.addAll(token.getUris());
+        }
+        uris.addAll(client.getUris());
+        return uris;
     }
 
     protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
-        if (uris == null || uris.isEmpty()) {
+        
+        if (uris.isEmpty()) {
             return true;
         }
         String servletPath = request.getPathInfo();

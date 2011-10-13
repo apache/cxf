@@ -42,7 +42,7 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
 
     public void init(FilterConfig filterConfig) throws ServletException {
         ServletContext servletContext = filterConfig.getServletContext();
-        super.setOAuthDataProvider(OAuthUtils.getOAuthDataProvider(servletContext));
+        super.setDataProvider(OAuthUtils.getOAuthDataProvider(servletContext));
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
