@@ -71,6 +71,9 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             = new ConcurrentHashMap<String, OSGiAutomaticWorkQueue>();
 
         public void updated(Dictionary d) throws ConfigurationException {
+            if (d == null) {
+                return;
+            }
             String s = (String)d.get("org.apache.cxf.workqueue.names");
             if (s != null) {
                 String s2[] = s.split(",");
