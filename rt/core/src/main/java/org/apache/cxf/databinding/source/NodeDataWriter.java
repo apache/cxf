@@ -30,7 +30,6 @@ import javax.xml.validation.Schema;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
@@ -57,7 +56,7 @@ public class NodeDataWriter implements DataWriter<Node> {
             XMLStreamWriter writer = new W3CDOMStreamWriter((Element)n);
             StaxUtils.copy(s, writer);
         } catch (XMLStreamException e) {
-            throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+            throw new Fault("COULD_NOT_WRITE_XML_STREAM_CAUSED_BY", LOG, e, e.getMessage());
         }
     }
 

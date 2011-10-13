@@ -88,9 +88,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                 StaxUtils.copy(s, writer);
             }
         } catch (XMLStreamException e) {
-            throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+            throw new Fault("COULD_NOT_WRITE_XML_STREAM_CAUSED_BY", LOG, e, e.getMessage());
         } catch (IOException e) {
-            throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+            throw new Fault(new Message("COULD_NOT_WRITE_XML_STREAM", LOG), e);
         }
     }
 
