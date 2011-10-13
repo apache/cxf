@@ -24,13 +24,11 @@ import java.net.MalformedURLException;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
-
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.greeter_control.types.FaultDetail;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,15 +53,6 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             StackTraceElement[] elements = ex.getCause().getStackTrace();
             assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", 
                          elements[0].getClassName());
-            ex.printStackTrace();
-            boolean findNPE = false;
-            for (StackTraceElement element : elements) {
-                if (element.getClassName().indexOf("java.lang.NullPointerException") > 0) {
-                    findNPE = true;
-                    break;
-                }
-            }
-            assertTrue("Cannot find the Cause of NPE", findNPE);
         } 
     }
     

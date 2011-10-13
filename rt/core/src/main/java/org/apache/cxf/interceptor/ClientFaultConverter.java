@@ -243,6 +243,11 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             StringTokenizer st = new StringTokenizer(ss, "\n");
             while (st.hasMoreTokens()) {
                 String oneLine = st.nextToken();
+                if (oneLine.startsWith("Caused by:")) {
+                    // need to skip this part of message,
+                    // as we can't create the cause exception instance directly. 
+                    break;
+                }
                 StringTokenizer stInner = new StringTokenizer(oneLine, "!");
                 StackTraceElement ste = new StackTraceElement(stInner.nextToken(), stInner.nextToken(),
                         stInner.nextToken(), Integer.parseInt(stInner.nextToken()));
