@@ -38,7 +38,7 @@ public class BookServer extends AbstractBusTestServerBase {
 
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(BookStore.class, BookStorePerRequest.class);
+        sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class);
         
         List<Object> providers = new ArrayList<Object>();
         
