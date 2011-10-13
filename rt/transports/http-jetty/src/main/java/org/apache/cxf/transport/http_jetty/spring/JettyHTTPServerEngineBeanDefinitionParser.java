@@ -133,8 +133,12 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
     private static ThreadingParameters toThreadingParameters(
                                     ThreadingParametersType paramtype) {
         ThreadingParameters params = new ThreadingParameters();
-        params.setMaxThreads(paramtype.getMaxThreads());
-        params.setMinThreads(paramtype.getMinThreads());
+        if (paramtype.getMaxThreads() != null) {
+            params.setMaxThreads(paramtype.getMaxThreads());
+        }
+        if (paramtype.getMinThreads() != null) {
+            params.setMinThreads(paramtype.getMinThreads());
+        }
         return params;
     }
     
