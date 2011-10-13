@@ -950,6 +950,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookSimple222() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/simplebooks/222");
+        Book book = wc.get(Book.class);
+        assertEquals(222L, book.getId());
+    }
+    
+    @Test
+    public void testGetBookSimple() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/simplebooks/simple");
+        Book book = wc.get(Book.class);
+        assertEquals(444L, book.getId());
+    }
+    
+    @Test
     public void testGetBook123() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/123",
                                "resources/expected_get_book123.txt",
