@@ -80,6 +80,7 @@ import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.Assertor;
@@ -1503,20 +1504,21 @@ public class HTTPConduit
                         }
                     }
                 };
-                Executor ex = outMessage.getExchange().get(Executor.class);
-                if (ex == null) {
-                    WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
-                        .getExtension(WorkQueueManager.class);
-                    ex = mgr.getNamedWorkQueue("http-conduit");
-                    if (ex == null) {
-                        ex = mgr.getAutomaticWorkQueue();
-                    }
-                } else {
-                    outMessage.getExchange().put(Executor.class.getName() 
-                                                 + ".USING_SPECIFIED", Boolean.TRUE);
-                }
                 try {
-                    ex.execute(runnable);
+                    Executor ex = outMessage.getExchange().get(Executor.class);
+                    if (ex == null) {
+                        WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
+                            .getExtension(WorkQueueManager.class);
+                        AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
+                        if (ex == null) {
+                            qu = mgr.getAutomaticWorkQueue();
+                        }
+                        qu.execute(runnable, 5000);
+                    } else {
+                        outMessage.getExchange().put(Executor.class.getName() 
+                                                 + ".USING_SPECIFIED", Boolean.TRUE);
+                        ex.execute(runnable);
+                    }
                 } catch (RejectedExecutionException rex) {
                     LOG.warning("EXECUTOR_FULL");
                     handleResponseInternal();
