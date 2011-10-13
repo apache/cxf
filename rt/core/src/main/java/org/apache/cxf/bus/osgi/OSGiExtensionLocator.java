@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,6 +36,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionFragmentParser;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
+import org.apache.cxf.bus.osgi.OSGiAutomaticWorkQueue.WorkQueueList;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
@@ -53,8 +53,6 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 
 /**
  * 
@@ -66,31 +64,6 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     private long id;
     private Extension listener;
 
-    static class WorkQueueList implements ManagedService {
-        Map<String, OSGiAutomaticWorkQueue> queues 
-            = new ConcurrentHashMap<String, OSGiAutomaticWorkQueue>();
-
-        public void updated(Dictionary d) throws ConfigurationException {
-            if (d == null) {
-                return;
-            }
-            String s = (String)d.get("org.apache.cxf.workqueue.names");
-            if (s != null) {
-                String s2[] = s.split(",");
-                for (String name : s2) {
-                    name = name.trim();
-                    if (queues.containsKey(name)) {
-                        queues.get(name).updated(d);
-                    } else {
-                        OSGiAutomaticWorkQueue wq = new OSGiAutomaticWorkQueue(name);
-                        wq.updated(d);
-                        wq.setShared(true);
-                        queues.put(name, wq);
-                    }
-                }
-            }
-        }
-    };
     private WorkQueueList workQueues = new WorkQueueList();
     
     /** {@inheritDoc}*/
@@ -127,16 +100,12 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         if (configAdminServiceRef != null) {  
             ConfigurationAdmin configAdmin = (ConfigurationAdmin)  
                     context.getService(configAdminServiceRef);  
-              
             Configuration config = configAdmin.getConfiguration("org.apache.cxf.workqueues");
+            
+            workQueues.register(context, config);
+            
             Dictionary d = config.getProperties();
-            
-            Properties props = new Properties();
-            props.put(Constants.SERVICE_PID, "org.apache.cxf.workqueues");  
-            context.registerService(ManagedService.class.getName(),  
-                                    workQueues, props); 
-
-            
+                        
             if (d != null) {
                 workQueues.updated(d);
             }

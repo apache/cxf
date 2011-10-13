@@ -66,6 +66,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     WatchDog watchDog;
     
     boolean shared;
+    int sharedCount;
     
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
@@ -107,6 +108,18 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     
     public void setShared(boolean b) {
         shared = b;
+    }
+    public boolean isShared() {
+        return shared;
+    }
+    public void addSharedUser() {
+        sharedCount++;
+    }
+    public void removeSharedUser() {
+        sharedCount--;
+    }
+    public int getShareCount() {
+        return sharedCount;
     }
     
     protected synchronized ThreadPoolExecutor getExecutor() {
@@ -418,7 +431,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     // AutomaticWorkQueue interface
     
     public void shutdown(boolean processRemainingWorkItems) {
-        if (executor != null && !shared) {
+        if (executor != null) {
             if (!processRemainingWorkItems) {
                 executor.getQueue().clear();
             }

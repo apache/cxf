@@ -29,6 +29,8 @@ import javax.annotation.Resource;
 import javax.management.JMException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
@@ -87,6 +89,9 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                     addNamedWorkQueue("default", defaultQueue);
                 }
             }
+            
+            bus.getExtension(BusLifeCycleManager.class)
+                .registerLifeCycleListener(new WQLifecycleListener());
         }
     }
 
@@ -101,7 +106,20 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     public synchronized void shutdown(boolean processRemainingTasks) {
         inShutdown = true;
         for (AutomaticWorkQueue q : namedQueues.values()) {
-            q.shutdown(processRemainingTasks);
+            if (q instanceof AutomaticWorkQueueImpl) {
+                AutomaticWorkQueueImpl impl = (AutomaticWorkQueueImpl)q;
+                if (impl.isShared() && imanager != null 
+                    && imanager.getMBeanServer() != null) {
+                    synchronized (impl) {
+                        impl.removeSharedUser();
+                    }
+                }
+                if (!impl.isShared()) {
+                    q.shutdown(processRemainingTasks);
+                }
+            } else {
+                q.shutdown(processRemainingTasks);
+            }
         }
 
         synchronized (this) {
@@ -139,11 +157,26 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     }
     public final void addNamedWorkQueue(String name, AutomaticWorkQueue q) {
         namedQueues.put(name, q);
-        if (imanager != null && q instanceof AutomaticWorkQueueImpl) {
-            try {
-                imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
-            } catch (JMException jmex) {
-                LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+        if (q instanceof AutomaticWorkQueueImpl) {
+            AutomaticWorkQueueImpl impl = (AutomaticWorkQueueImpl)q;
+            if (impl.isShared()) {
+                synchronized (impl) {
+                    if (impl.getShareCount() == 0 && imanager != null 
+                        && imanager.getMBeanServer() != null) {
+                        try {
+                            imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
+                        } catch (JMException jmex) {
+                            LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                        }
+                        impl.addSharedUser();
+                    }
+                }
+            } else if (imanager != null) {
+                try {
+                    imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
+                } catch (JMException jmex) {
+                    LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                }
             }
         }
     }
@@ -153,5 +186,16 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         addNamedWorkQueue("default", q);
         return q;
     }
-
+    
+    
+    class WQLifecycleListener implements BusLifeCycleListener {
+        public void initComplete() {
+            
+        }
+        public void preShutdown() {
+            shutdown(true);
+        }
+        public void postShutdown() {
+        }
+    }
 }

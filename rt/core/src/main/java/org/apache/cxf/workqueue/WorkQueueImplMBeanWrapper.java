@@ -101,15 +101,20 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
     }
 
     public ObjectName getObjectName() throws JMException {
-        String busId = "cxf";
-        if (manager instanceof WorkQueueManagerImpl) {
-            busId = ((WorkQueueManagerImpl)manager).getBus().getId();
-        }
         StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-        buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
-        buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=");
-        buffer.append(WorkQueueManagerImplMBeanWrapper.NAME_VALUE + ",");
+        if (!aWorkQueue.isShared()) {
+            String busId = "cxf";
+            if (manager instanceof WorkQueueManagerImpl) {
+                busId = ((WorkQueueManagerImpl)manager).getBus().getId();
+            }
+            buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
+            buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=");
+            buffer.append(WorkQueueManagerImplMBeanWrapper.NAME_VALUE + ",");
+        } else {
+            buffer.append(ManagementConstants.BUS_ID_PROP + "=Shared,");
+            //buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=Shared,");
+        }
         buffer.append(ManagementConstants.TYPE_PROP + "=" + TYPE_VALUE + ",");
         buffer.append(ManagementConstants.NAME_PROP + "=" + aWorkQueue.getName());
        
