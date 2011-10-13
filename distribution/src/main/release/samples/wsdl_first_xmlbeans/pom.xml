@@ -33,7 +33,6 @@
         <cxf.version>${project.version}</cxf.version>
     </properties>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
 		<resources>
 		  <resource>
 		    <targetPath>schemaorg_apache_xmlbeans</targetPath>
