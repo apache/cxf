@@ -88,14 +88,17 @@ public final class SOAPBindingUtil {
         try {
             proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                                               new Class[] {cls}, ih);
-        } catch (IllegalArgumentException ex) {
+        } catch (Throwable ex) {
             // Using cls classloader as a fallback to make it work within OSGi  
             ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
             if (contextLoader != cls.getClassLoader()) {
                 proxy = Proxy.newProxyInstance(cls.getClassLoader(),
                                               new Class[] {cls}, ih);
             } else {
-                throw ex;
+                if (ex instanceof RuntimeException) {
+                    throw (RuntimeException)ex;
+                }
+                throw new RuntimeException(ex);
             }
         }
         return cls.cast(proxy);
