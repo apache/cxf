@@ -148,14 +148,14 @@ public class AutomaticWorkQueueTest extends Assert {
                 }
             }
 
-            while (workqueue.getActiveCount() < 0) {
+            while (workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK - 1) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ex) {
                     // ignore
                 }
             }
-
+            
             for (int i = 0; i < DEFAULT_MAX_QUEUE_SIZE; i++) {
                 fillers[i] = new BlockingWorkItem();
                 try {
