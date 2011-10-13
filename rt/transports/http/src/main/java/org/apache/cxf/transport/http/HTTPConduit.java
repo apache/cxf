@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -2262,7 +2263,12 @@ public class HTTPConduit
                     outMessage.getExchange().put(Executor.class.getName() 
                                                  + ".USING_SPECIFIED", Boolean.TRUE);
                 }
-                ex.execute(runnable);
+                try {
+                    ex.execute(runnable);
+                } catch (RejectedExecutionException rex) {
+                    LOG.warning("EXECUTOR_FULL");
+                    handleResponseInternal();
+                }
             }
         }
         protected void handleResponseInternal() throws IOException {
