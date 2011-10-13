@@ -85,7 +85,8 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
                 }
                 throwable = throwable.getCause();
                 if (throwable != null) {
-                    sb.append("Caused by: " +  throwable.getClass() + " : " + throwable.getMessage() + "\n");
+                    sb.append("Caused by: " +  throwable.getClass().getCanonicalName() 
+                              + " : " + throwable.getMessage() + "\n");
                 }
             }
             Element detail = fault.getDetail();
