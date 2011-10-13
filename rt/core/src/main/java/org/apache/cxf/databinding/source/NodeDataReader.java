@@ -66,7 +66,8 @@ public class NodeDataReader implements DataReader<Node> {
             } catch (IOException e) {
                 throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
             } catch (TransformerException e) {
-                throw new Fault("COULD_NOT_REDA_XML_STREAM_CAUSED_BY", LOG, e, e.getMessage());
+                throw new Fault("COULD_NOT_REDA_XML_STREAM_CAUSED_BY", LOG, e,
+                                e.getClass().getCanonicalName(), e.getMessage());
             } 
         }  
         return read(input);

@@ -56,7 +56,8 @@ public class NodeDataWriter implements DataWriter<Node> {
             XMLStreamWriter writer = new W3CDOMStreamWriter((Element)n);
             StaxUtils.copy(s, writer);
         } catch (XMLStreamException e) {
-            throw new Fault("COULD_NOT_WRITE_XML_STREAM_CAUSED_BY", LOG, e, e.getMessage());
+            throw new Fault("COULD_NOT_WRITE_XML_STREAM_CAUSED_BY", LOG, e,
+                            e.getClass().getCanonicalName(), e.getMessage());
         }
     }
 
