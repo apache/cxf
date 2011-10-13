@@ -30,9 +30,13 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.Mergeable;
@@ -46,6 +50,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  * 
  */
 public class SpringBeanLocator implements ConfiguredBeanLocator {
+    private static final Logger LOG = LogUtils.getL7dLogger(SpringBeanLocator.class);
+    
     ApplicationContext context;
     ConfiguredBeanLocator orig;
     Set<String> passThroughs = new HashSet<String>();
@@ -129,12 +135,15 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         try {
             //use a little reflection to allow this to work without the spring-dm jars
             //for the non-osgi cases
+            Class<?> contextClass = findContextClass(bundleContext.getClass());
 
-            Object o = bundleContext.getClass()
-                .getMethod("getServiceReference", String.class).invoke(bundleContext, type.getName());
+            Method m = contextClass.getMethod("getServiceReference", String.class);
+            ReflectionUtil.setAccessible(m);
+            Object o = m.invoke(bundleContext, type.getName());
             if (o != null) {
-                o = bundleContext.getClass().getMethod("getService", ServiceReference.class)
-                    .invoke(bundleContext, o);
+                m = contextClass.getMethod("getService", ServiceReference.class);
+                ReflectionUtil.setAccessible(m);
+                o = m.invoke(bundleContext, o);
                 lst.add(type.cast(o));
             }
         } catch (NoSuchMethodException e) {
@@ -142,7 +151,27 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             //not using OSGi
         } catch (Throwable e) {
             //ignore
+            LOG.log(Level.WARNING, "Could not get service for " + type.getName(), e);
         }
+    }
+    private Class<?> findContextClass(Class<?> cls) {
+        for (Class<?> c : cls.getInterfaces()) {
+            if (c.getName().equals("org.osgi.framework.BundleContext")) {
+                return c;
+            }
+        }
+        for (Class<?> c : cls.getInterfaces()) {
+            Class<?> c2 = findContextClass(c);
+            if (c2 != null) {
+                return c2;
+            }
+        }
+        Class<?> c2 = findContextClass(cls.getSuperclass());
+        if (c2 != null) {
+            return c2;
+        }
+        
+        return cls;
     }
     
 
