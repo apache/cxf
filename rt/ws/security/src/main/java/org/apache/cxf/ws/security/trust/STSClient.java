@@ -127,49 +127,50 @@ import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
 public class STSClient implements Configurable, InterceptorProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(STSClient.class);
     
-    Bus bus;
-    String name = "default.sts-client";
-    Client client;
-    String location;
+    protected Bus bus;
+    protected String name = "default.sts-client";
+    protected Client client;
+    protected String location;
 
-    String wsdlLocation;
-    QName serviceName;
-    QName endpointName;
+    protected String wsdlLocation;
+    protected QName serviceName;
+    protected QName endpointName;
 
-    Policy policy;
-    String soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
-    int keySize = 256;
-    boolean requiresEntropy = true;
-    Element template;
-    AlgorithmSuite algorithmSuite;
-    String namespace = STSUtils.WST_NS_05_12;
-    String addressingNamespace;
-    Object onBehalfOf;
-    boolean enableAppliesTo = true;
+    protected Policy policy;
+    protected String soapVersion = SoapBindingConstants.SOAP11_BINDING_ID;
+    protected int keySize = 256;
+    protected boolean requiresEntropy = true;
+    protected Element template;
+    protected Element claims;
+    protected AlgorithmSuite algorithmSuite;
+    protected String namespace = STSUtils.WST_NS_05_12;
+    protected String addressingNamespace;
+    protected Object onBehalfOf;
+    protected boolean enableAppliesTo = true;
 
-    boolean useCertificateForConfirmationKeyInfo;
-    boolean isSecureConv;
-    boolean enableLifetime;
-    int ttl = 300;
+    protected boolean useCertificateForConfirmationKeyInfo;
+    protected boolean isSecureConv;
+    protected boolean enableLifetime;
+    protected int ttl = 300;
     
-    Object actAs;
-    String tokenType;
-    String keyType;
-    boolean sendKeyType = true;
-    Message message;
-    String context;
+    protected Object actAs;
+    protected String tokenType;
+    protected String keyType;
+    protected boolean sendKeyType = true;
+    protected Message message;
+    protected String context;
 
-    Map<String, Object> ctx = new HashMap<String, Object>();
+    protected Map<String, Object> ctx = new HashMap<String, Object>();
     
-    List<Interceptor<? extends Message>> in 
+    protected List<Interceptor<? extends Message>> in 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    List<Interceptor<? extends Message>> out 
+    protected List<Interceptor<? extends Message>> out 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    List<Interceptor<? extends Message>> outFault  
+    protected List<Interceptor<? extends Message>> outFault  
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    List<Interceptor<? extends Message>> inFault 
+    protected List<Interceptor<? extends Message>> inFault 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    List<AbstractFeature> features;
+    protected List<AbstractFeature> features;
 
     public STSClient(Bus b) {
         bus = b;
@@ -405,8 +406,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
         return client;
     }
-
-    private void createClient() throws BusException, EndpointException {
+    protected void createClient() throws BusException, EndpointException {
         if (client != null) {
             return;
         }
@@ -443,7 +443,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
     }
 
-    private BindingOperationInfo findOperation(String suffix) {
+    protected BindingOperationInfo findOperation(String suffix) {
         BindingInfo bi = client.getEndpoint().getBinding().getBindingInfo();
         for (BindingOperationInfo boi : bi.getOperations()) {
             SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
@@ -533,6 +533,9 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (enableAppliesTo) {
             addAppliesTo(writer, appliesTo);
         }
+        
+        addClaims(writer);
+        
         Element onBehalfOfToken = getOnBehalfOfToken();
         if (onBehalfOfToken != null) {
             writer.writeStartElement("wst", "OnBehalfOf", namespace);
@@ -613,7 +616,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return getDelegationSecurityToken(this.actAs);
     }
     
-    private Element getDelegationSecurityToken(Object delegationObject) throws Exception {
+    protected Element getDelegationSecurityToken(Object delegationObject) throws Exception {
         if (delegationObject != null) {
             final boolean isString = delegationObject instanceof String;
             final boolean isElement = delegationObject instanceof Element; 
@@ -635,7 +638,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return null;
     }
     
-    private byte[] writeElementsForRSTSymmetricKey(W3CDOMStreamWriter writer,
+    protected byte[] writeElementsForRSTSymmetricKey(W3CDOMStreamWriter writer,
             boolean wroteKeySize) throws Exception {
         byte[] requestorEntropy = null;
 
@@ -667,7 +670,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     }
 
 
-    private void writeElementsForRSTPublicKey(W3CDOMStreamWriter writer,
+    protected void writeElementsForRSTPublicKey(W3CDOMStreamWriter writer,
             X509Certificate cert) throws Exception {
         writer.writeStartElement("wst", "UseKey", namespace);
         writer.writeStartElement("dsig", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
@@ -700,13 +703,13 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeEndElement();
     }
 
-    private void addRequestType(String requestType, W3CDOMStreamWriter writer) throws XMLStreamException {
+    protected void addRequestType(String requestType, W3CDOMStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + requestType);
         writer.writeEndElement();
     }
     
-    private Element getDocumentElement(DOMSource ds) {
+    protected Element getDocumentElement(DOMSource ds) {
         Node nd = ds.getNode();
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
@@ -722,7 +725,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         requestSecurityToken(tok.getIssuerAddress(), action, "/Renew", tok);
     }
 
-    private PrimitiveAssertion getAddressingAssertion() {
+    protected PrimitiveAssertion getAddressingAssertion() {
         String ns = "http://schemas.xmlsoap.org/ws/2004/08/addressing/policy";
         String local = "UsingAddressing";
         if ("http://www.w3.org/2005/08/addressing".equals(addressingNamespace)) {
@@ -740,7 +743,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return validateSecurityToken(tok, validateTokenType);
     }
     
-    private List<SecurityToken> validateSecurityToken(SecurityToken tok, String tokentype) 
+    protected List<SecurityToken> validateSecurityToken(SecurityToken tok, String tokentype) 
         throws Exception {
         createClient();
         
@@ -931,11 +934,11 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
     }
     
-    private boolean useSecondaryParameters() {
+    protected boolean useSecondaryParameters() {
         return !STSUtils.WST_NS_05_02.equals(namespace);
     }
 
-    private String writeKeyType(W3CDOMStreamWriter writer, String keyTypeToWrite) 
+    protected String writeKeyType(W3CDOMStreamWriter writer, String keyTypeToWrite) 
         throws XMLStreamException {
         if (isSecureConv) {
             if (keyTypeToWrite == null) {
@@ -957,7 +960,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return keyTypeToWrite;
     }
 
-    private X509Certificate getCert(Crypto crypto) throws Exception {
+    protected X509Certificate getCert(Crypto crypto) throws Exception {
         String alias = (String)getProperty(SecurityConstants.STS_TOKEN_USERNAME);
         if (alias == null) {
             alias = crypto.getDefaultX509Identifier();
@@ -975,7 +978,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return certs[0];
     }
 
-    private void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
+    protected void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
         Date creationTime = new Date();
         Date expirationTime = new Date();
         expirationTime.setTime(creationTime.getTime() + (ttl * 1000L));
@@ -993,7 +996,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeEndElement();
     }
 
-    private void addAppliesTo(XMLStreamWriter writer, String appliesTo) throws XMLStreamException {
+    protected void addAppliesTo(XMLStreamWriter writer, String appliesTo) throws XMLStreamException {
         if (appliesTo != null && addressingNamespace != null) {
             writer.writeStartElement("wsp", "AppliesTo", "http://schemas.xmlsoap.org/ws/2004/09/policy");
             writer.writeNamespace("wsp", "http://schemas.xmlsoap.org/ws/2004/09/policy");
@@ -1007,15 +1010,21 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
     }
 
-    private void addTokenType(XMLStreamWriter writer) throws XMLStreamException {
+    protected void addTokenType(XMLStreamWriter writer) throws XMLStreamException {
         if (tokenType != null) {
             writer.writeStartElement("wst", "TokenType", namespace);
             writer.writeCharacters(tokenType);
             writer.writeEndElement();
         }
     }
+    
+    protected void addClaims(XMLStreamWriter writer) throws XMLStreamException {
+        if (claims != null) {
+            StaxUtils.copy(claims, writer);
+        }
+    }
 
-    private SecurityToken createSecurityToken(Element el, byte[] requestorEntropy)
+    protected SecurityToken createSecurityToken(Element el, byte[] requestorEntropy)
         throws WSSecurityException {
 
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
@@ -1118,7 +1127,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return token;
     }
     
-    private byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
+    protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
         try {
             EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
             WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
@@ -1137,7 +1146,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
     }
 
-    private CallbackHandler createHandler() {
+    protected CallbackHandler createHandler() {
         Object o = getProperty(SecurityConstants.CALLBACK_HANDLER);
         if (o instanceof String) {
             try {
@@ -1150,7 +1159,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return (CallbackHandler)o;
     }
 
-    private Object getProperty(String s) {
+    protected Object getProperty(String s) {
         Object o = ctx.get(s);
         if (o == null) {
             o = client.getEndpoint().getEndpointInfo().getProperty(s);
@@ -1164,7 +1173,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return o;
     }
 
-    private Crypto createCrypto(boolean decrypt) throws IOException, WSSecurityException {
+    protected Crypto createCrypto(boolean decrypt) throws IOException, WSSecurityException {
         Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO + (decrypt ? ".decrypt" : ""));
         if (crypto != null) {
             return crypto;
@@ -1204,7 +1213,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return null;
     }
 
-    private String findID(Element rar, Element rur, Element rst) {
+    protected String findID(Element rar, Element rur, Element rst) {
         String id = null;
         if (rst != null) {
             QName elName = DOMUtils.getElementQName(rst);
@@ -1231,7 +1240,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return id;
     }
 
-    private String getIDFromSTR(Element el) {
+    protected String getIDFromSTR(Element el) {
         Element child = DOMUtils.getFirstElement(el);
         if (child == null) {
             return null;
@@ -1251,6 +1260,10 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     public void setTemplate(Element rstTemplate) {
         template = rstTemplate;
+    }
+
+    public void setClaims(Element rstClaims) {
+        claims = rstClaims;
     }
     
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
