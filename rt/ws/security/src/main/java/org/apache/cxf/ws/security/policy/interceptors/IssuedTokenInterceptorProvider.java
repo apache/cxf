@@ -115,7 +115,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (v == null) {
                     v = message.getContextualProperty(s);
                 }
-                if (v != null) {
+                if (!ctx.containsKey(s) && v != null) {
                     ctx.put(s, v);
                 }
             }
