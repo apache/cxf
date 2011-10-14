@@ -33,6 +33,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityEngineResult;
+//import org.apache.ws.security.transform.STRTransform;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey or
@@ -92,6 +93,25 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
 
         List<WSDataRef> dataRefs = 
             CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+        if (!checkDataRefs(dataRefs, algorithmPolicy, ai)) {
+            return false;
+        }
+        
+        if (!checkKeyLengths(result, algorithmPolicy, ai, true)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Check the individual signature references
+     */
+    private boolean checkDataRefs(
+        List<WSDataRef> dataRefs,
+        AlgorithmSuite algorithmPolicy,
+        AssertionInfo ai
+    ) {
         for (WSDataRef dataRef : dataRefs) {
             String digestMethod = dataRef.getDigestAlgorithm();
             if (!algorithmPolicy.getDigest().equals(digestMethod)) {
@@ -100,12 +120,23 @@ public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator 
                 );
                 return false;
             }
+            /*
+             * TODO Re-enable once we upgrade to WSS4J 1.6.4
+            List<String> transformAlgorithms = dataRef.getTransformAlgorithms();
+            // Only a max of 2 transforms per reference is allowed
+            if (transformAlgorithms == null || transformAlgorithms.size() > 2) {
+                ai.setNotAsserted("The transform algorithms do not match the requirement");
+                return false;
+            }
+            for (String transformAlgorithm : transformAlgorithms) {
+                if (!(algorithmPolicy.getInclusiveC14n().equals(transformAlgorithm)
+                    || STRTransform.TRANSFORM_URI.equals(transformAlgorithm))) {
+                    ai.setNotAsserted("The transform algorithms do not match the requirement");
+                    return false;
+                }
+            }
+            */
         }
-        
-        if (!checkKeyLengths(result, algorithmPolicy, ai, true)) {
-            return false;
-        }
-        
         return true;
     }
     
