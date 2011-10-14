@@ -38,6 +38,7 @@ import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
+import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 
 public class RequestTokenHandler {
@@ -54,6 +55,8 @@ public class RequestTokenHandler {
         };
     
     private long tokenLifetime = 3600L;
+    private String defaultScope;
+    private String defaultURI;
     
     public Response handle(HttpServletRequest request, OAuthDataProvider dataProvider) {
         try {
@@ -77,8 +80,10 @@ public class RequestTokenHandler {
             String callback = oAuthMessage.getParameter(OAuth.OAUTH_CALLBACK);
             validateCallbackURL(client, callback);
 
-            List<String> scopes = OAuthUtils.parseScopesFromRequest(oAuthMessage);
-            List<String> uris = OAuthUtils.parseUrisFromRequest(oAuthMessage);
+            List<String> scopes = OAuthUtils.parseParamValue(
+                    oAuthMessage.getParameter(OAuthConstants.X_OAUTH_SCOPE), defaultScope);
+            List<String> uris = OAuthUtils.parseParamValue(
+                    oAuthMessage.getParameter(OAuthConstants.X_OAUTH_URI), defaultURI);
             
             RequestTokenRegistration reg = new RequestTokenRegistration();
             reg.setClient(client);
@@ -135,6 +140,14 @@ public class RequestTokenHandler {
 
     public void setTokenLifetime(long tokenLifetime) {
         this.tokenLifetime = tokenLifetime;
+    }
+
+    public void setDefaultScope(String defaultScope) {
+        this.defaultScope = defaultScope;
+    }
+
+    public void setDefaultURI(String defaultURI) {
+        this.defaultURI = defaultURI;
     }
             
 }

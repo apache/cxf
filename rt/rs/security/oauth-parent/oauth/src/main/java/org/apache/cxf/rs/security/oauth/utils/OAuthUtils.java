@@ -19,12 +19,8 @@
 package org.apache.cxf.rs.security.oauth.utils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
@@ -53,9 +49,6 @@ import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 
 public final class OAuthUtils {
-
-    private static final String PARAMETER_SEPARATOR = "&";
-    private static final String NAME_VALUE_SEPARATOR = "=";
 
     private OAuthUtils() {
     }
@@ -128,7 +121,8 @@ public final class OAuthUtils {
                 Response.status(status).entity(e.getMessage()).build());
     }
 
-    public static List<String> parseParamFromRequest(String paramValue) throws IOException {
+    public static List<String> parseParamValue(String paramValue, String defaultValue) 
+        throws IOException {
         
         List<String> scopeList = new ArrayList<String>();
 
@@ -140,56 +134,13 @@ public final class OAuthUtils {
                 scopeList.add(token);
             }
         }
+        if (defaultValue != null) {
+            scopeList.add(defaultValue);
+        }
         return scopeList;
     }
 
-    public static List<String> parseScopesFromRequest(OAuthMessage message) throws IOException {
-        return parseParamFromRequest(message.getParameter(OAuthConstants.X_OAUTH_SCOPE));
-    }
     
-    public static List<String> parseUrisFromRequest(OAuthMessage message) throws IOException {
-        return parseParamFromRequest(message.getParameter(OAuthConstants.X_OAUTH_URI));
-    }
-
-    /**
-     * Translates parameters into <code>application/x-www-form-urlencoded</code> String
-     *
-     * @param parameters parameters to encode
-     * @param encoding   The name of a supported
-     *                   <a href="../lang/package-summary.html#charenc">character
-     *                   encoding</a>.
-     * @return Translated string
-     */
-    public static String format(
-            final Collection<? extends Map.Entry<String, String>> parameters,
-            final String encoding) {
-        final StringBuilder result = new StringBuilder();
-        for (final Map.Entry<String, String> parameter : parameters) {
-            if (!StringUtils.isEmpty(parameter.getKey())
-                    && !StringUtils.isEmpty(parameter.getValue())) {
-                final String encodedName = encode(parameter.getKey(), encoding);
-                final String value = parameter.getValue();
-                final String encodedValue = value != null ? encode(value, encoding) : "";
-                if (result.length() > 0) {
-                    result.append(PARAMETER_SEPARATOR);
-                }
-                result.append(encodedName);
-                result.append(NAME_VALUE_SEPARATOR);
-                result.append(encodedValue);
-            }
-        }
-        return result.toString();
-    }
-
-    private static String encode(final String content, final String encoding) {
-        try {
-            return URLEncoder.encode(content,
-                    encoding != null ? encoding : "UTF-8");
-        } catch (UnsupportedEncodingException problem) {
-            throw new IllegalArgumentException(problem);
-        }
-    }
-
     public static RequestToken handleTokenRejectedException() throws OAuthProblemException {
         OAuthProblemException problemEx = new OAuthProblemException(
                 OAuth.Problems.TOKEN_REJECTED);

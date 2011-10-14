@@ -25,6 +25,7 @@ public class OAuthPermission extends Permission {
     private List<String> roles = Collections.emptyList();
     private List<String> httpVerbs = Collections.emptyList();
     private String uri;
+    private boolean authorizationKeyRequired = true;
     
     public OAuthPermission(String permission, String description, String role) {
         this(permission, description, Collections.singletonList(role));
@@ -54,6 +55,12 @@ public class OAuthPermission extends Permission {
     public String getUri() {
         return uri;
     }
-    
-    
+
+    public void setAuthorizationKeyRequired(boolean authorizationKeyRequired) {
+        this.authorizationKeyRequired = authorizationKeyRequired;
+    }
+
+    public boolean isAuthorizationKeyRequired() {
+        return authorizationKeyRequired;
+    }
 }

@@ -88,8 +88,9 @@ public class AbstractAuthFilter {
             
         } else {
             String consumerKey = oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY);
+            String consumerSecret = oAuthMessage.getParameter("oauth_consumer_secret");
             client = dataProvider.getClient(consumerKey);
-            if (client == null) {
+            if (client == null || consumerSecret == null || !consumerSecret.equals(client.getSecretKey())) {
                 throw new OAuthProblemException();
             }
         }
@@ -103,6 +104,7 @@ public class AbstractAuthFilter {
         
         List<OAuthPermission> permissions = dataProvider.getPermissionsInfo(
                 getAllScopes(client, accessToken));
+        
         for (OAuthPermission perm : permissions) {
             if (perm.getUri() != null 
                 && !checkRequestURI(req, Collections.singletonList(perm.getUri()))) {
@@ -112,9 +114,18 @@ public class AbstractAuthFilter {
                 && !perm.getHttpVerbs().contains(req.getMethod())) {
                 throw new OAuthProblemException();
             }
+            checkNoAccessTokenIsAllowed(client, accessToken, perm);
         }
+        
         return new OAuthInfo(client, accessToken, permissions);
         
+    }
+    
+    protected void checkNoAccessTokenIsAllowed(Client client, AccessToken token,
+            OAuthPermission perm) throws OAuthProblemException {
+        if (token == null && perm.isAuthorizationKeyRequired()) {
+            throw new OAuthProblemException();
+        }
     }
     
     protected List<String> getAllScopes(Client client, AccessToken token) {
