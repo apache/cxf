@@ -47,7 +47,7 @@ public class OSGiAutomaticWorkQueue extends AutomaticWorkQueueImpl {
         Properties current = new Properties();
 
         
-        public void register(BundleContext ctx, Configuration c) {
+        public synchronized void register(BundleContext ctx, Configuration c) {
             Properties props = new Properties();
             props.put(Constants.SERVICE_PID, "org.apache.cxf.workqueues");  
 
@@ -57,7 +57,7 @@ public class OSGiAutomaticWorkQueue extends AutomaticWorkQueueImpl {
             this.config = c;
         }
         
-        public void updateProperty(String key, String val) {
+        public synchronized void updateProperty(String key, String val) {
             if (val != null) {
                 current.put(key, val);
             } else {
@@ -69,7 +69,7 @@ public class OSGiAutomaticWorkQueue extends AutomaticWorkQueueImpl {
                 //ignore
             }
         }
-        public void updated(Dictionary d) throws ConfigurationException {
+        public synchronized void updated(Dictionary d) throws ConfigurationException {
             current.clear();
             if (d == null) {
                 return;
@@ -94,7 +94,9 @@ public class OSGiAutomaticWorkQueue extends AutomaticWorkQueueImpl {
                     }
                 }
             }
-            registration.setProperties(d);
+            if (registration != null) {
+                registration.setProperties(d);
+            }
         }
     };
     final WorkQueueList qlist;
