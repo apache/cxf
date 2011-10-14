@@ -43,6 +43,7 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.processor.ReferenceListProcessor;
 
 
 /**
@@ -127,7 +128,8 @@ public final class CryptoCoverageUtil {
         CoverageType type,
         CoverageScope scope
     ) throws WSSecurityException {
-        if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody)) {
+        String xpath = ReferenceListProcessor.getXPath(soapBody);
+        if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody, xpath)) {
             throw new WSSecurityException("The " + getCoverageTypeString(type)
                     + " does not cover the required elements (soap:Body).");
         }
@@ -174,7 +176,8 @@ public final class CryptoCoverageUtil {
         }
         
         for (Element el : elements) {
-            if (!CryptoCoverageUtil.matchElement(refs, type, scope, el)) {
+            String xpath = ReferenceListProcessor.getXPath(el);
+            if (!CryptoCoverageUtil.matchElement(refs, type, scope, el, xpath)) {
                 throw new WSSecurityException("The " + getCoverageTypeString(type)
                         + " does not cover the required elements ({"
                         + namespace + "}" + name + ").");
@@ -280,7 +283,7 @@ public final class CryptoCoverageUtil {
                     final Element el = (Element)list.item(x);
                     
                     boolean instanceMatched = CryptoCoverageUtil.
-                            matchElement(refs, type, scope, el);
+                            matchElement(refs, type, scope, el, xpathString);
                     
                     // We looked through all of the refs, but the element was
                     // not signed.
@@ -342,7 +345,7 @@ public final class CryptoCoverageUtil {
     }
 
     private static boolean matchElement(Collection<WSDataRef> refs,
-            CoverageType type, CoverageScope scope, Element el) {
+            CoverageType type, CoverageScope scope, Element el, String elXPath) {
         final boolean content;
         
         switch (scope) {
@@ -354,54 +357,42 @@ public final class CryptoCoverageUtil {
             content = false;
         }
         
-        boolean instanceMatched = false;
+        // Get the Element Id
+        Attr idAttr = el.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
+        
+        // We didn't get it with a qualified name, so
+        // look for the attribute using only the local name.
+        if (idAttr == null) {
+            idAttr = el.getAttributeNode("Id");
+        }
+        
+        String id = idAttr == null ? null : idAttr.getValue();
+        if (id != null && id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
         
         for (WSDataRef r : refs) {
             
             // If the element is the same object instance
             // as that in the ref, we found it and can
             // stop looking at this element.
-            if (r.getProtectedElement() == el 
-                    && r.isContent() == content) {
-                instanceMatched = true;
-                break;
+            if (r.getProtectedElement() == el && r.isContent() == content) {
+                return true;
             }
             
             // Only if checking signature coverage do we attempt to
-            // do matches based on ID and element names and not object
+            // do matches based on ID and element names (and XPath expressions) and not object
             // equality.
-            if (!instanceMatched && CoverageType.SIGNED.equals(type)) {
-                // If we get here, we haven't found it yet
-                // so we will look based on the element's
-                // wsu:Id and see if the ref references the
-                // ID specified in the attr.
-                Attr idAttr = el.getAttributeNodeNS(
-                        PolicyConstants.WSU_NAMESPACE_URI,
-                        "Id");
-                
-                // We didn't get it with a qualified name, so
-                // look for the attribute using only the local name.
-                if (idAttr == null) {
-                    idAttr = el.getAttributeNode("Id");
-                }
-                
-                String id = idAttr == null ? null : idAttr.getValue();
-                
-                // If the ref's qualified name equals the name of the
-                // element and the ref has a wsu:Id and it matches the
-                // element's wsu:Id attribute value, we found it.
-                if (r.getName().equals(
-                        new QName(el.getNamespaceURI(), el
-                                .getLocalName()))
-                        && r.getWsuId() != null
-                        && (r.getWsuId().equals(id) || r.getWsuId()
-                                .equals("#" + id))) {
-                    instanceMatched = true;
-                    break;
+            if (CoverageType.SIGNED.equals(type)) {
+                QName elQName = new QName(el.getNamespaceURI(), el.getLocalName());
+                if (r.getName().equals(elQName)
+                    && r.getWsuId() != null && (r.getWsuId().equals(id)
+                    && r.getXpath() != null && r.getXpath().equals(elXPath))) {
+                    return true;
                 }
             }
         }
-        return instanceMatched;
+        return false;
     }
     
     private static String getCoverageTypeString(CoverageType type) {
