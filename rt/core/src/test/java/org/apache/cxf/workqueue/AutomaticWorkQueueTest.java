@@ -147,7 +147,7 @@ public class AutomaticWorkQueueTest extends Assert {
                 }
             }
 
-            while (workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK - 1) {
+            while (workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ex) {
