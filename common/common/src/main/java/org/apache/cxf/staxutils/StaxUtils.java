@@ -402,7 +402,20 @@ public final class StaxUtils {
         }
     }
     public static void copy(Source source, XMLStreamWriter writer) throws XMLStreamException {
-        if (source instanceof SAXSource) {
+        if (source instanceof StaxSource) {
+            StaxSource ss = (StaxSource)source;
+            if (ss.getXMLStreamReader() == null) {
+                return;
+            }
+        } else if ("javax.xml.transform.stax.StAXSource".equals(source.getClass().getName())) {
+            try {
+                if (source.getClass().getMethod("getXMLStreamReader").invoke(source) == null) {
+                    return;
+                }
+            } catch (Exception ex) {
+                //ignore
+            }
+        } else if (source instanceof SAXSource) {
             SAXSource ss = (SAXSource)source;
             InputSource src = ss.getInputSource();
             if (src == null || (src.getSystemId() == null && src.getPublicId() == null)) {
@@ -428,9 +441,7 @@ public final class StaxUtils {
                 }
             }
        
-        }
-
-        if (source instanceof StreamSource) {
+        } else if (source instanceof StreamSource) {
             StreamSource ss = (StreamSource)source;
             if (ss.getInputStream() == null
                 && ss.getReader() == null
