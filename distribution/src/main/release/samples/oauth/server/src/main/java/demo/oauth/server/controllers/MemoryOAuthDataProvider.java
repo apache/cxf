@@ -37,7 +37,7 @@ import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
 import org.apache.cxf.rs.security.oauth.data.Token;
 import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
-import org.apache.cxf.rs.security.oauth.provider.MD5TokenGenerator;
+import org.apache.cxf.rs.security.oauth.provider.MD5SequenceGenerator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 
@@ -67,7 +67,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
 
     protected ConcurrentHashMap<String, Token> oauthTokens = new ConcurrentHashMap<String, Token>();
 
-    protected MD5TokenGenerator tokenGenerator = new MD5TokenGenerator();
+    protected MD5SequenceGenerator tokenGenerator = new MD5SequenceGenerator();
 
     protected DefaultOAuthValidator validator = new DefaultOAuthValidator();
 
@@ -123,17 +123,17 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         return requestToken;
     }
 
-    public String createRequestTokenVerifier(RequestToken requestToken) throws
+    public String setRequestTokenVerifier(RequestToken requestToken) throws
             OAuthServiceException {
-        requestToken.setOauthVerifier(generateToken());
-        return requestToken.getOauthVerifier();
+        requestToken.setVerifier(generateToken());
+        return requestToken.getVerifier();
     }
 
     public AccessToken createAccessToken(RequestToken requestToken) throws
             OAuthServiceException {
 
         Client client = requestToken.getClient();
-        requestToken = getRequestToken(requestToken.getTokenString());
+        requestToken = getRequestToken(requestToken.getTokenKey());
 
         String accessTokenString = generateToken();
         String tokenSecretString = generateToken();
@@ -144,7 +144,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         accessToken.setUris(requestToken.getUris());
 
         synchronized (oauthTokens) {
-            oauthTokens.remove(requestToken.getTokenString());
+            oauthTokens.remove(requestToken.getTokenKey());
             oauthTokens.put(accessTokenString, accessToken);
             synchronized (userAuthorizedClients) {
                 userAuthorizedClients.add(client.getConsumerKey(), client.getConsumerKey());
@@ -179,7 +179,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
             for (Token token : oauthTokens.values()) {
                 Client authNInfo = token.getClient();
                 if (consumerKey.equals(authNInfo.getConsumerKey())) {
-                    oauthTokens.remove(token.getTokenString());
+                    oauthTokens.remove(token.getTokenKey());
                 }
             }
         }
@@ -188,7 +188,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     protected String generateToken() throws OAuthServiceException {
         String token;
         try {
-            token = tokenGenerator.generateToken(UUID.randomUUID().toString().getBytes("UTF-8"));
+            token = tokenGenerator.generate(UUID.randomUUID().toString().getBytes("UTF-8"));
         } catch (Exception e) {
             throw new OAuthServiceException("Unable to create token ", e.getCause());
         }

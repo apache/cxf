@@ -78,7 +78,7 @@ public class SampleOAuthDataProvider extends MemoryOAuthDataProvider
         for (Token token : oauthTokens.values()) {
             Client authNInfo = token.getClient();
             if (consumerKey.equals(authNInfo.getConsumerKey())) {
-                oauthTokens.remove(token.getTokenString());
+                oauthTokens.remove(token.getTokenKey());
             }
         }
     }   

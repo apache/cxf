@@ -78,10 +78,10 @@ public class AuthorizationRequestHandler {
 
             Map<String, String> queryParams = new HashMap<String, String>();
             if (allow) {
-                String verifier = dataProvider.createRequestTokenVerifier(token);
+                String verifier = dataProvider.setRequestTokenVerifier(token);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
             }
-            queryParams.put(OAuth.OAUTH_TOKEN, token.getTokenString());
+            queryParams.put(OAuth.OAUTH_TOKEN, token.getTokenKey());
             if (token.getState() != null) {
                 queryParams.put("state", token.getState());
             }
@@ -126,7 +126,7 @@ public class AuthorizationRequestHandler {
     protected OAuthAuthorizationData addAdditionalParams(OAuthAuthorizationData secData,
                                                          OAuthDataProvider dataProvider,
                                                          RequestToken token) {
-        secData.setOauthToken(token.getTokenString());
+        secData.setOauthToken(token.getTokenKey());
         secData.setApplicationName(token.getClient().getApplicationName()); 
         secData.setApplicationURI(token.getClient().getApplicationURI());
         

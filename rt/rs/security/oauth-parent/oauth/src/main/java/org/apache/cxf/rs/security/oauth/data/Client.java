@@ -20,7 +20,9 @@ package org.apache.cxf.rs.security.oauth.data;
 
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * Represents a registered third-party consumer
+ */
 public class Client {
     private String consumerKey;
     private String secretKey;
@@ -32,66 +34,118 @@ public class Client {
     private List<String> uris = Collections.emptyList();
     private List<String> scopes = Collections.emptyList();
 
-    public Client(String consumerKey, 
+    public Client(String consumerId, 
                   String secretKey,
                   String applicationName,
                   String applicationURI) {
-        this.consumerKey = consumerKey;
+        this.consumerKey = consumerId;
         this.secretKey = secretKey;
         this.applicationURI = applicationURI;
         this.applicationName = applicationName;
     }
     
-    public Client(String consumerKey, String secretKey) {
-        this(consumerKey, secretKey, null, null);
+    public Client(String consumerId, String secretKey) {
+        this(consumerId, secretKey, null, null);
     }
 
+    /**
+     * Gets the consumer registration id
+     * @return the consumer key
+     */
     public String getConsumerKey() {
         return consumerKey;
     }
 
+    /**
+     * Gets the secret key
+     * @return the secret key
+     */
     public String getSecretKey() {
         return secretKey;
     }
 
+    /**
+     * Gets the name of the third-party application
+     * this client represents
+     * @return the application name
+     */
     public String getApplicationName() {
         return applicationName;
     }
 
+    /**
+     * Sets the name of the third-party application
+     * this client represents
+     * @param applicationName the name
+     */
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
     }
-    
+
+    /**
+     * Gets the public URI of the third-party application.
+     * For example, this property can be used to validate 
+     * request token callbacks
+     * @return the application URI
+     */
     public String getApplicationURI() {
         return applicationURI;
     }
 
+    /**
+     * Sets the public URI of the third-party application.
+     */
     public void setApplicationURI(String applicationURI) {
         this.applicationURI = applicationURI;
     }
 
+    /**
+     * Gets the optional login name; can be used 
+     * for enforcing the RBAC rules 
+     * @return the login name
+     */
     public String getLoginName() {
         return loginName == null ? consumerKey : loginName;
     }
     
+    /**
+     * Sets the optional login name
+     * @param name the login name
+     */
     public void setLoginName(String name) {
         this.loginName = name;
     }
     
-    public List<String> getUris() {
-        return uris;
-    }
-    
-    public void setUris(List<String> uris) {
-        this.uris = uris;
-    }
-    
+    /**
+     * Returns a list of opaque permissions/scopes
+     * @return the scopes
+     */
     public List<String> getScopes() {
         return scopes;
     }
 
+    /**
+     * Sets a list of opaque permissions/scopes
+     * @param scopes the scopes
+     */
     public void setScopes(List<String> scopes) {
         this.scopes = scopes;
+    }
+    
+    /**
+     * Returns a list of relative URIs the consumer wishes to access
+     * @return the uris
+     */
+    public List<String> getUris() {
+        return uris;
+    }
+
+    /**
+     * Sets a list of relative URIs the consumer wishes to access
+     * @param uris the uris
+     */
+    public void setUris(List<String> uris) {
+        this.uris = uris;
     }
     
     @Override

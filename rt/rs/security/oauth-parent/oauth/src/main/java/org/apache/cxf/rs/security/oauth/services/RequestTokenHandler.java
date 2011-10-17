@@ -100,7 +100,7 @@ public class RequestTokenHandler {
             }
             //create response
             Map<String, Object> responseParams = new HashMap<String, Object>();
-            responseParams.put(OAuth.OAUTH_TOKEN, requestToken.getTokenString());
+            responseParams.put(OAuth.OAUTH_TOKEN, requestToken.getTokenKey());
             responseParams.put(OAuth.OAUTH_TOKEN_SECRET, requestToken.getTokenSecret());
             responseParams.put(OAuth.OAUTH_CALLBACK_CONFIRMED, Boolean.TRUE);
 

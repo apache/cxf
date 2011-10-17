@@ -30,6 +30,9 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.SecurityContext;
 
+/**
+ * JAX-RS OAuth filter which can be used to protect end user endpoints
+ */
 @Provider
 public class OAuthRequestFilter extends AbstractAuthFilter implements RequestHandler {
     @Context

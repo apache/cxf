@@ -27,7 +27,9 @@ import javax.ws.rs.core.Response;
 
 
 /**
- * This resource will replace a request token with a new access token
+ * This resource will replace a request token with a new access token which
+ * will complete the OAuth flow. The third-party consumer will use the access
+ * token to access end user resources.
  */
 @Path("/token")
 public class AccessTokenService extends AbstractOAuthService {

@@ -23,6 +23,11 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * This bean represents a resource owner authorization challenge.
+ * Typically, an HTML view will be returned to a resource owner who
+ * will authorize or deny the third-party consumer
+ */
 @XmlRootElement(name = "authorizationData", 
                 namespace = "http://org.apache.cxf.rs.security.oauth")
 public class OAuthAuthorizationData implements Serializable {

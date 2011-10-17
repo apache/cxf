@@ -34,16 +34,37 @@ import net.oauth.OAuthMessage;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 
-public final class OAuthClientSupport {
-    private OAuthClientSupport() {
+/**
+ * The utility class for simplifying making OAuth request and access token
+ * requests as well as for creating Authorization OAuth headers
+ */
+public final class OAuthClientUtils {
+    private OAuthClientUtils() {
         
     }
-    public static URI getAuthorizationServiceURI(String authorizationServiceURI, String token) {
+    
+    /**
+     * Returns URI of the authorization service with the query parameter containing 
+     * the request token key 
+     * @param authorizationServiceURI the service URI
+     * @param requestToken the request token key
+     * @return
+     */
+    public static URI getAuthorizationURI(String authorizationServiceURI, String requestToken) {
         return UriBuilder.fromUri(authorizationServiceURI).
-            queryParam("oauth_token", token).build();
+            queryParam("oauth_token", requestToken).build();
                                            
     }
     
+    /**
+     * Returns a simple representation of the Request token
+     * @param requestTokenService initialized RequestToken service client
+     * @param consumer Consumer bean containing the consumer key and secret
+     * @param callback the callback URI where the request token verifier will
+     *        be returned 
+     * @param extraParams additional parameters such as state, scope, etc
+     * @return the token
+     */
     public static Token getRequestToken(WebClient requestTokenService,
                              Consumer consumer,
                              URI callback,
@@ -63,6 +84,14 @@ public final class OAuthClientSupport {
         OAuthAccessor accessor = new OAuthAccessor(oAuthConsumer);
         return getToken(requestTokenService, accessor, parameters);
     }
+    
+    /**
+     * Returns a simple representation of the Access token
+     * @param accessTokenService initialized AccessToken service client
+     * @param consumer Consumer bean containing the consumer key and secret
+     * @param verifier the verifier/authorization key
+     * @return the token
+     */
     public static Token getAccessToken(WebClient accessTokenService,
                                        Consumer consumer,
                                        Token requestToken,
@@ -81,14 +110,22 @@ public final class OAuthClientSupport {
         return getToken(accessTokenService, accessor, parameters);
     }
     
+    /**
+     * Creates OAuth Authorization header
+     * @param consumer Consumer bean containing the consumer key and secret
+     * @param token Access token representation
+     * @param method HTTP method
+     * @param requestURI request URI
+     * @return the header value
+     */
     public static String createAuthorizationHeader(Consumer consumer,
-                                            Token token, 
+                                            Token accessToken, 
                                             String method, 
                                             String requestURI) {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(OAuth.OAUTH_CONSUMER_KEY, consumer.getKey());
-        if (token != null) {
-            parameters.put(OAuth.OAUTH_TOKEN, token.getToken());
+        if (accessToken != null) {
+            parameters.put(OAuth.OAUTH_TOKEN, accessToken.getToken());
         }
         parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
         parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
@@ -97,9 +134,9 @@ public final class OAuthClientSupport {
         OAuthConsumer oAuthConsumer = 
             new OAuthConsumer(null, consumer.getKey(), consumer.getSecret(), null);
         OAuthAccessor accessor = new OAuthAccessor(oAuthConsumer);
-        if (token != null) {
-            accessor.accessToken = token.getToken();
-            accessor.tokenSecret = token.getSecret();
+        if (accessToken != null) {
+            accessor.accessToken = accessToken.getToken();
+            accessor.tokenSecret = accessToken.getSecret();
         }
         return doGetAuthorizationHeader(accessor, method, requestURI, parameters);
     }
@@ -128,6 +165,10 @@ public final class OAuthClientSupport {
             throw new WebApplicationException(500);
         }
     }
+    
+    /**
+     * Simple token representation
+     */
     public static class Token {
         private String token;
         private String secret;
@@ -146,6 +187,9 @@ public final class OAuthClientSupport {
 
 
     }
+    /**
+     * Simple consumer representation
+     */
     public static class Consumer {
         
         private String key;

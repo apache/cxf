@@ -20,6 +20,10 @@ package org.apache.cxf.rs.security.oauth.data;
 
 import java.util.List;
 
+/**
+ * Captures the information associated with the request token registration request.
+ * @see RequestToken  
+ */
 public class RequestTokenRegistration {
     private Client client; 
     private String state;

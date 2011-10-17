@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth.data;
 
+/**
+ * Request Token representation
+ */
 public class RequestToken extends Token {
 
     private String oauthVerifier;
@@ -34,26 +37,51 @@ public class RequestToken extends Token {
         super(client, tokenString, tokenSecret, lifetime);
     }
 
-    public void setOauthVerifier(String oauthVerifier) {
-        this.oauthVerifier = oauthVerifier;
+    /**
+     * Sets the token verifier
+     * @param oauthVerifier
+     */
+    public void setVerifier(String verifier) {
+        this.oauthVerifier = verifier;
     }
 
-    public String getOauthVerifier() {
+    /**
+     * Gets the token verifier
+     * @return the verifier
+     */
+    public String getVerifier() {
         return oauthVerifier;
     }
 
+    /**
+     * Sets the callback URI 
+     * @param callback the callback
+     */
     public void setCallback(String callback) {
         this.callback = callback;
     }
 
+    /**
+     * Gets the callback URI
+     * @return the callback
+     */
     public String getCallback() {
         return callback;
     }
 
+    /**
+     * Sets the state - it will be reported back to the consumer
+     * after the authorization decision on this token has been made. 
+     * @param state
+     */
     public void setState(String state) {
         this.state = state;
     }
 
+    /**
+     * Gets the state
+     * @return the state
+     */
     public String getState() {
         return state;
     }

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cxf.common.util.StringUtils;
 
 import org.apache.cxf.rs.security.oauth.data.Client;
-import org.apache.cxf.rs.security.oauth.provider.MD5TokenGenerator;
+import org.apache.cxf.rs.security.oauth.provider.MD5SequenceGenerator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 
@@ -63,15 +63,15 @@ public class ApplicationController implements ServletContextAware {
             return handleInternalRedirect(clientApp);
         }
 
-        MD5TokenGenerator tokenGen = new MD5TokenGenerator();
+        MD5SequenceGenerator tokenGen = new MD5SequenceGenerator();
         Principal principal = SecurityContextHolder.getContext().getAuthentication();
         String consumerKey = clientApp.getConsumerKey();
         if (StringUtils.isEmpty(consumerKey)) {
             consumerKey = tokenGen
-                .generateToken((principal.getName() + clientApp.getClientName()).getBytes("UTF-8"));
+                .generate((principal.getName() + clientApp.getClientName()).getBytes("UTF-8"));
         }
 
-        String secretKey = tokenGen.generateToken(new SecureRandom().generateSeed(20));
+        String secretKey = tokenGen.generate(new SecureRandom().generateSeed(20));
 
         Client clientInfo = 
 new Client(consumerKey, secretKey, clientApp.getClientName(), clientApp.getCallbackURL());

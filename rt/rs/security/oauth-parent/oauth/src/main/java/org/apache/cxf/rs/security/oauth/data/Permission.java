@@ -18,7 +18,11 @@
  */
 package org.apache.cxf.rs.security.oauth.data;
 
-
+/**
+ * Base permission description which is visible to 
+ * authorization handlers
+ * @see OAuthAuthorizationData
+ */
 public class Permission {
     private String permission;
     private String description;

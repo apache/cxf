@@ -41,7 +41,9 @@ import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
-
+/**
+ * Base OAuth filter which can be used to protect end-user endpoints
+ */
 public class AbstractAuthFilter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthFilter.class);
@@ -61,10 +63,23 @@ public class AbstractAuthFilter {
         
     }
     
+    /**
+     * Sets {@link OAuthDataProvider} provider.
+     * @param provider the provider
+     */
     public void setDataProvider(OAuthDataProvider provider) {
         dataProvider = provider;
     }
     
+    /**
+     * Authenticates the third-party consumer and returns
+     * {@link OAuthInfo} bean capturing the information about the request. 
+     * @param req http request
+     * @return OAuth info
+     * @see OAuthInfo
+     * @throws Exception
+     * @throws OAuthProblemException
+     */
     public OAuthInfo handleOAuthRequest(HttpServletRequest req) throws
         Exception, OAuthProblemException {
         if (LOG.isLoggable(Level.FINE)) {
@@ -82,7 +97,8 @@ public class AbstractAuthFilter {
 
             //check if access token is not null
             if (accessToken == null) {
-                throw new OAuthProblemException();
+                LOG.warning("Access token is unavailable");
+                throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
             client = accessToken.getClient(); 
             
@@ -91,28 +107,28 @@ public class AbstractAuthFilter {
             String consumerSecret = oAuthMessage.getParameter("oauth_consumer_secret");
             client = dataProvider.getClient(consumerKey);
             if (client == null || consumerSecret == null || !consumerSecret.equals(client.getSecretKey())) {
-                throw new OAuthProblemException();
+                LOG.warning("Client is invalid");
+                throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
             }
         }
 
         OAuthUtils.validateMessage(oAuthMessage, client, accessToken);
 
         //check valid URI
-        if (!checkRequestURI(req, getAllUris(client, accessToken))) {
-            throw new OAuthProblemException();
-        }
+        checkRequestURI(req, getAllUris(client, accessToken));
         
         List<OAuthPermission> permissions = dataProvider.getPermissionsInfo(
                 getAllScopes(client, accessToken));
         
         for (OAuthPermission perm : permissions) {
-            if (perm.getUri() != null 
-                && !checkRequestURI(req, Collections.singletonList(perm.getUri()))) {
-                throw new OAuthProblemException();
+            if (perm.getUri() != null) {
+                checkRequestURI(req, Collections.singletonList(perm.getUri()));
             }
             if (!perm.getHttpVerbs().isEmpty() 
                 && !perm.getHttpVerbs().contains(req.getMethod())) {
-                throw new OAuthProblemException();
+                String message = "Invalid http verb";
+                LOG.warning(message);
+                throw new OAuthProblemException(message);
             }
             checkNoAccessTokenIsAllowed(client, accessToken, perm);
         }
@@ -146,10 +162,11 @@ public class AbstractAuthFilter {
         return uris;
     }
 
-    protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
+    protected void checkRequestURI(HttpServletRequest request, List<String> uris)
+        throws OAuthProblemException {
         
         if (uris.isEmpty()) {
-            return true;
+            return;
         }
         String servletPath = request.getPathInfo();
         boolean foundValidScope = false;
@@ -167,7 +184,11 @@ public class AbstractAuthFilter {
                 }
             }
         }
-        return foundValidScope;
+        if (!foundValidScope) {
+            String message = "Invalid request URI";
+            LOG.warning(message);
+            throw new OAuthProblemException(message);
+        }
     }
     
     protected SecurityContext createSecurityContext(HttpServletRequest request, 

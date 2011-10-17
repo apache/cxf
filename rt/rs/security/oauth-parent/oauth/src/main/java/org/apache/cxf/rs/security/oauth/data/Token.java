@@ -21,7 +21,9 @@ package org.apache.cxf.rs.security.oauth.data;
 import java.util.Collections;
 import java.util.List;
 
-
+/**
+ * Base Token representation
+ */
 public abstract class Token {
 
     protected String tokenString;
@@ -32,17 +34,17 @@ public abstract class Token {
     protected List<String> scopes = Collections.emptyList();
     protected List<String> uris = Collections.emptyList();
     
-    protected Token(Client client, String tokenString,
+    protected Token(Client client, String tokenKey,
                     String tokenSecret, long lifetime) {
         this.client = client;
-        this.tokenString = tokenString;
+        this.tokenString = tokenKey;
         this.tokenSecret = tokenSecret;
         initTokenLifeTime(lifetime);
     }
 
-    protected Token(Client client, String tokenString,
+    protected Token(Client client, String tokenKey,
                     String tokenSecret) {
-        this(client, tokenString, tokenSecret, -1);
+        this(client, tokenKey, tokenSecret, -1);
     }
 
     private void initTokenLifeTime(Long lifetm) {
@@ -50,39 +52,74 @@ public abstract class Token {
         issuedAt = System.currentTimeMillis() / 1000;
     }
 
+    /**
+     * Returns the Client associated with this token
+     * @return the client
+     */
     public Client getClient() {
         return client;
     }
 
-    public String getTokenString() {
+    /**
+     * Returns the token key
+     * @return the key
+     */
+    public String getTokenKey() {
         return tokenString;
     }
 
+    /**
+     * Returns the token secret
+     * @return the secret
+     */
     public String getTokenSecret() {
         return tokenSecret;
     }
 
+    /**
+     * Returns the time (in seconds) when this token was issued at
+     * @return the seconds
+     */
     public long getIssuedAt() {
         return issuedAt;
     }
 
+    /**
+     * Returns the number of seconds this token can be valid after it was issued
+     * @return the seconds
+     */
     public long getLifetime() {
         return lifetime;
     }
 
+    /**
+     * Returns a list of opaque permissions/scopes
+     * @return the scopes
+     */
     public List<String> getScopes() {
         return scopes;
     }
 
+    /**
+     * Sets a list of opaque permissions/scopes
+     * @param scopes the scopes
+     */
     public void setScopes(List<String> scopes) {
         this.scopes = scopes;
     }
-       
-
+    
+    /**
+     * Returns a list of relative URIs the consumer wishes to access
+     * @return the uris
+     */
     public List<String> getUris() {
         return uris;
     }
 
+    /**
+     * Sets a list of relative URIs the consumer wishes to access
+     * @param uris the uris
+     */
     public void setUris(List<String> uris) {
         this.uris = uris;
     }

@@ -25,6 +25,9 @@ import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 
+/**
+ * Captures the information about the current request
+ */
 public class OAuthInfo {
     private Client client;
     private AccessToken token;

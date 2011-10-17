@@ -30,7 +30,11 @@ import net.oauth.SimpleOAuthValidator;
 
 import org.apache.cxf.rs.security.oauth.data.Token;
 
-
+/**
+ * The utility OAuth validator which is primarily used 
+ * by the runtime to validate that the issued tokens have not expired.
+ * Note that the runtime does validate OAuth signatures separately.
+ */
 public class DefaultOAuthValidator extends SimpleOAuthValidator {
 
     public DefaultOAuthValidator() {

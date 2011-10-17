@@ -37,7 +37,9 @@ import net.oauth.server.OAuthServlet;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
-
+/**
+ * HTTP Servlet filter which can be used to protect end user endpoints
+ */
 public class OAuthServletFilter extends AbstractAuthFilter implements javax.servlet.Filter {
 
     public void init(FilterConfig filterConfig) throws ServletException {

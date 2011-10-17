@@ -23,9 +23,13 @@ import java.security.NoSuchAlgorithmException;
 
 import net.oauth.OAuthException;
 
-
-public class MD5TokenGenerator {
-    public String generateToken(byte[] input) throws OAuthException {
+/**
+ * The utility MD5 sequence generator which can be used for generating
+ * request or access token keys and secrets as well as request token
+ * verifiers
+ */
+public class MD5SequenceGenerator {
+    public String generate(byte[] input) throws OAuthException {
         if (input == null) {
             throw new OAuthException("You have to pass input to Token Generator");
         }

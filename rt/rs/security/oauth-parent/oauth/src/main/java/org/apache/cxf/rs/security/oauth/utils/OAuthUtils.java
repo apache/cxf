@@ -48,6 +48,9 @@ import org.apache.cxf.rs.security.oauth.data.Token;
 import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 
+/**
+ * Various utility methods 
+ */
 public final class OAuthUtils {
 
     private OAuthUtils() {
@@ -60,9 +63,9 @@ public final class OAuthUtils {
         OAuthAccessor accessor = new OAuthAccessor(consumer);
         if (token != null) {
             if (token instanceof RequestToken) {
-                accessor.requestToken = token.getTokenString(); 
+                accessor.requestToken = token.getTokenKey(); 
             } else {
-                accessor.accessToken = token.getTokenString();
+                accessor.accessToken = token.getTokenKey();
             }
             accessor.tokenSecret = token.getTokenSecret();
         }

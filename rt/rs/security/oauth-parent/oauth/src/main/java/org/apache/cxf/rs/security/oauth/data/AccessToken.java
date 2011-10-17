@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth.data;
 
-
+/**
+ * Access Token representation
+ */
 public class AccessToken extends Token {
     public AccessToken(Client client, String tokenString,
                        String tokenSecret) {

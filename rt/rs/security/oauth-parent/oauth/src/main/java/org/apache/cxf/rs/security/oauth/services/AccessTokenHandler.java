@@ -63,7 +63,7 @@ public class AccessTokenHandler {
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
             String oauthVerifier = oAuthMessage.getParameter(OAuth.OAUTH_VERIFIER);
-            if (oauthVerifier == null || !oauthVerifier.equals(requestToken.getOauthVerifier())) {
+            if (oauthVerifier == null || !oauthVerifier.equals(requestToken.getVerifier())) {
                 throw new OAuthProblemException(OAuthConstants.VERIFIER_INVALID);
             }
             
@@ -73,7 +73,7 @@ public class AccessTokenHandler {
 
             //create response
             Map<String, Object> responseParams = new HashMap<String, Object>();
-            responseParams.put(OAuth.OAUTH_TOKEN, accessToken.getTokenString());
+            responseParams.put(OAuth.OAUTH_TOKEN, accessToken.getTokenKey());
             responseParams.put(OAuth.OAUTH_TOKEN_SECRET, accessToken.getTokenSecret());
 
             String responseString = OAuth.formEncode(responseParams.entrySet());

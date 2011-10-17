@@ -19,6 +19,9 @@
 
 package org.apache.cxf.rs.security.oauth.provider;
 
+/**
+ * Encapsulates OAuth-related problems
+ */
 public class OAuthServiceException extends RuntimeException {
 
     public OAuthServiceException(String message) {

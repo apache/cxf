@@ -21,6 +21,9 @@ package org.apache.cxf.rs.security.oauth.data;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Provides the complete information about a given opaque permission.
+ */
 public class OAuthPermission extends Permission {
     private List<String> roles = Collections.emptyList();
     private List<String> httpVerbs = Collections.emptyList();
@@ -36,30 +39,59 @@ public class OAuthPermission extends Permission {
         this.roles = roles;
     }
     
+    /**
+     * Returns an optional list of role names
+     * @return the roles
+     */
     public List<String> getRoles() {
         return roles;
     }
 
+    /**
+     * Sets an optional list of HTTP verbs 
+     * @param httpVerbs the verbs
+     */
     public void setHttpVerbs(List<String> httpVerbs) {
         this.httpVerbs = httpVerbs;
     }
 
+    /**
+     * Returns an optional list of HTTP verbs
+     * @return the list of verbs
+     */
     public List<String> getHttpVerbs() {
         return httpVerbs;
     }
 
+    /**
+     * Sets an optional URI
+     * @param uri the uri
+     */
     public void setUri(String uri) {
         this.uri = uri;
     }
 
+    /**
+     * Returns an optional URI    
+     * @return the uri
+     */
     public String getUri() {
         return uri;
     }
 
+    /**
+     * Can be used to disable the default requirement for all
+     * consumer requests to contain an access token
+     * @param authorizationKeyRequired the boolean value
+     */
     public void setAuthorizationKeyRequired(boolean authorizationKeyRequired) {
         this.authorizationKeyRequired = authorizationKeyRequired;
     }
 
+    /**
+     * Indicates if the access token must be present or not
+     * @return the boolean value
+     */
     public boolean isAuthorizationKeyRequired() {
         return authorizationKeyRequired;
     }

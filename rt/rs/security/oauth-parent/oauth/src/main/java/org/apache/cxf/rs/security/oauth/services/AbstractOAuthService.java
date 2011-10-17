@@ -26,7 +26,9 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 
-
+/**
+ * Abstract utility class which OAuth services extend
+ */
 public abstract class AbstractOAuthService {
     private MessageContext mc;
     

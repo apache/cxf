@@ -19,6 +19,9 @@
 
 package org.apache.cxf.rs.security.oauth.utils;
 
+/**
+ * Miscellaneous constants 
+ */
 public final class OAuthConstants {
     
     public static final String OAUTH_DATA_PROVIDER_CLASS = "oauth.data.provider-class";
