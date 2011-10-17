@@ -365,15 +365,13 @@ public class MAPCodec extends AbstractSoapInterceptor {
                         JAXBElement jaxbEl = null;
                         if (o instanceof Element) {
                             Element e = (Element)o;
-                            QName elQn = new QName(e.getNamespaceURI(), e.getLocalName());
-                            jaxbEl = new JAXBElement<String>(elQn,
-                                String.class, 
-                                e.getTextContent());
+                            Node importedNode = header.getOwnerDocument().importNode(e, true);
+                            header.appendChild(importedNode);                            
                         } else {
                             jaxbEl = (JAXBElement) o;
+                            marshaller.marshal(jaxbEl, header);
                         }
-                        marshaller.marshal(jaxbEl, header);
-                        
+                                               
                         Element lastAdded = (Element)header.getLastChild();
                         addIsReferenceParameterMarkerAttribute(lastAdded, maps.getNamespaceURI());
                     } else {
@@ -615,8 +613,12 @@ public class MAPCodec extends AbstractSoapInterceptor {
         EndpointReferenceType toEpr = maps.getToEndpointReference();
         if (null != toEpr) {
             for (Element e : referenceParameterHeaders) {
-                JAXBElement<String> el = unmarshaller.unmarshal(e, String.class);
-                ContextUtils.applyReferenceParam(toEpr, el);
+                if (DOMUtils.getChild(e, Node.ELEMENT_NODE) == null) {
+                    JAXBElement<String> el = unmarshaller.unmarshal(e, String.class);
+                    ContextUtils.applyReferenceParam(toEpr, el);
+                } else {
+                    ContextUtils.applyReferenceParam(toEpr, e);
+                }
             }
         }
     }

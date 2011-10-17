@@ -30,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
@@ -925,7 +924,7 @@ public final class ContextUtils {
         return NONE_ENDPOINT_REFERENCE;
     }
 
-    public static void applyReferenceParam(EndpointReferenceType toEpr, JAXBElement<String> el) {
+    public static void applyReferenceParam(EndpointReferenceType toEpr, Object el) {
         if (null == toEpr.getReferenceParameters()) {
             toEpr.setReferenceParameters(WSA_OBJECT_FACTORY.createReferenceParametersType());
         }
