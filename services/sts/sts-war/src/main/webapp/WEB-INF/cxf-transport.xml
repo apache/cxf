@@ -90,7 +90,7 @@
     </bean>
     
     <util:list id="transportEndpoints">
-		<value>https://localhost:(8081|8083)/doubleit/services/doubleittransport.*</value>
+		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*</value>
 	</util:list>
 	
 	<bean id="transportSTSProperties"

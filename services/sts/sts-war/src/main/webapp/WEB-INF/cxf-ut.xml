@@ -72,7 +72,7 @@
     </bean>
     
     <util:list id="utEndpoints">
-		<value>http://localhost:(8080|8082)/(doubleit|metrowsp)/services/doubleit(UT|.*symmetric.*|.*)</value>
+		<value>http://localhost:(\d)*/(doubleit|metrowsp)/services/doubleit(UT|.*symmetric.*|.*)</value>
 	</util:list>
 	
 	<bean id="utSTSProperties"

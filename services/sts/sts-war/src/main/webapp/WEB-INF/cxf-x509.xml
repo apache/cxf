@@ -72,8 +72,8 @@
     </bean>
     
     <util:list id="x509Endpoints">
-		<value>http://localhost:8082/doubleit/services/doubleitsymmetric.*</value>
-		<value>http://localhost:8082/doubleit/services/doubleitasymmetric.*</value>
+		<value>http://localhost:(\d)*/doubleit/services/doubleitsymmetric.*</value>
+		<value>http://localhost:(\d)*/doubleit/services/doubleitasymmetric.*</value>
 	</util:list>
 	
 	<bean id="x509STSProperties"
