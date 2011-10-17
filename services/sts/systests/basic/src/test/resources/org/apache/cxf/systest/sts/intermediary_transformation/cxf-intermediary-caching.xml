@@ -1,0 +1,132 @@
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://cxf.apache.org/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:sec="http://cxf.apache.org/configuration/security"
+  xmlns:http="http://cxf.apache.org/transports/http/configuration"
+  xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+  xmlns:jaxws="http://cxf.apache.org/jaxws"
+  xsi:schemaLocation="
+            http://cxf.apache.org/core
+            http://cxf.apache.org/schemas/core.xsd
+            http://cxf.apache.org/configuration/security
+            http://cxf.apache.org/schemas/configuration/security.xsd
+            http://cxf.apache.org/jaxws
+            http://cxf.apache.org/schemas/jaxws.xsd
+            http://cxf.apache.org/transports/http/configuration
+            http://cxf.apache.org/schemas/configuration/http-conf.xsd
+            http://cxf.apache.org/transports/http-jetty/configuration
+            http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd">
+            
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+   
+    <jaxws:endpoint id="doubleittransportsaml1endorsing"
+      implementor="org.apache.cxf.systest.sts.intermediary_transformation.IntermediaryCachingPortTypeImpl"
+      endpointName="s:DoubleItTransportSAML1EndorsingPort"
+      serviceName="s:DoubleItService"
+      depends-on="ClientAuthHttpsSettings"
+      address="https://localhost:${testutil.ports.Intermediary}/doubleit/services/doubleittransportsaml1endorsing"
+      wsdlLocation="org/apache/cxf/systest/sts/intermediary_transformation/DoubleIt.wsdl"
+      xmlns:s="http://www.example.org/contract/DoubleIt">
+        
+      <jaxws:properties>
+         <entry key="ws-security.callback-handler" 
+                value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+         <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+         <entry key="ws-security.is-bsp-compliant" value="false"/>
+      </jaxws:properties> 
+   </jaxws:endpoint>
+   
+   <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
+   <httpj:engine port="${testutil.ports.Intermediary}">
+    <httpj:tlsServerParameters>
+      <sec:keyManagers keyPassword="skpass">
+          <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+      </sec:keyManagers>
+      <sec:cipherSuitesFilter>
+        <sec:include>.*_EXPORT_.*</sec:include>
+        <sec:include>.*_EXPORT1024_.*</sec:include>
+        <sec:include>.*_WITH_DES_.*</sec:include>
+        <sec:include>.*_WITH_NULL_.*</sec:include>
+        <sec:exclude>.*_DH_anon_.*</sec:exclude>
+        </sec:cipherSuitesFilter>
+      <sec:clientAuthentication want="false" required="false"/>
+    </httpj:tlsServerParameters>
+   </httpj:engine>
+  </httpj:engine-factory>
+  
+  <bean id="delegationCallbackHandler" class="org.apache.cxf.ws.security.trust.delegation.ReceivedTokenCallbackHandler" />
+  
+  <bean id="defaultTokenStore"
+        class="org.apache.cxf.ws.security.tokenstore.MemoryTokenStore"/>
+  
+  <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2Port" 
+                 createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="https://localhost:8443/SecurityTokenService/Transport?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+                   <property name="onBehalfOf" ref="delegationCallbackHandler" />
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.username" value="bob"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                           <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                           <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.sts.token.usecert" value="true"/> 
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+           <entry key="org.apache.cxf.ws.security.tokenstore.TokenStore">
+                <ref bean="defaultTokenStore"/>
+           </entry>
+           <entry key="ws-security.cache.issued.token.in.endpoint" value="false"/>
+       </jaxws:properties>
+   </jaxws:client>
+   
+   <http:conduit name="https://localhost.*">
+      <http:tlsClientParameters disableCNCheck="true">
+        <sec:keyManagers keyPassword="ckpass">
+           <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+        </sec:keyManagers>
+        <sec:trustManagers>
+          <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+        </sec:trustManagers>
+      </http:tlsClientParameters>
+   </http:conduit>
+   
+</beans>
+

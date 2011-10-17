@@ -1,0 +1,60 @@
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<wsdl:definitions name="DoubleIt"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:di="http://www.example.org/schema/DoubleIt"
+	xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+	xmlns:t="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsaw="http://www.w3.org/2005/08/addressing"
+	xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" targetNamespace="http://www.example.org/contract/DoubleIt">
+	<!-- Replaced for wsp: http://schemas.xmlsoap.org/ws/2004/09/policy -->
+	
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.example.org/schema/DoubleIt">
+			<xsd:element name="DoubleIt">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="numberToDouble" type="xsd:int" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="DoubleItResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="doubledNumber" type="xsd:int" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="DoubleItRequest">
+		<wsdl:part element="di:DoubleIt" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="DoubleItResponse">
+		<wsdl:part element="di:DoubleItResponse" name="parameters" />
+	</wsdl:message>
+	<wsdl:portType name="DoubleItPortType">
+		<wsdl:operation name="DoubleIt">
+			<wsdl:input message="tns:DoubleItRequest" />
+			<wsdl:output message="tns:DoubleItResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	
+</wsdl:definitions>
