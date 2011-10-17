@@ -171,6 +171,11 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                     if (!b && !closed) {
                         closed = true;
                         try {
+                            super.close();
+                        } catch (XMLStreamException e) {
+                            //ignore
+                        }
+                        try {
                             ins.close();
                         } catch (IOException e) {
                             //ignore
