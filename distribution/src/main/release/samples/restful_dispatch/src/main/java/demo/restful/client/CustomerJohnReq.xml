@@ -17,6 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<tns:Customer xmlns:tns="http://apache.org/hello_world_soap_http/types">
-  <tns:id>123456</tns:id>
-</tns:Customer>
+<Customer>
+  <id>1234</id>
+  <name>John</name>
+  <phoneNumber>123456</phoneNumber>
+</Customer>
