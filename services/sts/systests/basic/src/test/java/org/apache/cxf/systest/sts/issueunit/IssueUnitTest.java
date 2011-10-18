@@ -244,29 +244,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
     }
     
     /**
-     * Test the endpoint address sent to the STS as part of AppliesTo. If the STS does not
-     * recognise the endpoint address it does not issue a token.
-     */
-    @org.junit.Test
-    public void testEndpointAddress() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        try {
-            String badAddress = 
-                "https://localhost:8081/doubleit/services/doubleitbadtransportsaml1";
-            requestSecurityToken(SAML1_TOKEN_TYPE, BEARER_KEYTYPE, bus, badAddress);
-            fail("Failure expected on a bad endpoint address");
-        } catch (Exception ex) {
-            // expected
-        }
-    }
-    
-    /**
      * Test that a request with no AppliesTo can be created by the CXF STS client.
      */
     @org.junit.Test

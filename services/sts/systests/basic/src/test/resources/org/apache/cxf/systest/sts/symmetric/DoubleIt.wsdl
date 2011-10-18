@@ -87,7 +87,7 @@
 									<sp:RequestSecurityTokenTemplate>
 										<t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1</t:TokenType>
 										<t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/SymmetricKey</t:KeyType>
-										<t:KeySize>256</t:KeySize>
+										<t:KeySize>128</t:KeySize>
 									</sp:RequestSecurityTokenTemplate>
 									<wsp:Policy>
 										<sp:RequireInternalReference />
@@ -118,7 +118,7 @@
 						<sp:OnlySignEntireHeadersAndBody />
 						<sp:AlgorithmSuite>
 							<wsp:Policy>
-								<sp:Basic256 />
+								<sp:Basic128 />
 							</wsp:Policy>
 						</sp:AlgorithmSuite>
 					</wsp:Policy>
@@ -155,7 +155,7 @@
 									<sp:RequestSecurityTokenTemplate>
 										<t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0</t:TokenType>
 										<t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/SymmetricKey</t:KeyType>
-										<t:KeySize>256</t:KeySize>
+										<t:KeySize>128</t:KeySize>
 									</sp:RequestSecurityTokenTemplate>
 									<wsp:Policy>
 										<sp:RequireInternalReference />
@@ -186,7 +186,7 @@
 						<sp:OnlySignEntireHeadersAndBody />
 						<sp:AlgorithmSuite>
 							<wsp:Policy>
-								<sp:Basic256 />
+								<sp:Basic128 />
 							</wsp:Policy>
 						</sp:AlgorithmSuite>
 					</wsp:Policy>
