@@ -34,7 +34,6 @@ returns a customer instance whose id is 1234. The XML document returned:
 
 A HTTP POST request to URL http://localhost:9000/customerservice/customer 
 with the data:
-
 <Customer>
   <id>1234</id>
   <name>John</name>
@@ -43,10 +42,17 @@ with the data:
 
 updates customer 1234 with the data provided. 
 
+The XML document returned:
+<Customer>
+  <name>John</name>
+  <id>123456</id>
+</Customer>
+
 The client code demonstrates how to send HTTP POST with XML data using 
 JAX-WS Dispatch and how to send HTTP GET using URL.openStream(). The 
 server code demonstrates how to build a RESTful endpoints through 
 JAX-WS Provider interface.
+
 
 Please review the README in the samples directory before continuing.
 
