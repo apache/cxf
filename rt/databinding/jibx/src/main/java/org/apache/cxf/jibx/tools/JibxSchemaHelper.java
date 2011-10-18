@@ -42,11 +42,11 @@ import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.ws.commons.schema.XmlSchema;
-import org.jibx.schema.ISchemaResolver;
 
 public class JibxSchemaHelper {
 
     private final Map<String, Element> schemaList;
+    private List<JibxSchemaResolver> resolvers;
     private final Map<String, String> catalogResolved = new HashMap<String, String>();
     private final Bus bus;
 
@@ -56,10 +56,11 @@ public class JibxSchemaHelper {
     }
 
     public void getSchemas(final Definition def, final SchemaCollection schemaCol,
-                           List<ISchemaResolver> resolvers) {
+                           List<JibxSchemaResolver> r) {
+        this.resolvers = r;
         List<Definition> defList = new ArrayList<Definition>();
         parseImports(def, defList);
-        extractSchema(def, schemaCol, resolvers);
+        extractSchema(def, schemaCol);
         // added
         getSchemaList(def);
 
@@ -67,7 +68,7 @@ public class JibxSchemaHelper {
         done.put(def, def);
         for (Definition def2 : defList) {
             if (!done.containsKey(def2)) {
-                extractSchema(def2, schemaCol, resolvers);
+                extractSchema(def2, schemaCol);
                 // added
                 getSchemaList(def2);
                 done.put(def2, def2);
@@ -75,7 +76,7 @@ public class JibxSchemaHelper {
         }
     }
 
-    private void extractSchema(Definition def, SchemaCollection schemaCol, List<ISchemaResolver> resolvers) {
+    private void extractSchema(Definition def, SchemaCollection schemaCol) {
         Types typesElement = def.getTypes();
         if (typesElement != null) {
             int schemaCount = 1;
@@ -119,7 +120,8 @@ public class JibxSchemaHelper {
                         XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);
                         catalogResolved.putAll(schemaResolver.getResolvedMap());
 
-                        JibxSchemaResolver resolver = new JibxSchemaResolver(systemId, xmlSchema, schemaCol);
+                        JibxSchemaResolver resolver 
+                            = new JibxSchemaResolver(systemId, xmlSchema, schemaCol, schemaElem);
                         resolvers.add(resolver);
 
                         // SchemaInfo schemaInfo = new SchemaInfo(xmlSchema.getTargetNamespace());
@@ -167,8 +169,15 @@ public class JibxSchemaHelper {
     private void addSchema(String docBaseURI, Schema schema) {
         // String docBaseURI = schema.getDocumentBaseURI();
         Element schemaEle = schema.getElement();
-        if (schemaList.get(docBaseURI) == null) {
-            schemaList.put(docBaseURI, schemaEle);
+        String name = docBaseURI;
+        for (JibxSchemaResolver r : resolvers) {
+            if (schemaEle == r.getElement()) {
+                name = r.getId();
+            }
+        }
+        
+        if (schemaList.get(name) == null) {
+            schemaList.put(name, schemaEle);
         } else if (schemaList.get(docBaseURI) != null && schemaList.containsValue(schemaEle)) {
             // do nothing
         } else {

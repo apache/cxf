@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.w3c.dom.Element;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -39,13 +41,15 @@ public class JibxSchemaResolver implements ISchemaResolver {
     private String id;
     private String name;
     private XmlSchema schema;
+    private Element element;
     private SchemaCollection collection;
 
-    public JibxSchemaResolver(String id, XmlSchema schema, SchemaCollection collection) {
+    public JibxSchemaResolver(String id, XmlSchema schema, SchemaCollection collection, Element element) {
         this.id = id;
         setName(id);
         this.schema = schema;
         this.collection = collection;
+        this.element = element;
     }
 
     public InputStream getContent() throws IOException {
@@ -57,13 +61,18 @@ public class JibxSchemaResolver implements ISchemaResolver {
     public String getId() {
         return id;
     }
+    
+    public Element getElement() {
+        return element;
+    }
 
     private void setName(String uri) {
-        this.name = uri.substring(uri.lastIndexOf('/') + 1);
+        this.name =  uri;
+        //this.name = uri.substring(uri.lastIndexOf('/') + 1);
     }
     
     public String getName() {
-        return name; // Fot the time being
+        return name;
     }
 
     public ISchemaResolver resolve(String loc, String tns) throws IOException {
@@ -81,6 +90,6 @@ public class JibxSchemaResolver implements ISchemaResolver {
         } catch (Exception e) {
             // do nothing
         }
-        return new JibxSchemaResolver(uri, read, schemaCol);
+        return new JibxSchemaResolver(uri, read, schemaCol, null);
     }
 }
