@@ -32,4 +32,5 @@ public interface OAuthClientManager {
 
     void removeRegisteredClient(String consumerKey);
 
+    void removeAllTokens(String consumerKey);
 }

@@ -45,7 +45,8 @@ public class DefaultOAuthValidator extends SimpleOAuthValidator {
         super.checkSingleParameters(message);
     }
 
-    public void validateToken(Token token) throws OAuthProblemException {
+    public void validateToken(Token token, OAuthDataProvider provider) 
+        throws OAuthProblemException {
         if (token == null) {
             throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
         } else {
@@ -53,6 +54,7 @@ public class DefaultOAuthValidator extends SimpleOAuthValidator {
             Long lifetime = token.getLifetime();
             if (lifetime != -1
                 && (issuedAt + lifetime < (System.currentTimeMillis() / 1000))) {
+                provider.removeToken(token);
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_EXPIRED);
             }
         }

@@ -26,6 +26,7 @@ import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
+import org.apache.cxf.rs.security.oauth.data.Token;
 
 /**
  * OAuth provider responsible for persisting the information about 
@@ -90,12 +91,12 @@ public interface OAuthDataProvider {
     AccessToken getAccessToken(String accessToken) throws OAuthServiceException;
 
     /**
-     * Removes the tokens associated with a given client id
-     * @param clientId the client id
+     * Removes the token
+     * @param token the token
      * @throws OAuthServiceException
      */
-    void removeTokens(String clientId) throws OAuthServiceException;;
-
+    void removeToken(Token token) throws OAuthServiceException;
+    
     /**
      * Returns the list of {@link OAuthPermission} beans describing opaque
      * permissions (aka scopes) such as "read_data", etc

@@ -67,7 +67,8 @@ public class AccessTokenHandler {
                 throw new OAuthProblemException(OAuthConstants.VERIFIER_INVALID);
             }
             
-            OAuthUtils.validateMessage(oAuthMessage, requestToken.getClient(), requestToken);
+            OAuthUtils.validateMessage(oAuthMessage, requestToken.getClient(), requestToken,
+                                       dataProvider);
 
             AccessToken accessToken = dataProvider.createAccessToken(requestToken);
 

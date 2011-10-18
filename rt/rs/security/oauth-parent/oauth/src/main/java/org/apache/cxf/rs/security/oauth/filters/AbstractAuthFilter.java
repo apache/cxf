@@ -112,7 +112,7 @@ public class AbstractAuthFilter {
             }
         }
 
-        OAuthUtils.validateMessage(oAuthMessage, client, accessToken);
+        OAuthUtils.validateMessage(oAuthMessage, client, accessToken, dataProvider);
 
         //check valid URI
         checkRequestURI(req, getAllUris(client, accessToken));

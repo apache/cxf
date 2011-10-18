@@ -75,7 +75,7 @@ public class RequestTokenHandler {
                 throw problemEx;
             }
 
-            OAuthUtils.validateMessage(oAuthMessage, client, null);
+            OAuthUtils.validateMessage(oAuthMessage, client, null, dataProvider);
 
             String callback = oAuthMessage.getParameter(OAuth.OAUTH_CALLBACK);
             validateCallbackURL(client, callback);
@@ -92,6 +92,7 @@ public class RequestTokenHandler {
             reg.setUris(uris);
             reg.setScopes(scopes);
             reg.setLifetime(tokenLifetime);
+            reg.setIssuedAt(System.currentTimeMillis() / 1000);
             
             RequestToken requestToken = dataProvider.createRequestToken(reg);
 

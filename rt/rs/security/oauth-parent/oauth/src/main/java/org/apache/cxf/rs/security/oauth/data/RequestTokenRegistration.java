@@ -31,6 +31,7 @@ public class RequestTokenRegistration {
     private List<String> uris;
     private List<String> scopes;
     private long lifetime;
+    private long issuedAt;
     
     public void setClient(Client client) {
         this.client = client;
@@ -70,5 +71,11 @@ public class RequestTokenRegistration {
     }
     public long getLifetime() {
         return lifetime;
+    }
+    public void setIssuedAt(long issuedAt) {
+        this.issuedAt = issuedAt;
+    }
+    public long getIssuedAt() {
+        return issuedAt;
     }
 }

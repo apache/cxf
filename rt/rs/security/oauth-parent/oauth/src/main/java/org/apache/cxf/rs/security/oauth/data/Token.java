@@ -26,30 +26,21 @@ import java.util.List;
  */
 public abstract class Token {
 
-    protected String tokenString;
-    protected String tokenSecret;
-    protected long issuedAt = -1;
-    protected long lifetime = -1;
-    protected Client client;
-    protected List<String> scopes = Collections.emptyList();
-    protected List<String> uris = Collections.emptyList();
+    private String tokenString;
+    private String tokenSecret;
+    private long issuedAt = -1;
+    private long lifetime = -1;
+    private Client client;
+    private List<String> scopes = Collections.emptyList();
+    private List<String> uris = Collections.emptyList();
     
     protected Token(Client client, String tokenKey,
-                    String tokenSecret, long lifetime) {
+                    String tokenSecret, long lifetime, long issuedAt) {
         this.client = client;
         this.tokenString = tokenKey;
         this.tokenSecret = tokenSecret;
-        initTokenLifeTime(lifetime);
-    }
-
-    protected Token(Client client, String tokenKey,
-                    String tokenSecret) {
-        this(client, tokenKey, tokenSecret, -1);
-    }
-
-    private void initTokenLifeTime(Long lifetm) {
-        this.lifetime = lifetm;
-        issuedAt = System.currentTimeMillis() / 1000;
+        this.lifetime = lifetime;
+        this.issuedAt = issuedAt;
     }
 
     /**

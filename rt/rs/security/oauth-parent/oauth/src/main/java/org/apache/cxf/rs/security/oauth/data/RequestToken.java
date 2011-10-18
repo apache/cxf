@@ -27,14 +27,16 @@ public class RequestToken extends Token {
     private String callback;
     private String state;
     
-    public RequestToken(Client client, String tokenString,
+    public RequestToken(Client client, 
+                        String tokenString,
                         String tokenSecret) {
-        this(client, tokenString, tokenSecret, -1L);
+        this(client, tokenString, tokenSecret, -1L, 
+             System.currentTimeMillis() / 1000);
     }
 
     public RequestToken(Client client, String tokenString,
-                        String tokenSecret, Long lifetime) {
-        super(client, tokenString, tokenSecret, lifetime);
+                        String tokenSecret, long lifetime, long issuedAt) {
+        super(client, tokenString, tokenSecret, lifetime, issuedAt);
     }
 
     /**

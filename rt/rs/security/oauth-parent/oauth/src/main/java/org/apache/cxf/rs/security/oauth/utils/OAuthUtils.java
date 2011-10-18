@@ -56,7 +56,10 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
-    public static void validateMessage(OAuthMessage oAuthMessage, Client client, Token token) 
+    public static void validateMessage(OAuthMessage oAuthMessage, 
+                                       Client client, 
+                                       Token token,
+                                       OAuthDataProvider provider) 
         throws Exception {
         OAuthConsumer consumer = new OAuthConsumer(null, client.getConsumerKey(),
             client.getSecretKey(), null);
@@ -73,7 +76,7 @@ public final class OAuthUtils {
         DefaultOAuthValidator validator = new DefaultOAuthValidator(); 
         validator.validateMessage(oAuthMessage, accessor);
         if (token != null) {
-            validator.validateToken(token);
+            validator.validateToken(token, provider);
         }
     }
     

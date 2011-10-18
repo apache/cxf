@@ -122,8 +122,8 @@ new Client(consumerKey, secretKey, clientApp.getClientName(), clientApp.getCallb
     @RequestMapping("/revokeAccess")
     public ModelAndView revokeAccess(HttpServletRequest request) {
         String consumerKey = request.getParameter("consumerKey");
-
-        oauthDataProvider.removeTokens(consumerKey);
+        
+        clientManager.removeAllTokens(consumerKey);
 
         ModelAndView modelAndView = new ModelAndView(new RedirectView("/app/listAuthorizedClients"));
         return modelAndView;

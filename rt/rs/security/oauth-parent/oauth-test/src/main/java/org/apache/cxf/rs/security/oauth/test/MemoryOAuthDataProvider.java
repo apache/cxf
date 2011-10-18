@@ -25,10 +25,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.oauth.OAuth;
-import net.oauth.OAuthProblemException;
-
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
@@ -36,7 +32,6 @@ import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
 import org.apache.cxf.rs.security.oauth.data.Token;
-import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.MD5SequenceGenerator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
@@ -65,8 +60,6 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     protected MD5SequenceGenerator tokenGenerator = 
         new MD5SequenceGenerator();
 
-    protected DefaultOAuthValidator validator = new DefaultOAuthValidator();
-
     public MemoryOAuthDataProvider() {
         Client client = new Client(OAuthTestUtils.CLIENT_ID, 
             OAuthTestUtils.CLIENT_SECRET,
@@ -94,7 +87,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         String tokenSecret = generateToken();
 
         RequestToken reqToken = new RequestToken(reg.getClient(), token, tokenSecret, 
-                                                 reg.getLifetime());
+                                                 reg.getLifetime(), reg.getIssuedAt());
         reqToken.setScopes(reg.getScopes());
         reqToken.setUris(reg.getUris());
         
@@ -104,22 +97,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
 
     public RequestToken getRequestToken(String tokenString) throws OAuthServiceException {
 
-        Token token = oauthTokens.get(tokenString);
-        if (token == null || (!RequestToken.class.isAssignableFrom(token.getClass()))) {
-            throw new OAuthServiceException(new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED));
-        }
-        RequestToken requestToken = (RequestToken) token;
-
-        Client c = token.getClient();
-        if (c == null) {
-            throw new OAuthServiceException(new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN));
-        }
-        try {
-            validator.validateToken(requestToken);
-        } catch (OAuthProblemException ex) {
-            throw new OAuthServiceException(ex);
-        }
-        return requestToken;
+        return (RequestToken)oauthTokens.get(tokenString);
     }
 
     public String setRequestTokenVerifier(RequestToken requestToken) throws
@@ -137,7 +115,8 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         String accessTokenString = generateToken();
         String tokenSecretString = generateToken();
 
-        AccessToken accessToken = new AccessToken(client, accessTokenString, tokenSecretString, 3600);
+        AccessToken accessToken = new AccessToken(client, accessTokenString, tokenSecretString,
+                                                  3600, System.currentTimeMillis() / 1000);
 
         accessToken.setScopes(requestToken.getScopes());
         accessToken.setUris(requestToken.getUris());
@@ -153,35 +132,20 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         return accessToken;
     }
 
-    public AccessToken getAccessToken(String accessToken) throws OAuthServiceException
-    {
-        Token token = oauthTokens.get(accessToken);
-        if (token == null || !AccessToken.class.isAssignableFrom(token.getClass())) {
-            throw new OAuthServiceException(new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED));
-        }
-        try {
-            validator.validateToken(token);
-        } catch (OAuthProblemException ex) {
-            throw new OAuthServiceException(ex);
-        }
-        return (AccessToken) token;
+    public AccessToken getAccessToken(String accessToken) throws OAuthServiceException {
+        return  (AccessToken)oauthTokens.get(accessToken);
     }
 
-    
-
-    public void removeTokens(String consumerKey) {
-        if (!StringUtils.isEmpty(consumerKey)) {
-            List<String> registeredApps = this.userAuthorizedClients.get(consumerKey);
-            if (registeredApps != null) {
-                registeredApps.remove(consumerKey);
-            }
-            for (Token token : oauthTokens.values()) {
-                Client authNInfo = token.getClient();
-                if (consumerKey.equals(authNInfo.getConsumerKey())) {
-                    oauthTokens.remove(token.getTokenKey());
-                }
+    public void removeToken(Token t) {
+        
+        for (Token token : oauthTokens.values()) {
+            Client authNInfo = token.getClient();
+            if (t.getClient().getConsumerKey().equals(authNInfo.getConsumerKey())) {
+                oauthTokens.remove(token.getTokenKey());
+                break;
             }
         }
+        
     }
 
     protected String generateToken() throws OAuthServiceException {

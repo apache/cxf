@@ -24,11 +24,12 @@ package org.apache.cxf.rs.security.oauth.data;
 public class AccessToken extends Token {
     public AccessToken(Client client, String tokenString,
                        String tokenSecret) {
-        super(client, tokenString, tokenSecret, -1L);
+        this(client, tokenString, tokenSecret, -1L, 
+             System.currentTimeMillis() / 1000);
     }
 
     public AccessToken(Client client, String tokenString,
-                       String tokenSecret, long lifeTime) {
-        super(client, tokenString, tokenSecret, lifeTime);
+                        String tokenSecret, long lifetime, long issuedAt) {
+        super(client, tokenString, tokenSecret, lifetime, issuedAt);
     }
 }
