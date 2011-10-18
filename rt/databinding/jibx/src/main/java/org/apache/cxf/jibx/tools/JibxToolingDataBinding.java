@@ -52,11 +52,15 @@ import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.jibx.binding.Compile;
 import org.jibx.binding.Utility;
 import org.jibx.binding.model.BindingElement;
+import org.jibx.binding.model.BindingHolder;
+import org.jibx.binding.model.BindingOrganizer;
 import org.jibx.binding.model.BindingUtils;
 import org.jibx.binding.model.MappingElement;
+import org.jibx.binding.model.ModelVisitor;
+import org.jibx.binding.model.NamespaceElement;
+import org.jibx.binding.model.TreeContext;
 import org.jibx.binding.model.ValueElement;
 import org.jibx.runtime.JiBXException;
-import org.jibx.schema.ISchemaResolver;
 import org.jibx.schema.codegen.CodeGen;
 import org.jibx.schema.codegen.PackageHolder;
 import org.jibx.schema.codegen.PackageOrganizer;
@@ -64,12 +68,13 @@ import org.jibx.schema.codegen.StringObjectPair;
 import org.jibx.schema.codegen.custom.SchemaCustom;
 import org.jibx.schema.codegen.custom.SchemasetCustom;
 import org.jibx.schema.validation.ProblemMultiHandler;
+import org.jibx.util.DummyClassLocator;
 
 public class JibxToolingDataBinding implements DataBindingProfile {
 
     private JibxToolingProblemHandler problemHandler = new JibxToolingProblemHandler();
     private Map<String, Element> schemaMap = new HashMap<String, Element>();
-    private List<ISchemaResolver> resolvers = new ArrayList<ISchemaResolver>();
+    private List<JibxSchemaResolver> resolvers = new ArrayList<JibxSchemaResolver>();
 
     private Map<org.jibx.runtime.QName, MappingElement> types = new HashMap<org.jibx.runtime.QName,
                                                                             MappingElement>();
@@ -161,14 +166,43 @@ public class JibxToolingDataBinding implements DataBindingProfile {
                 codegen.compile();
             }
 
-            BindingElement rootBinding = codegen.getRootBinding();
-            BindingUtils.getDefinitions(rootBinding, types, elements, null);
+            BindingUtils.getDefinitions(codegen.getRootBinding(), types, elements, null);
+            
+            Iterator it = codegen.getBindingOrganizer().iterateBindings();
+            while (it.hasNext()) {
+                BindingHolder o = (BindingHolder)it.next();
+                getDefinitions(o, types, elements);
+            }
 
         } catch (Exception e) {
             problemHandler.handleSevere("", e);
         }
     }
-
+    public static void getDefinitions(final BindingHolder holder, 
+                                      final Map<org.jibx.runtime.QName, MappingElement> types, 
+                                      final Map<org.jibx.runtime.QName, MappingElement> elems) {
+        TreeContext ctx = new TreeContext(new DummyClassLocator());
+        ModelVisitor visitor = new ModelVisitor() {
+            public boolean visit(MappingElement mapping) {
+                org.jibx.runtime.QName qname = mapping.getTypeQName();
+                if (qname != null) {
+                    types.put(qname, mapping);
+                }
+                String name = mapping.getName();
+                if (name != null) {
+                    NamespaceElement ns = mapping.getNamespace();
+                    if (ns == null) {
+                        qname = new org.jibx.runtime.QName(holder.getElementDefaultNamespace(), name);
+                    } else {
+                        qname = new org.jibx.runtime.QName(mapping.getNamespace().getUri(), name);
+                    }
+                    elems.put(qname, mapping);
+                }
+                return false;
+            }
+        };
+        ctx.tourTree(holder.getBinding(), visitor);
+    }
     public String getType(QName qn, boolean element) {
         MappingElement mappingElement = element ? elements.get(jibxQName(qn)) : types.get(jibxQName(qn));
         return (mappingElement == null) ? null : mappingElement.getClassName();
@@ -197,7 +231,7 @@ public class JibxToolingDataBinding implements DataBindingProfile {
     }
 
     private static void loadWsdl(String wsdlUrl, Map<String, Element> schemaMap,
-                                 List<ISchemaResolver> resolvers) throws WSDLException {
+                                 List<JibxSchemaResolver> resolvers) throws WSDLException {
         WSDLFactory factory = WSDLFactory.newInstance();
         WSDLReader reader = factory.newWSDLReader();
         Definition parentDef = reader.readWSDL(wsdlUrl);
@@ -236,13 +270,17 @@ public class JibxToolingDataBinding implements DataBindingProfile {
             SchemaCustom schemaCustom = new SchemaCustom(customRoot);
             schemaCustom.setName(schemaId);
             schemaCustom.setForceTypes(Boolean.TRUE);
+            schemaCustom.setNamespace(smap.get(schemaId).getAttribute("targetNamespace"));
             customRoot.getChildren().add(schemaCustom);
         }
-        for (ISchemaResolver r : resolvers) {
-            SchemaCustom schemaCustom = new SchemaCustom(customRoot);
-            schemaCustom.setName(r.getName());
-            schemaCustom.setForceTypes(Boolean.TRUE);
-            customRoot.getChildren().add(schemaCustom);                    
+        for (JibxSchemaResolver r : resolvers) {
+            if (!schemaIds.contains(r.getId())) {
+                SchemaCustom schemaCustom = new SchemaCustom(customRoot);
+                schemaCustom.setName(r.getName());
+                schemaCustom.setNamespace(r.getElement().getAttribute("targetNamespace"));
+                schemaCustom.setForceTypes(Boolean.TRUE);
+                customRoot.getChildren().add(schemaCustom);
+            }
         }
         return customRoot;
     }
@@ -292,9 +330,14 @@ public class JibxToolingDataBinding implements DataBindingProfile {
         private BindingElement rootBinding;
         private File compilePath;
         private PackageOrganizer packageOrganizer;
+        private BindingOrganizer bindingOrganizer;
 
         public void setProblemHandler(ProblemMultiHandler problemHandler) {
             this.problemHandler = problemHandler;
+        }
+
+        public BindingOrganizer getBindingOrganizer() {
+            return bindingOrganizer;
         }
 
         public void setCustomRoot(SchemasetCustom customRoot) {
@@ -394,6 +437,7 @@ public class JibxToolingDataBinding implements DataBindingProfile {
         }
 
         private void setPostGenerateInfo(CodeGen codegen) {
+            this.bindingOrganizer = codegen.getBindingDirectory();
             this.rootBinding = codegen.getRootBinding();
             this.packageOrganizer = codegen.getPackageDirectory();
         }
