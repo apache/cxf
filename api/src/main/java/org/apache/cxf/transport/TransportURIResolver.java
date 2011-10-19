@@ -87,7 +87,8 @@ public class TransportURIResolver extends ExtendedURIResolver {
             //nothing
         }
         if (is == null && base != null 
-            && base.getScheme() != null) {
+            && base.getScheme() != null
+            && !DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme())) {
             try {
                 ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
                 ConduitInitiator ci = null;
