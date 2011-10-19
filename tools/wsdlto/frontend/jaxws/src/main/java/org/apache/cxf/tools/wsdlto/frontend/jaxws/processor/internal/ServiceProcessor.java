@@ -648,6 +648,9 @@ public class ServiceProcessor extends AbstractProcessor {
     }
 
     private BindingType getBindingType(BindingInfo binding) {
+        if (binding.getExtensors(ExtensibilityElement.class) == null) {
+            return null;
+        }
         for (ExtensibilityElement ext : binding.getExtensors(ExtensibilityElement.class)) {
             if (SOAPBindingUtil.isSOAPBinding(ext)) {
                 bindingObj = SOAPBindingUtil.getSoapBinding(ext);
