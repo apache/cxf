@@ -269,10 +269,11 @@ public class HTTPTransportFactory
                 LOG.log(Level.SEVERE, m);
                 throw new IOException(m);
             }
-            HttpDestinationFactory servletFactory = new ServletDestinationFactory();
-            HttpDestinationFactory factory = servletFactory;
+            HttpDestinationFactory factory = null;
             if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
                 factory = jettyFactory;
+            } else {
+                factory = new ServletDestinationFactory();
             }
             
             d = factory.createDestination(endpointInfo, getBus(), registry);
