@@ -291,7 +291,7 @@ public final class URIParserUtil {
             URI uri = new URI(arg);
             if ("file".equalsIgnoreCase(uri.getScheme())) {
                 if (!uri.isOpaque()) {
-                    return uri.toString();
+                    return uri.normalize().toString();
                 }
                 return new File("").toURI().resolve(uri.getPath()).toString();
             } else {

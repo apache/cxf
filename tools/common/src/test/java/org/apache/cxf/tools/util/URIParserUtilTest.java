@@ -89,5 +89,8 @@ public class URIParserUtilTest extends Assert {
 
         uri = "http://hello/world.wsdl";
         assertEquals(uri, URIParserUtil.getAbsoluteURI(uri));
+        
+        uri = "file:/home/john/test/all/../../alltest";
+        assertEquals("file:/home/john/alltest", URIParserUtil.getAbsoluteURI(uri));
     }
 }
