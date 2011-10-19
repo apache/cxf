@@ -46,6 +46,8 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 @Produces("text/html")
@@ -65,10 +67,12 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     
     private String servletContextPath; 
     private String resourcePath;
+    private Map<String, String> resourcePaths = Collections.emptyMap();
     private Map<String, String> classResources = Collections.emptyMap();
     
     private String scope = REQUEST_SCOPE;
     private Map<String, String> beanNames = Collections.emptyMap();
+    private String beanName;
     private String dispatcherName;
     private String servletPath;
     
@@ -80,7 +84,18 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return resourcePath != null || classResources.containsKey(type.getName());
+        if (resourcePath != null || classResources.containsKey(type.getName())) {
+            return true;
+        }
+        if (!resourcePaths.isEmpty()) {
+            String path = getRequestPath();
+            for (String requestPath : resourcePaths.keySet()) {
+                if (path.endsWith(requestPath)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
@@ -88,7 +103,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         throws IOException {
         
         ServletContext sc = getServletContext();
-        String path = resourcePath != null ? resourcePath : classResources.get(clazz.getName());
+        String path = getResourcePath(clazz.getName());
         RequestDispatcher rd = getRequestDispatcher(sc, clazz, path);
         
         try {
@@ -111,6 +126,29 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
     }
 
+    private String getResourcePath(String clsName) {
+        String clsResourcePath = classResources.get(clsName);
+        if (clsResourcePath != null) {
+            return clsResourcePath;
+        }
+        if (resourcePath != null) {
+            return resourcePath;
+        }
+        String path = getRequestPath();
+        for (String requestPath : resourcePaths.keySet()) {
+            if (path.endsWith(requestPath)) {
+                return resourcePaths.get(requestPath);
+            }
+        }
+        // won't happen given that isWriteable() returned true
+        return null;
+    }
+    
+    private String getRequestPath() {
+        Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
+        return (String)inMessage.get(Message.REQUEST_URI);
+    }
+    
     protected ServletContext getServletContext() {
         ServletContext sc = mc.getServletContext();
         if (servletContextPath != null) {
@@ -156,7 +194,14 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.beanNames = beanNames;
     }
 
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
+    }
+
     protected String getBeanName(Object bean) {
+        if (beanName != null) {
+            return beanName;
+        }
         String name = beanNames.get(bean.getClass().getName());
         return name != null ? name : bean.getClass().getSimpleName().toLowerCase();
     }
@@ -198,6 +243,10 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     
     public void setServletPath(String path) {
         this.servletPath = path;
+    }
+
+    public void setResourcePaths(Map<String, String> resourcePaths) {
+        this.resourcePaths = resourcePaths;
     }
 
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
