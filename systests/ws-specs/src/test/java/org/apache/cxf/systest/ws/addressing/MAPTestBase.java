@@ -186,8 +186,6 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     }
 
     @Test
-    //@org.junit.Ignore("randomly fails quite often, but not in the "
-    //                    + " debugger so not sure what is going on yet")
     public void testExplicitMAPs() throws Exception {
         try {
             String msgId = "urn:uuid:12345-" + Math.random();
@@ -228,25 +226,6 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         }
     }
     
-/*    @Test
-    public void testFaultTo() throws Exception {
-        try {
-            String greeting = greeter.greetMe("warmup");
-            assertEquals("unexpected response received from service", 
-                         "Hello warmup",
-                         greeting);
-            checkVerification();
-            try {
-                greeter.testDocLitFault("BadRecordLitFault");
-                fail("expected fault from service");
-            } catch (BadRecordLitFault brlf) {
-                checkVerification();
-            }
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
-        }
-    }   */
-    
     @Test
     public void testOneway() throws Exception {
         try {
@@ -259,7 +238,6 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     
     
     @Test
-    //@org.junit.Ignore("Random failure on Linux")
     public void testApplicationFault() throws Exception {
         try {
             greeter.testDocLitFault("BadRecordLitFault");
