@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.AbstractDestination;
+import org.apache.cxf.transport.servlet.ServletDestination;
 
 public class FormattedServiceListWriter implements ServiceListWriter {
     private String styleSheetPath;
@@ -114,7 +115,11 @@ public class FormattedServiceListWriter implements ServiceListWriter {
             return endpointAddress;
         }
         endpointAddress = d.getEndpointInfo().getAddress();
-        if (basePath == null || endpointAddress.startsWith(basePath)) {
+        if (d instanceof ServletDestination
+            && (endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://"))) {
+            String path = ((ServletDestination)d).getPath();
+            return basePath + path;
+        } else if (basePath == null || endpointAddress.startsWith(basePath)) {
             return endpointAddress;
         } else {
             return basePath + endpointAddress;

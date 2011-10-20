@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.cxf.transport.AbstractDestination;
+import org.apache.cxf.transport.servlet.ServletDestination;
 
 public class UnformattedServiceListWriter implements ServiceListWriter {
     boolean renderWsdlList;
@@ -76,7 +77,11 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
             return endpointAddress;
         }
         endpointAddress = d.getEndpointInfo().getAddress();
-        if (basePath == null || endpointAddress.startsWith(basePath)) {
+        if (d instanceof ServletDestination
+            && (endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://"))) {
+            String path = ((ServletDestination)d).getPath();
+            return basePath + path;
+        } else if (basePath == null || endpointAddress.startsWith(basePath)) {
             return endpointAddress;
         } else {
             return basePath + endpointAddress;
