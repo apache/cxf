@@ -72,10 +72,6 @@ public abstract class WsnBrokerTest extends TestCase {
         port1 = getFreePort();
         port2 = getFreePort();
 
-        System.setProperty("java.util.logging.config.file", 
-                           getClass().getClassLoader().getResource("logging.properties").getPath());
-        java.util.logging.LogManager.getLogManager().readConfiguration();
-
         activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:6000)?persistent=false)");
 
         notificationBrokerServer = new JaxwsNotificationBroker("WSNotificationBroker", activemq);
