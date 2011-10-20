@@ -35,6 +35,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.ws.security.WSDocInfo;
@@ -367,17 +368,16 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
         
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "ws-security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
+            SecurityConstants.CALLBACK_HANDLER, 
+            "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
-        properties.put("ws-security.encryption.properties", "clientKeystore.properties");
-        properties.put("ws-security.encryption.username", "mystskey");
-        properties.put("ws-security.is-bsp-compliant", "false");
+        properties.put(SecurityConstants.IS_BSP_COMPLIANT, "false");
         
         if (PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            properties.put("ws-security.sts.token.username", "myclientkey");
-            properties.put("ws-security.sts.token.properties", "clientKeystore.properties");
+            properties.put(SecurityConstants.STS_TOKEN_USERNAME, "myclientkey");
+            properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "clientKeystore.properties");
             stsClient.setUseCertificateForConfirmationKeyInfo(true);
         }
         if (supportingToken != null) {
@@ -390,7 +390,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setProperties(properties);
         stsClient.setTokenType(tokenType);
         stsClient.setKeyType(keyType);
-        stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");
         
         return stsClient.requestSecurityToken(endpointAddress);
     }
@@ -407,17 +406,18 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "ws-security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
+            SecurityConstants.CALLBACK_HANDLER, 
+            "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
-        properties.put("ws-security.encryption.properties", "clientKeystore.properties");
-        properties.put("ws-security.encryption.username", "mystskey");
-        properties.put("ws-security.is-bsp-compliant", "false");
+        properties.put(SecurityConstants.ENCRYPT_PROPERTIES, "clientKeystore.properties");
+        properties.put(SecurityConstants.ENCRYPT_USERNAME, "mystskey");
+        properties.put(SecurityConstants.IS_BSP_COMPLIANT, "false");
 
         if (PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            properties.put("ws-security.sts.token.username", "myclientkey");
-            properties.put("ws-security.sts.token.properties", "clientKeystore.properties");
+            properties.put(SecurityConstants.STS_TOKEN_USERNAME, "myclientkey");
+            properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "clientKeystore.properties");
             stsClient.setUseCertificateForConfirmationKeyInfo(true);
         }
         stsClient.setEnableLifetime(true);
