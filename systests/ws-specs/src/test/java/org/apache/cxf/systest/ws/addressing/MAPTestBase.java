@@ -186,8 +186,6 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     }
 
     @Test
-    //@org.junit.Ignore("randomly fails quite often, but not in the "
-    //                    + " debugger so not sure what is going on yet")
     public void testExplicitMAPs() throws Exception {
         try {
             String msgId = "urn:uuid:12345-" + Math.random();
@@ -259,7 +257,6 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     
     
     @Test
-    //@org.junit.Ignore("Random failure on Linux")
     public void testApplicationFault() throws Exception {
         try {
             greeter.testDocLitFault("BadRecordLitFault");

@@ -19,14 +19,10 @@
 
 package org.apache.cxf.systest.ws.addressing;
 
-import java.lang.reflect.UndeclaredThrowableException;
-
 import javax.jws.WebService;
 
-import org.apache.hello_world_soap_http.BadRecordLitFault;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 
 /**
@@ -68,30 +64,6 @@ public class MAPTest extends MAPTestBase {
                 wsdlLocation = "testutils/hello_world.wsdl")
     public static class GreeterImpl extends org.apache.cxf.systest.ws.addressing.AbstractGreeterImpl {
         
-    }
-    
-    @Test
-    public void testUsingKeepAliveConnection() throws Exception {
-        if (!"HP-UX".equals(System.getProperty("os.name"))) {
-            return;
-        }
-        int n = 100;
-        for (int i = 0; i < n; i++) {
-            greeter.greetMeOneWay("oneway on keep-alive connection");
-        }
-        for (int i = 0; i < n; i++) {
-            assertNotNull(greeter.greetMe("twoway on keep-alive connection"));
-        }
-        for (int i = 0; i < 0; i++) {
-            try {
-                greeter.testDocLitFault("BadRecordLitFault");
-                fail("expected fault from service");
-            } catch (BadRecordLitFault brlf) {
-                //checkVerification();
-            } catch (UndeclaredThrowableException ex) {
-                throw (Exception)ex.getCause();
-            }
-        }
     }
 }
 
