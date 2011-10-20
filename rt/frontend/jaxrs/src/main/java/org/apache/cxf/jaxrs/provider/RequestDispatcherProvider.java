@@ -46,6 +46,8 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 @Produces("text/html")
@@ -65,12 +67,15 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     
     private String servletContextPath; 
     private String resourcePath;
+    private Map<String, String> resourcePaths = Collections.emptyMap();
     private Map<String, String> classResources = Collections.emptyMap();
     
     private String scope = REQUEST_SCOPE;
     private Map<String, String> beanNames = Collections.emptyMap();
+    private String beanName;
     private String dispatcherName;
     private String servletPath;
+    private boolean saveParametersAsAttributes;
     
     @Context
     private MessageContext mc; 
@@ -80,7 +85,18 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return resourcePath != null || classResources.containsKey(type.getName());
+        if (resourcePath != null || classResources.containsKey(type.getName())) {
+            return true;
+        }
+        if (!resourcePaths.isEmpty()) {
+            String path = getRequestPath();
+            for (String requestPath : resourcePaths.keySet()) {
+                if (path.endsWith(requestPath)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
@@ -88,7 +104,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         throws IOException {
         
         ServletContext sc = getServletContext();
-        String path = resourcePath != null ? resourcePath : classResources.get(clazz.getName());
+        String path = getResourcePath(clazz.getName());
         RequestDispatcher rd = getRequestDispatcher(sc, clazz, path);
         
         try {
@@ -96,7 +112,8 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             
             String theServletPath = servletPath == null ? "/" : servletPath;
             HttpServletRequestFilter servletRequest = 
-                new HttpServletRequestFilter(mc.getHttpServletRequest(), path, theServletPath);
+                new HttpServletRequestFilter(mc.getHttpServletRequest(), path, 
+                                             theServletPath, saveParametersAsAttributes);
             if (REQUEST_SCOPE.equals(scope)) {
                 servletRequest.setAttribute(getBeanName(o), o);
             } else if (SESSION_SCOPE.equals(scope)) {
@@ -111,6 +128,29 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
     }
 
+    private String getResourcePath(String clsName) {
+        String clsResourcePath = classResources.get(clsName);
+        if (clsResourcePath != null) {
+            return clsResourcePath;
+        }
+        if (resourcePath != null) {
+            return resourcePath;
+        }
+        String path = getRequestPath();
+        for (String requestPath : resourcePaths.keySet()) {
+            if (path.endsWith(requestPath)) {
+                return resourcePaths.get(requestPath);
+            }
+        }
+        // won't happen given that isWriteable() returned true
+        return null;
+    }
+    
+    private String getRequestPath() {
+        Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
+        return (String)inMessage.get(Message.REQUEST_URI);
+    }
+    
     protected ServletContext getServletContext() {
         ServletContext sc = mc.getServletContext();
         if (servletContextPath != null) {
@@ -156,7 +196,14 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.beanNames = beanNames;
     }
 
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
+    }
+
     protected String getBeanName(Object bean) {
+        if (beanName != null) {
+            return beanName;
+        }
         String name = beanNames.get(bean.getClass().getName());
         return name != null ? name : bean.getClass().getSimpleName().toLowerCase();
     }
@@ -200,16 +247,33 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.servletPath = path;
     }
 
+    public void setResourcePaths(Map<String, String> resourcePaths) {
+        this.resourcePaths = resourcePaths;
+    }
+    
+    public void setClassResources(Map<String, String> resources) {
+        this.classResources = resources;
+    }
+
+    public void setSaveParametersAsAttributes(boolean saveParametersAsAttributes) {
+        this.saveParametersAsAttributes = saveParametersAsAttributes;
+    }
+
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
         
         private Map<String, String[]> params;
         private String path;
         private String servletPath;
+        private boolean saveParamsAsAttributes;
         
-        public HttpServletRequestFilter(HttpServletRequest request, String path, String servletPath) {
+        public HttpServletRequestFilter(HttpServletRequest request, 
+                                        String path, 
+                                        String servletPath,
+                                        boolean saveParamsAsAttributes) {
             super(request);
             this.path = path;
             this.servletPath = servletPath;
+            this.saveParamsAsAttributes = saveParamsAsAttributes;
             params = new HashMap<String, String[]>(request.getParameterMap());
         }
         
@@ -229,11 +293,22 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
         
         public void setParameter(String name, String value) {
-            params.put(name, new String[]{value});
+            doSetParameters(name, new String[]{value});
         }
         
         public void setParameters(String name, List<String> values) {
-            params.put(name, values.toArray(new String[]{}));
+            doSetParameters(name, values.toArray(new String[]{}));
+        }
+        
+        private void doSetParameters(String name, String[] values) {
+            if (saveParamsAsAttributes) {
+                if (values.length == 1) {
+                    super.setAttribute(name, values[0]);
+                }
+                super.setAttribute(name + "Array", values);
+            } else {
+                params.put(name, values);
+            }
         }
         
         @Override
