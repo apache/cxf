@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.util.URIParserUtil;
 
 public class WsdlOption extends Option {
@@ -149,16 +150,21 @@ public class WsdlOption extends Option {
             list.add("true");
         }
         addIfTrue(list, isNoTypes(), "-noTypes");
-        addIfTrue(list, isAllowElementRefs(), "-allowElementRefs");
-        addIfTrue(list, isValidateWsdl(), "-validate");
-        addIfTrue(list, isMarkGenerated() != null && isMarkGenerated(), "-mark-generated");
+        addIfTrue(list, isAllowElementRefs(), "-" + ToolConstants.CFG_ALLOW_ELEMENT_REFS);
+        addIfTrue(list, isValidateWsdl(), "-" + ToolConstants.CFG_VALIDATE_WSDL);
+        addIfTrue(list, isMarkGenerated() != null && isMarkGenerated(),
+            "-" + ToolConstants.CFG_MARK_GENERATED);
         addIfNotNull(list, getDefaultExcludesNamespace(), "-dex");
         addIfNotNull(list, getDefaultNamespacePackageMapping(), "-dns");
         addIfNotNull(list, getServiceName(), "-sn");
-        addIfNotNull(list, getFaultSerialVersionUID(), "-faultSerialVersionUID");
-        addIfNotNull(list, getExceptionSuper(), "-exceptionSuper");
-        addIfTrue(list, isAutoNameResolution(), "-autoNameResolution");
-        addIfTrue(list, isNoAddressBinding(), "-noAddressBinding");
+        addIfNotNull(list, getFaultSerialVersionUID(), "-"
+                     + ToolConstants.CFG_FAULT_SERIAL_VERSION_UID);
+        addIfNotNull(list, getExceptionSuper(), "-"
+                     + ToolConstants.CFG_EXCEPTION_SUPER);
+        addIfTrue(list, isAutoNameResolution(), "-" 
+                     + ToolConstants.CFG_AUTORESOLVE);
+        addIfTrue(list, isNoAddressBinding(), "-" 
+                  + ToolConstants.CFG_NO_ADDRESS_BINDING);
         addList(list, "-xjc", false, getXJCargs());
         addList(list, "", false, getExtraargs());
         if (isSetWsdlLocation()) {
