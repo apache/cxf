@@ -19,6 +19,9 @@
 
 package org.apache.cxf.tools.util;
 
+import java.io.File;
+import java.net.URI;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -89,5 +92,12 @@ public class URIParserUtilTest extends Assert {
 
         uri = "http://hello/world.wsdl";
         assertEquals(uri, URIParserUtil.getAbsoluteURI(uri));
+    }
+    @Test
+    public void testCXF3855() throws Exception {
+        String orig = new String(new byte[] {-47, -122}, "UTF-8");
+        orig = "/foo" + orig + ".txt";
+        String s = URIParserUtil.escapeChars(orig);
+        assertEquals(orig, new File(new URI("file:" + s)).getAbsolutePath());
     }
 }

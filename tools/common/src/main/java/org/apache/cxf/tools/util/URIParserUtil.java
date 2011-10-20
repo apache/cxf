@@ -226,24 +226,25 @@ public final class URIParserUtil {
     }
 
     public static String escapeChars(String s) {
-        StringBuilder b = new StringBuilder(s);
-        int x = 0;
-        do {
-            char ch = b.charAt(x);
+        StringBuilder b = new StringBuilder(s.length());
+        
+        for (int x = 0; x < s.length(); x++) {
+            char ch = s.charAt(x);
             if (isExcluded(ch)) {
                 try {
                     byte[] bytes = Character.toString(ch).getBytes("UTF-8");
-                    b.setCharAt(x++, '%');
                     for (int y = 0; y < bytes.length; y++) {
-                        b.insert(x++, HEX_DIGITS.charAt((bytes[y] & 0xFF) >> 4));
-                        b.insert(x, HEX_DIGITS.charAt(bytes[y] & 0x0F));
+                        b.append("%");
+                        b.append(HEX_DIGITS.charAt((bytes[y] & 0xFF) >> 4));
+                        b.append(HEX_DIGITS.charAt(bytes[y] & 0x0F));
                     }
                 } catch (UnsupportedEncodingException e) {
                     //should not happen
                 }
+            } else {
+                b.append(ch);
             }
-            x++;
-        } while (x < b.length());
+        }
         return b.toString();
     }
     public static String normalize(final String uri) {
