@@ -34,9 +34,9 @@
     </parent>
 
     <properties>
-        <gwt.version>2.4.0</gwt.version>
-        <gwt.inject.version>1.5.0</gwt.inject.version>
-        <gwt.plugin.version>2.4.0</gwt.plugin.version>
+        <gwt.version>2.1.0</gwt.version>
+        <gwt.inject.version>1.0</gwt.inject.version>
+        <gwt.plugin.version>2.1.0</gwt.plugin.version>
         <google.findbugs.version>1.3.9</google.findbugs.version> 
 
         <gwt.hostedmode.dir>${project.build.directory}/war</gwt.hostedmode.dir>
