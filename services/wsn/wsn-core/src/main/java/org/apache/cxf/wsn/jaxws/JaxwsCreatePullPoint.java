@@ -21,11 +21,16 @@ package org.apache.cxf.wsn.jaxws;
 import java.net.URI;
 import javax.jms.ConnectionFactory;
 import javax.jws.WebService;
+import javax.xml.ws.BindingType;
 
 import org.apache.cxf.wsn.AbstractPullPoint;
 import org.apache.cxf.wsn.jms.JmsCreatePullPoint;
 
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint")
+@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint",
+            targetNamespace = "http://docs.oasis-open.org/wsn/bw-2",
+            serviceName = "CreatePullPoint",
+            portName = "CreatePullPointPort")
+@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsCreatePullPoint extends JmsCreatePullPoint {
 
     public JaxwsCreatePullPoint(String name) {

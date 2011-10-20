@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
+import javax.xml.ws.BindingType;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractSubscription;
@@ -37,7 +38,11 @@ import org.oasis_open.docs.wsn.brw_2.PublisherRegistrationFailedFault;
 import org.oasis_open.docs.wsn.bw_2.NotificationProducer;
 import org.oasis_open.docs.wsn.bw_2.SubscriptionManager;
 
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.PublisherRegistrationManager")
+@WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.PublisherRegistrationManager",
+            targetNamespace = "http://docs.oasis-open.org/wsn/brw-2",
+            serviceName = "PublisherRegistrationManager",
+            portName = "PublisherRegistrationManagerPort")
+@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsPublisher extends JmsPublisher {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(JaxwsPublisher.class);

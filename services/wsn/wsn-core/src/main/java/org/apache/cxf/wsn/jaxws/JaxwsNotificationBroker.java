@@ -20,12 +20,17 @@ package org.apache.cxf.wsn.jaxws;
 
 import javax.jms.ConnectionFactory;
 import javax.jws.WebService;
+import javax.xml.ws.BindingType;
 
 import org.apache.cxf.wsn.jms.JmsNotificationBroker;
 import org.apache.cxf.wsn.jms.JmsPublisher;
 import org.apache.cxf.wsn.jms.JmsSubscription;
 
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker")
+@WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker",
+            targetNamespace = "http://docs.oasis-open.org/wsn/brw-2",
+            serviceName = "NotificationBroker",
+            portName = "NotificationBrokerPort")
+@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsNotificationBroker extends JmsNotificationBroker {
 
     public JaxwsNotificationBroker(String name) {
