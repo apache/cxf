@@ -24,9 +24,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.cxf.management.web.browser.client.EventBus;
 import org.apache.cxf.management.web.browser.client.event.ChangedSubscriptionsEvent;
 
 //TODO Remove StorageStrategy feature

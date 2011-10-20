@@ -22,6 +22,7 @@ package org.apache.cxf.management.web.browser.client;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;

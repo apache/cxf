@@ -19,6 +19,7 @@
 
 package org.apache.cxf.management.web.browser.client;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.name.Names;
 

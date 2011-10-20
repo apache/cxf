@@ -24,13 +24,13 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import org.apache.cxf.management.web.browser.client.EventBus;
 import org.apache.cxf.management.web.browser.client.event.ChangedSubscriptionsEvent;
 import org.apache.cxf.management.web.browser.client.event.GoToBrowserEvent;
 import org.apache.cxf.management.web.browser.client.service.settings.SettingsFacade;

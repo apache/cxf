@@ -23,12 +23,12 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.apache.cxf.management.web.browser.client.EventBus;
 import org.apache.cxf.management.web.browser.client.event.ChangedFilterOptionsEvent;
 import org.apache.cxf.management.web.browser.client.event.ChangedFilterOptionsEventHandler;
 import org.apache.cxf.management.web.browser.client.event.ChangedSubscriptionsEvent;

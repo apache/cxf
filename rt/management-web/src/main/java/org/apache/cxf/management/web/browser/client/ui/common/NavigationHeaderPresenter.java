@@ -21,10 +21,10 @@ package org.apache.cxf.management.web.browser.client.ui.common;
 
 import javax.annotation.Nonnull;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import org.apache.cxf.management.web.browser.client.EventBus;
 import org.apache.cxf.management.web.browser.client.event.GoToSettingsEvent;
 import org.apache.cxf.management.web.browser.client.ui.BasePresenter;
 import org.apache.cxf.management.web.browser.client.ui.BindStrategy;

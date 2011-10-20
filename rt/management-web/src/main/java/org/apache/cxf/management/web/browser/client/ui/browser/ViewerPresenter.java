@@ -21,12 +21,12 @@ package org.apache.cxf.management.web.browser.client.ui.browser;
 
 import javax.annotation.Nonnull;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import org.apache.cxf.management.web.browser.client.EventBus;
 import org.apache.cxf.management.web.browser.client.event.SelectedSubscriptionEvent;
 import org.apache.cxf.management.web.browser.client.event.SelectedSubscriptionEventHandler;
 import org.apache.cxf.management.web.browser.client.service.browser.Feed;

@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasWidgets;
 
-import org.apache.cxf.management.web.browser.client.EventBus;
 
 public abstract class BasePresenter implements Presenter {
 

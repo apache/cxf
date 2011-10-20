@@ -19,16 +19,16 @@
 
 package org.apache.cxf.management.web.browser.client;
 
-import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class DefaultEventBus extends HandlerManager implements EventBus {
+public class DefaultEventBus extends SimpleEventBus  {
 
     @Inject
     public DefaultEventBus() {
-        super(null);
+        super();
     }
 
 }
