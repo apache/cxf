@@ -75,6 +75,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private String beanName;
     private String dispatcherName;
     private String servletPath;
+    private boolean saveParametersAsAttributes;
     
     @Context
     private MessageContext mc; 
@@ -111,7 +112,8 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             
             String theServletPath = servletPath == null ? "/" : servletPath;
             HttpServletRequestFilter servletRequest = 
-                new HttpServletRequestFilter(mc.getHttpServletRequest(), path, theServletPath);
+                new HttpServletRequestFilter(mc.getHttpServletRequest(), path, 
+                                             theServletPath, saveParametersAsAttributes);
             if (REQUEST_SCOPE.equals(scope)) {
                 servletRequest.setAttribute(getBeanName(o), o);
             } else if (SESSION_SCOPE.equals(scope)) {
@@ -248,17 +250,30 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     public void setResourcePaths(Map<String, String> resourcePaths) {
         this.resourcePaths = resourcePaths;
     }
+    
+    public void setClassResources(Map<String, String> resources) {
+        this.classResources = resources;
+    }
+
+    public void setSaveParametersAsAttributes(boolean saveParametersAsAttributes) {
+        this.saveParametersAsAttributes = saveParametersAsAttributes;
+    }
 
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
         
         private Map<String, String[]> params;
         private String path;
         private String servletPath;
+        private boolean saveParamsAsAttributes;
         
-        public HttpServletRequestFilter(HttpServletRequest request, String path, String servletPath) {
+        public HttpServletRequestFilter(HttpServletRequest request, 
+                                        String path, 
+                                        String servletPath,
+                                        boolean saveParamsAsAttributes) {
             super(request);
             this.path = path;
             this.servletPath = servletPath;
+            this.saveParamsAsAttributes = saveParamsAsAttributes;
             params = new HashMap<String, String[]>(request.getParameterMap());
         }
         
@@ -278,11 +293,22 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
         
         public void setParameter(String name, String value) {
-            params.put(name, new String[]{value});
+            doSetParameters(name, new String[]{value});
         }
         
         public void setParameters(String name, List<String> values) {
-            params.put(name, values.toArray(new String[]{}));
+            doSetParameters(name, values.toArray(new String[]{}));
+        }
+        
+        private void doSetParameters(String name, String[] values) {
+            if (saveParamsAsAttributes) {
+                if (values.length == 1) {
+                    super.setAttribute(name, values[0]);
+                }
+                super.setAttribute(name + "Array", values);
+            } else {
+                params.put(name, values);
+            }
         }
         
         @Override
