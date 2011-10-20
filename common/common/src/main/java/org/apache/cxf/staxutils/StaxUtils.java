@@ -430,6 +430,11 @@ public final class StaxUtils {
                         } catch (Throwable t) {
                             //ignore
                         }
+                        try {
+                            reader.setProperty("http://xml.org/sax/properties/lexical-handler", ch);
+                        } catch (Throwable t) {
+                            //ignore
+                        }
                         reader.parse(((SAXSource)source).getInputSource());
                         return;
                     } catch (Exception e) {
