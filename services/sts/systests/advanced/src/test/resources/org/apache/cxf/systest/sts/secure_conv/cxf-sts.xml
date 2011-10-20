@@ -1,0 +1,235 @@
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://cxf.apache.org/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:sec="http://cxf.apache.org/configuration/security"
+  xmlns:http="http://cxf.apache.org/transports/http/configuration"
+  xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+  xmlns:jaxws="http://cxf.apache.org/jaxws"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="
+            http://cxf.apache.org/core
+            http://cxf.apache.org/schemas/core.xsd
+            http://cxf.apache.org/configuration/security
+            http://cxf.apache.org/schemas/configuration/security.xsd
+            http://cxf.apache.org/jaxws
+            http://cxf.apache.org/schemas/jaxws.xsd
+            http://cxf.apache.org/transports/http/configuration
+            http://cxf.apache.org/schemas/configuration/http-conf.xsd
+            http://cxf.apache.org/transports/http-jetty/configuration
+            http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util
+            http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+    
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+
+    <bean id="transportSTSProviderBean"
+		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+		<property name="issueOperation" ref="transportIssueDelegate"/>
+		<property name="validateOperation" ref="transportValidateDelegate"/>
+		<property name="cancelOperation" ref="transportCancelDelegate"/>
+	</bean>	
+	
+	<bean id="transportSTSEncryptedProviderBean"
+        class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+        <property name="issueOperation" ref="transportEncryptedIssueDelegate"/>
+        <property name="validateOperation" ref="transportValidateDelegate"/>
+    </bean> 
+
+	<bean id="transportIssueDelegate"
+		class="org.apache.cxf.sts.operation.TokenIssueOperation">
+		<property name="tokenProviders" ref="transportTokenProviders"/>
+		<property name="services" ref="transportService"/>
+		<property name="stsProperties" ref="transportSTSProperties"/>
+		<property name="tokenStore" ref="defaultTokenStore"/>
+	</bean>
+	
+	<bean id="transportEncryptedIssueDelegate"
+        class="org.apache.cxf.sts.operation.TokenIssueOperation">
+        <property name="tokenProviders" ref="transportTokenProviders"/>
+        <property name="services" ref="transportService"/>
+        <property name="stsProperties" ref="transportSTSProperties"/>
+        <property name="encryptIssuedToken" value="true"/>
+        <property name="tokenStore" ref="defaultTokenStore"/>
+    </bean>
+	
+	<bean id="transportValidateDelegate"
+	    class="org.apache.cxf.sts.operation.TokenValidateOperation">
+	    <property name="tokenProviders" ref="transportTokenProviders"/>
+	    <property name="tokenValidators" ref="transportTokenValidators"/>
+		<property name="stsProperties" ref="transportSTSProperties"/>
+		<property name="tokenStore" ref="defaultTokenStore"/>
+	</bean>
+	
+	<bean id="transportCancelDelegate"
+        class="org.apache.cxf.sts.operation.TokenCancelOperation">
+        <property name="tokenCancellers" ref="transportTokenCancellers"/>
+        <property name="stsProperties" ref="transportSTSProperties"/>
+        <property name="tokenStore" ref="defaultTokenStore"/>
+    </bean>
+	
+	<bean id="defaultTokenStore"
+        class="org.apache.cxf.sts.cache.DefaultInMemoryTokenStore">
+    </bean>
+	
+	<util:list id="transportTokenProviders">
+		<ref bean="transportSCTProvider"/>
+		<ref bean="transportSCTSamlTokenProvider"/>
+	</util:list>
+	
+	<util:list id="transportTokenValidators">
+		<ref bean="transportSCTValidator"/>
+	</util:list>
+	
+	<util:list id="transportTokenCancellers">
+        <ref bean="transportSCTCanceller"/>
+    </util:list>
+    
+    <bean id="transportSCTProvider"
+		class="org.apache.cxf.sts.token.provider.SCTProvider">
+    </bean>
+
+    <bean id="transportSCTSamlTokenProvider"
+        class="org.apache.cxf.systest.sts.secure_conv.SCTSAMLTokenProvider">
+    </bean>
+
+    <bean id="transportSCTValidator"
+		class="org.apache.cxf.sts.token.validator.SCTValidator">
+    </bean>
+    
+     <bean id="transportSCTCanceller"
+        class="org.apache.cxf.sts.token.canceller.SCTCanceller">
+    </bean>
+    
+    <bean id="transportService"
+        class="org.apache.cxf.sts.service.StaticService">
+        <property name="endpoints" ref="transportEndpoints"/>
+    </bean>
+    
+    <util:list id="transportEndpoints">
+		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*</value>
+		<value>http://localhost:(\d)*/doubleit/services/doubleitsymmetric.*</value>
+	</util:list>
+	
+	<bean id="transportSTSProperties"
+	     class="org.apache.cxf.sts.StaticSTSProperties">
+	    <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+		<property name="signatureUsername" value="mystskey"/>
+		<property name="callbackHandlerClass" 
+		          value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+		<property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
+		<property name="issuer" value="DoubleItSTSIssuer"/>
+		<property name="encryptionUsername" value="myservicekey"/>
+    </bean>
+    
+   <jaxws:endpoint id="localSCTSTS"
+        implementor="#transportSTSProviderBean"
+        address="https://localhost:8084/SecurityTokenService/TransportSCT" 
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        depends-on="ClientAuthHttpsSettings"
+        serviceName="ns1:SecurityTokenService"
+        endpointName="ns1:Transport_Port">
+        <jaxws:inInterceptors>
+            <ref bean="sctInterceptor"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="sctOutInterceptor"/>
+        </jaxws:outInterceptors>
+         <jaxws:outFaultInterceptors>
+            <ref bean="sctOutInterceptor"/>
+        </jaxws:outFaultInterceptors>
+   </jaxws:endpoint>
+   
+   <jaxws:endpoint id="localSCTEncryptedSTS"
+        implementor="#transportSTSEncryptedProviderBean"
+        address="https://localhost:8084/SecurityTokenService/TransportSCTEncrypted" 
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        depends-on="ClientAuthHttpsSettings"
+        serviceName="ns1:SecurityTokenService"
+        endpointName="ns1:Transport_Port">
+        <jaxws:inInterceptors>
+            <ref bean="sctInterceptor"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="sctOutInterceptor"/>
+        </jaxws:outInterceptors>
+         <jaxws:outFaultInterceptors>
+            <ref bean="sctOutInterceptor"/>
+        </jaxws:outFaultInterceptors>
+   </jaxws:endpoint>
+   
+   <jaxws:endpoint id="localSCTEndorsingSTS"
+        implementor="#transportSTSProviderBean"
+        address="https://localhost:8084/SecurityTokenService/TransportEndorsing" 
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        depends-on="ClientAuthHttpsSettings"
+        serviceName="ns1:SecurityTokenService"
+        endpointName="ns1:Transport_Endorsing_Port">
+        <jaxws:inInterceptors>
+            <ref bean="sctInterceptor"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="sctOutInterceptor"/>
+        </jaxws:outInterceptors>
+         <jaxws:outFaultInterceptors>
+            <ref bean="sctOutInterceptor"/>
+        </jaxws:outFaultInterceptors>
+        <jaxws:properties>
+            <entry key="org.apache.cxf.ws.security.tokenstore.TokenStore">
+                <ref bean="defaultTokenStore"/>
+            </entry>
+        </jaxws:properties>
+   </jaxws:endpoint>
+   
+   <bean id="sctInterceptor" class="org.apache.cxf.sts.interceptor.SCTInInterceptor"/>
+   <bean id="sctOutInterceptor" class="org.apache.cxf.sts.interceptor.SCTOutInterceptor"/>
+	 
+   <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
+      <httpj:engine port="8084">
+      <httpj:tlsServerParameters>
+        <sec:trustManagers>
+          <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
+        </sec:trustManagers>
+        <sec:keyManagers keyPassword="stskpass">
+           <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
+        </sec:keyManagers>
+        <sec:cipherSuitesFilter>
+          <sec:include>.*_EXPORT_.*</sec:include>
+          <sec:include>.*_EXPORT1024_.*</sec:include>
+          <sec:include>.*_WITH_DES_.*</sec:include>
+          <sec:include>.*_WITH_NULL_.*</sec:include>
+          <sec:exclude>.*_DH_anon_.*</sec:exclude>
+        </sec:cipherSuitesFilter>
+        <sec:clientAuthentication want="true" required="true"/>
+      </httpj:tlsServerParameters>
+     </httpj:engine>
+   </httpj:engine-factory>
+   
+</beans>
+

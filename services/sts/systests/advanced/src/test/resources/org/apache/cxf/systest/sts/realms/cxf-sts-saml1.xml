@@ -1,0 +1,188 @@
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://cxf.apache.org/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:sec="http://cxf.apache.org/configuration/security"
+  xmlns:http="http://cxf.apache.org/transports/http/configuration"
+  xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+  xmlns:jaxws="http://cxf.apache.org/jaxws"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="
+            http://cxf.apache.org/core
+            http://cxf.apache.org/schemas/core.xsd
+            http://cxf.apache.org/configuration/security
+            http://cxf.apache.org/schemas/configuration/security.xsd
+            http://cxf.apache.org/jaxws
+            http://cxf.apache.org/schemas/jaxws.xsd
+            http://cxf.apache.org/transports/http/configuration
+            http://cxf.apache.org/schemas/configuration/http-conf.xsd
+            http://cxf.apache.org/transports/http-jetty/configuration
+            http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util
+            http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+    
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+
+    <bean id="transportSTSProviderBean"
+		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+		<property name="issueOperation" ref="transportIssueDelegate"/>
+		<property name="validateOperation" ref="transportValidateDelegate"/>
+	</bean>	
+	
+	<bean id="transportIssueDelegate"
+		class="org.apache.cxf.sts.operation.TokenIssueOperation">
+		<property name="tokenProviders" ref="transportTokenProviders"/>
+		<property name="services" ref="transportService"/>
+		<property name="stsProperties" ref="transportSTSProperties"/>
+	</bean>
+	
+	<bean id="transportValidateDelegate"
+	    class="org.apache.cxf.sts.operation.TokenValidateOperation">
+	    <property name="tokenProviders" ref="transportTokenProviders"/>
+	    <property name="tokenValidators" ref="transportTokenValidators"/>
+		<property name="stsProperties" ref="transportSTSProperties"/>
+	</bean>
+	
+	<util:list id="transportTokenProviders">
+		<ref bean="transportSAMLProvider"/>
+	</util:list>
+	
+	<util:list id="transportTokenValidators">
+		<ref bean="transportSAMLValidator"/>
+	</util:list>
+	
+	<bean id="realmA"
+        class="org.apache.cxf.sts.token.realm.SAMLRealm">
+        <property name="issuer" value="A-Issuer"/>
+        <property name="signatureAlias" value="myclientkey"/>
+    </bean>
+    
+    <bean id="realmC"
+        class="org.apache.cxf.sts.token.realm.SAMLRealm">
+        <property name="issuer" value="C-Issuer"/>
+        <property name="signatureAlias" value="myservicekey"/>
+    </bean>
+	
+	<util:map id="realms">
+        <entry key="A" value-ref="realmA"/>
+        <entry key="C" value-ref="realmC"/>
+    </util:map>
+	
+    <bean id="transportSAMLProvider"
+		class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+		<property name="realmMap" ref="realms"/>
+    </bean>
+
+    <bean id="transportSAMLValidator"
+		class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+    </bean>
+    
+    <bean id="transportService"
+        class="org.apache.cxf.sts.service.StaticService">
+        <property name="endpoints" ref="transportEndpoints"/>
+    </bean>
+    
+    <util:list id="transportEndpoints">
+		<value>https://localhost:(\d)*/doubleit/services/doubleitrealm.*</value>
+	</util:list>
+	
+	<bean id="customRealmParser" class="org.apache.cxf.systest.sts.realms.URLRealmParser"/>
+	
+	<bean id="transportSTSProperties"
+	     class="org.apache.cxf.sts.StaticSTSProperties">
+	    <property name="signaturePropertiesFile" value="org/apache/cxf/systest/sts/realms/stsKeystoreRealms.properties"/>
+		<property name="signatureUsername" value="mystskey"/>
+		<property name="callbackHandlerClass" 
+		          value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+		<property name="realmParser" ref="customRealmParser"/>
+		<property name="issuer" value="saml1-issuer"/>
+    </bean>
+    
+   <jaxws:endpoint id="RealmASTS"
+        implementor="#transportSTSProviderBean"
+        address="https://localhost:8085/SecurityTokenService/realmA" 
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        depends-on="ClientAuthHttpsSettings"
+        serviceName="ns1:SecurityTokenService"
+        endpointName="ns1:Transport_Port">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" 
+                   value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+        </jaxws:properties>
+   </jaxws:endpoint>
+   
+   <jaxws:endpoint id="DefaultRealmSTS"
+        implementor="#transportSTSProviderBean"
+        address="https://localhost:8085/SecurityTokenService/realmdefault" 
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        depends-on="ClientAuthHttpsSettings"
+        serviceName="ns1:SecurityTokenService"
+        endpointName="ns1:Transport_Port">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" 
+                   value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+        </jaxws:properties>
+   </jaxws:endpoint>
+   
+   <jaxws:endpoint id="RealmCSTS"
+        implementor="#transportSTSProviderBean"
+        address="https://localhost:8085/SecurityTokenService/realmC" 
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        depends-on="ClientAuthHttpsSettings"
+        serviceName="ns1:SecurityTokenService"
+        endpointName="ns1:Transport_Port">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" 
+                   value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+        </jaxws:properties>
+   </jaxws:endpoint>
+   
+   <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
+      <httpj:engine port="8085">
+      <httpj:tlsServerParameters>
+        <sec:trustManagers>
+          <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
+        </sec:trustManagers>
+        <sec:keyManagers keyPassword="stskpass">
+           <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
+        </sec:keyManagers>
+        <sec:cipherSuitesFilter>
+          <sec:include>.*_EXPORT_.*</sec:include>
+          <sec:include>.*_EXPORT1024_.*</sec:include>
+          <sec:include>.*_WITH_DES_.*</sec:include>
+          <sec:include>.*_WITH_NULL_.*</sec:include>
+          <sec:exclude>.*_DH_anon_.*</sec:exclude>
+        </sec:cipherSuitesFilter>
+        <sec:clientAuthentication want="true" required="true"/>
+      </httpj:tlsServerParameters>
+     </httpj:engine>
+   </httpj:engine-factory>
+   
+</beans>
+
