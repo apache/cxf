@@ -135,10 +135,12 @@ public final class EndpointReferenceUtils {
                         url = new URL(url, systemId);
                         newId = url.toExternalForm();
                     }
+                } catch (IllegalArgumentException e) {
+                    //ignore - systemId not a valid URI
                 } catch (URISyntaxException e) {
-                    //ignore
+                    //ignore - baseURI not a valid URI
                 } catch (MalformedURLException e) {
-                    //ignore
+                    //ignore - baseURI or systemId not a URL either
                 }
             }
             if (done.contains(newId + ":" + namespaceURI)) {
