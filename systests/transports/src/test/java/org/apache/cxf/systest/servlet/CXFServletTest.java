@@ -143,6 +143,29 @@ public class CXFServletTest extends AbstractServletTest {
     }
     
     @Test
+    public void testServiceListWithLoopAddress() throws Exception {
+        ServletUnitClient client = newClient();
+        client.setExceptionsThrownOnErrorStatus(false);
+
+        WebResponse res = client.getResponse(CONTEXT_URL + "/services");
+        
+        assertTrue(res.getText().contains("http://localhost/mycontext/services/greeter3"));
+        assertTrue(res.getText().contains("http://localhost/mycontext/services/greeter2"));
+        assertTrue(res.getText().contains("http://localhost/mycontext/services/greeter"));
+        WebRequest req = new GetMethodQueryWebRequest(CONTEXT_URL + "/services/greeter?wsdl");
+        res = client.getResponse(req); 
+        req = new GetMethodQueryWebRequest(CONTEXT_URL + "/services/greeter2?wsdl");
+        res = client.getResponse(req); 
+        req = new GetMethodQueryWebRequest(CONTEXT_URL + "/services/greeter3?wsdl");
+        res = client.getResponse(req); 
+        String loopAddr = "http://127.0.0.1/mycontext";
+        res = client.getResponse(loopAddr + "/services");
+        assertFalse(res.getText().contains(
+             "http://127.0.0.1/mycontext/serviceshttp://localhost/mycontext/services/greeter"));
+                
+    }
+    
+    @Test
     public void testGetWSDL() throws Exception {
         ServletUnitClient client = newClient();
         client.setExceptionsThrownOnErrorStatus(true);

@@ -742,6 +742,9 @@ public abstract class AbstractHTTPDestination
         registry = null;
     }
     
+    public String getPath() {
+        return path;
+    }
 
     @Override
     public void shutdown() {
