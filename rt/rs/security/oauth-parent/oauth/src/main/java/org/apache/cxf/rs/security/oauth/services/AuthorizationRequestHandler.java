@@ -80,6 +80,8 @@ public class AuthorizationRequestHandler {
             if (allow) {
                 String verifier = dataProvider.setRequestTokenVerifier(token);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
+            } else {
+                dataProvider.removeToken(token);
             }
             queryParams.put(OAuth.OAUTH_TOKEN, token.getTokenKey());
             if (token.getState() != null) {

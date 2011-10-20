@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.UriBuilder;
 
 import net.oauth.OAuth;
@@ -31,8 +30,11 @@ import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 
+import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
+import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 
 /**
  * The utility class for simplifying making OAuth request and access token
@@ -68,7 +70,7 @@ public final class OAuthClientUtils {
     public static Token getRequestToken(WebClient requestTokenService,
                              Consumer consumer,
                              URI callback,
-                             Map<String, String> extraParams) {
+                             Map<String, String> extraParams) throws OAuthServiceException {
         Map<String, String> parameters = new HashMap<String, String>();
         if (extraParams != null) {
             parameters.putAll(extraParams);
@@ -95,7 +97,7 @@ public final class OAuthClientUtils {
     public static Token getAccessToken(WebClient accessTokenService,
                                        Consumer consumer,
                                        Token requestToken,
-                                       String verifier) {
+                                       String verifier) throws OAuthServiceException {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(OAuth.OAUTH_CONSUMER_KEY, consumer.getKey());
         parameters.put(OAuth.OAUTH_TOKEN, requestToken.getToken());
@@ -147,22 +149,23 @@ public final class OAuthClientUtils {
             OAuthMessage msg = accessor.newRequestMessage(method, requestURI, parameters.entrySet());
             return msg.getAuthorizationHeader(null);
         } catch (Exception ex) {
-            throw new WebApplicationException(500);
+            throw new ClientWebApplicationException(ex);
         }
     }
     
     private static Token getToken(WebClient tokenService, OAuthAccessor accessor,
-        Map<String, String> parameters) {
+        Map<String, String> parameters) throws OAuthServiceException {
+        String header = doGetAuthorizationHeader(accessor, 
+                                                 "POST", 
+                                                 tokenService.getBaseURI().toString(),
+                                                 parameters);
         try {
-            String header = 
-                doGetAuthorizationHeader(accessor, "POST", tokenService.getBaseURI().toString(),
-                        parameters);
-            tokenService.header("Authorization", header);
+            tokenService.replaceHeader("Authorization", header);
             Form form = tokenService.post(null, Form.class);
             return new Token(form.getData().getFirst("oauth_token"),
                     form.getData().getFirst("oauth_token_secret"));
-        } catch (Exception ex) {
-            throw new WebApplicationException(500);
+        } catch (ServerWebApplicationException ex) {
+            throw new OAuthServiceException(ex);
         }
     }
     
