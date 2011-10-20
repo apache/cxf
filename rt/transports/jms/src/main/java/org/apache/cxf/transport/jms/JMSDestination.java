@@ -110,6 +110,11 @@ public class JMSDestination extends AbstractMultiplexDestination
         org.apache.cxf.common.i18n.Message msg = 
             new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name);
         jmsConfig.ensureProperlyConfigured(msg);
+        Object o = ei.getProperty(AbstractMessageListenerContainer.class.getName());
+        if (o instanceof AbstractMessageListenerContainer
+            && jmsConfig.getMessageListenerContainer() == null) {
+            jmsConfig.setMessageListenerContainer((AbstractMessageListenerContainer)o);
+        }
         jmsListener = JMSFactory.createJmsListener(ei, jmsConfig, this, 
                                                    jmsConfig.getTargetDestination());
     }
