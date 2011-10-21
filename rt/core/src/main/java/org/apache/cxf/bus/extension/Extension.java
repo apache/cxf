@@ -131,6 +131,9 @@ public class Extension {
         return namespaces;
     }
     
+    public void setArgs(Object a[]) {
+        args = a;
+    }
     
     public Class<?> getClassObject(ClassLoader cl) {
         if (clazz == null) {

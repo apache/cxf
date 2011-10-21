@@ -43,28 +43,36 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     private Bus bus;
     private ServletController controller;
     private ClassLoader loader;
+    private boolean loadBus = true;
     
     public CXFNonSpringServlet() {
     }
 
     public CXFNonSpringServlet(DestinationRegistry destinationRegistry) {
+        this(destinationRegistry, true);
+    }
+    public CXFNonSpringServlet(DestinationRegistry destinationRegistry,
+                               boolean loadBus) {
         this.destinationRegistry = destinationRegistry;
+        this.loadBus = loadBus;
     }
 
     @Override
     public void init(ServletConfig sc) throws ServletException {
         super.init(sc);
-        if (this.bus == null) {
+        if (this.bus == null && loadBus) {
             loadBus(sc);
         }
-        loader = bus.getExtension(ClassLoader.class);
-        ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
-        resourceManager.addResourceResolver(new ServletContextResourceResolver(
-                                               sc.getServletContext()));
-
-        if (destinationRegistry == null) {
-            this.destinationRegistry = getDestinationRegistryFromBus(this.bus);
+        if (this.bus != null) {
+            loader = bus.getExtension(ClassLoader.class);
+            ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
+            resourceManager.addResourceResolver(new ServletContextResourceResolver(
+                                                   sc.getServletContext()));
+            if (destinationRegistry == null) {
+                this.destinationRegistry = getDestinationRegistryFromBus(this.bus);
+            }
         }
+
         this.controller = createServletController(sc);
     }
 
@@ -112,7 +120,9 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            BusFactory.setThreadDefaultBus(bus);
+            if (bus != null) {
+                BusFactory.setThreadDefaultBus(bus);
+            }
             controller.invoke(request, response);
         } finally {
             BusFactory.setThreadDefaultBus(null);
@@ -136,6 +146,8 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     }
     
     public void destroyBus() {
-        bus.shutdown(true);
+        if (bus != null) {
+            bus.shutdown(true);
+        }
     }
 }

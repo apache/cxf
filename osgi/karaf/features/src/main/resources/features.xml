@@ -144,7 +144,8 @@
 
         <config name="org.apache.cxf.wsn">
             cxf.wsn.activemq = vm:localhost
-            cxf.wsn.port = 8182
+            cxf.wsn.rootUrl = http://0.0.0.0:8182
+            cxf.wsn.context = /wsn
         </config>
 
         <feature version="[5.4,6)">activemq</feature>

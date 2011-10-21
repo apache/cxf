@@ -22,6 +22,8 @@ package org.apache.cxf.bus.osgi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -35,11 +37,14 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionFragmentParser;
+import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
 import org.apache.cxf.bus.osgi.OSGiAutomaticWorkQueue.WorkQueueList;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.apache.cxf.configuration.ConfiguredBeanLocator.BeanLoaderListener;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.framework.Bundle;
@@ -83,7 +88,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     public void start(BundleContext context) throws Exception {
         context.addBundleListener(this);
         id = context.getBundle().getBundleId();
-        registerBusListener();
+        registerBusListener(context);
         for (Bundle bundle : context.getBundles()) {
             if ((bundle.getState() == Bundle.RESOLVED 
                 || bundle.getState() == Bundle.STARTING 
@@ -134,8 +139,9 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         }
         workQueues.queues.clear();
     }
-    private void registerBusListener() {
+    private void registerBusListener(final BundleContext context) {
         listener = new Extension(OSGIBusListener.class);
+        listener.setArgs(new Object[] {context});
         ExtensionRegistry.addExtensions(Collections.singletonList(listener));
     }
     private void unregisterBusListener() {
@@ -182,10 +188,24 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
         
         Bus bus;
         ServiceRegistration service;
+        BundleContext defaultContext;
  
         public OSGIBusListener(Bus b) {
+            this(b, null);
+        }
+        public OSGIBusListener(Bus b, Object args[]) {
             bus = b;
+            if (args != null && args.length > 0 
+                && args[0] instanceof BundleContext) {
+                defaultContext = (BundleContext)args[0];
+            }
             bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+            final ConfiguredBeanLocator cbl = bus.getExtension(ConfiguredBeanLocator.class);
+            if (cbl instanceof ExtensionManagerImpl) {
+                // wire in the OSGi things
+                bus.setExtension(new OSGiBeanLocator(cbl, defaultContext), 
+                                 ConfiguredBeanLocator.class);
+            }
         }
         private Version getBundleVersion(Bundle bundle) {
             Dictionary headers = bundle.getHeaders();
@@ -221,6 +241,51 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                 service.unregister();
                 service = null;
             }
+        }
+    }
+    
+    public static class OSGiBeanLocator implements ConfiguredBeanLocator {
+        final ConfiguredBeanLocator cbl;
+        final BundleContext context;
+        public OSGiBeanLocator(ConfiguredBeanLocator c, BundleContext ctx) {
+            cbl = c;
+            context = ctx;
+        }
+        public <T> T getBeanOfType(String name, Class<T> type) {
+            return cbl.getBeanOfType(name, type);
+        }
+        public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
+            Collection<? extends T> ret = cbl.getBeansOfType(type);
+            
+            if (ret == null || ret.isEmpty()) {
+                List<T> list = new ArrayList<T>();
+                try {
+                    ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
+                    if (refs != null) {
+                        for (ServiceReference r : refs) {
+                            list.add(type.cast(context.getService(r)));
+                        }
+                    }
+                    if (!list.isEmpty()) {
+                        return list;
+                    }
+                } catch (Exception ex) {
+                    //ignore, just don't support the OSGi services
+                    LOG.info("Try to find the Bean with type:" + type 
+                        + " from OSGi services and get error: " + ex);  
+                }
+            }
+            return ret;
+        }
+        public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
+            return cbl.loadBeansOfType(type, listener);
+        }
+        public boolean hasConfiguredPropertyValue(String beanName, String propertyName,
+                                                  String value) {
+            return cbl.hasConfiguredPropertyValue(beanName, propertyName, value);
+        }
+        public List<String> getBeanNamesOfType(Class<?> type) {
+            return cbl.getBeanNamesOfType(type);
         }
     }
     

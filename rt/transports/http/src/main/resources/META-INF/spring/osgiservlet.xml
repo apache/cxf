@@ -47,6 +47,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 
     <bean id="osgiServlet" class="org.apache.cxf.transport.servlet.CXFNonSpringServlet">
         <constructor-arg ref="destinationRegistry"/>
+        <constructor-arg value="false"/>
     </bean>
 
     <osgi:service ref="osgiServlet" interface="javax.servlet.Servlet">

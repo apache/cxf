@@ -24,7 +24,8 @@
     <cm:property-placeholder persistent-id="org.apache.cxf.wsn" update-strategy="reload">
         <cm:default-properties>
             <cm:property name="cxf.wsn.activemq" value="vm:localhost"/>
-            <cm:property name="cxf.wsn.port" value="8182" />
+            <cm:property name="cxf.wsn.rootUrl" value="http://0.0.0.0:8182" />
+            <cm:property name="cxf.wsn.context" value="/wsn" />
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -37,11 +38,11 @@
     <bean id="notificationBroker" class="org.apache.cxf.wsn.jaxws.JaxwsNotificationBroker" init-method="init" destroy-method="destroy">
         <argument value="NotificationBroker" />
         <argument ref="activemq" />
-        <property name="address" value="http://0.0.0.0:${cxf.wsn.port}/wsn/NotificationBroker" />
+        <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/NotificationBroker" />
     </bean>
     <service ref="notificationBroker" interface="org.oasis_open.docs.wsn.brw_2.NotificationBroker">
         <service-properties>
-            <entry key="address" value="http://0.0.0.0:${cxf.wsn.port}/wsn/NotificationBroker" />
+            <entry key="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/NotificationBroker" />
         </service-properties>
     </service>
 
@@ -49,11 +50,11 @@
     <bean id="createPullPoint" class="org.apache.cxf.wsn.jaxws.JaxwsCreatePullPoint" init-method="init" destroy-method="destroy">
         <argument value="org.apache.cxf.wsn.client.CreatePullPoint" />
         <argument ref="activemq" />
-        <property name="address" value="http://0.0.0.0:${cxf.wsn.port}/wsn/CreatePullPoint" />
+        <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/CreatePullPoint" />
     </bean>
     <service ref="createPullPoint" interface="org.oasis_open.docs.wsn.bw_2.CreatePullPoint">
         <service-properties>
-            <entry key="address" value="http://0.0.0.0:${cxf.wsn.port}/wsn/CreatePullPoint" />
+            <entry key="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/CreatePullPoint" />
         </service-properties>
     </service>
 
