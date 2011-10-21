@@ -796,7 +796,13 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         }
         builder.wsdlDocumentLocation(wsdlLocation);        
         
-        return builder.build();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(EndpointReferenceBuilder.class.getClassLoader());
+            return builder.build();
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     public <T extends EndpointReference> T getEndpointReference(Class<T> clazz,

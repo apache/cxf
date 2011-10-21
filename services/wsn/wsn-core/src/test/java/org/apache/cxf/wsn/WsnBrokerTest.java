@@ -41,21 +41,23 @@ import org.apache.cxf.wsn.client.Publisher;
 import org.apache.cxf.wsn.client.PullPoint;
 import org.apache.cxf.wsn.client.Registration;
 import org.apache.cxf.wsn.client.Subscription;
-import org.apache.cxf.wsn.jaxws.JaxwsCreatePullPoint;
-import org.apache.cxf.wsn.jaxws.JaxwsNotificationBroker;
+import org.apache.cxf.wsn.services.JaxwsCreatePullPoint;
+import org.apache.cxf.wsn.services.JaxwsNotificationBroker;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
 public abstract class WsnBrokerTest extends TestCase {
-
+    private boolean useExternal = true;
+    
+    
     private ActiveMQConnectionFactory activemq;
     private JaxwsNotificationBroker notificationBrokerServer;
     private JaxwsCreatePullPoint createPullPointServer;
     private NotificationBroker notificationBroker;
     private CreatePullPoint createPullPoint;
 
-    private int port1;
+    private int port1 = 8182;
     private int port2;
     
     protected abstract String getProviderImpl();
@@ -69,18 +71,21 @@ public abstract class WsnBrokerTest extends TestCase {
     
         System.setProperty("javax.xml.ws.spi.Provider", impl);
 
-        port1 = getFreePort();
         port2 = getFreePort();
+        if (!useExternal) {
+            port1 = getFreePort();
+            
+            activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:6000)?persistent=false)");
 
-        activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:6000)?persistent=false)");
+            notificationBrokerServer = new JaxwsNotificationBroker("WSNotificationBroker", activemq);
+            notificationBrokerServer.setAddress("http://localhost:" + port1 + "/wsn/NotificationBroker");
+            notificationBrokerServer.init();
 
-        notificationBrokerServer = new JaxwsNotificationBroker("WSNotificationBroker", activemq);
-        notificationBrokerServer.setAddress("http://localhost:" + port1 + "/wsn/NotificationBroker");
-        notificationBrokerServer.init();
+            createPullPointServer = new JaxwsCreatePullPoint("CreatePullPoint", activemq);
+            createPullPointServer.setAddress("http://localhost:" + port1 + "/wsn/CreatePullPoint");
+            createPullPointServer.init();
+        }
 
-        createPullPointServer = new JaxwsCreatePullPoint("CreatePullPoint", activemq);
-        createPullPointServer.setAddress("http://localhost:" + port1 + "/wsn/CreatePullPoint");
-        createPullPointServer.init();
 
         notificationBroker = new NotificationBroker("http://localhost:" + port1 + "/wsn/NotificationBroker");
         createPullPoint = new CreatePullPoint("http://localhost:" + port1 + "/wsn/CreatePullPoint");
@@ -95,8 +100,10 @@ public abstract class WsnBrokerTest extends TestCase {
 
     @Override
     public void tearDown() throws Exception {
-        notificationBrokerServer.destroy();
-        createPullPointServer.destroy();
+        if (!useExternal) {
+            notificationBrokerServer.destroy();
+            createPullPointServer.destroy();
+        }
         System.clearProperty("javax.xml.ws.spi.Provider");
     }
 

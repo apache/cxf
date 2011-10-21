@@ -16,39 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.wsn.jaxws;
+package org.apache.cxf.wsn.services;
 
-import java.net.URI;
 import javax.jms.ConnectionFactory;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import org.apache.cxf.wsn.AbstractPullPoint;
-import org.apache.cxf.wsn.jms.JmsCreatePullPoint;
+import org.apache.cxf.wsn.jms.JmsNotificationBroker;
+import org.apache.cxf.wsn.jms.JmsPublisher;
+import org.apache.cxf.wsn.jms.JmsSubscription;
 
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint",
-            targetNamespace = "http://docs.oasis-open.org/wsn/bw-2",
-            serviceName = "CreatePullPoint",
-            portName = "CreatePullPointPort")
+@WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker",
+            targetNamespace = "http://docs.oasis-open.org/wsn/brw-2",
+            serviceName = "NotificationBroker",
+            portName = "NotificationBrokerPort")
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
-public class JaxwsCreatePullPoint extends JmsCreatePullPoint {
+public class JaxwsNotificationBroker extends JmsNotificationBroker {
 
-    public JaxwsCreatePullPoint(String name) {
+    public JaxwsNotificationBroker(String name) {
         super(name);
         manager = new JaxwsEndpointManager();
     }
 
-    public JaxwsCreatePullPoint(String name, ConnectionFactory connectionFactory) {
+    public JaxwsNotificationBroker(String name, ConnectionFactory connectionFactory) {
         super(name, connectionFactory);
         manager = new JaxwsEndpointManager();
     }
 
     @Override
-    protected AbstractPullPoint createPullPoint(String name) {
-        JaxwsPullPoint pullPoint = new JaxwsPullPoint(name);
-        pullPoint.setManager(getManager());
-        pullPoint.setConnection(connection);
-        pullPoint.setAddress(URI.create(getAddress()).resolve("pullpoints/" + name).toString());
-        return pullPoint;
+    protected JmsSubscription createJmsSubscription(String name) {
+        return new JaxwsSubscription(name);
+    }
+
+    @Override
+    protected JmsPublisher createJmsPublisher(String name) {
+        return new JaxwsPublisher(name, this);
     }
 }

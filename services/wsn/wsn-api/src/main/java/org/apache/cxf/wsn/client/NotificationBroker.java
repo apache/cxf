@@ -21,9 +21,9 @@ package org.apache.cxf.wsn.client;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.apache.cxf.wsn.AbstractSubscription;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.FilterType;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessage;
@@ -55,7 +55,15 @@ import org.oasis_open.docs.wsn.bw_2.UnsupportedPolicyRequestFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
 
 public class NotificationBroker implements Referencable {
+    public static final String WSN_URI = "http://docs.oasis-open.org/wsn/b-2";
 
+    public static final String XPATH1_URI = "http://www.w3.org/TR/1999/REC-xpath-19991116";
+
+    public static final QName QNAME_TOPIC_EXPRESSION = new QName(WSN_URI, "TopicExpression");
+
+    public static final QName QNAME_MESSAGE_CONTENT = new QName(WSN_URI, "MessageContent");
+
+    
     private final org.oasis_open.docs.wsn.brw_2.NotificationBroker broker;
     private final W3CEndpointReference epr;
 
@@ -137,15 +145,15 @@ public class NotificationBroker implements Referencable {
             TopicExpressionType topicExp = new TopicExpressionType();
             topicExp.getContent().add(topic);
             subscribeRequest.getFilter().getAny().add(
-                    new JAXBElement<TopicExpressionType>(AbstractSubscription.QNAME_TOPIC_EXPRESSION,
+                    new JAXBElement<TopicExpressionType>(QNAME_TOPIC_EXPRESSION,
                             TopicExpressionType.class, topicExp));
         }
         if (xpath != null) {
             QueryExpressionType xpathExp = new QueryExpressionType();
-            xpathExp.setDialect(AbstractSubscription.XPATH1_URI);
+            xpathExp.setDialect(XPATH1_URI);
             xpathExp.getContent().add(xpath);
             subscribeRequest.getFilter().getAny().add(
-                    new JAXBElement<QueryExpressionType>(AbstractSubscription.QNAME_MESSAGE_CONTENT,
+                    new JAXBElement<QueryExpressionType>(QNAME_MESSAGE_CONTENT,
                             QueryExpressionType.class, xpathExp));
         }
         if (raw) {

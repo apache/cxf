@@ -23,6 +23,7 @@
     <packaging>bundle</packaging>
     <version>2.5.0-SNAPSHOT</version>
     <name>Apache CXF WSN OSGi</name>
+    <description>Apache CXF WSN Full OSGi</description>
     <url>http://cxf.apache.org</url>
 
     <parent>

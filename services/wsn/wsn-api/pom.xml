@@ -19,11 +19,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.services.wsn</groupId>
-    <artifactId>cxf-services-wsn-core</artifactId>
+    <artifactId>cxf-services-wsn-api</artifactId>
     <packaging>bundle</packaging>
     <version>2.5.0-SNAPSHOT</version>
-    <name>Apache CXF WSN Core</name>
-    <description>Apache CXF WSN Core Service</description>
+    <name>Apache CXF WSN API</name>
+    <description>Apache CXF WSN API</description>
     <url>http://cxf.apache.org</url>
 
     <parent>
@@ -35,114 +35,58 @@
 
 	<dependencies>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms_1.1_spec</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>${cxf.activemq.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-common-utilities</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf.services.wsn</groupId>
-            <artifactId>cxf-services-wsn-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${project.version}</version>
-			<scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${project.version}</version>
-			<scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-rt</artifactId>
-            <version>2.1.7</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.xml.ws</groupId>
-                    <artifactId>jaxws-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.xml.messaging.saaj</groupId>
-                    <artifactId>saaj-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.xml.stream</groupId>
-                    <artifactId>stax-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.net.httpserver</groupId>
-            <artifactId>http</artifactId>
-            <version>20070405</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 	
 	<build>
 		<plugins>
             <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+	            <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${basedir}/target/jaxws</sourceRoot>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/main/resources/org/apache/cxf/wsn/wsdl/wsn.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-verbose</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Require-Bundle>
-                            org.apache.activemq.activemq-core
-                        </Require-Bundle>
                         <Import-Package>
-                            org.apache.cxf.wsn.util.*;version=${project.version},
-                            !org.apache.cxf.wsn*,
-                            !org.apache.activemq*,
                             javax.xml.bind*;version="[0.0,3)",
                             javax.jws*;version="[0.0,3)",
                             javax.xml.ws*;version="[0.0,3)",
-                            org.apache.cxf*;version=${project.version},
+                            org.apache.cxf*;version="[2.4,3)",
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.cxf.wsn.services;version=${project.version}
+                            org.oasis_open.docs.wsn.*;version=1.3;-noimport:=true,
+                            org.oasis_open.docs.wsrf.*;version=1.2,
+                            org.apache.cxf.wsn.client;version=${project.version},
+                            org.apache.cxf.wsn.util;version=${project.version},
+                            org.apache.cxf.wsn.wsdl;version=${project.version},
+                            org.apache.cxf.wsn.jaxws;version=${project.version}
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <_nouses>true</_nouses>

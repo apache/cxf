@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxws.EndpointReferenceBuilder;
 import org.apache.cxf.security.SecurityContext;
 
 public class WebServiceContextImpl implements WebServiceContext {
@@ -107,7 +108,13 @@ public class WebServiceContextImpl implements WebServiceContext {
             }
         }
         
-        return builder.build();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(EndpointReferenceBuilder.class.getClassLoader());
+            return builder.build();
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     public <T extends EndpointReference> T getEndpointReference(Class<T> clazz,

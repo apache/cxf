@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.wsn.wsdl.WSNWSDLLocator;
 
 public abstract class WSNHelper {
 
@@ -43,15 +44,28 @@ public abstract class WSNHelper {
     }
 
     public static <T> T getPort(String address, Class<T> serviceInterface) {
-        Service service = Service.create(
-                WSNHelper.class.getClassLoader().getResource("org/apache/cxf/wsn/wsn.wsdl"),
-                new QName("http://cxf.apache.org/wsn/jaxws", serviceInterface.getSimpleName() + "Service")
-        );
-        return service.getPort(createWSA(address), serviceInterface);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(WSNHelper.class.getClassLoader());
+            
+            Service service = Service.create(WSNWSDLLocator.getWSDLUrl(),
+                                             new QName("http://cxf.apache.org/wsn/jaxws", 
+                                                       serviceInterface.getSimpleName() + "Service"));
+            return service.getPort(createWSA(address), serviceInterface);
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     public static W3CEndpointReference createWSA(String address) {
-        return new W3CEndpointReferenceBuilder().address(address).build();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(WSNHelper.class.getClassLoader());
+            
+            return new W3CEndpointReferenceBuilder().address(address).build();
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     public static String getWSAAddress(W3CEndpointReference ref) {

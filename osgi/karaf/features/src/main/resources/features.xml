@@ -140,6 +140,11 @@
         <bundle>mvn:org.apache.cxf.services.sts/cxf-services-sts-core/${project.version}</bundle>
     </feature>
 
+    <feature name="cxf-wsn-api" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf</feature>
+        <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-api/${project.version}</bundle>
+    </feature>
+
     <feature name="cxf-wsn" version="${project.version}" resolver="(obr)">
 
         <config name="org.apache.cxf.wsn">
@@ -149,8 +154,8 @@
         </config>
 
         <feature version="[5.4,6)">activemq</feature>
-        <feature version="${project.version}">cxf</feature>
+        <feature version="${project.version}">cxf-wsn-api</feature>
 
-        <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-osgi/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-core/${project.version}</bundle>
     </feature>
 </features>

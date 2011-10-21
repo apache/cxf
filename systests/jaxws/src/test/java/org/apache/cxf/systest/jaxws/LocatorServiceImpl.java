@@ -94,7 +94,14 @@ public class LocatorServiceImpl implements LocatorService {
             m.setContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly", "true");
         }
         
-        return eprBuilder.build();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+
+            return eprBuilder.build();
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     

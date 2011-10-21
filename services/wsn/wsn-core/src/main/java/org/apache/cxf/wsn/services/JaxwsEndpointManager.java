@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.wsn.jaxws;
+package org.apache.cxf.wsn.services;
 
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;

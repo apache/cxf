@@ -21,10 +21,10 @@ package org.apache.cxf.wsn.client;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.apache.cxf.wsn.AbstractSubscription;
 import org.apache.cxf.wsn.util.IdGenerator;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessage;
 import org.oasis_open.docs.wsn.b_2.GetCurrentMessageResponse;
@@ -63,6 +63,8 @@ import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
  */
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.NotificationProducer")
 public class Publisher implements NotificationProducer, Referencable {
+    public static final String WSN_URI = "http://docs.oasis-open.org/wsn/b-2";
+    public static final QName QNAME_TOPIC_EXPRESSION = new QName(WSN_URI, "TopicExpression");
 
     public interface Callback {
         void subscribe(TopicExpressionType topic);
@@ -108,7 +110,7 @@ public class Publisher implements NotificationProducer, Referencable {
                     f = e.getValue();
                 }
                 if (f instanceof TopicExpressionType) {
-                    if (!e.getName().equals(AbstractSubscription.QNAME_TOPIC_EXPRESSION)) {
+                    if (!e.getName().equals(QNAME_TOPIC_EXPRESSION)) {
                         InvalidTopicExpressionFaultType fault = new InvalidTopicExpressionFaultType();
                         throw new InvalidTopicExpressionFault("Unrecognized TopicExpression: " + e, fault);
                     }

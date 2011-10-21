@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package org.apache.cxf.wsn;
+package org.apache.cxf.wsn.services;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.cxf.wsn.jaxws.JaxwsCreatePullPoint;
-import org.apache.cxf.wsn.jaxws.JaxwsNotificationBroker;
+import org.apache.cxf.wsn.AbstractCreatePullPoint;
+import org.apache.cxf.wsn.AbstractNotificationBroker;
 
 /**
  * Starts up an instance of a WS-Notification service

@@ -95,8 +95,14 @@ public class EndpointReferenceBuilder {
             builder.wsdlDocumentLocation(this.endpoint.getEndpointInfo().getService().getDescription()
                 .getBaseURI());
         }
-        
-        return builder.build();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(EndpointReferenceBuilder.class.getClassLoader());
+            
+            return builder.build();
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
     public <T extends EndpointReference> T getEndpointReference(Class<T> clazz) {

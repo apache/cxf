@@ -16,17 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.wsn.jaxws;
 
-import javax.jws.WebService;
+package org.apache.cxf.wsn.wsdl;
 
-import org.apache.cxf.wsn.jms.JmsPullPoint;
+import java.net.URL;
 
-@WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.PullPoint")
-public class JaxwsPullPoint extends JmsPullPoint {
-
-    public JaxwsPullPoint(String name) {
-        super(name);
+/**
+ * 
+ */
+public final class WSNWSDLLocator {
+    
+    private WSNWSDLLocator() {
+        //utility class
+    }
+    
+    public static URL getWSDLUrl() {
+        return WSNWSDLLocator.class.getResource("wsn.wsdl");
     }
 
 }
