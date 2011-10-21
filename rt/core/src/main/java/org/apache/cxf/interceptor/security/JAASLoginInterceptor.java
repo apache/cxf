@@ -45,6 +45,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private String contextName;
     private String rolePrefix;
+    private boolean reportFault;
     
     public JAASLoginInterceptor() {
         super(Phase.UNMARSHAL);
@@ -64,6 +65,10 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public String getRolePrefix() {
         return rolePrefix;
+    }
+    
+    public void setReportFault(boolean reportFault) {
+        this.reportFault = reportFault;
     }
     
     public void handleMessage(Message message) throws Fault {
@@ -91,7 +96,11 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
                                                        BUNDLE, 
                                                        name, password);
             LOG.warning(errorMsg.toString());
-            throw new SecurityException(errorMsg.toString());
+            if (reportFault) {
+                throw new SecurityException(errorMsg.toString());
+            } else {
+                throw new SecurityException();
+            }
         }
         
         try {
@@ -105,7 +114,11 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (LoginException ex) {
             String errorMessage = "Unauthorized : " + ex.getMessage();
             LOG.fine(errorMessage.toString());
-            throw new AuthenticationException(errorMessage);
+            if (reportFault) {
+                throw new AuthenticationException(errorMessage);
+            } else {
+                throw new AuthenticationException();
+            }
         }
     }
 
