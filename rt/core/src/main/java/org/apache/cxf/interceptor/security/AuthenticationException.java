@@ -19,6 +19,9 @@
 package org.apache.cxf.interceptor.security;
 
 public class AuthenticationException extends SecurityException {
+    public AuthenticationException() {
+    }
+    
     public AuthenticationException(String reason) {
         super(reason);
     }
