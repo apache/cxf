@@ -35,6 +35,7 @@
     <modules>
         <module>sts-core</module>
         <module>sts-war</module>
+        <module>systests</module>
     </modules>
 
 </project>
