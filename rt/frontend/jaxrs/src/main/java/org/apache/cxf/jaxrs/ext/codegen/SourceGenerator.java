@@ -247,23 +247,17 @@ public class SourceGenerator {
         
     }
     
-    //TODO: similar procedure should work for representation, method and param
-    // thus some of the code here will need to be moved into a sep function to be
-    // reused by relevant handlers
     private Element getResourceElement(Application app, Element resElement,
                                        GrammarInfo gInfo, Set<String> typeClassNames,
                                        String type, File srcDir) {
         if (type.length() > 0) {
             if (type.startsWith("#")) {
-                String refId = type.substring(1);
-                List<Element> resourceTypes = getWadlElements(app.getAppElement(), "resource_type");
-                for (Element resourceType : resourceTypes) {
-                    if (refId.equals(resourceType.getAttribute("id"))) {
-                        Element realElement = (Element)resourceType.cloneNode(true);
-                        DOMUtils.setAttribute(realElement, "id", resElement.getAttribute("id"));
-                        DOMUtils.setAttribute(realElement, "path", resElement.getAttribute("path"));
-                        return realElement;
-                    }
+                Element resourceType = resolveLocalReference(app.getAppElement(), "resource_type", type);
+                if (resourceType != null) {
+                    Element realElement = (Element)resourceType.cloneNode(true);
+                    DOMUtils.setAttribute(realElement, "id", resElement.getAttribute("id"));
+                    DOMUtils.setAttribute(realElement, "path", resElement.getAttribute("path"));
+                    return realElement;
                 }
             } else {
                 URI wadlRef = URI.create(type);
@@ -282,6 +276,27 @@ public class SourceGenerator {
         } 
         return resElement;     
         
+    }
+    
+    private Element getWadlElement(Element wadlEl) {
+        String href = wadlEl.getAttribute("href");
+        if (href.length() > 0 && href.startsWith("#")) {
+            return resolveLocalReference(wadlEl.getOwnerDocument().getDocumentElement(), 
+                                         wadlEl.getLocalName(), href);
+        } else { 
+            return wadlEl;
+        }
+    }
+    
+    private Element resolveLocalReference(Element appEl, String elementName, String localRef) {
+        String refId = localRef.substring(1);
+        List<Element> resourceTypes = getWadlElements(appEl, elementName);
+        for (Element resourceType : resourceTypes) {
+            if (refId.equals(resourceType.getAttribute("id"))) {
+                return resourceType;
+            }
+        }
+        return null;
     }
     
     private GrammarInfo getGrammarInfo(Application app, List<SchemaInfo> schemaElements) {
@@ -339,8 +354,20 @@ public class SourceGenerator {
         String resourceId = resourceName != null 
             ? resourceName : rElement.getAttribute("id");
         if (resourceId.length() == 0) {
-            resourceId = DEFAULT_RESOURCE_NAME;
+            String path = rElement.getAttribute("path");
+            if (path.length() > 0) {
+                path = path.replaceAll("[\\{\\}_]*", "");
+                String[] split = path.split("/");
+                for (int i = 0; i < split.length; i++) {
+                    if (split[i].length() > 0) {
+                        resourceId += split[i].toUpperCase().charAt(0) + split[i].substring(1);
+                    }
+                }
+            } else {
+                resourceId = DEFAULT_RESOURCE_NAME;    
+            }
         }
+        
         boolean expandedQName = resourceId.startsWith("{") ? true : false;
         QName qname = convertToQName(resourceId, expandedQName);
         String namespaceURI = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
@@ -825,9 +852,19 @@ public class SourceGenerator {
     }
     
     private List<Element> getWadlElements(Element parent, String name) {
-        return parent != null 
+        List<Element> elements = parent != null 
             ? DOMUtils.getChildrenWithName(parent, WadlGenerator.WADL_NS, name)
             : CastUtils.cast(Collections.emptyList(), Element.class);
+        if (!"resource".equals(name)) {    
+            for (int i = 0; i < elements.size(); i++) {
+                Element el = elements.get(i);
+                Element realEl = getWadlElement(el);
+                if (el != realEl) {
+                    elements.set(i, realEl);
+                }
+            }
+        }
+        return elements;
     }
     
     private String getPrimitiveType(Element paramEl) {
