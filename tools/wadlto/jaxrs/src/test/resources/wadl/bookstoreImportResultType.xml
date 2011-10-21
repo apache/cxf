@@ -23,15 +23,18 @@
     <include href="schemas/book.xsd"/>
  </grammars>
  
+ <method name="POST" id="addBook">
+      <request>
+       <representation mediaType="application/xml" element="prefix1:thebook"/>
+      </request>
+ </method>
+ 
  <resource_type id="main-resource">
     <resource path="/books/{bookid}">
      <param name="bookid" style="template" type="xs:int"/>
      
-     <method name="POST" id="addBook">
-      <request>
-       <representation mediaType="application/xml" element="prefix1:thebook"/>
-      </request>
-     </method>
+     <method href="#addBook"/>
+     
     </resource>
  </resource_type>
  
