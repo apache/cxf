@@ -907,7 +907,7 @@ public final class ContextUtils {
         if (o instanceof QName) {
             return ((QName)o).getLocalPart();
         }
-        return o.toString();
+        return o == null ? null : o.toString();
     }
     public static EndpointReferenceType getNoneEndpointReference() {
         return NONE_ENDPOINT_REFERENCE;
