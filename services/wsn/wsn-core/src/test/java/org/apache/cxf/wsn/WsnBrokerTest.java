@@ -48,7 +48,7 @@ import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
 public abstract class WsnBrokerTest extends TestCase {
-    private boolean useExternal = true;
+    private boolean useExternal;
     
     
     private ActiveMQConnectionFactory activemq;
