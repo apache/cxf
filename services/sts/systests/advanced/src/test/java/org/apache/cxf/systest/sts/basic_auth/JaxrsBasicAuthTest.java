@@ -31,6 +31,8 @@ import org.junit.BeforeClass;
  * (via TLS).
  */
 public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
+    
+    static final String STSPORT = allocatePort(STSServer.class);
 
     private static final String PORT = allocatePort(Server.class);
     

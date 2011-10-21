@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 
@@ -37,6 +38,8 @@ import org.junit.BeforeClass;
  * back from the STS to sign the Timestamp.
  */
 public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestBase {
+    
+    static final String STSPORT = allocatePort(STSServer.class);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -58,7 +61,7 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:8084/SecurityTokenService/TransportSCT?wsdl";
+            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCT?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -83,7 +86,7 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             "ws-security.callback-handler", 
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
@@ -108,14 +111,14 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         stsClient.setEndpointName(port);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
-        properties.put("ws-security.signature.username", "myservicekey");
+        properties.put(SecurityConstants.USERNAME, "alice");
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "myservicekey");
         properties.put(
-            "ws-security.callback-handler", 
+            SecurityConstants.CALLBACK_HANDLER, 
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
-        properties.put("ws-security.sts.token.properties", "serviceKeystore.properties");
-        properties.put("ws-security.signature.properties", "serviceKeystore.properties");
+        properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, "serviceKeystore.properties");
 
         stsClient.setProperties(properties);
         stsClient.setSecureConv(true);

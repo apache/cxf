@@ -25,6 +25,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.example.contract.doubleit.DoubleItPortType;
@@ -41,6 +42,8 @@ import org.junit.BeforeClass;
  * (keytab in "/etc/bob.keytab").
  */
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
+    
+    static final String STSPORT = allocatePort(STSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -59,7 +62,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(org.apache.cxf.systest.sts.deployment.STSServer.class, true)
+                   launchServer(STSServer.class, true)
         );
     }
 

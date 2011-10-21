@@ -33,6 +33,8 @@
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -59,11 +61,16 @@
     <bean id="x509Service"
         class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="x509Endpoints"/>
+        <property name="encryptionProperties" ref="encProperties"/>
     </bean>
     
     <util:list id="x509Endpoints">
 		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*</value>
 	</util:list>
+	
+	<bean id="encProperties" class="org.apache.cxf.sts.service.EncryptionProperties">
+        <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+    </bean>
 	
 	<bean id="x509STSProperties"
 	     class="org.apache.cxf.sts.StaticSTSProperties">
@@ -78,7 +85,7 @@
     
 	<jaxws:endpoint id="X509STS"
 		implementor="#x509STSProviderBean"
-		address="http://localhost:8084/SecurityTokenService/X509" 
+		address="http://localhost:${testutil.ports.STSServer}/SecurityTokenService/X509" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/asymmetric_encr/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         serviceName="ns1:SecurityTokenService"

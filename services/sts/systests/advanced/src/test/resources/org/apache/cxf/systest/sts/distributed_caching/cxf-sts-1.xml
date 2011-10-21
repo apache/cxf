@@ -40,6 +40,8 @@
             http://www.springframework.org/schema/util
             http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -173,7 +175,7 @@
     
 	<jaxws:endpoint id="STS1"
 		implementor="#transportSTSProviderBean"
-		address="https://localhost:8084/SecurityTokenService/Transport" 
+		address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         depends-on="ClientAuthHttpsSettings"
@@ -182,7 +184,7 @@
    </jaxws:endpoint>
    
    <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-      <httpj:engine port="8084">
+      <httpj:engine port="${testutil.ports.STSServer}">
       <httpj:tlsServerParameters>
         <sec:trustManagers>
           <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>

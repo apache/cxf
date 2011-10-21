@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 
@@ -34,6 +35,8 @@ import org.junit.BeforeClass;
  * In this test case, a CXF client requests a SecurityContextToken from an STS.
  */
 public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBase {
+    
+    static final String STSPORT = allocatePort(STSServer.class);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -55,7 +58,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:8084/SecurityTokenService/TransportSCT?wsdl";
+            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCT?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -71,7 +74,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:8084/SecurityTokenService/TransportSCT?wsdl";
+            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCT?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -87,7 +90,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:8084/SecurityTokenService/TransportSCTEncrypted?wsdl";
+            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -103,7 +106,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:8084/SecurityTokenService/TransportSCTEncrypted?wsdl";
+            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -118,12 +121,12 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "ws-security.callback-handler", 
+            SecurityConstants.CALLBACK_HANDLER, 
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
-        properties.put("ws-security.sts.token.properties", "serviceKeystore.properties");
+        properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
 
         stsClient.setProperties(properties);
         stsClient.setSecureConv(true);
@@ -131,7 +134,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         stsClient.setKeySize(192);
         stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");
 
-        return stsClient.requestSecurityToken(null);
+        return stsClient.requestSecurityToken("http://localhost:8081/doubleit/services/doubleitsymmetric");
     }
     
 }

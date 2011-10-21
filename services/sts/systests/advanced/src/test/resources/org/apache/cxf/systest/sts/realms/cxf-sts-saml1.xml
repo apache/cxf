@@ -40,6 +40,8 @@
             http://www.springframework.org/schema/util
             http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -123,7 +125,7 @@
     
    <jaxws:endpoint id="RealmASTS"
         implementor="#transportSTSProviderBean"
-        address="https://localhost:8085/SecurityTokenService/realmA" 
+        address="https://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/realmA" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         depends-on="ClientAuthHttpsSettings"
@@ -137,7 +139,7 @@
    
    <jaxws:endpoint id="DefaultRealmSTS"
         implementor="#transportSTSProviderBean"
-        address="https://localhost:8085/SecurityTokenService/realmdefault" 
+        address="https://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/realmdefault" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         depends-on="ClientAuthHttpsSettings"
@@ -151,7 +153,7 @@
    
    <jaxws:endpoint id="RealmCSTS"
         implementor="#transportSTSProviderBean"
-        address="https://localhost:8085/SecurityTokenService/realmC" 
+        address="https://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/realmC" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         depends-on="ClientAuthHttpsSettings"
@@ -164,7 +166,7 @@
    </jaxws:endpoint>
    
    <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-      <httpj:engine port="8085">
+      <httpj:engine port="${testutil.ports.STSServer.2}">
       <httpj:tlsServerParameters>
         <sec:trustManagers>
           <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>

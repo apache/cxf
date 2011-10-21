@@ -278,7 +278,7 @@
                   </sp:TransportToken>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:TripleDesRsa15 />
+                        <sp:Basic128 />
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                   <sp:Layout>
@@ -324,7 +324,7 @@
                   </sp:TransportToken>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:TripleDesRsa15 />
+                        <sp:Basic128 />
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                   <sp:Layout>

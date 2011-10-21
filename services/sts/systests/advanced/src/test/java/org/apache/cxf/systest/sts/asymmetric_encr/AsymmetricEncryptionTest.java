@@ -26,6 +26,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.secure_conv.SecurityContextTokenUnitTest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 
@@ -37,6 +38,8 @@ import org.junit.BeforeClass;
  * to encrypt the issued token, using the certificate obtained from the received signature.
  */
 public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
+    
+    static final String STSPORT = allocatePort(STSServer.class);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -63,20 +66,20 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
 
     private SecurityToken requestSecurityToken(Bus bus) throws Exception {
         STSClient stsClient = new STSClient(bus);
-        stsClient.setWsdlLocation("http://localhost:8084/SecurityTokenService/X509?wsdl");
+        stsClient.setWsdlLocation("http://localhost:" + STSPORT + "/SecurityTokenService/X509?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port");
         stsClient.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0");
         stsClient.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer");
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "ws-security.callback-handler", 
+            SecurityConstants.CALLBACK_HANDLER, 
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
-        properties.put("ws-security.signature.username", "myclientkey");
-        properties.put("ws-security.signature.properties", "clientKeystore.properties");
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "myclientkey");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, "clientKeystore.properties");
 
         stsClient.setProperties(properties);
         stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");

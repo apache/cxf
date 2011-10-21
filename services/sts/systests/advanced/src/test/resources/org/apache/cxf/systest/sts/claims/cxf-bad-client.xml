@@ -29,6 +29,8 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
 http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -41,7 +43,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
                <bean class="org.apache.cxf.ws.security.trust.STSClient">
                    <constructor-arg ref="cxf"/>
                    <property name="wsdlLocation" 
-                             value="https://localhost:8084/SecurityTokenService/Transport?wsdl"/>
+                             value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport?wsdl"/>
                    <property name="serviceName" 
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                    <property name="endpointName" 

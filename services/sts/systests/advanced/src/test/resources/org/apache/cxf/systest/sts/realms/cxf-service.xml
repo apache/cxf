@@ -56,7 +56,7 @@
                <bean class="org.apache.cxf.ws.security.trust.STSClient">
                    <constructor-arg ref="cxf"/>
                    <property name="wsdlLocation" 
-                             value="https://localhost:8084/SecurityTokenService/realmB?wsdl"/>
+                             value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/realmB?wsdl"/>
                    <property name="serviceName" 
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                    <property name="endpointName" 
@@ -93,7 +93,7 @@
                <bean class="org.apache.cxf.ws.security.trust.STSClient">
                    <constructor-arg ref="cxf"/>
                    <property name="wsdlLocation" 
-                             value="https://localhost:8084/SecurityTokenService/realmB?wsdl"/>
+                             value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/realmB?wsdl"/>
                    <property name="serviceName" 
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                    <property name="endpointName" 
@@ -130,7 +130,7 @@
                <bean class="org.apache.cxf.ws.security.trust.STSClient">
                    <constructor-arg ref="cxf"/>
                    <property name="wsdlLocation" 
-                             value="https://localhost:8084/SecurityTokenService/realmB?wsdl"/>
+                             value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/realmB?wsdl"/>
                    <property name="serviceName" 
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                    <property name="endpointName" 
@@ -167,7 +167,7 @@
                <bean class="org.apache.cxf.ws.security.trust.STSClient">
                    <constructor-arg ref="cxf"/>
                    <property name="wsdlLocation" 
-                             value="https://localhost:8084/SecurityTokenService/realmB?wsdl"/>
+                             value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/realmB?wsdl"/>
                    <property name="serviceName" 
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                    <property name="endpointName" 

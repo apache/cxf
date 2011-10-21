@@ -32,6 +32,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 
@@ -43,6 +44,8 @@ import org.junit.BeforeClass;
  * token from the STS over TLS, and then sends it to the CXF endpoint over TLS.
  */
 public class Soap12Test extends AbstractBusClientServerTestBase {
+    
+    static final String STSPORT = allocatePort(STSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -133,23 +136,24 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         String context
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
-        stsClient.setWsdlLocation("https://localhost:8084/SecurityTokenService/TransportSoap12?wsdl");
+        stsClient.setWsdlLocation(
+            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSoap12?wsdl"
+        );
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Soap12_Port");
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "ws-security.callback-handler", 
+            SecurityConstants.CALLBACK_HANDLER, 
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
-        properties.put("ws-security.encryption.properties", "clientKeystore.properties");
-        properties.put("ws-security.encryption.username", "mystskey");
-        properties.put("ws-security.is-bsp-compliant", "false");
+        properties.put(SecurityConstants.ENCRYPT_PROPERTIES, "clientKeystore.properties");
+        properties.put(SecurityConstants.ENCRYPT_USERNAME, "mystskey");
 
         if (PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            properties.put("ws-security.sts.token.username", "myclientkey");
-            properties.put("ws-security.sts.token.properties", "clientKeystore.properties");
+            properties.put(SecurityConstants.STS_TOKEN_USERNAME, "myclientkey");
+            properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "clientKeystore.properties");
             stsClient.setUseCertificateForConfirmationKeyInfo(true);
         }
         if (supportingToken != null) {

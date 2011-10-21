@@ -49,6 +49,8 @@ import org.junit.BeforeClass;
  */
 public class CachingTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSServer.class);
+    
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
@@ -284,20 +286,20 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         String endpointAddress
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
-        stsClient.setWsdlLocation("https://localhost:8084/SecurityTokenService/Transport?wsdl");
+        stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("ws-security.username", "alice");
+        properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "ws-security.callback-handler", 
+            SecurityConstants.CALLBACK_HANDLER, 
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
 
         if (PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            properties.put("ws-security.sts.token.username", "myservicekey");
-            properties.put("ws-security.sts.token.properties", "serviceKeystore.properties");
+            properties.put(SecurityConstants.STS_TOKEN_USERNAME, "myservicekey");
+            properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
             stsClient.setUseCertificateForConfirmationKeyInfo(true);
         }
 

@@ -40,6 +40,8 @@
             http://www.springframework.org/schema/util
             http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -120,19 +122,24 @@
 		class="org.apache.cxf.sts.token.validator.SCTValidator">
     </bean>
     
-     <bean id="transportSCTCanceller"
+    <bean id="transportSCTCanceller"
         class="org.apache.cxf.sts.token.canceller.SCTCanceller">
     </bean>
     
     <bean id="transportService"
         class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="transportEndpoints"/>
+        <property name="encryptionProperties" ref="encProperties"/>
     </bean>
     
     <util:list id="transportEndpoints">
 		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*</value>
 		<value>http://localhost:(\d)*/doubleit/services/doubleitsymmetric.*</value>
 	</util:list>
+	
+	<bean id="encProperties" class="org.apache.cxf.sts.service.EncryptionProperties">
+        <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+    </bean>
 	
 	<bean id="transportSTSProperties"
 	     class="org.apache.cxf.sts.StaticSTSProperties">
@@ -147,7 +154,7 @@
     
    <jaxws:endpoint id="localSCTSTS"
         implementor="#transportSTSProviderBean"
-        address="https://localhost:8084/SecurityTokenService/TransportSCT" 
+        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportSCT" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         depends-on="ClientAuthHttpsSettings"
@@ -166,7 +173,7 @@
    
    <jaxws:endpoint id="localSCTEncryptedSTS"
         implementor="#transportSTSEncryptedProviderBean"
-        address="https://localhost:8084/SecurityTokenService/TransportSCTEncrypted" 
+        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportSCTEncrypted" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         depends-on="ClientAuthHttpsSettings"
@@ -185,7 +192,7 @@
    
    <jaxws:endpoint id="localSCTEndorsingSTS"
         implementor="#transportSTSProviderBean"
-        address="https://localhost:8084/SecurityTokenService/TransportEndorsing" 
+        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportEndorsing" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         depends-on="ClientAuthHttpsSettings"
@@ -211,7 +218,7 @@
    <bean id="sctOutInterceptor" class="org.apache.cxf.sts.interceptor.SCTOutInterceptor"/>
 	 
    <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-      <httpj:engine port="8084">
+      <httpj:engine port="${testutil.ports.STSServer}">
       <httpj:tlsServerParameters>
         <sec:trustManagers>
           <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>

@@ -34,7 +34,7 @@
 
     <modules>
         <module>basic</module>
-        <!--<module>advanced</module>-->
+        <module>advanced</module>
     </modules>
 
 </project>
