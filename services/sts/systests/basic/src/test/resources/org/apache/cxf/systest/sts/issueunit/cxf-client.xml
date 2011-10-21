@@ -35,7 +35,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
         </cxf:features>
     </cxf:bus>
     
-    <http:conduit name="https://localhost:8443/.*">
+    <http:conduit name="https://localhost:.*">
       <http:tlsClientParameters disableCNCheck="true">
         <sec:trustManagers>
           <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>

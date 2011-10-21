@@ -21,10 +21,12 @@ package org.apache.cxf.systest.sts.transport;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -37,10 +39,15 @@ import org.junit.BeforeClass;
  */
 public class TransportBindingTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSServer.class);
+    static final String STSPORT2 = allocatePort(STSServer.class, 2);
+    
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
+    
+    private static boolean standalone;
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -52,6 +59,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         );
         String deployment = System.getProperty("sts.deployment");
         if ("standalone".equals(deployment)) {
+            standalone = true;
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -77,6 +85,9 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportSaml1Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
+        }
         
         doubleIt(transportSaml1Port, 25);
         
@@ -98,6 +109,9 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
         
         doubleIt(transportSaml2Port, 30);
     }
@@ -124,6 +138,9 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportSaml1Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
+        }
         
         try {
             doubleIt(transportSaml1Port, 35);
@@ -149,6 +166,9 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportSaml1Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
+        }
         
         doubleIt(transportSaml1Port, 40);
     }
@@ -174,6 +194,9 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportSaml1Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
+        }
         
         try {
             doubleIt(transportSaml1Port, 35);

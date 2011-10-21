@@ -20,15 +20,19 @@ package org.apache.cxf.systest.sts.intermediary_transformation;
 
 import java.net.URL;
 import java.security.Principal;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;
 
@@ -59,6 +63,23 @@ public class IntermediaryPortTypeImpl extends AbstractBusClientServerTestBase im
             updateAddressPort(transportPort, IntermediaryTransformationTest.PORT2);
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+        
+        if ("standalone".equals(System.getProperty("sts.deployment"))) {
+            Map<String, Object> context = ((BindingProvider)transportPort).getRequestContext();
+            STSClient stsClient = (STSClient)context.get(SecurityConstants.STS_CLIENT);
+            if (stsClient != null) {
+                String location = stsClient.getWsdlLocation();
+                if (location.contains("8080")) {
+                    stsClient.setWsdlLocation(
+                        location.replace("8080", IntermediaryTransformationTest.STSPORT2)
+                    );
+                } else if (location.contains("8443")) {
+                    stsClient.setWsdlLocation(
+                        location.replace("8443", IntermediaryTransformationTest.STSPORT)
+                    );
+                }
+            }
         }
         
         return transportPort.doubleIt(numberToDouble);

@@ -33,6 +33,8 @@
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
@@ -82,7 +84,7 @@
     
 	<jaxws:endpoint id="EncryptedUTSTS"
 		implementor="#encryptedUtSTSProviderBean"
-		address="http://localhost:8080/SecurityTokenService/UTEncrypted" 
+		address="http://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/UTEncrypted" 
         wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
         xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         serviceName="ns1:SecurityTokenService"

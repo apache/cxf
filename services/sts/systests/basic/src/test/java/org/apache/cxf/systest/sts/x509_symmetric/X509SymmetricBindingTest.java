@@ -21,6 +21,7 @@ package org.apache.cxf.systest.sts.x509_symmetric;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 
@@ -40,10 +41,15 @@ import org.junit.BeforeClass;
  */
 public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSServer.class);
+    static final String STSPORT2 = allocatePort(STSServer.class, 2);
+    
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
     private static final String PORT = allocatePort(Server.class);
+    
+    private static boolean standalone;
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -55,6 +61,7 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         );
         String deployment = System.getProperty("sts.deployment");
         if ("standalone".equals(deployment)) {
+            standalone = true;
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -80,6 +87,9 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType symmetricSaml1Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT2);
+        }
 
         doubleIt(symmetricSaml1Port, 25);
     }
@@ -100,6 +110,9 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType symmetricSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
+        }
         
         doubleIt(symmetricSaml2Port, 30);
 

@@ -33,7 +33,8 @@
     </parent>
 
     <modules>
-        <!--<module>basic</module>-->
+        <module>basic</module>
+        <!--<module>advanced</module>-->
     </modules>
 
 </project>

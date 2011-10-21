@@ -77,12 +77,5 @@
    </httpj:engine>
   </httpj:engine-factory>
   
-   <http:conduit name="https://localhost:8443/.*">
-      <http:tlsClientParameters disableCNCheck="true">
-        <sec:trustManagers>
-          <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
-        </sec:trustManagers>
-      </http:tlsClientParameters>
-   </http:conduit>
 </beans>
 

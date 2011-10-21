@@ -58,6 +58,9 @@ import org.junit.BeforeClass;
  */
 public class IssueUnitTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSServer.class);
+    static final String STSPORT2 = allocatePort(STSServer.class, 2);
+    
     private static final String SAML1_TOKEN_TYPE = 
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1";
     private static final String SAML2_TOKEN_TYPE = 
@@ -71,10 +74,13 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
     private static final String DEFAULT_ADDRESS = 
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
     
+    private static boolean standalone;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         String deployment = System.getProperty("sts.deployment");
         if ("standalone".equals(deployment)) {
+            standalone = true;
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -363,7 +369,11 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         String context
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
-        stsClient.setWsdlLocation("https://localhost:8443/SecurityTokenService/Transport?wsdl");
+        String port = "8443";
+        if (standalone) {
+            port = STSPORT;
+        }
+        stsClient.setWsdlLocation("https://localhost:" + port + "/SecurityTokenService/Transport?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
         
@@ -401,7 +411,11 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
             String endpointAddress
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
-        stsClient.setWsdlLocation("https://localhost:8443/SecurityTokenService/Transport?wsdl");
+        String port = "8443";
+        if (standalone) {
+            port = STSPORT;
+        }
+        stsClient.setWsdlLocation("https://localhost:" + port + "/SecurityTokenService/Transport?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 

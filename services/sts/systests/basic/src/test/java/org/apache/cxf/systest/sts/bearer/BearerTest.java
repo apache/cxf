@@ -23,6 +23,7 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
@@ -32,6 +33,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -50,10 +52,15 @@ import org.junit.BeforeClass;
  */
 public class BearerTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSServer.class);
+    static final String STSPORT2 = allocatePort(STSServer.class, 2);
+    
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
     private static final String PORT = allocatePort(Server.class);
+    
+    private static boolean standalone;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -65,6 +72,7 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         );
         String deployment = System.getProperty("sts.deployment");
         if ("standalone".equals(deployment)) {
+            standalone = true;
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -89,8 +97,11 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2BearerPort");
         DoubleItPortType transportSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
-        
         updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
+        
         doubleIt(transportSaml2Port, 45);
     }
     
@@ -110,6 +121,9 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
         
         //
         // Create a SAML2 Bearer Assertion and add it to the TokenStore so that the

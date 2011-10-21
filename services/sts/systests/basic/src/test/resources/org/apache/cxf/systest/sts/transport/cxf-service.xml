@@ -56,28 +56,6 @@
             <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
          </entry>
          <entry key="ws-security.is-bsp-compliant" value="false"/>
-         <entry key="ws-security.sts.client">
-             <bean class="org.apache.cxf.ws.security.trust.STSClient">
-                 <constructor-arg ref="cxf"/>
-                 <property name="wsdlLocation" 
-                           value="https://localhost:8443/SecurityTokenService/Transport?wsdl"/>
-                 <property name="serviceName" 
-                           value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
-                 <property name="endpointName" 
-                           value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
-                 <property name="properties">
-                     <map>
-                         <entry key="ws-security.username" value="alice"/>
-                         <entry key="ws-security.callback-handler" 
-                                value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                         <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                         <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
-                         <entry key="ws-security.sts.token.usecert" value="true"/> 
-                     </map>
-                 </property>
-             </bean>            
-         </entry> 
-         
       </jaxws:properties> 
    </jaxws:endpoint>
    
@@ -95,31 +73,8 @@
                 value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
          <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
          <entry key="ws-security.saml2.validator">
-            <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator">
-                <constructor-arg value="true"/>
-            </bean>
+            <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
          </entry>
-         <entry key="ws-security.sts.client">
-               <bean class="org.apache.cxf.ws.security.trust.STSClient">
-                   <constructor-arg ref="cxf"/>
-                   <property name="wsdlLocation" 
-                             value="https://localhost:8443/SecurityTokenService/Transport?wsdl"/>
-                   <property name="serviceName" 
-                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
-                   <property name="endpointName" 
-                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
-                   <property name="properties">
-                       <map>
-                           <entry key="ws-security.username" value="alice"/>
-                           <entry key="ws-security.callback-handler" 
-                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                           <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                           <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
-                           <entry key="ws-security.sts.token.usecert" value="true"/> 
-                       </map>
-                   </property>
-               </bean>            
-           </entry> 
       </jaxws:properties> 
    </jaxws:endpoint>
    
@@ -161,12 +116,5 @@
    </httpj:engine>
   </httpj:engine-factory>
   
-   <http:conduit name="https://localhost:8443/.*">
-      <http:tlsClientParameters disableCNCheck="true">
-        <sec:trustManagers>
-          <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
-        </sec:trustManagers>
-      </http:tlsClientParameters>
-   </http:conduit>
 </beans>
 

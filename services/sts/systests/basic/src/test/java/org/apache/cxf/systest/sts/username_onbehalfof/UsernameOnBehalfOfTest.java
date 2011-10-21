@@ -26,6 +26,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -44,10 +45,15 @@ import org.junit.BeforeClass;
  */
 public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSServer.class);
+    static final String STSPORT2 = allocatePort(STSServer.class, 2);
+    
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
+    
+    private static boolean standalone;
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -59,6 +65,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         );
         String deployment = System.getProperty("sts.deployment");
         if ("standalone".equals(deployment)) {
+            standalone = true;
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -81,25 +88,31 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
+        updateAddressPort(bearerPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)bearerPort, STSPORT2);
+        }
 
         // Transport port
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
-        DoubleItPortType transportPort2 = 
+        DoubleItPortType bearerPort2 = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort2, PORT);
-        ((BindingProvider)transportPort2).getRequestContext().put(
+        updateAddressPort(bearerPort2, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)bearerPort2, STSPORT2);
+        }
+        ((BindingProvider)bearerPort2).getRequestContext().put(
             "ws-security.username", "eve"
         );
         // This time we expect a failure as the server validator doesn't accept "eve".
         try {
-            doubleIt(transportPort2, 30);
+            doubleIt(bearerPort2, 30);
             fail("Failure expected on an unknown user");
         } catch (Exception ex) {
             // expected
@@ -126,46 +139,52 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         //
         // Proxy no. 1
         // 
-        DoubleItPortType transportPort = 
+        DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
+        updateAddressPort(bearerPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)bearerPort, STSPORT2);
+        }
         
         TokenStore tokenStore = new MemoryTokenStore();
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             TokenStore.class.getName(), tokenStore
         );
 
         // Make a successful invocation
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // Change the STSClient so that it can no longer find the STS
         STSClient stsClient = new STSClient(bus);
         stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
-        BindingProvider p = (BindingProvider)transportPort;
+        BindingProvider p = (BindingProvider)bearerPort;
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
         // This invocation should be successful as the token is cached
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // 
         // Proxy no. 2
         //
-        DoubleItPortType transportPort2 = 
+        DoubleItPortType bearerPort2 = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort2, PORT);
+        updateAddressPort(bearerPort2, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)bearerPort2, STSPORT2);
+        }
         
         // Change the STSClient so that it can no longer find the STS
         stsClient = new STSClient(bus);
         stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
-        p = (BindingProvider)transportPort2;
+        p = (BindingProvider)bearerPort2;
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
         // This should fail as the cache is not being used
         try {
-            doubleIt(transportPort2, 40);
+            doubleIt(bearerPort2, 40);
             fail("Failure expected as the token is not stored in the cache");
         } catch (Exception ex) {
             // expected
@@ -176,12 +195,12 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         
         // Make another invocation - this should succeed as the token is cached
         p.getRequestContext().put("ws-security.username", "alice");
-        doubleIt(transportPort2, 40);
+        doubleIt(bearerPort2, 40);
         
         // Reset the cache - this invocation should fail
         p.getRequestContext().put(TokenStore.class.getName(), new MemoryTokenStore());
         try {
-            doubleIt(transportPort2, 40);
+            doubleIt(bearerPort2, 40);
             fail("Failure expected as the cache is reset");
         } catch (Exception ex) {
             // expected
@@ -205,31 +224,34 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
         
-        DoubleItPortType transportPort = 
+        DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
+        updateAddressPort(bearerPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)bearerPort, STSPORT2);
+        }
         
         // Disable storing tokens per-proxy
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, "false"
         );
         
         // Make a successful invocation
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "bob"
         );
-        doubleIt(transportPort, 30);
+        doubleIt(bearerPort, 30);
         
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "eve"
         );
         try {
-            doubleIt(transportPort, 30);
+            doubleIt(bearerPort, 30);
             fail("Failure expected on a bad user");
         } catch (Exception ex) {
             //
@@ -238,25 +260,25 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         // Change the STSClient so that it can no longer find the STS
         STSClient stsClient = new STSClient(bus);
         stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
-        BindingProvider p = (BindingProvider)transportPort;
+        BindingProvider p = (BindingProvider)bearerPort;
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
         // Make a successful invocation
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "bob"
         );
-        doubleIt(transportPort, 30);
+        doubleIt(bearerPort, 30);
         
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "eve2"
         );
         try {
-            doubleIt(transportPort, 30);
+            doubleIt(bearerPort, 30);
             fail("Failure expected on a bad user");
         } catch (Exception ex) {
             //
@@ -264,11 +286,11 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         
         // Reset the cache - this invocation should fail
         p.getRequestContext().put(TokenStore.class.getName(), new MemoryTokenStore());
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
         try {
-            doubleIt(transportPort, 30);
+            doubleIt(bearerPort, 30);
             fail("Failure expected");
         } catch (Exception ex) {
             //
@@ -292,35 +314,38 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
         
-        DoubleItPortType transportPort = 
+        DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
+        updateAddressPort(bearerPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)bearerPort, STSPORT2);
+        }
         
         // Disable storing tokens per-proxy
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, "false"
         );
         
         // Make a successful invocation
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
-        BindingProvider p = (BindingProvider)transportPort;
+        BindingProvider p = (BindingProvider)bearerPort;
         p.getRequestContext().put(
             SecurityConstants.STS_APPLIES_TO, 
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // Make a successful invocation
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "bob"
         );
         p.getRequestContext().put(
             SecurityConstants.STS_APPLIES_TO, 
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew2"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // Change the STSClient so that it can no longer find the STS
         STSClient stsClient = new STSClient(bus);
@@ -328,27 +353,27 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
         // Make a successful invocation - should work as token is cached
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
         p.getRequestContext().put(
             SecurityConstants.STS_APPLIES_TO, 
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // Make a successful invocation - should work as token is cached
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "bob"
         );
         p.getRequestContext().put(
             SecurityConstants.STS_APPLIES_TO, 
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew2"
         );
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // Change appliesTo - should fail
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
         p.getRequestContext().put(
@@ -356,7 +381,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew2"
         );
         try {
-            doubleIt(transportPort, 30);
+            doubleIt(bearerPort, 30);
             fail("Failure expected");
         } catch (Exception ex) {
             //
@@ -380,24 +405,27 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
         
-        DoubleItPortType transportPort = 
+        DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
+        updateAddressPort(bearerPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)bearerPort, STSPORT2);
+        }
         
         // Disable storing tokens per-proxy
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, "false"
         );
         
         // Make a successful invocation
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "alice"
         );
         // Disable appliesTo
-        BindingProvider p = (BindingProvider)transportPort;
+        BindingProvider p = (BindingProvider)bearerPort;
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
         stsClient.setEnableAppliesTo(false);
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // Change the STSClient so that it can no longer find the STS
         stsClient = new STSClient(bus);
@@ -406,14 +434,14 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
         // This should work
-        doubleIt(transportPort, 25);
+        doubleIt(bearerPort, 25);
         
         // Bob should fail
-        ((BindingProvider)transportPort).getRequestContext().put(
+        ((BindingProvider)bearerPort).getRequestContext().put(
             "ws-security.username", "bob"
         );
         try {
-            doubleIt(transportPort, 30);
+            doubleIt(bearerPort, 30);
             fail("Failure expected");
         } catch (Exception ex) {
             //

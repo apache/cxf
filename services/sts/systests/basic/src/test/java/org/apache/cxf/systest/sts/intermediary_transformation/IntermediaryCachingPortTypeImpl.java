@@ -20,6 +20,7 @@ package org.apache.cxf.systest.sts.intermediary_transformation;
 
 import java.net.URL;
 import java.security.Principal;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -64,6 +65,22 @@ public class IntermediaryCachingPortTypeImpl extends AbstractBusClientServerTest
                 updateAddressPort(transportPort, IntermediaryTransformationCachingTest.PORT2);
             } catch (Exception ex) {
                 ex.printStackTrace();
+            }
+            if ("standalone".equals(System.getProperty("sts.deployment"))) {
+                Map<String, Object> context = ((BindingProvider)transportPort).getRequestContext();
+                STSClient stsClient = (STSClient)context.get(SecurityConstants.STS_CLIENT);
+                if (stsClient != null) {
+                    String location = stsClient.getWsdlLocation();
+                    if (location.contains("8080")) {
+                        stsClient.setWsdlLocation(
+                            location.replace("8080", IntermediaryTransformationCachingTest.STSPORT2)
+                        );
+                    } else if (location.contains("8443")) {
+                        stsClient.setWsdlLocation(
+                            location.replace("8443", IntermediaryTransformationCachingTest.STSPORT)
+                        );
+                    }
+                }
             }
         }
         Principal pr = wsc.getUserPrincipal();

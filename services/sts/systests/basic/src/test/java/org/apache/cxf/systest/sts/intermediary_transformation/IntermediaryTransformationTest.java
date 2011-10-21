@@ -21,10 +21,12 @@ package org.apache.cxf.systest.sts.intermediary_transformation;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -41,12 +43,17 @@ import org.junit.BeforeClass;
  */
 public class IntermediaryTransformationTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSServer.class);
+    static final String STSPORT2 = allocatePort(STSServer.class, 2);
+    
     static final String PORT2 = allocatePort(Server.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
     private static final String PORT = allocatePort(Intermediary.class);
+    
+    private static boolean standalone;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -64,6 +71,7 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         );
         String deployment = System.getProperty("sts.deployment");
         if ("standalone".equals(deployment)) {
+            standalone = true;
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -89,6 +97,9 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         DoubleItPortType transportPort = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
+        }
 
         doubleIt(transportPort, 25);
     }
@@ -109,6 +120,9 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         DoubleItPortType transportPort = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
+        }
 
         try {
             doubleIt(transportPort, 30);
