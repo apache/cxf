@@ -96,7 +96,7 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         stsClient.setProperties(properties);
         stsClient.setSecureConv(true);
         stsClient.setRequiresEntropy(enableEntropy);
-        stsClient.setKeySize(192);
+        stsClient.setKeySize(128);
         stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");
 
         return stsClient.requestSecurityToken(null);
