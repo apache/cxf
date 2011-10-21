@@ -22,6 +22,7 @@ package org.apache.cxf.binding.soap.saaj;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -211,8 +212,13 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                         message.setContent(XMLStreamWriter.class, writer);
                     }
                 } catch (XMLStreamException e) {
-                    throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, message.getVersion()
-                                        .getSender());
+                    if (e.getCause() instanceof ConnectException) {
+                        throw new SoapFault(e.getCause().getMessage(), e,
+                                            message.getVersion().getSender());
+                    } else {
+                        throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e,
+                                            message.getVersion().getSender());
+                    }
                 }
             }
         }
