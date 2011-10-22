@@ -88,7 +88,6 @@
                             org.apache.cxf.wsn.wsdl;version=${project.version},
                             org.apache.cxf.wsn.jaxws;version=${project.version}
                         </Export-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                         <_nouses>true</_nouses>
                         <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>

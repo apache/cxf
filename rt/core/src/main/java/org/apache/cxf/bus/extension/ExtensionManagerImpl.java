@@ -140,9 +140,16 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             }
         }        
     }
-
     final void load(String resource) throws IOException {
-        Enumeration<URL> urls = loader.getResources(resource);
+        load(resource, loader);
+        if (loader != getClass().getClassLoader()) {
+            load(resource, getClass().getClassLoader());
+        }
+    }
+    final void load(String resource, ClassLoader l) throws IOException {
+        
+        Enumeration<URL> urls = l.getResources(resource);
+        
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             InputStream is = url.openStream();
@@ -156,6 +163,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                     exts = new ExtensionFragmentParser().getExtensionsFromText(is);
                 }
                 for (Extension e : exts) {
+                    if (loader != l) {
+                        e.classloader = l;
+                    }
                     all.put(e.getName(), e);
                 }
             } finally {
