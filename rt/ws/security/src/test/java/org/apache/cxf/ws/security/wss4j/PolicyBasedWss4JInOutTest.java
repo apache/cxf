@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.xml.namespace.QName;
@@ -58,29 +57,6 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(CoverageType.SIGNED));
     }
     
-    @Test
-    public void testTransportBinding() throws Exception {
-        this.runInInterceptorAndValidate(
-                "wsse-request-clean.xml",
-                "transport_binding_policy.xml",
-                Arrays.asList(SP12Constants.TRANSPORT_BINDING,
-                              SP12Constants.TRANSPORT_TOKEN),
-                null,
-                new ArrayList<CoverageType>());
-        
-        // Note that outbound does not asset TRANSPORT_TOKEN as another handler
-        // would assert that.
-        this.runAndValidate(
-                "wsse-request-clean.xml",
-                "transport_binding_policy.xml",
-                Arrays.asList(SP12Constants.TRANSPORT_BINDING),
-                null,
-                Arrays.asList(SP12Constants.TRANSPORT_BINDING,
-                              SP12Constants.TRANSPORT_TOKEN),
-                null,
-                new ArrayList<CoverageType>());
-    }
-
     @Test
     public void testAsymmetricBindingAlgorithmSuitePolicy() throws Exception {
         this.runAndValidate(
