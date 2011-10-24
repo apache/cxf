@@ -77,6 +77,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.AlgorithmSuitePolicyVal
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.TransportBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
 import org.apache.neethi.Assertion;
@@ -580,6 +581,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     new SamlTokenPolicyValidator(soapBody, signedResults, msg);
                 validator.validatePolicy(aim, wser);
                 break;
+            // TODO remove
             case WSConstants.TS:
                 assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
                 break;
@@ -621,10 +623,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         assertAsymetricBinding(aim, msg, prots, results, hasDerivedKeys);
         assertSymmetricBinding(aim, msg, prots, results, hasDerivedKeys);
-        assertTransportBinding(aim, results);
         
         X509TokenPolicyValidator x509Validator = new X509TokenPolicyValidator(msg, results);
         x509Validator.validatePolicy(aim);
+        
+        TransportBindingPolicyValidator transportValidator = 
+            new TransportBindingPolicyValidator(msg, results, signedResults);
+        transportValidator.validatePolicy(aim);
         
         SecurityContextTokenPolicyValidator sctValidator = 
             new SecurityContextTokenPolicyValidator(msg, results);
@@ -786,30 +791,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 assertPolicy(aim, abinding.getRecipientToken().getToken(), derived);
             }
         }
-        return true;
-    }
-    private boolean assertTransportBinding(AssertionInfoMap aim, List<WSSecurityEngineResult> results) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-        if (ais == null) {                       
-            return true;
-        }
-        
-        for (AssertionInfo ai : ais) {
-            TransportBinding binding = (TransportBinding)ai.getAssertion();
-            ai.setAsserted(true);
-            if (binding.getTransportToken() != null) {
-                assertPolicy(aim, binding.getTransportToken());
-                assertPolicy(aim, binding.getTransportToken().getToken());
-            }
-            
-            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
-            if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
-                return false;
-            }
-        }
-        
-        assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
-        assertPolicy(aim, SP12Constants.SIGNED_PARTS);
         return true;
     }
     
