@@ -364,9 +364,8 @@ public class SourceGenerator {
                         resourceId += split[i].toUpperCase().charAt(0) + split[i].substring(1);
                     }
                 }
-            } else {
-                resourceId = DEFAULT_RESOURCE_NAME;    
             }
+            resourceId += DEFAULT_RESOURCE_NAME;    
         }
         
         boolean expandedQName = resourceId.startsWith("{") ? true : false;
