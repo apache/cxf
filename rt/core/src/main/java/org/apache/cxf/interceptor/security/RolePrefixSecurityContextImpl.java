@@ -34,8 +34,13 @@ public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
     private Subject theSubject;
     
     public RolePrefixSecurityContextImpl(Subject subject, String rolePrefix) {
-        this.p = findPrincipal(subject, rolePrefix);
-        this.roles = findRoles(subject, rolePrefix);
+        this(subject, rolePrefix, JAASLoginInterceptor.ROLE_CLASSIFIER_PREFIX);
+    }
+    
+    public RolePrefixSecurityContextImpl(Subject subject, String roleClassifier,
+                                         String roleClassifierType) {
+        this.p = findPrincipal(subject, roleClassifier, roleClassifierType);
+        this.roles = findRoles(subject, roleClassifier, roleClassifierType);
         this.theSubject = subject;
     }
     
@@ -54,25 +59,35 @@ public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
         return false;
     }
     
-    private static Principal findPrincipal(Subject subject, String rolePrefix) {
+    private static Principal findPrincipal(Subject subject, 
+        String roleClassifier, String roleClassifierType) {
         for (Principal p : subject.getPrincipals()) {
-            if (!p.getName().startsWith(rolePrefix)) {
+            if (!isRole(p, roleClassifier, roleClassifierType)) {
                 return p;
             }
         }
         return null;
     }
     
-    private static Set<Principal> findRoles(Subject subject, String rolePrefix) {
+    private static Set<Principal> findRoles(Subject subject, 
+        String roleClassifier, String roleClassifierType) {
         Set<Principal> set = new HashSet<Principal>();
         for (Principal p : subject.getPrincipals()) {
-            if (p.getName().startsWith(rolePrefix)) {
+            if (isRole(p, roleClassifier, roleClassifierType)) {
                 set.add(p);
             }
         }
         return Collections.unmodifiableSet(set);
     }
 
+    private static boolean isRole(Principal p, String roleClassifier, String roleClassifierType) {
+        if (JAASLoginInterceptor.ROLE_CLASSIFIER_PREFIX.equals(roleClassifierType)) {
+            return p.getName().startsWith(roleClassifier);
+        } else {
+            return p.getClass().getName().endsWith(roleClassifier);
+        }
+    }
+    
     public Subject getSubject() {
         return theSubject;
     }
