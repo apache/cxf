@@ -32,7 +32,10 @@ import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 /**
  * 
  */
-public class Client {
+public final class Client {
+    private Client() {
+        //not constructed
+    }
 
     /**
      * @param args
