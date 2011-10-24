@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -804,6 +805,11 @@ public class SourceGenerator {
             if (writeAnnotations(info.isInterfaceGenerated())) {
                 writeAnnotation(sbCode, imports, paramAnn, name, false, false);
                 sbCode.append(" ");
+                String defaultVal = paramEl.getAttribute("default");
+                if (defaultVal.length() > 0) {
+                    writeAnnotation(sbCode, imports, DefaultValue.class, defaultVal, false, false);
+                    sbCode.append(" ");    
+                }
             }
             boolean isRepeating = Boolean.valueOf(paramEl.getAttribute("repeating"));
             String type = getPrimitiveType(paramEl);
@@ -869,7 +875,7 @@ public class SourceGenerator {
     
     private String getPrimitiveType(Element paramEl) {
         String type = paramEl.getAttribute("type");
-        if (type == null) {
+        if (type.length() == 0) {
             return "String";
         }
         String[] pair = type.split(":");
