@@ -157,6 +157,7 @@
                         <Specification-Title>Apache CXF</Specification-Title>
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
+                        <SPI-Provider>true</SPI-Provider>
                         <DynamicImport-Package>
                             com.ctc.wstx.*,
                             com.sun.xml.bind.api,
