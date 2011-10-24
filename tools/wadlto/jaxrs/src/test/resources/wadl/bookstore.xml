@@ -56,6 +56,11 @@
         <param name="c.a" style="query" type="xs:int"/>
         <param name="c.b" style="query" type="xs:int"/>
         <param name="c.d.a" style="query" type="xs:int"/>
+        <param name="option"  default="A" style="query"
+required="true">
+     <option value="A"/>
+     <option value="B"/>
+   </param> 
       </request>
       <response>
        <representation mediaType="text/plain">
