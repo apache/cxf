@@ -39,12 +39,15 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 
 public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
-
+    public static final String ROLE_CLASSIFIER_PREFIX = "prefix";
+    public static final String ROLE_CLASSIFIER_CLASS_NAME = "classname";
+    
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAASLoginInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(JAASLoginInterceptor.class);
     
     private String contextName;
-    private String rolePrefix;
+    private String roleClassifier;
+    private String roleClassifierType = ROLE_CLASSIFIER_PREFIX;
     private boolean reportFault;
     
     public JAASLoginInterceptor() {
@@ -59,12 +62,29 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         return contextName;
     }
     
+    @Deprecated
     public void setRolePrefix(String name) {
-        rolePrefix = name;
+        setRoleClassifier(name);
     }
     
-    public String getRolePrefix() {
-        return rolePrefix;
+    public void setRoleClassifier(String value) {
+        roleClassifier = value;
+    }
+    
+    public String getRoleClassifier() {
+        return roleClassifier;
+    }
+    
+    public void setRoleClassifierType(String value) {
+        if (!ROLE_CLASSIFIER_PREFIX.equals(value)
+            && !ROLE_CLASSIFIER_CLASS_NAME.equals(value)) {
+            throw new IllegalArgumentException("Unsupported role classifier");
+        }
+        roleClassifierType = value;
+    }
+    
+    public String getRoleClassifierType() {
+        return roleClassifierType;
     }
     
     public void setReportFault(boolean reportFault) {
@@ -127,8 +147,9 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     protected SecurityContext createSecurityContext(Subject subject) {
-        if (getRolePrefix() != null) {
-            return new RolePrefixSecurityContextImpl(subject, getRolePrefix());
+        if (getRoleClassifier() != null) {
+            return new RolePrefixSecurityContextImpl(subject, getRoleClassifier(),
+                                                     getRoleClassifierType());
         } else {
             return new DefaultSecurityContext(subject);
         }

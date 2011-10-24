@@ -51,6 +51,17 @@ public class RolePrefixSecurityContextImplTest extends Assert {
     }
     
     @Test
+    public void testUserInRoleWithRolePrincipal() {
+        Subject s = new Subject();
+        Principal p = new SimplePrincipal("Barry");
+        s.getPrincipals().add(p);
+        s.getPrincipals().add(new RolePrincipal("friend"));
+        assertTrue(new RolePrefixSecurityContextImpl(s, "RolePrincipal", "classname")
+                       .isUserInRole("friend"));
+    }
+    
+    
+    @Test
     public void testMultipleRoles() {
         Subject s = new Subject();
         Principal p = new SimplePrincipal("Barry");
@@ -76,4 +87,14 @@ public class RolePrefixSecurityContextImplTest extends Assert {
         assertSame(new RolePrefixSecurityContextImpl(s, "").getSubject(), s);
     }
     
+    private static class RolePrincipal implements Principal {
+        private String roleName; 
+        public RolePrincipal(String roleName) {
+            this.roleName = roleName;
+        }
+        public String getName() {
+            return roleName;
+        }
+        
+    }
 }
