@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+
+           xsi:schemaLocation="
+            http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+  <cm:property-placeholder persistent-id="org.apache.cxf.osgi" id="cxfOsgiProperties">
+
+    <cm:default-properties>
+
+      <cm:property name="org.apache.cxf.servlet.context" value="/cxf"/>
+      <cm:property name="org.apache.cxf.servlet.name" value="cxf-osgi-transport-servlet"/>
+      <cm:property name="org.apache.cxf.servlet.hide-service-list-page" value="false"/>
+      <cm:property name="org.apache.cxf.servlet.disable-address-updates" value="false"/>
+      <cm:property name="org.apache.cxf.servlet.base-address" value=""/>
+      <cm:property name="org.apache.cxf.servlet.service-list-path" value=""/>
+      <cm:property name="org.apache.cxf.servlet.static-resources-list" value=""/>
+      <cm:property name="org.apache.cxf.servlet.redirects-list" value=""/>
+      <cm:property name="org.apache.cxf.servlet.redirect-servlet-name" value=""/>
+      <cm:property name="org.apache.cxf.servlet.redirect-servlet-path" value=""/>
+
+    </cm:default-properties>
+
+  </cm:property-placeholder>
+
+  <bean id="destinationRegistry" class="org.apache.cxf.transport.http.DestinationRegistryImpl"/>
+
+  <bean id="osgiServlet" class="org.apache.cxf.transport.servlet.CXFNonSpringServlet">
+    <argument ref="destinationRegistry"/>
+    <argument value="false"/>
+  </bean>
+
+  <service ref="osgiServlet" interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="alias" value="${org.apache.cxf.servlet.context}"/>
+      <entry key="servlet-name" value="${org.apache.cxf.servlet.name}"/>
+      <entry key="hide-service-list-page" value="${org.apache.cxf.servlet.hide-service-list-page}"/>
+      <entry key="disable-address-updates" value="${org.apache.cxf.servlet.disable-address-updates}"/>
+      <entry key="base-address" value="${org.apache.cxf.servlet.base-address}"/>
+      <entry key="service-list-path" value="${org.apache.cxf.servlet.service-list-path}"/>
+      <entry key="static-resources-list" value="${org.apache.cxf.servlet.static-resources-list}"/>
+      <entry key="redirects-list" value="${org.apache.cxf.servlet.redirects-list}"/>
+      <entry key="redirect-servlet-name" value="${org.apache.cxf.servlet.redirect-servlet-name}"/>
+      <entry key="redirect-servlet-path" value="${org.apache.cxf.servlet.redirect-servlet-path}"/>
+    </service-properties>
+  </service>
+
+  <service ref="destinationRegistry" interface="org.apache.cxf.transport.http.DestinationRegistry">
+  </service>
+
+</blueprint>
+
+
