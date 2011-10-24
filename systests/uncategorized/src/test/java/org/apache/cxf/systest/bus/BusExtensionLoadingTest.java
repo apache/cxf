@@ -72,23 +72,9 @@ public class BusExtensionLoadingTest extends Assert {
         BusFactory factory = new CXFBusFactory();
         Bus bus = factory.createBus();
         assertNotNullExtensions(bus);
-
-        ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(new TestClassLoader());
-            bus = factory.createBus();
-            assertNullExtensions(bus);
-        } finally {
-            Thread.currentThread().setContextClassLoader(origClassLoader);
-        }
     }
 
-    private static void assertNullExtensions(Bus bus) {
-        assertNull(bus.getExtension(WSDLManager.class));
-        assertNull(bus.getExtension(QueryHandlerRegistry.class));
-        assertNull(bus.getExtension(ServerRegistry.class));
-        assertNull(bus.getExtension(HeaderManager.class));
-    }
+
 
     private static void assertNotNullExtensions(Bus bus) {
         assertNotNull(bus.getExtension(WSDLManager.class));

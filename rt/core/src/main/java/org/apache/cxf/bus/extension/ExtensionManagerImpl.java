@@ -141,10 +141,10 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }        
     }
     final void load(String resource) throws IOException {
-        load(resource, loader);
         if (loader != getClass().getClassLoader()) {
             load(resource, getClass().getClassLoader());
         }
+        load(resource, loader);
     }
     final void load(String resource, ClassLoader l) throws IOException {
         
