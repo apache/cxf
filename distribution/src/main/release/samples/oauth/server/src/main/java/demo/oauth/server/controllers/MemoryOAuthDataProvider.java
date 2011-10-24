@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.oauth.OAuth;
 import net.oauth.OAuthProblemException;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
@@ -124,7 +123,8 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         String accessTokenString = generateToken();
         String tokenSecretString = generateToken();
 
-        AccessToken accessToken = new AccessToken(client, accessTokenString, tokenSecretString, 3600, System.currentTimeMillis()/1000);
+        AccessToken accessToken = new AccessToken(client, accessTokenString,
+            tokenSecretString, 3600, System.currentTimeMillis() / 1000);
 
         accessToken.setScopes(requestToken.getScopes());
         accessToken.setUris(requestToken.getUris());
