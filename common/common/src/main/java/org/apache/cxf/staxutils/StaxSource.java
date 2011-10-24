@@ -103,7 +103,7 @@ public class StaxSource extends SAXSource implements XMLReader {
                         int start = streamReader.getTextStart();
                         char[] chars = streamReader.getTextCharacters();
                         lexicalHandler.comment(chars, start, length);
-                    }
+                    } 
                     break;
                 case XMLStreamConstants.DTD:
                     break;
@@ -253,6 +253,10 @@ public class StaxSource extends SAXSource implements XMLReader {
 
     public void setContentHandler(ContentHandler handler) {
         this.contentHandler = handler;
+        if (handler instanceof LexicalHandler
+            && lexicalHandler == null) {
+            lexicalHandler = (LexicalHandler)handler;
+        }
     }
 
     public ContentHandler getContentHandler() {
