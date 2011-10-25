@@ -153,7 +153,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         assertEquals("0", getStringFromInputStream(in));
                 
     }
-    
+    @Ignore
     @Test
     public void testGetBookTransform() throws Exception {
         
@@ -166,6 +166,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    @Ignore
     public void testPostBookTransform() throws Exception {
            
         String address = "http://localhost:" + PORT 
