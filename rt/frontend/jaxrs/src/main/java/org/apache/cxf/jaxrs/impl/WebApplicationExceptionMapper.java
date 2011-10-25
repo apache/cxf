@@ -30,6 +30,9 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.logging.FaultListener;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class WebApplicationExceptionMapper 
     implements ExceptionMapper<WebApplicationException> {
@@ -57,6 +60,19 @@ public class WebApplicationExceptionMapper
         Response r = ex.getResponse(); 
         if (r == null) {
             r = Response.status(500).type(MediaType.TEXT_PLAIN).entity(errorMsg.toString()).build();
+        }
+        
+        
+        Message msg = PhaseInterceptorChain.getCurrentMessage();
+        FaultListener flogger = null;
+        if (msg != null) {
+            flogger = (FaultListener)PhaseInterceptorChain.getCurrentMessage()
+                .getContextualProperty(FaultListener.class.getName());
+        }
+        if (flogger != null) {
+            flogger.faultOccurred(ex, message, msg);
+        } else if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, message, ex);
         }
         
         if (printStackTrace) {
