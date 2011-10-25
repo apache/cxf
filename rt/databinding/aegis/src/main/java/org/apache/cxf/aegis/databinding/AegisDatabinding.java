@@ -99,6 +99,10 @@ public class AegisDatabinding extends AbstractDataBinding {
         super();
         part2Type = new HashMap<MessagePartInfo, AegisType>();
     }
+    public AegisDatabinding(AegisContext ctx) {
+        this();
+        aegisContext = ctx;
+    }
 
     /**
      * The Databinding API has initialize(Service). However, this object should be usable even if that API is
@@ -366,7 +370,7 @@ public class AegisDatabinding extends AbstractDataBinding {
 
             // QName elName = getSuggestedName(service, op, param)
             deps.add(type);
-
+            type.getTypeMapping().register(type);
             addDependencies(deps, type);
         }
     }
@@ -547,6 +551,9 @@ public class AegisDatabinding extends AbstractDataBinding {
 
     private AegisType getParameterType(Service s, TypeMapping tm, MessagePartInfo param, int paramtype) {
         AegisType type = tm.getType(param.getTypeQName());
+        if (type != null && type.getTypeClass() != param.getTypeClass()) {
+            type = null;
+        }
 
         int offset = 0;
         if (paramtype == OUT_PARAM) {

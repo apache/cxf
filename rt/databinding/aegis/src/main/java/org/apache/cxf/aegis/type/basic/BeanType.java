@@ -535,11 +535,9 @@ public class BeanType extends AegisType {
         /*
          * Automagically add chain of superclasses if this is an an extension.
          */
-        if (inf.isExtension()) {
-            AegisType sooperType = getSuperType();
-            if (sooperType != null) {
-                deps.add(sooperType);
-            }
+        AegisType sooperType = getSuperType();
+        if (sooperType != null) {
+            deps.add(sooperType);
         }
 
         return deps;
@@ -574,7 +572,12 @@ public class BeanType extends AegisType {
      */
     public AegisType getSuperType() {
         BeanTypeInfo inf = getTypeInfo();
-        Class c = inf.getTypeClass().getSuperclass();
+        Class c = inf.getTypeClass();
+        if (c.isInterface() && c.getInterfaces().length == 1) {
+            c = c.getInterfaces()[0];
+        } else {
+            c = c.getSuperclass();
+        }
         /*
          * Don't dig any deeper than Object or Exception
          */
@@ -584,11 +587,12 @@ public class BeanType extends AegisType {
             if (superType == null) {
                 // if we call createType, we know that we'll get a BeanType. */
                 superType = (BeanType)getTypeMapping().getTypeCreator().createType(c);
-                Class cParent = c.getSuperclass();
-                if (cParent != null && cParent != Object.class) {
-                    ((BeanType)superType).getTypeInfo().setExtension(true);
+                if (superType != null) {
+                    tm.register(superType);
+                    this.info.setExtension(true);
                 }
-                tm.register(superType);
+            } else {
+                this.info.setExtension(true);
             }
             return superType;
         } else {
