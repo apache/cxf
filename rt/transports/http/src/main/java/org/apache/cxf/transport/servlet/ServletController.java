@@ -51,8 +51,6 @@ public class ServletController {
     protected boolean isHideServiceList;
     protected boolean disableAddressUpdates;
     protected String forcedBaseAddress;
-    protected String serviceListStyleSheet;
-    protected String title;
     protected String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
     protected ServletConfig servletConfig;
     protected DestinationRegistry destinationRegistry;
@@ -71,13 +69,6 @@ public class ServletController {
         serviceListRelativePath = relativePath;
     }
 
-    public void setServiceListStyleSheet(String serviceListStyleSheet) {
-        this.serviceListStyleSheet = serviceListStyleSheet;
-    }
-    public void setTitle(String t) {
-        title = t;
-    }
-    
     protected String getBaseURL(HttpServletRequest request) {
         return forcedBaseAddress == null ? BaseUrlHelper.getBaseURL(request) : forcedBaseAddress;
     }
