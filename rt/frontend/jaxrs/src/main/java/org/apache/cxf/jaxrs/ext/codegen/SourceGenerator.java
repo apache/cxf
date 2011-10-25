@@ -147,6 +147,8 @@ public class SourceGenerator {
     private String resourcePackageName;
     private String resourceName;
     private String wadlPath;
+    private String wadlNamespace = WadlGenerator.WADL_NS;
+    private boolean generateEnums;
     
     private Map<String, String> properties; 
     
@@ -170,6 +172,18 @@ public class SourceGenerator {
     
     public void setSupportMultipleXmlReps(boolean support) {
         supportMultipleXmlReps = support;
+    }
+    
+    public void setWadlNamespace(String ns) {
+        this.wadlNamespace = ns;
+    }
+    
+    public String getWadlNamespace() {
+        return wadlNamespace;
+    }
+    
+    public void setGenerateEnums(boolean generate) {
+        this.generateEnums = generate;
     }
     
     private String getClassPackageName(String wadlPackageName) {
@@ -231,13 +245,13 @@ public class SourceGenerator {
         for (int i = 0; i < resourceEls.size(); i++) {
             Element resource = getResourceElement(app, resourceEls.get(i), gInfo, typeClassNames, 
                                                   resourceEls.get(i).getAttribute("type"), src);
-            writeResourceClass(app, resource, 
-                               new ContextInfo(typeClassNames, gInfo, generateInterfaces), 
-                               src, true);
+            writeResourceClass(resource, 
+                               new ContextInfo(app, src, typeClassNames, gInfo, generateInterfaces), 
+                               true);
             if (generateInterfaces && generateImpl) {
-                writeResourceClass(app, resource, 
-                                   new ContextInfo(typeClassNames, gInfo, false), 
-                                   src, true);
+                writeResourceClass(resource, 
+                                   new ContextInfo(app, src, typeClassNames, gInfo, false), 
+                                   true);
             }
             if (resourceName != null) {
                 break;
@@ -349,9 +363,9 @@ public class SourceGenerator {
         
     }
     
-    private void writeResourceClass(Application app, Element rElement,
+    private void writeResourceClass(Element rElement,
                                     ContextInfo info, 
-                                    File src, boolean isRoot) {
+                                    boolean isRoot) {
         String resourceId = resourceName != null 
             ? resourceName : rElement.getAttribute("id");
         if (resourceId.length() == 0) {
@@ -404,29 +418,29 @@ public class SourceGenerator {
         writeImplementsInterface(sbCode, qname.getLocalPart(), info.isInterfaceGenerated());              
         sbCode.append(" {" + getLineSep() + getLineSep());
         
-        writeMethods(rElement, imports, sbCode, info, resourceId, isRoot, "");
+        writeMethods(rElement, classPackage, imports, sbCode, info, resourceId, isRoot, "");
         
         sbCode.append("}");
         writeImports(sbImports, imports, classPackage);
         
-        createJavaSourceFile(src, new QName(classPackage, className), sbCode, sbImports);
+        createJavaSourceFile(info.getSrcDir(), new QName(classPackage, className), sbCode, sbImports, true);
         
-        writeSubresourceClasses(app, rElement, info, src, isRoot, resourceId);
+        writeSubresourceClasses(rElement, info, isRoot, resourceId);
     }
     
-    private void writeSubresourceClasses(Application app, Element rElement, ContextInfo info, 
-            File src, boolean isRoot, String resourceId) {
+    private void writeSubresourceClasses(Element rElement, ContextInfo info, 
+                                         boolean isRoot, String resourceId) {
 
         List<Element> childEls = getWadlElements(rElement, "resource");
         for (Element subEl : childEls) {
             String id = subEl.getAttribute("id");
             if (id.length() > 0 && !resourceId.equals(id) && !id.startsWith("{java")
                 && !id.startsWith("java")) {
-                Element subElement = getResourceElement(app, subEl, info.getGrammarInfo(), 
-                    info.getTypeClassNames(), subEl.getAttribute("type"), src);
-                writeResourceClass(app, subElement, info, src, false);
+                Element subElement = getResourceElement(info.getApp(), subEl, info.getGrammarInfo(), 
+                    info.getTypeClassNames(), subEl.getAttribute("type"), info.getSrcDir());
+                writeResourceClass(subElement, info, false);
             }
-            writeSubresourceClasses(app, subEl, info, src, false, id);
+            writeSubresourceClasses(subEl, info, false, id);
         }
     }
     
@@ -487,17 +501,20 @@ public class SourceGenerator {
             + getLineSep() + " * Created by Apache CXF WadlToJava code generator"
             + getLineSep() + "**/";
     }
-    
-    private void writeMethods(Element rElement,  
-                              Set<String> imports, StringBuilder sbCode, 
+    //CHECKSTYLE:OFF
+    private void writeMethods(Element rElement,
+                              String classPackage,
+                              Set<String> imports, 
+                              StringBuilder sbCode, 
                               ContextInfo info,
                               String resourceId,
                               boolean isRoot,
                               String currentPath) {
+    //CHECKSTYLE:ON    
         List<Element> methodEls = getWadlElements(rElement, "method");
        
         for (Element methodEl : methodEls) {
-            writeResourceMethod(methodEl, imports, sbCode, info, isRoot, currentPath);    
+            writeResourceMethod(methodEl, classPackage, imports, sbCode, info, isRoot, currentPath);    
         }
         
         List<Element> childEls = getWadlElements(rElement, "resource");
@@ -506,9 +523,9 @@ public class SourceGenerator {
             String newPath = (currentPath + path).replace("//", "/");
             String id = childEl.getAttribute("id");
             if (id.length() == 0) {
-                writeMethods(childEl, imports, sbCode, info, id, false, newPath);
+                writeMethods(childEl, classPackage, imports, sbCode, info, id, false, newPath);
             } else {
-                writeResourceMethod(childEl, imports, sbCode, info, false, newPath);
+                writeResourceMethod(childEl, classPackage, imports, sbCode, info, false, newPath);
             }
         }
     }
@@ -550,7 +567,8 @@ public class SourceGenerator {
         }
     }
     
-    private void writeResourceMethod(Element methodEl, 
+    private void writeResourceMethod(Element methodEl,
+                                     String classPackage,
                                      Set<String> imports,
                                      StringBuilder sbCode,
                                      ContextInfo info,
@@ -636,7 +654,7 @@ public class SourceGenerator {
                         !isRoot && !isResourceElement && resourceEl.getAttribute("id").length() > 0);
             
             Element repElement = getActualRepElement(allRequestReps, inXmlRep); 
-            writeRequestTypes(firstRequestEl, repElement, inParamElements, 
+            writeRequestTypes(firstRequestEl, classPackage, repElement, inParamElements, 
                     jaxpSourceRequired, sbCode, imports, info);
             sbCode.append(")");
             if (info.isInterfaceGenerated()) {
@@ -714,7 +732,7 @@ public class SourceGenerator {
             return xmlElement;
         }
         for (Element el : repElements) {
-            Element param = DOMUtils.getFirstChildWithName(el, WadlGenerator.WADL_NS, "param");
+            Element param = DOMUtils.getFirstChildWithName(el, getWadlNamespace(), "param");
             if (param != null) {
                 return el;
             }
@@ -775,15 +793,16 @@ public class SourceGenerator {
         }
         sbCode.append(localName).append(" ");
     }
-        
+    //CHECKSTYLE:OFF    
     private void writeRequestTypes(Element requestEl,
+                                   String classPackage,
                                    Element repElement,
                                    List<Element> inParamEls, 
                                    boolean jaxpRequired,
                                    StringBuilder sbCode, 
                                    Set<String> imports, 
                                    ContextInfo info) {
-        
+    //CHECKSTYLE:ON    
         boolean form = false;
         boolean formParamsAvailable = false;
         if (requestEl != null) {
@@ -801,6 +820,15 @@ public class SourceGenerator {
                 paramAnn = FormParam.class; 
             } 
             String name = paramEl.getAttribute("name");
+            boolean enumCreated = false;
+            if (generateEnums) {
+                List<Element> options =
+                    DOMUtils.findAllElementsByTagNameNS(paramEl, getWadlNamespace(), "option");
+                if (options.size() > 0) {
+                    generateEnumClass(getTypicalClassName(name), options, info.getSrcDir(), classPackage);
+                    enumCreated = true;
+                }
+            }
             if (writeAnnotations(info.isInterfaceGenerated())) {
                 writeAnnotation(sbCode, imports, paramAnn, name, false, false);
                 sbCode.append(" ");
@@ -821,7 +849,9 @@ public class SourceGenerator {
                 addImport(imports, List.class.getName());
                 type = "List<" + type + ">";
             }
-            sbCode.append(type).append(" ").append(name.replaceAll("[\\.\\-]", "_"));
+            String paramName = enumCreated ? getTypicalClassName(name) 
+                                           : name.replaceAll("[\\.\\-]", "_");
+            sbCode.append(type).append(" ").append(paramName);
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
                 if (i + 1 >= 4 && ((i + 1) % 4) == 0) {
@@ -856,9 +886,40 @@ public class SourceGenerator {
         }
     }
     
+    private void generateEnumClass(String clsName, List<Element> options, File src, String classPackage) {
+        StringBuilder sbImports = new StringBuilder();
+        StringBuilder sbCode = new StringBuilder();
+        sbImports.append(getClassComment()).append(getLineSep());
+        sbImports.append("package " + classPackage)
+            .append(";").append(getLineSep()).append(getLineSep());
+        
+        sbCode.append("public enum " + clsName);
+        sbCode.append(" {" + getLineSep());
+        
+        for (int i = 0; i < options.size(); i++) {
+            String value = options.get(i).getAttribute("value");
+            sbCode.append(TAB).append(value.toUpperCase());
+            if (i + 1 < options.size()) {
+                sbCode.append(",");
+            }
+            sbCode.append(getLineSep());
+        }
+        sbCode.append("}");
+        createJavaSourceFile(src, new QName(classPackage, clsName), sbCode, sbImports, false);
+    }
+    
+    private String getTypicalClassName(String name) { 
+        String theName = name.toUpperCase();
+        if (theName.length() == 1) {
+            return theName;
+        } else {
+            return theName.substring(0, 1) + theName.substring(1).toLowerCase();
+        }
+    }
+    
     private List<Element> getWadlElements(Element parent, String name) {
         List<Element> elements = parent != null 
-            ? DOMUtils.getChildrenWithName(parent, WadlGenerator.WADL_NS, name)
+            ? DOMUtils.getChildrenWithName(parent, getWadlNamespace(), name)
             : CastUtils.cast(Collections.emptyList(), Element.class);
         if (!"resource".equals(name)) {    
             for (int i = 0; i < elements.size(); i++) {
@@ -911,7 +972,7 @@ public class SourceGenerator {
                 }
             }
         } else {
-            Element param = DOMUtils.getFirstChildWithName(repElement, WadlGenerator.WADL_NS, "param");
+            Element param = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
             if (param != null) {
                 return getPrimitiveType(param);
             }
@@ -978,11 +1039,14 @@ public class SourceGenerator {
         sbCode.append(getLineSep()).append(TAB);
     }
     
-    private void createJavaSourceFile(File src, QName qname, StringBuilder sbCode, StringBuilder sbImports) {
+    private void createJavaSourceFile(File src, QName qname, StringBuilder sbCode, StringBuilder sbImports,
+                                      boolean serviceClass) {
         String content = sbImports.toString() + getLineSep() + sbCode.toString();
         
         String namespace = qname.getNamespaceURI();
-        generatedServiceClasses.add(namespace + "." + qname.getLocalPart());
+        if (serviceClass) {
+            generatedServiceClasses.add(namespace + "." + qname.getLocalPart());
+        }
         
         namespace = namespace.replace(".", getFileSep());
         
@@ -1302,11 +1366,25 @@ public class SourceGenerator {
         private Set<String> typeClassNames;
         private GrammarInfo gInfo;
         private Set<String> resourceClassNames = new HashSet<String>();
+        private Application rootApp;
+        private File srcDir;
         
-        public ContextInfo(Set<String> typeClassNames, GrammarInfo gInfo, boolean interfaceIsGenerated) {
+        public ContextInfo(Application rootApp,
+                           File srcDir,
+                           Set<String> typeClassNames, 
+                           GrammarInfo gInfo, 
+                           boolean interfaceIsGenerated) {
             this.interfaceIsGenerated = interfaceIsGenerated;
             this.typeClassNames = typeClassNames;
             this.gInfo = gInfo;
+            this.rootApp = rootApp;
+            this.srcDir = srcDir;
+        }
+        public Application getApp() {
+            return rootApp;
+        }
+        public File getSrcDir() {
+            return srcDir;
         }
         public boolean isInterfaceGenerated() {
             return interfaceIsGenerated;

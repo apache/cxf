@@ -117,6 +117,11 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
 
+        String wadlNs = (String)context.get(WadlToolConstants.CFG_WADL_NAMESPACE);
+        if (wadlNs != null) {
+            sg.setWadlNamespace(wadlNs);
+        }
+        
         sg.setSupportMultipleXmlReps(context.optionSet(WadlToolConstants.CFG_MULTIPLE_XML_REPS));
         // set the base path
         sg.setWadlPath(wadlURL);
@@ -137,6 +142,10 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         // TODO: consider introducing an option too for users be able to
         //       supply custom type mappings
         sg.setSchemaTypesMap(DEFAULT_TYPES_MAP);
+
+        if (context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS)) {
+            sg.setGenerateEnums(true);
+        }
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)

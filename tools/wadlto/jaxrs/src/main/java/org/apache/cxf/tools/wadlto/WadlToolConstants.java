@@ -44,6 +44,9 @@ public final class WadlToolConstants {
     
     public static final String CFG_NO_ADDRESS_BINDING = ToolConstants.CFG_NO_ADDRESS_BINDING;
     
+    public static final String CFG_WADL_NAMESPACE = "wadlNamespace";
+    public static final String CFG_GENERATE_ENUMS = "generateEnums";
+    
     public static final String CFG_WADLURL = "wadl";
     
     
