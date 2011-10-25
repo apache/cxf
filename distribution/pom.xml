@@ -123,7 +123,7 @@
         <dependency>
             <groupId>${project.groupId}.xjcplugins</groupId>
             <artifactId>cxf-xjc-bug671</artifactId>
-            <version>${cxf.xjc-utils.version}</version>
+            <version>${cxf.xjc-utils.verswversion>
         </dependency>
         <dependency>
             <groupId>${project.groupId}.xjcplugins</groupId>
@@ -315,6 +315,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-javascript</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
