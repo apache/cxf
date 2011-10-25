@@ -26,12 +26,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -39,7 +41,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class InTransformReaderTest extends Assert {
-    
+    private static final Logger LOG = LogUtils.getLogger(InTransformReaderTest.class);
+
     @Test
     public void testReadWithDefaultNamespace() throws Exception {
         InputStream is = new ByteArrayInputStream("<test xmlns=\"http://bar\"/>".getBytes());
@@ -351,8 +354,8 @@ public class InTransformReaderTest extends Assert {
     public void testReadWithAppendPostInclude1() throws Exception {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
-                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
-        transformStreamAndCompare("../resources/amazonIn1.xml", "../resources/amazon.xml",
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
+        transformStreamAndCompare("../resources/amazonIn2.xml", "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -361,8 +364,8 @@ public class InTransformReaderTest extends Assert {
     public void testReadWithAppendPostInclude2() throws Exception {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
-                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
-        transformStreamAndCompare("../resources/amazonIn1nospace.xml", "../resources/amazon.xml",
+                           "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
+        transformStreamAndCompare("../resources/amazonIn2nospace.xml", "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -384,6 +387,30 @@ public class InTransformReaderTest extends Assert {
                            "{http://apache.org/cxf/calculator/types}add");
         transformStreamAndCompare("../resources/AddRequestIn1nospace.xml", "../resources/AddRequest.xml",
                                   null, appendElements, null, null, null);
+        
+    }
+
+    @Test
+    public void testReadWithAppendPostWrapReplaceDrop() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("payload",
+                              "{http://www.w3.org/2003/05/soap-envelope}Envelope");
+        transformElements.put("params",
+                              "{http://apache.org/cxf/calculator/types}add");
+        transformElements.put("i1",
+                              "{http://apache.org/cxf/calculator/types}arg0");
+        transformElements.put("i2",
+                              "{http://apache.org/cxf/calculator/types}arg1");
+        transformElements.put("i3",
+                              "");
+        Map<String, String> appendElements = new HashMap<String, String>();
+        appendElements.put("payload/",
+                           "{http://www.w3.org/2003/05/soap-envelope}Body");
+        List<String> dropElements = new ArrayList<String>();
+        dropElements.add("param");
+
+        transformStreamAndCompare("../resources/AddRequestIn3.xml", "../resources/AddRequest.xml",
+                                  transformElements, appendElements, dropElements, null, null);
         
     }
 
@@ -430,20 +457,24 @@ public class InTransformReaderTest extends Assert {
             if (revent == -1 && tevent == -1) {
                 break;
             }
-            assertEquals(revent, tevent);
+            LOG.fine("Event: " + tevent + " ? " + revent);
+            assertEquals(tevent, revent);
 
             switch (revent) {
             case XMLStreamConstants.START_ELEMENT:
+                LOG.fine("Start Element " + teacher.getName() + " ? " + reader.getName());
                 assertEquals(teacher.getName(), reader.getName());
                 verifyAttributes(reader, teacher);
                 break;
             case XMLStreamConstants.END_ELEMENT:
+                LOG.fine("End Element " + teacher.getName() + " ? " + reader.getName());
                 if (eec) {
                     // perform end-element-check
                     assertEquals(teacher.getName(), reader.getName());
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
+                LOG.fine("Characters " + teacher.getText() + " ? " + reader.getText());
                 assertEquals(teacher.getText(), reader.getText());
                 break;
             default:
