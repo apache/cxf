@@ -63,6 +63,7 @@ public class JAASAuthenticationFilter implements RequestHandler {
         interceptor.setContextName(name);
     }
     
+    @Deprecated
     public void setRolePrefix(String name) {
         interceptor.setRolePrefix(name);
     }
