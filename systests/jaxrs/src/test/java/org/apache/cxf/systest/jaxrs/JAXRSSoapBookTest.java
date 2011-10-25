@@ -153,7 +153,6 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         assertEquals("0", getStringFromInputStream(in));
                 
     }
-    @Ignore
     @Test
     public void testGetBookTransform() throws Exception {
         
