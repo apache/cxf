@@ -165,7 +165,6 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
     public void testPostBookTransform() throws Exception {
            
         String address = "http://localhost:" + PORT 
