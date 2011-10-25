@@ -89,6 +89,7 @@
         <module>jax_rs/spring_security</module>
         <module>sts_issue_operation</module>
         <module>logbrowser</module>
+        <module>ws_notification</module>
 
 
         <!--
