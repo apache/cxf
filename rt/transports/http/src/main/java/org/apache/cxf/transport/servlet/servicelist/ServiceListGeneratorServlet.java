@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -44,6 +45,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
     private Bus bus;
     private String serviceListStyleSheet;
     private String title;
+    private boolean showForeignContexts = true;
 
     public ServiceListGeneratorServlet(DestinationRegistry destinationRegistry, Bus bus) {
         this.destinationRegistry = destinationRegistry;
@@ -98,7 +100,8 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             } else {
                 styleSheetPath = request.getRequestURI() + "/?stylesheet=1";
             }
-            serviceListWriter = new FormattedServiceListWriter(styleSheetPath, title, atomMap);
+            serviceListWriter = 
+                new FormattedServiceListWriter(styleSheetPath, title, showForeignContexts, atomMap);
             
         }
         response.setContentType(serviceListWriter.getContentType());
@@ -157,12 +160,17 @@ public class ServiceListGeneratorServlet extends HttpServlet {
 
     public void init(ServletConfig servletConfig) {
         String configServiceListStyleSheet = servletConfig.getInitParameter("service-list-stylesheet");
-        if (configServiceListStyleSheet != null) {
+        if (!StringUtils.isEmpty(configServiceListStyleSheet)) {
             this.serviceListStyleSheet = configServiceListStyleSheet;
         }
         String configTitle = servletConfig.getInitParameter("service-list-title");
-        if (configTitle != null) {
+        if (!StringUtils.isEmpty(configTitle)) {
             this.title = configTitle;
+        }
+        
+        String showAllContexts = servletConfig.getInitParameter("service-list-all-contexts");
+        if (!StringUtils.isEmpty(showAllContexts)) {
+            this.showForeignContexts = Boolean.valueOf(showAllContexts);
         }
     }
 
@@ -176,4 +184,5 @@ public class ServiceListGeneratorServlet extends HttpServlet {
 
     public void destroy() { 
     }
+    
 }

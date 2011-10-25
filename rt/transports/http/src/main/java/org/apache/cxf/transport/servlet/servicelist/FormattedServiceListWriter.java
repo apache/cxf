@@ -30,12 +30,15 @@ public class FormattedServiceListWriter implements ServiceListWriter {
     private String styleSheetPath;
     private String title;
     private Map<String, String> atomMap;
-
+    private boolean showForeignContexts;
+    
     public FormattedServiceListWriter(String styleSheetPath, 
-                                      String title, 
+                                      String title,
+                                      boolean showForeignContexts,
                                       Map<String, String> atomMap) {
         this.styleSheetPath = styleSheetPath;
         this.title = title;
+        this.showForeignContexts = showForeignContexts;
         this.atomMap = atomMap;
     }
 
@@ -85,6 +88,11 @@ public class FormattedServiceListWriter implements ServiceListWriter {
     private void writerSoapEndpoint(PrintWriter writer,
                                     String basePath,
                                     AbstractDestination sd) {
+        String absoluteURL = getAbsoluteAddress(basePath, sd);
+        if (absoluteURL == null) {
+            return;
+        }
+        
         writer.write("<tr><td>");
         writer.write("<span class=\"porttypename\">"
                      + sd.getEndpointInfo().getInterface().getName().getLocalPart() + "</span>");
@@ -97,7 +105,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("</ul>");
         writer.write("</td><td>");
         
-        String absoluteURL = getAbsoluteAddress(basePath, sd);
+        
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
                      + absoluteURL + "</span>");
         writer.write("<br/><span class=\"field\">WSDL :</span> " + "<a href=\"" + absoluteURL
@@ -115,12 +123,19 @@ public class FormattedServiceListWriter implements ServiceListWriter {
             return endpointAddress;
         }
         endpointAddress = d.getEndpointInfo().getAddress();
-        if (d instanceof ServletDestination
-            && (endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://"))) {
-            String path = ((ServletDestination)d).getPath();
-            return basePath + path;
-        } else if (basePath == null || endpointAddress.startsWith(basePath)) {
-            return endpointAddress;
+        if (endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://")) {
+            if (endpointAddress.startsWith(basePath)) {
+                return endpointAddress;
+            } else if (showForeignContexts) {
+                if (d instanceof ServletDestination) {
+                    String path = ((ServletDestination)d).getPath();
+                    return basePath + path;
+                } else {
+                    return endpointAddress;
+                }
+            } else {
+                return null;
+            }
         } else {
             return basePath + endpointAddress;
         }
@@ -143,6 +158,9 @@ public class FormattedServiceListWriter implements ServiceListWriter {
                                       String basePath,
                                       AbstractDestination sd) {
         String absoluteURL = getAbsoluteAddress(basePath, sd);
+        if (absoluteURL == null) {
+            return;
+        }
         
         writer.write("<tr><td>");
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
