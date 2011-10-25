@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
@@ -262,11 +263,47 @@ public final class WrapperClassGenerator extends ASMHelper {
                       getClassCode(XmlNsForm.class),
                       q ? "QUALIFIED" : "UNQUALIFIED");
         av0.visitEnd();
+        
+        if (clz.getPackage() != null && clz.getPackage().getAnnotations() != null) {
+            for (Annotation ann : clz.getPackage().getAnnotations()) {
+                if (ann instanceof XmlJavaTypeAdapters) {
+                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapters;",
+                                             true);
+                    generateXmlJavaTypeAdapters(av0, (XmlJavaTypeAdapters)ann);
+                    av0.visitEnd();
+                } else if (ann instanceof XmlJavaTypeAdapter) {
+                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;",
+                                             true);
+                    generateXmlJavaTypeAdapter(av0, (XmlJavaTypeAdapter)ann);
+                    av0.visitEnd();
+                }
+            }
+        }
         cw.visitEnd();
-
+        
         loadClass(className, clz, cw.toByteArray());
     }
 
+    private void generateXmlJavaTypeAdapters(AnnotationVisitor av, XmlJavaTypeAdapters adapters) {
+        AnnotationVisitor av1 = av.visitArray("value");
+        
+        for (XmlJavaTypeAdapter adapter : adapters.value()) {
+            AnnotationVisitor av2 
+                = av1.visitAnnotation(null, "Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;");
+            generateXmlJavaTypeAdapter(av2, adapter);
+            av2.visitEnd();
+        }
+        av1.visitEnd();
+    }
+    private void generateXmlJavaTypeAdapter(AnnotationVisitor av, XmlJavaTypeAdapter adapter) {
+        if (adapter.value() != null) {
+            av.visit("value", org.objectweb.asm.Type.getType(getClassCode(adapter.value())));
+        }
+        if (adapter.type() != javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT.class) {
+            av.visit("type", org.objectweb.asm.Type.getType(getClassCode(adapter.type())));
+        }
+    }
+    
     private void generateMessagePart(ClassWriter cw, MessagePartInfo mpi, Method method, String className) {
         if (Boolean.TRUE.equals(mpi.getProperty(ReflectionServiceFactoryBean.HEADER))) {
             return;
@@ -375,13 +412,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0.visitEnd();
             } else if (ann instanceof XmlJavaTypeAdapter) {
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;", true);
-                XmlJavaTypeAdapter adapter = (XmlJavaTypeAdapter)ann;
-                if (adapter.value() != null) {
-                    av0.visit("value", org.objectweb.asm.Type.getType(getClassCode(adapter.value())));
-                }
-                if (adapter.type() != javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT.class) {
-                    av0.visit("type", org.objectweb.asm.Type.getType(getClassCode(adapter.type())));
-                }
+                generateXmlJavaTypeAdapter(av0, (XmlJavaTypeAdapter)ann);
                 av0.visitEnd();
             } else if (ann instanceof XmlAttachmentRef) {
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlAttachmentRef;", true);
