@@ -52,12 +52,6 @@
        </dependency>
        <dependency>
            <groupId>org.apache.cxf</groupId>
-           <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-           <version>${project.version}</version>
-           <scope>test</scope>
-       </dependency>
-       <dependency>
-           <groupId>org.apache.cxf</groupId>
            <artifactId>cxf-rt-frontend-jaxws</artifactId>
            <version>${project.version}</version>
            <scope>test</scope>
