@@ -66,6 +66,7 @@ import org.junit.Test;
 
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServer.PORT;
+    public static final String PORT2 = allocatePort(JAXRSClientServerBookTest.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -84,7 +85,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testProxyWrongAddress() throws Exception {
-        BookStore store = JAXRSClientFactory.create("http://localhost:8080/wrongaddress", 
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT2 + "/wrongaddress", 
                                                     BookStore.class);
         try {
             store.getBook("123");
