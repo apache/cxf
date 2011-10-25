@@ -69,9 +69,11 @@ public class WebApplicationExceptionMapper
             flogger = (FaultListener)PhaseInterceptorChain.getCurrentMessage()
                 .getContextualProperty(FaultListener.class.getName());
         }
+        boolean doDefault = true;
         if (flogger != null) {
-            flogger.faultOccurred(ex, message, msg);
-        } else if (LOG.isLoggable(Level.FINE)) {
+            doDefault = flogger.faultOccurred(ex, message, msg);
+        }
+        if (LOG.isLoggable(Level.FINE) && doDefault) {
             LOG.log(Level.FINE, message, ex);
         }
         
