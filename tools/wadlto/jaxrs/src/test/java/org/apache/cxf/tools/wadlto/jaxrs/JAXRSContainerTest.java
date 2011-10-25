@@ -42,7 +42,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
             context.put(WadlToolConstants.CFG_COMPILE, "true");
-
+            
             container.setContext(context);
             container.execute();
 

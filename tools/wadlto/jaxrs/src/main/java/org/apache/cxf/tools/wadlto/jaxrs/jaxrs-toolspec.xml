@@ -32,6 +32,16 @@ Examples:
 
     <usage>
         <optionGroup id="options">
+            <option id="wadlns">
+                <annotation>
+                    Specify the WADL namespace.
+                </annotation>
+                <switch>wadlns</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>wadl-namespace</annotation>
+                </associatedArgument>
+            </option>
+            
             <option id="packagename">
                 <annotation>
                     Specifies the java package name to use for the generated code
@@ -124,9 +134,16 @@ Examples:
             <option id="impl" maxOccurs="1">
                 <annotation>
                     Specifies that a dummy service implementation is generated.
-                    
                 </annotation>
                 <switch>impl</switch>
+            </option>
+            
+            <option id="generateEnums" maxOccurs="1">
+                <annotation>
+                    Specifies that Enum classes can be generated to represent
+                    parameters with multiple options
+                </annotation>
+                <switch>generateEnums</switch>
             </option>
             
             <option id="noAddressBinding" maxOccurs="1">
