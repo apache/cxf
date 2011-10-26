@@ -22,12 +22,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -511,22 +513,18 @@ public class DynamicClientFactory {
                 }
                 for (URL url : urls) {
                     if (url.getProtocol().startsWith("file")) {
-                        File file;
-                        try { 
-                            URI uri = new URI(url.getProtocol(), null, url.getPath(), null, null);
-
-                            if (uri.getPath() == null) {
-                                continue;
-                            }
-                            file = new File(uri.getPath()); 
-                        } catch (URISyntaxException urise) { 
+                        File file = null;
+                        // CXF-3884 use url-decoder to get the decoded file path from the url
+                        try {
                             if (url.getPath() == null) {
                                 continue;
                             }
-                            file = new File(url.getPath()); 
+                            file = new File(URLDecoder.decode(url.getPath(), "utf-8")); 
+                        } catch (UnsupportedEncodingException uee) {
+                            // ignored as utf-8 is supported
                         } 
 
-                        if (file.exists()) { 
+                        if (null != file && file.exists()) { 
                             classPath.append(file.getAbsolutePath()) 
                                 .append(System 
                                         .getProperty("path.separator")); 
