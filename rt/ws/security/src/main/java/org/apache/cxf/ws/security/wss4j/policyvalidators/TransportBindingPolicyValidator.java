@@ -38,7 +38,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
  */
 public class TransportBindingPolicyValidator extends AbstractBindingPolicyValidator {
     
-    private List<WSSecurityEngineResult> results;
     private List<WSSecurityEngineResult> signedResults;
     private Message message;
 
@@ -85,21 +84,25 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             }
             
             // Check the IncludeTimestamp
-            if (!validateTimestamp(binding.isIncludeTimestamp(), true, results, signedResults, message)) {
+            if (!validateTimestamp(binding.isIncludeTimestamp(), true, signedResults, message)) {
                 String error = "Received Timestamp does not match the requirements";
                 notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
+                ai.setNotAsserted(error);
                 return false;
             }
+            assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
             
             // Check the Layout
             Layout layout = binding.getLayout();
             boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTimestampFirst;
             boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
-            if (!validateLayout(results, timestampFirst, timestampLast)) {
+            if (!validateLayout(timestampFirst, timestampLast)) {
                 String error = "Layout does not match the requirements";
                 notAssertPolicy(aim, SP12Constants.LAYOUT, error);
+                ai.setNotAsserted(error);
                 return false;
             }
+            assertPolicy(aim, SP12Constants.LAYOUT);
         }
         
         // We don't need to check these policies for the Transport binding

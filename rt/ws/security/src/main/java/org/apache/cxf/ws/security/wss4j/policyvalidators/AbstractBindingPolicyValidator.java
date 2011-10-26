@@ -25,10 +25,22 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.model.EncryptionToken;
+import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.ProtectionToken;
+import org.apache.cxf.ws.security.policy.model.SignatureToken;
+import org.apache.cxf.ws.security.policy.model.SymmetricAsymmetricBindingBase;
+import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.TokenWrapper;
+import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
@@ -41,11 +53,14 @@ import org.apache.ws.security.util.WSSecurityUtil;
  */
 public abstract class AbstractBindingPolicyValidator {
     
+    private static final QName SIG_QNAME = new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
+    
+    protected List<WSSecurityEngineResult> results;
+    
     /**
      * Validate a Timestamp
      * @param includeTimestamp whether a Timestamp must be included or not
      * @param transportBinding whether the Transport binding is in use or not
-     * @param results the results list
      * @param signedResults the signed results list
      * @param message the Message object
      * @return whether the Timestamp policy is valid or not
@@ -53,7 +68,6 @@ public abstract class AbstractBindingPolicyValidator {
     protected boolean validateTimestamp(
         boolean includeTimestamp,
         boolean transportBinding,
-        List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
@@ -79,7 +93,7 @@ public abstract class AbstractBindingPolicyValidator {
                 List<WSDataRef> dataRefs = 
                     CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                 for (WSDataRef dataRef : dataRefs) {
-                    if (timestamp == dataRef.getProtectedElement()) {
+                    if (timestamp.getElement() == dataRef.getProtectedElement()) {
                         return true;
                     }
                 }
@@ -95,21 +109,17 @@ public abstract class AbstractBindingPolicyValidator {
     protected boolean validateEntireHeaderAndBodySignatures(
         List<WSSecurityEngineResult> signedResults
     ) {
-        if (signedResults.isEmpty()) {
-            return false;
-        }
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> dataRefs = 
                     CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
             for (WSDataRef dataRef : dataRefs) {
                 String xpath = dataRef.getXpath();
                 String[] nodes = xpath.split("/");
-                // envelope/Body || envelope/Header/header
-                if (nodes.length == 2 || nodes.length == 3) {
-                    return true;
-                // envelope/Header/wsse:Security/header
-                } else if (nodes.length == 4 && nodes[2].contains("Security")) {
-                    return true;
+                // envelope/Body || envelope/Header/header || envelope/Header/wsse:Security/header
+                if (nodes.length == 5 && nodes[3].contains("Security")) {
+                    continue;
+                } else if (nodes.length < 3 || nodes.length > 4) {
+                    return false;
                 }
             }
         }
@@ -120,7 +130,6 @@ public abstract class AbstractBindingPolicyValidator {
      * Validate the layout assertion. It just checks the LaxTsFirst and LaxTsLast properties
      */
     protected boolean validateLayout(
-        List<WSSecurityEngineResult> results,
         boolean laxTimestampFirst,
         boolean laxTimestampLast
     ) {
@@ -144,6 +153,198 @@ public abstract class AbstractBindingPolicyValidator {
         }
         return true;
         
+    }
+    
+    /**
+     * Check various properties set in the policy of the binding
+     */
+    protected boolean checkProperties(
+        SymmetricAsymmetricBindingBase binding, 
+        AssertionInfo ai,
+        AssertionInfoMap aim,
+        List<WSSecurityEngineResult> signedResults,
+        Message message
+    ) {
+        // Check the AlgorithmSuite
+        AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
+        if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
+            return false;
+        }
+        
+        // Check the IncludeTimestamp
+        if (!validateTimestamp(binding.isIncludeTimestamp(), false, signedResults, message)) {
+            String error = "Received Timestamp does not match the requirements";
+            notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
+            ai.setNotAsserted(error);
+            return false;
+        }
+        assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
+        
+        // Check the Layout
+        Layout layout = binding.getLayout();
+        boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTimestampFirst;
+        boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
+        if (!validateLayout(timestampFirst, timestampLast)) {
+            String error = "Layout does not match the requirements";
+            notAssertPolicy(aim, SP12Constants.LAYOUT, error);
+            ai.setNotAsserted(error);
+            return false;
+        }
+        assertPolicy(aim, SP12Constants.LAYOUT);
+        
+        // Check the EntireHeaderAndBodySignatures property
+        if (binding.isEntireHeadersAndBodySignatures()
+            && !validateEntireHeaderAndBodySignatures(signedResults)) {
+            String error = "OnlySignEntireHeadersAndBody does not match the requirements";
+            ai.setNotAsserted(error);
+            return false;
+        }
+        
+        // Check whether the signatures were encrypted or not
+        if (binding.isSignatureProtection() && !isSignatureEncrypted()) {
+            ai.setNotAsserted("The signature is not protected");
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Check the Protection Order of the binding
+     */
+    protected boolean checkProtectionOrder(SymmetricAsymmetricBindingBase binding, AssertionInfo ai) {
+        if (binding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
+            if (!binding.isSignatureProtection() && isSignedBeforeEncrypted()) {
+                ai.setNotAsserted("Not encrypted before signed");
+                return false;
+            }
+        } else if (isEncryptedBeforeSigned()) {
+            ai.setNotAsserted("Not signed before encrypted");
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Check to see if a signature was applied before encryption.
+     * Note that results are stored in the reverse order.
+     */
+    private boolean isSignedBeforeEncrypted() {
+        boolean signed = false;
+        for (WSSecurityEngineResult result : results) {
+            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            List<WSDataRef> el = 
+                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+            
+            // Don't count an endorsing signature
+            if (actInt.intValue() == WSConstants.SIGN && el != null
+                && !(el.size() == 1 && el.get(0).getName().equals(SIG_QNAME))) {
+                signed = true;
+            }
+            if (actInt.intValue() == WSConstants.ENCR && el != null) {
+                if (signed) {
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check to see if encryption was applied before signature.
+     * Note that results are stored in the reverse order.
+     */
+    private boolean isEncryptedBeforeSigned() {
+        boolean encrypted = false;
+        for (WSSecurityEngineResult result : results) {
+            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            List<WSDataRef> el = 
+                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+            
+            if (actInt.intValue() == WSConstants.ENCR && el != null) {
+                encrypted = true;
+            }
+            // Don't count an endorsing signature
+            if (actInt.intValue() == WSConstants.SIGN && el != null
+                && !(el.size() == 1 && el.get(0).getName().equals(SIG_QNAME))) {
+                if (encrypted) {
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check the derived key requirement.
+     */
+    protected boolean checkDerivedKeys(
+        TokenWrapper tokenWrapper, 
+        boolean hasDerivedKeys,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
+    ) {
+        Token token = tokenWrapper.getToken();
+        // If derived keys are not required then just return
+        if (!(token instanceof X509Token && token.isDerivedKeys())) {
+            return true;
+        }
+        if (tokenWrapper instanceof EncryptionToken 
+            && !hasDerivedKeys && !encryptedResults.isEmpty()) {
+            return false;
+        } else if (tokenWrapper instanceof SignatureToken
+            && !hasDerivedKeys && !signedResults.isEmpty()) {
+            return false;
+        } else if (tokenWrapper instanceof ProtectionToken
+            && !hasDerivedKeys && !(signedResults.isEmpty() || encryptedResults.isEmpty())) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Check whether all Signature (and SignatureConfirmation) elements were encrypted
+     */
+    protected boolean isSignatureEncrypted() {
+        for (WSSecurityEngineResult result : results) {
+            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.SIGN) {
+                // TODO || actInt.intValue() == WSConstants.SC) {
+                String sigId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                if (sigId == null || !isIdEncrypted(sigId)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Return true if the given id was encrypted
+     */
+    private boolean isIdEncrypted(String sigId) {
+        for (WSSecurityEngineResult wser : results) {
+            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.ENCR) {
+                List<WSDataRef> el = 
+                    CastUtils.cast((List<?>)wser.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                if (el != null) {
+                    for (WSDataRef r : el) {
+                        Element protectedElement = r.getProtectedElement();
+                        if (protectedElement != null) {
+                            String id = protectedElement.getAttribute("Id");
+                            String wsuId = protectedElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+                            if (sigId.equals(id) || sigId.equals(wsuId)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
     
     protected void assertPolicy(AssertionInfoMap aim, Assertion token) {
