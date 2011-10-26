@@ -29,16 +29,18 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 import org.apache.cxf.common.util.StringUtils;
 
 /**
  * 
  */
-public class StreamWriterContentHandler implements ContentHandler {
+public class StreamWriterContentHandler implements ContentHandler, LexicalHandler {
     
     XMLStreamWriter writer;
     Map<String, String> mapping = new LinkedHashMap<String, String>();
+    boolean inCDATA;
     
     public StreamWriterContentHandler(XMLStreamWriter w) {
         writer = w;
@@ -72,7 +74,11 @@ public class StreamWriterContentHandler implements ContentHandler {
      */
     public void characters(char ch[], int start, int length) throws SAXException {
         try {
-            writer.writeCharacters(ch, start, length);
+            if (inCDATA) {
+                writer.writeCData(new String(ch, start, length));
+            } else {
+                writer.writeCharacters(ch, start, length);
+            }
         } catch (XMLStreamException e) {
             throw new SAXException(e);
         }
@@ -87,6 +93,11 @@ public class StreamWriterContentHandler implements ContentHandler {
      * @throws SAXException
      */
     public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
+        try {
+            writer.writeCharacters(ch, start, length);
+        } catch (XMLStreamException e) {
+            throw new SAXException(e);
+        }
     }
 
     /**
@@ -242,7 +253,27 @@ public class StreamWriterContentHandler implements ContentHandler {
             throw new SAXException(e);
         }
     }
-    
-    
 
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+    }
+    public void endDTD() throws SAXException {
+    }
+    public void startEntity(String name) throws SAXException {
+    }
+    public void endEntity(String name) throws SAXException {
+    }
+    public void startCDATA() throws SAXException {
+        inCDATA = true;
+    }
+    public void endCDATA() throws SAXException {
+        inCDATA = false;
+    }
+
+    public void comment(char[] ch, int start, int length) throws SAXException {
+        try {
+            writer.writeComment(new String(ch, start, length));
+        } catch (XMLStreamException e) {
+            throw new SAXException(e);
+        }
+    }
 }
