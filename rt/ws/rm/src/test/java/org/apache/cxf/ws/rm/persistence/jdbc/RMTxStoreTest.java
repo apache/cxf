@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
@@ -429,10 +430,12 @@ public class RMTxStoreTest extends Assert {
 
             seq = store.getDestinationSequence(sid1);
             assertNotNull(seq);
+            verifyDestinationSequence("sequence1", seq);
 
             sid2 = setupDestinationSequence("sequence2");
             seq = store.getDestinationSequence(sid2);
             assertNotNull(seq);
+            verifyDestinationSequence("sequence2", seq);
         } finally {
             if (null != sid1) {
                 store.removeDestinationSequence(sid1);
@@ -457,10 +460,12 @@ public class RMTxStoreTest extends Assert {
 
             seq = store.getSourceSequence(sid1);
             assertNotNull(seq);
-
+            verifySourceSequence("sequence1", seq);
+            
             sid2 = setupSourceSequence("sequence2");
             seq = store.getSourceSequence(sid2);
             assertNotNull(seq);
+            verifySourceSequence("sequence2", seq);
         } finally {
             if (null != sid1) {
                 store.removeSourceSequence(sid1);
@@ -582,6 +587,52 @@ public class RMTxStoreTest extends Assert {
         control.reset();
         
         return sid;
+    }
+
+    private void verifyDestinationSequence(String s, DestinationSequence seq) {
+        Identifier sid = seq.getIdentifier();
+        assertNotNull(sid);
+        assertEquals(s, sid.getValue());
+        if ("sequence1".equals(s)) {
+            assertEquals(0, seq.getLastMessageNumber());
+            SequenceAcknowledgement sa = seq.getAcknowledgment();
+            assertNotNull(sa);
+            verifyAcknowledgementRanges(sa.getAcknowledgementRange(), new long[]{1, 1});
+        } else if ("sequence2".equals(s)) {
+            assertEquals(10, seq.getLastMessageNumber());
+            SequenceAcknowledgement sa = seq.getAcknowledgment();
+            assertNotNull(sa);
+            verifyAcknowledgementRanges(sa.getAcknowledgementRange(), new long[]{1, 1, 3, 10});
+        }
+    }
+    
+    private void verifySourceSequence(String s, SourceSequence seq) {
+        Identifier sid = seq.getIdentifier();
+        assertNotNull(sid);
+        assertEquals(s, sid.getValue());
+        if ("sequence1".equals(s)) {
+            assertNull(seq.getExpires());
+            assertEquals(1, seq.getCurrentMessageNr());
+            assertFalse(seq.isLastMessage());
+        } else if ("sequence2".equals(s)) {
+            Date expires = seq.getExpires();
+            assertNotNull(expires);
+            expires.after(new Date());
+            assertEquals(10, seq.getCurrentMessageNr());
+            assertTrue(seq.isLastMessage());
+        }
+    }
+    
+    private void verifyAcknowledgementRanges(List<SequenceAcknowledgement.AcknowledgementRange> ranges, 
+                                             long[] values) {
+        assertNotNull(ranges);
+        assertEquals(values.length / 2, ranges.size());
+        
+        int v = 0;
+        for (SequenceAcknowledgement.AcknowledgementRange range : ranges) {
+            assertEquals(values[v++], (long)range.getLower());   
+            assertEquals(values[v++], (long)range.getUpper());   
+        }
     }
     
     private void setupMessage(Identifier sid, Long mn, String to, boolean outbound) 
