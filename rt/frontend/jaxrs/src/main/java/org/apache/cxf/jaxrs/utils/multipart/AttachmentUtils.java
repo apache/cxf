@@ -72,12 +72,15 @@ public final class AttachmentUtils {
     }
     
     public static MultipartBody getMultipartBody(MessageContext mc,
-        String attachmentDir, String attachmentThreshold) {
+        String attachmentDir, String attachmentThreshold, String attachmentMaxSize) {
         if (attachmentDir != null) {
             mc.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDir);
         }
         if (attachmentThreshold != null) {
             mc.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, attachmentThreshold);
+        }
+        if (attachmentMaxSize != null) {
+            mc.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, attachmentMaxSize);
         }
         
         boolean embeddedAttachment = mc.get("org.apache.cxf.multipart.embedded") != null;
@@ -88,8 +91,11 @@ public final class AttachmentUtils {
     }
     
     public static List<Attachment> getAttachments(MessageContext mc, 
-        String attachmentDir, String attachmentThreshold) {
-        return getMultipartBody(mc, attachmentDir, attachmentThreshold).getAllAttachments();
+        String attachmentDir, String attachmentThreshold, String attachmentMaxSize) {
+        return getMultipartBody(mc, 
+                                attachmentDir, 
+                                attachmentThreshold, 
+                                attachmentMaxSize).getAllAttachments();
     }
     
     public static Attachment getMultipart(Class<Object> c, Annotation[] anns, 

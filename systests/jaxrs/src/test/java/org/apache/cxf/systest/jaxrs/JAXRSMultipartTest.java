@@ -43,6 +43,10 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
@@ -526,6 +530,28 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         }
     }
     
+    @Test
+    public void testMultipartRequestTooLarge() throws Exception {
+        PostMethod post = new PostMethod("http://localhost:" + PORT + "/bookstore/books/image");
+        String ct = "multipart/mixed";
+        post.setRequestHeader("Content-Type", ct);
+        Part[] parts = new Part[1];
+        parts[0] = new FilePart("image",
+                new ByteArrayPartSource("testfile.png", new byte[1024 * 1024 * 15]),
+                "image/png", null);
+        post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+
+        HttpClient httpclient = new HttpClient();
+
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(413, result);
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }
+    }
+
     private void doAddBook(String address, String resourceName, int status) throws Exception {
         doAddBook("multipart/related", address, resourceName, status);
     }
