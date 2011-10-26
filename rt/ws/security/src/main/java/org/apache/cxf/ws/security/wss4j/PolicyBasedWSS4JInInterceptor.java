@@ -66,21 +66,19 @@ import org.apache.cxf.ws.security.policy.model.RequiredParts;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.policy.model.TransportToken;
 import org.apache.cxf.ws.security.policy.model.Wss11;
-import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
-import org.apache.cxf.ws.security.wss4j.policyvalidators.AlgorithmSuitePolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SymmetricBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.TransportBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
-import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -203,35 +201,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             return true;
         }
         return false;
-    }
-    private void assertPolicy(AssertionInfoMap aim, Token token, Boolean derived) {
-        if (derived == null) {
-            //no keys were needed for anything
-            return;
-        }
-        if (!derived && token instanceof X509Token && token.isDerivedKeys()) {
-            notAssertPolicy(aim, token, "No derived keys found.");
-        }
-    }
-    private void assertPolicy(AssertionInfoMap aim, Assertion token) {
-        Collection<AssertionInfo> ais = aim.get(token.getName());
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == token) {
-                    ai.setAsserted(true);
-                }
-            }    
-        }
-    }
-    private void notAssertPolicy(AssertionInfoMap aim, Assertion token, String msg) {
-        Collection<AssertionInfo> ais = aim.get(token.getName());
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == token) {
-                    ai.setNotAsserted(msg);
-                }
-            }    
-        }
     }
 
     private String checkAsymetricBinding(AssertionInfoMap aim, 
@@ -472,37 +441,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
     }
     
-    enum Protections {
-        NONE,
-        SIGN,
-        ENCRYPT,
-        SIGN_ENCRYPT,
-        ENCRYPT_SIGN,
-        ENCRYPT_SIGN_PROTECT,
-    };
-    private Protections addSign(Protections prots) {
-        if (prots == Protections.NONE) {
-            return Protections.SIGN;
-        }
-        if (prots == Protections.ENCRYPT) {
-            return Protections.ENCRYPT_SIGN;
-        }
-        return prots;
-    }
-    private Protections addEncrypt(Protections prots) {
-        if (prots == Protections.NONE) {
-            return Protections.ENCRYPT;
-        }
-        if (prots == Protections.SIGN) {
-            return Protections.SIGN_ENCRYPT;
-        }
-        if (prots == Protections.ENCRYPT_SIGN
-            || prots == Protections.SIGN_ENCRYPT) {
-            return Protections.ENCRYPT_SIGN_PROTECT;
-        }
-        return prots;
-    }
-    
     @Override
     protected void doResults(
         SoapMessage msg, 
@@ -517,7 +455,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
         Boolean hasDerivedKeys = null;
         boolean hasEndorsement = false;
-        Protections prots = Protections.NONE;
         
         //
         // Prefetch all signature results
@@ -544,7 +481,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     for (WSDataRef r : sl) {
                         signed.add(r);
                     }
-                    prots = addSign(prots);
                 }
                 break;
             case WSConstants.ENCR:
@@ -557,7 +493,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     for (WSDataRef r : el) {
                         encrypted.add(r);
                     }
-                    prots = addEncrypt(prots);
                 }
                 break;
             case WSConstants.UT:
@@ -580,13 +515,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 SamlTokenPolicyValidator validator = 
                     new SamlTokenPolicyValidator(soapBody, signedResults, msg);
                 validator.validatePolicy(aim, wser);
-                break;
-            // TODO remove
-            case WSConstants.TS:
-                assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
-                break;
-            case WSConstants.DKT:
-                hasDerivedKeys = Boolean.TRUE;
                 break;
             case WSConstants.SC:
                 assertPolicy(aim, SP12Constants.WSS11);
@@ -621,15 +549,20 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         assertHeadersExists(aim, msg, soapHeader);
         
-        assertAsymetricBinding(aim, msg, prots, results, hasDerivedKeys);
-        assertSymmetricBinding(aim, msg, prots, results, hasDerivedKeys);
-        
         X509TokenPolicyValidator x509Validator = new X509TokenPolicyValidator(msg, results);
         x509Validator.validatePolicy(aim);
         
         TransportBindingPolicyValidator transportValidator = 
             new TransportBindingPolicyValidator(msg, results, signedResults);
         transportValidator.validatePolicy(aim);
+        
+        SymmetricBindingPolicyValidator symmetricValidator = 
+            new SymmetricBindingPolicyValidator(msg, results, signedResults);
+        symmetricValidator.validatePolicy(aim);
+        
+        AsymmetricBindingPolicyValidator asymmetricValidator = 
+            new AsymmetricBindingPolicyValidator(msg, results, signedResults);
+        asymmetricValidator.validatePolicy(aim);
         
         SecurityContextTokenPolicyValidator sctValidator = 
             new SecurityContextTokenPolicyValidator(msg, results);
@@ -700,100 +633,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
     }
 
-    private boolean assertSymmetricBinding(AssertionInfoMap aim, 
-                                           SoapMessage message,
-                                           Protections prots,
-                                           List<WSSecurityEngineResult> results,
-                                           Boolean derived) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-        if (ais == null) {
-            return true;
-        }
-        
-        for (AssertionInfo ai : ais) {
-            SymmetricBinding abinding = (SymmetricBinding)ai.getAssertion();
-            ai.setAsserted(true);
-            if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-                if (abinding.isSignatureProtection()) {
-                    if (prots == Protections.ENCRYPT_SIGN
-                        || prots == Protections.SIGN_ENCRYPT) {
-                        ai.setNotAsserted("Not encrypted before signed and then protected");
-                        return false;
-                    }
-                } else if (prots == Protections.SIGN_ENCRYPT) {
-                    ai.setNotAsserted("Not encrypted before signed");
-                    return false;
-                }
-            } else if (prots == Protections.ENCRYPT_SIGN) {
-                ai.setNotAsserted("Not signed before encrypted");
-                return false;
-            }
-            
-            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
-            if (!algorithmValidator.validatePolicy(ai, abinding.getAlgorithmSuite())) {
-                return false;
-            }
-            
-            if (abinding.getEncryptionToken() != null) {
-                assertPolicy(aim, abinding.getEncryptionToken());
-                assertPolicy(aim, abinding.getEncryptionToken().getToken(), derived);
-            }
-            if (abinding.getSignatureToken() != null) {
-                assertPolicy(aim, abinding.getSignatureToken());
-                assertPolicy(aim, abinding.getSignatureToken().getToken(), derived);
-            }
-            if (abinding.getProtectionToken() != null) {
-                assertPolicy(aim, abinding.getProtectionToken());
-                assertPolicy(aim, abinding.getProtectionToken().getToken(), derived);
-            }
-        }
-        return true;
-    }
-    private boolean assertAsymetricBinding(AssertionInfoMap aim, 
-                                           SoapMessage message,
-                                           Protections prots,
-                                           List<WSSecurityEngineResult> results,
-                                           Boolean derived) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-        if (ais == null) {                       
-            return true;
-        }
-        for (AssertionInfo ai : ais) {
-            AsymmetricBinding abinding = (AsymmetricBinding)ai.getAssertion();
-            ai.setAsserted(true);
-            if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-                if (abinding.isSignatureProtection()) {
-                    if (prots == Protections.ENCRYPT_SIGN
-                        || prots == Protections.SIGN_ENCRYPT) {
-                        ai.setNotAsserted("Not encrypted before signed and then protected");
-                        return false;
-                    }
-                } else if (prots == Protections.SIGN_ENCRYPT) {
-                    ai.setNotAsserted("Not encrypted before signed");
-                    return false;
-                }
-            } else if (prots == Protections.ENCRYPT_SIGN) {
-                ai.setNotAsserted("Not signed before encrypted");
-                return false;
-            }
-            
-            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
-            if (!algorithmValidator.validatePolicy(ai, abinding.getAlgorithmSuite())) {
-                return false;
-            }
-            
-            if (abinding.getInitiatorToken() != null) {
-                assertPolicy(aim, abinding.getInitiatorToken());
-                assertPolicy(aim, abinding.getInitiatorToken().getToken(), derived);
-            }
-            if (abinding.getRecipientToken() != null) {
-                assertPolicy(aim, abinding.getRecipientToken());
-                assertPolicy(aim, abinding.getRecipientToken().getToken(), derived);
-            }
-        }
-        return true;
-    }
-    
     private boolean isTransportBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
         if (ais != null && ais.size() > 0) {

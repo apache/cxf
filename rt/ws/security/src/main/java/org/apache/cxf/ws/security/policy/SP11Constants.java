@@ -68,6 +68,9 @@ public final class SP11Constants extends SPConstants {
 
     public static final QName INCLUDE_TIMESTAMP = new QName(SP_NS,
             SPConstants.INCLUDE_TIMESTAMP, SP11Constants.SP_PREFIX);
+    
+    public static final QName ONLY_SIGN_ENTIRE_HEADERS_AND_BODY = new QName(SP_NS,
+            SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, SP11Constants.SP_PREFIX);
 
     public static final QName TRANSPORT_TOKEN = new QName(SP_NS,
             SPConstants.TRANSPORT_TOKEN, SP11Constants.SP_PREFIX);

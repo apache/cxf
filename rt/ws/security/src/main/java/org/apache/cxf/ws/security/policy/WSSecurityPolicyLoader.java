@@ -130,7 +130,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP12Constants.INCLUDE_TIMESTAMP, SP11Constants.INCLUDE_TIMESTAMP,
             SP12Constants.ENCRYPT_SIGNATURE, SP11Constants.ENCRYPT_SIGNATURE,
             SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, 
-            new QName(SP11Constants.SP_NS, SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY),
+            SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY,
             SP12Constants.WSS_X509_V1_TOKEN_10,
             SP12Constants.WSS_X509_V1_TOKEN_11,
             SP12Constants.WSS_X509_V3_TOKEN_10,
