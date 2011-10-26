@@ -408,66 +408,6 @@ public class RMTxStoreTest extends Assert {
     }
 
     @Test
-    public void testGetDestinationSequence() throws SQLException, IOException {
-        
-        Identifier sid1 = null;
-        Identifier sid2 = null;
-        
-        DestinationSequence seq = store.getDestinationSequence(RMUtils.getWSRMFactory().createIdentifier());
-        assertNull(seq);
-
-        try {
-            sid1 = setupDestinationSequence("sequence1");
-
-            seq = store.getDestinationSequence(sid1);
-            assertNotNull(seq);
-            verifyDestinationSequence("sequence1", seq);
-
-            sid2 = setupDestinationSequence("sequence2");
-            seq = store.getDestinationSequence(sid2);
-            assertNotNull(seq);
-            verifyDestinationSequence("sequence2", seq);
-        } finally {
-            if (null != sid1) {
-                store.removeDestinationSequence(sid1);
-            }
-            if (null != sid2) {
-                store.removeDestinationSequence(sid2);
-            }
-        }
-    }
-
-    @Test
-    public void testGetSourceSequence() throws SQLException, IOException {
-        
-        Identifier sid1 = null;
-        Identifier sid2 = null;
-        
-        SourceSequence seq = store.getSourceSequence(RMUtils.getWSRMFactory().createIdentifier());
-        assertNull(seq);
-        
-        try {
-            sid1 = setupSourceSequence("sequence1");
-
-            seq = store.getSourceSequence(sid1);
-            assertNotNull(seq);
-            verifySourceSequence("sequence1", seq);
-            
-            sid2 = setupSourceSequence("sequence2");
-            seq = store.getSourceSequence(sid2);
-            assertNotNull(seq);
-            verifySourceSequence("sequence2", seq);
-        } finally {
-            if (null != sid1) {
-                store.removeSourceSequence(sid1);
-            }
-            if (null != sid2) {
-                store.removeSourceSequence(sid2);
-            }
-        }
-    }
-
-    @Test
     public void testGetMessages() throws SQLException, IOException {
         
         Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
@@ -621,12 +561,12 @@ public class RMTxStoreTest extends Assert {
         
         int v = 0;
         for (SequenceAcknowledgement.AcknowledgementRange range : ranges) {
-            assertEquals(values[v++], (long)range.getLower());   
-            assertEquals(values[v++], (long)range.getUpper());   
+            assertEquals(values[v++], (long)range.getLower().longValue());   
+            assertEquals(values[v++], (long)range.getUpper().longValue());   
         }
     }
     
-    private void setupMessage(Identifier sid, Long mn, String to, boolean outbound) 
+    private void setupMessage(Identifier sid, BigInteger mn, String to, boolean outbound) 
         throws IOException, SQLException  {
         RMMessage msg = control.createMock(RMMessage.class);
         EasyMock.expect(msg.getMessageNumber()).andReturn(mn);
