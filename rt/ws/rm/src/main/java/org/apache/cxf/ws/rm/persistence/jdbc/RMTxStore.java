@@ -176,7 +176,7 @@ public class RMTxStore implements RMStore {
     
     public String getUserName() {
         return userName;
-    }    
+    }
    
     public void setConnection(Connection c) {
         connection = c;
@@ -482,8 +482,10 @@ public class RMTxStore implements RMStore {
         String id = sid.getValue();
         BigInteger nr = msg.getMessageNumber();
         String to = msg.getTo();
-        LOG.log(Level.FINE, "Storing {0} message number {1} for sequence {2}, to = {3}",
-            new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "Storing {0} message number {1} for sequence {2}, to = {3}",
+                    new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
+        }
         PreparedStatement stmt = outbound ? createOutboundMessageStmt : createInboundMessageStmt;
         if (null == stmt) {
             stmt = connection.prepareStatement(MessageFormat.format(CREATE_MESSAGE_STMT_STR,
@@ -505,8 +507,10 @@ public class RMTxStore implements RMStore {
             }
         }, bytes.length);
         stmt.execute();
-        LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
-                new Object[] {outbound ? "outbound" : "inbound", nr, id});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
+                    new Object[] {outbound ? "outbound" : "inbound", nr, id});
+        }
         
     }
     
@@ -516,7 +520,7 @@ public class RMTxStore implements RMStore {
             updateSrcSequenceStmt = connection.prepareStatement(UPDATE_SRC_SEQUENCE_STMT_STR);
         }
         updateSrcSequenceStmt.setBigDecimal(1, new BigDecimal(seq.getCurrentMessageNr())); 
-        updateSrcSequenceStmt.setBoolean(2, seq.isLastMessage()); 
+        updateSrcSequenceStmt.setString(2, seq.isLastMessage() ? "1" : "0"); 
         updateSrcSequenceStmt.setString(3, seq.getIdentifier().getValue());
         updateSrcSequenceStmt.execute();
     }
