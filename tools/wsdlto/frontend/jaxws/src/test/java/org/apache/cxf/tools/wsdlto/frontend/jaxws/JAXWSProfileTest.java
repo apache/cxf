@@ -42,8 +42,15 @@ public class JAXWSProfileTest extends Assert {
 
         loader.loadPlugin("/org/apache/cxf/tools/wsdlto/frontend/jaxws/jaxws-plugin.xml");
         
-        assertEquals(2, loader.getPlugins().size());
-        Plugin plugin = getPlugin(loader, 1);
+        assertEquals(3, loader.getPlugins().size());
+        
+        Plugin plugin = null;
+        for (Plugin p : loader.getPlugins().values()) {
+            if (p.getName().contains("jaxws")) {
+                plugin = p;
+            }
+        }
+        assertNotNull(plugin);
         assertEquals("tools-jaxws-frontend", plugin.getName());
         assertEquals("2.0", plugin.getVersion());
         assertEquals("apache cxf", plugin.getProvider());
