@@ -45,8 +45,8 @@ public class WrappedTest extends AbstractAegisTest {
         super.setUp();
         setEnableJDOM(true);
         arrayService = new ArrayService();
-        createService(BeanService.class, "BeanService");
         createService(ArrayService.class, arrayService, "Array", new QName("urn:Array", "Array"));
+        createService(BeanService.class, "BeanService");
         arrayWsdlDoc = getWSDLDocument("Array");
     }
     

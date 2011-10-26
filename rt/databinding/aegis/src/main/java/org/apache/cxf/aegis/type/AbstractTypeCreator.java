@@ -127,7 +127,8 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             result = getTypeMapping().getType(javaClass);
         } else {
             AegisType type = getTypeMapping().getType(info.getType());
-            if (type == null) {
+            if (type == null 
+                || (info.getTypeName() != null && !type.getSchemaType().equals(info.getTypeName()))) {
                 if (info.getTypeName() != null) {
                     type = getTypeMapping().getType(info.getTypeName());
                 }
