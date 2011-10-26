@@ -46,6 +46,7 @@ import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
+import org.apache.cxf.io.CacheSizeExceededException;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
@@ -67,7 +68,11 @@ public class MessageContextImpl implements MessageContext {
         String keyValue = key.toString();
         if (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS.equals(keyValue)
             || (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS + ".embedded").equals(keyValue)) {
-            return createAttachments(key.toString());
+            try {
+                return createAttachments(key.toString());
+            } catch (CacheSizeExceededException e) {
+                throw new WebApplicationException(413);
+            }
         }
         if (keyValue.equals("WRITE-" + Message.ATTACHMENTS)) {
             return m.getExchange().getOutMessage().get(Message.ATTACHMENTS);
@@ -216,6 +221,8 @@ public class MessageContextImpl implements MessageContext {
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_DIRECTORY));
             inMessage.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD));
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE,
+                m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MAX_SIZE));
             inMessage.setContent(InputStream.class, 
                 m.getExchange().getInMessage().get("org.apache.cxf.multipart.embedded.input"));
             inMessage.put(Message.CONTENT_TYPE, 
