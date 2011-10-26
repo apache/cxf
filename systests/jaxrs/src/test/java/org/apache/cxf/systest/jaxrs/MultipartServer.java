@@ -19,15 +19,22 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.Collections;
+
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
+
 public class MultipartServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(MultipartServer.class);
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(MultipartStore.class);
+        sf.setProperties(Collections.<String, Object>singletonMap(
+                AttachmentDeserializer.ATTACHMENT_MAX_SIZE,
+                String.valueOf(1024 * 1024 * 10)));
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(MultipartStore.class,
                                new SingletonResourceProvider(new MultipartStore()));

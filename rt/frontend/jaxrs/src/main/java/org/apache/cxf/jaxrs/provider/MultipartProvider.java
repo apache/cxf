@@ -82,6 +82,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     private MessageContext mc;
     private String attachmentDir;
     private String attachmentThreshold;
+    private String attachmentMaxSize;
 
     public void setMessageContext(MessageContext context) {
         this.mc = context;
@@ -95,6 +96,10 @@ public class MultipartProvider extends AbstractConfigurableProvider
         attachmentThreshold = threshold;
     }
     
+    public void setAttachmentMaxSize(String maxSize) {
+        attachmentMaxSize = maxSize;
+    }
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
                               MediaType mt) {
         return isSupported(type, genericType, annotations, mt);
@@ -131,8 +136,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
                            MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
         checkContentLength();
-        List<Attachment> infos = 
-            AttachmentUtils.getAttachments(mc, attachmentDir, attachmentThreshold);
+        List<Attachment> infos = AttachmentUtils.getAttachments(
+                mc, attachmentDir, attachmentThreshold, attachmentMaxSize);
         
         if (Collection.class.isAssignableFrom(c) 
             && AnnotationUtils.getAnnotation(anns, Multipart.class) == null) {

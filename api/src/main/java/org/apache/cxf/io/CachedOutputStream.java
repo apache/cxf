@@ -42,6 +42,7 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 public class CachedOutputStream extends OutputStream {
     private static final File DEFAULT_TEMP_DIR;
     private static final int DEFAULT_THRESHOLD;
+    private static final long DEFAULT_MAX_SIZE;
     static {
         String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold",
                                       "-1");
@@ -62,12 +63,17 @@ public class CachedOutputStream extends OutputStream {
         } else {
             DEFAULT_TEMP_DIR = null;
         }
+
+        s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize",
+                               "-1");
+        DEFAULT_MAX_SIZE = Long.parseLong(s);
     }
 
     protected boolean outputLocked;
     protected OutputStream currentStream;
 
     private long threshold = DEFAULT_THRESHOLD;
+    private long maxSize = DEFAULT_MAX_SIZE;
 
     private int totalLength;
 
@@ -382,13 +388,20 @@ public class CachedOutputStream extends OutputStream {
 
     }
 
+    private  void enforceLimits() throws IOException {
+        if (maxSize > 0 && totalLength > maxSize) {
+            throw new CacheSizeExceededException();
+        }
+        if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
+            createFileOutputStream();
+        }       
+    }
+
     public void write(byte[] b, int off, int len) throws IOException {
         if (!outputLocked) {
             onWrite();
             this.totalLength += len;
-            if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
-                createFileOutputStream();
-            }
+            enforceLimits();
             currentStream.write(b, off, len);
         }
     }
@@ -397,9 +410,7 @@ public class CachedOutputStream extends OutputStream {
         if (!outputLocked) {
             onWrite();
             this.totalLength += b.length;
-            if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
-                createFileOutputStream();
-            }
+            enforceLimits();
             currentStream.write(b);
         }
     }
@@ -408,9 +419,7 @@ public class CachedOutputStream extends OutputStream {
         if (!outputLocked) {
             onWrite();
             this.totalLength++;
-            if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
-                createFileOutputStream();
-            }
+            enforceLimits();
             currentStream.write(b);
         }
     }
@@ -496,5 +505,9 @@ public class CachedOutputStream extends OutputStream {
     }
     public void setThreshold(long threshold) {
         this.threshold = threshold;
+    }
+
+    public void setMaxSize(long maxSize) {
+        this.maxSize = maxSize;
     }
 }

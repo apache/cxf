@@ -48,6 +48,8 @@ public class AttachmentDeserializer {
 
     public static final String ATTACHMENT_MEMORY_THRESHOLD = "attachment-memory-threshold";
 
+    public static final String ATTACHMENT_MAX_SIZE = "attachment-max-size";
+
     public static final int THRESHOLD = 1024 * 100; //100K (byte unit)
 
     private static final Pattern CONTENT_TYPE_BOUNDARY_PATTERN = Pattern.compile("boundary=\"?([^\";]*)");
@@ -185,6 +187,15 @@ public class AttachmentDeserializer {
             }
         } else {
             bos.setThreshold(THRESHOLD);
+        }
+
+        Object maxSize = message.getContextualProperty(ATTACHMENT_MAX_SIZE);
+        if (maxSize != null) {
+            if (maxSize instanceof Long) {
+                bos.setMaxSize((Long) maxSize);
+            } else {
+                bos.setMaxSize(Long.valueOf((String)maxSize));
+            }
         }
     }
 

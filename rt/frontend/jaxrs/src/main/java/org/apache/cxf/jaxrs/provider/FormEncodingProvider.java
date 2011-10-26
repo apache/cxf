@@ -61,6 +61,7 @@ public class FormEncodingProvider implements
     @Context private MessageContext mc;
     private String attachmentDir;
     private String attachmentThreshold;
+    private String attachmentMaxSize;
 
     public void setAttachmentDirectory(String dir) {
         attachmentDir = dir;
@@ -70,6 +71,10 @@ public class FormEncodingProvider implements
         attachmentThreshold = threshold;
     }
     
+    public void setAttachmentMaxSize(String maxSize) {
+        attachmentMaxSize = maxSize;
+    }
+
     public void setValidator(FormValidator formValidator) {
         validator = formValidator;
     }
@@ -141,7 +146,7 @@ public class FormEncodingProvider implements
                                InputStream is, MediaType mt, boolean decode) {
         if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
             MultipartBody body = 
-                AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold);
+                AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold, attachmentMaxSize);
             FormUtils.populateMapFromMultipart(params, body, decode);
         } else {
             String enc = HttpUtils.getEncoding(mt, "UTF-8");
