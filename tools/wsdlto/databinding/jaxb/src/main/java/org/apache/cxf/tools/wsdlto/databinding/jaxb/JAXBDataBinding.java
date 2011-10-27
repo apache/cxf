@@ -249,6 +249,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     private ToolContext context;
     private DefaultValueProvider defaultValues;
     private boolean initialized;
+    private JAXBBindErrorListener listener;
     
     static {
         DEFAULT_TYPE_MAP.add("boolean");
@@ -294,7 +295,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         schemaCompiler.setClassNameAllocator(allocator);
            
-        JAXBBindErrorListener listener = new JAXBBindErrorListener(context.isVerbose());
+        listener = new JAXBBindErrorListener(context.isVerbose());
         schemaCompiler.setErrorListener(listener);
         // Collection<SchemaInfo> schemas = serviceInfo.getSchemas();
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
@@ -408,6 +409,10 @@ public class JAXBDataBinding implements DataBindingProfile {
                     throw new ToolException(e);
                 }
             }
+        }
+        
+        if (listener.hasErrors()) {
+            listener.throwError();
         }
         initialized = true;
     }
@@ -738,6 +743,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 for (String str : fileCodeWriter.getExcludeFileList()) {
                     context.getExcludeFileList().add(str);
                 }
+                
             }
             return;
         } catch (IOException e) {
