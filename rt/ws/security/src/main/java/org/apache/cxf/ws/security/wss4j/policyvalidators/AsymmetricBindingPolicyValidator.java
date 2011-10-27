@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.security.cert.X509Certificate;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +30,8 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
+import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 
@@ -102,6 +106,19 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         AssertionInfoMap aim
     ) {
         if (binding.getInitiatorToken() != null) {
+            Token token = binding.getInitiatorToken().getToken();
+            if (token instanceof X509Token) {
+                for (WSSecurityEngineResult result : signedResults) {
+                    X509Certificate cert = 
+                        (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                    if (cert == null) {
+                        String error = "An X.509 certificate was not used for the initiator token";
+                        notAssertPolicy(aim, binding.getInitiatorToken().getName(), error);
+                        ai.setNotAsserted(error);
+                        return false;
+                    }
+                }
+            }
             assertPolicy(aim, binding.getInitiatorToken());
             if (!checkDerivedKeys(
                 binding.getInitiatorToken(), hasDerivedKeys, signedResults, encryptedResults
