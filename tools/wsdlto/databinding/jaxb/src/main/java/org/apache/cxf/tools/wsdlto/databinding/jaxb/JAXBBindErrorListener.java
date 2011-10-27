@@ -18,6 +18,7 @@
  */
 
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
+
 import com.sun.tools.xjc.api.ErrorListener;
 
 import org.apache.cxf.tools.common.ToolException;
@@ -25,21 +26,40 @@ import org.apache.cxf.tools.common.ToolException;
 public class JAXBBindErrorListener implements ErrorListener {
     private boolean isVerbose;
     private String prefix = "Thrown by JAXB: ";
-
+    private StringBuilder errors = new StringBuilder();
+    private Exception firstException;
+    
     public JAXBBindErrorListener(boolean verbose) {
         isVerbose = verbose;
     }
 
+    public boolean hasErrors() {
+        return errors.length() != 0;
+    }
+    public void throwError() {
+        throw new ToolException(prefix + "\n" + errors.toString(), firstException);
+    }
+    
     public void error(org.xml.sax.SAXParseException exception) {
-        if (exception.getLineNumber() > 0) {
-            throw new ToolException(prefix + exception.getLocalizedMessage() 
-                                    + " at line " + exception.getLineNumber()
-                                    + " column " + exception.getColumnNumber()
-                                    + " of schema " + exception.getSystemId(), exception);
-           
+        if (errors.length() == 0) {
+            errors.append(prefix);
         }
-        throw new ToolException(prefix + mapMessage(exception.getLocalizedMessage()), exception);
-
+        errors.append("\n");
+        if (exception.getLineNumber() > 0) {
+            errors.append(exception.getLocalizedMessage() + "\n"
+                       + " at line " + exception.getLineNumber()
+                       + " column " + exception.getColumnNumber()
+                       + " of schema " + exception.getSystemId()
+                       + "\n");
+           
+        } else {
+            errors.append(prefix + mapMessage(exception.getLocalizedMessage())
+                          + "\n");
+        }
+        if (firstException == null) {
+            firstException = exception;
+            firstException.fillInStackTrace();
+        }
     }
 
     public void fatalError(org.xml.sax.SAXParseException exception) {
@@ -56,7 +76,7 @@ public class JAXBBindErrorListener implements ErrorListener {
 
     public void warning(org.xml.sax.SAXParseException exception) {
         if (this.isVerbose) {
-            System.err.println("JAXB parsing schema warning " + exception.toString()
+            System.out.println("JAXB parsing schema warning " + exception.toString()
                                + " in schema " + exception.getSystemId());
         }
     }
