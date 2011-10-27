@@ -136,6 +136,20 @@
                                         <extraarg>jibx</extraarg>
                                     </extraargs>
                                 </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/source/hello_world.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>domsource</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/source/doc_lit_bare.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>domsource</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
