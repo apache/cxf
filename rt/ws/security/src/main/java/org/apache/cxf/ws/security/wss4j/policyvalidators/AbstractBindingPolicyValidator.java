@@ -310,8 +310,8 @@ public abstract class AbstractBindingPolicyValidator {
     protected boolean isSignatureEncrypted() {
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.SIGN) {
-                // TODO || actInt.intValue() == WSConstants.SC) {
+            if (actInt.intValue() == WSConstants.SIGN
+                || actInt.intValue() == WSConstants.SC) {
                 String sigId = (String)result.get(WSSecurityEngineResult.TAG_ID);
                 if (sigId == null || !isIdEncrypted(sigId)) {
                     return false;

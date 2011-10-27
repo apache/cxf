@@ -150,10 +150,15 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             List<WSEncryptionPart> enc = getEncryptedParts();
             
             //Check for signature protection
-            if (abinding.isSignatureProtection() && mainSigId != null) {
-                WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
-                sigPart.setElement(bottomUpElement);
-                enc.add(sigPart);
+            if (abinding.isSignatureProtection()) {
+                if (mainSigId != null) {
+                    WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
+                    sigPart.setElement(bottomUpElement);
+                    enc.add(sigPart);
+                }
+                if (sigConfList != null && !sigConfList.isEmpty()) {
+                    enc.addAll(sigConfList);
+                }
             }
             
             if (isRequestor()) {
@@ -257,13 +262,19 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
             
             // Check for signature protection
-            if (abinding.isSignatureProtection() && mainSigId != null) {
+            if (abinding.isSignatureProtection()) {
                 List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
 
                 // Now encrypt the signature using the above token
-                WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
-                sigPart.setElement(bottomUpElement);
-                secondEncrParts.add(sigPart);
+                if (mainSigId != null) {
+                    WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
+                    sigPart.setElement(bottomUpElement);
+                    secondEncrParts.add(sigPart);
+                }
+                
+                if (sigConfList != null && !sigConfList.isEmpty()) {
+                    secondEncrParts.addAll(sigConfList);
+                }
                 
                 if (isRequestor()) {
                     for (String id : encryptedTokensIdList) {
@@ -271,7 +282,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                 }
 
-                if (encryptionToken.isDerivedKeys()) {
+                if (encryptionToken.isDerivedKeys() && !secondEncrParts.isEmpty()) {
                     try {
                         Element secondRefList 
                             = ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
@@ -280,7 +291,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     } catch (WSSecurityException ex) {
                         throw new Fault(ex);
                     }
-                } else {
+                } else if (!secondEncrParts.isEmpty()) {
                     try {
                         // Encrypt, get hold of the ref list and add it
                         Element secondRefList = saaj.getSOAPPart()

@@ -144,6 +144,7 @@ public abstract class AbstractBindingBuilder {
     protected SoapMessage message;
     protected WSSecTimestamp timestampEl;
     protected String mainSigId;
+    protected List<WSEncryptionPart> sigConfList;
     
     protected Set<String> encryptedTokensIdList = new HashSet<String>();
 
@@ -1909,6 +1910,7 @@ public abstract class AbstractBindingBuilder {
                     WSConstants.UT_SIGN, signatureActions);
         }
         
+        sigConfList = new ArrayList<WSEncryptionPart>();
         // prepare a SignatureConfirmation token
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(wssConfig);
         if (signatureActions.size() > 0) {
@@ -1918,7 +1920,10 @@ public abstract class AbstractBindingBuilder {
                 wsc.prepare(saaj.getSOAPPart());
                 addSupportingElement(wsc.getSignatureConfirmationElement());
                 if (sigParts != null) {
-                    sigParts.add(new WSEncryptionPart(wsc.getId()));
+                    WSEncryptionPart part = new WSEncryptionPart(wsc.getId(), "Element");
+                    part.setElement(wsc.getSignatureConfirmationElement());
+                    sigParts.add(part);
+                    sigConfList.add(part);
                 }
             }
         } else {
@@ -1926,7 +1931,10 @@ public abstract class AbstractBindingBuilder {
             wsc.prepare(saaj.getSOAPPart());
             addSupportingElement(wsc.getSignatureConfirmationElement());
             if (sigParts != null) {
-                sigParts.add(new WSEncryptionPart(wsc.getId()));
+                WSEncryptionPart part = new WSEncryptionPart(wsc.getId(), "Element");
+                part.setElement(wsc.getSignatureConfirmationElement());
+                sigParts.add(part);
+                sigConfList.add(part);
             }
         }
     }
