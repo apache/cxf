@@ -19,8 +19,7 @@
 
 package org.apache.cxf.tools.util;
 
-import java.io.File;
-import java.net.URI;
+import java.net.URLDecoder;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -98,6 +97,6 @@ public class URIParserUtilTest extends Assert {
         String orig = new String(new byte[] {-47, -122}, "UTF-8");
         orig = "/foo" + orig + ".txt";
         String s = URIParserUtil.escapeChars(orig);
-        assertEquals(orig, new File(new URI("file:" + s)).getAbsolutePath());
+        assertEquals(orig, URLDecoder.decode(s, "UTF-8"));
     }
 }
