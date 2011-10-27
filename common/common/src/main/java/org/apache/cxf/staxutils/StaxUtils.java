@@ -191,10 +191,10 @@ public final class StaxUtils {
      */
     public static XMLInputFactory createXMLInputFactory(boolean nsAware) {
         XMLInputFactory factory = XMLInputFactory.newInstance();
-        factory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, nsAware);
-        factory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+        setProperty(factory, XMLInputFactory.IS_NAMESPACE_AWARE, nsAware);
+        setProperty(factory, XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
+        setProperty(factory, XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
+        setProperty(factory, XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
         factory.setXMLResolver(new XMLResolver() {
             public Object resolveEntity(String publicID, String systemID,
                                         String baseURI, String namespace)
@@ -203,6 +203,14 @@ public final class StaxUtils {
             }
         });
         return factory;
+    }
+    
+    private static void setProperty(XMLInputFactory f, String p, Object o) {
+        try {
+            f.setProperty(p,  o);
+        } catch (Throwable t) {
+            //ignore
+        }
     }
 
     
