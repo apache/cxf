@@ -221,16 +221,21 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 }
                 
                 //Check for signature protection and encryption of UsernameToken
-                if (sbinding.isSignatureProtection() && this.mainSigId != null 
+                if (sbinding.isSignatureProtection() 
                     || encryptedTokensIdList.size() > 0 && isRequestor()) {
                     List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
                     
                     //Now encrypt the signature using the above token
                     if (sbinding.isSignatureProtection()) {
-                        WSEncryptionPart sigPart = 
-                            new WSEncryptionPart(this.mainSigId, "Element");
-                        sigPart.setElement(bottomUpElement);
-                        secondEncrParts.add(sigPart);
+                        if (this.mainSigId != null) {
+                            WSEncryptionPart sigPart = 
+                                new WSEncryptionPart(this.mainSigId, "Element");
+                            sigPart.setElement(bottomUpElement);
+                            secondEncrParts.add(sigPart);
+                        }
+                        if (sigConfList != null && !sigConfList.isEmpty()) {
+                            secondEncrParts.addAll(sigConfList);
+                        }
                     }
                     
                     if (isRequestor()) {
@@ -241,11 +246,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     
                     Element secondRefList = null;
                     
-                    if (encryptionToken.isDerivedKeys()) {
+                    if (encryptionToken.isDerivedKeys() && !secondEncrParts.isEmpty()) {
                         secondRefList = ((WSSecDKEncrypt)encr).encryptForExternalRef(null, 
                                 secondEncrParts);
                         this.addDerivedKeyElement(secondRefList);
-                    } else {
+                    } else if (!secondEncrParts.isEmpty()) {
                         //Encrypt, get hold of the ref list and add it
                         secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, encrParts);
                         this.addDerivedKeyElement(secondRefList);
@@ -358,10 +363,15 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             List<WSEncryptionPart> enc = getEncryptedParts();
             
             //Check for signature protection
-            if (sbinding.isSignatureProtection() && mainSigId != null) {
-                WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
-                sigPart.setElement(bottomUpElement);
-                enc.add(sigPart);
+            if (sbinding.isSignatureProtection()) {
+                if (mainSigId != null) {
+                    WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
+                    sigPart.setElement(bottomUpElement);
+                    enc.add(sigPart);
+                }
+                if (sigConfList != null && !sigConfList.isEmpty()) {
+                    enc.addAll(sigConfList);
+                }
             }
             
             if (isRequestor()) {
