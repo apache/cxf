@@ -274,8 +274,9 @@ public class DynamicClientFactory {
         SchemaCompiler compiler = 
             JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<String>());
         
+        InnerErrorListener listener = new InnerErrorListener(wsdlUrl);
         Object elForRun = ReflectionInvokationHandler
-            .createProxyWrapper(new InnerErrorListener(wsdlUrl),
+            .createProxyWrapper(listener,
                                 JAXBUtils.getParamClass(compiler, "setErrorListener"));
         
         compiler.setErrorListener(elForRun);
@@ -283,6 +284,9 @@ public class DynamicClientFactory {
         addSchemas(wsdlUrl, schemas, compiler);
         addBindingFiles(bindingFiles, compiler);
         S2JJAXBModel intermediateModel = compiler.bind();
+        
+        listener.throwException();
+        
         JCodeModel codeModel = intermediateModel.generateCode(null, elForRun);
         StringBuilder sb = new StringBuilder();
         boolean firstnt = false;
@@ -570,14 +574,37 @@ public class DynamicClientFactory {
     class InnerErrorListener {
 
         private String url;
+        private StringBuilder errors = new StringBuilder();
+        private Exception ex;
 
         InnerErrorListener(String url) {
             this.url = url;
         }
 
+        public void throwException() {
+            if (errors.length() > 0) {
+                throw new RuntimeException(errors.toString(), ex);
+            }
+        }
         public void error(SAXParseException arg0) {
-            throw new RuntimeException("Error compiling schema from WSDL at {" + url + "}: "
-                                       + arg0.getMessage(), arg0);
+            if (ex == null) {
+                ex = arg0;
+            }
+            if (errors.length() == 0) {
+                errors.append("Error compiling schema from WSDL at {").append(url).append("}: \n");
+            } else {
+                errors.append("\n");
+            }
+            if (arg0.getLineNumber() > 0) {
+                errors.append(arg0.getLocalizedMessage() + "\n"
+                    + " at line " + arg0.getLineNumber()
+                    + " column " + arg0.getColumnNumber()
+                    + " of schema " + arg0.getSystemId()
+                    + "\n");
+            } else {
+                errors.append(arg0.getMessage());
+                errors.append("\n");
+            }
         }
 
         public void fatalError(SAXParseException arg0) {
