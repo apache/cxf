@@ -683,7 +683,7 @@ public class RMTxStore implements RMStore {
         }
     }
 
-    private static boolean isTableExistsError(SQLException ex) {
+    protected boolean isTableExistsError(SQLException ex) {
         return DERBY_TABLE_EXISTS_STATE.equals(ex.getSQLState())
                 || ORACLE_TABLE_EXISTS_CODE == ex.getErrorCode();
     }
