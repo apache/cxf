@@ -52,8 +52,6 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected PrintWriter writer;
     protected boolean prettyLogging;
     
-    private Map<String, Logger> messageLoggers = new HashMap<String, Logger>();
-    
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
     }
@@ -65,6 +63,9 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     
     Logger getMessageLogger(Message message) {
         EndpointInfo endpoint = message.getExchange().getEndpoint().getEndpointInfo();
+        if (endpoint.getService() == null) {
+            return getLogger();
+        }
         String serviceName = endpoint.getService().getName().getLocalPart();
         InterfaceInfo iface = endpoint.getService().getInterface();
         String portName = endpoint.getName().getLocalPart();
@@ -75,7 +76,6 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         if (logger == null) {
             logger = LogUtils.getL7dLogger(this.getClass(), null, logName);
             endpoint.setProperty("MessageLogger", logger);
-            messageLoggers.put(logName, logger);
         }
         return logger;
     }
