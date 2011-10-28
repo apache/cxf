@@ -78,7 +78,15 @@ public class JMSConfiguration implements InitializingBean {
     private String durableSubscriptionName;
 
     private String targetDestination;
+    
+    /**
+     * Destination name to listen on for reply messages
+     */
     private String replyDestination;
+    
+    /**
+     * Destination name to send out as replyTo address in the message 
+     */
     private String replyToDestination;
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
