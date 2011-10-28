@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.xml.transform.OutputKeys;
@@ -170,7 +171,11 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             // Flushing the writer to make sure the message is written
             writer.flush();
         } else if (logger.isLoggable(Level.INFO)) {
-            logger.info(message);
+            LogRecord lr = new LogRecord(Level.INFO, message);
+            lr.setSourceClassName(logger.getName());
+            lr.setSourceMethodName(null);
+            lr.setLoggerName(logger.getName());
+            logger.log(lr);
         }
     }
     
