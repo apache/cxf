@@ -76,7 +76,7 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
             try {
                 StringBuilder buffer = new StringBuilder();
                 cos.writeCacheTo(buffer, cos.size());
-                this.exchange.setResponseSize(cos.size());
+                this.exchange.setResponseSize((int)cos.size());
                 this.exchange.setResponse(buffer.toString());
             } catch (Exception ex) {
                 // ignore

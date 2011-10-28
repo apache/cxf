@@ -235,9 +235,9 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(msg2.getMessageNumber()).andReturn(ONE); 
         byte[] bytes = new byte[89];
         EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg1.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg1.getSize()).andReturn((long)bytes.length);
         EasyMock.expect(msg2.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg2.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg2.getSize()).andReturn((long)bytes.length);
         
         control.replay();
         store.beginTransaction();
@@ -249,7 +249,7 @@ public class RMTxStoreTest extends Assert {
         control.reset();
         EasyMock.expect(msg1.getMessageNumber()).andReturn(ONE); 
         EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg1.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg1.getSize()).andReturn((long)bytes.length);
         
         control.replay();
         store.beginTransaction();
@@ -265,9 +265,9 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(msg1.getMessageNumber()).andReturn(TEN);
         EasyMock.expect(msg2.getMessageNumber()).andReturn(TEN); 
         EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
-        EasyMock.expect(msg1.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg1.getSize()).andReturn((long)bytes.length);
         EasyMock.expect(msg2.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
-        EasyMock.expect(msg2.getSize()).andReturn(bytes.length);
+        EasyMock.expect(msg2.getSize()).andReturn((long)bytes.length);
         
         control.replay();
         store.beginTransaction();
@@ -655,7 +655,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(msg.getTo()).andReturn(to);
         byte[] value = ("Message " + mn.longValue()).getBytes();
         EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(value));
-        EasyMock.expect(msg.getSize()).andReturn(value.length);
+        EasyMock.expect(msg.getSize()).andReturn((long)value.length);
         
         control.replay();
         store.beginTransaction();

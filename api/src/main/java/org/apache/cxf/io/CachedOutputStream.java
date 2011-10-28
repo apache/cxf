@@ -76,7 +76,7 @@ public class CachedOutputStream extends OutputStream {
     private long threshold = DEFAULT_THRESHOLD;
     private long maxSize = DEFAULT_MAX_SIZE;
 
-    private int totalLength;
+    private long totalLength;
 
     private boolean inmem;
 
@@ -259,7 +259,7 @@ public class CachedOutputStream extends OutputStream {
         IOUtils.copyAndCloseInput(in, out, bufferSize);
     }
 
-    public int size() {
+    public long size() {
         return totalLength;
     }
 
@@ -293,11 +293,11 @@ public class CachedOutputStream extends OutputStream {
         }
     }
     
-    public void writeCacheTo(StringBuilder out, int limit) throws IOException {
+    public void writeCacheTo(StringBuilder out, long limit) throws IOException {
         writeCacheTo(out, "UTF-8", limit);
     }
     
-    public void writeCacheTo(StringBuilder out, String charsetName, int limit) throws IOException {
+    public void writeCacheTo(StringBuilder out, String charsetName, long limit) throws IOException {
         flush();
         if (totalLength < limit
             || limit == -1) {
@@ -305,11 +305,11 @@ public class CachedOutputStream extends OutputStream {
             return;
         }
 
-        int count = 0;
+        long count = 0;
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
                 byte bytes[] = ((ByteArrayOutputStream)currentStream).toByteArray();
-                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, limit));
+                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, (int)limit));
             } else {
                 throw new IOException("Unknown format of currentStream");
             }
@@ -317,12 +317,12 @@ public class CachedOutputStream extends OutputStream {
             // read the file
             FileInputStream fin = new FileInputStream(tempFile);
             byte bytes[] = new byte[1024];
-            int x = fin.read(bytes);
+            long x = fin.read(bytes);
             while (x != -1) {
                 if ((count + x) > limit) {
                     x = limit - count;
                 }
-                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, x));
+                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, (int)x));
                 count += x;
 
                 if (count >= limit) {

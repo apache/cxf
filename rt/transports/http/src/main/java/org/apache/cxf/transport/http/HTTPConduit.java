@@ -1100,8 +1100,8 @@ public class HTTPConduit
 
         message.put(KEY_HTTP_CONNECTION, connection);
 
-        if (stream != null) {
-            connection.setFixedLengthStreamingMode(stream.size());
+        if (stream != null && stream.size() < Integer.MAX_VALUE) {
+            connection.setFixedLengthStreamingMode((int)stream.size());
         }
 
         // Need to set the headers before the trust decision

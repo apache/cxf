@@ -136,7 +136,7 @@ public class RMMessage {
      * 
      * @return
      */
-    public int getSize() {
+    public long getSize() {
         return content.size();
     }
 }

@@ -59,7 +59,7 @@ public class PersistInInterceptor extends AbstractPhaseInterceptor<Message> {
                 bos.close();
 
                 exchange.setRequest(builder.toString());
-                exchange.setRequestSize(bos.size());
+                exchange.setRequestSize((int)bos.size());
 
             } catch (IOException e) {
                 throw new Fault(e);
