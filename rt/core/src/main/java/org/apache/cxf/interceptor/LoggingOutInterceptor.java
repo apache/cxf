@@ -80,8 +80,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         
         private final Message message;
         private final OutputStream origStream;
-        @SuppressWarnings("PMD")
-        private final Logger logger;
+        private final Logger logger; //NOPMD
         
         public LoggingCallback(final Logger logger, final Message msg, final OutputStream os) {
             this.logger = logger;
