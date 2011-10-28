@@ -565,7 +565,7 @@ public class RMTxStore implements RMStore {
         stmt.setString(i++, id);  
         stmt.setLong(i++, nr);
         stmt.setString(i++, to); 
-        stmt.setBinaryStream(i++, msg.getInputStream(), msg.getSize());
+        stmt.setBinaryStream(i++, msg.getInputStream(), (int)msg.getSize());
         stmt.execute();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
