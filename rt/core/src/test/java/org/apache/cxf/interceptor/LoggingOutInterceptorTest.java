@@ -21,7 +21,9 @@ package org.apache.cxf.interceptor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -46,7 +48,8 @@ public class LoggingOutInterceptorTest extends Assert {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.put(Message.CONTENT_TYPE, "application/xml");
-        LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(message, cos);
+        Logger logger = LogUtils.getL7dLogger(this.getClass());
+        LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(logger, message, cos);
         l.onClose(cos);
         String str = baos.toString();
         //format has changed

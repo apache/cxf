@@ -63,14 +63,15 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         if (os == null) {
             return;
         }
-        if (getLogger().isLoggable(Level.INFO) || writer != null) {
+        Logger logger = getMessageLogger(message);
+        if (logger.isLoggable(Level.INFO) || writer != null) {
             // Write the output while caching it for the log message
             boolean hasLogged = message.containsKey(LOG_SETUP);
             if (!hasLogged) {
                 message.put(LOG_SETUP, Boolean.TRUE);
                 final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
                 message.setContent(OutputStream.class, newOut);
-                newOut.registerCallback(new LoggingCallback(message, os));
+                newOut.registerCallback(new LoggingCallback(logger, message, os));
             }
         }
     }
@@ -79,8 +80,11 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         
         private final Message message;
         private final OutputStream origStream;
+        @SuppressWarnings("PMD")
+        private final Logger logger;
         
-        public LoggingCallback(final Message msg, final OutputStream os) {
+        public LoggingCallback(final Logger logger, final Message msg, final OutputStream os) {
+            this.logger = logger;
             this.message = msg;
             this.origStream = os;
         }
@@ -144,7 +148,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 //ignore
             }
 
-            log(buffer.toString());
+            log(logger, buffer.toString());
             try {
                 //empty out the cache
                 cos.lockOutputStream();

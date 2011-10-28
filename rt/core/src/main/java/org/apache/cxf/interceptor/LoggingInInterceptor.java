@@ -69,12 +69,13 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     }
     
     public void handleMessage(Message message) throws Fault {
-        if (writer != null || getLogger().isLoggable(Level.INFO)) {
-            logging(message);
+        Logger logger = getMessageLogger(message);
+        if (writer != null || logger.isLoggable(Level.INFO)) {
+            logging(logger, message);
         }
     }
 
-    protected void logging(Message message) throws Fault {
+    protected void logging(Logger logger, Message message) throws Fault {
         if (message.containsKey(LoggingMessage.ID_KEY)) {
             return;
         }
@@ -144,7 +145,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 throw new Fault(e);
             }
         }
-        log(buffer.toString());
+        log(logger, buffer.toString());
     }
 
     @Override
