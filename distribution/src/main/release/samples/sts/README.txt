@@ -14,18 +14,6 @@ the associated secret key to sign various parts of the message.
 
 Please review the README in the samples directory before continuing.
 
-
-Prerequisite
-------------
-
-If your environment already includes cxf-manifest.jar on the CLASSPATH,
-and the JDK and ant bin directories on the PATH, it is not necessary to
-run the environment script described in the samples directory README.
-If your environment is not properly configured, or if you are planning
-on using wsdl2java, javac, and java to build and run the demos, you must
-set the environment by running the script.
-
-
 *** Requirements ***
 
 The samples in this directory use STRONG encryption.  The default encryption algorithms

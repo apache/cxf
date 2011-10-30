@@ -120,6 +120,13 @@
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.cxf.services.sts</groupId>
+                    <artifactId>cxf-services-sts-core</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>server</id>
@@ -202,11 +209,5 @@
             <artifactId>cxf-rt-ws-policy</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf.services.sts</groupId>
-            <artifactId>cxf-services-sts-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
     </dependencies>
 </project>
