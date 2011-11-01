@@ -20,15 +20,21 @@
 package org.apache.cxf.systest.ws.saml.client;
 
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
@@ -72,6 +78,15 @@ public class SamlCallbackHandler implements CallbackHandler {
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
+                if (SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)
+                    || SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
+                    try {
+                        KeyInfoBean keyInfo = createKeyInfo();
+                        subjectBean.setKeyInfo(keyInfo);
+                    } catch (Exception ex) {
+                        throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
+                    }
+                }
                 callback.setSubject(subjectBean);
                 
                 AttributeStatementBean attrBean = new AttributeStatementBean();
@@ -84,6 +99,20 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
             }
         }
+    }
+    
+    protected KeyInfoBean createKeyInfo() throws Exception {
+        Crypto crypto = 
+            CryptoFactory.getInstance("org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("alice");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        
+        KeyInfoBean keyInfo = new KeyInfoBean();
+        keyInfo.setCertificate(certs[0]);
+        keyInfo.setCertIdentifer(CERT_IDENTIFIER.X509_CERT);
+        
+        return keyInfo;
     }
     
 }

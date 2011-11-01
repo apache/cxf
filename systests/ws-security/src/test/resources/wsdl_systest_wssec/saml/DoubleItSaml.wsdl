@@ -206,8 +206,8 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:binding name="DoubleItSaml2SymmetricProtectionBinding" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItSaml2SymmetricProtectionPolicy" />
+    <wsdl:binding name="DoubleItAsymmetricSamlInitiatorBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItAsymmetricSamlInitiatorPolicy" />
         <soap:binding style="document"
             transport="http://schemas.xmlsoap.org/soap/http" />
         <wsdl:operation name="DoubleIt">
@@ -248,9 +248,9 @@
                    binding="tns:DoubleItSaml2EndorsingTransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml2EndorsingTransport" />
         </wsdl:port>
-        <wsdl:port name="DoubleItSaml2SymmetricProtectionPort" 
-                   binding="tns:DoubleItSaml2SymmetricProtectionBinding">
-            <soap:address location="http://localhost:9001/DoubleItSaml2SymmetricProtection" />
+        <wsdl:port name="DoubleItAsymmetricSamlInitiatorPort" 
+                   binding="tns:DoubleItAsymmetricSamlInitiatorBinding">
+            <soap:address location="http://localhost:9001/DoubleItAsymmetricSamlInitiator" />
         </wsdl:port>
         <wsdl:port name="DoubleItSaml2SymmetricSignedElementsPort" 
                    binding="tns:DoubleItSaml2SymmetricSignedElementsBinding">
@@ -580,12 +580,12 @@
          </wsp:All>
       </wsp:ExactlyOne>
     </wsp:Policy>
-    <wsp:Policy wsu:Id="DoubleItSaml2SymmetricProtectionPolicy">
+    <wsp:Policy wsu:Id="DoubleItAsymmetricSamlInitiatorPolicy">
       <wsp:ExactlyOne>
          <wsp:All>
-            <sp:SymmetricBinding>
+             <sp:AsymmetricBinding>
                <wsp:Policy>
-                  <sp:ProtectionToken>
+                  <sp:InitiatorToken>
                      <wsp:Policy>
                         <sp:SamlToken
                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
@@ -594,7 +594,18 @@
                            </wsp:Policy>
                        </sp:SamlToken>
                      </wsp:Policy>
-                  </sp:ProtectionToken>
+                  </sp:InitiatorToken>
+                  <sp:RecipientToken>
+                     <wsp:Policy>
+                        <sp:X509Token
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           <wsp:Policy>
+                              <sp:WssX509V3Token10 />
+                              <sp:RequireIssuerSerialReference />
+                           </wsp:Policy>
+                        </sp:X509Token>
+                     </wsp:Policy>
+                  </sp:RecipientToken>
                   <sp:Layout>
                      <wsp:Policy>
                         <sp:Lax/>
@@ -608,7 +619,7 @@
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                </wsp:Policy>
-            </sp:SymmetricBinding>
+            </sp:AsymmetricBinding>
             <sp:Wss11>
                <wsp:Policy>
                   <sp:MustSupportRefIssuerSerial/>

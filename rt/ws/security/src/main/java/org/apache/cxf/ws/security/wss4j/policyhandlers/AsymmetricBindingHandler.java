@@ -42,6 +42,7 @@ import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.RecipientToken;
+import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -61,6 +62,7 @@ import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecTimestamp;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
  * 
@@ -116,6 +118,15 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                             this.addEncryptedKeyElement(cloneElement(el));
                             attached = true;
                         } 
+                    }
+                } else if (initiatorToken instanceof SamlToken) {
+                    AssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
+                    if (assertionWrapper != null) {
+                        if (includeToken(initiatorToken.getInclusion())) {
+                            addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                            storeAssertionAsSecurityToken(assertionWrapper);
+                        }
+                        policyAsserted(initiatorToken);
                     }
                 }
             }
@@ -205,6 +216,21 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         this.addEncryptedKeyElement(cloneElement(el));
                         attached = true;
                     } 
+                }
+            } else if (initiatorToken instanceof SamlToken) {
+                try {
+                    AssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
+                    if (assertionWrapper != null) {
+                        if (includeToken(initiatorToken.getInclusion())) {
+                            addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                            storeAssertionAsSecurityToken(assertionWrapper);
+                        }
+                        policyAsserted(initiatorToken);
+                    }
+                } catch (Exception e) {
+                    String reason = e.getMessage();
+                    LOG.log(Level.WARNING, "Encrypt before sign failed due to : " + reason);
+                    throw new Fault(e);
                 }
             }
         }
