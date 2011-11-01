@@ -253,8 +253,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
-    public void testSaml2OverSymmetricProtection() throws Exception {
+    public void testAsymmetricSamlInitiator() throws Exception {
 
         if (!unrestrictedPoliciesInstalled) {
             return;
@@ -268,11 +267,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         DoubleItService service = new DoubleItService();
         
-        DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricProtectionPort();
+        DoubleItPortType saml2Port = service.getDoubleItAsymmetricSamlInitiatorPort();
         updateAddressPort(saml2Port, PORT);
         
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            "ws-security.saml-callback-handler", callbackHandler
         );
         BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
         assertTrue(result.equals(BigInteger.valueOf(50)));

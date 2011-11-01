@@ -46,7 +46,8 @@ public class CustomSaml2Validator extends SamlAssertionValidator {
         }
         
         String confirmationMethod = assertion.getConfirmationMethods().get(0);
-        if (!OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
+        if (!(OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)
+            || OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod))) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
         

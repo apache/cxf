@@ -859,6 +859,43 @@ public abstract class AbstractBindingBuilder {
         return assertion;
     }
     
+    /**
+     * Store a SAML Assertion as a SecurityToken
+     */
+    protected void storeAssertionAsSecurityToken(AssertionWrapper assertion) {
+        String id = findIDFromSamlToken(assertion.getElement());
+        if (id == null) {
+            return;
+        }
+        SecurityToken secToken = new SecurityToken(id);
+        if (assertion.getSaml2() != null) {
+            secToken.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        } else {
+            secToken.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+        }
+        secToken.setToken(assertion.getElement());
+        getTokenStore().add(secToken);
+        message.setContextualProperty(SecurityConstants.TOKEN, secToken);
+    }
+    
+    protected String findIDFromSamlToken(Element samlToken) {
+        String id = null;
+        if (samlToken != null) {
+            QName elName = DOMUtils.getElementQName(samlToken);
+            if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))
+                && samlToken.hasAttributeNS(null, "AssertionID")) {
+                id = samlToken.getAttributeNS(null, "AssertionID");
+            } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))
+                && samlToken.hasAttributeNS(null, "ID")) {
+                id = samlToken.getAttributeNS(null, "ID");
+            }
+            if (id == null) {
+                id = samlToken.getAttributeNS(WSConstants.WSU_NS, "Id");
+            }
+        }
+        return id;
+    }
+    
     public String getPassword(String userName, Assertion info, int type) {
         //Then try to get the password from the given callback handler
         Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
@@ -1508,7 +1545,7 @@ public abstract class AbstractBindingBuilder {
     ) throws WSSecurityException {
         WSSecSignature sig = new WSSecSignature(wssConfig);
         checkForX509PkiPath(sig, token);
-        if (token instanceof IssuedToken) {
+        if (token instanceof IssuedToken || token instanceof SamlToken) {
             policyAsserted(token);
             policyAsserted(wrapper);
             SecurityToken securityToken = getSecurityToken();
