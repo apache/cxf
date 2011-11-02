@@ -118,6 +118,7 @@
   <wsdl:service name="CustomerServiceService">
     <wsdl:port name="CustomerServicePort" binding="tns:CustomerServiceServiceSoapBinding">
       <soap:address location="http://localhost:9090/CustomerServicePort"/>
+      <!--soap:address location="http://localhost:8080/wsdl_first-{CXFVersion}/services/CustomerServicePort?wsdl"/-->
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>
