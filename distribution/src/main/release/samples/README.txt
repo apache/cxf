@@ -61,7 +61,7 @@ Building the Demos in a Servlet Container Using Apache Maven
 "mvn clean install" will generate a WAR file for the servlet-based
 examples.  Either the WAR can be manually copied to your servlet
 container's war deployment directory (webapps by default with Tomcat)
-or the Tomcat Maven Plugin (http://mojo.codehaus.org/tomcat-maven-plugin/) 
+or the Tomcat Maven Plugin (http://tomcat.apache.org/maven-plugin.html) 
 can be used to auto-install the WAR onto Tomcat.
 
 Building the Demos that run in a Servlet Container (Apache Ant only)
