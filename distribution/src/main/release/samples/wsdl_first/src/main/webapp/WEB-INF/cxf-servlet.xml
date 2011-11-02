@@ -30,6 +30,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
                 id="CustomerServiceHTTP" address="/CustomerServicePort"
                 serviceName="customer:CustomerServiceService" endpointName="customer:CustomerServicePort"
                 implementor="com.example.customerservice.server.CustomerServiceImpl">
+		<!--jaxws:properties>
+		    <entry key="schema-validation-enabled" value="true" />
+		</jaxws:properties-->
         </jaxws:endpoint>
 
 </beans>
