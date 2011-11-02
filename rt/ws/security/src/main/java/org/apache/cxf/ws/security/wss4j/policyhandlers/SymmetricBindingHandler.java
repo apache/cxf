@@ -775,7 +775,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 sigTokId = tok.getId();
             }
-                           
+                      
+            if (included && sbinding.isTokenProtection()) {
+                sigs.add(new WSEncryptionPart(sigTokId));
+            }
             
             sig.setCustomTokenId(sigTokId);
             sig.setSecretKey(tok.getSecret());

@@ -123,4 +123,45 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="AsymmetricProtectTokens"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricProtect" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricProtectTokensPort"
+       xmlns:s="http://WSSec/x509"
+       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.encryption.username" value="alice"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="SymmetricProtectTokens"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricProtect" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricProtectTokensPort"
+       xmlns:s="http://WSSec/x509"
+       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>

@@ -110,11 +110,6 @@ public class TransportBinding extends Binding {
             layout.serialize(writer);
             // </sp:Layout>
         }
-        if (isTokenProtection()) {
-            // <sp:ProtectTokens />
-            writer.writeStartElement(prefix, SPConstants.PROTECT_TOKENS, namespaceURI);
-            writer.writeEndElement();
-        }
 
         if (isIncludeTimestamp()) {
             // <sp:IncludeTimestamp>
