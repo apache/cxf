@@ -130,6 +130,44 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         x509Port.doubleIt(BigInteger.valueOf(25));
     }
     
+    @org.junit.Test
+    public void testAsymmetricProtectTokens() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        DoubleItPortType x509Port = service.getDoubleItAsymmetricProtectTokensPort();
+        updateAddressPort(x509Port, PORT);
+        x509Port.doubleIt(BigInteger.valueOf(25));
+    }
+    
+    @org.junit.Test
+    public void testSymmetricProtectTokens() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        DoubleItPortType x509Port = service.getDoubleItSymmetricProtectTokensPort();
+        updateAddressPort(x509Port, PORT);
+        x509Port.doubleIt(BigInteger.valueOf(25));
+    }
+    
     private boolean checkUnrestrictedPoliciesInstalled() {
         try {
             byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};

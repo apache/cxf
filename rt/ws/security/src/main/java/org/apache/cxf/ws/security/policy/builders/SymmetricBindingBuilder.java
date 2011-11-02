@@ -108,7 +108,9 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
                 symmetricBinding.setEntireHeadersAndBodySignatures(true);
             } else if (SPConstants.ENCRYPT_SIGNATURE.equals(name.getLocalPart())) {
                 symmetricBinding.setSignatureProtection(true);
-            }
+            } else if (SPConstants.PROTECT_TOKENS.equals(name.getLocalPart())) {
+                symmetricBinding.setTokenProtection(true);
+            } 
         }
     }
 }

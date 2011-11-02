@@ -286,12 +286,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             dkSig.prepare(doc, secHeader);
             
-            /*
-            if(binding.isTokenProtection()) {
-                sigParts.add(new WSEncryptionPart(encrKey.getBSTTokenId()));
-            }
-            */
-            
             dkSig.setParts(sigParts);
             List<Reference> referenceList = dkSig.addReferencesToSign(sigParts, secHeader);
             
