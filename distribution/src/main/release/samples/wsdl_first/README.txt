@@ -2,7 +2,7 @@ WSDL First Demo
 ===============
 
 This demo shows how to build and call a webservice using a given WSDL (also called Contract First).
-As writing a WSDL by hand is not so easy the following Howto may also be an interesting read:
+As writing a WSDL by hand is not so easy the following Howto may also be a useful read:
 http://cxf.apache.org/docs/defining-contract-first-webservices-with-wsdl-generation-from-java.html
 
 This demo mainly addresses SOAP over HTTP in Document / Literal or Document / Literal wrapped style. 
@@ -27,7 +27,7 @@ One other common use of the binding file is to also generate asynchronous stubs.
 jaxws:enableAsyncMapping has to be uncommented to use this.
 
 More info about the binding file can be found here:
-https://jax-ws.dev.java.net/jax-ws-20-fcs/docs/customizations.html
+http://jax-ws.java.net/jax-ws-20-fcs/docs/customizations.html
 
 Server implementation
 ---------------------
@@ -40,9 +40,9 @@ zero objects would be used. This is mainly to show how custom exceptions can be 
 For any other name the method will return a list of two Customer objects. The number of  objects can be increased to
 test how fast CXF works for larger data.
 
-Now that the service is implemented it needs to be made available. In this example a standalone server is used. 
-This can be done either with the JAX-WS API demonstrated in the class CustomerService or using a spring config as
-demonstrated in the class CustomerServiceSpringServer.
+Now that the service is implemented it needs to be made available.  This samples provides two options for deploying the 
+web service provider: standalone server (using embedded Jetty) or as a WAR file in Tomcat (Version 6.x or 7.x).
+
 
 Client implementation
 ---------------------
@@ -60,23 +60,33 @@ or Spring and how to wire it to your business class (in this case CustomerServic
 
 Prerequisite
 ------------
-
 Please review the README in the samples main directory before continuing.
 
 Building and running the demo using Maven
----------------------------------------
+-----------------------------------------
 
 From the base directory of this sample (i.e., where this README file is
 located), the pom.xml file is used to build and run the demo. 
 
 Using either UNIX or Windows:
 
-  mvn install   (builds the demo)
-  mvn -Pserver  (from one command line window)
+  mvn clean install   (builds the demo and creates a WAR file for optional Tomcat deployment)
+  mvn -Pserver  (from one command line window -- only if using a standalone service, i.e., embedded Jetty)
   mvn -Pclient  (from a second command line window)
 
-To remove the code generated from the WSDL file and the .class
-files, run "mvn clean".
+If you're using Tomcat for the web service provider:
+----------------------------------------------------
+1.) Update the soap:address value in the resources/CustomerService.wsdl value, switching the
+soap:address value to servlet-specific one (presently commented-out).  Make sure the version
+number there is the same as the version of CXF being used.
+
+2.) You can manually copy the generated WAR file to the Tomcat webapps folder, or, if you
+have Maven and Tomcat set up to use the Tomcat Maven Plugin (http://mojo.codehaus.org/tomcat-maven-plugin/)
+you can use the mvn tomcat:redeploy command instead.  Important: if you're using this 
+command, and are using Tomcat 6 instead of Tomcat 7, update the tomcat-maven-plugin configuration 
+in the pom.xml, switching to the the Tomcat 6-specific "url" element.
+
+To remove the code generated from the WSDL file and the .class files, run "mvn clean".
 
 There is no special maven profile for the spring client and server but you can easily set it up yourself.
 
