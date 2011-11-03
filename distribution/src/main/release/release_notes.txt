@@ -1,4 +1,4 @@
-Apache CXF 2.4.3 Release Notes
+Apache CXF 2.4.4 Release Notes
 
 1. Overview
 
@@ -43,7 +43,7 @@ have created your own Policy objects or builders.   Additionally, XmlSchema was 
 so any custom Aegis types may need to be updated.
 
 
-2.4.3 fixes over 95 JIRA issues reported by users and the community.
+2.4.4 fixes over 35 JIRA issues reported by users and the community.
 
 
 
@@ -88,111 +88,50 @@ for caveats when upgrading from CXF 2.3.x to 2.4.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-Release Notes - CXF - Version 2.4.3
-
-** Sub-task
-    * [CXF-1519] - @XmlType in exception class is not respected
-    * [CXF-2006] - RespectBinding feature and not understood required extensibility elements
-
+Release Notes - CXF - Version 2.4.4
 ** Bug
-    * [CXF-2774] - urls in service list
-    * [CXF-2924] - WS-SP support does not enforce signature algorithm or digest algorithm on server side
-    * [CXF-2952] - Corba Use Case: CXF/JAX-WS Server and CXF/JAX-WS Client with corba:sequence produces Unmarshalling Error: null 
-    * [CXF-3054] - wsdl12js.bat doesn't immediately exit after return result from version query
-    * [CXF-3189] - Maven pom includes dependencies when build on IBM JDK
-    * [CXF-3611] - JAXBEncoderDecoder.marshallException fails if exception object contains a map
-    * [CXF-3691] - CXF and Tibco BW : JMS transport does not copy protocol headers in the destination message
-    * [CXF-3715] - AbstractClient.java split Cookie "BC=0; expires=Fri,  05-Aug-2011 22:04:41 GMT; path=/; domain=.jolira.com" into two cookies "BC=0; expires=Fri," and "05-Aug-2011 22:04:41 GMT; path=/; domain=.jolira.com"
-    * [CXF-3720] - SOAP over JMS miss SOAPJMS_soapAction property when use soap12
-    * [CXF-3740] - CXF WSA handler have to throw WebServiceException on client side if addressing is required but not found in the message
-    * [CXF-3742] - Too many startServer() and clientDestroyed() got invoked when spring created and java code created client/server mixed used.
-    * [CXF-3744] - LoggingOutInterceptor shows wrong or no payload if StaxTransformFeature is active
-    * [CXF-3747] - Dispatch client fails to set WS-Addressing Action header when WSDL's soap:operation does not have a style attribute
-    * [CXF-3748] - Using Dispatch API with SOAPMessage type fails to set WS-Addressing action header properly if there's whitespace after the soap:body
-    * [CXF-3749] - Using Dispatch API with Source type fails to set WS-Addressing action header properly in MESSAGE mode with SOAP 1.2
-    * [CXF-3750] - Sometimes, CXF servlet will blocked until bussiness logical finished for one-way operation
-    * [CXF-3754] - Dispatch API's ServiceImpl class fails to copy address/properties/bus/handlers from jaxws:client spring configuration
-    * [CXF-3755] - setting wsa:addressing feature in cxf:bus causes wrong action header to be sent when using Dispatch API
-    * [CXF-3756] - wadl2java ignores multiple inline XML schemas
-    * [CXF-3758] - when web container be redeployed WebServiceContextImpl's static atrribute ThreadLocal<MessageContext> may not be release successfully.
-    * [CXF-3759] - wadl2java fails with NullPointerException if status codes of multiple response elements are not in ascending numerical order
-    * [CXF-3760] - Problematic inheritance of @Produces/@Consumes
-    * [CXF-3761] - STSClient can't process EncryptedKey elements received from an STS
-    * [CXF-3763] - CLONE - JaxWsDynamicClientFactory unable to handle custom exceptions
-    * [CXF-3764] - JARS does not respect encoding when reading application/x-www-form-urlencoded;charset=Iso-8859-1 parameters
-    * [CXF-3770] - WADL Generator does not handle Enums correctly
-    * [CXF-3772] - Apache CXF 2.4.2 samples do not build on Windows 7 Ultimate 64 bit using Java SDK 1.7 and ant 1.8.2. following the README.txt directions.
-    * [CXF-3773] - CXF unregisters MBeans for JAX-WS endpoints twice
-    * [CXF-3775] - Cache-Control header provider won't emit the right values if multiple privateFields or noCacheFields are provided
-    * [CXF-3776] - Duplicate policy getting added with java-first approach
-    * [CXF-3777] - WS-RM provider may try to send a CreateSequence message to the anonymous endpoint in some cases
-    * [CXF-3780] - DynamicClientFactory trying to resolve wsdl URL prior to calling into service factories
-    * [CXF-3783] - Provide an option for the dispatch client to automatically set the correct SOAPAction based on the message payload
-    * [CXF-3784] - incorrect OSGi metadata header for the jbi tansport and binding
-    * [CXF-3785] - Calling start on a server that already is started resets things
-    * [CXF-3786] - incorrect jaxp-ri bundle name in features.xml
-    * [CXF-3787] - CXF does not set the correct host when viewing WSDLs that are published with JAXWS API
-    * [CXF-3788] - Allow CXF HTTP Client to handle HTTP 202 for twoway calls when the real response is sent back to the decoupled endpoint.
-    * [CXF-3789] - org.apache.cxf.endpoint.ClientImpl.invoke(BindingOperationInfo, Object[], Exchange) wastes cycles
-    * [CXF-3790] - org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor.handleMessage(Message) contains cruft code
-    * [CXF-3793] - Error in apache-cxf-2.4.2-features.xml
-    * [CXF-3801] - EndpointReferenceUtils.convertToXML() causes ConcurrentModificationException under load
-    * [CXF-3802] - jaxws Provider doesn't allow override of outbound ws addressing headers
-    * [CXF-3803] - Non-spring based servlet not destroying Bus instances
-    * [CXF-3805] - BeanInCreationException when CXF client factorybean used
-    * [CXF-3808] - JAX-RS proxies don't work with the failover feature
-    * [CXF-3821] - FormEncodingProvider does not check for null incoming object
-    * [CXF-3822] - JAX-RS: A 406 status could should be returned for an improperly formatted Accept header
-    * [CXF-3828] - german umlauts not supported in path names
-    * [CXF-3834] - Array JAXRS parameters are not supported
-    * [CXF-3842] - WS-Policy: Caused by: java.lang.IllegalArgumentException: local part cannot be "null" when creating a QName
+
+    * [CXF-3829] - NPE in wsdl2java if soap:binding tag is omitted
+    * [CXF-3840] - WS-Addressing and WS-RM: Nested Reference Parameters in request are not supported and become concatenated in the response to client
+    * [CXF-3845] - Incompatibility between Derby 10.8 and WS-RM RMTxStore
+    * [CXF-3846] - NullPointerException when requesting ?wsdl using AegisDatabinding and @SchemaValidation
+    * [CXF-3847] - ResponseBuilderImpl.status - validation against instance var instead of parameter
+    * [CXF-3853] - RMTxStore: Vendor specific condition check
+    * [CXF-3854] - java.lang.StringIndexOutOfBoundsException is thrown when generating sources for a WADL with WADL2Java Maven plugin
+    * [CXF-3855] - Incorrect character escaping by URIParserUtil
+    * [CXF-3856] - cxf-codegen-plugin cannot allow element references for wrapped style
+    * [CXF-3860] - CXF sample "restful_dispatch" Readme.txt need to be updated
+    * [CXF-3862] - BindingCustomization does not work for the wsdl url like file://home/usr/../../wsdl/helloworld.wsdl
+    * [CXF-3866] - "CXF-Service List" page mess up in some case
+    * [CXF-3871] - NPE is thrown when ws-addr is configured using policy and ws-addr Action is absent
+    * [CXF-3875] - WADL generator fails if no parameter type is specified
+    * [CXF-3878] - org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper does not print the WebApplicationException stack trace even when log level is set to FINEST
+    * [CXF-3884] - [JAXB] DynamicClientFactory#setupClasspath does not handle URL encoded file names correctly
 
 ** Improvement
-    * [CXF-2053] - wsdl2java should log reason for switching from wrapped to bare in verbose mode
-    * [CXF-3055] - Adding -version, -V and -Q switches to all command line tools
-    * [CXF-3086] - "Warning building bundle" message in CXF 2.3 build
-    * [CXF-3162] - Make it possible to set bus id through core:bus namespace handler
-    * [CXF-3186] - Update to latest JAXB version 2.2.3 from 2.2.2
-    * [CXF-3245] - Command line options are not uniform across CXF tools
-    * [CXF-3276] - "Building Apache CXF HTTP Transport for OSGi 2.3.2" - build warnings
-    * [CXF-3323] - Update "description" elements in all CXF POM files. 
-    * [CXF-3593] - Provide a bus level option to ensure that WSDL locations are specified
-    * [CXF-3686] - Adjust sample project method calls that should be accessed in a static manner.
-    * [CXF-3690] - Refactor packaging for uniformity across examples.
-    * [CXF-3705] - It's impossible to extend org.apache.cxf.ws.security.policy.model.AlgorithmSuite with a custom non-standad algorithms.
-    * [CXF-3736] - Send the cause of exception stack trace
-    * [CXF-3745] - Update OutTransformWriter to support default namespaces
-    * [CXF-3752] - Allow ability to reset values in ResponseTimeCounter via JMX
-    * [CXF-3765] - CXF features should use version range for features provided by Karaf
-    * [CXF-3766] - Move the spring-jms feature into Karaf
-    * [CXF-3767] - Support the ability to sign and encrypt message parts using a Kerberos Ticket
-    * [CXF-3769] - Update WADL2Java generator to accept additional args 
-    * [CXF-3794] - use geronimo-jaxws_2.2_spec 1.1 bundle
-    * [CXF-3795] - Update JAXBElementProvider to optionally register a namespace to prefix mapper
-    * [CXF-3796] - Introduce an header to disable the handling the PartialResponse when the response code is 202
-    * [CXF-3806] - WebClient should be able to replace or remove already set headers only  
-    * [CXF-3807] - jaasLoginModuleName methods in KerberosClient.java should be renamed to contextName
-    * [CXF-3814] - update JDK download url in examples README.txt
-    * [CXF-3815] - Add bin script for wsdl2idl in the CXF kit
-    * [CXF-3817] - Add maven support on examples
-    * [CXF-3820] - SecurityToken class should be serializable
-    * [CXF-3823] - cxf-rt-transport-http-jetty should have the dependency of servlet API 2.5 instead of 3.0
-    * [CXF-3824] - CLI tool -help should be able to list all switch in toolspec
-    * [CXF-3825] - Add a README file in the CXF_HOME/etc
-    * [CXF-3830] - Remove unmaintained integration/JCA examples from CXF build.
-    * [CXF-3832] - Update JSONProvider to read from and write to Document
-    * [CXF-3833] - Add maxIdleTime attribute support on the engine element
-    * [CXF-3843] - Update InTransformReader to replace simple element content
+
+    * [CXF-3797] - WADL2Java Generator improvements
+    * [CXF-3849] - JAXBElementProvider prints Exception on System.err
+    * [CXF-3852] - Enable the validate profile of karaf feature
+    * [CXF-3857] - Support for subclassing of STSClient and adding Claims to RST
+    * [CXF-3858] - It will be helpful to add the cause exception message, when throw the fault from XMLStreamDataReader and XMLStreamDataWriter
+    * [CXF-3863] - Warning info since build service from wsdl of JaxWsServiceFactoryBean once I located the wsdl location
+    * [CXF-3869] - Improve RequestDispatcherProvider configuration
+    * [CXF-3872] - Confusing error message "Problem writing SAAJ model to stream" in case if service not avalable (patch)
+    * [CXF-3873] - Detail exceptions in JAASLoginInInterceptor (patch)
+    * [CXF-3874] - Update RolePrefixSecurityContext to recognize roles by full or simple class name of the class
+    * [CXF-3877] - CxfServlet displays wrong endpoints.
+    * [CXF-3879] - Add the ability to enforce a maximum attachment size
+    * [CXF-3880] - TransformReader's append-child option should insert the child as the last element
+    * [CXF-3881] - WADL Generator should optionally generate Enums
+    * [CXF-3887] - wsdl2java only shows first error from JAXB/xjc
 
 ** New Feature
-    * [CXF-3125] - Add -validate option to the following utilities:  wsdl2xml, wsdl2soap, wsdl2service and wsdl2corba.
-    * [CXF-3743] - register extensions with CXFNonSpringJaxrsServlet
-    * [CXF-3762] - Add an -exceptionSuper flag, allowing wsdl2java to generate exceptions which extend from java.lang.RuntimeException
+
+    * [CXF-3205] - @XmlJavaTypeAdapter at package level versus ASM generation of wrappers
+    * [CXF-3225] - Add support for saml tokens in sp:InitiatorToken
+    * [CXF-3389] - Integrate CXF JAX-RS with EJB
 
 ** Task
-    * [CXF-3737] - Comments reference incorrect tool names in several files.
-    * [CXF-3738] - Remove the Bouncy Castle license from the distribution.
-    * [CXF-3810] - exclude ws_security/interopfest example from kit
 
-
-
+    * [CXF-3892] - upgrade to servicemix specs 1.9.0
