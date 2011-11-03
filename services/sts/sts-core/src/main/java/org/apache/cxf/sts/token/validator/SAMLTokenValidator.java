@@ -196,10 +196,10 @@ public class SAMLTokenValidator implements TokenValidator {
                 }
             }
             
-            response.setValid(true);
             SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
             response.setPrincipal(samlPrincipal);
             response.setTokenRealm(tokenRealm);
+            response.setValid(true);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

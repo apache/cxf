@@ -20,12 +20,14 @@ package org.apache.cxf.sts.token.validator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 
@@ -106,11 +108,17 @@ public class SCTValidator implements TokenValidator {
                     return response;
                 }
                 byte[] secret = (byte[])token.getSecret();
-                response.setValid(true);
                 Map<String, Object> properties = new HashMap<String, Object>();
                 properties.put(SCT_VALIDATOR_SECRET, secret);
                 response.setAdditionalProperties(properties);
                 response.setPrincipal(token.getPrincipal());
+                
+                Properties props = token.getProperties();
+                if (props != null) {
+                    String realm = props.getProperty(STSConstants.TOKEN_REALM);
+                    response.setTokenRealm(realm);
+                }
+                response.setValid(true);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
             }
