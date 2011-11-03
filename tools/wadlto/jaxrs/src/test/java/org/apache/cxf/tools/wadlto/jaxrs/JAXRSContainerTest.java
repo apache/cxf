@@ -28,7 +28,6 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSContainerTest extends ProcessorTestBase {
@@ -301,7 +300,6 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
     @Test    
-    @Ignore("missing a file")
     public void testCodeGenNoIds2() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
