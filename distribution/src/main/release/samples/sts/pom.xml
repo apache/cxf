@@ -94,6 +94,44 @@
     </build>
     <profiles>
         <profile>
+            <id>jdk15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-endorsed-dir</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>xerces</groupId>
+                                            <artifactId>xercesImpl</artifactId>
+                                            <outputDirectory>${basedir}/target/endorsed</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>xml-apis</groupId>
+                                            <artifactId>xml-apis</artifactId>
+                                            <version>1.3.04</version>
+                                            <outputDirectory>${basedir}/target/endorsed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                 </configuration>
+                             </execution>
+                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>sts</id>
             <build>
                 <defaultGoal>test</defaultGoal>
@@ -110,6 +148,7 @@
                                 <configuration>
                                     <executable>java</executable>
                                     <arguments>
+                                        <argument>-Djava.endorsed.dirs=${basedir}/target/endorsed</argument>
                                         <argument>-classpath</argument>
                                         <classpath />
                                         <argument>demo.wssec.sts.Server</argument>
@@ -145,6 +184,7 @@
                                 <configuration>
                                     <executable>java</executable>
                                     <arguments>
+                                        <argument>-Djava.endorsed.dirs=${basedir}/target/endorsed</argument>
                                         <argument>-classpath</argument>
                                         <classpath />
                                         <argument>demo.wssec.server.Server</argument>
