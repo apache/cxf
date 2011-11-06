@@ -16,10 +16,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>java_first_jaxws</artifactId>
+    <packaging>war</packaging>
     <name>Java First demo using JAX-WS APIs</name>
     <description>Java First demo using JAX-WS APIs</description>
     <version>2.5.1-SNAPSHOT</version>
@@ -31,6 +33,7 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
+        <cxf.release.base>${basedir}/../..</cxf.release.base>
     </properties>
     <build>
         <plugins>
@@ -41,6 +44,26 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+                <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.1</version>
+                    <configuration>
+                        <webXml>${cxf.release.base}/etc/web.xml</webXml>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>tomcat-maven-plugin</artifactId>
+                    <version>1.1</version>
+                    <configuration>
+                        <server>myTomcat</server>
+                        <!-- if using Tomcat 6 (see README) -->
+                        <!--url>http://localhost:8080/manager</url-->
+                        <!-- if using Tomcat 7 (see README) -->
+                        <url>http://localhost:8080/manager/text</url>
+                        <path>/${project.build.finalName}</path>
+                    </configuration>
+                </plugin>
         </plugins>
     </build>
     <profiles>
@@ -66,6 +89,13 @@
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-transports-http-jetty</artifactId>
+                    <version>2.5.1-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>client</id>
@@ -100,11 +130,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>2.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>2.5.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
