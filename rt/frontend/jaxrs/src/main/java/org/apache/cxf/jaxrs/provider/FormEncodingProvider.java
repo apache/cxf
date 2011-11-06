@@ -24,9 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
@@ -192,22 +189,9 @@ public class FormEncodingProvider implements
             (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).getData() : obj);
         boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
         
-        String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        String enc = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
         
-        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<String, List<String>> entry = it.next();
-            for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
-                String value = entryIterator.next();
-                os.write(entry.getKey().getBytes(encoding));
-                os.write('=');
-                String data = encoded ? value : HttpUtils.urlEncode(value);
-                os.write(data.getBytes(encoding));
-                if (entryIterator.hasNext() || it.hasNext()) {
-                    os.write('&');
-                }
-            }
-
-        }
+        FormUtils.writeMapToOutputStream(map, os, enc, encoded);
         
     }
 

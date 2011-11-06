@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -76,6 +77,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private String dispatcherName;
     private String servletPath;
     private boolean saveParametersAsAttributes;
+    private boolean logRedirects;
     
     @Context
     private MessageContext mc; 
@@ -114,12 +116,14 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             HttpServletRequestFilter servletRequest = 
                 new HttpServletRequestFilter(mc.getHttpServletRequest(), path, 
                                              theServletPath, saveParametersAsAttributes);
+            String attributeName = getBeanName(o);
             if (REQUEST_SCOPE.equals(scope)) {
-                servletRequest.setAttribute(getBeanName(o), o);
+                servletRequest.setAttribute(attributeName, o);
             } else if (SESSION_SCOPE.equals(scope)) {
-                servletRequest.getSession(true).setAttribute(getBeanName(o), o);
+                servletRequest.getSession(true).setAttribute(attributeName, o);
             } 
             setRequestParameters(servletRequest);
+            logRedirection(path, attributeName, o);
             rd.forward(servletRequest, mc.getHttpServletResponse());
         } catch (Throwable ex) {
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.FALSE);
@@ -128,6 +132,16 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
     }
 
+    private void logRedirection(String path, String attributeName, Object o) {
+        Level level = logRedirects ? Level.INFO : Level.FINE;  
+        if (LOG.isLoggable(level)) {
+            String message = 
+                new org.apache.cxf.common.i18n.Message("RESPONSE_REDIRECTED_TO", 
+                    BUNDLE, o.getClass().getName(), attributeName, path).toString();
+            LOG.log(level, message);
+        }
+    }
+    
     private String getResourcePath(String clsName) {
         String clsResourcePath = classResources.get(clsName);
         if (clsResourcePath != null) {
@@ -198,6 +212,10 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
 
     public void setBeanName(String beanName) {
         this.beanName = beanName;
+    }
+    
+    public void setLogRedirects(String value) {
+        this.logRedirects = Boolean.valueOf(value);
     }
 
     protected String getBeanName(Object bean) {

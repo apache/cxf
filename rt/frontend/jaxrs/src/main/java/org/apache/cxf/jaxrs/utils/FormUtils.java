@@ -22,24 +22,31 @@ package org.apache.cxf.jaxrs.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class FormUtils {
-
     public static final String FORM_PARAM_MAP = "org.apache.cxf.form_data";
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
     private static final String MULTIPART_FORM_DATA_TYPE = "form-data";  
         
     private FormUtils() {
@@ -97,6 +104,36 @@ public final class FormUtils {
                 String[] values = request.getParameterValues(paramName);
                 params.put(HttpUtils.urlDecode(paramName), Arrays.asList(values));
             }
+            String chain = PhaseInterceptorChain.getCurrentMessage().getInterceptorChain().toString();
+            if (chain.contains(LoggingInInterceptor.class.getSimpleName())) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try {
+                    writeMapToOutputStream(params, bos, enc, false);
+                    LOG.info(bos.toString(enc));
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
+        }
+    }
+    
+    public static void writeMapToOutputStream(MultivaluedMap<String, String> map, 
+                                              OutputStream os,
+                                              String enc,
+                                              boolean encoded) throws IOException {
+        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, List<String>> entry = it.next();
+            for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
+                String value = entryIterator.next();
+                os.write(entry.getKey().getBytes(enc));
+                os.write('=');
+                String data = encoded ? value : HttpUtils.urlEncode(value);
+                os.write(data.getBytes(enc));
+                if (entryIterator.hasNext() || it.hasNext()) {
+                    os.write('&');
+                }
+            }
+
         }
     }
     
