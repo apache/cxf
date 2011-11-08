@@ -19,10 +19,15 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
@@ -30,24 +35,52 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.model.KerberosToken;
+import org.apache.cxf.ws.security.policy.model.SupportingToken;
+import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.X509Token;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.KerberosSecurity;
+import org.apache.ws.security.message.token.PKIPathSecurity;
+import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Validate an EndorsingSupportingToken policy. 
  */
-public class EndorsingTokenPolicyValidator {
+public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator {
     
+    private List<WSSecurityEngineResult> results;
     private List<WSSecurityEngineResult> signedResults;
     private Message message;
-
+    private Element timestamp;
+    private boolean tls;
+    
     public EndorsingTokenPolicyValidator(
+        List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
+        this.results = results;
         this.signedResults = signedResults;
         this.message = message;
+        WSSecurityEngineResult result = WSSecurityUtil.fetchActionResult(results, WSConstants.TS);
+        if (result != null) {
+            Timestamp ts = (Timestamp)result.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+            timestamp = ts.getElement();
+        }
+        
+        // See whether TLS is in use or not
+        TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+        if (tlsInfo != null) {
+            tls = true;
+        }
     }
     
     public boolean validatePolicy(
@@ -56,21 +89,74 @@ public class EndorsingTokenPolicyValidator {
         Collection<AssertionInfo> endorsingAis = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
         if (endorsingAis != null && !endorsingAis.isEmpty()) {
             for (AssertionInfo ai : endorsingAis) {
+                SupportingToken binding = (SupportingToken)ai.getAssertion();
+                if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENDORSING != binding.getTokenType()) {
+                    continue;
+                }
                 ai.setAsserted(true);
                 
-                TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-                boolean transport = false;
-                if (tlsInfo != null) {
-                    transport = true;
-                }
-                if (!checkEndorsed(transport)) {
-                    ai.setNotAsserted("Message fails endorsing supporting tokens requirements");
-                    return false;
+                List<Token> tokens = binding.getTokens();
+                for (Token token : tokens) {
+                    if (!isTokenRequired(token, message)) {
+                        continue;
+                    }
+                    if (token instanceof KerberosToken && !processKerberosTokens()) {
+                        ai.setNotAsserted(
+                             "The received token does not match the supporting token requirement"
+                        );
+                        return false;
+                    } else if (token instanceof X509Token && !processX509Tokens()) {
+                        ai.setNotAsserted(
+                            "The received token does not match the supporting token requirement"
+                        );
+                        return false;
+                    }
                 }
             }
         }
         
         return true;
+    }
+    
+    private boolean processKerberosTokens() {
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
+        for (WSSecurityEngineResult wser : results) {
+            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.BST) {
+                BinarySecurity binarySecurity = 
+                    (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                if (binarySecurity instanceof KerberosSecurity) {
+                    tokenResults.add(wser);
+                }
+            }
+        }
+        
+        if (tokenResults.isEmpty()) {
+            return false;
+        }
+        
+        return checkEndorsed(tokenResults, tls);
+    }
+    
+    private boolean processX509Tokens() {
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
+        for (WSSecurityEngineResult wser : results) {
+            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.BST) {
+                BinarySecurity binarySecurity = 
+                    (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                if (binarySecurity instanceof X509Security
+                    || binarySecurity instanceof PKIPathSecurity) {
+                    tokenResults.add(wser);
+                }
+            }
+        }
+        
+        if (tokenResults.isEmpty()) {
+            return false;
+        }
+        
+        return checkEndorsed(tokenResults, tls);
     }
     
     /**
@@ -79,18 +165,19 @@ public class EndorsingTokenPolicyValidator {
      * @param transport
      * @return true if the endorsed supporting token policy is correct
      */
-    private boolean checkEndorsed(boolean transport) {
+    private boolean checkEndorsed(List<WSSecurityEngineResult> tokenResults, boolean transport) {
         if (transport) {
-            return checkTimestampIsSigned();
+            return checkTimestampIsSigned(tokenResults);
         }
-        return checkSignatureIsSigned();
+        return checkSignatureIsSigned(tokenResults);
     }
     
     /**
-     * Return true if the Timestamp is signed
+     * Return true if the Timestamp is signed by one of the token results
+     * @param tokenResults A list of WSSecurityEngineResults corresponding to tokens
      * @return true if the Timestamp is signed
      */
-    private boolean checkTimestampIsSigned() {
+    private boolean checkTimestampIsSigned(List<WSSecurityEngineResult> tokenResults) {
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> sl =
                 CastUtils.cast((List<?>)signedResult.get(
@@ -98,8 +185,8 @@ public class EndorsingTokenPolicyValidator {
                 ));
             if (sl != null) {
                 for (WSDataRef dataRef : sl) {
-                    QName signedQName = dataRef.getName();
-                    if (WSSecurityEngine.TIMESTAMP.equals(signedQName)) {
+                    if (timestamp == dataRef.getProtectedElement()
+                        && checkSignature(signedResult, tokenResults)) {
                         return true;
                     }
                 }
@@ -109,24 +196,67 @@ public class EndorsingTokenPolicyValidator {
     }
     
     /**
-     * Return true if the Signature is itself signed
+     * Return true if the Signature is itself signed by one of the token results
+     * @param tokenResults A list of WSSecurityEngineResults corresponding to tokens
      * @return true if the Signature is itself signed
      */
-    private boolean checkSignatureIsSigned() {
+    private boolean checkSignatureIsSigned(List<WSSecurityEngineResult> tokenResults) {
         for (WSSecurityEngineResult signedResult : signedResults) {
             List<WSDataRef> sl =
                 CastUtils.cast((List<?>)signedResult.get(
                     WSSecurityEngineResult.TAG_DATA_REF_URIS
                 ));
-            if (sl != null) {
+            if (sl != null && sl.size() == 1) {
                 for (WSDataRef dataRef : sl) {
                     QName signedQName = dataRef.getName();
-                    if (WSSecurityEngine.SIGNATURE.equals(signedQName)) {
+                    if (WSSecurityEngine.SIGNATURE.equals(signedQName)
+                        && checkSignature(signedResult, tokenResults)) {
                         return true;
                     }
                 }
             }
         }
+        return false;
+    }
+    
+    /**
+     * Check that a WSSecurityEngineResult corresponding to a signature uses the same 
+     * signing credential as one of the tokens.
+     * @param signatureResult a WSSecurityEngineResult corresponding to a signature
+     * @param tokenResult A list of WSSecurityEngineResults corresponding to tokens
+     * @return 
+     */
+    private boolean checkSignature(
+        WSSecurityEngineResult signatureResult,
+        List<WSSecurityEngineResult> tokenResult
+    ) {
+        // See what was used to sign this result
+        X509Certificate cert = 
+            (X509Certificate)signatureResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        byte[] secret = (byte[])signatureResult.get(WSSecurityEngineResult.TAG_SECRET);
+        
+        // Now see if the same credential exists in the tokenResult list
+        for (WSSecurityEngineResult token : tokenResult) {
+            Integer actInt = (Integer)token.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.BST) {
+                BinarySecurity binarySecurity = 
+                    (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                if (binarySecurity instanceof X509Security
+                    || binarySecurity instanceof PKIPathSecurity) {
+                    X509Certificate foundCert = 
+                        (X509Certificate)token.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                    if (foundCert.equals(cert)) {
+                        return true;
+                    }
+                } else if (binarySecurity instanceof KerberosSecurity) {
+                    byte[] foundSecret = (byte[])token.get(WSSecurityEngineResult.TAG_SECRET);
+                    if (foundSecret != null && Arrays.equals(foundSecret, secret)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
         return false;
     }
 }

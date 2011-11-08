@@ -108,15 +108,20 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         if (binding.getInitiatorToken() != null) {
             Token token = binding.getInitiatorToken().getToken();
             if (token instanceof X509Token) {
+                boolean foundCert = false;
                 for (WSSecurityEngineResult result : signedResults) {
                     X509Certificate cert = 
                         (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    if (cert == null) {
-                        String error = "An X.509 certificate was not used for the initiator token";
-                        notAssertPolicy(aim, binding.getInitiatorToken().getName(), error);
-                        ai.setNotAsserted(error);
-                        return false;
+                    if (cert != null) {
+                        foundCert = true;
+                        break;
                     }
+                }
+                if (!foundCert && !signedResults.isEmpty()) {
+                    String error = "An X.509 certificate was not used for the initiator token";
+                    notAssertPolicy(aim, binding.getInitiatorToken().getName(), error);
+                    ai.setNotAsserted(error);
+                    return false;
                 }
             }
             assertPolicy(aim, binding.getInitiatorToken());

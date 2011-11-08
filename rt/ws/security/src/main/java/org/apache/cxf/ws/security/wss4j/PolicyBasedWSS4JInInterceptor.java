@@ -574,6 +574,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         suppValidator.setValidateUsernameToken(utWithCallbacks);
         suppValidator.validatePolicy(aim);
         
+        EndorsingTokenPolicyValidator endorsingValidator = 
+            new EndorsingTokenPolicyValidator(results, signedResults, msg);
+        endorsingValidator.validatePolicy(aim);
+        
         //REVISIT - probably can verify some of these like if UT is encrypted and/or signed, etc...
         assertPolicy(aim, SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         assertPolicy(aim, SP12Constants.SUPPORTING_TOKENS);
@@ -582,14 +586,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
             assertPolicy(aim, SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
             assertPolicy(aim, SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        }
-        if (isRequestor(msg)) {
-            assertPolicy(aim, SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-        } else {
-            // TODO need to revisit all of the other endorsed policies
-            EndorsingTokenPolicyValidator endorsingValidator = 
-                new EndorsingTokenPolicyValidator(signedResults, msg);
-            endorsingValidator.validatePolicy(aim);
         }
         super.doResults(msg, actor, soapHeader, soapBody, results, utWithCallbacks);
     }
