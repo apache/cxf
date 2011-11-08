@@ -19,7 +19,8 @@
 package org.apache.cxf.sts;
 
 /**
- * This class contains various configuration properties that can be used to sign an issued token.
+ * This class contains various configuration properties that can be used to sign an issued token,
+ * or generate a symmetric key in the STS.
  */
 public class SignatureProperties {
     private boolean useKeyValue;
@@ -44,15 +45,14 @@ public class SignatureProperties {
     }
 
     /**
-     * Get the key size to use when generating a symmetric key to sign an issued token. The default is
-     * 256 bits.
+     * Get the key size to use when generating a symmetric key. The default is 256 bits.
      */
     public long getKeySize() {
         return keySize;
     }
 
     /**
-     * Set the key size to use when generating a symmetric key to sign an issued token. The default is
+     * Set the key size to use when generating a symmetric key. The default is
      * 256 bits.
      */
     public void setKeySize(long keySize) {
@@ -60,16 +60,16 @@ public class SignatureProperties {
     }
     
     /**
-     * Get the minimum key size to use when generating a symmetric key to sign an issued token. The
-     * requestor can specify a KeySize value to use. The default is 128 bits.
+     * Get the minimum key size to use when generating a symmetric key. The requestor can 
+     * specify a KeySize value to use. The default is 128 bits.
      */
     public long getMinimumKeySize() {
         return minimumKeySize;
     }
 
     /**
-     * Set the minimum key size to use when generating a symmetric key to sign an issued token. The
-     * requestor can specify a KeySize value to use. The default is 128 bits.
+     * Set the minimum key size to use when generating a symmetric key. The requestor can
+     * specify a KeySize value to use. The default is 128 bits.
      */
     public void setMinimumKeySize(long minimumKeySize) {
         this.minimumKeySize = minimumKeySize;
