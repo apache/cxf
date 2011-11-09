@@ -34,6 +34,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -263,6 +265,45 @@ public class ProviderFactoryTest extends Assert {
         assertTrue(jsonReader instanceof JSONProvider);
         assertNotSame(jsonReader, customJsonReader);
     }
+    
+    @Test
+    public void testDataSourceReader() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new DataSourceProvider());
+        MessageBodyReader reader = pf.createMessageBodyReader(
+              (Class<?>)DataSource.class, null, null, 
+              MediaType.valueOf("image/png"), new MessageImpl());
+        assertTrue(reader instanceof DataSourceProvider);
+        MessageBodyReader reader2 = pf.createMessageBodyReader(
+                          (Class<?>)DataHandler.class, null, null, 
+                          MediaType.valueOf("image/png"), new MessageImpl());
+        assertSame(reader, reader2);
+    }
+    
+    @Test
+    public void testDataSourceWriter() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new DataSourceProvider());
+        MessageBodyWriter writer = pf.createMessageBodyWriter(
+              (Class<?>)DataSource.class, null, null, 
+              MediaType.valueOf("image/png"), new MessageImpl());
+        assertTrue(writer instanceof DataSourceProvider);
+        MessageBodyWriter writer2 = pf.createMessageBodyWriter(
+                          (Class<?>)DataHandler.class, null, null, 
+                          MediaType.valueOf("image/png"), new MessageImpl());
+        assertSame(writer, writer2);
+    }
+    
+    @Test
+    public void testNoDataSourceWriter() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new DataSourceProvider());
+        MessageBodyWriter writer = pf.createMessageBodyWriter(
+              (Class<?>)DataSource.class, null, null, 
+              MediaType.valueOf("multipart/form-data"), new MessageImpl());
+        assertFalse(writer instanceof DataSourceProvider);
+    }
+    
     
     @Test
     public void testSchemaLocations() {
