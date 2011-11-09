@@ -143,6 +143,20 @@ public final class OAuthClientUtils {
         return doGetAuthorizationHeader(accessor, method, requestURI, parameters);
     }
     
+
+    /**
+     * Creates OAuth Authorization header containing consumer key and secret values only
+     * @param consumer Consumer bean containing the consumer key and secret
+     * @return the header value
+     */
+    public static String createAuthorizationHeader(Consumer consumer) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("OAuth ").append("oauth_consumer_key=").append(consumer.getKey())
+          .append("oauth_consumer_secret=").append(consumer.getSecret());
+        return sb.toString();
+        
+    }
+    
     private static String doGetAuthorizationHeader(OAuthAccessor accessor, 
             String method, String requestURI, Map<String, String> parameters) {
         try {

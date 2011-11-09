@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.oauth.filters;
 
 import java.security.Principal;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,10 +114,10 @@ public class AbstractAuthFilter {
         OAuthUtils.validateMessage(oAuthMessage, client, accessToken, dataProvider);
 
         //check valid URI
-        checkRequestURI(req, getAllUris(client, accessToken));
+        checkRequestURI(req, OAuthUtils.getAllUris(client, accessToken));
         
         List<OAuthPermission> permissions = dataProvider.getPermissionsInfo(
-                getAllScopes(client, accessToken));
+                OAuthUtils.getAllScopes(client, accessToken));
         
         for (OAuthPermission perm : permissions) {
             if (perm.getUri() != null) {
@@ -144,24 +143,6 @@ public class AbstractAuthFilter {
         }
     }
     
-    protected List<String> getAllScopes(Client client, AccessToken token) {
-        List<String> scopes = new LinkedList<String>();
-        if (token != null) {
-            scopes.addAll(token.getScopes());
-        }
-        scopes.addAll(client.getScopes());
-        return scopes;
-    }
-    
-    protected List<String> getAllUris(Client client, AccessToken token) {
-        List<String> uris = new LinkedList<String>();
-        if (token != null) {
-            uris.addAll(token.getUris());
-        }
-        uris.addAll(client.getUris());
-        return uris;
-    }
-
     protected void checkRequestURI(HttpServletRequest request, List<String> uris)
         throws OAuthProblemException {
         

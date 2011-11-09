@@ -20,7 +20,12 @@ package org.apache.cxf.rs.security.oauth.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
@@ -56,6 +61,24 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static List<String> getAllScopes(Client client, Token token) {
+        List<String> scopes = new LinkedList<String>();
+        if (token != null) {
+            scopes.addAll(token.getScopes());
+        }
+        scopes.addAll(client.getScopes());
+        return scopes;
+    }
+    
+    public static List<String> getAllUris(Client client, Token token) {
+        List<String> uris = new LinkedList<String>();
+        if (token != null) {
+            uris.addAll(token.getUris());
+        }
+        uris.addAll(client.getUris());
+        return uris;
+    }
+    
     public static void validateMessage(OAuthMessage oAuthMessage, 
                                        Client client, 
                                        Token token,
@@ -90,15 +113,28 @@ public final class OAuthUtils {
     
     public static void addParametersIfNeeded(HttpServletRequest request,
             OAuthMessage oAuthMessage) throws IOException {
-        if (oAuthMessage.getParameters().isEmpty() 
+        List<Entry<String, String>> params = oAuthMessage.getParameters();
+        String enc = oAuthMessage.getBodyEncoding();
+        enc = enc == null ? "UTF-8" : enc;
+        
+        if (params.isEmpty() 
             && MediaType.APPLICATION_FORM_URLENCODED.equals(oAuthMessage.getBodyType())) {
-            String enc = oAuthMessage.getBodyEncoding();
-            enc = enc == null ? "UTF-8" : enc;
             String body = FormUtils.readBody(oAuthMessage.getBodyAsStream(), enc);
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
             FormUtils.populateMapFromString(map, body, enc, true, request);
             for (String key : map.keySet()) {
                 oAuthMessage.addParameter(key, map.getFirst(key));
+            }
+        } else {
+            // This path will most likely work only for the AuthorizationRequestService
+            // when processing a user confirmation with only 3 parameters expected
+            String ct = request.getContentType();
+            if (ct != null && MediaType.APPLICATION_FORM_URLENCODED.equals(ct)) {
+                Map<String, List<String>> map = new HashMap<String, List<String>>();
+                for (Entry<String, String> param : params) {
+                    map.put(param.getKey(), Collections.singletonList(param.getValue()));
+                }
+                FormUtils.logRequestParametersIfNeeded(map, enc);
             }
         }
     }

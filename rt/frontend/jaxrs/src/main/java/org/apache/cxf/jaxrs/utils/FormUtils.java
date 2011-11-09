@@ -107,20 +107,24 @@ public final class FormUtils {
                 String[] values = request.getParameterValues(paramName);
                 params.put(HttpUtils.urlDecode(paramName), Arrays.asList(values));
             }
-            String chain = PhaseInterceptorChain.getCurrentMessage().getInterceptorChain().toString();
-            if (chain.contains(LoggingInInterceptor.class.getSimpleName())) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try {
-                    writeMapToOutputStream(params, bos, enc, false);
-                    LOG.info(bos.toString(enc));
-                } catch (IOException ex) {
-                    // ignore
-                }
+            logRequestParametersIfNeeded(params, enc);
+        }
+    }
+    
+    public static void logRequestParametersIfNeeded(Map<String, List<String>> params, String enc) {
+        String chain = PhaseInterceptorChain.getCurrentMessage().getInterceptorChain().toString();
+        if (chain.contains(LoggingInInterceptor.class.getSimpleName())) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                writeMapToOutputStream(params, bos, enc, false);
+                LOG.info(bos.toString(enc));
+            } catch (IOException ex) {
+                // ignore
             }
         }
     }
     
-    public static void writeMapToOutputStream(MultivaluedMap<String, String> map, 
+    public static void writeMapToOutputStream(Map<String, List<String>> map, 
                                               OutputStream os,
                                               String enc,
                                               boolean encoded) throws IOException {
