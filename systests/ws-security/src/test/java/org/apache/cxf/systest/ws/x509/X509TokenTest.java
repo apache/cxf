@@ -41,6 +41,7 @@ import wssec.x509.DoubleItService;
  */
 public class X509TokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String PORT2 = allocatePort(Server.class, 2);
 
     private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
@@ -165,6 +166,25 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         DoubleItService service = new DoubleItService();
         DoubleItPortType x509Port = service.getDoubleItSymmetricProtectTokensPort();
         updateAddressPort(x509Port, PORT);
+        x509Port.doubleIt(BigInteger.valueOf(25));
+    }
+    
+    @org.junit.Test
+    public void testTransportEndorsing() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        DoubleItPortType x509Port = service.getDoubleItTransportEndorsingPort();
+        updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(BigInteger.valueOf(25));
     }
     

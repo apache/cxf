@@ -37,6 +37,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
+import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.X509Token;
@@ -100,12 +101,18 @@ public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator 
                     if (!isTokenRequired(token, message)) {
                         continue;
                     }
-                    if (token instanceof KerberosToken && !processKerberosTokens()) {
+                    boolean derived = token.isDerivedKeys();
+                    if (token instanceof KerberosToken && !processKerberosTokens(derived)) {
                         ai.setNotAsserted(
                              "The received token does not match the supporting token requirement"
                         );
                         return false;
-                    } else if (token instanceof X509Token && !processX509Tokens()) {
+                    } else if (token instanceof X509Token && !processX509Tokens(derived)) {
+                        ai.setNotAsserted(
+                            "The received token does not match the supporting token requirement"
+                        );
+                        return false;
+                    } else if (token instanceof SecurityContextToken && !processSCTokens(derived)) {
                         ai.setNotAsserted(
                             "The received token does not match the supporting token requirement"
                         );
@@ -118,7 +125,7 @@ public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator 
         return true;
     }
     
-    private boolean processKerberosTokens() {
+    private boolean processKerberosTokens(boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
@@ -126,6 +133,13 @@ public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator 
                 BinarySecurity binarySecurity = 
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof KerberosSecurity) {
+                    if (derived) {
+                        byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                        WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
+                        if (dktResult != null) {
+                            tokenResults.add(dktResult);
+                        }
+                    }
                     tokenResults.add(wser);
                 }
             }
@@ -138,7 +152,7 @@ public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator 
         return checkEndorsed(tokenResults, tls);
     }
     
-    private boolean processX509Tokens() {
+    private boolean processX509Tokens(boolean derived) {
         List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
@@ -147,6 +161,12 @@ public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator 
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof X509Security
                     || binarySecurity instanceof PKIPathSecurity) {
+                    if (derived) {
+                        WSSecurityEngineResult resultToStore = processX509DerivedTokenResult(wser);
+                        if (resultToStore != null) {
+                            tokenResults.add(resultToStore);
+                        }
+                    }
                     tokenResults.add(wser);
                 }
             }
@@ -157,6 +177,77 @@ public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator 
         }
         
         return checkEndorsed(tokenResults, tls);
+    }
+    
+    private WSSecurityEngineResult processX509DerivedTokenResult(WSSecurityEngineResult result) {
+        X509Certificate cert = 
+            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        WSSecurityEngineResult encrResult = getMatchingEncryptedKey(cert);
+        if (encrResult != null) {
+            byte[] secret = (byte[])encrResult.get(WSSecurityEngineResult.TAG_SECRET);
+            WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
+            if (dktResult != null) {
+                return dktResult;
+            }
+        }
+        return null;
+    }
+    
+    private boolean processSCTokens(boolean derived) {
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
+        for (WSSecurityEngineResult wser : results) {
+            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.SCT) {
+                if (derived) {
+                    byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                    WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
+                    if (dktResult != null) {
+                        tokenResults.add(dktResult);
+                    }
+                }
+                tokenResults.add(wser);
+            }
+        }
+        
+        if (tokenResults.isEmpty()) {
+            return false;
+        }
+        
+        return checkEndorsed(tokenResults, tls);
+    }
+    
+    /**
+     * Get a security result representing a Derived Key that has a secret key that
+     * matches the parameter.
+     */
+    private WSSecurityEngineResult getMatchingDerivedKey(byte[] secret) {
+        for (WSSecurityEngineResult wser : results) {
+            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.DKT) {
+                byte[] dktSecret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                if (Arrays.equals(secret, dktSecret)) {
+                    return wser;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Get a security result representing an EncryptedKey that matches the parameter.
+     */
+    private WSSecurityEngineResult getMatchingEncryptedKey(X509Certificate cert) {
+        for (WSSecurityEngineResult wser : results) {
+            Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.ENCR) {
+                X509Certificate encrCert = 
+                    (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                if (cert.equals(encrCert)) {
+                    return wser;
+                }
+            }
+        }
+        return null;
     }
     
     /**
@@ -237,22 +328,24 @@ public class EndorsingTokenPolicyValidator extends AbstractTokenPolicyValidator 
         
         // Now see if the same credential exists in the tokenResult list
         for (WSSecurityEngineResult token : tokenResult) {
-            Integer actInt = (Integer)token.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.BST) {
-                BinarySecurity binarySecurity = 
-                    (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                if (binarySecurity instanceof X509Security
-                    || binarySecurity instanceof PKIPathSecurity) {
-                    X509Certificate foundCert = 
-                        (X509Certificate)token.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    if (foundCert.equals(cert)) {
-                        return true;
-                    }
-                } else if (binarySecurity instanceof KerberosSecurity) {
-                    byte[] foundSecret = (byte[])token.get(WSSecurityEngineResult.TAG_SECRET);
-                    if (foundSecret != null && Arrays.equals(foundSecret, secret)) {
-                        return true;
-                    }
+            BinarySecurity binarySecurity = 
+                (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+            if (binarySecurity instanceof X509Security
+                || binarySecurity instanceof PKIPathSecurity) {
+                X509Certificate foundCert = 
+                    (X509Certificate)token.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                if (foundCert.equals(cert)) {
+                    return true;
+                }
+            } else {
+                byte[] foundSecret = (byte[])token.get(WSSecurityEngineResult.TAG_SECRET);
+                if (foundSecret != null && Arrays.equals(foundSecret, secret)) {
+                    return true;
+                }
+                byte[] derivedKey = 
+                    (byte[])token.get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY);
+                if (derivedKey != null && Arrays.equals(derivedKey, secret)) {
+                    return true;
                 }
             }
         }
