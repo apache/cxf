@@ -45,6 +45,29 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+      <!-- -->
+    <!-- Any services listening on port 9009 must use the following -->
+    <!-- Transport Layer Security (TLS) settings -->
+    <!-- -->
+    <httpj:engine-factory id="tls-settings">
+        <httpj:engine port="${testutil.ports.Server.2}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
 
     <jaxws:endpoint 
        id="KeyIdentifier"
@@ -160,6 +183,23 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="TransportEndorsing"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportEndorsing" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportEndorsingPort"
+       xmlns:s="http://WSSec/x509"
+       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
        </jaxws:properties> 
      
     </jaxws:endpoint> 
