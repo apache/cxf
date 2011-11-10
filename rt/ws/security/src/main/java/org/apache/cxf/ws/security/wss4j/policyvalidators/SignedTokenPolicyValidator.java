@@ -29,18 +29,20 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
+import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.ws.security.WSSecurityEngineResult;
 
 /**
- * Validate an EndorsingSupportingToken policy. 
+ * Validate SignedSupportingToken policies.
  */
-public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
+public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
     
-    public EndorsingTokenPolicyValidator(
+    public SignedTokenPolicyValidator(
         Message message,
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
@@ -51,36 +53,43 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
     public boolean validatePolicy(
         AssertionInfoMap aim
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         if (ais == null || ais.isEmpty()) {                       
             return true;
         }
-
+        
         for (AssertionInfo ai : ais) {
             SupportingToken binding = (SupportingToken)ai.getAssertion();
-            if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENDORSING != binding.getTokenType()) {
+            if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED != binding.getTokenType()) {
                 continue;
             }
             ai.setAsserted(true);
-
+            
             List<Token> tokens = binding.getTokens();
             for (Token token : tokens) {
                 if (!isTokenRequired(token, message)) {
                     continue;
                 }
                 
-                boolean derived = token.isDerivedKeys();
                 boolean processingFailed = false;
-                if (token instanceof KerberosToken) {
-                    if (!processKerberosTokens(false, true, derived)) {
+                if (token instanceof UsernameToken) {
+                    if (!processUsernameTokens(true, false, false)) {
+                        processingFailed = true;
+                    }
+                } else if (token instanceof SamlToken) {
+                    if (!processSAMLTokens(true, false, false)) {
+                        processingFailed = true;
+                    }
+                } else if (token instanceof KerberosToken) {
+                    if (!processKerberosTokens(true, false, false)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
-                    if (!processX509Tokens(false, true, derived)) {
+                    if (!processX509Tokens(true, false, false)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof SecurityContextToken) {
-                    if (!processSCTokens(false, true, derived)) {
+                    if (!processSCTokens(true, false, false)) {
                         processingFailed = true;
                     }
                 } else if (!(token instanceof IssuedToken)) {
@@ -89,11 +98,12 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
                 
                 if (processingFailed) {
                     ai.setNotAsserted(
-                        "The received token does not match the endorsing supporting token requirement"
+                        "The received token does not match the signed supporting token requirement"
                     );
                     return false;
                 }
             }
+
         }
         
         return true;

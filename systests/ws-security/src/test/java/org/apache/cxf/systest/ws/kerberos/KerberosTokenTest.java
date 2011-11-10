@@ -44,6 +44,9 @@ import wssec.kerberos.DoubleItService;
  * @Ignore annotations and run the tests with:
  *  
  * mvn test -Dtest=KerberosTokenTest -Djava.security.auth.login.config=src/test/resources/kerberos.jaas
+ * 
+ * See here for more information:
+ * http://coheigea.blogspot.com/2011/10/using-kerberos-with-web-services-part.html
  */
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -225,6 +228,30 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         
         DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricDerivedProtectionPort();
         updateAddressPort(kerberosPort, PORT);
+        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testKerberosOverAsymmetricSignedEndorsing() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType kerberosPort = service.getDoubleItKerberosAsymmetricSignedEndorsingPort();
+        updateAddressPort(kerberosPort, PORT);
+        
         BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
