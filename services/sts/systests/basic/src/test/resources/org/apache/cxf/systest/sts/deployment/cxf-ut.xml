@@ -99,7 +99,6 @@
             <entry key="ws-security.callback-handler" 
                    value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="mystskey"/>
         </jaxws:properties> 
 	</jaxws:endpoint>
 	

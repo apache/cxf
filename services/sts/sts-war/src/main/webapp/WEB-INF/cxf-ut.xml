@@ -95,7 +95,6 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
             <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="mystskey"/>
             <!-- Below needs to be set to non-default value of false for Metro clients -->
             <entry key="ws-security.is-bsp-compliant" value="false"/>
         </jaxws:properties> 
