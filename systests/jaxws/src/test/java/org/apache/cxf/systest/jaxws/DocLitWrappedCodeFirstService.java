@@ -126,6 +126,10 @@ public interface DocLitWrappedCodeFirstService {
                       @WebParam(mode = WebParam.Mode.OUT)
                       Holder<String> g);
     
+    void singleInOut(@WebParam(mode = WebParam.Mode.OUT, 
+                               name = "created", targetNamespace = "")
+                               Holder<Boolean> created);
+    
     
     @WebMethod
     List<Foo> listObjectOutput();
