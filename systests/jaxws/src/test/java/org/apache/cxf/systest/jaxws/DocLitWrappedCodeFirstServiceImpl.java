@@ -136,6 +136,15 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         g.value = "g";
         return ret;
     }
+    
+    public void singleInOut(Holder<Boolean> created) {
+        if (created.value == null) {
+            created.value = false;
+        } else {
+            created.value = true;
+        }
+            
+    }
 
     public List<Foo> listObjectOutput() {
         Foo a = new Foo();
