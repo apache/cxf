@@ -36,11 +36,11 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.ws.security.WSSecurityEngineResult;
 
 /**
- * Validate an EndorsingSupportingToken policy. 
+ * Validate a SignedEndorsingSupportingToken policy. 
  */
-public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
+public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
     
-    public EndorsingTokenPolicyValidator(
+    public SignedEndorsingTokenPolicyValidator(
         Message message,
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
@@ -51,14 +51,14 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
     public boolean validatePolicy(
         AssertionInfoMap aim
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         if (ais == null || ais.isEmpty()) {                       
             return true;
         }
 
         for (AssertionInfo ai : ais) {
             SupportingToken binding = (SupportingToken)ai.getAssertion();
-            if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENDORSING != binding.getTokenType()) {
+            if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING != binding.getTokenType()) {
                 continue;
             }
             ai.setAsserted(true);
@@ -72,15 +72,15 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
                 boolean derived = token.isDerivedKeys();
                 boolean processingFailed = false;
                 if (token instanceof KerberosToken) {
-                    if (!processKerberosTokens(false, true, derived)) {
+                    if (!processKerberosTokens(true, true, derived)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
-                    if (!processX509Tokens(false, true, derived)) {
+                    if (!processX509Tokens(true, true, derived)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof SecurityContextToken) {
-                    if (!processSCTokens(false, true, derived)) {
+                    if (!processSCTokens(true, true, derived)) {
                         processingFailed = true;
                     }
                 } else if (!(token instanceof IssuedToken)) {
@@ -89,7 +89,7 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
                 
                 if (processingFailed) {
                     ai.setNotAsserted(
-                        "The received token does not match the endorsing supporting token requirement"
+                        "The received token does not match the signed endorsing supporting token requirement"
                     );
                     return false;
                 }

@@ -114,6 +114,17 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://WSSec/x509}DoubleItTransportSignedEndorsingPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.signature.username" value="alice"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>

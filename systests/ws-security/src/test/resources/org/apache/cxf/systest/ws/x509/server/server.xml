@@ -137,8 +137,6 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
-          <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
           <entry key="ws-security.encryption.username" value="alice"/>
@@ -160,8 +158,6 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
-          <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
           <entry key="ws-security.encryption.username" value="alice"/>
@@ -192,6 +188,23 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportEndorsing" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItTransportEndorsingPort"
+       xmlns:s="http://WSSec/x509"
+       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="TransportSignedEndorsing"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportSignedEndorsing" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportSignedEndorsingPort"
        xmlns:s="http://WSSec/x509"
        implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
        wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
