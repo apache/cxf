@@ -392,6 +392,21 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
                                                              DocLitWrappedCodeFirstService.class);
         runDocLitTest(port);
     }
+    
+    @Test
+    public void testWrappedHolderOutNull() throws Exception {
+        // this test to verify CXF-3836 works
+        QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService",
+                                   "DocLitWrappedCodeFirstServicePort");
+        QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService",
+                                   "DocLitWrappedCodeFirstService");
+
+        Service service = Service.create(new URL(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl"), servName);
+        DocLitWrappedCodeFirstService port = service.getPort(portName, DocLitWrappedCodeFirstService.class);
+        Holder<Boolean> created = new Holder<Boolean>();
+        port.singleInOut(created);
+        assertEquals(created.value, Boolean.FALSE);
+    }
 
     private void setASM(boolean b) throws Exception {
         Field f = ASMHelper.class.getDeclaredField("oldASM");
