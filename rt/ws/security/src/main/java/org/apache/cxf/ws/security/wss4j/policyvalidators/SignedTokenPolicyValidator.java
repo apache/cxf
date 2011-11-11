@@ -64,6 +64,7 @@ public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyVal
                 continue;
             }
             ai.setAsserted(true);
+            setSigned(true);
             
             List<Token> tokens = binding.getTokens();
             for (Token token : tokens) {
@@ -73,23 +74,23 @@ public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyVal
                 
                 boolean processingFailed = false;
                 if (token instanceof UsernameToken) {
-                    if (!processUsernameTokens(true, false, false)) {
+                    if (!processUsernameTokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof SamlToken) {
-                    if (!processSAMLTokens(true, false, false)) {
+                    if (!processSAMLTokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof KerberosToken) {
-                    if (!processKerberosTokens(true, false, false)) {
+                    if (!processKerberosTokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
-                    if (!processX509Tokens(true, false, false)) {
+                    if (!processX509Tokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof SecurityContextToken) {
-                    if (!processSCTokens(true, false, false)) {
+                    if (!processSCTokens()) {
                         processingFailed = true;
                     }
                 } else if (!(token instanceof IssuedToken)) {

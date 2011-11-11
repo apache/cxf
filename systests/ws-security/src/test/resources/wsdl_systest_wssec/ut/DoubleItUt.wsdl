@@ -168,6 +168,25 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSignedEncryptedBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSignedEncryptedPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItPlaintextPort" binding="tns:DoubleItPlaintextBinding">
@@ -184,6 +203,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEndorsingPort" binding="tns:DoubleItSignedEndorsingBinding">
             <soap:address location="https://localhost:9009/DoubleItUTSignedEndorsing" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSignedEncryptedPort" binding="tns:DoubleItSignedEncryptedBinding">
+            <soap:address location="https://localhost:9009/DoubleItUTSignedEncrypted" />
         </wsdl:port>
     </wsdl:service>
 
@@ -382,6 +404,43 @@
                         </sp:X509Token>
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItSignedEncryptedPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding>
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken RequireClientCertificate="false" />
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:SignedEncryptedSupportingTokens>
+                    <wsp:Policy>
+                        <sp:UsernameToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:WssUsernameToken10/>
+                            </wsp:Policy>
+                        </sp:UsernameToken>
+                    </wsp:Policy>
+                </sp:SignedEncryptedSupportingTokens>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>

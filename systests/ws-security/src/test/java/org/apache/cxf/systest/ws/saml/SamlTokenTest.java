@@ -305,7 +305,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testSaml2EndorsingOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -317,14 +316,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         DoubleItService service = new DoubleItService();
         
-        DoubleItPortType saml1Port = service.getDoubleItSaml2EndorsingTransportPort();
-        updateAddressPort(saml1Port, PORT2);
+        DoubleItPortType saml2Port = service.getDoubleItSaml2EndorsingTransportPort();
+        updateAddressPort(saml2Port, PORT2);
         
-        ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", callbackHandler
         );
 
-        BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
+        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     

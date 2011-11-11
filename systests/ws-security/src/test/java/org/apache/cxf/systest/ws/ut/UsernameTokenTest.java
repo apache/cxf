@@ -136,4 +136,21 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(BigInteger.valueOf(25));
     }
     
+    @org.junit.Test
+    public void testSignedEncrypted() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType utPort = service.getDoubleItSignedEncryptedPort();
+        updateAddressPort(utPort, PORT);
+        utPort.doubleIt(BigInteger.valueOf(25));
+    }
+    
 }
