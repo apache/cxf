@@ -27,12 +27,12 @@ import java.util.TreeMap;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Exchange;
@@ -87,7 +87,7 @@ public class RequestPreprocessorTest extends Assert {
         sqh.preprocess(m, new UriInfoImpl(m, null));
         Response r = m.getExchange().get(Response.class);
         assertNotNull(r);
-        assertEquals(WadlGenerator.WADL_TYPE.toString(),
+        assertEquals(MediaType.APPLICATION_XML,
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
     }
     

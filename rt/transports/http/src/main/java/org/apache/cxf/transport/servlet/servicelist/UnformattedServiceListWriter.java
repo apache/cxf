@@ -67,7 +67,7 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
                                                   AbstractDestination[] destinations) throws IOException {
         for (AbstractDestination sd : destinations) {
             String address = getAbsoluteAddress(baseAddress, sd);
-            writer.write(address + "?_wadl&_type=xml\n");
+            writer.write(address + "?_wadl\n");
         }
     }
 

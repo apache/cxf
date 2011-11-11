@@ -109,7 +109,8 @@ public class WadlGenerator implements RequestHandler {
     public static final String WADL_QUERY = "_wadl";
     public static final MediaType WADL_TYPE = MediaType.valueOf("application/vnd.sun.wadl+xml");
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
-
+    
+    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_XML_TYPE; 
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
@@ -137,6 +138,7 @@ public class WadlGenerator implements RequestHandler {
     private List<String> privateAddresses;
     private String applicationTitle;
     private String nsPrefix = DEFAULT_NS_PREFIX;
+    private MediaType defaultMediaType = DEFAULT_MEDIA_TYPE;
     
     public WadlGenerator() {
 
@@ -182,9 +184,9 @@ public class WadlGenerator implements RequestHandler {
 
         HttpHeaders headers = new HttpHeadersImpl(m);
         List<MediaType> accepts = headers.getAcceptableMediaTypes();
-        MediaType type = accepts.contains(MediaType.APPLICATION_XML_TYPE)
-            ? MediaType.APPLICATION_XML_TYPE : accepts.contains(MediaType.APPLICATION_JSON_TYPE) 
-                ? MediaType.APPLICATION_JSON_TYPE : WADL_TYPE;
+        MediaType type = accepts.contains(WADL_TYPE)
+            ? WADL_TYPE : accepts.contains(MediaType.APPLICATION_JSON_TYPE) 
+                ? MediaType.APPLICATION_JSON_TYPE : defaultMediaType;
         
         Response response = getExistingWadl(m, ui, type);
         if (response != null) {
@@ -1458,6 +1460,10 @@ public class WadlGenerator implements RequestHandler {
 
     public void setIgnoreRequests(boolean ignoreRequests) {
         this.ignoreRequests = ignoreRequests;
+    }
+
+    public void setDefaultMediaType(String mt) {
+        this.defaultMediaType = MediaType.valueOf(mt);
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
