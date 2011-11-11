@@ -498,9 +498,13 @@ public abstract class AbstractBindingBuilder {
                 Element clone = cloneElement(secToken.getToken());
                 secToken.setToken(clone);
                 addSupportingElement(clone);
-        
+                
+                String id = secToken.getId();
+                if (id != null && id.charAt(0) == '#') {
+                    id = id.substring(1);
+                }
                 if (suppTokens.isEncryptedToken()) {
-                    this.encryptedTokensIdList.add(secToken.getId());
+                    this.encryptedTokensIdList.add(id);
                 }
         
                 if (secToken.getX509Certificate() == null) {  
@@ -508,7 +512,7 @@ public abstract class AbstractBindingBuilder {
                 } else {
                     WSSecSignature sig = new WSSecSignature(wssConfig);                    
                     sig.setX509Certificate(secToken.getX509Certificate());
-                    sig.setCustomTokenId(secToken.getId());
+                    sig.setCustomTokenId(id);
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                     String tokenType = secToken.getTokenType();
                     if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
@@ -544,9 +548,6 @@ public abstract class AbstractBindingBuilder {
                         throw new Fault(e);
                     }
                     
-                    if (suppTokens.isEncryptedToken()) {
-                        encryptedTokensIdList.add(secToken.getId());
-                    }
                     ret.put(token, sig);                
                 }
 
@@ -671,7 +672,11 @@ public abstract class AbstractBindingBuilder {
                     part.setId(secRef.getID());
                     part.setElement(clone);
                 } else {
-                    part = new WSEncryptionPart(token.getId());
+                    String id = token.getId();
+                    if (id != null && id.charAt(0) == '#') {
+                        id = id.substring(1);
+                    }
+                    part = new WSEncryptionPart(id);
                     part.setElement(token.getToken());
                 }
             } else {
