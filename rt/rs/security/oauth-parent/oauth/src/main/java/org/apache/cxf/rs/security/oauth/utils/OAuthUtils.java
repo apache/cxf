@@ -46,6 +46,7 @@ import net.oauth.server.OAuthServlet;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
@@ -61,6 +62,24 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static boolean checkRequestURI(String servletPath, String uri) {
+        boolean wildcard = uri.endsWith("*");
+        String theURI = wildcard ? uri.substring(0, uri.length() - 1) : uri;
+        try {
+            URITemplate template = new URITemplate(theURI);
+            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            if (template.match(servletPath, map)) {
+                String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
+                if (wildcard || StringUtils.isEmpty(finalGroup) || "/".equals(finalGroup)) {
+                    return true;
+                }
+            }
+        } catch (Exception ex) {
+            // ignore
+        }
+        return false;
+    }
+    
     public static List<String> getAllScopes(Client client, Token token) {
         List<String> scopes = new LinkedList<String>();
         if (token != null) {

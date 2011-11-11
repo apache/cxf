@@ -27,7 +27,7 @@ import java.util.List;
 public class OAuthPermission extends Permission {
     private List<String> roles = Collections.emptyList();
     private List<String> httpVerbs = Collections.emptyList();
-    private String uri;
+    private List<String> uri = Collections.emptyList();
     private boolean authorizationKeyRequired = true;
     
     public OAuthPermission(String permission, String description, String role) {
@@ -64,18 +64,18 @@ public class OAuthPermission extends Permission {
     }
 
     /**
-     * Sets an optional URI
-     * @param uri the uri
+     * Sets an optional list of URIs
+     * @param uri the uris
      */
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setUris(List<String> uris) {
+        this.uri = uris;
     }
 
     /**
-     * Returns an optional URI    
+     * Returns an optional list of URI    
      * @return the uri
      */
-    public String getUri() {
+    public List<String> getUris() {
         return uri;
     }
 

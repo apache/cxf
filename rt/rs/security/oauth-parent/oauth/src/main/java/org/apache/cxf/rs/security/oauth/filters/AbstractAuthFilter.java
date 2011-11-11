@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.oauth.filters;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -120,9 +119,7 @@ public class AbstractAuthFilter {
                 OAuthUtils.getAllScopes(client, accessToken));
         
         for (OAuthPermission perm : permissions) {
-            if (perm.getUri() != null) {
-                checkRequestURI(req, Collections.singletonList(perm.getUri()));
-            }
+            checkRequestURI(req, perm.getUris());
             if (!perm.getHttpVerbs().isEmpty() 
                 && !perm.getHttpVerbs().contains(req.getMethod())) {
                 String message = "Invalid http verb";
@@ -152,17 +149,9 @@ public class AbstractAuthFilter {
         String servletPath = request.getPathInfo();
         boolean foundValidScope = false;
         for (String uri : uris) {
-            boolean wildcard = uri.endsWith("*");
-            if (wildcard) {
-                if (servletPath.startsWith(uri.substring(0, uri.length() - 1))) {
-                    foundValidScope = true;
-                    break;
-                }
-            } else {
-                if (uri.equals(servletPath)) {
-                    foundValidScope = true;
-                    break;
-                }
+            if (OAuthUtils.checkRequestURI(servletPath, uri)) {
+                foundValidScope = true;
+                break;
             }
         }
         if (!foundValidScope) {

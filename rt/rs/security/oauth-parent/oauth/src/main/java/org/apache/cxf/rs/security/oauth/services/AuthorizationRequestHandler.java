@@ -133,8 +133,8 @@ public class AuthorizationRequestHandler {
         secData.setApplicationURI(token.getClient().getApplicationURI());
         
         secData.setPermissions(
-                dataProvider.getPermissionsInfo(token.getScopes()));
-        secData.setUris(token.getUris());
+                dataProvider.getPermissionsInfo(OAuthUtils.getAllScopes(token.getClient(), token)));
+        secData.setUris(OAuthUtils.getAllUris(token.getClient(), token));
         
         return secData;
     }
