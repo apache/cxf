@@ -254,6 +254,26 @@
         </wsdl:operation>
     </wsdl:binding>
     
+    <wsdl:binding name="DoubleItKerberosAsymmetricSignedEncryptedBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItKerberosAsymmetricSignedEncryptedPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItKerberosTransportPort" binding="tns:DoubleItKerberosTransportBinding">
             <soap:address location="https://localhost:9009/DoubleItKerberosTransport" />
@@ -289,6 +309,10 @@
         <wsdl:port name="DoubleItKerberosAsymmetricSignedEndorsingPort"
                    binding="tns:DoubleItKerberosAsymmetricSignedEndorsingBinding">
             <soap:address location="http://localhost:9001/DoubleItKerberosAsymmetricSignedEndorsing" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItKerberosAsymmetricSignedEncryptedPort"
+                   binding="tns:DoubleItKerberosAsymmetricSignedEncryptedBinding">
+            <soap:address location="http://localhost:9001/DoubleItKerberosAsymmetricSignedEncrypted" />
         </wsdl:port>
     </wsdl:service>
 
@@ -731,6 +755,68 @@
                   </sp:KerberosToken>
               </wsp:Policy>
             </sp:SignedEndorsingSupportingTokens>
+         </wsp:All>
+      </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+     <wsp:Policy wsu:Id="DoubleItKerberosAsymmetricSignedEncryptedPolicy">
+       <wsp:ExactlyOne>
+         <wsp:All>
+            <sp:AsymmetricBinding>
+               <wsp:Policy>
+                  <sp:InitiatorToken>
+                     <wsp:Policy>
+                        <sp:X509Token
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                           <wsp:Policy>
+                              <sp:WssX509V3Token10 />
+                              <sp:RequireIssuerSerialReference />
+                           </wsp:Policy>
+                        </sp:X509Token>
+                     </wsp:Policy>
+                  </sp:InitiatorToken>
+                  <sp:RecipientToken>
+                     <wsp:Policy>
+                        <sp:X509Token
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           <wsp:Policy>
+                              <sp:WssX509V3Token10 />
+                              <sp:RequireIssuerSerialReference />
+                           </wsp:Policy>
+                        </sp:X509Token>
+                     </wsp:Policy>
+                  </sp:RecipientToken>
+                  <sp:Layout>
+                     <wsp:Policy>
+                        <sp:Lax/>
+                     </wsp:Policy>
+                  </sp:Layout>
+                  <sp:IncludeTimestamp/>
+                  <sp:OnlySignEntireHeadersAndBody/>
+                  <sp:AlgorithmSuite>
+                     <wsp:Policy>
+                        <sp:Basic128/>
+                     </wsp:Policy>
+                  </sp:AlgorithmSuite>
+               </wsp:Policy>
+            </sp:AsymmetricBinding>
+            <sp:Wss11>
+               <wsp:Policy>
+                  <sp:MustSupportRefIssuerSerial/>
+                  <sp:MustSupportRefThumbprint/>
+                  <sp:MustSupportRefEncryptedKey/>
+               </wsp:Policy>
+            </sp:Wss11>
+            <sp:SignedEncryptedSupportingTokens>
+               <wsp:Policy>
+                  <sp:KerberosToken
+                      sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                      <wsp:Policy>
+                          <sp:WssGssKerberosV5ApReqToken11/>
+                      </wsp:Policy>
+                  </sp:KerberosToken>
+              </wsp:Policy>
+            </sp:SignedEncryptedSupportingTokens>
          </wsp:All>
       </wsp:ExactlyOne>
     </wsp:Policy>

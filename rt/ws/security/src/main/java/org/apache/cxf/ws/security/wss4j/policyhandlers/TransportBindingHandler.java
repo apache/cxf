@@ -34,6 +34,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Header;
@@ -217,6 +218,15 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                                 addSig(signatureValues, doX509TokenSignature(token, 
                                                                              endSuppTokens.getSignedParts(), 
                                                                              endSuppTokens));
+                            } else if (token instanceof SamlToken) {
+                                AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+                                assertionWrapper.toDOM(saaj.getSOAPPart());
+                                storeAssertionAsSecurityToken(assertionWrapper);
+                                addSig(signatureValues, doIssuedTokenSignature(token, 
+                                                                               endSuppTokens
+                                                                               .getSignedParts(), 
+                                                                               endSuppTokens,
+                                                                               null));
                             }
                         }
                     }
@@ -471,7 +481,14 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             sig.setX509Certificate(secTok.getX509Certificate());
 
             crypto = secTok.getCrypto();
+            if (crypto == null) {
+                crypto = getSignatureCrypto(wrapper);
+            }
             String uname = crypto.getX509Identifier(secTok.getX509Certificate());
+            if (uname == null) {
+                String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
+                uname = (String)message.getContextualProperty(userNameKey);
+            }
             String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
             if (password == null) {
                 password = "";

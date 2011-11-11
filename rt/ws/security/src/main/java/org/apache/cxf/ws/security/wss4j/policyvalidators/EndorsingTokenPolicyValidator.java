@@ -29,6 +29,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
+import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
@@ -62,6 +63,7 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
                 continue;
             }
             ai.setAsserted(true);
+            setEndorsed(true);
 
             List<Token> tokens = binding.getTokens();
             for (Token token : tokens) {
@@ -70,17 +72,22 @@ public class EndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicy
                 }
                 
                 boolean derived = token.isDerivedKeys();
+                setDerived(derived);
                 boolean processingFailed = false;
                 if (token instanceof KerberosToken) {
-                    if (!processKerberosTokens(false, true, derived)) {
+                    if (!processKerberosTokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
-                    if (!processX509Tokens(false, true, derived)) {
+                    if (!processX509Tokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof SecurityContextToken) {
-                    if (!processSCTokens(false, true, derived)) {
+                    if (!processSCTokens()) {
+                        processingFailed = true;
+                    }
+                } else if (token instanceof SamlToken) {
+                    if (!processSAMLTokens()) {
                         processingFailed = true;
                     }
                 } else if (!(token instanceof IssuedToken)) {
