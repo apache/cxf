@@ -166,7 +166,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
                      + absoluteURL + "</span>");
         writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + absoluteURL
-                     + "?_wadl&_type=xml\">" + absoluteURL + "?_wadl&type=xml" + "</a>");
+                     + "?_wadl\">" + absoluteURL + "?_wadl" + "</a>");
         addAtomLinkIfNeeded(absoluteURL, atomMap, writer);
         writer.write("</td></tr>");
     }

@@ -70,7 +70,7 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 @Consumes({"application/xml", "application/*+xml", "text/xml" })
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
-    
+    private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
     private static final List<String> MARSHALLER_PROPERTIES =
         Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
                                     Marshaller.JAXB_FORMATTED_OUTPUT,
@@ -247,7 +247,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     }
 
     protected void marshalCollection(Class<?> originalCls, Object collection, 
-                                     Type genericType, String encoding, OutputStream os, 
+                                     Type genericType, String enc, OutputStream os, 
                                      MediaType m, Annotation[] anns) 
         throws Exception {
         
@@ -276,6 +276,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                               .entity(message).build());
         }
         
+        StringBuilder prefix = new StringBuilder();
+        prefix.append(XML_PI_START + (enc == null ? "UTF-8" : enc) + "\"?>");
+        os.write(prefix.toString().getBytes());
         String startTag = null;
         String endTag = null;
         if (qname.getNamespaceURI().length() > 0) {
@@ -291,11 +294,11 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             XmlJavaTypeAdapter adapter = 
                 org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(firstObj.getClass(), anns);
             marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true), 
-                                    actualClass, genericType, encoding, os, m, 
+                                    actualClass, genericType, enc, os, m, 
                                     qname.getNamespaceURI());
             while (it.hasNext()) {
                 marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true), actualClass, 
-                                        genericType, encoding, os, m, 
+                                        genericType, enc, os, m, 
                                         qname.getNamespaceURI());
             }
         }

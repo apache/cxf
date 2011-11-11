@@ -395,7 +395,8 @@ public class JAXBElementProviderTest extends Assert {
                          org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
                          new Annotation[0], MediaType.TEXT_XML_TYPE, 
                          new MetadataMap<String, Object>(), bos);
-        String expected = "<ns1:SuperBooks xmlns:ns1=\"http://superbooks\">"
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<ns1:SuperBooks xmlns:ns1=\"http://superbooks\">"
             + "<ns1:SuperBook xmlns:ns2=\"http://books\" xmlns:ns1=\"http://superbooks\"><id>123</id>"
             + "<name>CXF in Action</name><superId>124</superId></ns1:SuperBook></ns1:SuperBooks>";
         assertEquals(expected, bos.toString());
@@ -795,7 +796,8 @@ public class JAXBElementProviderTest extends Assert {
         provider.writeTo(list, ArrayList.class, type,
             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
     
-        String expected = "<tagholders><tagholder><attr>attribute</attr>"
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<tagholders><tagholder><attr>attribute</attr>"
             + "<thetag><group>B</group><name>A</name></thetag></tagholder></tagholders>";
         assertEquals(expected, bos.toString());
     }

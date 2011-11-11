@@ -237,7 +237,7 @@ public class WadlGeneratorTest extends Assert {
     
     private void checkResponse(Response r) throws Exception {
         assertNotNull(r);
-        assertEquals(WadlGenerator.WADL_TYPE.toString(),
+        assertEquals(MediaType.APPLICATION_XML,
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
 //        File f = new File("test.xml");
 //        f.delete();
@@ -252,6 +252,7 @@ public class WadlGeneratorTest extends Assert {
     @Test
     public void testMultipleRootResources() throws Exception {
         WadlGenerator wg = new WadlGenerator();
+        wg.setDefaultMediaType(WadlGenerator.WADL_TYPE.toString());
         ClassResourceInfo cri1 = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
         ClassResourceInfo cri2 = 
@@ -261,7 +262,8 @@ public class WadlGeneratorTest extends Assert {
         cris.add(cri2);
         Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, cris);
         Response r = wg.handleRequest(m, null);
-        checkResponse(r);
+        assertEquals(WadlGenerator.WADL_TYPE.toString(),
+                     r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
