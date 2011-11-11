@@ -29,6 +29,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.codegen.CodeGeneratorProvider;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -105,9 +106,21 @@ public class RequestPreprocessor {
     private void handleExtensionMappings(Message m, UriInfo uriInfo) {
         String path = uriInfo.getPath(false);
         for (Map.Entry<?, ?> entry : extensionMappings.entrySet()) {
-            if (path.endsWith("." + entry.getKey().toString())) {
+            String key = entry.getKey().toString();
+            if (path.endsWith("." + key)) {
                 updateAcceptTypeHeader(m, entry.getValue().toString());
-                updatePath(m, path, entry.getKey().toString());
+                updatePath(m, path, key);
+                if ("wadl".equals(key)) {
+                    // the path has been updated and Accept was not necessarily set to 
+                    // WADL type (xml or json or html - other options)
+                    String query = (String)m.get(Message.QUERY_STRING);
+                    if (StringUtils.isEmpty(query)) {
+                        query = WadlGenerator.WADL_QUERY;
+                    } else if (!query.contains(WadlGenerator.WADL_QUERY)) {
+                        query += "&" + WadlGenerator.WADL_QUERY;
+                    }
+                    m.put(Message.QUERY_STRING, query);
+                }
                 break;
             }
         }
