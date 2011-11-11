@@ -575,7 +575,7 @@ public class WadlGenerator implements RequestHandler {
                 name = parentName + "." + name;
             }
             Class<?> paramCls = entry.getValue();
-            boolean isPrimitive = InjectionUtils.isPrimitive(paramCls);
+            boolean isPrimitive = InjectionUtils.isPrimitive(paramCls) || paramCls.isEnum();
             if (isPrimitive || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
                 doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[]{}, isJson);
             } else {
