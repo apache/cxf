@@ -740,18 +740,17 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         assertTrue(listings.contains("http://localhost:" + PORT + "/test/services/soap/bookservice?wsdl"));
         assertFalse(listings.contains("http://localhost:" + PORT + "/test/services/soap/bookservice2?wsdl"));
         
-        assertTrue(listings.contains("http://localhost:" + PORT + "/test/services/rest?_wadl&type=xml"));
+        assertTrue(listings.contains("http://localhost:" + PORT + "/test/services/rest?_wadl"));
         assertEquals(200, WebClient.create(
             "http://localhost:" + PORT + "/test/services/rest?_wadl&type=xml").get().getStatus());
-        assertTrue(listings.contains("http://localhost:" + PORT + "/test/services/rest2?_wadl&type=xml"));
+        assertTrue(listings.contains("http://localhost:" + PORT + "/test/services/rest2?_wadl"));
         assertEquals(200, WebClient.create(
             "http://localhost:" + PORT + "/test/services/rest2?_wadl&type=xml").get().getStatus());
-        assertFalse(listings.contains("http://localhost:" + PORT + "/test/services/rest3?_wadl&type=xml"));
+        assertFalse(listings.contains("http://localhost:" + PORT + "/test/services/rest3?_wadl"));
         assertFalse(listings.contains("Atom Log Feed"));
     
         WebClient webClient = 
-            WebClient.create("http://localhost:" + PORT + "/test/services/rest3?_wadl&type=xml");
-        WebClient.getConfig(webClient).getHttpConduit().getClient().setReceiveTimeout(1000000);
+            WebClient.create("http://localhost:" + PORT + "/test/services/rest3?_wadl");
         assertEquals(404, webClient.get().getStatus());
     }
     
