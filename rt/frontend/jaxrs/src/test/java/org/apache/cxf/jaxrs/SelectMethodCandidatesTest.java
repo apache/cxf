@@ -166,7 +166,7 @@ public class SelectMethodCandidatesTest extends Assert {
         assertEquals("The Book", c.getTitle());
     }
     
-    private void doTestGenericSuperType(Class<?> serviceClass, String methodName) {
+    private void doTestGenericSuperType(Class<?> serviceClass, String methodName) throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(serviceClass);
         sf.create();

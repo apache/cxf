@@ -19,11 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
@@ -74,49 +70,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         Book book = collection.iterator().next();
         assertEquals(123L, book.getId());
     }
-    
-    @Test
-    public void testPostPetStatus() throws Exception {
         
-        String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/petstore/pets";
-
-        URL url = new URL(endpointAddress);   
-        HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();  
-             
-        httpUrlConnection.setUseCaches(false);   
-        httpUrlConnection.setDefaultUseCaches(false);   
-        httpUrlConnection.setDoOutput(true);   
-        httpUrlConnection.setDoInput(true);   
-        httpUrlConnection.setRequestMethod("POST");   
-        httpUrlConnection.setRequestProperty("Accept",   "text/xml");   
-        httpUrlConnection.setRequestProperty("Content-type",   "application/x-www-form-urlencoded");   
-        httpUrlConnection.setRequestProperty("Connection",   "close");   
-
-        OutputStream outputstream = httpUrlConnection.getOutputStream();
-        File inputFile = new File(getClass().getResource("resources/singleValPostBody.txt").toURI());         
-         
-        byte[] tmp = new byte[4096];
-        int i = 0;
-        InputStream is = new FileInputStream(inputFile);
-        try {
-            while ((i = is.read(tmp)) >= 0) {
-                outputstream.write(tmp, 0, i);
-            }
-        } finally {
-            is.close();
-        }
-
-        outputstream.flush();
-
-        int responseCode = httpUrlConnection.getResponseCode();   
-        assertEquals(200, responseCode); 
-        assertEquals("Wrong status returned", "open", getStringFromInputStream(httpUrlConnection
-            .getInputStream()));  
-        httpUrlConnection.disconnect();
-    }
-    
-    
     
     private String getStringFromInputStream(InputStream in) throws Exception {
         return IOUtils.toString(in);

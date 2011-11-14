@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.interceptor;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -233,8 +234,18 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         setExchangeProperties(message, ori, values, resources.size());  
       
         //Process parameters
-        List<Object> params = JAXRSUtils.processParameters(ori, values, message);
-        message.setContent(List.class, params);
+        try {
+            List<Object> params = JAXRSUtils.processParameters(ori, values, message);
+            message.setContent(List.class, params);
+        } catch (IOException ex) {
+            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
+            if (excResponse == null) {
+                throw new WebApplicationException(ex);
+            } else {
+                message.getExchange().put(Response.class, excResponse);
+            }
+        }
+        
     }
     
     private void setExchangeProperties(Message message, OperationResourceInfo ori, 

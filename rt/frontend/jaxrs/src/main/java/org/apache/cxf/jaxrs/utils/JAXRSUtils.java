@@ -550,7 +550,8 @@ public final class JAXRSUtils {
     //Message contains following information: PATH, HTTP_REQUEST_METHOD, CONTENT_TYPE, InputStream.
     public static List<Object> processParameters(OperationResourceInfo ori, 
                                                  MultivaluedMap<String, String> values, 
-                                                 Message message) {
+                                                 Message message)
+        throws IOException, WebApplicationException {
         
         
         Method method = ori.getMethodToInvoke();
@@ -595,7 +596,8 @@ public final class JAXRSUtils {
                                            Parameter parameter, 
                                            MultivaluedMap<String, String> values,
                                            Message message,
-                                           OperationResourceInfo ori) {
+                                           OperationResourceInfo ori) 
+        throws IOException, WebApplicationException {
         InputStream is = message.getContent(InputStream.class);
 
         if (parameter.getType() == ParameterType.REQUEST_BODY) {
@@ -1016,7 +1018,7 @@ public final class JAXRSUtils {
                                                   InputStream is, 
                                                   MediaType contentType, 
                                                   List<MediaType> consumeTypes,
-                                                  Message m) {
+                                                  Message m) throws IOException, WebApplicationException {
         
         List<MediaType> types = JAXRSUtils.intersectMimeTypes(consumeTypes, contentType);
         
@@ -1035,11 +1037,7 @@ public final class JAXRSUtils {
                               targetTypeClass, parameterType, parameterAnnotations, contentType,
                               headers.getRequestHeaders(), is);
                 } catch (IOException e) {
-                    String errorMessage = "Error deserializing input stream into target class "
-                                          + targetTypeClass.getSimpleName() 
-                                           + ", content type : " + contentType;
-                    LOG.severe(errorMessage);
-                    throw new WebApplicationException(e);
+                    throw e;
                 } catch (WebApplicationException ex) {
                     throw ex;
                 } catch (Exception ex) {
