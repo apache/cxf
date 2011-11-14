@@ -73,10 +73,16 @@ public class InjectionUtilsTest extends Assert {
         values.add("lv11");
         values.add("lv22");
         bean2.setC(values);
+        Set<String> set = new HashSet<String>();
+        set.add("set1");
+        set.add("set2");
+        bean2.setS(set);
+        
         bean1.setD(bean2);
         
+        
         MultivaluedMap<String, Object> map = InjectionUtils.extractValuesFromBean(bean1, "");
-        assertEquals("Size is wrong", 6, map.size());
+        assertEquals("Size is wrong", 7, map.size());
         assertEquals(1, map.get("a").size());
         assertEquals("aValue", map.getFirst("a"));
         assertEquals(1, map.get("b").size());
@@ -92,6 +98,10 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(2, map.get("d.c").size());
         assertEquals("lv11", map.get("d.c").get(0));
         assertEquals("lv22", map.get("d.c").get(1));
+        
+        assertEquals(2, map.get("d.s").size());
+        assertEquals("set1", map.get("d.s").get(0));
+        assertEquals("set2", map.get("d.s").get(1));
         
     }
 
@@ -140,6 +150,8 @@ public class InjectionUtilsTest extends Assert {
         private String a;
         private Long b;
         private List<String> c;
+        private Set<String> s;
+        
         public void setA(String aString) {
             this.a = aString;
         }
@@ -159,7 +171,13 @@ public class InjectionUtilsTest extends Assert {
             return c;
         }
         
+        public void setS(Set<String> set) {
+            this.s = set;
+        }
         
+        public Set<String> getS() {
+            return this.s;
+        }
     }
     
 }
