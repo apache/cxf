@@ -100,9 +100,8 @@ public class InjectionUtilsTest extends Assert {
         assertEquals("lv22", map.get("d.c").get(1));
         
         assertEquals(2, map.get("d.s").size());
-        assertEquals("set1", map.get("d.s").get(0));
-        assertEquals("set2", map.get("d.s").get(1));
-        
+        assertTrue(map.get("d.s").contains("set1"));
+        assertTrue(map.get("d.s").contains("set2"));
     }
 
     static class CustomerBean1 {
