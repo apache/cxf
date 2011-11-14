@@ -329,6 +329,32 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
+
+    @org.junit.Test
+    public void testSaml2OverAsymmetricSignedEncrypted() throws Exception {
+
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType saml2Port = service.getDoubleItSaml2AsymmetricSignedEncryptedPort();
+        updateAddressPort(saml2Port, PORT);
+        
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+        );
+        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
     
     
     private boolean checkUnrestrictedPoliciesInstalled() {

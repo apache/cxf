@@ -222,7 +222,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 
                 //Check for signature protection and encryption of UsernameToken
                 if (sbinding.isSignatureProtection() 
-                    || encryptedTokensIdList.size() > 0 && isRequestor()) {
+                    || encryptedTokensList.size() > 0 && isRequestor()) {
                     List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
                     
                     //Now encrypt the signature using the above token
@@ -239,9 +239,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     
                     if (isRequestor()) {
-                        for (String s : encryptedTokensIdList) {
-                            secondEncrParts.add(new WSEncryptionPart(s, "Element"));
-                        }
+                        secondEncrParts.addAll(encryptedTokensList);
                     }
                     
                     Element secondRefList = null;
@@ -375,9 +373,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             
             if (isRequestor()) {
-                for (String id : encryptedTokensIdList) {
-                    enc.add(new WSEncryptionPart(id, "Element"));
-                }
+                enc.addAll(encryptedTokensList);
             }
             doEncryption(encrTokenWrapper,
                          encrTok,

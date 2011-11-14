@@ -173,9 +173,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
             
             if (isRequestor()) {
-                for (String id : encryptedTokensIdList) {
-                    enc.add(new WSEncryptionPart(id, "Element"));
-                }
+                enc.addAll(encryptedTokensList);
             }
 
             //Do encryption
@@ -303,9 +301,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
                 
                 if (isRequestor()) {
-                    for (String id : encryptedTokensIdList) {
-                        secondEncrParts.add(new WSEncryptionPart(id, "Element"));
-                    }
+                    secondEncrParts.addAll(encryptedTokensList);
                 }
 
                 if (encryptionToken.isDerivedKeys() && !secondEncrParts.isEmpty()) {
