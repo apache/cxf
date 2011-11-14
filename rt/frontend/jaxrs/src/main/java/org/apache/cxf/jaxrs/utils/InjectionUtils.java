@@ -950,10 +950,11 @@ public final class InjectionUtils {
                 if (isPrimitive(value.getClass())) {
                     values.putSingle(propertyName, value);
                 } else if (isSupportedCollectionOrArray(value.getClass())) {
-                    // ignoring arrrays for a moment
                     List<Object> theValues = null;
                     if (value.getClass().isArray()) {
                         theValues = Arrays.asList(value);
+                    } else if (value instanceof Set) {
+                        theValues = new ArrayList<Object>((Set<?>)value);
                     } else {
                         theValues = CastUtils.cast((List<?>)value);
                     }
