@@ -34,8 +34,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-
     <modules>
         <module>cxf-jaxws-javafirst</module>
+	<module>cxf-jaxrs-service</module>
     </modules>
 </project>
