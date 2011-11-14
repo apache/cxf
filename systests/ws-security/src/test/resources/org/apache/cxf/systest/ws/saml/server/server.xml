@@ -209,4 +209,28 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="Saml2TokenOverAsymmetricSignedEncrypted"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSaml2AsymmetricSignedEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml2AsymmetricSignedEncryptedPort"
+       xmlns:s="http://WSSec/saml"
+       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.username" value="bob"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.encryption.username" value="alice"/>
+           <entry key="ws-security.saml2.validator" 
+                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>

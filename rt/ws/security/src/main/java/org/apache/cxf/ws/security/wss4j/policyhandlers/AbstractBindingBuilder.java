@@ -146,7 +146,7 @@ public abstract class AbstractBindingBuilder {
     protected String mainSigId;
     protected List<WSEncryptionPart> sigConfList;
     
-    protected Set<String> encryptedTokensIdList = new HashSet<String>();
+    protected Set<WSEncryptionPart> encryptedTokensList = new HashSet<WSEncryptionPart>();
 
     protected Map<Token, Object> endEncSuppTokMap;
     protected Map<Token, Object> endSuppTokMap;
@@ -482,7 +482,9 @@ public abstract class AbstractBindingBuilder {
                         || MessageUtils.getContextualBoolean(message, 
                                                              SecurityConstants.ALWAYS_ENCRYPT_UT,
                                                              true)) {
-                        encryptedTokensIdList.add(utBuilder.getId());
+                        WSEncryptionPart part = new WSEncryptionPart(utBuilder.getId(), "Element");
+                        part.setElement(utBuilder.getUsernameTokenElement());
+                        encryptedTokensList.add(part);
                     }
                 }
             } else if (isRequestor() 
@@ -504,7 +506,9 @@ public abstract class AbstractBindingBuilder {
                     id = id.substring(1);
                 }
                 if (suppTokens.isEncryptedToken()) {
-                    this.encryptedTokensIdList.add(id);
+                    WSEncryptionPart part = new WSEncryptionPart(id, "Element");
+                    part.setElement(clone);
+                    encryptedTokensList.add(part);
                 }
         
                 if (secToken.getX509Certificate() == null) {  
@@ -560,20 +564,28 @@ public abstract class AbstractBindingBuilder {
                     sig.prependBSTElementToHeader(secHeader);
                 }
                 if (suppTokens.isEncryptedToken()) {
-                    encryptedTokensIdList.add(sig.getBSTTokenId());
+                    WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
+                    encryptedTokensList.add(part);
                 }
                 ret.put(token, sig);
             } else if (token instanceof KeyValueToken) {
                 WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
                 if (suppTokens.isEncryptedToken()) {
-                    encryptedTokensIdList.add(sig.getBSTTokenId());
+                    WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
+                    encryptedTokensList.add(part);
                 }
                 ret.put(token, sig);                
             } else if (token instanceof SamlToken) {
                 AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
                 if (assertionWrapper != null) {
-                    addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                    Element assertionElement = assertionWrapper.toDOM(saaj.getSOAPPart());
+                    addSupportingElement(assertionElement);
                     ret.put(token, assertionWrapper);
+                    if (suppTokens.isEncryptedToken()) {
+                        WSEncryptionPart part = new WSEncryptionPart(assertionWrapper.getId(), "Element");
+                        part.setElement(assertionElement);
+                        encryptedTokensList.add(part);
+                    }
                 }
             }
         }
@@ -1679,7 +1691,8 @@ public abstract class AbstractBindingBuilder {
                     
                     signatures.add(sig.getSignatureValue());
                     if (isSigProtect) {
-                        encryptedTokensIdList.add(sig.getId());
+                        WSEncryptionPart part = new WSEncryptionPart(sig.getId(), "Element");
+                        encryptedTokensList.add(part);
                     }
                 } catch (WSSecurityException e) {
                     policyNotAsserted(ent.getKey(), e);
