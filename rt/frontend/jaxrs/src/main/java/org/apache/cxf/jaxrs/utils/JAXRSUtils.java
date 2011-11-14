@@ -200,7 +200,8 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> values = 
             (MultivaluedMap<String, String>)message.get(URITemplate.TEMPLATE_PARAMETERS);
         for (Method m : cri.getParameterMethods()) {
-            Parameter p = ResourceUtils.getParameter(0, m.getAnnotations());
+            Parameter p = ResourceUtils.getParameter(0, m.getAnnotations(), 
+                                                     m.getParameterTypes()[0]);
             Object o = createHttpParameterValue(p, 
                                                 m.getParameterTypes()[0],
                                                 m.getGenericParameterTypes()[0],
@@ -212,7 +213,8 @@ public final class JAXRSUtils {
         }
         // Param fields
         for (Field f : cri.getParameterFields()) {
-            Parameter p = ResourceUtils.getParameter(0, f.getAnnotations());
+            Parameter p = ResourceUtils.getParameter(0, f.getAnnotations(), 
+                                                     f.getType());
             Object o = createHttpParameterValue(p, 
                                                 f.getType(),
                                                 f.getGenericType(),

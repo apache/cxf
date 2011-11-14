@@ -440,14 +440,15 @@ public class WadlGeneratorTest extends Assert {
                          new Param("mid", "matrix", "xs:int"));
         checkDocs(resourceEls.get(5), "", "Book subresource", ""); 
         // should have 4 child resources
-        List<Element> subResourceEls = getElements(resourceEls.get(5), "resource", 5);
+        List<Element> subResourceEls = getElements(resourceEls.get(5), "resource", 6);
 
         assertEquals("/book", subResourceEls.get(0).getAttribute("path"));
         assertEquals("/form1", subResourceEls.get(1).getAttribute("path"));
         assertEquals("/form2", subResourceEls.get(2).getAttribute("path"));
         assertEquals("/form3/{id}", subResourceEls.get(3).getAttribute("path"));
-        assertEquals("/chapter/{cid}", subResourceEls.get(4).getAttribute("path"));
-        checkDocs(subResourceEls.get(4), "", "Chapter subresource", "");
+        assertEquals("/form4/{id}", subResourceEls.get(4).getAttribute("path"));
+        assertEquals("/chapter/{cid}", subResourceEls.get(5).getAttribute("path"));
+        checkDocs(subResourceEls.get(5), "", "Chapter subresource", "");
         // verify book-subresource /book resource
         // GET 
         verifyGetResourceMethod(subResourceEls.get(0), bookEl, null);
@@ -472,9 +473,9 @@ public class WadlGeneratorTest extends Assert {
         
         
         // verify subresource /chapter/{id}
-        List<Element> chapterMethodEls = getElements(subResourceEls.get(4), "resource", 1);
+        List<Element> chapterMethodEls = getElements(subResourceEls.get(5), "resource", 1);
         assertEquals("/id", chapterMethodEls.get(0).getAttribute("path"));
-        verifyParameters(subResourceEls.get(4), 1, 
+        verifyParameters(subResourceEls.get(5), 1, 
                          new Param("cid", "template", "xs:int"));
         // GET
         verifyGetResourceMethod(chapterMethodEls.get(0), chapterEl, "Get the chapter");

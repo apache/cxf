@@ -73,6 +73,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -277,15 +278,16 @@ public final class ResourceUtils {
         if (paramAnns.length == 0) {
             return CastUtils.cast(Collections.emptyList(), Parameter.class);
         }
+        Class<?>[] types = resourceMethod.getParameterTypes();
         List<Parameter> params = new ArrayList<Parameter>(paramAnns.length);
         for (int i = 0; i < paramAnns.length; i++) {
-            Parameter p = getParameter(i, paramAnns[i]);
+            Parameter p = getParameter(i, paramAnns[i], types[i]);
             params.add(p);
         }
         return params;
     }
     
-    public static Parameter getParameter(int index, Annotation[] anns) {
+    public static Parameter getParameter(int index, Annotation[] anns, Class<?> type) {
         
         Context ctx = AnnotationUtils.getAnnotation(anns, Context.class);
         if (ctx != null) {
@@ -316,10 +318,19 @@ public final class ResourceUtils {
             return new Parameter(ParameterType.MATRIX, index, m.value(), isEncoded, dValue);
         }  
     
+        Parameter formParam = null;
         FormParam f = AnnotationUtils.getAnnotation(anns, FormParam.class);
         if (f != null) {
-            return new Parameter(ParameterType.FORM, index, f.value(), isEncoded, dValue);
-        }  
+            formParam = new Parameter(ParameterType.FORM, index, f.value(), isEncoded, dValue);
+        } else {    
+            Multipart multipart = AnnotationUtils.getAnnotation(anns, Multipart.class);
+            if (multipart != null && InjectionUtils.isPrimitive(type)) {
+                formParam = new Parameter(ParameterType.FORM, index, multipart.value(), isEncoded, dValue);
+            }
+        }
+        if (formParam != null) {
+            return formParam;
+        }
         
         HeaderParam h = AnnotationUtils.getAnnotation(anns, HeaderParam.class);
         if (h != null) {
@@ -564,7 +575,7 @@ public final class ResourceUtils {
             if (AnnotationUtils.isContextClass(params[i])) {
                 values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
             } else {
-                Parameter p = ResourceUtils.getParameter(i, anns[i]);
+                Parameter p = ResourceUtils.getParameter(i, anns[i], params[i]);
                 values[i] = JAXRSUtils.createHttpParameterValue(
                                 p, params[i], genericTypes[i], anns[i], m, templateValues, null);
             }

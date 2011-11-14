@@ -296,11 +296,13 @@ public class WadlGenerator implements RequestHandler {
         Map<Parameter, Object> classParams = new HashMap<Parameter, Object>();
         List<Method> paramMethods = cri.getParameterMethods();
         for (Method m : paramMethods) {
-            classParams.put(ResourceUtils.getParameter(0, m.getAnnotations()), m);
+            classParams.put(ResourceUtils.getParameter(0, m.getAnnotations(),
+                                                       m.getParameterTypes()[0]), m);
         }
         List<Field> fieldParams = cri.getParameterFields();
         for (Field f : fieldParams) {
-            classParams.put(ResourceUtils.getParameter(0, f.getAnnotations()), f);
+            classParams.put(ResourceUtils.getParameter(0, f.getAnnotations(),
+                                                       f.getType()), f);
         }
         return classParams;
     }
