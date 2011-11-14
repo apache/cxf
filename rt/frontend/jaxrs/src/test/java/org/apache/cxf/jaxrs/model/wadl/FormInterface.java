@@ -27,6 +27,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
 public interface FormInterface {
     @Path("/form1")
     @POST
@@ -44,4 +46,11 @@ public interface FormInterface {
     @Produces(MediaType.TEXT_PLAIN)
     String form3(@PathParam("id") String id, 
                  @FormParam("field1") String f1, @FormParam("field2") String f2);
+    
+    @Path("/form4/{id}")
+    @POST
+    @Consumes("multipart/form-data")
+    @Produces(MediaType.TEXT_PLAIN)
+    String form4(@PathParam("id") String id, 
+                 @Multipart("field1") String f1, @Multipart("field2") String f2);
 }
