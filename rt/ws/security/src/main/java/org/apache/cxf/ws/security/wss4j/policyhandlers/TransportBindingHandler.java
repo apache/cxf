@@ -119,7 +119,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     }
     
     public void handleBinding() {
-        Collection<AssertionInfo> ais;
         WSSecTimestamp timestamp = createTimestamp();
         handleLayout(timestamp);
         
@@ -141,124 +140,179 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             addEncryptedKeyElement(cloneElement(el));
                         } 
                     }
-                }
-                
-                List<byte[]> signatureValues = new ArrayList<byte[]>();
-
-                ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        SupportingToken sgndSuppTokens = (SupportingToken)ai.getAssertion();
-                        if (sgndSuppTokens != null) {
-                            addSignedSupportingTokens(sgndSuppTokens);
-                        }
-                        ai.setAsserted(true);
-                    }
-                }
-                ais = aim.get(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
-                if (ais != null) {
-                    SupportingToken sgndSuppTokens = null;
-                    for (AssertionInfo ai : ais) {
-                        sgndSuppTokens = (SupportingToken)ai.getAssertion();
-                        ai.setAsserted(true);
-                    }
-                    if (sgndSuppTokens != null) {
-                        SignedEncryptedParts signdParts = sgndSuppTokens.getSignedParts();
-
-                        for (Token token : sgndSuppTokens.getTokens()) {
-                            if (token instanceof IssuedToken
-                                || token instanceof SecureConversationToken
-                                || token instanceof SecurityContextToken
-                                || token instanceof KeyValueToken
-                                || token instanceof KerberosToken) {
-                                addSig(signatureValues, doIssuedTokenSignature(token, signdParts,
-                                                                               sgndSuppTokens,
-                                                                               null));
-                            } else if (token instanceof X509Token
-                                || token instanceof KeyValueToken) {
-                                addSig(signatureValues, doX509TokenSignature(token,
-                                                                             signdParts,
-                                                                             sgndSuppTokens));
-                            }
-                        }
-                    }
-                }
-                ais = aim.get(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        SupportingToken sgndSuppTokens = (SupportingToken)ai.getAssertion();
-                        if (sgndSuppTokens != null) {
-                            addSignedSupportingTokens(sgndSuppTokens);
-                        }
-                        ai.setAsserted(true);
-                    }
-                }
-                
-                ais = aim.get(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        SupportingToken encrSuppTokens = (SupportingToken)ai.getAssertion();
-                        if (encrSuppTokens != null) {
-                            addSignedSupportingTokens(encrSuppTokens);
-                        }
-                        ai.setAsserted(true);
-                    }
-                }
-                
-                ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-                if (ais != null) {
-                    SupportingToken endSuppTokens = null;
-                    for (AssertionInfo ai : ais) {
-                        endSuppTokens = (SupportingToken)ai.getAssertion();
-                        ai.setAsserted(true);
-                    } 
                     
-                    if (endSuppTokens != null) {
-                        for (Token token : endSuppTokens.getTokens()) {
-                            if (token instanceof IssuedToken
-                                || token instanceof SecureConversationToken
-                                || token instanceof SecurityContextToken
-                                || token instanceof KerberosToken) {
-                                addSig(signatureValues, doIssuedTokenSignature(token, 
-                                                                               endSuppTokens
-                                                                                   .getSignedParts(), 
-                                                                               endSuppTokens,
-                                                                               null));
-                            } else if (token instanceof X509Token
-                                || token instanceof KeyValueToken) {
-                                addSig(signatureValues, doX509TokenSignature(token, 
-                                                                             endSuppTokens.getSignedParts(), 
-                                                                             endSuppTokens));
-                            } else if (token instanceof SamlToken) {
-                                AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
-                                assertionWrapper.toDOM(saaj.getSOAPPart());
-                                storeAssertionAsSecurityToken(assertionWrapper);
-                                addSig(signatureValues, doIssuedTokenSignature(token, 
-                                                                               endSuppTokens
-                                                                               .getSignedParts(), 
-                                                                               endSuppTokens,
-                                                                               null));
-                            }
-                        }
-                    }
+                    handleNonEndorsingSupportingTokens();
+                    handleEndorsingSupportingTokens();
                 }
-                ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        SupportingToken suppTokens = (SupportingToken)ai.getAssertion();
-                        if (suppTokens != null && suppTokens.getTokens() != null 
-                            && suppTokens.getTokens().size() > 0) {
-                            handleSupportingTokens(suppTokens, false);
-                        }
-                        ai.setAsserted(true);
-                    }
-                }
-
             } else {
                 addSignatureConfirmation(null);
             }
         } catch (Exception e) {
             throw new Fault(e);
+        }
+    }
+    
+    /**
+     * Handle the non-endorsing supporting tokens
+     */
+    private void handleNonEndorsingSupportingTokens() throws Exception {
+        Collection<AssertionInfo> ais;
+        
+        ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                SupportingToken sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                if (sgndSuppTokens != null) {
+                    addSignedSupportingTokens(sgndSuppTokens);
+                }
+                ai.setAsserted(true);
+            }
+        }
+        
+        ais = aim.get(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                SupportingToken sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                if (sgndSuppTokens != null) {
+                    addSignedSupportingTokens(sgndSuppTokens);
+                }
+                ai.setAsserted(true);
+            }
+        }
+        
+        ais = aim.get(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                SupportingToken encrSuppTokens = (SupportingToken)ai.getAssertion();
+                if (encrSuppTokens != null) {
+                    addSignedSupportingTokens(encrSuppTokens);
+                }
+                ai.setAsserted(true);
+            }
+        }
+        
+        ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                SupportingToken suppTokens = (SupportingToken)ai.getAssertion();
+                if (suppTokens != null && suppTokens.getTokens() != null 
+                    && suppTokens.getTokens().size() > 0) {
+                    handleSupportingTokens(suppTokens, false);
+                }
+                ai.setAsserted(true);
+            }
+        }
+    }
+    
+    /**
+     * Handle the endorsing supporting tokens
+     */
+    private void handleEndorsingSupportingTokens() throws Exception {
+        Collection<AssertionInfo> ais;
+        List<byte[]> signatureValues = new ArrayList<byte[]>();
+        
+        ais = aim.get(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        if (ais != null) {
+            SupportingToken sgndSuppTokens = null;
+            for (AssertionInfo ai : ais) {
+                sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                ai.setAsserted(true);
+            }
+            if (sgndSuppTokens != null) {
+                SignedEncryptedParts signdParts = sgndSuppTokens.getSignedParts();
+
+                for (Token token : sgndSuppTokens.getTokens()) {
+                    if (token instanceof IssuedToken
+                        || token instanceof SecureConversationToken
+                        || token instanceof SecurityContextToken
+                        || token instanceof KeyValueToken
+                        || token instanceof KerberosToken) {
+                        addSig(signatureValues, doIssuedTokenSignature(token, signdParts,
+                                                                       sgndSuppTokens,
+                                                                       null));
+                    } else if (token instanceof X509Token
+                        || token instanceof KeyValueToken) {
+                        addSig(signatureValues, doX509TokenSignature(token,
+                                                                     signdParts,
+                                                                     sgndSuppTokens));
+                    }
+                }
+            }
+        }
+        
+        ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        if (ais != null) {
+            SupportingToken endSuppTokens = null;
+            for (AssertionInfo ai : ais) {
+                endSuppTokens = (SupportingToken)ai.getAssertion();
+                ai.setAsserted(true);
+            } 
+            
+            if (endSuppTokens != null) {
+                for (Token token : endSuppTokens.getTokens()) {
+                    if (token instanceof IssuedToken
+                        || token instanceof SecureConversationToken
+                        || token instanceof SecurityContextToken
+                        || token instanceof KerberosToken) {
+                        addSig(signatureValues, doIssuedTokenSignature(token, 
+                                                                       endSuppTokens
+                                                                           .getSignedParts(), 
+                                                                       endSuppTokens,
+                                                                       null));
+                    } else if (token instanceof X509Token
+                        || token instanceof KeyValueToken) {
+                        addSig(signatureValues, doX509TokenSignature(token, 
+                                                                     endSuppTokens.getSignedParts(), 
+                                                                     endSuppTokens));
+                    } else if (token instanceof SamlToken) {
+                        AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+                        assertionWrapper.toDOM(saaj.getSOAPPart());
+                        storeAssertionAsSecurityToken(assertionWrapper);
+                        addSig(signatureValues, doIssuedTokenSignature(token, 
+                                                                       endSuppTokens
+                                                                       .getSignedParts(), 
+                                                                       endSuppTokens,
+                                                                       null));
+                    }
+                }
+            }
+        }
+        ais = aim.get(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        if (ais != null) {
+            SupportingToken endSuppTokens = null;
+            for (AssertionInfo ai : ais) {
+                endSuppTokens = (SupportingToken)ai.getAssertion();
+                ai.setAsserted(true);
+            } 
+            
+            if (endSuppTokens != null) {
+                for (Token token : endSuppTokens.getTokens()) {
+                    if (token instanceof IssuedToken
+                        || token instanceof SecureConversationToken
+                        || token instanceof SecurityContextToken
+                        || token instanceof KerberosToken) {
+                        addSig(signatureValues, doIssuedTokenSignature(token, 
+                                                                       endSuppTokens
+                                                                           .getSignedParts(), 
+                                                                       endSuppTokens,
+                                                                       null));
+                    } else if (token instanceof X509Token
+                        || token instanceof KeyValueToken) {
+                        addSig(signatureValues, doX509TokenSignature(token, 
+                                                                     endSuppTokens.getSignedParts(), 
+                                                                     endSuppTokens));
+                    } else if (token instanceof SamlToken) {
+                        AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+                        assertionWrapper.toDOM(saaj.getSOAPPart());
+                        storeAssertionAsSecurityToken(assertionWrapper);
+                        addSig(signatureValues, doIssuedTokenSignature(token, 
+                                                                       endSuppTokens
+                                                                       .getSignedParts(), 
+                                                                       endSuppTokens,
+                                                                       null));
+                    }
+                }
+            }
         }
     }
     
