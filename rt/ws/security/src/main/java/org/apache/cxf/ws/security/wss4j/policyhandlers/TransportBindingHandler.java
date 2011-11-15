@@ -194,6 +194,17 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     }
                 }
                 
+                ais = aim.get(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        SupportingToken encrSuppTokens = (SupportingToken)ai.getAssertion();
+                        if (encrSuppTokens != null) {
+                            addSignedSupportingTokens(encrSuppTokens);
+                        }
+                        ai.setAsserted(true);
+                    }
+                }
+                
                 ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
                 if (ais != null) {
                     SupportingToken endSuppTokens = null;

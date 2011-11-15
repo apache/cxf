@@ -111,4 +111,13 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://WSSec/ut}DoubleItEncryptedPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.username" value="Alice"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
 </beans>

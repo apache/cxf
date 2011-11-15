@@ -72,6 +72,7 @@ import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.EncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
@@ -589,9 +590,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         signedEncryptedValidator.setValidateUsernameToken(utWithCallbacks);
         signedEncryptedValidator.validatePolicy(aim);
         
+        EncryptedTokenPolicyValidator encryptedValidator = 
+            new EncryptedTokenPolicyValidator(msg, results, signedResults);
+        encryptedValidator.setValidateUsernameToken(utWithCallbacks);
+        encryptedValidator.validatePolicy(aim);
+        
         //REVISIT - probably can verify some of these like if UT is encrypted and/or signed, etc...
         assertPolicy(aim, SP12Constants.SUPPORTING_TOKENS);
-        assertPolicy(aim, SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
         if (hasEndorsement || isRequestor(msg)) {
             assertPolicy(aim, SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
             assertPolicy(aim, SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
