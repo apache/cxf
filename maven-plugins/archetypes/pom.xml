@@ -36,6 +36,6 @@
 
     <modules>
         <module>cxf-jaxws-javafirst</module>
-        <!--module>cxf-jaxrs-service</module-->
+        <module>cxf-jaxrs-service</module>
     </modules>
 </project>
