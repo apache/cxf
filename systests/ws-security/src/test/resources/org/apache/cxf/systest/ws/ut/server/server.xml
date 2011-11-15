@@ -178,4 +178,21 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="Encrypted"
+       address="https://localhost:${testutil.ports.Server}/DoubleItUTEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItEncryptedPort"
+       xmlns:s="http://WSSec/ut"
+       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>
