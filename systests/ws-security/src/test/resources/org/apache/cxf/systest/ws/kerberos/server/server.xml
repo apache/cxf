@@ -71,7 +71,7 @@
         </httpj:engine>
     </httpj:engine-factory>
     
-    <!--<bean id="kerberosTicketDecoderImpl" 
+    <!-- <bean id="kerberosTicketDecoderImpl" 
           class="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenDecoderImpl"/>-->
     
     <bean id="kerberosValidator"
@@ -286,5 +286,24 @@
        </jaxws:properties> 
      
     </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="KerberosOverSymmetricEndorsingEncrypted"
+       address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetricEndorsingEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKerberosSymmetricEndorsingEncryptedPort"
+       xmlns:s="http://WSSec/kerberos"
+       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
     
 </beans>

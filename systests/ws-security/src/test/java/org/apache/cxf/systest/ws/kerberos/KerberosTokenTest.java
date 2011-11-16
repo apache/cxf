@@ -280,6 +280,30 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testKerberosOverSymmetricEndorsingEncrypted() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricEndorsingEncryptedPort();
+        updateAddressPort(kerberosPort, PORT);
+        
+        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
+    
     
     private boolean checkUnrestrictedPoliciesInstalled() {
         try {
