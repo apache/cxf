@@ -219,23 +219,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 ai.setAsserted(true);
             }
             if (sgndSuppTokens != null) {
-                SignedEncryptedParts signdParts = sgndSuppTokens.getSignedParts();
-
                 for (Token token : sgndSuppTokens.getTokens()) {
-                    if (token instanceof IssuedToken
-                        || token instanceof SecureConversationToken
-                        || token instanceof SecurityContextToken
-                        || token instanceof KeyValueToken
-                        || token instanceof KerberosToken) {
-                        addSig(signatureValues, doIssuedTokenSignature(token, signdParts,
-                                                                       sgndSuppTokens,
-                                                                       null));
-                    } else if (token instanceof X509Token
-                        || token instanceof KeyValueToken) {
-                        addSig(signatureValues, doX509TokenSignature(token,
-                                                                     signdParts,
-                                                                     sgndSuppTokens));
-                    }
+                    handleEndorsingToken(token, sgndSuppTokens, signatureValues);
                 }
             }
         }
@@ -250,30 +235,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             if (endSuppTokens != null) {
                 for (Token token : endSuppTokens.getTokens()) {
-                    if (token instanceof IssuedToken
-                        || token instanceof SecureConversationToken
-                        || token instanceof SecurityContextToken
-                        || token instanceof KerberosToken) {
-                        addSig(signatureValues, doIssuedTokenSignature(token, 
-                                                                       endSuppTokens
-                                                                           .getSignedParts(), 
-                                                                       endSuppTokens,
-                                                                       null));
-                    } else if (token instanceof X509Token
-                        || token instanceof KeyValueToken) {
-                        addSig(signatureValues, doX509TokenSignature(token, 
-                                                                     endSuppTokens.getSignedParts(), 
-                                                                     endSuppTokens));
-                    } else if (token instanceof SamlToken) {
-                        AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
-                        assertionWrapper.toDOM(saaj.getSOAPPart());
-                        storeAssertionAsSecurityToken(assertionWrapper);
-                        addSig(signatureValues, doIssuedTokenSignature(token, 
-                                                                       endSuppTokens
-                                                                       .getSignedParts(), 
-                                                                       endSuppTokens,
-                                                                       null));
-                    }
+                    handleEndorsingToken(token, endSuppTokens, signatureValues);
                 }
             }
         }
@@ -287,32 +249,39 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             if (endSuppTokens != null) {
                 for (Token token : endSuppTokens.getTokens()) {
-                    if (token instanceof IssuedToken
-                        || token instanceof SecureConversationToken
-                        || token instanceof SecurityContextToken
-                        || token instanceof KerberosToken) {
-                        addSig(signatureValues, doIssuedTokenSignature(token, 
-                                                                       endSuppTokens
-                                                                           .getSignedParts(), 
-                                                                       endSuppTokens,
-                                                                       null));
-                    } else if (token instanceof X509Token
-                        || token instanceof KeyValueToken) {
-                        addSig(signatureValues, doX509TokenSignature(token, 
-                                                                     endSuppTokens.getSignedParts(), 
-                                                                     endSuppTokens));
-                    } else if (token instanceof SamlToken) {
-                        AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
-                        assertionWrapper.toDOM(saaj.getSOAPPart());
-                        storeAssertionAsSecurityToken(assertionWrapper);
-                        addSig(signatureValues, doIssuedTokenSignature(token, 
-                                                                       endSuppTokens
-                                                                       .getSignedParts(), 
-                                                                       endSuppTokens,
-                                                                       null));
-                    }
+                    handleEndorsingToken(token, endSuppTokens, signatureValues);
                 }
             }
+        }
+    }
+    
+    private void handleEndorsingToken(
+        Token token, SupportingToken wrapper, List<byte[]> signatureValues
+    ) throws Exception {
+        SignedEncryptedParts signdParts = wrapper.getSignedParts();
+        if (token instanceof IssuedToken
+            || token instanceof SecureConversationToken
+            || token instanceof SecurityContextToken
+            || token instanceof KeyValueToken
+            || token instanceof KerberosToken) {
+            addSig(
+                signatureValues, 
+                doIssuedTokenSignature(token, signdParts, wrapper)
+            );
+        } else if (token instanceof X509Token
+            || token instanceof KeyValueToken) {
+            addSig(
+                signatureValues, 
+                doX509TokenSignature(token, signdParts, wrapper)
+            );
+        } else if (token instanceof SamlToken) {
+            AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+            assertionWrapper.toDOM(saaj.getSOAPPart());
+            storeAssertionAsSecurityToken(assertionWrapper);
+            addSig(
+                signatureValues, 
+                doIssuedTokenSignature(token, signdParts, wrapper)
+            );
         }
     }
     
@@ -391,19 +360,14 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
     }
 
-    private byte[] doIssuedTokenSignature(Token token, 
-                                          SignedEncryptedParts signdParts,
-                                          TokenWrapper wrapper,
-                                          SecurityToken securityTok) throws Exception {
-        //Get the issued token
-        SecurityToken secTok = securityTok;
-        if (secTok == null) {
-            secTok = getSecurityToken();
-        }
-   
+    private byte[] doIssuedTokenSignature(
+        Token token, SignedEncryptedParts signdParts, TokenWrapper wrapper
+    ) throws Exception {
         boolean tokenIncluded = false;
-        
+        // Get the issued token
+        SecurityToken secTok = getSecurityToken();
         List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
+        
         if (includeToken(token.getInclusion())) {
             //Add the token
             Element el = cloneElement(secTok.getToken());
@@ -427,8 +391,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 WSEncryptionPart bodyPart = convertToEncryptionPart(saaj.getSOAPBody());
                 sigParts.add(bodyPart);
             }
-            if (secTok.getX509Certificate() != null
-                || securityTok != null) {
+            if (secTok.getX509Certificate() != null) {
                 //the "getX509Certificate" this is to workaround an issue in WCF
                 //In WCF, for TransportBinding, in most cases, it doesn't want any of
                 //the headers signed even if the policy says so.   HOWEVER, for KeyValue
