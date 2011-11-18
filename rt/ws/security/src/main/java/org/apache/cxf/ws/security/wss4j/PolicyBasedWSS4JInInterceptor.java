@@ -78,6 +78,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyVal
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SamlTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityContextTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEncryptedTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SymmetricBindingPolicyValidator;
@@ -168,6 +169,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
         return ais != null && !ais.isEmpty();
     }
+    
     private void handleWSS11(AssertionInfoMap aim, SoapMessage message) {
         if (!isRequestor(message)) {
             assertPolicy(aim, SP12Constants.WSS11);
@@ -179,8 +181,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             for (AssertionInfo ai : ais) {
                 Wss11 wss11 = (Wss11)ai.getAssertion();
                 if (wss11.isRequireSignatureConfirmation()) {
-                    message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION,
-                                "true");
+                    message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
                 } else {
                     ai.setAsserted(true);
                 }
@@ -197,6 +198,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         } 
         return action + " " + val;
     }
+    
     private boolean assertPolicy(AssertionInfoMap aim, QName q) {
         Collection<AssertionInfo> ais = aim.get(q);
         if (ais != null && !ais.isEmpty()) {
@@ -240,6 +242,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
      
         return action;
     }
+    
     private String checkTransportBinding(AssertionInfoMap aim, 
                                          String action, 
                                          SoapMessage message) {
@@ -277,6 +280,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         return action;
     }
+    
     private String checkSymetricBinding(AssertionInfoMap aim, 
                                 String action, 
                                 SoapMessage message) {
@@ -458,8 +462,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         Collection<WSDataRef> signed = new HashSet<WSDataRef>();
         Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
-        Boolean hasDerivedKeys = null;
-        boolean hasEndorsement = false;
         
         //
         // Prefetch all signature results
@@ -471,27 +473,15 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             switch (actInt.intValue()) {   
             case WSConstants.SIGN:
-                if (hasDerivedKeys == null) {
-                    hasDerivedKeys = Boolean.FALSE;
-                }
                 List<WSDataRef> sl = CastUtils.cast((List<?>)wser
                                                        .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                 if (sl != null) {
-                    if (sl.size() == 1
-                        && sl.get(0).getName().equals(new QName(WSConstants.SIG_NS, WSConstants.SIG_LN))) {
-                        //endorsing the signature
-                        hasEndorsement = true;
-                        break;
-                    }
                     for (WSDataRef r : sl) {
                         signed.add(r);
                     }
                 }
                 break;
             case WSConstants.ENCR:
-                if (hasDerivedKeys == null) {
-                    hasDerivedKeys = Boolean.FALSE;
-                }
                 List<WSDataRef> el = CastUtils.cast((List<?>)wser
                                                        .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                 if (el != null) {
@@ -526,7 +516,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 break;
             default:
                 //System.out.println(actInt);
-                //anything else to process?  Maybe check tokens for BKT requirements?
             }                        
         }
         
@@ -601,13 +590,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         endorsingEncryptedValidator.setValidateUsernameToken(utWithCallbacks);
         endorsingEncryptedValidator.validatePolicy(aim);
         
-        //REVISIT - probably can verify some of these like if UT is encrypted and/or signed, etc...
+        SignedEndorsingEncryptedTokenPolicyValidator signedEndorsingEncryptedValidator = 
+            new SignedEndorsingEncryptedTokenPolicyValidator(msg, results, signedResults);
+        signedEndorsingEncryptedValidator.validatePolicy(aim);
+        
+        // The supporting tokens are already validated
         assertPolicy(aim, SP12Constants.SUPPORTING_TOKENS);
-        if (hasEndorsement || isRequestor(msg)) {
-            assertPolicy(aim, SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        }
+        
         super.doResults(msg, actor, soapHeader, soapBody, results, utWithCallbacks);
     }
+    
     private void assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 
         throws SOAPException {
         

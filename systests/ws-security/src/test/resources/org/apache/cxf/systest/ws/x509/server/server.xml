@@ -232,6 +232,23 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
        </jaxws:properties> 
      
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="TransportSignedEndorsingEncrypted"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportSignedEndorsingEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportSignedEndorsingEncryptedPort"
+       xmlns:s="http://WSSec/x509"
+       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties> 
+     
     </jaxws:endpoint> 
     
 </beans>
