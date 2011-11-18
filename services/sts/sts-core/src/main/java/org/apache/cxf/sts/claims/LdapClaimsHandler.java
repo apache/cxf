@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.NamingEnumeration;
@@ -33,6 +35,8 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
+import javax.security.auth.kerberos.KerberosPrincipal;
+import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -89,7 +93,33 @@ public class LdapClaimsHandler implements ClaimsHandler {
 
     public ClaimCollection retrieveClaimValues(Principal principal, RequestClaimCollection claims) {
 
-        String dn = getDnOfPrincipal(principal.getName());
+        String user = null;
+        if (principal instanceof KerberosPrincipal) {
+            KerberosPrincipal kp = (KerberosPrincipal)principal;
+            StringTokenizer st = new StringTokenizer(kp.getName(), "@");
+            user = st.nextToken();
+        } else if (principal instanceof X500Principal) {
+            X500Principal x500p = (X500Principal)principal;
+            LOG.warning("Unsupported principal type X500: " + x500p.getName());
+            return new ClaimCollection();
+        } else if (principal != null) {
+            user = principal.getName();
+        } else {
+            //[TODO] if onbehalfof -> principal == null
+            LOG.info("Principal is null");
+            return new ClaimCollection();
+        }
+        
+        if (user == null) {
+            LOG.warning("User must not be null");
+            return new ClaimCollection();
+        } else {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Retrieve claims for user " + user);
+            }
+        }
+        
+        String dn = getDnOfPrincipal(user);
 
         List<String> searchAttributeList = new ArrayList<String>();
         for (RequestClaim claim : claims) {
