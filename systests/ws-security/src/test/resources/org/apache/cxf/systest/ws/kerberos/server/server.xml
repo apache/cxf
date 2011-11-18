@@ -306,4 +306,23 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="KerberosOverSymmetricSignedEndorsingEncrypted"
+       address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetricSignedEndorsingEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKerberosSymmetricSignedEndorsingEncryptedPort"
+       xmlns:s="http://WSSec/kerberos"
+       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
+       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>
