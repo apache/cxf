@@ -30,9 +30,9 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-<lang:groovy id="helloworld" script-source="classpath:demo/spring/HelloWorld.groovy" scope="prototype">
+<lang:groovy id="helloworld" script-source="classpath:HelloWorld.groovy" scope="prototype">
 </lang:groovy>
-<lang:groovy id="helloworldImpl" script-source="classpath:demo/spring/HelloWorldImpl.groovy" scope="prototype">
+<lang:groovy id="helloworldImpl" script-source="classpath:HelloWorldImpl.groovy" scope="prototype">
 </lang:groovy>
 
   <simple:server serviceClass="demo.spring.HelloWorld"  address="/HelloWorld">

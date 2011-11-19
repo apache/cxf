@@ -46,7 +46,8 @@ public class Server {
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/");
 
-        webappcontext.setWar("webapp");
+//        webappcontext.setWar("src/main/webapp");
+        webappcontext.setWar("target/GroovySpringSupport.war");
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
