@@ -89,8 +89,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         this.getInFaultInterceptors().add(new IssuedTokenInInterceptor());
     }
     
-    
-    static final TokenStore getTokenStore(Message message) {
+    static final TokenStore createTokenStore(Message message) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
             TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
@@ -101,8 +100,15 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 tokenStore = new MemoryTokenStore();
                 info.setProperty(TokenStore.class.getName(), tokenStore);
             }
-            return tokenStore;
+            return tokenStore; 
         }
+    }
+    static final TokenStore getTokenStore(Message message) {
+        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+        if (tokenStore == null) {
+            tokenStore = createTokenStore(message);
+        }
+        return tokenStore;
     }
 
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -243,6 +249,14 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
                 if (tok == null) {
                     String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                    if (tokId != null) {
+                        tok = getTokenStore(message).getToken(tokId);
+                    }
+                }
+            } else {
+                tok = (SecurityToken)message.get(SecurityConstants.TOKEN);
+                if (tok == null) {
+                    String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
                     if (tokId != null) {
                         tok = getTokenStore(message).getToken(tokId);
                     }
