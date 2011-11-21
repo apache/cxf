@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.cert.Certificate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,10 +33,12 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.opensaml.common.SAMLVersion;
 
@@ -48,40 +51,49 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
     private List<WSSecurityEngineResult> signedResults;
     private Element soapBody;
     private Message message;
+    private List<WSSecurityEngineResult> samlResults;
 
     public SamlTokenPolicyValidator(
         Element soapBody,
         List<WSSecurityEngineResult> signedResults,
-        Message message
+        Message message,
+        List<WSSecurityEngineResult> results
     ) {
         this.soapBody = soapBody;
         this.signedResults = signedResults;
         this.message = message;
+        samlResults = new ArrayList<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
     }
     
     public boolean validatePolicy(
-        AssertionInfoMap aim,
-        WSSecurityEngineResult wser
+        AssertionInfoMap aim
     ) {
         Collection<AssertionInfo> samlAis = aim.get(SP12Constants.SAML_TOKEN);
-        if (samlAis != null && !samlAis.isEmpty()) {
-            for (AssertionInfo ai : samlAis) {
-                AssertionWrapper assertionWrapper = 
-                    (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                SamlToken samlToken = (SamlToken)ai.getAssertion();
-                ai.setAsserted(true);
-                
-                boolean tokenRequired = isTokenRequired(samlToken, message);
-                if (tokenRequired && assertionWrapper == null) {
-                    ai.setNotAsserted(
-                        "The received token does not match the token inclusion requirement"
-                    );
-                    return false;
-                }
-                if (!tokenRequired) {
-                    continue;
-                }
+        if (samlAis == null || samlAis.isEmpty()) {
+            return true;
+        }
+        
+        for (AssertionInfo ai : samlAis) {
+            SamlToken samlToken = (SamlToken)ai.getAssertion();
+            ai.setAsserted(true);
 
+            boolean tokenRequired = isTokenRequired(samlToken, message);
+            if (tokenRequired && samlResults.isEmpty()) {
+                ai.setNotAsserted(
+                    "The received token does not match the token inclusion requirement"
+                );
+                return false;
+            }
+            if (!tokenRequired) {
+                continue;
+            }
+
+            for (WSSecurityEngineResult result : samlResults) {
+                AssertionWrapper assertionWrapper = 
+                    (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                
                 if (!checkVersion(samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
                     return false;
@@ -100,12 +112,13 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                     return false;
                 }
                 /*
-                if (!checkIssuerName(samlToken, assertionWrapper)) {
-                    ai.setNotAsserted("Wrong IssuerName");
-                }
-                */
+                    if (!checkIssuerName(samlToken, assertionWrapper)) {
+                        ai.setNotAsserted("Wrong IssuerName");
+                    }
+                 */
             }
         }
+        
         return true;
     }
     
