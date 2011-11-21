@@ -505,8 +505,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 CoverageType.SIGNED, CoverageScope.ELEMENT);
         check &= assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
                 CoverageType.ENCRYPTED, CoverageScope.ELEMENT);
-        check &= assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
-                CoverageType.ENCRYPTED, CoverageScope.CONTENT);
+        check &= assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg, 
+                soapEnvelope, CoverageType.ENCRYPTED, CoverageScope.CONTENT);
         
         check &= assertHeadersExists(aim, msg, soapHeader);
         return check;
