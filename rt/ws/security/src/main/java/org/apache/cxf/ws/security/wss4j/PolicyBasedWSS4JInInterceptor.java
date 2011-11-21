@@ -291,7 +291,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return action;
     }
     
-    private void assertXPathTokens(AssertionInfoMap aim, 
+    private boolean assertXPathTokens(AssertionInfoMap aim, 
                                    QName name, 
                                    Collection<WSDataRef> refs,
                                    SoapMessage msg,
@@ -322,15 +322,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         } catch (WSSecurityException e) {
                             ai.setNotAsserted("No " + type 
                                     + " element found matching XPath " + xPath);
+                            return false;
                         }
                     }
                 }
             }
         }
+        return true;
     }
 
     
-    private void assertTokens(AssertionInfoMap aim, 
+    private boolean assertTokens(AssertionInfoMap aim, 
                               QName name, 
                               Collection<WSDataRef> signed,
                               SoapMessage msg,
@@ -356,6 +358,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         }
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted(msg.getVersion().getBody() + " not " + type);
+                        return false;
                     }
                 }
                 
@@ -366,10 +369,12 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                 CoverageScope.ELEMENT);
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted(h.getQName() + " not + " + type);
+                        return false;
                     }
                 }
             }
         }
+        return true;
     }
     
     protected void computeAction(SoapMessage message, RequestData data) {
@@ -444,13 +449,19 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         // Check policies
         //
-        checkSignedEncryptedCoverage(aim, msg, soapHeader, soapBody, signed, encrypted);
+        boolean check = checkSignedEncryptedCoverage(aim, msg, soapHeader, soapBody, signed, encrypted);
         
-        checkTokenCoverage(aim, msg, soapBody, results, signedResults, utWithCallbacks);
+        if (check) {
+            check = checkTokenCoverage(aim, msg, soapBody, results, signedResults, utWithCallbacks);
+        }
         
-        checkBindingCoverage(aim, msg, results, signedResults);
+        if (check) {
+            check = checkBindingCoverage(aim, msg, results, signedResults);
+        }
 
-        checkSupportingTokenCoverage(aim, msg, results, signedResults, utWithCallbacks);
+        if (check) {
+            check = checkSupportingTokenCoverage(aim, msg, results, signedResults, utWithCallbacks);
+        }
         
         // The supporting tokens are already validated
         assertPolicy(aim, SP12Constants.SUPPORTING_TOKENS);
@@ -467,7 +478,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     /**
      * Check SignedParts, EncryptedParts, SignedElements, EncryptedElements, RequiredParts, etc.
      */
-    private void checkSignedEncryptedCoverage(
+    private boolean checkSignedEncryptedCoverage(
         AssertionInfoMap aim,
         SoapMessage msg,
         Element soapHeader,
@@ -476,34 +487,35 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         Collection<WSDataRef> encrypted
     ) throws SOAPException {
         CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
-        
         //
         // SIGNED_PARTS and ENCRYPTED_PARTS only apply to non-Transport bindings
         //
+        boolean check = true;
         if (!isTransportBinding(aim)) {
-            assertTokens(
+            check &= assertTokens(
                 aim, SP12Constants.SIGNED_PARTS, signed, msg, soapHeader, soapBody, CoverageType.SIGNED
             );
-            assertTokens(
+            check &= assertTokens(
                 aim, SP12Constants.ENCRYPTED_PARTS, encrypted, msg, soapHeader, soapBody, 
                 CoverageType.ENCRYPTED
             );
         }
         Element soapEnvelope = soapHeader.getOwnerDocument().getDocumentElement();
-        assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, msg, soapEnvelope,
+        check &= assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, msg, soapEnvelope,
                 CoverageType.SIGNED, CoverageScope.ELEMENT);
-        assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
+        check &= assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
                 CoverageType.ENCRYPTED, CoverageScope.ELEMENT);
-        assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
+        check &= assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
                 CoverageType.ENCRYPTED, CoverageScope.CONTENT);
         
-        assertHeadersExists(aim, msg, soapHeader);
+        check &= assertHeadersExists(aim, msg, soapHeader);
+        return check;
     }
     
     /**
      * Check the token coverage
      */
-    private void checkTokenCoverage(
+    private boolean checkTokenCoverage(
         AssertionInfoMap aim,
         SoapMessage msg,
         Element soapBody,
@@ -519,13 +531,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
         
+        boolean check = true;
         X509TokenPolicyValidator x509Validator = new X509TokenPolicyValidator(msg, results);
-        x509Validator.validatePolicy(aim);
+        check &= x509Validator.validatePolicy(aim);
         
         if (utWithCallbacks) {
             UsernameTokenPolicyValidator utValidator = 
                 new UsernameTokenPolicyValidator(msg, results);
-            utValidator.validatePolicy(aim);
+            check &= utValidator.validatePolicy(aim);
         } else {
             Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
             if (ais != null) {
@@ -537,82 +550,92 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         SamlTokenPolicyValidator samlValidator = 
             new SamlTokenPolicyValidator(soapBody, signedResults, msg, results);
-        samlValidator.validatePolicy(aim);
+        check &= samlValidator.validatePolicy(aim);
         
         SecurityContextTokenPolicyValidator sctValidator = 
             new SecurityContextTokenPolicyValidator(msg, results);
-        sctValidator.validatePolicy(aim);
+        check &= sctValidator.validatePolicy(aim);
         
         WSS11PolicyValidator wss11Validator = new WSS11PolicyValidator(msg, results);
-        wss11Validator.validatePolicy(aim);
+        check &= wss11Validator.validatePolicy(aim);
+        
+        return check;
     }
     
     /**
      * Check the binding coverage
      */
-    private void checkBindingCoverage(
+    private boolean checkBindingCoverage(
         AssertionInfoMap aim, 
         SoapMessage msg,
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
+        boolean check = true;
+        
         TransportBindingPolicyValidator transportValidator = 
             new TransportBindingPolicyValidator(msg, results, signedResults);
-        transportValidator.validatePolicy(aim);
+        check &= transportValidator.validatePolicy(aim);
             
         SymmetricBindingPolicyValidator symmetricValidator = 
             new SymmetricBindingPolicyValidator(msg, results, signedResults);
-        symmetricValidator.validatePolicy(aim);
+        check &= symmetricValidator.validatePolicy(aim);
 
         AsymmetricBindingPolicyValidator asymmetricValidator = 
             new AsymmetricBindingPolicyValidator(msg, results, signedResults);
-        asymmetricValidator.validatePolicy(aim);
+        check &= asymmetricValidator.validatePolicy(aim);
+        
+        return check;
     }
     
     /**
      * Check the supporting token coverage
      */
-    private void checkSupportingTokenCoverage(
+    private boolean checkSupportingTokenCoverage(
         AssertionInfoMap aim,
         SoapMessage msg,
         List<WSSecurityEngineResult> results, 
         List<WSSecurityEngineResult> signedResults, 
         boolean utWithCallbacks
     ) {
+        boolean check = true;
+        
         SignedTokenPolicyValidator suppValidator = 
             new SignedTokenPolicyValidator(msg, results, signedResults);
         suppValidator.setValidateUsernameToken(utWithCallbacks);
-        suppValidator.validatePolicy(aim);
+        check &= suppValidator.validatePolicy(aim);
 
         EndorsingTokenPolicyValidator endorsingValidator = 
             new EndorsingTokenPolicyValidator(msg, results, signedResults);
-        endorsingValidator.validatePolicy(aim);
+        check &= endorsingValidator.validatePolicy(aim);
 
         SignedEndorsingTokenPolicyValidator signedEdorsingValidator = 
             new SignedEndorsingTokenPolicyValidator(msg, results, signedResults);
-        signedEdorsingValidator.validatePolicy(aim);
+        check &= signedEdorsingValidator.validatePolicy(aim);
 
         SignedEncryptedTokenPolicyValidator signedEncryptedValidator = 
             new SignedEncryptedTokenPolicyValidator(msg, results, signedResults);
         signedEncryptedValidator.setValidateUsernameToken(utWithCallbacks);
-        signedEncryptedValidator.validatePolicy(aim);
+        check &= signedEncryptedValidator.validatePolicy(aim);
 
         EncryptedTokenPolicyValidator encryptedValidator = 
             new EncryptedTokenPolicyValidator(msg, results, signedResults);
         encryptedValidator.setValidateUsernameToken(utWithCallbacks);
-        encryptedValidator.validatePolicy(aim);
+        check &= encryptedValidator.validatePolicy(aim);
 
         EndorsingEncryptedTokenPolicyValidator endorsingEncryptedValidator = 
             new EndorsingEncryptedTokenPolicyValidator(msg, results, signedResults);
         endorsingEncryptedValidator.setValidateUsernameToken(utWithCallbacks);
-        endorsingEncryptedValidator.validatePolicy(aim);
+        check &= endorsingEncryptedValidator.validatePolicy(aim);
 
         SignedEndorsingEncryptedTokenPolicyValidator signedEndorsingEncryptedValidator = 
             new SignedEndorsingEncryptedTokenPolicyValidator(msg, results, signedResults);
-        signedEndorsingEncryptedValidator.validatePolicy(aim);
+        check &= signedEndorsingEncryptedValidator.validatePolicy(aim);
+        
+        return check;
     }
     
-    private void assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 
+    private boolean assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, Node header) 
         throws SOAPException {
         
         Collection<AssertionInfo> ais = aim.get(SP12Constants.REQUIRED_PARTS);
@@ -624,6 +647,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     if (header == null 
                         || DOMUtils.getFirstChildWithName((Element)header, h.getQName()) == null) {
                         ai.setNotAsserted("No header element of name " + h.getQName() + " found.");
+                        return false;
                     }
                 }
             }
@@ -647,14 +671,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                                                  XPathConstants.NODESET);
                         if (list.getLength() == 0) {
                             ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                            return false;
                         }
                     } catch (XPathExpressionException e) {
                         ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
+                        return false;
                     }
                 }
             }
         }
         
+        return true;
     }
 
     private boolean isTransportBinding(AssertionInfoMap aim) {
