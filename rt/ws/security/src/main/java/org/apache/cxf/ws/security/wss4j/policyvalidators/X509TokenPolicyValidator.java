@@ -59,26 +59,28 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator {
         AssertionInfoMap aim
     ) {
         Collection<AssertionInfo> x509Ais = aim.get(SP12Constants.X509_TOKEN);
-        if (x509Ais != null && !x509Ais.isEmpty()) {
-            for (AssertionInfo ai : x509Ais) {
-                X509Token x509TokenPolicy = (X509Token)ai.getAssertion();
-                ai.setAsserted(true);
-                
-                if (!isTokenRequired(x509TokenPolicy, message)) {
-                    continue;
-                }
-                
-                if (bstResults.isEmpty()) {
-                    ai.setNotAsserted(
-                        "The received token does not match the token inclusion requirement"
-                    );
-                    return false;
-                }
-                
-                if (!checkTokenType(x509TokenPolicy.getTokenVersionAndType())) {
-                    ai.setNotAsserted("An incorrect X.509 Token Type is detected");
-                    return false;
-                }
+        if (x509Ais == null || x509Ais.isEmpty()) {
+            return true;
+        }
+        
+        for (AssertionInfo ai : x509Ais) {
+            X509Token x509TokenPolicy = (X509Token)ai.getAssertion();
+            ai.setAsserted(true);
+
+            if (!isTokenRequired(x509TokenPolicy, message)) {
+                continue;
+            }
+
+            if (bstResults.isEmpty()) {
+                ai.setNotAsserted(
+                    "The received token does not match the token inclusion requirement"
+                );
+                return false;
+            }
+
+            if (!checkTokenType(x509TokenPolicy.getTokenVersionAndType())) {
+                ai.setNotAsserted("An incorrect X.509 Token Type is detected");
+                return false;
             }
         }
         return true;
