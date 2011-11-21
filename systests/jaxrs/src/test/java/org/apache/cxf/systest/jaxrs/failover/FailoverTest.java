@@ -150,7 +150,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     @Test(expected = ClientWebApplicationException.class)    
     public void testSequentialStrategyFailure() throws Exception {
         FailoverFeature feature = 
-            getFeature(false, false, "http://localhost:8080/non-existent"); 
+            getFeature(false, false, "http://localhost:8182/non-existent"); 
         strategyTest(Server.ADDRESS1, feature, null, null, false, false, false);
     }
 
