@@ -17,8 +17,8 @@
   under the License.
 -->
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
          http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>CXF STS</display-name>
 	<servlet>
@@ -37,5 +37,5 @@
 	<session-config>
 		<session-timeout>60</session-timeout>
 	</session-config>
-	
+        
 </web-app>

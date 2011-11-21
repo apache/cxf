@@ -19,38 +19,38 @@
 
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
 
-	xsi:schemaLocation="
+        xsi:schemaLocation="
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.0.xsd	
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="contextSource" class="org.springframework.ldap.core.support.LdapContextSource">
-		<property name="url" value="ldap://mycompany.com:389" />
-		<property name="userDn"	value="CN=test,OU=svcUID,OU=users,DC=emea,DC=mycompany,DC=com" />
-		<property name="password" value="changeit" />
-	</bean>
-	
-	<bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
-		<constructor-arg ref="contextSource" />
-	</bean>
+        <bean id="contextSource" class="org.springframework.ldap.core.support.LdapContextSource">
+                <property name="url" value="ldap://mycompany.com:389" />
+                <property name="userDn"	value="CN=test,OU=svcUID,OU=users,DC=emea,DC=mycompany,DC=com" />
+                <property name="password" value="changeit" />
+        </bean>
+        
+        <bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
+                <constructor-arg ref="contextSource" />
+        </bean>
 
-	<util:map id="claimsToLdapAttributeMapping">
-		<entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" value="givenName" />
-		<entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" value="sn" />
-		<entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" value="mail" />
-		<entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country" value="c" />
-	</util:map>
-	
-	
-	<bean id="testClaimsHandler" class="org.apache.cxf.sts.claims.LdapClaimsHandler">
-		<property name="ldapTemplate" ref="ldapTemplate" />
-		<property name="claimsLdapAttributeMapping" ref="claimsToLdapAttributeMapping" />
-		<property name="userBaseDN" value="OU=users,DC=emea,DC=mycompany,DC=com" />
-	</bean>
-	
+        <util:map id="claimsToLdapAttributeMapping">
+                <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" value="givenName" />
+                <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" value="sn" />
+                <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" value="mail" />
+                <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country" value="c" />
+        </util:map>
+        
+        
+        <bean id="testClaimsHandler" class="org.apache.cxf.sts.claims.LdapClaimsHandler">
+                <property name="ldapTemplate" ref="ldapTemplate" />
+                <property name="claimsLdapAttributeMapping" ref="claimsToLdapAttributeMapping" />
+                <property name="userBaseDN" value="OU=users,DC=emea,DC=mycompany,DC=com" />
+        </bean>
+        
 </beans>
- 	
+        

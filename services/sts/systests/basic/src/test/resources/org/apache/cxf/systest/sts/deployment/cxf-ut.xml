@@ -42,66 +42,59 @@
     </cxf:bus>
 
     <bean id="utSTSProviderBean"
-		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-		<property name="issueOperation" ref="utIssueDelegate"/>
-		<property name="validateOperation" ref="utValidateDelegate"/>
-	</bean>	
+	    class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+	    <property name="issueOperation" ref="utIssueDelegate" />
+	    <property name="validateOperation" ref="utValidateDelegate" />
+    </bean>
 
-	<bean id="utIssueDelegate"
-		class="org.apache.cxf.sts.operation.TokenIssueOperation">
-		<property name="tokenProviders" ref="utSamlTokenProvider"/>
-		<property name="services" ref="utService"/>
-		<property name="stsProperties" ref="utSTSProperties"/>
+	<bean id="utIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+		<property name="tokenProviders" ref="utSamlTokenProvider" />
+		<property name="services" ref="utService" />
+		<property name="stsProperties" ref="utSTSProperties" />
 	</bean>
-	
-	<bean id="utValidateDelegate"
-	    class="org.apache.cxf.sts.operation.TokenValidateOperation">
-	    <property name="tokenValidators" ref="utSamlTokenValidator"/>
-		<property name="stsProperties" ref="utSTSProperties"/>
+
+	<bean id="utValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+		<property name="tokenValidators" ref="utSamlTokenValidator" />
+		<property name="stsProperties" ref="utSTSProperties" />
 	</bean>
-	
-	<bean id="utSamlTokenProvider"
-		class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-    </bean>
-    
-    <bean id="utSamlTokenValidator"
-		class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-    </bean>
-    
-    <bean id="utService"
-        class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="utEndpoints"/>
-    </bean>
-    
-    <util:list id="utEndpoints">
-		<value>http://localhost:(\d)*/(doubleit|metrowsp)/services/doubleit(UT|.*symmetric.*|.*)</value>
+
+	<bean id="utSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+	</bean>
+
+	<bean id="utSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+	</bean>
+
+	<bean id="utService" class="org.apache.cxf.sts.service.StaticService">
+		<property name="endpoints" ref="utEndpoints" />
+	</bean>
+
+	<util:list id="utEndpoints">
+		<value>http://localhost:(\d)*/(doubleit|metrowsp)/services/doubleit(UT|.*symmetric.*|.*)
+		</value>
 	</util:list>
-	
-	<bean id="utSTSProperties"
-	     class="org.apache.cxf.sts.StaticSTSProperties">
-	    <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
-		<property name="signatureUsername" value="mystskey"/>
-		<property name="callbackHandlerClass" 
-		          value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-		<property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
-		<property name="issuer" value="DoubleItSTSIssuer"/>
-		<property name="encryptionUsername" value="myservicekey"/>
-    </bean>
-    
-	<jaxws:endpoint id="UTSTS"
-		implementor="#utSTSProviderBean"
-		address="http://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/UT" 
-        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
-        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-        serviceName="ns1:SecurityTokenService"
-        endpointName="ns1:UT_Port">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" 
-                   value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
-        </jaxws:properties> 
+
+	<bean id="utSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
+		<property name="signatureUsername" value="mystskey" />
+		<property name="callbackHandlerClass"
+			value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
+		<property name="issuer" value="DoubleItSTSIssuer" />
+		<property name="encryptionUsername" value="myservicekey" />
+	</bean>
+
+	<jaxws:endpoint id="UTSTS" implementor="#utSTSProviderBean"
+		address="http://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/UT"
+		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+		serviceName="ns1:SecurityTokenService" endpointName="ns1:UT_Port">
+		<jaxws:properties>
+			<entry key="ws-security.callback-handler"
+				value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+			<entry key="ws-security.signature.properties" value="stsKeystore.properties" />
+		</jaxws:properties>
 	</jaxws:endpoint>
-	
+        
 
 </beans>
 

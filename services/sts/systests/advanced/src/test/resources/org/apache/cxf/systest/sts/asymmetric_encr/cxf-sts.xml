@@ -42,62 +42,57 @@
     </cxf:bus>
 
     <bean id="x509STSProviderBean"
-		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-		<property name="issueOperation" ref="x509IssueDelegate"/>
-	</bean>	
+	    class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+	    <property name="issueOperation" ref="x509IssueDelegate" />
+    </bean>
 
-	<bean id="x509IssueDelegate"
-		class="org.apache.cxf.sts.operation.TokenIssueOperation">
-		<property name="tokenProviders" ref="x509SamlTokenProvider"/>
-		<property name="services" ref="x509Service"/>
-		<property name="stsProperties" ref="x509STSProperties"/>
-		<property name="encryptIssuedToken" value="true"/>
+	<bean id="x509IssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+		<property name="tokenProviders" ref="x509SamlTokenProvider" />
+		<property name="services" ref="x509Service" />
+		<property name="stsProperties" ref="x509STSProperties" />
+		<property name="encryptIssuedToken" value="true" />
 	</bean>
-	
-	<bean id="x509SamlTokenProvider"
-		class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-    </bean>
-    
-    <bean id="x509Service"
-        class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="x509Endpoints"/>
-        <property name="encryptionProperties" ref="encProperties"/>
-    </bean>
-    
-    <util:list id="x509Endpoints">
-		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*</value>
+
+	<bean id="x509SamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+	</bean>
+
+	<bean id="x509Service" class="org.apache.cxf.sts.service.StaticService">
+		<property name="endpoints" ref="x509Endpoints" />
+		<property name="encryptionProperties" ref="encProperties" />
+	</bean>
+
+	<util:list id="x509Endpoints">
+		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
+		</value>
 	</util:list>
-	
+
 	<bean id="encProperties" class="org.apache.cxf.sts.service.EncryptionProperties">
-        <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
-    </bean>
-	
-	<bean id="x509STSProperties"
-	     class="org.apache.cxf.sts.StaticSTSProperties">
-	    <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
-		<property name="signatureUsername" value="mystskey"/>
-		<property name="callbackHandlerClass" 
-		          value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-		<property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
-		<property name="issuer" value="DoubleItSTSIssuer"/>
-		<property name="encryptionUsername" value="useReqSigCert"/>
-    </bean>
-    
-	<jaxws:endpoint id="X509STS"
-		implementor="#x509STSProviderBean"
-		address="http://localhost:${testutil.ports.STSServer}/SecurityTokenService/X509" 
-        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/asymmetric_encr/ws-trust-1.4-service.wsdl"
-        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-        serviceName="ns1:SecurityTokenService"
-        endpointName="ns1:X509_Port">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" 
-                   value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
-            <entry key="ws-security.signature.username" value="mystskey"/>
-        </jaxws:properties> 
+		<property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
+	</bean>
+
+	<bean id="x509STSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
+		<property name="signatureUsername" value="mystskey" />
+		<property name="callbackHandlerClass"
+			value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
+		<property name="issuer" value="DoubleItSTSIssuer" />
+		<property name="encryptionUsername" value="useReqSigCert" />
+	</bean>
+
+	<jaxws:endpoint id="X509STS" implementor="#x509STSProviderBean"
+		address="http://localhost:${testutil.ports.STSServer}/SecurityTokenService/X509"
+		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/asymmetric_encr/ws-trust-1.4-service.wsdl"
+		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+		serviceName="ns1:SecurityTokenService" endpointName="ns1:X509_Port">
+		<jaxws:properties>
+			<entry key="ws-security.callback-handler"
+				value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+			<entry key="ws-security.signature.properties" value="stsKeystore.properties" />
+			<entry key="ws-security.signature.username" value="mystskey" />
+		</jaxws:properties>
 	</jaxws:endpoint>
-	
+        
 
 </beans>
 

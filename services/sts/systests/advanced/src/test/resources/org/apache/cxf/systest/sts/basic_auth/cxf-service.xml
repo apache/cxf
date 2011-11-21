@@ -91,12 +91,12 @@
    </bean> 
 
    <bean id="stsclient" class="org.apache.cxf.ws.security.trust.STSClient">
-	<constructor-arg ref="cxf"/>
-	<property name="wsdlLocation" 
-	          value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport?wsdl"/>
-	<property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
-	<property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
-	<property name="properties">
+        <constructor-arg ref="cxf"/>
+        <property name="wsdlLocation" 
+                  value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport?wsdl"/>
+        <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+        <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+        <property name="properties">
         <map>
             <entry key="ws-security.username" value="bob"/>
             <entry key="ws-security.callback-handler" 

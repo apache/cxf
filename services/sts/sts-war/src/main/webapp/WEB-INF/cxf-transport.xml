@@ -39,81 +39,73 @@
         </cxf:features>
     </cxf:bus>
 
-    <bean id="transportSTSProviderBean"
+	<bean id="transportSTSProviderBean"
 		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-		<property name="issueOperation" ref="transportIssueDelegate"/>
-		<property name="validateOperation" ref="transportValidateDelegate"/>
-	</bean>	
+		<property name="issueOperation" ref="transportIssueDelegate" />
+		<property name="validateOperation" ref="transportValidateDelegate" />
+	</bean>
 
-	<bean id="transportIssueDelegate"
-		class="org.apache.cxf.sts.operation.TokenIssueOperation">
-		<property name="tokenProviders" ref="transportTokenProviders"/>
-		<property name="services" ref="transportService"/>
-		<property name="stsProperties" ref="transportSTSProperties"/>
+	<bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+		<property name="tokenProviders" ref="transportTokenProviders" />
+		<property name="services" ref="transportService" />
+		<property name="stsProperties" ref="transportSTSProperties" />
 	</bean>
-	
-	<bean id="transportValidateDelegate"
-	    class="org.apache.cxf.sts.operation.TokenValidateOperation">
-	    <property name="tokenValidators" ref="transportTokenValidators"/>
-		<property name="stsProperties" ref="transportSTSProperties"/>
+
+	<bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+		<property name="tokenValidators" ref="transportTokenValidators" />
+		<property name="stsProperties" ref="transportSTSProperties" />
 	</bean>
-	
+
 	<util:list id="transportTokenProviders">
-		<ref bean="transportSamlTokenProvider"/>
+		<ref bean="transportSamlTokenProvider" />
 	</util:list>
-	
+
 	<util:list id="transportTokenValidators">
-		<ref bean="transportSamlTokenValidator"/>
-		<ref bean="transportX509TokenValidator"/>
-		<ref bean="transportUsernameTokenValidator"/>
+		<ref bean="transportSamlTokenValidator" />
+		<ref bean="transportX509TokenValidator" />
+		<ref bean="transportUsernameTokenValidator" />
 	</util:list>
-	
-    <bean id="transportSamlTokenProvider"
-		class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-    </bean>
-    
-    <bean id="transportX509TokenValidator"
-		class="org.apache.cxf.sts.token.validator.X509TokenValidator">
-    </bean>
-    
-    <bean id="transportUsernameTokenValidator"
+
+	<bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+	</bean>
+
+	<bean id="transportX509TokenValidator" class="org.apache.cxf.sts.token.validator.X509TokenValidator">
+	</bean>
+
+	<bean id="transportUsernameTokenValidator"
 		class="org.apache.cxf.sts.token.validator.UsernameTokenValidator">
-    </bean>
-    
-    <bean id="transportSamlTokenValidator"
-		class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-    </bean>
-    
-    <bean id="transportService"
-        class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="transportEndpoints"/>
-    </bean>
-    
-    <util:list id="transportEndpoints">
-		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*</value>
+	</bean>
+
+	<bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+	</bean>
+
+	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
+		<property name="endpoints" ref="transportEndpoints" />
+	</bean>
+
+	<util:list id="transportEndpoints">
+		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
+		</value>
 	</util:list>
-	
-	<bean id="transportSTSProperties"
-	     class="org.apache.cxf.sts.StaticSTSProperties">
-	    <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
-		<property name="signatureUsername" value="mystskey"/>
-		<property name="callbackHandlerClass" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
-		<property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
-		<property name="issuer" value="DoubleItSTSIssuer"/>
-		<property name="encryptionUsername" value="myservicekey"/>
-    </bean>
-    
-	<jaxws:endpoint id="transportSTS"
-		implementor="#transportSTSProviderBean"
-		address="/Transport" 
-        wsdlLocation="/WEB-INF/wsdl/ws-trust-1.4-service.wsdl"
-        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-        serviceName="ns1:SecurityTokenService"
-        endpointName="ns1:Transport_Port">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
-        </jaxws:properties> 
+
+	<bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
+		<property name="signatureUsername" value="mystskey" />
+		<property name="callbackHandlerClass"
+			value="org.apache.cxf.sts.war.PasswordCallbackHandler" />
+		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
+		<property name="issuer" value="DoubleItSTSIssuer" />
+		<property name="encryptionUsername" value="myservicekey" />
+	</bean>
+
+	<jaxws:endpoint id="transportSTS" implementor="#transportSTSProviderBean"
+		address="/Transport" wsdlLocation="/WEB-INF/wsdl/ws-trust-1.4-service.wsdl"
+		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+		serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
+		<jaxws:properties>
+			<entry key="ws-security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler" />
+		</jaxws:properties>
 	</jaxws:endpoint>
-	
+        
 </beans>
 

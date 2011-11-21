@@ -48,176 +48,163 @@
         </cxf:features>
     </cxf:bus>
 
-    <bean id="transportSTSProviderBean"
+	<bean id="transportSTSProviderBean"
 		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-		<property name="issueOperation" ref="transportIssueDelegate"/>
-		<property name="validateOperation" ref="transportValidateDelegate"/>
-	</bean>	
+		<property name="issueOperation" ref="transportIssueDelegate" />
+		<property name="validateOperation" ref="transportValidateDelegate" />
+	</bean>
 
-	<bean id="transportIssueDelegate"
-		class="org.apache.cxf.sts.operation.TokenIssueOperation">
-		<property name="tokenProviders" ref="transportTokenProviders"/>
-		<property name="services" ref="transportService"/>
-		<property name="stsProperties" ref="transportSTSProperties"/>
-		<property name="claimsManager" ref="claimsManager"/>
-		<property name="tokenStore" ref="defaultTokenStore"/>
+	<bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+		<property name="tokenProviders" ref="transportTokenProviders" />
+		<property name="services" ref="transportService" />
+		<property name="stsProperties" ref="transportSTSProperties" />
+		<property name="claimsManager" ref="claimsManager" />
+		<property name="tokenStore" ref="defaultTokenStore" />
 	</bean>
-	
-	<bean id="transportValidateDelegate"
-	    class="org.apache.cxf.sts.operation.TokenValidateOperation">
-	    <property name="tokenProviders" ref="transportTokenProviders"/>
-	    <property name="tokenValidators" ref="transportTokenValidators"/>
-		<property name="stsProperties" ref="transportSTSProperties"/>
-		<property name="tokenStore" ref="defaultTokenStore"/>
+
+	<bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+		<property name="tokenProviders" ref="transportTokenProviders" />
+		<property name="tokenValidators" ref="transportTokenValidators" />
+		<property name="stsProperties" ref="transportSTSProperties" />
+		<property name="tokenStore" ref="defaultTokenStore" />
 	</bean>
-	
-	<bean id="defaultTokenStore"
-        class="org.apache.cxf.sts.cache.DefaultInMemoryTokenStore">
-    </bean>
-	
+
+	<bean id="defaultTokenStore" class="org.apache.cxf.sts.cache.DefaultInMemoryTokenStore">
+	</bean>
+
 	<util:list id="transportTokenProviders">
-		<ref bean="transportSamlTokenProvider"/>
-		<ref bean="transportCustomBSTTokenProvider"/>
+		<ref bean="transportSamlTokenProvider" />
+		<ref bean="transportCustomBSTTokenProvider" />
 	</util:list>
-	
+
 	<util:list id="transportTokenValidators">
-		<ref bean="transportSamlTokenValidator"/>
-		<ref bean="transportX509TokenValidator"/>
-		<ref bean="transportUsernameTokenValidator"/>
-		<ref bean="transportCustomBSTTokenValidator"/>
+		<ref bean="transportSamlTokenValidator" />
+		<ref bean="transportX509TokenValidator" />
+		<ref bean="transportUsernameTokenValidator" />
+		<ref bean="transportCustomBSTTokenValidator" />
 	</util:list>
-	
+
 	<bean id="transportCustomBSTTokenProvider"
 		class="org.apache.cxf.systest.sts.deployment.CustomBSTTokenProvider">
-    </bean>
-	
-    <bean id="transportSamlTokenProvider"
-		class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+	</bean>
+
+	<bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
 		<property name="attributeStatementProviders" ref="attributeStatementProvidersList" />
-    </bean>
-    
-    <util:list id="attributeStatementProvidersList">
-    	<ref bean="defaultAttributeProvider"/>
-		<ref bean="customAttributeProvider"/>
+	</bean>
+
+	<util:list id="attributeStatementProvidersList">
+		<ref bean="defaultAttributeProvider" />
+		<ref bean="customAttributeProvider" />
 	</util:list>
-    
-    <bean id="defaultAttributeProvider"
+
+	<bean id="defaultAttributeProvider"
 		class="org.apache.cxf.sts.token.provider.DefaultAttributeStatementProvider">
-    </bean>
-    
-    <bean id="customAttributeProvider"
+	</bean>
+
+	<bean id="customAttributeProvider"
 		class="org.apache.cxf.systest.sts.deployment.CustomAttributeStatementProvider">
-    </bean>
-    
-    <bean id="claimsManager"
-		class="org.apache.cxf.sts.claims.ClaimsManager">
+	</bean>
+
+	<bean id="claimsManager" class="org.apache.cxf.sts.claims.ClaimsManager">
 		<property name="claimHandlers" ref="claimHandlerList" />
-    </bean>
-    
-    <util:list id="claimHandlerList">
-		<ref bean="customClaimsHandler"/>
+	</bean>
+
+	<util:list id="claimHandlerList">
+		<ref bean="customClaimsHandler" />
 	</util:list>
-    
-    <bean id="customClaimsHandler"
+
+	<bean id="customClaimsHandler"
 		class="org.apache.cxf.systest.sts.deployment.CustomClaimsHandler">
-    </bean>
-            
-    <bean id="transportCustomBSTTokenValidator"
+	</bean>
+
+	<bean id="transportCustomBSTTokenValidator"
 		class="org.apache.cxf.systest.sts.deployment.CustomBSTTokenValidator">
-    </bean>
-    
-    <bean id="transportX509TokenValidator"
-		class="org.apache.cxf.sts.token.validator.X509TokenValidator">
-    </bean>
-    
-    <bean id="transportUsernameTokenValidator"
+	</bean>
+
+	<bean id="transportX509TokenValidator" class="org.apache.cxf.sts.token.validator.X509TokenValidator">
+	</bean>
+
+	<bean id="transportUsernameTokenValidator"
 		class="org.apache.cxf.sts.token.validator.UsernameTokenValidator">
-    </bean>
-    
-    <bean id="transportSamlTokenValidator"
-		class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-    </bean>
-    
-    <bean id="transportService"
-        class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="transportEndpoints"/>
-    </bean>
-    
-    <util:list id="transportEndpoints">
-		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*</value>
+	</bean>
+
+	<bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+	</bean>
+
+	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
+		<property name="endpoints" ref="transportEndpoints" />
+	</bean>
+
+	<util:list id="transportEndpoints">
+		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
+		</value>
 	</util:list>
-	
-	<bean id="transportSTSProperties"
-	     class="org.apache.cxf.sts.StaticSTSProperties">
-	    <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
-		<property name="signatureUsername" value="mystskey"/>
-		<property name="callbackHandlerClass" 
-		          value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-		<property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
-		<property name="issuer" value="DoubleItSTSIssuer"/>
-		<property name="encryptionUsername" value="myservicekey"/>
-    </bean>
-    
-	<jaxws:endpoint id="localSTS"
-		implementor="#transportSTSProviderBean"
-		address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport" 
-        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
-        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-        depends-on="ClientAuthHttpsSettings"
-        serviceName="ns1:SecurityTokenService"
-        endpointName="ns1:Transport_Port">
-   </jaxws:endpoint>
-   
-   <jaxws:endpoint id="localSoap12STS"
-        implementor="#transportSTSProviderBean"
-        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportSoap12" 
-        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
-        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-        depends-on="ClientAuthHttpsSettings"
-        serviceName="ns1:SecurityTokenService"
-        endpointName="ns1:Transport_Soap12_Port">
-   </jaxws:endpoint>
-   
-   <bean id="kerberosValidator"
-        class="org.apache.ws.security.validate.KerberosTokenValidator">
-        <property name="jaasLoginModuleName" value="bob"/>
-        <property name="serviceName" value="bob@service.ws.apache.org"/>
-   </bean> 
-   
-   <jaxws:endpoint id="localKerberosSTS"
-        implementor="#transportSTSProviderBean"
-        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Kerberos" 
-        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
-        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-        depends-on="ClientAuthHttpsSettings"
-        serviceName="ns1:SecurityTokenService"
-        endpointName="ns1:Transport_Kerberos_Port">
-        <jaxws:properties>
-            <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
-        </jaxws:properties> 
-   </jaxws:endpoint>
-   
-   <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-      <httpj:engine port="${testutil.ports.STSServer}">
-      <httpj:tlsServerParameters>
-        <sec:trustManagers>
-          <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
-        </sec:trustManagers>
-        <sec:keyManagers keyPassword="stskpass">
-           <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
-        </sec:keyManagers>
-        <sec:cipherSuitesFilter>
-          <sec:include>.*_EXPORT_.*</sec:include>
-          <sec:include>.*_EXPORT1024_.*</sec:include>
-          <sec:include>.*_WITH_DES_.*</sec:include>
-          <sec:include>.*_WITH_AES_.*</sec:include>
-          <sec:include>.*_WITH_NULL_.*</sec:include>
-          <sec:exclude>.*_DH_anon_.*</sec:exclude>
-        </sec:cipherSuitesFilter>
-        <sec:clientAuthentication want="true" required="true"/>
-      </httpj:tlsServerParameters>
-     </httpj:engine>
-   </httpj:engine-factory>
+
+	<bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
+		<property name="signatureUsername" value="mystskey" />
+		<property name="callbackHandlerClass"
+			value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
+		<property name="issuer" value="DoubleItSTSIssuer" />
+		<property name="encryptionUsername" value="myservicekey" />
+	</bean>
+
+	<jaxws:endpoint id="localSTS" implementor="#transportSTSProviderBean"
+		address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport"
+		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+		depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService"
+		endpointName="ns1:Transport_Port">
+	</jaxws:endpoint>
+
+	<jaxws:endpoint id="localSoap12STS" implementor="#transportSTSProviderBean"
+		address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportSoap12"
+		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+		depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService"
+		endpointName="ns1:Transport_Soap12_Port">
+	</jaxws:endpoint>
+
+	<bean id="kerberosValidator" class="org.apache.ws.security.validate.KerberosTokenValidator">
+		<property name="jaasLoginModuleName" value="bob" />
+		<property name="serviceName" value="bob@service.ws.apache.org" />
+	</bean>
+
+	<jaxws:endpoint id="localKerberosSTS" implementor="#transportSTSProviderBean"
+		address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Kerberos"
+		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+		depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService"
+		endpointName="ns1:Transport_Kerberos_Port">
+		<jaxws:properties>
+			<entry key="ws-security.bst.validator" value-ref="kerberosValidator" />
+		</jaxws:properties>
+	</jaxws:endpoint>
+
+	<httpj:engine-factory id="ClientAuthHttpsSettings"
+		bus="cxf">
+		<httpj:engine port="${testutil.ports.STSServer}">
+			<httpj:tlsServerParameters>
+				<sec:trustManagers>
+					<sec:keyStore type="jks" password="stsspass" resource="stsstore.jks" />
+				</sec:trustManagers>
+				<sec:keyManagers keyPassword="stskpass">
+					<sec:keyStore type="jks" password="stsspass" resource="stsstore.jks" />
+				</sec:keyManagers>
+				<sec:cipherSuitesFilter>
+					<sec:include>.*_EXPORT_.*</sec:include>
+					<sec:include>.*_EXPORT1024_.*</sec:include>
+					<sec:include>.*_WITH_DES_.*</sec:include>
+					<sec:include>.*_WITH_AES_.*</sec:include>
+					<sec:include>.*_WITH_NULL_.*</sec:include>
+					<sec:exclude>.*_DH_anon_.*</sec:exclude>
+				</sec:cipherSuitesFilter>
+				<sec:clientAuthentication want="true"
+					required="true" />
+			</httpj:tlsServerParameters>
+		</httpj:engine>
+	</httpj:engine-factory>
    
 </beans>
 
