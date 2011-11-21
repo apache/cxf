@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
@@ -519,7 +518,7 @@ public class RMTxStoreTest extends Assert {
         
         return sid;
     }
-
+    /*
     private void verifyDestinationSequence(String s, DestinationSequence seq) {
         Identifier sid = seq.getIdentifier();
         assertNotNull(sid);
@@ -553,7 +552,7 @@ public class RMTxStoreTest extends Assert {
             assertTrue(seq.isLastMessage());
         }
     }
-    
+
     private void verifyAcknowledgementRanges(List<SequenceAcknowledgement.AcknowledgementRange> ranges, 
                                              long[] values) {
         assertNotNull(ranges);
@@ -565,7 +564,7 @@ public class RMTxStoreTest extends Assert {
             assertEquals(values[v++], (long)range.getUpper().longValue());   
         }
     }
-    
+    */    
     private void setupMessage(Identifier sid, BigInteger mn, String to, boolean outbound) 
         throws IOException, SQLException  {
         RMMessage msg = control.createMock(RMMessage.class);

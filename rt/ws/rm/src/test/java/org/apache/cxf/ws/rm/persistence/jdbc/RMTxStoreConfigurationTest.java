@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
+import java.sql.SQLException;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.rm.RMManager;
@@ -46,4 +48,16 @@ public class RMTxStoreConfigurationTest extends Assert {
         assertEquals("jdbc:derby://localhost:1527/rmdb;create=true", store.getUrl());
     }
    
+    @Test
+    public void testSetCustomTableExistsState() {
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-custom-error-bean.xml");
+        RMManager manager = bus.getExtension(RMManager.class);
+        assertNotNull(manager);
+        RMTxStore store = (RMTxStore)manager.getStore();
+                
+        assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288)));
+        
+        assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1)));
+    }
 }
