@@ -56,8 +56,8 @@ public class RMTxStoreConfigurationTest extends Assert {
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
                 
-        assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288, null)));
+        assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288)));
         
-        assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1, null)));
+        assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1)));
     }
 }
