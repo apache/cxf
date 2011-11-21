@@ -148,6 +148,9 @@ public class RMTxStore implements RMStore {
     private String userName;
     private String password;
     
+    private String tableExistsState = DERBY_TABLE_EXISTS_STATE;
+    private int tableExistsCode = ORACLE_TABLE_EXISTS_CODE;
+    
     // configuration
     
     public void setDriverClassName(String dcn) {
@@ -182,6 +185,22 @@ public class RMTxStore implements RMStore {
         return userName;
     }
    
+    public String getTableExistsState() {
+        return tableExistsState;
+    }
+
+    public void setTableExistsState(String tableExistsState) {
+        this.tableExistsState = tableExistsState;
+    }
+
+    public int getTableExistsCode() {
+        return tableExistsCode;
+    }
+
+    public void setTableExistsCode(int tableExistsCode) {
+        this.tableExistsCode = tableExistsCode;
+    }
+
     public void setConnection(Connection c) {
         connection = c;
     }
@@ -742,8 +761,9 @@ public class RMTxStore implements RMStore {
     }
 
     protected boolean isTableExistsError(SQLException ex) {
-        return DERBY_TABLE_EXISTS_STATE.equals(ex.getSQLState())
-                || ORACLE_TABLE_EXISTS_CODE == ex.getErrorCode();
+        // we could be deriving the state/code from the driver url to avoid explicit setting of them
+        return (null != tableExistsState && tableExistsState.equals(ex.getSQLState()))
+                || tableExistsCode == ex.getErrorCode();
     }
 
 
