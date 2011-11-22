@@ -30,7 +30,7 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
     
 	<bean id="clientFactory" class="org.apache.cxf.frontend.ClientProxyFactoryBean">
 	  <property name="serviceClass" value="demo.spring.HelloWorld"/>
-	  <property name="address" value="http://localhost:9002/HelloWorld"/>
+	  <property name="address" value="http://localhost:9002/services/HelloWorld"/>
 	</bean>
 	  
 </beans>

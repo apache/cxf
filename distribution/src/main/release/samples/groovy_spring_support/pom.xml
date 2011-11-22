@@ -55,26 +55,8 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-transform</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/main/java/demo/spring/HelloWorldImpl.groovy" todir="${basedir}/target/classes/demo/spring" />
-                                <copy file="${basedir}/src/main/java/demo/spring/HelloWorld.groovy" todir="${basedir}/target/classes/demo/spring" />
-                                <copy file="${basedir}/src/main/java/demo/spring/client/client-beans.xml" todir="${basedir}/target/classes/demo/spring/client" />
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
+        <finalName>GroovySpringSupport</finalName>
     </build>
     <profiles>
         <profile>
