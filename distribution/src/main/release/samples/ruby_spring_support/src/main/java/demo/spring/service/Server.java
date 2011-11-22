@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package demo.spring.servlet;
+package demo.spring.service;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -46,7 +46,7 @@ public class Server {
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/");
 
-        webappcontext.setWar("webapp");
+        webappcontext.setWar("target/RubySpringSupport.war");
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});

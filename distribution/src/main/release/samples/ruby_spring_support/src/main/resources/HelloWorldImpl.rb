@@ -17,7 +17,7 @@
 
 require 'java'
 
-include_class 'demo.spring.HelloWorld'
+include_class 'demo.spring.service.HelloWorld'
 
 class HelloWorldImpl
   

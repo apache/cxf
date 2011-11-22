@@ -30,10 +30,10 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml" />
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-    <lang:jruby id="helloworldImpl" script-source="classpath:demo/spring/HelloWorldImpl.rb" script-interfaces="demo.spring.HelloWorld" scope="prototype">
+    <lang:jruby id="helloworldImpl" script-source="classpath:HelloWorldImpl.rb" script-interfaces="demo.spring.service.HelloWorld" scope="prototype">
     </lang:jruby>
 
-    <simple:server id="pojoservice"  serviceClass="demo.spring.HelloWorld"  address="/HelloWorld">
+    <simple:server id="pojoservice"  serviceClass="demo.spring.service.HelloWorld"  address="/HelloWorld">
 
         <simple:serviceBean>
             <ref bean="helloworldImpl" />
