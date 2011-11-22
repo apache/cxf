@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -35,35 +37,29 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
- * Validate a WSSecurityEngineResult corresponding to the processing of an X.509 Token
- * against the appropriate policy.
+ * Validate an X509 Token policy.
  */
-public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator {
+public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
     
     private static final String X509_V3_VALUETYPE = WSConstants.X509TOKEN_NS + "#X509v3";
     private static final String PKI_VALUETYPE = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
     
-    private List<WSSecurityEngineResult> bstResults;
-    private Message message;
-
-    public X509TokenPolicyValidator(
-        Message message,
-        List<WSSecurityEngineResult> results
-    ) {
-        this.message = message;
-        bstResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST, bstResults);
-    }
-    
     public boolean validatePolicy(
-        AssertionInfoMap aim
+        AssertionInfoMap aim,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> x509Ais = aim.get(SP12Constants.X509_TOKEN);
-        if (x509Ais == null || x509Ais.isEmpty()) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.X509_TOKEN);
+        if (ais == null || ais.isEmpty()) {
             return true;
         }
         
-        for (AssertionInfo ai : x509Ais) {
+        List<WSSecurityEngineResult> bstResults = new ArrayList<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST, bstResults);
+        
+        for (AssertionInfo ai : ais) {
             X509Token x509TokenPolicy = (X509Token)ai.getAssertion();
             ai.setAsserted(true);
 
@@ -78,7 +74,7 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator {
                 return false;
             }
 
-            if (!checkTokenType(x509TokenPolicy.getTokenVersionAndType())) {
+            if (!checkTokenType(x509TokenPolicy.getTokenVersionAndType(), bstResults)) {
                 ai.setNotAsserted("An incorrect X.509 Token Type is detected");
                 return false;
             }
@@ -86,22 +82,30 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator {
         return true;
     }
     
-    private boolean checkTokenType(String requiredVersionAndType) {
-        if (!bstResults.isEmpty()) {
-            String requiredType = X509_V3_VALUETYPE;
-            if (SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10.equals(requiredType)
-                || SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11.equals(requiredType)) {
-                requiredType = PKI_VALUETYPE;
-            }
-            
-            for (WSSecurityEngineResult result : bstResults) {
-                BinarySecurity binarySecurityToken = 
-                    (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                if (binarySecurityToken != null) {
-                    String type = binarySecurityToken.getValueType();
-                    if (requiredType.equals(type)) {
-                        return true;
-                    }
+    /**
+     * Check that at least one received token matches the token type.
+     */
+    private boolean checkTokenType(
+        String requiredVersionAndType,
+        List<WSSecurityEngineResult> bstResults
+    ) {
+        if (bstResults.isEmpty()) {
+            return false;
+        }
+
+        String requiredType = X509_V3_VALUETYPE;
+        if (SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10.equals(requiredType)
+            || SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11.equals(requiredType)) {
+            requiredType = PKI_VALUETYPE;
+        }
+
+        for (WSSecurityEngineResult result : bstResults) {
+            BinarySecurity binarySecurityToken = 
+                (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+            if (binarySecurityToken != null) {
+                String type = binarySecurityToken.getValueType();
+                if (requiredType.equals(type)) {
+                    return true;
                 }
             }
         }

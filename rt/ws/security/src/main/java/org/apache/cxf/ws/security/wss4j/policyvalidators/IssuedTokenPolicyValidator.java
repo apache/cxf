@@ -40,7 +40,7 @@ import org.opensaml.common.SAMLVersion;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a SAML Assertion
- * against an IssuedToken policy.
+ * or Kerberos token against an IssuedToken policy.
  */
 public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     
@@ -56,70 +56,73 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     }
     
     public boolean validatePolicy(
-        Collection<AssertionInfo> issuedAis,
+        Collection<AssertionInfo> ais,
         AssertionWrapper assertionWrapper
     ) {
-        if (issuedAis != null) {
-            for (AssertionInfo ai : issuedAis) {
-                IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
-                ai.setAsserted(true);
-                
-                boolean tokenRequired = isTokenRequired(issuedToken, message);
-                if (tokenRequired && assertionWrapper == null) {
-                    ai.setNotAsserted(
-                        "The received token does not match the token inclusion requirement"
-                    );
-                    return false;
-                }
-                if (!tokenRequired) {
-                    continue;
-                }
-                
-                Element template = issuedToken.getRstTemplate();
-                if (template != null && !checkIssuedTokenTemplate(template, assertionWrapper)) {
-                    ai.setNotAsserted("Error in validating the IssuedToken policy");
-                    return false;
-                }
-                
-                TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-                Certificate[] tlsCerts = null;
-                if (tlsInfo != null) {
-                    tlsCerts = tlsInfo.getPeerCertificates();
-                }
-                if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
-                    ai.setNotAsserted("Assertion fails holder-of-key requirements");
-                    return false;
-                }
+        if (ais == null || ais.isEmpty()) {
+            return true;
+        }
+        
+        for (AssertionInfo ai : ais) {
+            IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
+            ai.setAsserted(true);
+
+            if (!isTokenRequired(issuedToken, message)) {
+                continue;
+            }
+            
+            if (assertionWrapper == null) {
+                ai.setNotAsserted(
+                    "The received token does not match the token inclusion requirement"
+                );
+                return false;
+            }
+
+            Element template = issuedToken.getRstTemplate();
+            if (template != null && !checkIssuedTokenTemplate(template, assertionWrapper)) {
+                ai.setNotAsserted("Error in validating the IssuedToken policy");
+                return false;
+            }
+
+            TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+            Certificate[] tlsCerts = null;
+            if (tlsInfo != null) {
+                tlsCerts = tlsInfo.getPeerCertificates();
+            }
+            if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
+                ai.setNotAsserted("Assertion fails holder-of-key requirements");
+                return false;
             }
         }
         return true;
     }
     
     public boolean validatePolicy(
-        Collection<AssertionInfo> issuedAis,
+        Collection<AssertionInfo> ais,
         BinarySecurity binarySecurityToken
     ) {
-        if (issuedAis != null) {
-            for (AssertionInfo ai : issuedAis) {
-                IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
-                ai.setAsserted(true);
+        if (ais == null || ais.isEmpty()) {
+            return true;
+        }
+        
+        for (AssertionInfo ai : ais) {
+            IssuedToken issuedToken = (IssuedToken)ai.getAssertion();
+            ai.setAsserted(true);
 
-                boolean tokenRequired = isTokenRequired(issuedToken, message);
-                if (tokenRequired && binarySecurityToken == null) {
-                    ai.setNotAsserted(
-                        "The received token does not match the token inclusion requirement"
-                    );
-                    return false;
-                }
-                if (!tokenRequired) {
-                    continue;
-                }
+            if (!isTokenRequired(issuedToken, message)) {
+                continue;
+            }
+            if (binarySecurityToken == null) {
+                ai.setNotAsserted(
+                    "The received token does not match the token inclusion requirement"
+                );
+                return false;
+            }
 
-                Element template = issuedToken.getRstTemplate();
-                if (template != null && !checkIssuedTokenTemplate(template, binarySecurityToken)) {
-                    ai.setNotAsserted("Error in validating the IssuedToken policy");
-                    return false;
-                }
+            Element template = issuedToken.getRstTemplate();
+            if (template != null && !checkIssuedTokenTemplate(template, binarySecurityToken)) {
+                ai.setNotAsserted("Error in validating the IssuedToken policy");
+                return false;
             }
         }
         return true;

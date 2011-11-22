@@ -26,6 +26,10 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
+import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.saml.SAMLKeyInfo;
@@ -36,6 +40,33 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
  * Some abstract functionality for validating SAML Assertions
  */
 public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyValidator {
+    
+    /**
+     * Check to see if a token is required or not.
+     * @param token the token
+     * @param message The message
+     * @return true if the token is required
+     */
+    protected boolean isTokenRequired(
+        Token token,
+        Message message
+    ) {
+        IncludeTokenType inclusion = token.getInclusion();
+        if (inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
+            return false;
+        } else if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
+            return true;
+        } else {
+            boolean initiator = MessageUtils.isRequestor(message);
+            if (initiator && (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR)) {
+                return true;
+            } else if (!initiator && (inclusion == IncludeTokenType.INCLUDE_TOKEN_ONCE
+                || inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT)) {
+                return true;
+            }
+            return false;
+        }
+    }
     
     /**
      * Check the holder-of-key requirements against the received assertion. The subject
