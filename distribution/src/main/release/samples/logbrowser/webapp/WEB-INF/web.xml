@@ -1,41 +1,34 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
-
 <!--
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements. See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership. The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License. You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
-	
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied. See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership. The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations
+    under the License.
 -->
-<!-- START SNIPPET: webxml -->
-<web-app>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+         http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
     <servlet>
         <servlet-name>CustomerService</servlet-name>
         <display-name>CustomerService</display-name>
-        <servlet-class>
-            org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
-        </servlet-class>
+        <servlet-class>org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet</servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-	    <param-value>
-                 demo.service.App
-            </param-value>
+            <param-value>demo.service.App</param-value>
         </init-param>
         <init-param>
             <param-name>jaxrs.inInterceptors</param-name>
@@ -43,42 +36,34 @@
                 org.apache.cxf.interceptor.LoggingInInterceptor
             </param-value>
         </init-param>
-
         <init-param>
             <param-name>jaxrs.outInterceptors</param-name>
             <param-value>
                 org.apache.cxf.interceptor.LoggingOutInterceptor
             </param-value>
         </init-param>
-
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-	<servlet>
-		<servlet-name>BrowserServlet</servlet-name>
-		<display-name>BrowserServlet</display-name>
-		<servlet-class>
-			org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
-		</servlet-class>
-		<init-param>
-			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>
-                            demo.logbrowser.App
-                        </param-value>
-		</init-param>
+    <servlet>
+        <servlet-name>BrowserServlet</servlet-name>
+        <display-name>BrowserServlet</display-name>
+        <servlet-class>org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet</servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>demo.logbrowser.App</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
 
-		<load-on-startup>2</load-on-startup>
-	</servlet>
+    <servlet-mapping>
+        <servlet-name>BrowserServlet</servlet-name>
+        <url-pattern>/log/*</url-pattern>
+    </servlet-mapping>
 
-
-	<servlet-mapping>
-		<servlet-name>BrowserServlet</servlet-name>
-		<url-pattern>/log/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>CustomerService</servlet-name>
-		<url-pattern>/service/*</url-pattern>
-	</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CustomerService</servlet-name>
+        <url-pattern>/service/*</url-pattern>
+    </servlet-mapping>
 </web-app>
 <!-- END SNIPPET: webxml -->
