@@ -39,7 +39,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
  * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey or
  * EncryptedData structure against an AlgorithmSuite policy.
  */
-public class AlgorithmSuitePolicyValidator extends AbstractTokenPolicyValidator {
+public class AlgorithmSuitePolicyValidator {
     
     private List<WSSecurityEngineResult> results;
 

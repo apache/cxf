@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -33,39 +35,39 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
- * Validate a WSSecurityEngineResult corresponding to the processing of a SecurityContextToken
- * against the appropriate policy.
+ * Validate a SecurityContextToken policy.
  */
-public class SecurityContextTokenPolicyValidator extends AbstractTokenPolicyValidator {
+public class SecurityContextTokenPolicyValidator 
+    extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
     
-    private List<WSSecurityEngineResult> sctResults;
-    private Message message;
+    public boolean validatePolicy(
+        AssertionInfoMap aim,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURITY_CONTEXT_TOKEN);
+        if (ais == null || ais.isEmpty()) {
+            return true;
+        }
 
-    public SecurityContextTokenPolicyValidator(Message message, List<WSSecurityEngineResult> results) {
-        this.message = message;
-        sctResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> sctResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.SCT, sctResults);
-    }
-    
-    public boolean validatePolicy(AssertionInfoMap aim) {
-        Collection<AssertionInfo> sctAis = aim.get(SP12Constants.SECURITY_CONTEXT_TOKEN);
-        if (sctAis != null && !sctAis.isEmpty()) {
-            for (AssertionInfo ai : sctAis) {
-                SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();
-                ai.setAsserted(true);
-                    
-                boolean tokenRequired = isTokenRequired(sctPolicy, message);
-                
-                if (!tokenRequired) {
-                    continue;
-                }
-                
-                if (sctResults.isEmpty()) {
-                    ai.setNotAsserted(
-                        "The received token does not match the token inclusion requirement"
-                    );
-                    return false;
-                }
+
+        for (AssertionInfo ai : ais) {
+            SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();
+            ai.setAsserted(true);
+
+            if (!isTokenRequired(sctPolicy, message)) {
+                continue;
+            }
+
+            if (sctResults.isEmpty()) {
+                ai.setNotAsserted(
+                    "The received token does not match the token inclusion requirement"
+                );
+                return false;
             }
         }
         return true;

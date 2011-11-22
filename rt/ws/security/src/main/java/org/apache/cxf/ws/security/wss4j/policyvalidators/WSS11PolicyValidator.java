@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -36,27 +38,22 @@ import org.apache.ws.security.util.WSSecurityUtil;
 /**
  * Validate a WSS11 policy.
  */
-public class WSS11PolicyValidator {
-    
-    private List<WSSecurityEngineResult> scResults;
-    private Message message;
-
-    public WSS11PolicyValidator(
-        Message message,
-        List<WSSecurityEngineResult> results
-    ) {
-        this.message = message;
-        scResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SC, scResults);
-    }
+public class WSS11PolicyValidator implements TokenPolicyValidator {
     
     public boolean validatePolicy(
-        AssertionInfoMap aim
+        AssertionInfoMap aim,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.WSS11);
         if (ais == null || ais.isEmpty()) {
             return true;
         }
+        
+        List<WSSecurityEngineResult> scResults = new ArrayList<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SC, scResults);
         
         for (AssertionInfo ai : ais) {
             Wss11 wss11 = (Wss11)ai.getAssertion();

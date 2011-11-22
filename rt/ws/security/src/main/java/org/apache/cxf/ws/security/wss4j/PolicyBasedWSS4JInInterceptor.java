@@ -76,6 +76,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingEncrypte
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SymmetricBindingPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.TokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.TransportBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
@@ -523,41 +524,21 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         List<WSSecurityEngineResult> signedResults, 
         boolean utWithCallbacks
     ) {
-        List<WSSecurityEngineResult> utResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, utResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, utResults);
-        
-        List<WSSecurityEngineResult> samlResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
-        
         boolean check = true;
-        X509TokenPolicyValidator x509Validator = new X509TokenPolicyValidator(msg, results);
-        check &= x509Validator.validatePolicy(aim);
+        TokenPolicyValidator x509Validator = new X509TokenPolicyValidator();
+        check &= x509Validator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
-        if (utWithCallbacks) {
-            UsernameTokenPolicyValidator utValidator = 
-                new UsernameTokenPolicyValidator(msg, results);
-            check &= utValidator.validatePolicy(aim);
-        } else {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
-            if (ais != null) {
-                for (AssertionInfo ai : ais) {
-                    ai.setAsserted(true);
-                }
-            }
-        }
+        TokenPolicyValidator utValidator = new UsernameTokenPolicyValidator(utWithCallbacks);
+        check &= utValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
-        SamlTokenPolicyValidator samlValidator = 
-            new SamlTokenPolicyValidator(soapBody, signedResults, msg, results);
-        check &= samlValidator.validatePolicy(aim);
+        TokenPolicyValidator samlValidator = new SamlTokenPolicyValidator();
+        check &= samlValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
-        SecurityContextTokenPolicyValidator sctValidator = 
-            new SecurityContextTokenPolicyValidator(msg, results);
-        check &= sctValidator.validatePolicy(aim);
+        TokenPolicyValidator sctValidator = new SecurityContextTokenPolicyValidator();
+        check &= sctValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
-        WSS11PolicyValidator wss11Validator = new WSS11PolicyValidator(msg, results);
-        check &= wss11Validator.validatePolicy(aim);
+        TokenPolicyValidator wss11Validator = new WSS11PolicyValidator();
+        check &= wss11Validator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
         return check;
     }
@@ -599,6 +580,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         boolean utWithCallbacks
     ) {
         boolean check = true;
+        
+        List<WSSecurityEngineResult> utResults = new ArrayList<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, utResults);
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, utResults);
+        
+        List<WSSecurityEngineResult> samlResults = new ArrayList<WSSecurityEngineResult>();
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
         
         SignedTokenPolicyValidator suppValidator = 
             new SignedTokenPolicyValidator(msg, results, signedResults);

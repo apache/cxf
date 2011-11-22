@@ -159,8 +159,8 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 if (!isRequestor(message)) {
                     List<WSHandlerResult> results = 
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
-                    if (results != null) {
-                        parseHandlerResults(results, message, aim);
+                    if (results != null && results.size() > 0) {
+                        parseHandlerResults(results.get(0), message, aim);
                     }
                 } else {
                     //client side should be checked on the way out
@@ -172,26 +172,22 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         }
         
         private void parseHandlerResults(
-            List<WSHandlerResult> results,
+            WSHandlerResult rResult,
             Message message,
             AssertionInfoMap aim
         ) {
-            if (results != null) {
-                for (WSHandlerResult rResult : results) {
-                    List<WSSecurityEngineResult> kerberosResults = findKerberosResults(rResult.getResults());
-                    for (WSSecurityEngineResult wser : kerberosResults) {
-                        KerberosSecurity kerberosToken = 
-                            (KerberosSecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                        KerberosTokenPolicyValidator kerberosValidator = 
-                            new KerberosTokenPolicyValidator(message);
-                        boolean valid = kerberosValidator.validatePolicy(aim, kerberosToken);
-                        if (valid) {
-                            SecurityToken token = createSecurityToken(kerberosToken);
-                            token.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
-                            message.getExchange().put(SecurityConstants.TOKEN, token);
-                            return;
-                        }
-                    }
+            List<WSSecurityEngineResult> kerberosResults = findKerberosResults(rResult.getResults());
+            for (WSSecurityEngineResult wser : kerberosResults) {
+                KerberosSecurity kerberosToken = 
+                    (KerberosSecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                KerberosTokenPolicyValidator kerberosValidator = 
+                    new KerberosTokenPolicyValidator(message);
+                boolean valid = kerberosValidator.validatePolicy(aim, kerberosToken);
+                if (valid) {
+                    SecurityToken token = createSecurityToken(kerberosToken);
+                    token.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
+                    message.getExchange().put(SecurityConstants.TOKEN, token);
+                    return;
                 }
             }
         }
