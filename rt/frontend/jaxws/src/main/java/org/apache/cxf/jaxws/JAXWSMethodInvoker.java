@@ -59,6 +59,14 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
                 params = Collections.singletonList(null);
             }
             res = CastUtils.cast((List)super.invoke(exchange, serviceObject, m, params));
+            if ((serviceObject instanceof Provider) 
+                && Boolean.TRUE.equals(exchange.getInMessage().
+                                       getContextualProperty("jaxws.provider.interpretNullAsOneway"))
+                && (res != null && !res.isEmpty() && res.get(0) == null)) {
+                // treat the non-oneway call as oneway when a provider returns null
+                res = null;
+                changeToOneway(exchange);
+            }
             //update the webservice response context
             updateWebServiceContext(exchange, ctx);
         } catch (Fault f) {
@@ -72,6 +80,16 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             addHandlerProperties(ctx, handlerScopedStuff);
         }
         return res;
+    }
+
+    private void changeToOneway(Exchange exchange) {
+        exchange.setOneWay(true);
+        javax.servlet.http.HttpServletResponse httpresp = 
+            (javax.servlet.http.HttpServletResponse)exchange.getInMessage().
+                get("HTTP.RESPONSE");
+        if (httpresp != null) {
+            httpresp.setStatus(202);
+        }
     }
     
 }
