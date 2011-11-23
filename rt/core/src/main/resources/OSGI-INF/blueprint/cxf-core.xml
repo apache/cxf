@@ -24,7 +24,13 @@
 
   <service interface="org.apache.aries.blueprint.NamespaceHandler">
     <service-properties>
-      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/blueprint/core"/>
+      <entry key="osgi.service.blueprint.namespace">
+        <list>
+            <value>http://cxf.apache.org/blueprint/core</value>
+            <value>http://cxf.apache.org/configuration/beans</value>
+            <value>http://cxf.apache.org/configuration/parameterized-types</value>
+        </list>
+      </entry>
     </service-properties>
     <bean class="org.apache.cxf.bus.blueprint.CXFCoreNamespaceHandler"/>
   </service>
