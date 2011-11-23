@@ -51,11 +51,9 @@ import org.apache.ws.security.util.WSSecurityUtil;
 /**
  * Some abstract functionality for validating a security binding.
  */
-public abstract class AbstractBindingPolicyValidator {
+public abstract class AbstractBindingPolicyValidator implements BindingPolicyValidator {
     
     private static final QName SIG_QNAME = new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
-    
-    protected List<WSSecurityEngineResult> results;
     
     /**
      * Validate a Timestamp
@@ -68,6 +66,7 @@ public abstract class AbstractBindingPolicyValidator {
     protected boolean validateTimestamp(
         boolean includeTimestamp,
         boolean transportBinding,
+        List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
@@ -131,7 +130,8 @@ public abstract class AbstractBindingPolicyValidator {
      */
     protected boolean validateLayout(
         boolean laxTimestampFirst,
-        boolean laxTimestampLast
+        boolean laxTimestampLast,
+        List<WSSecurityEngineResult> results
     ) {
         if (laxTimestampFirst) {
             if (results.isEmpty()) {
@@ -162,6 +162,7 @@ public abstract class AbstractBindingPolicyValidator {
         SymmetricAsymmetricBindingBase binding, 
         AssertionInfo ai,
         AssertionInfoMap aim,
+        List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
@@ -172,7 +173,7 @@ public abstract class AbstractBindingPolicyValidator {
         }
         
         // Check the IncludeTimestamp
-        if (!validateTimestamp(binding.isIncludeTimestamp(), false, signedResults, message)) {
+        if (!validateTimestamp(binding.isIncludeTimestamp(), false, results, signedResults, message)) {
             String error = "Received Timestamp does not match the requirements";
             notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
             ai.setNotAsserted(error);
@@ -184,7 +185,7 @@ public abstract class AbstractBindingPolicyValidator {
         Layout layout = binding.getLayout();
         boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTimestampFirst;
         boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
-        if (!validateLayout(timestampFirst, timestampLast)) {
+        if (!validateLayout(timestampFirst, timestampLast, results)) {
             String error = "Layout does not match the requirements";
             notAssertPolicy(aim, SP12Constants.LAYOUT, error);
             ai.setNotAsserted(error);
@@ -201,7 +202,7 @@ public abstract class AbstractBindingPolicyValidator {
         }
         
         // Check whether the signatures were encrypted or not
-        if (binding.isSignatureProtection() && !isSignatureEncrypted()) {
+        if (binding.isSignatureProtection() && !isSignatureEncrypted(results)) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }
@@ -212,13 +213,17 @@ public abstract class AbstractBindingPolicyValidator {
     /**
      * Check the Protection Order of the binding
      */
-    protected boolean checkProtectionOrder(SymmetricAsymmetricBindingBase binding, AssertionInfo ai) {
+    protected boolean checkProtectionOrder(
+        SymmetricAsymmetricBindingBase binding, 
+        AssertionInfo ai,
+        List<WSSecurityEngineResult> results
+    ) {
         if (binding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-            if (!binding.isSignatureProtection() && isSignedBeforeEncrypted()) {
+            if (!binding.isSignatureProtection() && isSignedBeforeEncrypted(results)) {
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
-        } else if (isEncryptedBeforeSigned()) {
+        } else if (isEncryptedBeforeSigned(results)) {
             ai.setNotAsserted("Not signed before encrypted");
             return false;
         }
@@ -229,7 +234,7 @@ public abstract class AbstractBindingPolicyValidator {
      * Check to see if a signature was applied before encryption.
      * Note that results are stored in the reverse order.
      */
-    private boolean isSignedBeforeEncrypted() {
+    private boolean isSignedBeforeEncrypted(List<WSSecurityEngineResult> results) {
         boolean signed = false;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
@@ -255,7 +260,7 @@ public abstract class AbstractBindingPolicyValidator {
      * Check to see if encryption was applied before signature.
      * Note that results are stored in the reverse order.
      */
-    private boolean isEncryptedBeforeSigned() {
+    private boolean isEncryptedBeforeSigned(List<WSSecurityEngineResult> results) {
         boolean encrypted = false;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
@@ -307,13 +312,13 @@ public abstract class AbstractBindingPolicyValidator {
     /**
      * Check whether all Signature (and SignatureConfirmation) elements were encrypted
      */
-    protected boolean isSignatureEncrypted() {
+    protected boolean isSignatureEncrypted(List<WSSecurityEngineResult> results) {
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.SIGN
                 || actInt.intValue() == WSConstants.SC) {
                 String sigId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                if (sigId == null || !isIdEncrypted(sigId)) {
+                if (sigId == null || !isIdEncrypted(sigId, results)) {
                     return false;
                 }
             }
@@ -324,7 +329,7 @@ public abstract class AbstractBindingPolicyValidator {
     /**
      * Return true if the given id was encrypted
      */
-    private boolean isIdEncrypted(String sigId) {
+    private boolean isIdEncrypted(String sigId, List<WSSecurityEngineResult> results) {
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.ENCR) {

@@ -66,6 +66,7 @@ import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.BindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
@@ -457,7 +458,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
         
         if (check) {
-            check = checkBindingCoverage(aim, msg, results, signedResults);
+            check = checkBindingCoverage(aim, msg, soapBody, results, signedResults, encryptResults);
         }
 
         if (check) {
@@ -549,22 +550,30 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private boolean checkBindingCoverage(
         AssertionInfoMap aim, 
         SoapMessage msg,
+        Element soapBody,
         List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
     ) {
         boolean check = true;
         
-        TransportBindingPolicyValidator transportValidator = 
-            new TransportBindingPolicyValidator(msg, results, signedResults);
-        check &= transportValidator.validatePolicy(aim);
+        BindingPolicyValidator transportValidator = new TransportBindingPolicyValidator();
+        check &= 
+            transportValidator.validatePolicy(
+                aim, msg, soapBody, results, signedResults, encryptedResults
+            );
             
-        SymmetricBindingPolicyValidator symmetricValidator = 
-            new SymmetricBindingPolicyValidator(msg, results, signedResults);
-        check &= symmetricValidator.validatePolicy(aim);
+        BindingPolicyValidator symmetricValidator = new SymmetricBindingPolicyValidator();
+        check &= 
+            symmetricValidator.validatePolicy(
+                aim, msg, soapBody, results, signedResults, encryptedResults
+            );
 
-        AsymmetricBindingPolicyValidator asymmetricValidator = 
-            new AsymmetricBindingPolicyValidator(msg, results, signedResults);
-        check &= asymmetricValidator.validatePolicy(aim);
+        BindingPolicyValidator asymmetricValidator = new AsymmetricBindingPolicyValidator();
+        check &= 
+            asymmetricValidator.validatePolicy(
+                aim, msg, soapBody, results, signedResults, encryptedResults
+            );
         
         return check;
     }
