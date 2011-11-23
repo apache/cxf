@@ -22,7 +22,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import org.apache.aries.blueprint.reflect.MetadataUtil;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -64,7 +63,8 @@ public class BlueprintResourceFactory implements ResourceProvider {
         Object component = blueprintContainer.getComponentMetadata(beanId);
         if (component instanceof BeanMetadata) {
             BeanMetadata local = (BeanMetadata) component;
-            isSingleton = MetadataUtil.isSingletonScope(local);
+            isSingleton = BeanMetadata.SCOPE_SINGLETON.equals(local.getScope())  
+                || (local.getScope() == null && local.getId() != null);
         }
     }
 
