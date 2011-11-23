@@ -20,10 +20,10 @@
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -40,38 +40,26 @@ import org.apache.ws.security.WSSecurityEngineResult;
  */
 public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValidator {
     
-    private List<WSSecurityEngineResult> signedResults;
-    private List<WSSecurityEngineResult> encryptedResults;
-    private Message message;
-    private boolean hasDerivedKeys;
-
-    public AsymmetricBindingPolicyValidator(
-        Message message,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        this.message = message;
-        this.results = results;
-        this.signedResults = signedResults;
-        
-        // Store the encryption results and whether we have any derived key results
-        encryptedResults = new ArrayList<WSSecurityEngineResult>();
-        for (WSSecurityEngineResult result : results) {
-            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.DKT) {
-                hasDerivedKeys = true;
-            } else if (actInt.intValue() == WSConstants.ENCR) {
-                encryptedResults.add(result);
-            }
-        }
-    }
-    
     public boolean validatePolicy(
-        AssertionInfoMap aim
+        AssertionInfoMap aim,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
         if (ais == null || ais.isEmpty()) {                       
             return true;
+        }
+        
+        boolean hasDerivedKeys = false;
+        for (WSSecurityEngineResult result : results) {
+            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt.intValue() == WSConstants.DKT) {
+                hasDerivedKeys = true;
+                break;
+            }
         }
         
         for (AssertionInfo ai : ais) {
@@ -79,17 +67,17 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, ai)) {
+            if (!checkProtectionOrder(binding, ai, results)) {
                 return false;
             }
             
             // Check various properties of the binding
-            if (!checkProperties(binding, ai, aim, signedResults, message)) {
+            if (!checkProperties(binding, ai, aim, results, signedResults, message)) {
                 return false;
             }
             
             // Check various tokens of the binding
-            if (!checkTokens(binding, ai, aim)) {
+            if (!checkTokens(binding, ai, aim, hasDerivedKeys, signedResults, encryptedResults)) {
                 return false;
             }
         }
@@ -103,7 +91,10 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
     private boolean checkTokens(
         AsymmetricBinding binding, 
         AssertionInfo ai,
-        AssertionInfoMap aim
+        AssertionInfoMap aim,
+        boolean hasDerivedKeys,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
     ) {
         if (binding.getInitiatorToken() != null) {
             Token token = binding.getInitiatorToken().getToken();

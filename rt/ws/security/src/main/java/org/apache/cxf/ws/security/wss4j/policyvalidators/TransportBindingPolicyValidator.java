@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
@@ -38,21 +40,13 @@ import org.apache.ws.security.WSSecurityEngineResult;
  */
 public class TransportBindingPolicyValidator extends AbstractBindingPolicyValidator {
     
-    private List<WSSecurityEngineResult> signedResults;
-    private Message message;
-
-    public TransportBindingPolicyValidator(
-        Message message,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        this.message = message;
-        this.results = results;
-        this.signedResults = signedResults;
-    }
-    
     public boolean validatePolicy(
-        AssertionInfoMap aim
+        AssertionInfoMap aim,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
         if (ais == null || ais.isEmpty()) {                       
@@ -84,7 +78,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             }
             
             // Check the IncludeTimestamp
-            if (!validateTimestamp(binding.isIncludeTimestamp(), true, signedResults, message)) {
+            if (!validateTimestamp(binding.isIncludeTimestamp(), true, results, signedResults, message)) {
                 String error = "Received Timestamp does not match the requirements";
                 notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
                 ai.setNotAsserted(error);
@@ -96,7 +90,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             Layout layout = binding.getLayout();
             boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTimestampFirst;
             boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
-            if (!validateLayout(timestampFirst, timestampLast)) {
+            if (!validateLayout(timestampFirst, timestampLast, results)) {
                 String error = "Layout does not match the requirements";
                 notAssertPolicy(aim, SP12Constants.LAYOUT, error);
                 ai.setNotAsserted(error);
