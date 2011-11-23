@@ -90,16 +90,6 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             return null;
         }
     }
-    
-    public <T> T getBeanOfType(String name, Class<T> type) {
-        
-        ComponentMetadata cmd = getComponentMetadata(name);
-        Class<?> cls = getClassForMetaData(cmd);
-        if (cls != null && type.isAssignableFrom(cls)) {
-            return type.cast(container.getComponentInstance(name));
-        }
-        return orig.getBeanOfType(name, type);
-    }
 
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
