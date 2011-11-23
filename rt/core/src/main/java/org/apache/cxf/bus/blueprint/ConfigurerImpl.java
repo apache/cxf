@@ -19,6 +19,7 @@
 
 package org.apache.cxf.bus.blueprint;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,20 +30,21 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.aries.blueprint.ExtendedBlueprintContainer;
-import org.apache.aries.blueprint.container.BeanRecipe;
-import org.apache.aries.blueprint.di.Recipe;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
 import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.osgi.service.blueprint.container.NoSuchComponentException;
+import org.osgi.service.blueprint.reflect.BeanMetadata;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
 
 /**
  * 
  */
 public class ConfigurerImpl implements Configurer {
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurerImpl.class);
-    ExtendedBlueprintContainer container;
+    BlueprintContainer container;
     
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
         = new HashMap<String, List<MatcherHolder>>();
@@ -58,7 +60,7 @@ public class ConfigurerImpl implements Configurer {
     
     
     public ConfigurerImpl(BlueprintContainer con) {
-        container = (ExtendedBlueprintContainer)con;
+        container = con;
         initializeWildcardMap();
     }
     private boolean isWildcardBeanName(String bn) {
@@ -69,19 +71,19 @@ public class ConfigurerImpl implements Configurer {
     private void initializeWildcardMap() {
         for (String s : container.getComponentIds()) {
             if (isWildcardBeanName(s)) {
-                Recipe r = container.getRepository().getRecipe(s);
-                if (r instanceof BeanRecipe) {
-                    Class c = ((BeanRecipe)r).getType();
+                ComponentMetadata cmd = container.getComponentMetadata(s);
+                Class<?> cls = BlueprintBeanLocator.getClassForMetaData(container, cmd);
+                if (cls != null) {
                     String orig = s;
                     if (s.charAt(0) == '*') {
                         //old wildcard
                         s = "." + s.replaceAll("\\.", "\\."); 
                     }
                     Matcher matcher = Pattern.compile(s).matcher("");
-                    List<MatcherHolder> m = wildCardBeanDefinitions.get(c.getName());
+                    List<MatcherHolder> m = wildCardBeanDefinitions.get(cls.getName());
                     if (m == null) {
                         m = new ArrayList<MatcherHolder>();
-                        wildCardBeanDefinitions.put(c.getName(), m);
+                        wildCardBeanDefinitions.put(cls.getName(), m);
                     }
                     MatcherHolder holder = new MatcherHolder(orig, matcher);
                     m.add(holder);
@@ -109,9 +111,42 @@ public class ConfigurerImpl implements Configurer {
             configureWithWildCard(bn, beanInstance);
         }
         
-        Recipe r = container.getRepository().getRecipe(bn);
-        if (r instanceof BeanRecipe) {
-            ((BeanRecipe)r).setProperties(beanInstance);
+        
+        Method m = ReflectionUtil.findMethod(container.getClass(), "injectBeanInstance",
+                                             BeanMetadata.class, Object.class);
+        try {
+            if (m != null) {
+                //Aries blueprint 0.4.1+
+                ComponentMetadata cm = null;
+                try {
+                    cm = container.getComponentMetadata(bn);
+                } catch (NoSuchComponentException nsce) {
+                    cm = null;
+                }
+                if (cm instanceof BeanMetadata) {
+                    ReflectionUtil.setAccessible(m);
+                    m.invoke(container, (BeanMetadata)cm, beanInstance);
+                }
+            } else {
+                //Aries blueprint 0.3.x
+                m = ReflectionUtil.findMethod(container.getClass(), "getRepository");
+                Object o = ReflectionUtil.setAccessible(m).invoke(container);
+                m = ReflectionUtil.findMethod(container.getClass(), "getRecipe", String.class);
+                o = ReflectionUtil.setAccessible(m).invoke(o, bn);  //returns the recipe
+                m = ReflectionUtil.findMethod(o.getClass(), "setProperties", Object.class);
+                if (m != null) {
+                    ReflectionUtil.setAccessible(m).invoke(o, beanInstance);
+                }
+            }
+        } catch (InvocationTargetException ite) {
+            Throwable t = ite.getCause();
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException)t;
+            } else {
+                throw new RuntimeException(t);
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Could not configure object " + bn, ex);
         }
     }
     private void configureWithWildCard(String bn, Object beanInstance) {

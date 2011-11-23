@@ -28,6 +28,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -225,5 +226,43 @@ public final class ReflectionUtil {
         } else {
             return beanInfo.getPropertyDescriptors();
         }
+    }
+
+    /**
+     * Try to find a method we can use.   If the object implements a public  
+     * interface that has the public version of that method, we'll use the interface
+     * defined method in case the actual instance class is not public 
+     */
+    public static Method findMethod(Class<?> cls,
+                                    String name,
+                                    Class<?> ... params) {
+        if (cls == null) {
+            return null;
+        }
+        for (Class<?> cs : cls.getInterfaces()) {
+            if (Modifier.isPublic(cs.getModifiers())) {
+                Method m = findMethod(cs, name, params);
+                if (m != null && Modifier.isPublic(m.getModifiers())) {
+                    return m;
+                }
+            }
+        }
+        try {
+            Method m = cls.getDeclaredMethod(name, params);
+            if (m != null && Modifier.isPublic(m.getModifiers())) {
+                return m;
+            }
+        } catch (Exception e) {
+            //ignore
+        }
+        Method m = findMethod(cls.getSuperclass(), name, params);
+        if (m == null) {
+            try {
+                m = cls.getMethod(name, params);
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        return m;
     }
 }
