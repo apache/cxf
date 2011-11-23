@@ -30,19 +30,23 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.feature.FastInfosetFeature;
 import org.apache.cxf.feature.LoggingFeature;
-import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 /**
  * 
  */
-public class CXFCoreNamespaceHandler implements NamespaceHandler {
-    private BlueprintContainer blueprintContainer;
-    
+public class CXFCoreNamespaceHandler implements NamespaceHandler {    
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("/schemas/blueprint/core.xsd");
+        if ("http://cxf.apache.org/blueprint/core".equals(namespace)) {
+            return getClass().getClassLoader().getResource("/schemas/blueprint/core.xsd");
+        } else if ("http://cxf.apache.org/configuration/beans".equals(namespace)) {
+            return getClass().getClassLoader().getResource("/schemas/configuration/cxf-beans.xsd");           
+        } else if ("http://cxf.apache.org/configuration/parameterized-types".equals(namespace)) {
+            return getClass().getClassLoader().getResource("/schemas/configuration/parameterized-types.xsd");
+        }
+        return null;
     }
 
 
@@ -67,15 +71,6 @@ public class CXFCoreNamespaceHandler implements NamespaceHandler {
     }
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
-    }
-    
-
-    public BlueprintContainer getBlueprintContainer() {
-        return blueprintContainer;
-    }
-
-    public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
-        this.blueprintContainer = blueprintContainer;
     }
     
 }
