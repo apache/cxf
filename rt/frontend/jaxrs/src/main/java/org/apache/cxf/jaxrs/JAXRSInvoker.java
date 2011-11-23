@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs;
 
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -234,12 +235,17 @@ public class JAXRSInvoker extends AbstractInvoker {
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
                 // work out request parameters for the sub-resource class. Here we
                 // presume InputStream has not been consumed yet by the root resource class.
-                //I.e., only one place either in the root resource or sub-resource class can
-                //have a parameter that read from entity body.
                 List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
                 msg.setContent(List.class, newParams);
 
                 return this.invoke(exchange, newParams, result);
+            } catch (IOException ex) {
+                Response resp = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
+                if (resp == null) {
+                    resp = JAXRSUtils.convertFaultToResponse(new WebApplicationException(ex), 
+                                                             exchange.getInMessage());
+                }
+                return new MessageContentsList(resp);
             } catch (WebApplicationException ex) {
                 Response excResponse;
                 if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), 
