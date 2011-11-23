@@ -20,7 +20,6 @@
 package org.apache.cxf.bus.blueprint;
 
 
-import org.apache.aries.blueprint.utils.BundleDelegatingClassLoader;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
