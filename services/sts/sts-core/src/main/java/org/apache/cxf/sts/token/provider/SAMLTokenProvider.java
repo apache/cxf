@@ -28,6 +28,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -35,6 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
@@ -287,29 +290,41 @@ public class SAMLTokenProvider implements TokenProvider {
         if (signToken) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
             
-            String alias = null;
+            // Initialise signature objects with defaults of STSPropertiesMBean
+            Crypto signatureCrypto = stsProperties.getSignatureCrypto();
+            CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
+            SignatureProperties signatureProperties = stsProperties.getSignatureProperties();
+            String alias = stsProperties.getSignatureUsername();
+            
             if (samlRealm != null) {
-                alias = samlRealm.getSignatureAlias();
-            }
-            if (alias == null || "".equals(alias)) {
-                alias = stsProperties.getSignatureUsername();
-            }
-            if (alias == null || "".equals(alias)) {
-                Crypto signatureCrypto = stsProperties.getSignatureCrypto();
-                if (signatureCrypto != null) {
-                    alias = signatureCrypto.getDefaultX509Identifier();
-                    LOG.fine("Signature alias is null so using default alias: " + alias);
+                // If SignatureCrypto configured in realm then
+                // callbackhandler and alias of STSPropertiesMBean is ignored
+                if (samlRealm.getSignatureCrypto() != null) {
+                    LOG.fine("SAMLRealm signature keystore used");
+                    signatureCrypto = samlRealm.getSignatureCrypto();
+                    callbackHandler = samlRealm.getCallbackHandler();
+                    alias = samlRealm.getSignatureAlias();
                 }
+                // SignatureProperties can be defined independently of SignatureCrypto
+                if (samlRealm.getSignatureProperties() != null) {
+                    signatureProperties = samlRealm.getSignatureProperties();
+                }
+            } 
+            
+            // If alias not defined, get the default of the SignatureCrypto
+            if ((alias == null || "".equals(alias)) && (signatureCrypto != null)) {
+                alias = signatureCrypto.getDefaultX509Identifier();
+                LOG.fine("Signature alias is null so using default alias: " + alias);
             }
             // Get the password
             WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
             LOG.fine("Creating SAML Token");
-            stsProperties.getCallbackHandler().handle(cb);
+            callbackHandler.handle(cb);
             String password = cb[0].getPassword();
     
             LOG.fine("Signing SAML Token");
-            boolean useKeyValue = stsProperties.getSignatureProperties().isUseKeyValue();
-            assertion.signAssertion(alias, password, stsProperties.getSignatureCrypto(), useKeyValue);
+            boolean useKeyValue = signatureProperties.isUseKeyValue();
+            assertion.signAssertion(alias, password, signatureCrypto, useKeyValue);
         }
         
         return assertion;

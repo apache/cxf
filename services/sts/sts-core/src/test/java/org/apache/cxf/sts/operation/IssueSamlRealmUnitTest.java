@@ -47,6 +47,7 @@ import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -297,6 +298,187 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("STS"));
     }
     
+    
+    /**
+     * Test to successfully issue a Saml 1.1 token in realm "B"
+     * using crypto definition in SAMLRealm
+     */
+    @org.junit.Test
+    public void testIssueSaml1TokenRealmBCustomCrypto() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        SAMLTokenProvider provider = new SAMLTokenProvider();
+        provider.setRealmMap(createRealms());
+        providerList.add(provider);
+        issueOperation.setTokenProviders(providerList);
+        
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        stsProperties.setRealmParser(new CustomRealmParser());
+        issueOperation.setStsProperties(stsProperties);
+        
+        // Set signature properties in SAMLRealm B
+        Map<String, SAMLRealm> samlRealms = provider.getRealmMap();
+        SAMLRealm realm = samlRealms.get("B");
+        realm.setSignatureCrypto(crypto);
+        realm.setCallbackHandler(new PasswordCallbackHandler());
+        
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put("url", "https");
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Issue a token - this will fail as the SAMLRealm configuration is inconsistent
+        // no signature alias defined
+        try {
+            issueOperation.issue(request, webServiceContext);
+            fail("Failure expected on no encryption name");
+        } catch (STSException ex) {
+            // expected
+        }
+        
+        realm.setSignatureAlias("mystskey");
+        
+        // Issue a token
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertFalse(tokenString.contains("A-Issuer"));
+        assertTrue(tokenString.contains("B-Issuer"));
+        assertFalse(tokenString.contains("STS"));
+    }
+    
+    
+    /**
+     * Test to successfully issue a Saml 1.1 token in realm "B"
+     * using PKCS12 crypto definition with default key in SAMLRealm
+     */
+    @org.junit.Test
+    public void testIssueSaml1TokenRealmBCustomCryptoPKCS12() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        SAMLTokenProvider provider = new SAMLTokenProvider();
+        provider.setRealmMap(createRealms());
+        providerList.add(provider);
+        issueOperation.setTokenProviders(providerList);
+        
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        stsProperties.setRealmParser(new CustomRealmParser());
+        issueOperation.setStsProperties(stsProperties);
+        
+        // Set signature properties in SAMLRealm B
+        Map<String, SAMLRealm> samlRealms = provider.getRealmMap();
+        SAMLRealm realm = samlRealms.get("B");
+        realm.setSignatureCrypto(CryptoFactory.getInstance(getEncryptionPropertiesPKCS12()));
+        realm.setCallbackHandler(new PasswordCallbackHandler());
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put("url", "https");
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Issue a token
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertFalse(tokenString.contains("A-Issuer"));
+        assertTrue(tokenString.contains("B-Issuer"));
+        assertFalse(tokenString.contains("STS"));
+    }
+    
+    
     /**
      * Create some SAML Realms
      */
@@ -350,6 +532,19 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        
+        return properties;
+    }
+    
+    private Properties getEncryptionPropertiesPKCS12() {
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+        );
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "security");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "x509.p12");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.type", "pkcs12");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.private.password", "security");
         
         return properties;
     }
