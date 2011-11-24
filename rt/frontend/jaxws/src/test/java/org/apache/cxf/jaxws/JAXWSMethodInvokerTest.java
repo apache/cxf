@@ -143,6 +143,8 @@ public class JAXWSMethodInvokerTest extends Assert {
         Service serviceClass = EasyMock.createMock(Service.class);
         serviceClass.size();
         EasyMock.expectLastCall().andReturn(0).anyTimes();
+        serviceClass.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
         ex.put(Service.class, serviceClass);
         
         MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
