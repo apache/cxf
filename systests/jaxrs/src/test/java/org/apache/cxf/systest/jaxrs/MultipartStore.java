@@ -144,6 +144,18 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/testnullpart")
+    @Consumes("multipart/form-data")
+    @Produces("text/plain")
+    public String testNullPart(@Multipart(value = "someid", errorIfMissing = false) String value) {
+        if (value != null) {
+            return value;
+        } else {
+            return "nobody home";
+        }
+    }
+    
+    @POST
     @Path("/books/jaxbjsonimage")
     @Consumes("multipart/mixed")
     @Produces("multipart/mixed")

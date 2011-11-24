@@ -108,6 +108,12 @@ public final class AttachmentUtils {
                     return a;    
                 }
             }
+            if (!id.errorIfMissing()) {
+                /*
+                 * If user asked for a null, give them a null. 
+                 */
+                return null;
+            }
             org.apache.cxf.common.i18n.Message errorMsg = 
                 new org.apache.cxf.common.i18n.Message("MULTTIPART_ID_NOT_FOUND", 
                                                        BUNDLE, 
