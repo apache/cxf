@@ -76,6 +76,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEncryptedTokenPol
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedEndorsingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SignedTokenPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.SupportingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SymmetricBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.TokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.TransportBindingPolicyValidator;
@@ -88,6 +89,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
@@ -462,7 +464,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
 
         if (check) {
-            check = checkSupportingTokenCoverage(aim, msg, results, signedResults, utWithCallbacks);
+            check = 
+                checkSupportingTokenCoverage(
+                    aim, msg, results, signedResults, encryptResults, utWithCallbacks
+                );
         }
         
         // The supporting tokens are already validated
@@ -585,11 +590,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim,
         SoapMessage msg,
         List<WSSecurityEngineResult> results, 
-        List<WSSecurityEngineResult> signedResults, 
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults,
         boolean utWithCallbacks
     ) {
-        boolean check = true;
-        
         List<WSSecurityEngineResult> utResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, utResults);
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, utResults);
@@ -598,37 +602,57 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
         
-        SignedTokenPolicyValidator suppValidator = 
-            new SignedTokenPolicyValidator(msg, results, signedResults);
-        suppValidator.setValidateUsernameToken(utWithCallbacks);
-        check &= suppValidator.validatePolicy(aim);
+        // Store the timestamp element
+        WSSecurityEngineResult tsResult = WSSecurityUtil.fetchActionResult(results, WSConstants.TS);
+        Element timestamp = null;
+        if (tsResult != null) {
+            Timestamp ts = (Timestamp)tsResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+            timestamp = ts.getElement();
+        }
+        
+        boolean check = true;
+        
+        SupportingTokenPolicyValidator validator = new SignedTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
 
-        EndorsingTokenPolicyValidator endorsingValidator = 
-            new EndorsingTokenPolicyValidator(msg, results, signedResults);
-        check &= endorsingValidator.validatePolicy(aim);
+        validator = new EndorsingTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
 
-        SignedEndorsingTokenPolicyValidator signedEdorsingValidator = 
-            new SignedEndorsingTokenPolicyValidator(msg, results, signedResults);
-        check &= signedEdorsingValidator.validatePolicy(aim);
+        validator = new SignedEndorsingTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
 
-        SignedEncryptedTokenPolicyValidator signedEncryptedValidator = 
-            new SignedEncryptedTokenPolicyValidator(msg, results, signedResults);
-        signedEncryptedValidator.setValidateUsernameToken(utWithCallbacks);
-        check &= signedEncryptedValidator.validatePolicy(aim);
+        validator = new SignedEncryptedTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
 
-        EncryptedTokenPolicyValidator encryptedValidator = 
-            new EncryptedTokenPolicyValidator(msg, results, signedResults);
-        encryptedValidator.setValidateUsernameToken(utWithCallbacks);
-        check &= encryptedValidator.validatePolicy(aim);
+        validator = new EncryptedTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
 
-        EndorsingEncryptedTokenPolicyValidator endorsingEncryptedValidator = 
-            new EndorsingEncryptedTokenPolicyValidator(msg, results, signedResults);
-        endorsingEncryptedValidator.setValidateUsernameToken(utWithCallbacks);
-        check &= endorsingEncryptedValidator.validatePolicy(aim);
+        validator = new EndorsingEncryptedTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
 
-        SignedEndorsingEncryptedTokenPolicyValidator signedEndorsingEncryptedValidator = 
-            new SignedEndorsingEncryptedTokenPolicyValidator(msg, results, signedResults);
-        check &= signedEndorsingEncryptedValidator.validatePolicy(aim);
+        validator = new SignedEndorsingEncryptedTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
         
         return check;
     }
