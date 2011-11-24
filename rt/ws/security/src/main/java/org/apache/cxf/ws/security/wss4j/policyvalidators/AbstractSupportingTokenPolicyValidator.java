@@ -38,63 +38,68 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * A base class to use to validate various SupportingToken policies.
  */
-public abstract class AbstractSupportingTokenPolicyValidator extends AbstractTokenPolicyValidator {
+public abstract class AbstractSupportingTokenPolicyValidator 
+    extends AbstractTokenPolicyValidator implements SupportingTokenPolicyValidator {
     
-    protected Message message;
-    protected List<WSSecurityEngineResult> results;
-    protected List<WSSecurityEngineResult> signedResults;
-    protected List<WSSecurityEngineResult> encryptedResults;
-    protected boolean tls;
-    protected boolean validateUsernameToken = true;
-    protected Element timestamp;
+    private Message message;
+    private List<WSSecurityEngineResult> results;
+    private List<WSSecurityEngineResult> signedResults;
+    private List<WSSecurityEngineResult> encryptedResults;
+    private List<WSSecurityEngineResult> utResults;
+    private List<WSSecurityEngineResult> samlResults;
+    private boolean validateUsernameToken = true;
+    private Element timestamp;
     private boolean signed;
     private boolean encrypted;
     private boolean derived;
     private boolean endorsed;
 
-    public AbstractSupportingTokenPolicyValidator(
-        Message message,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
+    /**
+     * Set the list of UsernameToken results
+     */
+    public void setUsernameTokenResults(
+        List<WSSecurityEngineResult> utResultsList,
+        boolean valUsernameToken
     ) {
-        this.message = message;
-        this.results = results;
-        this.signedResults = signedResults;
-        
-        // Store the timestamp element
-        WSSecurityEngineResult tsResult = WSSecurityUtil.fetchActionResult(results, WSConstants.TS);
-        if (tsResult != null) {
-            Timestamp ts = (Timestamp)tsResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-            timestamp = ts.getElement();
-        }
-        
-        // Store the encryption results
-        encryptedResults = new ArrayList<WSSecurityEngineResult>();
-        for (WSSecurityEngineResult result : results) {
-            Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.ENCR) {
-                encryptedResults.add(result);
-            }
-        }
-        
-        // See whether TLS is in use or not
-        TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-        if (tlsInfo != null) {
-            tls = true;
-        }
+        utResults = utResultsList;
+        validateUsernameToken = valUsernameToken;
     }
     
-    public void setValidateUsernameToken(boolean validateUsernameToken) {
-        this.validateUsernameToken = validateUsernameToken;
+    /**
+     * Set the list of SAMLToken results
+     */
+    public void setSAMLTokenResults(List<WSSecurityEngineResult> samlResultsList) {
+        samlResults = samlResultsList;
+    }
+    
+    /**
+     * Set the Timestamp element
+     */
+    public void setTimestampElement(Element timestampElement) {
+        timestamp = timestampElement;
+    }
+    
+    public void setMessage(Message msg) {
+        message = msg;
+    }
+    
+    public void setResults(List<WSSecurityEngineResult> results) {
+        this.results = results;
+    }
+    
+    public void setSignedResults(List<WSSecurityEngineResult> signedResults) {
+        this.signedResults = signedResults;
+    }
+    
+    public void setEncryptedResults(List<WSSecurityEngineResult> encryptedResults) {
+        this.encryptedResults = encryptedResults;
     }
     
     public void setSigned(boolean signed) {
@@ -120,18 +125,14 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractTok
         if (!validateUsernameToken) {
             return true;
         }
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, tokenResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, tokenResults);
-        
-        if (tokenResults.isEmpty()) {
+        if (utResults.isEmpty()) {
             return false;
         }
         
-        if (signed && !areTokensSigned(tokenResults)) {
+        if (signed && !areTokensSigned(utResults)) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(tokenResults)) {
+        if (encrypted && !areTokensEncrypted(utResults)) {
             return false;
         }
         return true;
@@ -142,21 +143,17 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractTok
      * Process SAML Tokens. Only SignedSupportingTokens are currently enforced.
      */
     protected boolean processSAMLTokens() {
-        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, tokenResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, tokenResults);
-        
-        if (tokenResults.isEmpty()) {
+        if (samlResults.isEmpty()) {
             return false;
         }
         
-        if (signed && !areTokensSigned(tokenResults)) {
+        if (signed && !areTokensSigned(samlResults)) {
             return false;
         }
-        if (encrypted && !areTokensEncrypted(tokenResults)) {
+        if (encrypted && !areTokensEncrypted(samlResults)) {
             return false;
         }
-        if (endorsed && !checkEndorsed(tokenResults)) {
+        if (endorsed && !checkEndorsed(samlResults)) {
             return false;
         }
         return true;
@@ -336,13 +333,22 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractTok
         return null;
     }
     
+    private boolean isTLSInUse() {
+        // See whether TLS is in use or not
+        TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+        if (tlsInfo != null) {
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Check the endorsing supporting token policy. If we're using the Transport Binding then
      * check that the Timestamp is signed. Otherwise, check that the signature is signed.
      * @return true if the endorsed supporting token policy is correct
      */
     private boolean checkEndorsed(List<WSSecurityEngineResult> tokenResults) {
-        if (tls) {
+        if (isTLSInUse()) {
             return checkTimestampIsSigned(tokenResults);
         }
         return checkSignatureIsSigned(tokenResults);
@@ -353,13 +359,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractTok
      * Return true if a list of tokens were signed, false otherwise.
      */
     private boolean areTokensSigned(List<WSSecurityEngineResult> tokens) {
-        if (tls) {
-            return true;
-        }
-        for (WSSecurityEngineResult wser : tokens) {
-            Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-            if (!isTokenSigned(tokenElement)) {
-                return false;
+        if (!isTLSInUse()) {
+            for (WSSecurityEngineResult wser : tokens) {
+                Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                if (!isTokenSigned(tokenElement)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -369,13 +374,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractTok
      * Return true if a list of tokens were encrypted, false otherwise.
      */
     private boolean areTokensEncrypted(List<WSSecurityEngineResult> tokens) {
-        if (tls) {
-            return true;
-        }
-        for (WSSecurityEngineResult wser : tokens) {
-            Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-            if (!isTokenEncrypted(tokenElement)) {
-                return false;
+        if (!isTLSInUse()) {
+            for (WSSecurityEngineResult wser : tokens) {
+                Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                if (!isTokenEncrypted(tokenElement)) {
+                    return false;
+                }
             }
         }
         return true;

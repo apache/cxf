@@ -42,21 +42,26 @@ import org.apache.ws.security.WSSecurityEngineResult;
  */
 public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
     
-    public SignedTokenPolicyValidator(
-        Message message,
-        List<WSSecurityEngineResult> results,
-        List<WSSecurityEngineResult> signedResults
-    ) {
-        super(message, results, signedResults);
+    public SignedTokenPolicyValidator() {
+        setSigned(true);
     }
     
     public boolean validatePolicy(
-        AssertionInfoMap aim
+        AssertionInfoMap aim, 
+        Message message,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         if (ais == null || ais.isEmpty()) {                       
             return true;
         }
+        
+        setMessage(message);
+        setResults(results);
+        setSignedResults(signedResults);
+        setEncryptedResults(encryptedResults);
         
         for (AssertionInfo ai : ais) {
             SupportingToken binding = (SupportingToken)ai.getAssertion();
@@ -64,7 +69,6 @@ public class SignedTokenPolicyValidator extends AbstractSupportingTokenPolicyVal
                 continue;
             }
             ai.setAsserted(true);
-            setSigned(true);
             
             List<Token> tokens = binding.getTokens();
             for (Token token : tokens) {
