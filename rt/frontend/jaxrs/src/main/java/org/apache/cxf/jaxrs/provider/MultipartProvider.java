@@ -167,7 +167,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         if (multipart != null) {
             return fromAttachment(multipart, c, t, anns);
         }
-        throw new WebApplicationException(404);
+        throw new WebApplicationException(400);
     }
     
     private Class<?> getActualType(Type type, int pos) {
