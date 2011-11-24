@@ -413,7 +413,9 @@ public class WadlGenerator implements RequestHandler {
 
     protected boolean compareOperations(OperationResourceInfo ori1, OperationResourceInfo ori2) {
         if (ori1 == null || ori2 == null
-            || !ori1.getURITemplate().getValue().equals(ori2.getURITemplate().getValue())) {
+            || !ori1.getURITemplate().getValue().equals(ori2.getURITemplate().getValue())
+            || ori1.getHttpMethod() != null && ori2.getHttpMethod() == null 
+            || ori2.getHttpMethod() != null && ori1.getHttpMethod() == null) {
             return false;
         }
         int ori1PathParams = 0;
