@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -138,6 +140,7 @@ public final class FormUtils {
     }
     
     public static void populateMapFromMultipart(MultivaluedMap<String, String> params,
+                                                Annotation[] anns,
                                                 MultipartBody body, 
                                                 boolean decode) {
         List<Attachment> atts = body.getAllAttachments();
@@ -145,7 +148,13 @@ public final class FormUtils {
             ContentDisposition cd = a.getContentDisposition();
             if (cd == null || !MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())
                 || cd.getParameter("name") == null) {
-                throw new WebApplicationException(415);
+                Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
+                
+                if (id == null || id.errorIfMissing()) {
+                    throw new WebApplicationException(400);
+                } else {
+                    return;
+                }
             }
             String name = cd.getParameter("name").replace("\"", "").replace("'", "");
             try {

@@ -99,7 +99,7 @@ public class FormEncodingProvider implements
             }
             
             MultivaluedMap<String, String> params = createMap(clazz);
-            populateMap(params, is, mt,
+            populateMap(params, annotations, is, mt,
                         AnnotationUtils.getAnnotation(annotations, Encoded.class) == null);
             validateMap(params);
             
@@ -140,11 +140,14 @@ public class FormEncodingProvider implements
      * @return a Map of parameters.
      */
     protected void populateMap(MultivaluedMap<String, String> params, 
-                               InputStream is, MediaType mt, boolean decode) {
+                               Annotation[] anns,
+                               InputStream is, 
+                               MediaType mt, 
+                               boolean decode) {
         if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
             MultipartBody body = 
                 AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold, attachmentMaxSize);
-            FormUtils.populateMapFromMultipart(params, body, decode);
+            FormUtils.populateMapFromMultipart(params, anns, body, decode);
         } else {
             String enc = HttpUtils.getEncoding(mt, "UTF-8");
             FormUtils.populateMapFromString(params, 

@@ -163,11 +163,19 @@ public class MultipartProvider extends AbstractConfigurableProvider
             return new MultipartBody(infos);
         }
         
-        Attachment multipart = AttachmentUtils.getMultipart(c, anns, mt, infos);
+        Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
+        Attachment multipart = AttachmentUtils.getMultipart(c, id, mt, infos);
         if (multipart != null) {
             return fromAttachment(multipart, c, t, anns);
+        } else if (id != null && !id.errorIfMissing()) {
+            /*
+             * If user asked for a null, give them a null. 
+             */
+            return null;
         }
+        
         throw new WebApplicationException(400);
+        
     }
     
     private Class<?> getActualType(Type type, int pos) {

@@ -335,17 +335,17 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         return ImageIO.read(getClass().getResource(name));
     }
     
-    @org.junit.Ignore
     @Test
     public void testNullableParams() throws Exception {
-        String address = "http://localhost:" + PORT + "/books/testnullpart";
+        String address = "http://localhost:" + PORT + "/bookstore/books/testnullpart";
         WebClient client = WebClient.create(address);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
         client.type("multipart/form-data").accept("text/plain");
         List<Attachment> atts = new LinkedList<Attachment>();
         atts.add(new Attachment("somepart", "text/plain", "hello there"));
         Response r = client.postCollection(atts, Attachment.class);
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
-        assertEquals("nobody home", r.getEntity());
+        assertEquals("nobody home", IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
     
     @Test
