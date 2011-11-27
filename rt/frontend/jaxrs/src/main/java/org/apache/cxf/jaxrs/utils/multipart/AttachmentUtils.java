@@ -40,7 +40,6 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
@@ -98,9 +97,11 @@ public final class AttachmentUtils {
                                 attachmentMaxSize).getAllAttachments();
     }
     
-    public static Attachment getMultipart(Class<Object> c, Annotation[] anns, 
-        MediaType mt, List<Attachment> infos) throws IOException {
-        Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
+    public static Attachment getMultipart(Class<Object> c, 
+                                          Multipart id, 
+                                          MediaType mt, 
+                                          List<Attachment> infos) throws IOException {
+        
         if (id != null) {
             for (Attachment a : infos) {
                 if (matchAttachmentId(a, id, mt)) {
@@ -108,20 +109,16 @@ public final class AttachmentUtils {
                     return a;    
                 }
             }
-            if (!id.errorIfMissing()) {
-                /*
-                 * If user asked for a null, give them a null. 
-                 */
-                return null;
+            if (id.errorIfMissing()) {
+                org.apache.cxf.common.i18n.Message errorMsg = 
+                    new org.apache.cxf.common.i18n.Message("MULTTIPART_ID_NOT_FOUND", 
+                                                           BUNDLE, 
+                                                           id.value(),
+                                                           mt.toString());
+                LOG.warning(errorMsg.toString());
+                throw new WebApplicationException(
+                          new MultipartReadException(id.value(), id.type(), errorMsg.toString()));
             }
-            org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("MULTTIPART_ID_NOT_FOUND", 
-                                                       BUNDLE, 
-                                                       id.value(),
-                                                       mt.toString());
-            LOG.warning(errorMsg.toString());
-            throw new WebApplicationException(
-                      new MultipartReadException(id.value(), id.type(), errorMsg.toString()));
         }
         
         return infos.size() > 0 ? infos.get(0) : null; 
@@ -139,15 +136,19 @@ public final class AttachmentUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> MultivaluedMap<String, T> populateFormMap(MessageContext mc, Class<T> cls) {
+    public static <T> MultivaluedMap<String, T> populateFormMap(MessageContext mc, 
+                                                                Class<T> cls,
+                                                                boolean errorIfMissing) {
         MultivaluedMap<String, T> data = new MetadataMap<String, T>();
-        FormUtils.populateMapFromMultipart((MultivaluedMap)data, 
-                                           AttachmentUtils.getMultipartBody(mc), true);
+        FormUtils.populateMapFromMultipart((MultivaluedMap)data,
+                                           new Annotation[]{},
+                                           AttachmentUtils.getMultipartBody(mc), 
+                                           true);
         return data;
     }
     
     public static MultivaluedMap<String, String> populateFormMap(MessageContext mc) {
-        return populateFormMap(mc, String.class);
+        return populateFormMap(mc, String.class, true);
     }
     
     private static Map<String, Attachment> fromListToMap(List<Attachment> atts) {
