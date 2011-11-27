@@ -44,7 +44,7 @@ public @interface Multipart {
      * the {@link org.apache.cxf.jaxrs.provider.MultipartProvider} 
      * throws a {@link javax.ws.rs.WebApplicationException}
      * with status 400. If this option is set to <strong>false</strong>,
-     * the parameter is set to <strong>null</strong>.
+     * the parameter is set to <strong>null</strong> instead.
      */
-    boolean errorIfMissing() default true; 
+    boolean required() default true; 
 }
