@@ -989,7 +989,7 @@ public class BookStore {
     }
     
     @XmlJavaTypeAdapter(BookInfoAdapter2.class)
-    static interface BookInfoInterface {
+    interface BookInfoInterface {
         String getName();
         
         long getId();
