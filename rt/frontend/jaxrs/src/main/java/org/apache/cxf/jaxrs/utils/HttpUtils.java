@@ -56,8 +56,9 @@ public final class HttpUtils {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(HttpUtils.class);
     private static final Logger LOG = LogUtils.getL7dLogger(HttpUtils.class);
     
-    private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
-    private static final String LOCAL_HOST = "localhost";
+    private static final String ANY_IP_ADDRESS = "0.0.0.0";
+    private static final int DEFAULT_HTTP_PORT = 80;
+    
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     private static final String CHARSET_PARAMETER = "charset";
     
@@ -181,18 +182,21 @@ public final class HttpUtils {
                || HttpHeaders.LAST_MODIFIED.equalsIgnoreCase(headerName); 
     }
     
-    public static URI toAbsoluteUri(URI u, Message message) { 
-        if (!u.isAbsolute()) {
-            HttpServletRequest httpRequest = 
-                (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
-            if (httpRequest != null) {
-                String scheme = httpRequest.isSecure() ? "https" : "http";
-                String host = httpRequest.getLocalName();
-                if (LOCAL_IP_ADDRESS.equals(host)) {
-                    host = LOCAL_HOST;
-                }
-                int port = httpRequest.getLocalPort();
-                return URI.create(scheme + "://" + host + ':' + port + u.toString());
+    public static URI toAbsoluteUri(URI u, Message message) {
+        HttpServletRequest request = 
+            (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+        boolean absolute = u.isAbsolute();
+        if (request != null && (!absolute || u.getHost().equals(ANY_IP_ADDRESS))) {
+            String serverAndPort = request.getServerName();
+            int port = request.getLocalPort();
+            if (port != DEFAULT_HTTP_PORT) {
+                serverAndPort += ":" + port;
+            }
+            String base = request.getScheme() + "://" + serverAndPort;
+            if (!absolute) {
+                u = URI.create(base + u.toString());
+            } else {
+                u = URI.create(u.toString().replace(ANY_IP_ADDRESS, serverAndPort));
             }
         }
         return u;
@@ -239,7 +243,9 @@ public final class HttpUtils {
         } else {
             address = (String)m.get(Message.ENDPOINT_ADDRESS);
         }
-        
+        if (address.startsWith("http") && address.endsWith("//")) {
+            address = address.substring(0, address.length() - 1);
+        }
         return address;
     }
     
