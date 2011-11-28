@@ -24,16 +24,32 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.provider.PrimitiveTextProvider;
 
 public class StringTextWriter extends PrimitiveTextProvider {
+    
+    @Context
+    private UriInfo ui;
+    
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return false;
+    }
+    
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+        String path = ui.getAbsolutePath().toString();
+        if (path.endsWith("/webapp/resources/bookstore/nonexistent")) {
+            return super.isWriteable(type, genericType, annotations, mt);
+        } else {
+            return false;
+        }
     }
     
     public void writeTo(Object obj, Class<?> type, Type genType, Annotation[] anns, 
