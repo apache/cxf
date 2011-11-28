@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.net.URI;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
@@ -28,6 +31,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Destination;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.easymock.EasyMock;
 
 import org.junit.Assert;
@@ -140,6 +144,22 @@ public class HttpUtilsTest extends Assert {
     @Test
     public void testGetBaseAddressWithoutScheme() {
         doTestGetBaseAddress("/s", "/s");
+    }
+    
+    @Test
+    public void testReplaceAnyIPAddress() {
+        Message m = new MessageImpl();
+        HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
+        m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
+        req.getScheme();
+        EasyMock.expectLastCall().andReturn("http");
+        req.getServerName();
+        EasyMock.expectLastCall().andReturn("localhost");
+        req.getLocalPort();
+        EasyMock.expectLastCall().andReturn(8080);
+        EasyMock.replay(req);
+        URI u = HttpUtils.toAbsoluteUri(URI.create("http://0.0.0.0/bar/foo"), m);
+        assertEquals("http://localhost:8080/bar/foo", u.toString());
     }
     
     private void doTestGetBaseAddress(String baseURI, String expected) {
