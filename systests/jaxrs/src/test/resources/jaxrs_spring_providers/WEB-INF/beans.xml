@@ -48,4 +48,5 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </bean>   
     <bean id="exceptionMapper2" class="org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper"/>
     <bean id="plainTextProvider" class="org.apache.cxf.systest.jaxrs.StringTextWriter"/>
+    
 </beans>
