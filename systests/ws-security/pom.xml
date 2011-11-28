@@ -67,6 +67,9 @@
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl</wsdl>
                                 </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/spnego/DoubleItSpnego.wsdl</wsdl>
+                                </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
