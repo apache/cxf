@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.cxf.aegis.type.java5.IgnoreProperty;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
@@ -47,6 +48,15 @@ import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
 @Description(lang = "en-us", title = "book store resource", value = "super resource")
 public class BookStore {
 
+    @Descriptions({ 
+        @Description(value = "Attachments", target = DocTarget.PARAM)
+    })
+    @POST 
+    @Consumes("multipart/form-data")
+    public void formdata(MultipartBody body) {
+        
+    }
+    
     @GET 
     @Produces("text/plain")
     public String getName(@PathParam("id") Long id, @QueryParam("") QueryBean query) {

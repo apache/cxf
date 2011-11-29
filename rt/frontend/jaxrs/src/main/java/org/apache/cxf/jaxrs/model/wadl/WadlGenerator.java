@@ -686,6 +686,9 @@ public class WadlGenerator implements RequestHandler {
             if (inbound) {
                 int index = getRequestBodyParam(ori).getIndex();
                 anns = opMethod.getParameterAnnotations()[index];
+                if (!isDocAvailable(anns)) {
+                    anns = opMethod.getAnnotations();
+                }
                 docCategory = DocTarget.PARAM;
             } else {
                 anns = opMethod.getAnnotations();
