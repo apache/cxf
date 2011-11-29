@@ -147,9 +147,7 @@ public final class ProviderFactory {
                     Type[] args = pt.getActualTypeArguments();
                     for (int i = 0; i < args.length; i++) {
                         if (contextType == args[i]) {
-                            
-                            InjectionUtils.injectContextFields(cr.getProvider(), cr, m);
-                            InjectionUtils.injectContextMethods(cr.getProvider(), cr, m);
+                            injectContextValues(cr, m);
                             return cr.getProvider();
                         }
                     }
@@ -177,7 +175,7 @@ public final class ProviderFactory {
         List<ExceptionMapper<T>> candidates = new LinkedList<ExceptionMapper<T>>();
         
         for (ProviderInfo<ExceptionMapper> em : exceptionMappers) {
-            handleMapper((List)candidates, em, exceptionType, m, ExceptionMapper.class);
+            handleMapper((List)candidates, em, exceptionType, m, ExceptionMapper.class, true);
         }
         if (candidates.size() == 0) {
             return null;
@@ -192,7 +190,7 @@ public final class ProviderFactory {
         List<ParameterHandler<T>> candidates = new LinkedList<ParameterHandler<T>>();
         
         for (ProviderInfo<ParameterHandler> em : paramHandlers) {
-            handleMapper((List)candidates, em, paramType, null, ParameterHandler.class);
+            handleMapper((List)candidates, em, paramType, null, ParameterHandler.class, true);
         }
         if (candidates.size() == 0) {
             return null;
@@ -208,7 +206,7 @@ public final class ProviderFactory {
         List<ResponseExceptionMapper<T>> candidates = new LinkedList<ResponseExceptionMapper<T>>();
         
         for (ProviderInfo<ResponseExceptionMapper> em : responseExceptionMappers) {
-            handleMapper((List)candidates, em, paramType, null, ResponseExceptionMapper.class);
+            handleMapper((List)candidates, em, paramType, null, ResponseExceptionMapper.class, true);
         }
         if (candidates.size() == 0) {
             return null;
@@ -217,8 +215,12 @@ public final class ProviderFactory {
         return candidates.get(0);
     }
     
-    private static void handleMapper(List<Object> candidates, ProviderInfo em, 
-                                     Class<?> expectedType, Message m, Class<?> providerClass) {
+    private static void handleMapper(List<Object> candidates, 
+                                     ProviderInfo em, 
+                                     Class<?> expectedType, 
+                                     Message m, 
+                                     Class<?> providerClass,
+                                     boolean injectContext) {
         
         Class<?> mapperClass =  ClassHelper.getRealClass(em.getProvider());
         Type[] types = getGenericInterfaces(mapperClass);
@@ -242,9 +244,8 @@ public final class ProviderFactory {
                         if (!isResolved) {
                             return;
                         }
-                        if (m != null) {
-                            InjectionUtils.injectContextFields(em.getProvider(), em, m);
-                            InjectionUtils.injectContextMethods(em.getProvider(), em, m);
+                        if (injectContext) {
+                            injectContextValues(em, m);
                         }
                         candidates.add(em.getProvider());
                         return;
@@ -254,15 +255,17 @@ public final class ProviderFactory {
                         continue;
                     }
                     if (actualClass.isAssignableFrom(expectedType)) {
-                        if (m != null) {
-                            InjectionUtils.injectContextFields(em.getProvider(), em, m);
-                            InjectionUtils.injectContextMethods(em.getProvider(), em, m);
+                        if (injectContext) {
+                            injectContextValues(em, m);
                         }
                         candidates.add(em.getProvider());
                         return;
                     }
                 }
             } else if (t instanceof Class && ((Class<?>)t).isAssignableFrom(providerClass)) {
+                if (injectContext) {
+                    injectContextValues(em, m);
+                }
                 candidates.add(em.getProvider());
             }
         }
@@ -383,12 +386,19 @@ public final class ProviderFactory {
         sortReaders();
         sortWriters();
         
-        injectContexts(messageReaders, messageWriters, contextResolvers, requestHandlers, responseHandlers,
+        injectContextProxies(messageReaders, messageWriters, contextResolvers, requestHandlers, responseHandlers,
                        exceptionMappers);
     }
 //CHECKSTYLE:ON
     
-    void injectContexts(List<?> ... providerLists) {
+    static void injectContextValues(ProviderInfo pi, Message m) {
+        if (m != null) {
+            InjectionUtils.injectContextFields(pi.getProvider(), pi, m);
+            InjectionUtils.injectContextMethods(pi.getProvider(), pi, m);
+        }
+    }
+    
+    void injectContextProxies(List<?> ... providerLists) {
         for (List<?> list : providerLists) {
             for (Object p : list) {
                 ProviderInfo pi = (ProviderInfo)p;
@@ -432,13 +442,11 @@ public final class ProviderFactory {
                                                          Message m) {
         List<MessageBodyReader<T>> candidates = new LinkedList<MessageBodyReader<T>>();
         for (ProviderInfo<MessageBodyReader> ep : messageReaders) {
-            if (matchesReaderCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
+            if (matchesReaderCriterias(ep, type, genericType, annotations, mediaType, m)) {
                 if (this == SHARED_FACTORY) {
-                    InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                    InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
                     return ep.getProvider();
                 }
-                handleMapper((List)candidates, ep, type, m, MessageBodyReader.class);
+                handleMapper((List)candidates, ep, type, m, MessageBodyReader.class, false);
             }
         }     
         
@@ -450,11 +458,13 @@ public final class ProviderFactory {
         
     }
     
-    private <T> boolean matchesReaderCriterias(MessageBodyReader<T> ep,
+    private <T> boolean matchesReaderCriterias(ProviderInfo<MessageBodyReader> pi,
                                                Class<T> type,
                                                Type genericType,
                                                Annotation[] annotations,
-                                               MediaType mediaType) {
+                                               MediaType mediaType,
+                                               Message m) {
+        MessageBodyReader<?> ep = pi.getProvider();
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderConsumeTypes(ep);
         
         List<MediaType> availableMimeTypes = 
@@ -463,9 +473,12 @@ public final class ProviderFactory {
         if (availableMimeTypes.size() == 0) {
             return false;
         }
-        
-        return ep.isReadable(type, genericType, annotations, mediaType);
-        
+        injectContextValues(pi, m);
+        boolean matches = ep.isReadable(type, genericType, annotations, mediaType);
+        if (!matches) {
+            pi.clearThreadLocalProxies();
+        }
+        return matches;
     }
         
     /**
@@ -486,13 +499,11 @@ public final class ProviderFactory {
                                                          Message m) {
         List<MessageBodyWriter<T>> candidates = new LinkedList<MessageBodyWriter<T>>();
         for (ProviderInfo<MessageBodyWriter> ep : messageWriters) {
-            if (matchesWriterCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
+            if (matchesWriterCriterias(ep, type, genericType, annotations, mediaType, m)) {
                 if (this == SHARED_FACTORY) {
-                    InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                    InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
                     return ep.getProvider();
                 }
-                handleMapper((List)candidates, ep, type, m, MessageBodyWriter.class);
+                handleMapper((List)candidates, ep, type, m, MessageBodyWriter.class, false);
             }
         }     
         if (candidates.size() == 0) {
@@ -502,11 +513,13 @@ public final class ProviderFactory {
         return candidates.get(0);
     }
     
-    private <T> boolean matchesWriterCriterias(MessageBodyWriter<T> ep,
+    private <T> boolean matchesWriterCriterias(ProviderInfo<MessageBodyWriter> pi,
                                                Class<T> type,
                                                Type genericType,
                                                Annotation[] annotations,
-                                               MediaType mediaType) {
+                                               MediaType mediaType,
+                                               Message m) {
+        MessageBodyWriter<?> ep = pi.getProvider();
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderProduceTypes(ep);
         
         List<MediaType> availableMimeTypes = 
@@ -516,7 +529,12 @@ public final class ProviderFactory {
         if (availableMimeTypes.size() == 0) {
             return false;
         }
-        return ep.isWriteable(type, genericType, annotations, mediaType); 
+        injectContextValues(pi, m);
+        boolean matches = ep.isWriteable(type, genericType, annotations, mediaType);
+        if (!matches) {
+            pi.clearThreadLocalProxies();
+        }
+        return matches;
     }
     
     List<ProviderInfo<MessageBodyReader>> getMessageReaders() {
