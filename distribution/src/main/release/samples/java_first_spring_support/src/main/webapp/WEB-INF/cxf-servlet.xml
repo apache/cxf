@@ -23,15 +23,15 @@
 	xmlns:jaxws="http://cxf.apache.org/jaxws"
 	xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schema/jaxws.xsd">
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
-    <bean id="client" class="demo.spring.HelloWorld" 
-      factory-bean="clientFactory" factory-method="create"/>
-    
-	<bean id="clientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
-	  <property name="serviceClass" value="demo.spring.HelloWorld"/>
-	  <property name="address" value="http://localhost:9002/HelloWorld"/>
-	</bean>
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<jaxws:endpoint 
+	  id="helloWorld" 
+	  implementor="demo.spring.service.HelloWorldImpl" 
+	  address="/HelloWorld" />
 	  
 </beans>
 <!-- END SNIPPET: beans -->

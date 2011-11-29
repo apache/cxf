@@ -17,7 +17,7 @@
  * under the License.
  */
 // START SNIPPET: service
-package demo.spring;
+package demo.spring.service;
 
 import javax.jws.WebService;
 
