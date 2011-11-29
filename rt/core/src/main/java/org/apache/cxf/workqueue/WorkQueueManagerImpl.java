@@ -108,13 +108,21 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         for (AutomaticWorkQueue q : namedQueues.values()) {
             if (q instanceof AutomaticWorkQueueImpl) {
                 AutomaticWorkQueueImpl impl = (AutomaticWorkQueueImpl)q;
-                if (impl.isShared() && imanager != null 
-                    && imanager.getMBeanServer() != null) {
+                if (impl.isShared()) {
                     synchronized (impl) {
                         impl.removeSharedUser();
+                        
+                        if (impl.getShareCount() == 0 
+                            && imanager != null 
+                            && imanager.getMBeanServer() != null) {
+                            try {
+                                imanager.unregister(new WorkQueueImplMBeanWrapper(impl, this));
+                            } catch (JMException jmex) {
+                                LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                            }
+                        }
                     }
-                }
-                if (!impl.isShared()) {
+                } else {
                     q.shutdown(processRemainingTasks);
                 }
             } else {
@@ -161,15 +169,16 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             AutomaticWorkQueueImpl impl = (AutomaticWorkQueueImpl)q;
             if (impl.isShared()) {
                 synchronized (impl) {
-                    if (impl.getShareCount() == 0 && imanager != null 
+                    if (impl.getShareCount() == 0 
+                        && imanager != null 
                         && imanager.getMBeanServer() != null) {
                         try {
                             imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
                         } catch (JMException jmex) {
                             LOG.log(Level.WARNING , jmex.getMessage(), jmex);
                         }
-                        impl.addSharedUser();
                     }
+                    impl.addSharedUser();
                 }
             } else if (imanager != null) {
                 try {
