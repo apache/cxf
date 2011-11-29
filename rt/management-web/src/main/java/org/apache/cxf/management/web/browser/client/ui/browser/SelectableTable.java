@@ -256,11 +256,11 @@ public class SelectableTable<T> extends Composite {
         }
     }
 
-    public static interface SelectRowHandler {
+    public interface SelectRowHandler {
         void onSelectRow(int row);
     }
 
-    public static interface ColumnDefinition<T> {
+    public interface ColumnDefinition<T> {
         String getContent(T t);
         
         String getWidth();
