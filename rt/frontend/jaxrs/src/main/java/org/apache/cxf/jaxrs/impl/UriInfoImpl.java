@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -156,9 +157,9 @@ public class UriInfoImpl implements UriInfo {
 
     public List<Object> getMatchedResources() {
         if (stack != null) {
-            List<Object> resources = new ArrayList<Object>(stack.size());
+            List<Object> resources = new LinkedList<Object>();
             for (MethodInvocationInfo invocation : stack) {
-                resources.add(invocation.getRealClass());
+                resources.add(0, invocation.getRealClass());
             }
             return resources;
         }
@@ -173,7 +174,7 @@ public class UriInfoImpl implements UriInfo {
     public List<String> getMatchedURIs(boolean decode) {
         if (stack != null) {
             List<String> objects = new ArrayList<String>();
-            List<String> uris = new ArrayList<String>(stack.size());
+            List<String> uris = new LinkedList<String>();
             String sum = "";
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
@@ -189,7 +190,7 @@ public class UriInfoImpl implements UriInfo {
                 }
                 UriBuilder ub = UriBuilder.fromPath(sum);
                 objects.addAll(invocation.getTemplateValues());
-                uris.add(ub.build(objects.toArray()).normalize().getPath());
+                uris.add(0, ub.build(objects.toArray()).normalize().getPath());
             }
             return uris;
         }
