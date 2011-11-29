@@ -81,7 +81,6 @@ import org.apache.ws.security.util.XmlSchemaDateFormat;
 /**
  * This abstract class contains some common functionality for different operations.
  */
-@SuppressWarnings("")
 public abstract class AbstractOperation {
 
     public static final QName TOKEN_TYPE = 
