@@ -685,7 +685,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
     }
 
-    private static interface CorrelationIDFactory {
+    private interface CorrelationIDFactory {
         String createCorrealtionID();
     }
     
