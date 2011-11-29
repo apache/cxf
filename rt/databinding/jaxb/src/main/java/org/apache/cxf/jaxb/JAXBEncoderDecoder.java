@@ -252,7 +252,7 @@ public final class JAXBEncoderDecoder {
                 writeObject(marshaller, source, mObj);
             }
         } catch (Fault ex) {
-            throw (Fault)ex.fillInStackTrace();
+            throw ex;
         } catch (Exception ex) {
             if (ex instanceof javax.xml.bind.MarshalException) {
                 javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
@@ -815,7 +815,6 @@ public final class JAXBEncoderDecoder {
         } catch (PrivilegedActionException e) {
             Exception ex = e.getException();
             if (ex instanceof Fault) {
-                ex.fillInStackTrace();
                 throw (Fault)ex;
             }
             if (ex instanceof javax.xml.bind.UnmarshalException) {
@@ -1000,7 +999,6 @@ public final class JAXBEncoderDecoder {
             }
             return ret;
         } catch (Fault ex) {
-            ex.fillInStackTrace();
             throw ex;
         } catch (Exception ex) {
             if (ex instanceof javax.xml.bind.UnmarshalException) {
