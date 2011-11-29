@@ -20,8 +20,7 @@ package demo.spring.client;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
-import demo.spring.HelloWorld;
+import demo.spring.service.HelloWorld;
 
 
 public final class Client {
@@ -32,7 +31,7 @@ public final class Client {
     public static void main(String args[]) throws Exception {
         // START SNIPPET: client
         ClassPathXmlApplicationContext context 
-            = new ClassPathXmlApplicationContext(new String[] {"demo/spring/client/client-beans.xml"});
+            = new ClassPathXmlApplicationContext(new String[] {"client-beans.xml"});
 
         HelloWorld client = (HelloWorld)context.getBean("client");
 
