@@ -37,7 +37,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
-
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
@@ -45,6 +44,8 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.RequestParser;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
@@ -52,6 +53,9 @@ import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenReference;
+import org.apache.cxf.sts.token.validator.TokenValidator;
+import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
+import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
@@ -72,9 +76,12 @@ import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 
+
+
 /**
  * This abstract class contains some common functionality for different operations.
  */
+@SuppressWarnings("")
 public abstract class AbstractOperation {
 
     public static final QName TOKEN_TYPE = 
@@ -86,6 +93,7 @@ public abstract class AbstractOperation {
     protected boolean encryptIssuedToken;
     protected List<ServiceMBean> services;
     protected List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
+    protected List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
     protected boolean returnReferences = true;
     protected STSTokenStore tokenStore;
     
@@ -124,6 +132,14 @@ public abstract class AbstractOperation {
     public List<TokenProvider> getTokenProviders() {
         return tokenProviders;
     }
+
+    public void setTokenValidators(List<TokenValidator> tokenValidators) {
+        this.tokenValidators = tokenValidators;
+    }
+
+    public List<TokenValidator> getTokenValidators() {
+        return tokenValidators;
+    }  
     
     /**
      * Check the arguments from the STSProvider and parse the request.
@@ -486,5 +502,48 @@ public abstract class AbstractOperation {
         }
         return null;
     }
+    
+    protected TokenValidatorResponse validateReceivedToken(
+            WebServiceContext context, String realm,
+            TokenRequirements tokenRequirements, ReceivedToken token) {
+        token.setValidationState(STATE.NONE);
+        
+        tokenRequirements.setValidateTarget(token);
+
+        TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
+        validatorParameters.setStsProperties(stsProperties);
+        validatorParameters.setPrincipal(context.getUserPrincipal());
+        validatorParameters.setWebServiceContext(context);
+        validatorParameters.setTokenStore(getTokenStore());
+        validatorParameters.setKeyRequirements(null);
+        validatorParameters.setTokenRequirements(tokenRequirements);
+
+        TokenValidatorResponse tokenResponse = null;
+        for (TokenValidator tokenValidator : tokenValidators) {
+            boolean canHandle = false;
+            if (realm == null) {
+                canHandle = tokenValidator.canHandleToken(token);
+            } else {
+                canHandle = tokenValidator.canHandleToken(token, realm);
+            }
+            if (canHandle) {
+                try {
+                    tokenResponse = tokenValidator.validateToken(validatorParameters);
+                    token.setValidationState(
+                            tokenResponse.isValid() ? STATE.VALID : STATE.INVALID
+                    );
+                    // The parsed principal is set if available. It's up to other components to
+                    // deal with the STATE of the validation
+                    token.setPrincipal(tokenResponse.getPrincipal());
+                } catch (RuntimeException ex) {
+                    LOG.log(Level.WARNING, "Failed to validate the token", ex);
+                    token.setValidationState(STATE.INVALID);
+                }
+                break;
+            }
+        }
+        return tokenResponse;
+    }
+    
     
 }

@@ -20,8 +20,6 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +30,8 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
+import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
-import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.RequestParser;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -41,8 +39,6 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.provider.TokenReference;
-import org.apache.cxf.sts.token.validator.TokenValidator;
-import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
@@ -61,23 +57,13 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenValidateOperation.class);
 
-    private List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
-    
-    public void setTokenValidators(List<TokenValidator> tokenValidators) {
-        this.tokenValidators = tokenValidators;
-    }
-    
-    public List<TokenValidator> getTokenValidators() {
-        return tokenValidators;
-    }
-    
+   
     public RequestSecurityTokenResponseType validate(
         RequestSecurityTokenType request, 
         WebServiceContext context
     ) {
         RequestParser requestParser = parseRequest(request, context);
         
-        KeyRequirements keyRequirements = requestParser.getKeyRequirements();
         TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
         
         ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
@@ -92,31 +78,16 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             );
         }
         
-        TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
-        validatorParameters.setStsProperties(stsProperties);
-        validatorParameters.setPrincipal(context.getUserPrincipal());
-        validatorParameters.setWebServiceContext(context);
-        validatorParameters.setTokenStore(getTokenStore());
-        
-        validatorParameters.setKeyRequirements(keyRequirements);
-        validatorParameters.setTokenRequirements(tokenRequirements);
-        
-        //
-        // Validate token
-        //
-        TokenValidatorResponse tokenResponse = null;
-        for (TokenValidator tokenValidator : tokenValidators) {
-            if (tokenValidator.canHandleToken(validateTarget)) {
-                try {
-                    tokenResponse = tokenValidator.validateToken(validatorParameters);
-                } catch (RuntimeException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    tokenResponse = new TokenValidatorResponse();
-                    tokenResponse.setValid(false);
-                }
-                break;
-            }
+        // Get the realm of the request
+        String realm = null;
+        if (stsProperties.getRealmParser() != null) {
+            RealmParser realmParser = stsProperties.getRealmParser();
+            realm = realmParser.parseRealm(context);
         }
+        
+        TokenValidatorResponse tokenResponse = validateReceivedToken(
+                context, realm, tokenRequirements, validateTarget);
+        
         if (tokenResponse == null) {
             LOG.fine("No Token Validator has been found that can handle this token");
             tokenResponse = new TokenValidatorResponse();
@@ -151,9 +122,15 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             if (additionalProperties != null) {
                 providerParameters.setAdditionalProperties(additionalProperties);
             }
-            String realm = providerParameters.getRealm();
+            realm = providerParameters.getRealm();
             for (TokenProvider tokenProvider : tokenProviders) {
-                if (tokenProvider.canHandleToken(tokenType, realm)) {
+                boolean canHandle = false;
+                if (realm == null) {
+                    canHandle = tokenProvider.canHandleToken(tokenType);
+                } else {
+                    canHandle = tokenProvider.canHandleToken(tokenType, realm);
+                }
+                if (canHandle) {
                     try {
                         tokenProviderResponse = tokenProvider.createToken(providerParameters);
                     } catch (STSException ex) {

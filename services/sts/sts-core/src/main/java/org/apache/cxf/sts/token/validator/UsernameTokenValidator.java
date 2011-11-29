@@ -44,6 +44,7 @@ import org.apache.cxf.sts.token.realm.UsernameTokenRealmCodec;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 
+import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -167,6 +168,8 @@ public class UsernameTokenValidator implements TokenValidator {
             boolean bspCompliant = wssConfig.isWsiBSPCompliant();
             UsernameToken ut = 
                 new UsernameToken(usernameTokenElement, allowNamespaceQualifiedPasswordTypes, bspCompliant);
+            // The parsed principal is set independent whether validation is successful or not
+            response.setPrincipal(new CustomTokenPrincipal(ut.getName()));
             if (ut.getPassword() == null) {
                 return response;
             }

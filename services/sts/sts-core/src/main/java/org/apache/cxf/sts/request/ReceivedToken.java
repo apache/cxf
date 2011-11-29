@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.request;
 
+import java.security.Principal;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
@@ -41,6 +42,11 @@ public class ReceivedToken {
     private boolean isBinarySecurityToken;
     private boolean isUsernameToken;
     private boolean isDOMElement;
+    private String tokenContext; // WS-Security, OnBehalfOf, ActAs
+    private STATE validationState;
+    private Principal principal;
+    
+    public enum STATE { VALID, INVALID, NONE };
     
     public ReceivedToken(Object receivedToken) throws STSException {
         if (receivedToken instanceof JAXBElement<?>) {
@@ -102,6 +108,30 @@ public class ReceivedToken {
 
     public void setDOMElement(boolean domElement) {
         this.isDOMElement = domElement;
+    }
+    
+    public String getTokenContext() {
+        return tokenContext;
+    }
+
+    public void setTokenContext(String tokenContext) {
+        this.tokenContext = tokenContext;
+    }
+
+    public STATE getValidationState() {
+        return validationState;
+    }
+
+    public void setValidationState(STATE validationState) {
+        this.validationState = validationState;
+    }
+
+    public Principal getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
     }
     
 }

@@ -31,16 +31,15 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
@@ -84,16 +83,11 @@ public class DefaultSubjectProvider implements SubjectProvider {
         Principal principal = null;
         ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();
         //[TODO] ActAs support
-        if (receivedToken != null && receivedToken.isDOMElement()) {
-            LOG.fine("Received token is DOM element: " + receivedToken.isDOMElement());
-            Element receivedTokenElement = (Element)receivedToken.getToken();
-            try {
-                AssertionWrapper assertion = new AssertionWrapper(receivedTokenElement);
-                principal = new SAMLTokenPrincipal(assertion);
-            } catch (WSSecurityException e) {
-                LOG.log(Level.WARNING, "Failed to parse OnBehalfOf element", e);
-                throw new STSException("Unknown OnBehalfOf element", STSException.REQUEST_FAILED);
-            }
+        //TokenValidator in IssueOperation has validated the ReceivedToken
+        //if validation was successful, the principal was set in ReceivedToken 
+        if (receivedToken != null && receivedToken.getPrincipal() != null 
+                && receivedToken.getValidationState().equals(STATE.VALID)) {
+            principal = receivedToken.getPrincipal();
         } else {
             principal = providerParameters.getPrincipal();
         }
