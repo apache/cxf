@@ -55,6 +55,9 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 
+import org.joda.time.DateTime;
+import org.opensaml.common.SAMLVersion;
+
 /**
  * A TokenProvider implementation that provides a SAML Token.
  */
@@ -152,7 +155,21 @@ public class SAMLTokenProvider implements TokenProvider {
             } else {
                 response.setTokenId(token.getAttribute("AssertionID"));
             }
-            response.setLifetime(conditionsProvider.getLifetime());
+            
+            DateTime validFrom = null;
+            DateTime validTill = null;
+            long lifetime = 0;
+            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+                validFrom = assertion.getSaml2().getConditions().getNotBefore();
+                validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
+                lifetime = validTill.getMillis() - validFrom.getMillis();
+            } else {
+                validFrom = assertion.getSaml1().getConditions().getNotBefore();
+                validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+                lifetime = validTill.getMillis() - validFrom.getMillis();
+            }
+            response.setLifetime(lifetime / 1000);
+            
             response.setEntropy(entropyBytes);
             if (keySize > 0) {
                 response.setKeySize(keySize);

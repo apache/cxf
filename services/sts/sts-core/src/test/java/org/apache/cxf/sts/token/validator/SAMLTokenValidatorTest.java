@@ -21,6 +21,7 @@ package org.apache.cxf.sts.token.validator;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -40,9 +41,11 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.Lifetime;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -53,6 +56,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.junit.BeforeClass;
 
 
@@ -191,6 +195,64 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(validatorResponse != null);
         assertFalse(validatorResponse.isValid());
     }
+
+    
+    /**
+     * Test a SAML 1.1 Assertion with an invalid condition
+     */
+    @org.junit.Test
+    public void testInvalidConditionSAML1Assertion() throws Exception {
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a SAML Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+        Thread.sleep(100);
+        TokenValidatorResponse validatorResponse = 
+            samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertFalse("SAML token is invalid", validatorResponse.isValid());
+    }
+    
+    /**
+     * Test a SAML 2.0 Assertion with an invalid condition
+     */
+    @org.junit.Test
+    public void testInvalidConditionSAML2Assertion() throws Exception {
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a SAML Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+        Thread.sleep(100);
+        TokenValidatorResponse validatorResponse = 
+            samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertFalse("SAML token is invalid", validatorResponse.isValid());
+    }
+    
     
     /**
      * Test a SAML 1.1 Assertion using Certificate Constraints 
@@ -278,6 +340,39 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         
         return providerResponse.getToken();
     }
+    
+    private Element createSAMLAssertion(
+            String tokenType, Crypto crypto, String signatureUsername,
+            CallbackHandler callbackHandler, long ttlMs
+    ) throws WSSecurityException {
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
+        conditionsProvider.setAcceptClientLifetime(true);
+        samlTokenProvider.setConditionsProvider(conditionsProvider);
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                    tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
+            );
+
+        if (ttlMs != 0) {
+            Lifetime lifetime = new Lifetime();
+            Date creationTime = new Date();
+            Date expirationTime = new Date();
+            expirationTime.setTime(creationTime.getTime() + ttlMs);
+
+            XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
+            lifetime.setCreated(fmt.format(creationTime));
+            lifetime.setExpires(fmt.format(expirationTime));
+
+            providerParameters.getTokenRequirements().setLifetime(lifetime);
+        }
+
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        return providerResponse.getToken();
+    }    
     
     private TokenProviderParameters createProviderParameters(
         String tokenType, String keyType, Crypto crypto, 
