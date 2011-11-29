@@ -359,8 +359,8 @@ public class WadlGeneratorTest extends Assert {
         // must have a single template parameter
         verifyParameters(resource, 1, new Param("id", "template", "xs:long"));
         
-        // must have 2 methods, GET and PUT
-        List<Element> methodEls = getElements(resource, "method", 2);
+        // must have 3 methods, GET, POST and PUT
+        List<Element> methodEls = getElements(resource, "method", 3);
         
         // verify GET
         assertEquals("GET", methodEls.get(0).getAttribute("name"));
@@ -382,11 +382,16 @@ public class WadlGeneratorTest extends Assert {
         //check response
         verifyRepresentation(methodEls.get(0), "response", "text/plain", "");
         
-        // verify PUT
-        assertEquals("PUT", methodEls.get(1).getAttribute("name"));
-        verifyRepresentation(methodEls.get(1), "request", "text/plain", "");
+        // verify POST
+        assertEquals("POST", methodEls.get(1).getAttribute("name"));
+        Element formRep = verifyRepresentation(methodEls.get(1), "request", "multipart/form-data", "");
+        checkDocs(formRep, "", "Attachments", "");
         
-        verifyResponseWithStatus(methodEls.get(1), "204");
+        // verify PUT
+        assertEquals("PUT", methodEls.get(2).getAttribute("name"));
+        verifyRepresentation(methodEls.get(2), "request", "text/plain", "");
+        
+        verifyResponseWithStatus(methodEls.get(2), "204");
         
         // verify resource starting with /book2
         verifyGetResourceMethod(resourceEls.get(0), book2El, null);
@@ -533,7 +538,7 @@ public class WadlGeneratorTest extends Assert {
             WadlGenerator.WADL_NS, "representation").size());
     }
     
-    private void verifyRepresentation(Element element, 
+    private Element verifyRepresentation(Element element, 
                                       String name, 
                                       String mediaType,
                                       String elementValue) {
@@ -548,6 +553,7 @@ public class WadlGeneratorTest extends Assert {
             String pName = "request".equals(name) ? "request" : "result";
             verifyParameters(representationEls.get(0), 1, new Param(pName, "plain", "xs:string"));
         }
+        return representationEls.get(0);
     }
     
     private void verifyXmlJsonRepresentations(Element element, String type, String docs) {
