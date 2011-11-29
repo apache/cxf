@@ -155,6 +155,6 @@ public class BearerTest extends AbstractBusClientServerTestBase {
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        System.out.println("The number " + numToDouble + " doubled is " + resp);
+        assertEquals(numToDouble * 2 , resp);
     }
 }

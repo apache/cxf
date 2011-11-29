@@ -110,7 +110,6 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        System.out.println("The number " + numToDouble + " doubled is " + resp);
-        assertTrue(resp == 2 * numToDouble);
+        assertEquals(numToDouble * 2 , resp);
     }
 }
