@@ -79,6 +79,9 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
     
     public void handleMessage(Message message) throws Fault {
         Fault f = (Fault)message.getContent(Exception.class);
+        if (f == null) {
+            return;
+        }
 
         Throwable cause = f.getCause();
         WebFault fault = null;
