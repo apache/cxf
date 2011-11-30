@@ -95,7 +95,7 @@
         <cxf.stax.impl.version>${cxf.woodstox.core.version}</cxf.stax.impl.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
-        <cxf.xmlbeans.version>2.4.0</cxf.xmlbeans.version>
+        <cxf.xmlbeans.version>2.5.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.0.1</cxf.xmlschema.version>
         <cxf.jibx.version>1.2.3</cxf.jibx.version>
         <cxf.axiom.version>1.2.10</cxf.axiom.version>
@@ -135,7 +135,7 @@
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
-        <cxf.xmlbeans.bundle.version>2.4.0_4</cxf.xmlbeans.bundle.version>
+        <cxf.xmlbeans.bundle.version>2.5.0_2</cxf.xmlbeans.bundle.version>
         <cxf.servicemix.specs.version>1.9.0</cxf.servicemix.specs.version>
         <cxf.javax.mail.version>1.4.4</cxf.javax.mail.version>
         <cxf.jaxb.bundle.version>2.2.1.1_1</cxf.jaxb.bundle.version>
