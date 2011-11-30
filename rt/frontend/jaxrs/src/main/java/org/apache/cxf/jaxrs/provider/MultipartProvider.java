@@ -167,7 +167,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         Attachment multipart = AttachmentUtils.getMultipart(c, id, mt, infos);
         if (multipart != null) {
             return fromAttachment(multipart, c, t, anns);
-        } else if (id != null && !id.errorIfMissing()) {
+        } else if (id != null && !id.required()) {
             /*
              * If user asked for a null, give them a null. 
              */

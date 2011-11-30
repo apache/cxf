@@ -150,7 +150,7 @@ public final class FormUtils {
                 || cd.getParameter("name") == null) {
                 Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
                 
-                if (id == null || id.errorIfMissing()) {
+                if (id == null || id.required()) {
                     throw new WebApplicationException(400);
                 } else {
                     return;

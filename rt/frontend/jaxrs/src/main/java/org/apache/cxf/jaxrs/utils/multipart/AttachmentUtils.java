@@ -109,7 +109,7 @@ public final class AttachmentUtils {
                     return a;    
                 }
             }
-            if (id.errorIfMissing()) {
+            if (id.required()) {
                 org.apache.cxf.common.i18n.Message errorMsg = 
                     new org.apache.cxf.common.i18n.Message("MULTTIPART_ID_NOT_FOUND", 
                                                            BUNDLE, 

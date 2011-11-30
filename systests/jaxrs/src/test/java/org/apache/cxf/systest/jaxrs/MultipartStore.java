@@ -147,7 +147,7 @@ public class MultipartStore {
     @Path("/books/testnullpart")
     @Consumes("multipart/form-data")
     @Produces("text/plain")
-    public String testNullPart(@Multipart(value = "someid", errorIfMissing = false) String value) {
+    public String testNullPart(@Multipart(value = "someid", required = false) String value) {
         if (value != null) {
             return value;
         } else {
