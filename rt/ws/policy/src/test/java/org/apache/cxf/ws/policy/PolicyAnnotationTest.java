@@ -196,7 +196,7 @@ public class PolicyAnnotationTest extends Assert {
     }
     )
     @WebService
-    public static interface TestInterface {
+    public interface TestInterface {
         @Policies({
             @Policy(uri = "annotationpolicies/TestOperationPolicy.xml"),
             @Policy(uri = "annotationpolicies/TestOperationInputPolicy.xml", 
