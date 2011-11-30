@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.management.JMException;
 import javax.management.ObjectName;
 
@@ -55,7 +54,6 @@ public class CounterRepository {
         counters = new ConcurrentHashMap<ObjectName, Counter>();
     }
     
-    @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
     }
