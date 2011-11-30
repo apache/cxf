@@ -821,14 +821,14 @@ public class ClientImpl
                 }
             }
         } finally {
+            BusFactory.setThreadDefaultBus(origBus);
             synchronized (message.getExchange()) {
-                if (!isPartialResponse(message) || callback == null) {
+                if (!isPartialResponse(message)) {
                     message.getExchange().put(FINISHED, Boolean.TRUE);
                     message.getExchange().setInMessage(message);
                     message.getExchange().notifyAll();
                 }
             }
-            BusFactory.setThreadDefaultBus(origBus);
         }
     }
 
