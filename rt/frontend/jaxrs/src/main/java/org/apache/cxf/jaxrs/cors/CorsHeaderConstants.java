@@ -24,7 +24,7 @@ package org.apache.cxf.jaxrs.cors;
  */
 public final class CorsHeaderConstants {
 
-    public static final String HEADER_ORIGIN = "origin";
+    public static final String HEADER_ORIGIN = "Origin";
     public static final String HEADER_AC_REQUEST_METHOD = "Access-Control-Request-Method";
     public static final String HEADER_AC_REQUEST_HEADERS = "Access-Control-Request-Headers";
     public static final String HEADER_AC_ALLOW_METHODS = "Access-Control-Allow-Methods";
