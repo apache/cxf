@@ -105,7 +105,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 try {
                     return method.invoke(this, params);
                 } catch (InvocationTargetException e) {
-                    throw e.fillInStackTrace().getCause();
+                    throw e.getCause();
                 }
             }
 
@@ -124,11 +124,11 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 result = invokeSync(method, oi, params);
             }
         } catch (WebServiceException wex) {
-            throw wex.fillInStackTrace();
+            throw wex;
         } catch (Exception ex) {
             for (Class<?> excls : method.getExceptionTypes()) {
                 if (excls.isInstance(ex)) {
-                    throw ex.fillInStackTrace();
+                    throw ex;
                 }
             }
             if (ex instanceof Fault && ex.getCause() instanceof IOException) {
