@@ -50,13 +50,12 @@ public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
     }
       
     public ObjectName getObjectName() throws JMException {
-        
-        String busId = bus.getId();        
         StringBuilder buffer = new StringBuilder();
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-        buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
-        buffer.append("WorkQueueManager=" + NAME_VALUE);
-        buffer.append("," + ManagementConstants.TYPE_PROP + "=" + TYPE_VALUE);
+
+        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
+        buffer.append("WorkQueueManager=").append(NAME_VALUE);
+        buffer.append(',').append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE);
 
         //Use default domain name of server
         return new ObjectName(buffer.toString());

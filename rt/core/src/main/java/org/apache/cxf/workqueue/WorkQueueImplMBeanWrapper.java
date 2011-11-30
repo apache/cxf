@@ -22,6 +22,7 @@ package org.apache.cxf.workqueue;
 import javax.management.JMException;
 import javax.management.ObjectName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedAttribute;
@@ -102,24 +103,24 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
 
     public ObjectName getObjectName() throws JMException {
         StringBuilder buffer = new StringBuilder();
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
+        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
         if (!aWorkQueue.isShared()) {
-            String busId = "cxf";
+            String busId = Bus.DEFAULT_BUS_ID;
             if (manager instanceof WorkQueueManagerImpl) {
                 busId = ((WorkQueueManagerImpl)manager).getBus().getId();
             }
-            buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
-            buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=");
-            buffer.append(WorkQueueManagerImplMBeanWrapper.NAME_VALUE + ",");
+            buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(busId).append(',');
+            buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE).append('=');
+            buffer.append(WorkQueueManagerImplMBeanWrapper.NAME_VALUE).append(',');
         } else {
-            buffer.append(ManagementConstants.BUS_ID_PROP + "=Shared,");
+            buffer.append(ManagementConstants.BUS_ID_PROP).append("=Shared,");
             //buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=Shared,");
         }
-        buffer.append(ManagementConstants.TYPE_PROP + "=" + TYPE_VALUE + ",");
-        buffer.append(ManagementConstants.NAME_PROP + "=" + aWorkQueue.getName());
-       
+        buffer.append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',');
+        buffer.append(ManagementConstants.NAME_PROP).append('=').append(aWorkQueue.getName());
+
         //Use default domain name of server
         return new ObjectName(buffer.toString());
     }
-    
+
 }
