@@ -69,8 +69,8 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             assertEquals((short)1, detail.getMinor());
             assertEquals("PingMeFault raised by server", ex.getMessage());
             StackTraceElement[] element = ex.getStackTrace();
-            // The stack trace will be reset as it's a declare exception
-            assertEquals("org.apache.cxf.jaxws.JaxWsClientProxy", element[0].getClassName());
+            assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", 
+                         element[0].getClassName());
         }
     }
 
