@@ -51,6 +51,9 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void handleMessage(Message message) throws Fault {
         Fault f = (Fault)message.getContent(Exception.class);
+        if (f == null) {
+            return;
+        }
 
         Throwable cause = f.getCause();
         if (cause == null) {
