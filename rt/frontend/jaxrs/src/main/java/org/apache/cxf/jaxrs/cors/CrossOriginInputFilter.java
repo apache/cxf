@@ -56,7 +56,6 @@ public class CrossOriginInputFilter implements RequestHandler {
     private List<String> allowedHeaders = Collections.emptyList();
     private boolean allowAllOrigins;
 
-    @Override
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         if ("OPTIONS".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
             OperationResourceInfo opResInfo = m.getExchange().get(OperationResourceInfo.class);

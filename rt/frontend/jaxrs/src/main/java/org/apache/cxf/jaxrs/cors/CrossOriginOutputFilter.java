@@ -52,7 +52,6 @@ public class CrossOriginOutputFilter implements ResponseHandler {
         return null;
     }
 
-    @Override
     public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
         String op = (String)m.getExchange().get(CrossOriginOutputFilter.class.getName());
         if (op == null) {
