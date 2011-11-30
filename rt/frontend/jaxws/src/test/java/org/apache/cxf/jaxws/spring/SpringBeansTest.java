@@ -398,5 +398,38 @@ public class SpringBeansTest extends Assert {
 
     }
 
+    @Test
+    public void testTwoEndpointsWithTwoBuses() throws Exception {
+        ClassPathXmlApplicationContext ctx = null;
+        Bus cxf1 = null;
+        Bus cxf2 = null;
+        try {
+            ctx = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/endpoints2.xml");
+            EndpointImpl ep1 = (EndpointImpl) ctx.getBean("ep1");
+            assertNotNull(ep1);
+            cxf1 = (Bus) ctx.getBean("cxf1");
+            assertNotNull(cxf1);
+            assertEquals(cxf1, ep1.getBus());
+            assertEquals("barf", ep1.getBus().getProperty("foo"));            
+
+            EndpointImpl ep2 = (EndpointImpl) ctx.getBean("ep2");
+            assertNotNull(ep2);
+            cxf2 = (Bus) ctx.getBean("cxf2");
+            assertNotNull(cxf2);
+            assertEquals(cxf2, ep2.getBus());
+            assertEquals("snarf", ep2.getBus().getProperty("foo"));            
+
+        } finally {
+            if (cxf1 != null) {
+                cxf1.shutdown(true);
+            }
+            if (cxf2 != null) {
+                cxf2.shutdown(true);
+            }
+            if (ctx != null) {
+                ctx.close();
+            }
+        }
+    }
 }
 
