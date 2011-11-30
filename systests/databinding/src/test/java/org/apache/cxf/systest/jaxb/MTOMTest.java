@@ -72,7 +72,7 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
     @Logging
     @WebService
     @MTOM(threshold = 1)
-    public static interface MTOMService {
+    public interface MTOMService {
         ObjectWithHashMapData getHashMapData(int y);
     }
     @WebService
