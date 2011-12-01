@@ -23,8 +23,6 @@
     xmlns:http="http://cxf.apache.org/transports/http/configuration"
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
     xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:security="http://schemas.iona.com/soa/security-config"
-    xmlns:interop="http://WSSec/wssec10"
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="
@@ -35,7 +33,6 @@
         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-        http://schemas.iona.com/soa/security-config                     http://schemas.iona.com/soa/security-config.xsd
     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
@@ -74,9 +71,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItX509KeyIdentifier" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKeyIdentifierPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
@@ -92,9 +89,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItX509IssuerSerial" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItIssuerSerialPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
@@ -110,9 +107,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItX509Thumbprint" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItThumbprintPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
@@ -128,9 +125,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItX509Asymmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItAsymmetricIssuerSerialPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
@@ -149,9 +146,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricProtect" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItAsymmetricProtectTokensPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
@@ -170,9 +167,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricProtect" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSymmetricProtectTokensPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
@@ -188,9 +185,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportEndorsing" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItTransportEndorsingPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -205,9 +202,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportSignedEndorsing" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItTransportSignedEndorsingPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -222,9 +219,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportEndorsingEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItTransportEndorsingEncryptedPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -239,9 +236,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportSignedEndorsingEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItTransportSignedEndorsingEncryptedPort"
-       xmlns:s="http://WSSec/x509"
-       implementor="org.apache.cxf.systest.ws.x509.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/x509/DoubleItX509.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>

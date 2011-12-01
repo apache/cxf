@@ -19,22 +19,22 @@
 
 package org.apache.cxf.systest.ws.x509;
 
-import java.math.BigInteger;
 import java.net.URL;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.x509.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.BeforeClass;
+import org.example.contract.doubleit.DoubleItPortType;
 
-import wssec.x509.DoubleItPortType;
-import wssec.x509.DoubleItService;
+import org.junit.BeforeClass;
 
 /**
  * A set of tests for X.509 Tokens.
@@ -42,6 +42,9 @@ import wssec.x509.DoubleItService;
 public class X509TokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
+
+    private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
+    private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
@@ -67,11 +70,14 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItKeyIdentifierPort();
+        
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -87,10 +93,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItIssuerSerialPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItIssuerSerialPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -106,10 +115,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItThumbprintPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItThumbprintPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -125,10 +137,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItAsymmetricIssuerSerialPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricIssuerSerialPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -144,10 +159,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItAsymmetricProtectTokensPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricProtectTokensPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -163,10 +181,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItSymmetricProtectTokensPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricProtectTokensPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -182,10 +203,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItTransportEndorsingPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -201,10 +225,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItTransportSignedEndorsingPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSignedEndorsingPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -220,10 +247,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItTransportEndorsingEncryptedPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingEncryptedPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     @org.junit.Test
@@ -239,10 +269,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        DoubleItPortType x509Port = service.getDoubleItTransportSignedEndorsingEncryptedPort();
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSignedEndorsingEncryptedPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
-        x509Port.doubleIt(BigInteger.valueOf(25));
+        x509Port.doubleIt(25);
     }
     
     private boolean checkUnrestrictedPoliciesInstalled() {
