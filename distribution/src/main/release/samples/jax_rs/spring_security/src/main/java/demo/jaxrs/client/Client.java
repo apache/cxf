@@ -83,7 +83,7 @@ public final class Client {
         PostMethod post = new PostMethod("http://localhost:9002/customerservice/customers");
         setMethodHeaders(post, name, password);
         RequestEntity entity = new InputStreamRequestEntity(
-            this.getClass().getResourceAsStream("add_customer.xml"));
+            this.getClass().getClassLoader().getResourceAsStream("add_customer.xml"));
         post.setRequestEntity(entity);
         
         handleHttpMethod(post);
@@ -96,7 +96,7 @@ public final class Client {
         PutMethod put = new PutMethod("http://localhost:9002/customerservice/customers/123");
         setMethodHeaders(put, name, password);
         RequestEntity entity = new InputStreamRequestEntity(
-            this.getClass().getResourceAsStream("update_customer.xml"));
+            this.getClass().getClassLoader().getResourceAsStream("update_customer.xml"));
         put.setRequestEntity(entity);
         
         handleHttpMethod(put);

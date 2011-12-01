@@ -46,7 +46,7 @@ public class Server {
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/");
 
-        webappcontext.setWar("webapp");
+        webappcontext.setWar("target/JAXRSSpringSecurity.war");
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
