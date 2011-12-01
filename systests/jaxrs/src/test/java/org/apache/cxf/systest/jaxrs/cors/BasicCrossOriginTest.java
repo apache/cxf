@@ -19,18 +19,16 @@
 
 package org.apache.cxf.systest.jaxrs.cors;
 
-import java.io.InputStream;
-import java.util.List;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.cors.CorsHeaderConstants;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -45,25 +43,21 @@ public class BasicCrossOriginTest extends AbstractBusClientServerTestBase {
                    launchServer(SpringServer.class, true));
     }
     
-    @org.junit.Ignore
-    @SuppressWarnings("unchecked")
     @Test
     public void testSimpleGet() throws Exception {
         String origin = "http://localhost:" + PORT;
-        WebClient wc = WebClient.create(origin + "/");
-        WebClient.getConfig(wc).getOutInterceptors().add(new LoggingOutInterceptor());
-        // Since our WebClient doesn't know from Origin, we need to do this ourselves.
-        wc.header("Origin", origin);
-        Response r = wc.replacePath("/simpleGet/HelloThere").accept("text/plain").get();
-        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
-        String echo = IOUtils.toString((InputStream)r.getEntity());
-        assertEquals("HelloThere", echo);
-        MultivaluedMap<String, Object> m = r.getMetadata();
-        Object acAllowed = m.get(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN);
-        assertNotNull(acAllowed);
-        List<String> origins = (List<String>)acAllowed;
-        assertEquals(1, origins.size());
-        assertEquals(origin, origins.get(0));
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet(origin + "/simpleGet/HelloThere");
+        httpget.addHeader("Origin", origin);
+        HttpResponse response = httpclient.execute(httpget);
+        HttpEntity entity = response.getEntity();
+        String e = IOUtils.toString(entity.getContent(), "utf-8");
+
+        assertEquals("HelloThere", e);
+        Header[] aaoHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN);
+        assertNotNull(aaoHeaders);
+        assertEquals(1, aaoHeaders.length);
+        assertEquals("*", aaoHeaders[0].getValue());
     }
     
     @Ignore

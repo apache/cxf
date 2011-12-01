@@ -51,6 +51,12 @@ public class CrossOriginOutputFilter implements ResponseHandler {
         }
         return null;
     }
+    
+    private void addHeaders(ResponseBuilder rb, String key, List<String> vals) {
+        for (String v : vals) {
+            rb.header(key, v);
+        }
+    }
 
     public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
         String op = (String)m.getExchange().get(CrossOriginOutputFilter.class.getName());
@@ -61,24 +67,24 @@ public class CrossOriginOutputFilter implements ResponseHandler {
         ResponseBuilder rbuilder = Response.fromResponse(response);
         if ("simple".equals(op)) {
             // 5.1.3: add Allow-Origin supplied from the input side, plus allow-credentials as requested
-            rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, originHeader);
+            addHeaders(rbuilder, CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, originHeader);
             rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, 
                                 Boolean.toString(allowCredentials));
             // 5.1.4 add allowed headers
             List<String> allowedHeaders 
                 = getHeadersFromInput(m, CorsHeaderConstants.HEADER_AC_ALLOW_METHODS);
             if (allowedHeaders != null) {
-                rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, allowedHeaders);
+                addHeaders(rbuilder, CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, allowedHeaders);
             }
             if (exposeHeaders.size() > 0) {
-                rbuilder.header(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS, exposeHeaders);
+                addHeaders(rbuilder, CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS, exposeHeaders);
             }
             // if someone wants to clear the cache, we can't help them.
             return rbuilder.build();
         } else {
             // preflight
             // 5.2.7 add Allow-Origin supplied from the input side, plus allow-credentials as requested
-            rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, originHeader);
+            addHeaders(rbuilder, CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, originHeader);
             rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, 
                                 Boolean.toString(allowCredentials));
             // 5.2.8 max-age
@@ -89,13 +95,13 @@ public class CrossOriginOutputFilter implements ResponseHandler {
             /*
              * Currently, input side just lists the one requested method, and spec endorses that.
              */
-            rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, 
+            addHeaders(rbuilder, CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, 
                             getHeadersFromInput(m, CorsHeaderConstants.HEADER_AC_ALLOW_METHODS));
             // 5.2.10 add allowed headers
             List<String> allowedHeaders 
                 = getHeadersFromInput(m, CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS);
             if (allowedHeaders != null && allowedHeaders.size() > 0) {
-                rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, allowedHeaders);
+                addHeaders(rbuilder, CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, allowedHeaders);
             }
             return rbuilder.build();
             
