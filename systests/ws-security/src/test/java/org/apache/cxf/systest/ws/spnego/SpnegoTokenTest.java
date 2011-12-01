@@ -86,6 +86,30 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         assertTrue(result.equals(BigInteger.valueOf(50)));
     }
     
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSpnegoOverSymmetricDerived() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SpnegoTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        DoubleItService service = new DoubleItService();
+        
+        DoubleItPortType spnegoPort = service.getDoubleItSpnegoSymmetricDerivedPort();
+        updateAddressPort(spnegoPort, PORT);
+        
+        BigInteger result = spnegoPort.doubleIt(BigInteger.valueOf(25));
+        assertTrue(result.equals(BigInteger.valueOf(50)));
+    }
+    
     
     private boolean checkUnrestrictedPoliciesInstalled() {
         try {
