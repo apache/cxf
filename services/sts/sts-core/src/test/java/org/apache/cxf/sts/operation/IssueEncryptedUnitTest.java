@@ -313,6 +313,14 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testConfiguredKeyWrapAlgorithm() throws Exception {
+        //
+        // This test fails (sometimes) with the IBM JDK
+        // See https://www-304.ibm.com/support/docview.wss?uid=swg1IZ76737
+        //
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         issueOperation.setEncryptIssuedToken(true);
         
@@ -375,6 +383,14 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSpecifiedKeyWrapAlgorithm() throws Exception {
+        //
+        // This test fails (sometimes) with the IBM JDK
+        // See https://www-304.ibm.com/support/docview.wss?uid=swg1IZ76737
+        //
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         issueOperation.setEncryptIssuedToken(true);
         
