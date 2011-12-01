@@ -22,7 +22,6 @@ package org.apache.cxf.jaxrs.cors;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
