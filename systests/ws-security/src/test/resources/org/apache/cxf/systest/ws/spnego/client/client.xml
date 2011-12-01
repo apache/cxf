@@ -57,4 +57,20 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://WSSec/spnego}DoubleItSpnegoSymmetricDerivedPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+           <entry key="ws-security.kerberos.client">
+               <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="contextName" value="alice"/>
+                   <property name="serviceName" value="bob@service.ws.apache.org"/>
+               </bean>            
+           </entry>
+       </jaxws:properties>
+    </jaxws:client>
+    
 </beans>
