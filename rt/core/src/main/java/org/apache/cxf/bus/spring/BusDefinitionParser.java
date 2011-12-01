@@ -60,9 +60,9 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         }
         element.removeAttribute("name");
         if (StringUtils.isEmpty(bus)) {
-            addBusWiringAttribute(bean, BusWiringType.PROPERTY);
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY, null, ctx);
         } else {
-            addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus);
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus, ctx);
         }
         String id = element.getAttribute("id");
         if (!StringUtils.isEmpty(id)) {
