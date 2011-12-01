@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.cors;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -72,29 +74,110 @@ public class BasicCrossOriginTest extends AbstractBusClientServerTestBase {
         assertEquals("*", aaoHeaders[0].getValue());
     }
 
-    @Test
-    public void specificOriginSimpleGet() throws Exception {
-        String origin = "http://localhost:" + PORT;
-
+    private void assertAllOrigin(boolean allOrigins, String[] originList, String[] requestOrigins,
+                                 boolean permitted) throws ClientProtocolException, IOException {
+        if (allOrigins) {
+            originList = new String[0];
+        }
+        // tell filter what to do.
         String confResult = configClient.accept("text/plain").replacePath("/setOriginList")
-            .type("application/json")
-            .post(new String[] {
-                origin
-            }, String.class);
+            .type("application/json").post(originList, String.class);
         assertEquals("ok", confResult);
 
         HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(origin + "/test/simpleGet/HelloThere");
-        httpget.addHeader("Origin", origin);
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/test/simpleGet/HelloThere");
+        if (requestOrigins != null) {
+            for (String requestOrigin : requestOrigins) {
+                httpget.addHeader("Origin", requestOrigin);
+            }
+        }
         HttpResponse response = httpclient.execute(httpget);
         HttpEntity entity = response.getEntity();
         String e = IOUtils.toString(entity.getContent(), "utf-8");
 
-        assertEquals("HelloThere", e);
+        assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         Header[] aaoHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN);
-        assertNotNull(aaoHeaders);
-        assertEquals(1, aaoHeaders.length);
-        assertEquals(origin, aaoHeaders[0].getValue());
+        if (permitted) {
+            assertNotNull(aaoHeaders);
+            if (allOrigins) {
+                assertEquals(1, aaoHeaders.length);
+                assertEquals("*", aaoHeaders[0].getValue());
+            } else {
+                assertEquals(requestOrigins.length, aaoHeaders.length);
+                for (int x = 0; x < requestOrigins.length; x++) {
+                    assertEquals(requestOrigins[x], aaoHeaders[x].getValue());
+                }
+            }
+        } else {
+            // Origin: null? We don't use it and it's not in the CORS spec.
+            assertTrue(aaoHeaders == null || aaoHeaders.length == 0);
+        }
+    }
+
+    @Test
+    public void allowStarPassOne() throws Exception {
+        // Allow *, pass origin
+        assertAllOrigin(true, null, new String[] {
+            "http://localhost:" + PORT
+        }, true);
+    }
+    
+    @Test
+    public void allowStarPassNone() throws Exception {
+        // allow *, no origin
+        assertAllOrigin(true, null, null, false);
+    }
+    
+    @Test
+    public void allowOnePassOne() throws Exception {
+        // allow one, pass that one
+        assertAllOrigin(false, new String[] {
+            "http://localhost:" + PORT
+        }, new String[] {
+            "http://localhost:" + PORT
+        }, true);
+    } 
+    
+    @Test
+    public void allowOnePassWrong() throws Exception {
+        // allow one, pass something else
+        assertAllOrigin(false, new String[] {
+            "http://localhost:" + PORT
+        }, new String[] {
+            "http://area51.mil:31315",
+        }, false);
+    }
+    
+    @Test
+    public void allowTwoPassOne() throws Exception {
+        // allow two, pass one
+        assertAllOrigin(false, new String[] {
+            "http://localhost:" + PORT, "http://area51.mil:3141"
+        }, new String[] {
+            "http://localhost:" + PORT
+        }, true);
+    }
+    
+    @org.junit.Ignore
+    @Test
+    public void allowTwoPassTwo() throws Exception {
+        // allow two, pass two
+        assertAllOrigin(false, new String[] {
+            "http://localhost:" + PORT, "http://area51.mil:3141"
+        }, new String[] {
+            "http://localhost:" + PORT, "http://area51.mil:3141"
+        }, true);
+    }
+    
+    @Test
+    public void allowTwoPassThree() throws Exception {
+        // allow two, pass three
+        assertAllOrigin(false, new String[] {
+            "http://localhost:" + PORT, "http://area51.mil:3141"
+        }, new String[] {
+            "http://localhost:" + PORT, "http://area51.mil:3141", "http://hogwarts.edu:9"
+        }, false);
+
     }
 
     @Ignore

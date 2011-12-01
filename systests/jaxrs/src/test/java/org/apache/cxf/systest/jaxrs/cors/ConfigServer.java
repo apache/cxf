@@ -26,24 +26,19 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.apache.cxf.jaxrs.cors.CrossOriginInputFilter;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharingFilter;
 
 /**
  * 
  */
-public class ConfigServer implements ApplicationContextAware {
-    private ApplicationContext appContext;
+public class ConfigServer {
+    private CrossOriginResourceSharingFilter inputFilter;
 
     @POST
     @Consumes("application/json")
     @Path("/setOriginList")
     @Produces("text/plain")
     public String setOriginList(String[] origins) {
-        CrossOriginInputFilter inputFilter = appContext
-            .getBean("cors-input", org.apache.cxf.jaxrs.cors.CrossOriginInputFilter.class);
         if (origins == null || origins.length == 0) {
             inputFilter.setAllowAllOrigins(true);
         } else {
@@ -53,8 +48,12 @@ public class ConfigServer implements ApplicationContextAware {
         return "ok";
     }
 
-    public void setApplicationContext(ApplicationContext context) throws BeansException {
-        appContext = context;
+    public CrossOriginResourceSharingFilter getInputFilter() {
+        return inputFilter;
+    }
+
+    public void setInputFilter(CrossOriginResourceSharingFilter inputFilter) {
+        this.inputFilter = inputFilter;
     }
 
 }
