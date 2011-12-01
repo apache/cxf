@@ -35,4 +35,6 @@ public class CorsServer {
     public String simpleGet(@PathParam("echo") String echo) {
         return echo;
     }
+    
+
 }

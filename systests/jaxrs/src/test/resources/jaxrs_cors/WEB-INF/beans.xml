@@ -27,18 +27,29 @@ http://cxf.apache.org/core
 	<bean id="cors-output" class="org.apache.cxf.jaxrs.cors.CrossOriginOutputFilter">
 	</bean>
 
-	<jaxrs:server id="cors-service" address="/">
+	<jaxrs:server id="cors-service" address="/test">
 		<jaxrs:serviceBeans>
 			<ref bean="cors-server" />
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="cors-input" />
 			<ref bean="cors-output" />
-		</jaxrs:providers>
+		</jaxrs:providers><!-- 
 		<jaxrs:features>
 			<cxf:logging />
 		</jaxrs:features>
+		-->
 	</jaxrs:server>
+	<jaxrs:server id="config-service" address="/config">
+		<jaxrs:serviceBeans>
+			<ref bean="config-server" />
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+		</jaxrs:providers> 
+	</jaxrs:server>
+
+	<bean id="config-server" class="org.apache.cxf.systest.jaxrs.cors.ConfigServer"/>
 	<bean id="cors-server" scope="prototype"
 		class="org.apache.cxf.systest.jaxrs.cors.CorsServer" />
 </beans>
