@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -31,7 +30,24 @@
     <version>2.4.5-SNAPSHOT</version>
     <description>Apache CXF WS-Security System Tests</description>
     <url>http://cxf.apache.org</url>
+    
     <build>
+        <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
+        
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -39,13 +55,14 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
+                        <phase>generate-sources</phase>
                         <configuration>
                             <fork>${cxf.codegenplugin.forkmode}</fork>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest_wssec</testWsdlRoot>
+                            <sourceRoot>${basedir}/target/generated-sources</sourceRoot>
                             <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/DoubleItLogical.wsdl</wsdl>
+                                </wsdlOption>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/wssec10/WsSecurity10.wsdl</wsdl>
                                 </wsdlOption>
@@ -54,15 +71,6 @@
                                 </wsdlOption>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/wssc/WSSecureConversation.wsdl</wsdl>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/saml/DoubleItSaml.wsdl</wsdl>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/ut/DoubleItUt.wsdl</wsdl>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/x509/DoubleItX509.wsdl</wsdl>
                                 </wsdlOption>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl</wsdl>

@@ -65,7 +65,7 @@ under the License.
     <!-- -->
     <!-- HTTP/S configuration for clients -->
     <!-- -->
-    <http:conduit name="{http://cxf.apache.org/policytest/DoubleIt}DoubleItPortHttps.http-conduit">
+    <http:conduit name="{http://www.example.org/contract/DoubleIt}DoubleItPortHttps.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
                 <sec:keyStore type="JKS" password="password" 

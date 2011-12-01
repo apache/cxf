@@ -23,8 +23,6 @@
     xmlns:http="http://cxf.apache.org/transports/http/configuration"
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
     xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:security="http://schemas.iona.com/soa/security-config"
-    xmlns:interop="http://WSSec/wssec10"
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="
@@ -35,7 +33,6 @@
         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-        http://schemas.iona.com/soa/security-config                     http://schemas.iona.com/soa/security-config.xsd
     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
@@ -77,9 +74,9 @@
        address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintext" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItPlaintextPort"
-       xmlns:s="http://WSSec/ut"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -94,9 +91,9 @@
        address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintextCreated" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItPlaintextCreatedPort"
-       xmlns:s="http://WSSec/ut"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -111,9 +108,9 @@
        address="https://localhost:${testutil.ports.Server}/DoubleItUTHashed" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItHashedPort"
-       xmlns:s="http://WSSec/ut"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -128,9 +125,9 @@
        address="https://localhost:${testutil.ports.Server}/DoubleItUTNoPassword" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItNoPasswordPort"
-       xmlns:s="http://WSSec/ut"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -145,9 +142,9 @@
        address="https://localhost:${testutil.ports.Server}/DoubleItUTSignedEndorsing" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSignedEndorsingPort"
-       xmlns:s="http://WSSec/ut"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -164,9 +161,9 @@
        address="https://localhost:${testutil.ports.Server}/DoubleItUTSignedEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSignedEncryptedPort"
-       xmlns:s="http://WSSec/ut"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -183,9 +180,9 @@
        address="https://localhost:${testutil.ports.Server}/DoubleItUTEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItEncryptedPort"
-       xmlns:s="http://WSSec/ut"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/ut/DoubleItUt.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>

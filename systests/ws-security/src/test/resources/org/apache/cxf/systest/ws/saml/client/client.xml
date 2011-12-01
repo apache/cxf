@@ -52,7 +52,7 @@
         </http:tlsClientParameters>
     </http:conduit>  
     
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2SymmetricPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2SymmetricPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -61,7 +61,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2SymmetricSupportingPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2SymmetricSupportingPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -70,7 +70,7 @@
        </jaxws:properties>
     </jaxws:client>  
    
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2AsymmetricPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2AsymmetricPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -84,7 +84,7 @@
        </jaxws:properties>
     </jaxws:client> 
 
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml1SelfSignedTransportPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml1SelfSignedTransportPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -96,7 +96,7 @@
        </jaxws:properties>
     </jaxws:client>  
     
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2EndorsingTransportPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2EndorsingTransportPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -108,7 +108,7 @@
        </jaxws:properties>
     </jaxws:client>  
    
-    <jaxws:client name="{http://WSSec/saml}DoubleItAsymmetricSamlInitiatorPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSamlInitiatorPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -123,7 +123,7 @@
        </jaxws:properties>
     </jaxws:client> 
     
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2SymmetricSignedElementsPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2SymmetricSignedElementsPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -132,7 +132,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2AsymmetricSignedEncryptedPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2AsymmetricSignedEncryptedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -146,7 +146,7 @@
        </jaxws:properties>
     </jaxws:client> 
     
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2AsymmetricEncryptedPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2AsymmetricEncryptedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -160,7 +160,7 @@
        </jaxws:properties>
     </jaxws:client> 
     
-    <jaxws:client name="{http://WSSec/saml}DoubleItSaml2EndorsingEncryptedTransportPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2EndorsingEncryptedTransportPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 

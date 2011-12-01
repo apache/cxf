@@ -19,13 +19,14 @@
 
 package org.apache.cxf.systest.ws.saml;
 
-import java.math.BigInteger;
 import java.net.URL;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -34,10 +35,9 @@ import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 
-import org.junit.BeforeClass;
+import org.example.contract.doubleit.DoubleItPortType;
 
-import wssec.saml.DoubleItPortType;
-import wssec.saml.DoubleItService;
+import org.junit.BeforeClass;
 
 /**
  * A set of tests for SAML Tokens.
@@ -45,6 +45,9 @@ import wssec.saml.DoubleItService;
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
+    
+    private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
+    private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
@@ -68,13 +71,15 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml1Port = service.getDoubleItSaml1TransportPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml1Port, PORT2);
         
         try {
-            saml1Port.doubleIt(BigInteger.valueOf(25));
+            saml1Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
@@ -84,7 +89,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
         try {
-            saml1Port.doubleIt(BigInteger.valueOf(25));
+            saml1Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML2 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Wrong SAML Version"));
@@ -93,8 +98,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
-        BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -110,13 +115,15 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
        
         try {
-            saml2Port.doubleIt(BigInteger.valueOf(25));
+            saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
@@ -126,7 +133,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         try {
-            saml2Port.doubleIt(BigInteger.valueOf(25));
+            saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Wrong SAML Version"));
@@ -135,8 +142,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
         
         try {
             SamlCallbackHandler callbackHandler = 
@@ -145,7 +152,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             ((BindingProvider)saml2Port).getRequestContext().put(
                 "ws-security.saml-callback-handler", callbackHandler
             );
-            saml2Port.doubleIt(BigInteger.valueOf(25));
+            saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a invalid SAML2 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
@@ -170,9 +177,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricSupportingPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricSupportingPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
 
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -180,7 +189,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         
         try {
-            saml2Port.doubleIt(BigInteger.valueOf(25));
+            saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Assertion fails sender-vouches requirements"));
@@ -201,13 +210,15 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2AsymmetricPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2AsymmetricPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
 
         try {
-            saml2Port.doubleIt(BigInteger.valueOf(25));
+            saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
@@ -217,7 +228,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
         try {
-            saml2Port.doubleIt(BigInteger.valueOf(25));
+            saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Wrong SAML Version"));
@@ -226,8 +237,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -240,16 +251,18 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml1Port = service.getDoubleItSaml1SelfSignedTransportPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1SelfSignedTransportPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml1Port, PORT2);
         
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
         );
-        BigInteger result = saml1Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -265,9 +278,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItAsymmetricSamlInitiatorPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSamlInitiatorPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
         
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
@@ -275,8 +290,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -292,16 +307,18 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2SymmetricSignedElementsPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricSignedElementsPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
         
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -314,9 +331,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2EndorsingTransportPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT2);
         
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
@@ -325,8 +344,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", callbackHandler
         );
 
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
     }
 
     @org.junit.Test
@@ -343,16 +362,18 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2AsymmetricSignedEncryptedPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2AsymmetricSignedEncryptedPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
         
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler()
         );
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -369,9 +390,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2AsymmetricEncryptedPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2AsymmetricEncryptedPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
         
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
@@ -379,8 +402,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     
@@ -394,9 +417,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType saml2Port = service.getDoubleItSaml2EndorsingEncryptedTransportPort();
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingEncryptedTransportPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT2);
         
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
@@ -405,8 +430,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "ws-security.saml-callback-handler", callbackHandler
         );
 
-        BigInteger result = saml2Port.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     private boolean checkUnrestrictedPoliciesInstalled() {

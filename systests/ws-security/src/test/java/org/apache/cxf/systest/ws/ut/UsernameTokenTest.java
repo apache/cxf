@@ -19,24 +19,28 @@
 
 package org.apache.cxf.systest.ws.ut;
 
-import java.math.BigInteger;
 import java.net.URL;
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.ut.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.BeforeClass;
+import org.example.contract.doubleit.DoubleItPortType;
 
-import wssec.ut.DoubleItPortType;
-import wssec.ut.DoubleItService;
+import org.junit.BeforeClass;
 
 /**
  * A set of tests for Username Tokens over the Transport Binding.
  */
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    
+    private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
+    private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -58,11 +62,14 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType utPort = service.getDoubleItPlaintextPort();
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        utPort.doubleIt(BigInteger.valueOf(25));
+        
+        utPort.doubleIt(25);
     }
     
     @org.junit.Test
@@ -75,12 +82,14 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType utPort = service.getDoubleItPlaintextCreatedPort();
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextCreatedPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
-        utPort.doubleIt(BigInteger.valueOf(25));
+        utPort.doubleIt(25);
     }
     
     @org.junit.Test
@@ -93,12 +102,14 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType utPort = service.getDoubleItHashedPort();
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItHashedPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
-        utPort.doubleIt(BigInteger.valueOf(25));
+        utPort.doubleIt(25);
     }
     
     @org.junit.Test
@@ -111,12 +122,14 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType utPort = service.getDoubleItNoPasswordPort();
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItNoPasswordPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
-        utPort.doubleIt(BigInteger.valueOf(25));
+        utPort.doubleIt(25);
     }
     
     @org.junit.Test
@@ -129,11 +142,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType utPort = service.getDoubleItSignedEndorsingPort();
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        utPort.doubleIt(BigInteger.valueOf(25));
+        utPort.doubleIt(25);
     }
     
     @org.junit.Test
@@ -146,11 +161,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType utPort = service.getDoubleItSignedEncryptedPort();
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        utPort.doubleIt(BigInteger.valueOf(25));
+        utPort.doubleIt(25);
     }
     
     @org.junit.Test
@@ -163,11 +180,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType utPort = service.getDoubleItEncryptedPort();
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptedPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        utPort.doubleIt(BigInteger.valueOf(25));
+        utPort.doubleIt(25);
     }
     
 }

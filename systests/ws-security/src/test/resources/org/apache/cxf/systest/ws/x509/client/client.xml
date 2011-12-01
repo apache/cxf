@@ -39,7 +39,7 @@
         </cxf:features>
     </cxf:bus>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItKeyIdentifierPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -48,7 +48,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItIssuerSerialPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItIssuerSerialPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -57,7 +57,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItThumbprintPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItThumbprintPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -66,21 +66,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItAsymmetricIssuerSerialPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
-       </jaxws:properties>
-    </jaxws:client>
-    
-    <jaxws:client name="{http://WSSec/x509}DoubleItAsymmetricProtectTokensPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricIssuerSerialPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -94,7 +80,21 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItSymmetricProtectTokensPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricProtectTokensPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.signature.username" value="alice"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricProtectTokensPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -103,7 +103,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItTransportEndorsingPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.signature.properties" 
@@ -114,7 +114,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItTransportSignedEndorsingPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSignedEndorsingPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.signature.properties" 
@@ -125,7 +125,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItTransportEndorsingEncryptedPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingEncryptedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.signature.properties" 
@@ -136,7 +136,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/x509}DoubleItTransportSignedEndorsingEncryptedPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSignedEndorsingEncryptedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.signature.properties" 

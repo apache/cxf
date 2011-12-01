@@ -23,8 +23,6 @@
     xmlns:http="http://cxf.apache.org/transports/http/configuration"
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
     xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:security="http://schemas.iona.com/soa/security-config"
-    xmlns:interop="http://WSSec/wssec10"
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="
@@ -35,7 +33,6 @@
         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-        http://schemas.iona.com/soa/security-config                     http://schemas.iona.com/soa/security-config.xsd
     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
@@ -77,9 +74,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1Transport" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml1TransportPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -92,9 +89,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Symmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2SymmetricPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -112,9 +109,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Asymmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2AsymmetricPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -136,9 +133,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1SelfSignedTransport" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml1SelfSignedTransportPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -154,9 +151,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingTransport" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2EndorsingTransportPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -172,9 +169,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItAsymmetricSamlInitiator" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItAsymmetricSamlInitiatorPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -196,9 +193,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItSaml2SymmetricSignedElements" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2SymmetricSignedElementsPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -214,9 +211,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItSaml2AsymmetricSignedEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2AsymmetricSignedEncryptedPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -238,9 +235,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItSaml2AsymmetricEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2AsymmetricEncryptedPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -260,9 +257,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingEncryptedTransport" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSaml2EndorsingEncryptedTransportPort"
-       xmlns:s="http://WSSec/saml"
-       implementor="org.apache.cxf.systest.ws.saml.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/saml/DoubleItSaml.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 

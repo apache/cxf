@@ -16,10 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.ws.common;
 
-package org.apache.cxf.systest.ws.saml.server;
-
-import java.math.BigInteger;
 import java.security.Principal;
 
 import javax.annotation.Resource;
@@ -27,26 +25,25 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
+import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;
 
-import wssec.saml.DoubleItPortType;
-
-@WebService(targetNamespace = "http://WSSec/saml", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
             serviceName = "DoubleItService", 
-            endpointInterface = "wssec.saml.DoubleItPortType")
+            endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")              
-public class DoubleItImpl implements DoubleItPortType {
+public class DoubleItPortTypeImpl implements DoubleItPortType {
     
     @Resource
     WebServiceContext wsContext;
 
-    public java.math.BigInteger doubleIt(java.math.BigInteger numberToDouble) {
+    public int doubleIt(int numberToDouble) {
         Principal pr = wsContext.getUserPrincipal();
         
         Assert.assertNotNull("Principal must not be null", pr);
         Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
         
-        return numberToDouble.multiply(BigInteger.valueOf(2));
+        return numberToDouble * 2;
     }
     
 }

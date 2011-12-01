@@ -16,23 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.cxf.systest.ws.x509.server;
-
-import java.math.BigInteger;
+package org.apache.cxf.systest.ws.common;
 
 import javax.jws.WebService;
+
 import org.apache.cxf.feature.Features;
-import wssec.saml.DoubleItPortType;
+import org.example.contract.doubleit.DoubleItPortType;
 
-@WebService(targetNamespace = "http://WSSec/x509", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
             serviceName = "DoubleItService", 
-            endpointInterface = "wssec.saml.DoubleItPortType")
+            endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")              
-public class DoubleItImpl implements DoubleItPortType  {
-
-    public java.math.BigInteger doubleIt(java.math.BigInteger numberToDouble) {
-        return numberToDouble.multiply(BigInteger.valueOf(2));
+public class DoubleItImpl implements DoubleItPortType {
+    
+    public int doubleIt(int numberToDouble) {
+        return numberToDouble * 2;
     }
     
 }
