@@ -20,10 +20,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
-    <name>JAX-RS Spring Security Demo</name>
-    <description>JAX-RS Spring Security Demo</description>
     <artifactId>jax_rs_spring_security</artifactId>
     <version>2.4.5-SNAPSHOT</version>
+    <name>JAX-RS Spring Security Demo</name>
+    <description>JAX-RS Spring Security Demo</description>
+    <packaging>war</packaging>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
@@ -36,33 +37,7 @@
         <aspectj.version>1.5.4</aspectj.version>
     </properties>
     <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-	    	        <goals>
-	    	            <goal>run</goal>
-	    	        </goals>
-	    	        <configuration>
-	    	            <tasks>
-	    	               <copy file="${basedir}/src/main/java/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client" />
-	    	               <copy file="${basedir}/src/main/java/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client" />
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
-	    	</executions>
-            </plugin>
-        </plugins>
+        <finalName>JAXRSSpringSecurity</finalName>
     </build>   
     <profiles>
         <profile>
