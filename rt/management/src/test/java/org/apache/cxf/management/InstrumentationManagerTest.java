@@ -26,11 +26,15 @@ import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.management.counters.CounterRepository;
 import org.apache.cxf.workqueue.WorkQueueManagerImpl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class InstrumentationManagerTest extends Assert {
     InstrumentationManager im;
@@ -44,7 +48,9 @@ public class InstrumentationManagerTest extends Assert {
     @After
     public void tearDown() throws Exception {
         //test case had done the bus.shutdown
-        bus.shutdown(true);
+        if (bus != null) {
+            bus.shutdown(true);
+        }
     }
     
     @Test
@@ -84,5 +90,41 @@ public class InstrumentationManagerTest extends Assert {
 
         bus.shutdown(true);
     }
+
+    @Test
+    public void testInstrumentTwoBuses() {
+        ClassPathXmlApplicationContext context = null;
+        Bus cxf1 = null;
+        Bus cxf2 = null;
+        try {
+            context = new ClassPathXmlApplicationContext("managed-spring-twobuses.xml");
+
+            cxf1 = (Bus)context.getBean("cxf1");
+            InstrumentationManager im1 = cxf1.getExtension(InstrumentationManager.class);
+            assertNotNull("Instrumentation Manager of cxf1 should not be null", im1);
+            CounterRepository cr1 = cxf1.getExtension(CounterRepository.class);
+            assertNotNull("CounterRepository of cxf1 should not be null", cr1);
+            assertEquals("CounterRepository of cxf1 has the wrong bus", cxf1, cr1.getBus());
+            
+            cxf2 = (Bus)context.getBean("cxf2");
+            InstrumentationManager im2 = cxf2.getExtension(InstrumentationManager.class);
+            assertNotNull("Instrumentation Manager of cxf2 should not be null", im2);
+            CounterRepository cr2 = cxf2.getExtension(CounterRepository.class);
+            assertNotNull("CounterRepository of cxf2 should not be null", cr2);
+            assertEquals("CounterRepository of cxf2 has the wrong bus", cxf2, cr2.getBus());
+
+        } finally {
+            if (cxf1 != null) {
+                cxf1.shutdown(true);
+            }
+            if (cxf2 != null) {
+                cxf2.shutdown(true);
+            }
+            if (context != null) {
+                context.close();
+            }
+        }
+    }
+    
 
 }

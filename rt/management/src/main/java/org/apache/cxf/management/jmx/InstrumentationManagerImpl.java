@@ -87,7 +87,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     public Bus getBus() {
         return bus;
     }
-    
+
     @Resource(name = "cxf")
     public void setBus(Bus bus) {        
         this.bus = bus;
@@ -296,6 +296,9 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         throws JMException {
         ObjectInstance instance = null;
         try {
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.info("registering MBean " + name + ": " + obj);
+            }
             instance = mbs.registerMBean(obj, name);           
         } catch (InstanceAlreadyExistsException e) {            
             if (forceRegistration) {
