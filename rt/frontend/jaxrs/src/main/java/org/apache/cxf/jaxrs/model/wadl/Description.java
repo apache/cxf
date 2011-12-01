@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Can be used to document resource classes and methods
  * 
- * See {@link <a href="http://www.w3.org/Submission/wadl/#x3-80002.3">WADL Documentation</a>}.
+ * See <a href="http://www.w3.org/Submission/wadl/#x3-80002.3">WADL Documentation</a>.
  */
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)

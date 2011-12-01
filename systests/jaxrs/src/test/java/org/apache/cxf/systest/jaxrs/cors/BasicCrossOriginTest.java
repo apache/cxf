@@ -29,6 +29,7 @@ import org.apache.cxf.jaxrs.cors.CorsHeaderConstants;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -73,6 +74,16 @@ public class BasicCrossOriginTest extends AbstractBusClientServerTestBase {
         assertEquals(1, aaoHeaders.length);
         assertEquals("*", aaoHeaders[0].getValue());
     }
+    
+    private List<String> headerValues(Header[] headers) {
+        List<String> values = new ArrayList<String>();
+        for (Header h : headers) {
+            for (HeaderElement e : h.getElements()) {
+                values.add(e.getName());
+            }
+        }
+        return values;
+    }
 
     private void assertAllOrigin(boolean allOrigins, String[] originList, String[] requestOrigins,
                                  boolean permitted) throws ClientProtocolException, IOException {
@@ -103,9 +114,10 @@ public class BasicCrossOriginTest extends AbstractBusClientServerTestBase {
                 assertEquals(1, aaoHeaders.length);
                 assertEquals("*", aaoHeaders[0].getValue());
             } else {
-                assertEquals(requestOrigins.length, aaoHeaders.length);
+                List<String> ovalues = headerValues(aaoHeaders);
+                assertEquals(requestOrigins.length, ovalues.size());
                 for (int x = 0; x < requestOrigins.length; x++) {
-                    assertEquals(requestOrigins[x], aaoHeaders[x].getValue());
+                    assertEquals(requestOrigins[x], ovalues.get(x));
                 }
             }
         } else {
@@ -158,7 +170,6 @@ public class BasicCrossOriginTest extends AbstractBusClientServerTestBase {
         }, true);
     }
     
-    @org.junit.Ignore
     @Test
     public void allowTwoPassTwo() throws Exception {
         // allow two, pass two

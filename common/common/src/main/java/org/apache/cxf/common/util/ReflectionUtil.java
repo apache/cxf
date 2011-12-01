@@ -23,6 +23,7 @@ import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -264,5 +265,23 @@ public final class ReflectionUtil {
             }
         }
         return m;
+    }
+    
+
+    /**
+     * Look for a specified annotation on a method. If there, return it. If not, search it's containing class.
+     * Assume that the annotation is marked @Inherited.
+     * 
+     * @param m method to examine
+     * @param annotationType the annotation type to look for.
+     * @return
+     */
+    public static <T extends Annotation> T getAnnotationForMethodOrContainingClass(Method m,
+                                                                                   Class<T> annotationType) {
+        T annotation = m.getAnnotation(annotationType);
+        if (annotation != null) {
+            return annotation;
+        }
+        return m.getDeclaringClass().getAnnotation(annotationType);
     }
 }

@@ -43,7 +43,7 @@ public class ConfigServer {
             inputFilter.setAllowAllOrigins(true);
         } else {
             inputFilter.setAllowAllOrigins(false);
-            inputFilter.setAllowedOrigins(Arrays.asList(origins));
+            inputFilter.setAllowOrigins(Arrays.asList(origins));
         }
         return "ok";
     }
