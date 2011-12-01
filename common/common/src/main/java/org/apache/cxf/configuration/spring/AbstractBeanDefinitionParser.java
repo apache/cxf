@@ -40,6 +40,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
@@ -51,12 +52,13 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.StringUtils;
 
 public abstract class AbstractBeanDefinitionParser 
     extends org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser {
     public static final String WIRE_BUS_ATTRIBUTE = AbstractBeanDefinitionParser.class.getName() + ".wireBus";
     public static final String WIRE_BUS_NAME = AbstractBeanDefinitionParser.class.getName() + ".wireBusName";
+    public static final String WIRE_BUS_HANDLER 
+        = "org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBeanDefinitionParser.class);
     
     private Class beanClass;
@@ -95,9 +97,13 @@ public abstract class AbstractBeanDefinitionParser
                 bean.addDependsOn(val);
             } else if (!"id".equals(name) && !"name".equals(name) && isAttribute(pre, name)) {
                 if ("bus".equals(name)) {                                     
-                    if (val != null && val.trim().length() > 0 
-                        && ctx.getRegistry().containsBeanDefinition(val)) {
-                        bean.addPropertyReference(name, val);
+                    if (val != null && val.trim().length() > 0) {
+                        if (ctx.getRegistry().containsBeanDefinition(val)) {
+                            bean.addPropertyReference(name, val);
+                        } else {
+                            addBusWiringAttribute(bean, BusWiringType.PROPERTY,
+                                                  val, ctx);
+                        }
                         setBus = true;                         
                     }
                 } else {
@@ -214,16 +220,27 @@ public abstract class AbstractBeanDefinitionParser
 
     protected void addBusWiringAttribute(BeanDefinitionBuilder bean, 
                                          BusWiringType type) {
-        addBusWiringAttribute(bean, type, null);
+        addBusWiringAttribute(bean, type, null, null);
     }
                                          
     protected void addBusWiringAttribute(BeanDefinitionBuilder bean, 
                                          BusWiringType type,
-                                         String busName) {
+                                         String busName,
+                                         ParserContext ctx) {
         LOG.fine("Adding " + WIRE_BUS_ATTRIBUTE + " attribute " + type + " to bean " + bean);
         bean.getRawBeanDefinition().setAttribute(WIRE_BUS_ATTRIBUTE, type);
-        if (busName != null) {
+        if (!StringUtils.isEmpty(busName)) {
+            if (busName.charAt(0) == '#') {
+                busName = busName.substring(1);
+            }
             bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME, busName); 
+        }
+        
+        if (ctx != null 
+            && !ctx.getRegistry().containsBeanDefinition(WIRE_BUS_HANDLER)) {
+            BeanDefinitionBuilder b 
+                = BeanDefinitionBuilder.rootBeanDefinition(WIRE_BUS_HANDLER);
+            ctx.getRegistry().registerBeanDefinition(WIRE_BUS_HANDLER, b.getBeanDefinition());
         }
     }
     
@@ -406,7 +423,7 @@ public abstract class AbstractBeanDefinitionParser
             return;
         }
         
-        if (StringUtils.hasText(val)) {
+        if (!StringUtils.isEmpty(val)) {
             if (val.startsWith("#")) {
                 bean.addPropertyReference(propertyName, val.substring(1));
             } else {
