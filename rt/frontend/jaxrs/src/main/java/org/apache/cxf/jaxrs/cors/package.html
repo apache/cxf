@@ -1,0 +1,83 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+</head>
+<body bgcolor="white">
+<h1>CORS</h1>
+<p>This package provides a filter to assist applications in implementing Cross Origin Resource Sharing, 
+as described in the <a href="http://www.w3.org/TR/cors">CORS specification</a>.
+</p>
+<h2>CORS Access Model</h2>
+<p>
+CORS exists to protect web servers from unexpected cross-origin access. The premise of CORS is that many web resources 
+are deployed by people who don't want to permit cross-origin access, but who couldn't detect it or didn't bother
+to control it. Thus, CORS defines a set of restrictions <em>implemented on the client</em> that, by default, 
+prohibit cross-origin access.
+</p>
+<p>
+If you want your service to permit cross-origin access, your service must return additional headers to the client to reassure
+it that you really want to permit the access. {@link CrossOriginResourceSharingFilter} adds these headers to your service's 
+responses based on rules that you configure.
+</p>
+<h2>CORS Resource Model (versus JAX-RS)</h2>
+<p>
+CORS and JAX-RS differ, fundamentally, in how they define a resource for access control purposes. In CORS, a resource
+is defined by the combination of URI and HTTP method. Once a client has obtained access information for a URI+METHOD,
+it may cache it. JAX-RS, on the other hand, defines a resource as:
+<ul>
+<li>URI</li>
+<li>method</li>
+<li>Accepts</li>
+<li>Accepts-Language</li>
+<li>Content-Type</li>
+</ul>
+The logical place, in other words, to specify CORS policy in a JAX-RS application is at the level of an annotated method. However, each method is
+applied to the narrow 'resource' defined by the list above, not just the URI+Method pair. This will motivate the annotation model below. 
+</p>
+<h2>Simple and Preflight requests</h2>
+<p>The CORS specification differentiates two kinds of HTTP requests: <em>simple</em> and <em>not simple</em>. (See the specification
+for the definition.) For a simple request, the client simply
+sends the request to the service, and then looks for the <tt>Access-Control-</tt> headers to indicate whether the server has explicitly granted 
+cross-origin access. For a non-simple request, the client sends a so-called <em>preflight</em> request and waits for a response before 
+issuing the original request.
+<h2>Configuration via Annotation</h2>
+<p>
+One way to control the behavior of the filter is the @{@link CrossOriginResourceSharing} annotation on a method. 
+This is a complete solution for simple requests. You can specify all of the controls. However, if you have non-simple methods, the mismatch on 
+resource access models above makes it impossible for CXF to map the OPTIONS request that will arrive to the correct method.
+</p>
+<p>
+If all the methods of a class can share a common policy, you can attach a single @{@link CrossOriginResourceSharing} 
+to a resource class, and it will apply to all the resource implied by all of the methods.
+</p>
+<p>
+If you need finer control, you can use @{@link CrossOriginResourceSharingPaths} at the class level. This annotation contains a list of 
+@{@link CrossOriginResourceSharing} annotations. In the nested annotations, you add <tt>path = "/localResourcePath"</tt> to associate the 
+annotation with a path. The filter will find the annotation based on path, and then allow (or forbid) based on the method
+as compared to the <tt>allowedMethods</tt>.
+</p>
+<h2>Bean Configuration</h2>
+<p>
+The simplest configuration applies when you want to apply the same configuration to all of your resources. In this case, you can
+use the properties of {@link CrossOriginResourceSharingFilter} to specify the policy.
+</p>
+</body>
+</html>

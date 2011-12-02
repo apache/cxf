@@ -25,18 +25,29 @@ http://cxf.apache.org/core
 		<property name="allowAllOrigins" value="true" />
 	</bean>
 
-	<jaxrs:server id="cors-service" address="/untest">
+	<jaxrs:server id="unann-cors-service" address="/untest">
 		<jaxrs:serviceBeans>
-			<ref bean="cors-server" />
+			<ref bean="unann-cors-server" />
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="cors-filter" />
-		</jaxrs:providers><!-- 
+		</jaxrs:providers>
+		<!-- 
 		<jaxrs:features>
 			<cxf:logging />
-		</jaxrs:features>-->
-
+		</jaxrs:features>
+		-->
 	</jaxrs:server>
+
+	<jaxrs:server id="ann-cors-service" address="/antest">
+		<jaxrs:serviceBeans>
+			<ref bean="ann-cors-server" />
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="cors-filter" />
+		</jaxrs:providers>
+	</jaxrs:server>
+	
 	<jaxrs:server id="config-service" address="/config">
 		<jaxrs:serviceBeans>
 			<ref bean="config-server" />
@@ -49,6 +60,8 @@ http://cxf.apache.org/core
 	<bean id="config-server" class="org.apache.cxf.systest.jaxrs.cors.ConfigServer">
 		<property name='inputFilter' ref='cors-filter'/>
 	</bean>
-	<bean id="cors-server" scope="prototype"
+	<bean id="unann-cors-server" scope="prototype"
 		class="org.apache.cxf.systest.jaxrs.cors.UnannotatedCorsServer" />
+	<bean id="ann-cors-server" scope="prototype"
+		class="org.apache.cxf.systest.jaxrs.cors.AnnotatedCorsServer" />
 </beans>

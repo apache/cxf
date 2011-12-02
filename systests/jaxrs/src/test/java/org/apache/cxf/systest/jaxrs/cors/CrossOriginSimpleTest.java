@@ -47,8 +47,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Unit tests for simple CORS requests. Simple requests traffic only in allowed origins,
- * allowed credentials, and exposed headers. 
+ * Unit tests for CORS. This isn't precisely simple as it's turned out. 
  * 
  * Note that it's not the server's job to detect invalid CORS requests. If a client
  * fails to preflight, it's just not our job. However, also note that all 'actual' 
@@ -303,6 +302,79 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         List<String> allowHeadersValues 
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS));
         assertEquals(Arrays.asList(new String[] {"X-custom-1", "X-custom-2" }), allowHeadersValues);
+    }
+    
+    @Test
+    public void testAnnotatedClassCorrectOrigin() throws Exception {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/antest/simpleGet/HelloThere");
+        httpget.addHeader("Origin", "http://area51.mil:31415");
+
+        HttpResponse response = httpclient.execute(httpget);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        HttpEntity entity = response.getEntity();
+        String e = IOUtils.toString(entity.getContent(), "utf-8");
+
+        assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
+        assertOriginResponse(false, new String[] {"http://area51.mil:31415" }, true, response);
+    }
+    
+    @Test
+    public void testAnnotatedClassWrongOrigin() throws Exception {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/antest/simpleGet/HelloThere");
+        httpget.addHeader("Origin", "http://su.us:1001");
+
+        HttpResponse response = httpclient.execute(httpget);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        HttpEntity entity = response.getEntity();
+        String e = IOUtils.toString(entity.getContent(), "utf-8");
+
+        assertEquals("HelloThere", e);
+        assertOriginResponse(false, null, false, response);
+    }
+    
+    @Test
+    public void testAnnotatedLocalPreflight() throws Exception {
+        configureAllowOrigins(true, null);
+        String r = configClient.replacePath("/setAllowCredentials/false")
+            .accept("text/plain").post(null, String.class);
+        assertEquals("ok", r);
+        
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions http = new HttpOptions("http://localhost:" + PORT + "/antest/delete");
+        // this is the origin we expect to get.
+        http.addHeader("Origin", "http://area51.mil:3333");
+        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "DELETE");
+        HttpResponse response = httpclient.execute(http);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertOriginResponse(false, new String[]{"http://area51.mil:3333"}, true, response);
+        assertAllowCredentials(response, false);
+        List<String> exposeHeadersValues 
+            = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS));
+        // preflight never returns Expose-Headers
+        assertEquals(Collections.emptyList(), exposeHeadersValues);
+        List<String> allowedMethods     
+            = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS));
+        assertEquals(Arrays.asList("DELETE PUT"), allowedMethods);
+    }
+    
+    @Test
+    public void testAnnotatedLocalPreflightNoGo() throws Exception {
+        configureAllowOrigins(true, null);
+        String r = configClient.replacePath("/setAllowCredentials/false")
+            .accept("text/plain").post(null, String.class);
+        assertEquals("ok", r);
+        
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions http = new HttpOptions("http://localhost:" + PORT + "/antest/delete");
+        // this is the origin we expect to get.
+        http.addHeader("Origin", "http://area51.mil:4444");
+        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "DELETE");
+        HttpResponse response = httpclient.execute(http);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertOriginResponse(false, new String[]{"http://area51.mil:4444"}, false, response);
+        // we could check that the others are also missing.
     }
 
     @Ignore
