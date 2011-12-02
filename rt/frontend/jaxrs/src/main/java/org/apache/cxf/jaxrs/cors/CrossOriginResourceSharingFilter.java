@@ -119,7 +119,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         // 5.1.4
         List<String> effectiveExposeHeaders = effectiveExposeHeaders(ann);
         if (effectiveExposeHeaders != null && effectiveExposeHeaders.size() != 0) {
-            m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, effectiveExposeHeaders);
+            m.getExchange().put(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS, effectiveExposeHeaders);
         }
 
         // note what kind of processing we're doing.

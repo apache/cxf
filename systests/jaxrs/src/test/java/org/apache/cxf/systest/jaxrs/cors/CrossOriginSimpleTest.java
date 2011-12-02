@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs.cors;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
@@ -297,8 +298,8 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertAllowCredentials(response, false);
         List<String> exposeHeadersValues 
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS));
-        // depend on knowing the order.
-        assertEquals(Arrays.asList(new String[] {"X-custom-3", "X-custom-4" }), exposeHeadersValues);
+        // preflight never returns Expose-Headers
+        assertEquals(Collections.emptyList(), exposeHeadersValues);
         List<String> allowHeadersValues 
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS));
         assertEquals(Arrays.asList(new String[] {"X-custom-1", "X-custom-2" }), allowHeadersValues);

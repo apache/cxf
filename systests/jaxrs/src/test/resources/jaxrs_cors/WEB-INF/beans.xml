@@ -31,10 +31,10 @@ http://cxf.apache.org/core
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="cors-filter" />
-		</jaxrs:providers>
+		</jaxrs:providers><!-- 
 		<jaxrs:features>
 			<cxf:logging />
-		</jaxrs:features>
+		</jaxrs:features>-->
 
 	</jaxrs:server>
 	<jaxrs:server id="config-service" address="/config">
