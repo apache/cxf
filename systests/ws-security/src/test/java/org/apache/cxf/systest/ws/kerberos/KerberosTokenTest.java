@@ -19,22 +19,22 @@
 
 package org.apache.cxf.systest.ws.kerberos;
 
-import java.math.BigInteger;
 import java.net.URL;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.kerberos.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.BeforeClass;
+import org.example.contract.doubleit.DoubleItPortType;
 
-import wssec.kerberos.DoubleItPortType;
-import wssec.kerberos.DoubleItService;
+import org.junit.BeforeClass;
 
 /**
  * A set of tests for Kerberos Tokens. The tests are @Ignore'd, as they require a running KDC. To run the
@@ -52,6 +52,9 @@ import wssec.kerberos.DoubleItService;
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
+    
+    private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
+    private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
@@ -76,12 +79,15 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosTransportPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosTransportPort();
         updateAddressPort(kerberosPort, PORT2);
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -99,13 +105,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricPort();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSymmetricPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+
         updateAddressPort(kerberosPort, PORT);
         
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -123,13 +132,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricSupportingPort();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSymmetricSupportingPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+
         updateAddressPort(kerberosPort, PORT);
         
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -147,13 +159,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosAsymmetricPort();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosAsymmetricPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+
         updateAddressPort(kerberosPort, PORT);
         
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -167,12 +182,15 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosTransportEndorsingPort();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosTransportEndorsingPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+
         updateAddressPort(kerberosPort, PORT2);
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -186,12 +204,15 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosAsymmetricEndorsingPort();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosAsymmetricEndorsingPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+
         updateAddressPort(kerberosPort, PORT);
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -205,12 +226,15 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSymmetricProtectionPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricProtectionPort();
         updateAddressPort(kerberosPort, PORT);
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     
@@ -225,12 +249,15 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSymmetricDerivedProtectionPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricDerivedProtectionPort();
         updateAddressPort(kerberosPort, PORT);
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -248,13 +275,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosAsymmetricSignedEndorsingPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosAsymmetricSignedEndorsingPort();
         updateAddressPort(kerberosPort, PORT);
         
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -272,13 +302,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosAsymmetricSignedEncryptedPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosAsymmetricSignedEncryptedPort();
         updateAddressPort(kerberosPort, PORT);
         
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -296,13 +329,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSymmetricEndorsingEncryptedPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricEndorsingEncryptedPort();
         updateAddressPort(kerberosPort, PORT);
         
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -320,13 +356,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSymmetricSignedEndorsingEncryptedPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         
-        DoubleItPortType kerberosPort = service.getDoubleItKerberosSymmetricSignedEndorsingEncryptedPort();
         updateAddressPort(kerberosPort, PORT);
         
-        BigInteger result = kerberosPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     

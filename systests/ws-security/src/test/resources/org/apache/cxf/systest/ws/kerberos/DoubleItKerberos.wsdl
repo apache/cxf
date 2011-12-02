@@ -19,61 +19,17 @@
 -->
 <wsdl:definitions name="DoubleIt"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://WSSec/kerberos"
-    targetNamespace="http://WSSec/kerberos" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt"
+    targetNamespace="http://www.example.org/contract/DoubleIt" 
     xmlns:wsp="http://www.w3.org/ns/ws-policy"
     xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
     xmlns:wsaws="http://www.w3.org/2005/08/addressing" 
     xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
     xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802">
-    <wsdl:types>
-        <xsd:schema targetNamespace="http://WSSec/kerberos">
-            <xsd:element name="DoubleIt">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="numberToDouble">
-                            <xsd:simpleType>
-                                <xsd:restriction base="xsd:integer">
-                                    <xsd:minInclusive value="0"/>
-                                </xsd:restriction>
-                            </xsd:simpleType>
-                        </xsd:element>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-            <xsd:element name="DoubleItResponse">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="doubledNumber" type="xsd:integer" />
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-            <xsd:element name="DoubleItFault">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="reason" type="xsd:string" />
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:schema>
-    </wsdl:types>
-    <wsdl:message name="DoubleItRequest">
-        <wsdl:part element="tns:DoubleIt" name="parameters" />
-    </wsdl:message>
-    <wsdl:message name="DoubleItResponse">
-        <wsdl:part element="tns:DoubleItResponse" name="parameters" />
-    </wsdl:message>
-    <wsdl:message name="DoubleItFault">
-        <wsdl:part element="tns:DoubleItFault" name="fault" />
-    </wsdl:message>
-    <wsdl:portType name="DoubleItPortType">
-        <wsdl:operation name="DoubleIt">
-            <wsdl:input message="tns:DoubleItRequest" />
-            <wsdl:output message="tns:DoubleItResponse" />
-            <wsdl:fault name="DoubleItFault" message="tns:DoubleItFault" />
-        </wsdl:operation>
-    </wsdl:portType>
-    
+
+    <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" 
+                 namespace="http://www.example.org/contract/DoubleIt"/>
+                     
     <wsdl:binding name="DoubleItKerberosTransportBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItKerberosTransportPolicy" />
         <soap:binding style="document"

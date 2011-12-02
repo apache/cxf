@@ -19,22 +19,22 @@
 
 package org.apache.cxf.systest.ws.spnego;
 
-import java.math.BigInteger;
 import java.net.URL;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.spnego.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.BeforeClass;
+import org.example.contract.doubleit.DoubleItPortType;
 
-import wssec.spnego.DoubleItPortType;
-import wssec.spnego.DoubleItService;
+import org.junit.BeforeClass;
 
 /**
  * A set of tests for Spnego Tokens. The tests are @Ignore'd, as they require a running KDC. To run the
@@ -50,6 +50,9 @@ import wssec.spnego.DoubleItService;
 public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
+    private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
+    private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
+    
     private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
     
     @BeforeClass
@@ -77,13 +80,15 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType spnegoPort = service.getDoubleItSpnegoSymmetricPort();
+        URL wsdl = SpnegoTokenTest.class.getResource("DoubleItSpnego.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSpnegoSymmetricPort");
+        DoubleItPortType spnegoPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(spnegoPort, PORT);
         
-        BigInteger result = spnegoPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = spnegoPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     @org.junit.Test
@@ -101,13 +106,15 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        DoubleItService service = new DoubleItService();
-        
-        DoubleItPortType spnegoPort = service.getDoubleItSpnegoSymmetricDerivedPort();
+        URL wsdl = SpnegoTokenTest.class.getResource("DoubleItSpnego.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSpnegoSymmetricDerivedPort");
+        DoubleItPortType spnegoPort = 
+                service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(spnegoPort, PORT);
         
-        BigInteger result = spnegoPort.doubleIt(BigInteger.valueOf(25));
-        assertTrue(result.equals(BigInteger.valueOf(50)));
+        int result = spnegoPort.doubleIt(25);
+        assertTrue(result == 50);
     }
     
     
