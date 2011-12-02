@@ -25,17 +25,17 @@ http://cxf.apache.org/core
 		<property name="allowAllOrigins" value="true" />
 	</bean>
 
-	<jaxrs:server id="cors-service" address="/test">
+	<jaxrs:server id="cors-service" address="/untest">
 		<jaxrs:serviceBeans>
 			<ref bean="cors-server" />
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="cors-filter" />
-		</jaxrs:providers><!-- 
+		</jaxrs:providers>
 		<jaxrs:features>
 			<cxf:logging />
 		</jaxrs:features>
-		-->
+
 	</jaxrs:server>
 	<jaxrs:server id="config-service" address="/config">
 		<jaxrs:serviceBeans>
@@ -50,5 +50,5 @@ http://cxf.apache.org/core
 		<property name='inputFilter' ref='cors-filter'/>
 	</bean>
 	<bean id="cors-server" scope="prototype"
-		class="org.apache.cxf.systest.jaxrs.cors.CorsServer" />
+		class="org.apache.cxf.systest.jaxrs.cors.UnannotatedCorsServer" />
 </beans>

@@ -19,17 +19,31 @@
 
 package org.apache.cxf.systest.jaxrs.cors;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharing;
+import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharingPaths;
+
 /**
- * 
+ * Service bean with no class-level annotation for cross-script control.
  */
-public class CorsServer {
+@CrossOriginResourceSharingPaths(
+ @CrossOriginResourceSharing(path = "/annotatedPut", 
+     allowOrigins = { "http://area51.mil:31415" }, 
+     allowCredentials = true, 
+     maxAge = 1, 
+     allowMethods = { "PUT" },
+     allowHeaders = { "X-custom-1", "X-custom-2" },
+     exposeHeaders = {"X-custom-3", "X-custom-4" }
+ ))                                 
+public class UnannotatedCorsServer {
 
     @GET
     @Produces("text/plain")
@@ -37,10 +51,34 @@ public class CorsServer {
     public String simpleGet(@PathParam("echo") String echo) {
         return echo;
     }
-    
+
     @DELETE
     @Path("/delete")
     public Response deleteSomething() {
         return Response.ok().build();
+    }
+    
+    @GET
+    @CrossOriginResourceSharing(allowOrigins = {
+            "http://area51.mil:31415" }, 
+             allowCredentials = true, 
+             exposeHeaders = {"X-custom-3", "X-custom-4" })
+    @Produces("text/plain")
+    @Path("/annotatedGet/{echo}")
+    public String annotatedGet(@PathParam("echo") String echo) {
+        return echo;
+    }
+    
+    /**
+     * A method annotated to test preflight.
+     * @param input
+     * @return
+     */
+    @PUT
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    @Path("/annotatedPut")
+    public String annotatedPut(String input) {
+        return input;
     }
 }

@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.cors;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
@@ -36,6 +37,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.junit.Before;
@@ -82,14 +84,17 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
 
     private void assertAllOrigin(boolean allOrigins, String[] originList, String[] requestOrigins,
                                  boolean permitted) throws ClientProtocolException, IOException {
-        connfigureAllowOrigins(allOrigins, originList);
+        configureAllowOrigins(allOrigins, originList);
 
         HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/test/simpleGet/HelloThere");
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/simpleGet/HelloThere");
         if (requestOrigins != null) {
+            StringBuffer ob = new StringBuffer();
             for (String requestOrigin : requestOrigins) {
-                httpget.addHeader("Origin", requestOrigin);
+                ob.append(requestOrigin);
+                ob.append(" "); // extra trailing space won't hurt.
             }
+            httpget.addHeader("Origin", ob.toString());
         }
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
@@ -110,9 +115,10 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
                 assertEquals("*", aaoHeaders[0].getValue());
             } else {
                 List<String> ovalues = headerValues(aaoHeaders);
-                assertEquals(requestOrigins.length, ovalues.size());
+                assertEquals(1, ovalues.size()); // get back one ac-allow-origin header.
+                String[] origins = ovalues.get(0).split(" +");
                 for (int x = 0; x < requestOrigins.length; x++) {
-                    assertEquals(requestOrigins[x], ovalues.get(x));
+                    assertEquals(requestOrigins[x], origins[x]);
                 }
             }
         } else {
@@ -121,7 +127,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private void connfigureAllowOrigins(boolean allOrigins, String[] originList) {
+    private void configureAllowOrigins(boolean allOrigins, String[] originList) {
         if (allOrigins) {
             originList = new String[0];
         }
@@ -208,14 +214,12 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals("ok", r);
         
         HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/test/simpleGet/HelloThere");
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/simpleGet/HelloThere");
         httpget.addHeader("Origin", "http://localhost:" + PORT);
 
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
-        Header[] aaoHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS);
-        assertEquals(1, aaoHeaders.length);
-        assertEquals("true", aaoHeaders[0].getValue());
+        assertAllowCredentials(response, true);
     }
     
     @Test
@@ -225,33 +229,79 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals("ok", r);
         
         HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/test/simpleGet/HelloThere");
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/simpleGet/HelloThere");
         httpget.addHeader("Origin", "http://localhost:" + PORT);
 
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
-        Header[] aaoHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS);
-        assertEquals(1, aaoHeaders.length);
-        assertEquals("false", aaoHeaders[0].getValue());
+        assertAllowCredentials(response, false);
     }
     
     @Test
     public void testNonSimpleActualRequest() throws Exception {
-        connfigureAllowOrigins(true, null);
+        configureAllowOrigins(true, null);
         String r = configClient.replacePath("/setAllowCredentials/false")
             .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
         
         HttpClient httpclient = new DefaultHttpClient();
-        HttpDelete httpdelete = new HttpDelete("http://localhost:" + PORT + "/test/delete");
+        HttpDelete httpdelete = new HttpDelete("http://localhost:" + PORT + "/untest/delete");
         httpdelete.addHeader("Origin", "http://localhost:" + PORT);
 
         HttpResponse response = httpclient.execute(httpdelete);
         assertEquals(200, response.getStatusLine().getStatusCode());
+        assertAllowCredentials(response, false);
+        assertOriginResponse(true, null, true, response);
+    }
+
+    private void assertAllowCredentials(HttpResponse response, boolean correct) {
         Header[] aaoHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS);
         assertEquals(1, aaoHeaders.length);
-        assertEquals("false", aaoHeaders[0].getValue());
-        assertOriginResponse(true, null, true, response);
+        assertEquals(Boolean.toString(correct), aaoHeaders[0].getValue());
+    }
+    
+    @Test
+    public void testAnnotatedSimple() throws Exception {
+        configureAllowOrigins(true, null);
+        String r = configClient.replacePath("/setAllowCredentials/false")
+            .accept("text/plain").post(null, String.class);
+        assertEquals("ok", r);
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/annotatedGet/HelloThere");
+        // this is the origin we expect to get.
+        httpget.addHeader("Origin", "http://area51.mil:31415");
+        HttpResponse response = httpclient.execute(httpget);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertOriginResponse(false, new String[]{"http://area51.mil:31415"}, true, response);
+        assertAllowCredentials(response, false);
+        List<String> exposeHeadersValues 
+            = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS));
+        assertEquals(Arrays.asList(new String[] {"X-custom-3", "X-custom-4" }), exposeHeadersValues);
+    }
+    
+    @Test
+    public void testAnnotatedMethodPreflight() throws Exception {
+        configureAllowOrigins(true, null);
+        String r = configClient.replacePath("/setAllowCredentials/false")
+            .accept("text/plain").post(null, String.class);
+        assertEquals("ok", r);
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions http = new HttpOptions("http://localhost:" + PORT + "/untest/annotatedPut");
+        // this is the origin we expect to get.
+        http.addHeader("Origin", "http://area51.mil:31415");
+        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "PUT");
+        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1, X-custom-2");
+        HttpResponse response = httpclient.execute(http);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertOriginResponse(false, new String[]{"http://area51.mil:31415"}, true, response);
+        assertAllowCredentials(response, false);
+        List<String> exposeHeadersValues 
+            = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS));
+        // depend on knowing the order.
+        assertEquals(Arrays.asList(new String[] {"X-custom-3", "X-custom-4" }), exposeHeadersValues);
+        List<String> allowHeadersValues 
+            = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS));
+        assertEquals(Arrays.asList(new String[] {"X-custom-1", "X-custom-2" }), allowHeadersValues);
     }
 
     @Ignore

@@ -53,17 +53,17 @@ public @interface CrossOriginResourceSharing {
      * A list of permitted origins. This is ignored 
      * if {@link #allowAllOrigins()} is true.
      */
-    String[] allowOrigins();
+    String[] allowOrigins() default { };
     /**
      * A list of HTTP methods. This is used only for preflight,
      * and is only valid on a class.
      */
-    String[] allowMethods();
+    String[] allowMethods() default { };
     /**
      * A list of headers that the client may include
      * in an actual request.
      */
-    String[] allowHeaders();
+    String[] allowHeaders() default { };
     /**
      * If true, this resource will return 
      * <pre>Access-Control-Allow-Credentials: true</pre>
@@ -73,7 +73,7 @@ public @interface CrossOriginResourceSharing {
      * A list of headers to return in <tt>
      * Access-Control-Expose-Headers</tt>. 
      */
-    String[] exposeHeaders();
+    String[] exposeHeaders() default { };
     /**
      * The value to return in <tt>Access-Control-Max-Age</tt>.
      * If this is negative, then no header is returned. The default
@@ -89,4 +89,10 @@ public @interface CrossOriginResourceSharing {
      * performs preflight processing.
      */
     boolean localPreflight() default false;
+    
+    /**
+     * For use inside @{@link CrossOriginResourceSharingPaths}. The path to apply the
+     * policies to.
+     */
+    String path() default "";
 }
