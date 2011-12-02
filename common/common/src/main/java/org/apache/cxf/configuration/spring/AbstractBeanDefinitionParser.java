@@ -57,6 +57,8 @@ public abstract class AbstractBeanDefinitionParser
     extends org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser {
     public static final String WIRE_BUS_ATTRIBUTE = AbstractBeanDefinitionParser.class.getName() + ".wireBus";
     public static final String WIRE_BUS_NAME = AbstractBeanDefinitionParser.class.getName() + ".wireBusName";
+    public static final String WIRE_BUS_CREATE 
+        = AbstractBeanDefinitionParser.class.getName() + ".wireBusCreate";
     public static final String WIRE_BUS_HANDLER 
         = "org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBeanDefinitionParser.class);

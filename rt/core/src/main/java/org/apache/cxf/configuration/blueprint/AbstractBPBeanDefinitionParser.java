@@ -268,8 +268,9 @@ public abstract class AbstractBPBeanDefinitionParser {
     }
 
     protected RefMetadata getBusRef(ParserContext context, String name) {
-
-        getBus(context, name);
+        if ("cxf".equals(name)) {
+            getBus(context, name);
+        }
         return createRef(context, name);
     }
 

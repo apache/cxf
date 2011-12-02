@@ -58,6 +58,8 @@ import org.apache.cxf.message.Message;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.After;
 import org.junit.Test;
+
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -429,6 +431,16 @@ public class SpringBeansTest extends Assert {
             if (ctx != null) {
                 ctx.close();
             }
+        }
+    }
+    @Test
+    public void testEndpointWithUndefinedBus() throws Exception {
+        try {
+            new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/endpoints3.xml");
+            fail("Should have thrown an exception");
+        } catch (BeanCreationException ex) {
+            assertEquals("ep2", ex.getBeanName());
+            assertTrue(ex.getMessage().contains("cxf1"));
         }
     }
 }

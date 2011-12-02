@@ -66,8 +66,9 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         busName = n;
     }
     private static Bus getBusForName(String name,
-                                        ApplicationContext context) {
-        if (!context.containsBean(name)) {
+                                     ApplicationContext context,
+                                     boolean create) {
+        if (!context.containsBean(name) && (create || Bus.DEFAULT_BUS_ID.equals(name))) {
             SpringBus b = new SpringBus();
             b.setApplicationContext(context);
             ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)context;
@@ -76,8 +77,9 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         return context.getBean(name, Bus.class);
     }
     private Object getBusForName(String name,
-                                        ConfigurableListableBeanFactory factory) {
-        if (!factory.containsBeanDefinition(name)) {
+                                 ConfigurableListableBeanFactory factory,
+                                 boolean create) {
+        if (!factory.containsBeanDefinition(name) && (create || Bus.DEFAULT_BUS_ID.equals(name))) {
             DefaultListableBeanFactory df = (DefaultListableBeanFactory)factory;
             df.registerBeanDefinition(name, 
                                       new RootBeanDefinition(SpringBus.class));
@@ -88,7 +90,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
         Object inject = bus;
         if (inject == null) {
-            inject = getBusForName(Bus.DEFAULT_BUS_ID, factory);
+            inject = getBusForName(Bus.DEFAULT_BUS_ID, factory, true);
         } else {
             if (!factory.containsBeanDefinition(Bus.DEFAULT_BUS_ID)
                 && !factory.containsSingleton(Bus.DEFAULT_BUS_ID)) {
@@ -103,15 +105,18 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
                 continue;
             }
             String busname = (String)beanDefinition.getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_NAME);
+            Boolean create = (Boolean)beanDefinition
+                .getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_CREATE);
             Object inj = inject;
             if (busname != null) {
                 if (bus != null) {
                     continue;
                 }
-                inj = getBusForName(busname, factory);
+                inj = getBusForName(busname, factory, create == null ? false : create);
             }
             beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_NAME);
             beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE);
+            beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_CREATE);
             if (BusWiringType.PROPERTY == type) {
                 beanDefinition.getPropertyValues()
                     .addPropertyValue("bus", inj);
@@ -172,7 +177,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
 
     public static Bus addDefaultBus(ApplicationContext ctx) {
         if (!ctx.containsBean(Bus.DEFAULT_BUS_ID)) {
-            Bus b = getBusForName(Bus.DEFAULT_BUS_ID, ctx);
+            Bus b = getBusForName(Bus.DEFAULT_BUS_ID, ctx, true);
             if (ctx instanceof ConfigurableApplicationContext) {
                 ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)ctx;
                 new BusWiringBeanFactoryPostProcessor(b).postProcessBeanFactory(cctx.getBeanFactory());
@@ -181,6 +186,6 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         return ctx.getBean(Bus.DEFAULT_BUS_ID, Bus.class);
     }
     public static Bus addBus(ApplicationContext ctx, String name) {
-        return getBusForName(name, ctx);
+        return getBusForName(name, ctx, true);
     }
 }

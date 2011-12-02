@@ -63,6 +63,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY, null, ctx);
         } else {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus, ctx);
+            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_CREATE, Boolean.TRUE);
         }
         String id = element.getAttribute("id");
         if (!StringUtils.isEmpty(id)) {
