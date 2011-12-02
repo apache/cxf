@@ -86,9 +86,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransport" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosTransportPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -103,9 +103,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosSymmetricPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -122,9 +122,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetricSupporting" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosSymmetricSupportingPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -141,9 +141,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosAsymmetricPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -165,9 +165,9 @@
        address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransportEndorsing" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosTransportEndorsingPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl"
        depends-on="tls-settings">
         
        <jaxws:properties>
@@ -182,9 +182,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetricEndorsing" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosAsymmetricEndorsingPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -206,9 +206,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetricProtection" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosSymmetricProtectionPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -225,9 +225,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetricDerivedProtection" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosSymmetricDerivedProtectionPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -244,9 +244,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetricSignedEndorsing" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosAsymmetricSignedEndorsingPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -268,9 +268,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosAsymmetricSignedEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosAsymmetricSignedEncryptedPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.username" value="bob"/>
@@ -292,9 +292,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetricEndorsingEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosSymmetricEndorsingEncryptedPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -311,9 +311,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetricSignedEndorsingEncrypted" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosSymmetricSignedEndorsingEncryptedPort"
-       xmlns:s="http://WSSec/kerberos"
-       implementor="org.apache.cxf.systest.ws.kerberos.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/kerberos/DoubleItKerberos.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 

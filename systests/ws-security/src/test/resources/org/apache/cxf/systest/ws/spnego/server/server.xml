@@ -57,9 +57,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetric" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSpnegoSymmetricPort"
-       xmlns:s="http://WSSec/spnego"
-       implementor="org.apache.cxf.systest.ws.spnego.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/spnego/DoubleItSpnego.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/spnego/DoubleItSpnego.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
@@ -72,9 +72,9 @@
        address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetricDerived" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItSpnegoSymmetricDerivedPort"
-       xmlns:s="http://WSSec/spnego"
-       implementor="org.apache.cxf.systest.ws.spnego.server.DoubleItImpl"
-       wsdlLocation="wsdl_systest_wssec/spnego/DoubleItSpnego.wsdl">
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/spnego/DoubleItSpnego.wsdl">
         
        <jaxws:properties>
            <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>

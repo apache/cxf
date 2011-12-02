@@ -41,7 +41,7 @@
         </cxf:features>
     </cxf:bus>
     
-    <jaxws:client name="{http://WSSec/spnego}DoubleItSpnegoSymmetricPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSpnegoSymmetricPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -57,7 +57,7 @@
        </jaxws:properties>
     </jaxws:client>
     
-    <jaxws:client name="{http://WSSec/spnego}DoubleItSpnegoSymmetricDerivedPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSpnegoSymmetricDerivedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
