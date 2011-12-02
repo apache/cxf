@@ -27,6 +27,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -279,15 +280,20 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                               .entity(message).build());
         }
         
-        StringBuilder prefix = new StringBuilder();
-        prefix.append(XML_PI_START + (enc == null ? "UTF-8" : enc) + "\"?>");
-        os.write(prefix.toString().getBytes());
+        StringBuilder pi = new StringBuilder();
+        pi.append(XML_PI_START + (enc == null ? "UTF-8" : enc) + "\"?>");
+        os.write(pi.toString().getBytes());
         String startTag = null;
         String endTag = null;
+        
         if (qname.getNamespaceURI().length() > 0) {
-            startTag = "<ns1:" + qname.getLocalPart() + " xmlns:ns1=\"" + qname.getNamespaceURI()
-                       + "\">";
-            endTag = "</ns1:" + qname.getLocalPart() + ">"; 
+            String prefix = nsPrefixes.get(qname.getNamespaceURI());
+            if (prefix == null) {
+                prefix = "ns1";
+            }
+            startTag = "<" + prefix + ":" + qname.getLocalPart() + " xmlns:" + prefix + "=\"" 
+                + qname.getNamespaceURI() + "\">";
+            endTag = "</" + prefix + ":" + qname.getLocalPart() + ">"; 
         } else {
             startTag = "<" + qname.getLocalPart() + ">";
             endTag = "</" + qname.getLocalPart() + ">";
@@ -329,7 +335,11 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         ms.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         if (ns.length() > 0) {
-            Map<String, String> map = Collections.singletonMap(ns, "ns1");
+            Map<String, String> map = new HashMap<String, String>();
+            // set the default just in case
+            if (!nsPrefixes.containsKey(ns)) {
+                map.put(ns, "ns1");
+            }
             map.putAll(nsPrefixes);
             setNamespaceMapper(ms, map);
         }

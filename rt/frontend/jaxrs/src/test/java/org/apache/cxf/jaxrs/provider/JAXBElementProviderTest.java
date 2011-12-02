@@ -80,6 +80,7 @@ import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
+import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import org.junit.Assert;
@@ -333,6 +334,20 @@ public class JAXBElementProviderTest extends Assert {
         provider.writeTo(tag, TagVO2.class, TagVO2.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         assertTrue(bos.toString().contains("prefix:thetag"));
+    }
+    
+    @Test
+    public void testWriteCollectionWithCustomPrefixes() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setNamespacePrefixes(
+            Collections.singletonMap("http://tags", "prefix"));
+        TagVO2 tag = new TagVO2("a", "b");
+        List<TagVO2> tags = Collections.singletonList(tag);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tags, List.class, new ParameterizedCollectionType<TagVO2>(TagVO2.class),
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        assertTrue(bos.toString().contains("prefix:thetag"));
+        assertFalse(bos.toString().contains("ns1:thetag"));
     }
     
     @Test
