@@ -134,6 +134,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testProcessingInstruction() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/name-in-query"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        String name = "Many        spaces";
+        wc.query("name", name);
+        String content = wc.get(String.class);
+        assertTrue(content.contains("<!DOCTYPE Something SYSTEM 'my.dtd'>"));
+        assertTrue(content.contains("<?xmlstylesheet href='common.css'?>"));
+    }
+    
+    @Test
     public void testGetBookWithColonMarks() throws Exception {
         
         // URLEncoder will turn ":" into "%3A" but ':' is actually
