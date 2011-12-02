@@ -56,7 +56,9 @@ import javax.xml.transform.Source;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
@@ -71,6 +73,7 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
+    
     private static final List<String> MARSHALLER_PROPERTIES =
         Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
                                     Marshaller.JAXB_FORMATTED_OUTPUT,
@@ -234,7 +237,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 Object actualObject = checkAdapter(obj, cls, anns, true);
                 Class<?> actualClass = obj != actualObject || cls.isInterface() 
                     ? actualObject.getClass() : cls;
-                marshal(actualObject, actualClass, genericType, encoding, os, m);
+                marshal(actualObject, actualClass, genericType, encoding, os, m, anns);
             }
         } catch (JAXBException e) {
             handleJAXBException(e);
@@ -344,6 +347,12 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
                            String enc, OutputStream os, MediaType mt) throws Exception {
+        marshal(obj, cls, genericType, enc, os, mt, new Annotation[]{});
+    }
+    
+    protected void marshal(Object obj, Class<?> cls, Type genericType, 
+                           String enc, OutputStream os, MediaType mt,
+                           Annotation[] anns) throws Exception {
         obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
         if (obj instanceof JAXBElement && cls != JAXBElement.class) {
             cls = JAXBElement.class;
@@ -354,7 +363,22 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             setNamespaceMapper(ms, nsPrefixes);
         }
         addAttachmentMarshaller(ms);
+        addProcessingInstructions(ms, anns);
         marshal(obj, cls, genericType, enc, os, mt, ms);
+    }
+    
+    private void addProcessingInstructions(Marshaller ms, Annotation[] anns) throws Exception {
+        XMLInstruction pi = AnnotationUtils.getAnnotation(anns, XMLInstruction.class);
+        if (pi != null) {
+            String value = pi.value();
+            // Should we even consider adding a base URI here ?
+            // Relative references may be resolved OK, to be verified
+            try {
+                ms.setProperty("com.sun.xml.bind.xmlHeaders", value);
+            } catch (PropertyException ex) {
+                ms.setProperty("com.sun.xml.internal.bind.xmlHeaders", value);
+            }
+        }
     }
     
     protected void addAttachmentMarshaller(Marshaller ms) {
