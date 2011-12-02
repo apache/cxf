@@ -20,9 +20,7 @@
 package org.apache.cxf.systest.ws.security;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +32,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
@@ -42,24 +41,19 @@ import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
 import javax.xml.xpath.XPathConstants;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl;
+import org.apache.cxf.systest.ws.common.DoubleItImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
@@ -70,7 +64,6 @@ import org.example.schema.doubleit.DoubleIt;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 
 public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String PORT = allocatePort(SecurityPolicyTest.class);
@@ -111,105 +104,106 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     @BeforeClass 
     public static void init() throws Exception {
         
+        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        
         createStaticBus(SecurityPolicyTest.class.getResource("https_config.xml").toString())
             .getExtension(PolicyEngine.class).setEnabled(true);
         getStaticBus().getOutInterceptors().add(new LoggingOutInterceptor());
-        EndpointImpl ep = (EndpointImpl)Endpoint.publish(POLICY_HTTPS_ADDRESS,
-                                       new DoubleItPortTypeImpl());
+        
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortHttps"));
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_HTTPS_ADDRESS);
+        ep.publish();
         ep.getServer().getEndpoint().getEndpointInfo().setProperty(SecurityConstants.CALLBACK_HANDLER,
                                                                    new ServerPasswordCallback());
-        Endpoint.publish(POLICY_ADDRESS,
-                         new DoubleItPortTypeImpl());
+        Endpoint.publish(POLICY_ADDRESS, new DoubleItImpl());
         
-        ep = (EndpointImpl)Endpoint.publish(POLICY_ENCSIGN_ADDRESS,
-                                            new DoubleItPortTypeImpl());
-        
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(
+            new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortEncryptThenSign")
+        );
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_ENCSIGN_ADDRESS);
+        ep.publish();
         EndpointInfo ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("bob.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "bob.properties", "alice.properties");
 
-        ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNENC_ADDRESS,
-                                            new DoubleItPortTypeImpl());
-        
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(
+            new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortSignThenEncrypt")
+        );
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_SIGNENC_ADDRESS);
+        ep.publish();
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("bob.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "bob.properties", "alice.properties");
 
-        ep = (EndpointImpl)Endpoint.publish(POLICY_SIGN_ADDRESS,
-                                            new DoubleItPortTypeImpl());
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortSign"));
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_SIGN_ADDRESS);
+        ep.publish();
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("bob.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "bob.properties", "alice.properties");
 
-        ep = (EndpointImpl)Endpoint.publish(POLICY_XPATH_ADDRESS,
-                                            new DoubleItPortTypeImpl());
-        ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("bob.properties").toString());
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortXPath"));
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_XPATH_ADDRESS);
+        ep.publish();
+        ei = ep.getServer().getEndpoint().getEndpointInfo();
+        setCryptoProperties(ei, "alice.properties", "bob.properties");
         
         ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNENC_PROVIDER_ADDRESS,
                                             new DoubleItProvider());
         
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("bob.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "bob.properties", "alice.properties");
         
-        ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNONLY_ADDRESS,
-                                            new DoubleItPortTypeImpl());
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortSignedOnly"));
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_SIGNONLY_ADDRESS);
+        ep.publish();
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("bob.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "bob.properties", "alice.properties");
         
-        
-        ep = (EndpointImpl)Endpoint.publish(POLICY_CXF3041_ADDRESS,
-                                            new DoubleItPortTypeImpl());
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortCXF3041"));
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_CXF3041_ADDRESS);
+        ep.publish();
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("bob.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "bob.properties", "alice.properties");
         
-        ep = (EndpointImpl)Endpoint.publish(POLICY_CXF3042_ADDRESS,
-                                            new DoubleItPortTypeImpl());
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortCXF3042"));
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_CXF3042_ADDRESS);
+        ep.publish();
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "alice.properties", "alice.properties");
 
-        ep = (EndpointImpl)Endpoint.publish(POLICY_CXF3452_ADDRESS,
-                                            new DoubleItPortTypeImpl());
+        ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortCXF3452"));
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_CXF3452_ADDRESS);
+        ep.publish();
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
-        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        setCryptoProperties(ei, "alice.properties", "alice.properties");
         ei.setProperty(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE); 
     }
     
+    private static void setCryptoProperties(EndpointInfo ei, String sigProps, String encProps) {
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource(sigProps).toString());
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource(encProps).toString());
+    }
+    
     @Test
-    @org.junit.Ignore
     public void testPolicy() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
 
@@ -299,12 +293,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 throw ex;
             }
         }
-
-        
     }
     
     @Test
-    @org.junit.Ignore
     public void testSignedOnlyWithUnsignedMessage() throws Exception {
         //CXF-2244
         SpringBusFactory bf = new SpringBusFactory();
@@ -331,36 +322,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         //This should work as it should be properly signed.
         assertEquals(10, pt.doubleIt(5));
         
-        StringWriter swriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(swriter);
-        try {
-            ClientProxy.getClient(pt).getInInterceptors()
-                .add(new LoggingInInterceptor("CheckFaultLogging", writer));
-            pt.doubleIt(-100);
-            fail("Should have resulted in a DoubleItFault_Exception");
-        } catch (Exception ex) {
-            //expected
-            writer.flush();
-            String s = swriter.toString();
-            s = s.substring(s.indexOf("Payload: ") + 9);
-            s = s.substring(0, s.lastIndexOf("Envelope>") + 9);
-            assertTrue("Content wasn't encrypted!", !s.contains("I don't like that."));
-            //System.out.println(s);
-            Document d = XMLUtils.parse(new InputSource(new StringReader(s)));
-            Node nd = d.getDocumentElement().getFirstChild();
-            while (nd != null && !"Body".equals(nd.getLocalName())) {
-                nd = nd.getNextSibling();
-            }
-            if (nd == null) {
-                throw ex;
-            }
-            //System.out.println(s);
-            Attr val = ((org.w3c.dom.Element)nd)
-                .getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
-            assertNotNull("No wsu:Id, thus, not signed", val);
-        }
-
-        
         //Try sending a message with the "TimestampOnly" policy into affect to the 
         //service running the "signed only" policy.  This SHOULD fail as the
         //body is then not signed.
@@ -377,12 +338,19 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
     }
     
-    /*
     @Test
     public void testDispatchClient() throws Exception {
-        Dispatch<Source> disp = service.createDispatch(DoubleItService.DoubleItPortEncryptThenSign, 
-                                                       Source.class,
-                                                       Mode.PAYLOAD);
+        SpringBusFactory bf = new SpringBusFactory();
+
+        Bus bus = bf.createBus();
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        
+        QName portQName = new QName(NAMESPACE, "DoubleItPortEncryptThenSign");
+        Dispatch<Source> disp = service.createDispatch(portQName, Source.class, Mode.PAYLOAD);
         
         disp.getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                      new KeystorePasswordCallback());
@@ -392,7 +360,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                      getClass().getResource("bob.properties"));
         updateAddressPort(disp, PORT);
 
-        String req = "<ns2:DoubleIt xmlns:ns2=\"http://cxf.apache.org/policytest/DoubleIt\">"
+        String req = "<ns2:DoubleIt xmlns:ns2=\"http://www.example.org/schema/DoubleIt\">"
             + "<numberToDouble>25</numberToDouble></ns2:DoubleIt>";
         Source source = new StreamSource(new StringReader(req));
         source = disp.invoke(source);
@@ -402,12 +370,11 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             nd = ((Document)nd).getDocumentElement();
         }
         Map<String, String> ns = new HashMap<String, String>();
-        ns.put("ns2", "http://cxf.apache.org/policytest/DoubleIt");
+        ns.put("ns2", "http://www.example.org/schema/DoubleIt");
         XPathUtils xp = new XPathUtils(ns);
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
         assertEquals(XMLUtils.toString(nd), "50", o);
     }
-    */
     
     @WebServiceProvider(targetNamespace = "http://www.example.org/contract/DoubleIt", 
                         portName = "DoubleItPortSignThenEncrypt",
@@ -429,12 +396,12 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 el = ((Document)el).getDocumentElement();
             }
             Map<String, String> ns = new HashMap<String, String>();
-            ns.put("ns2", "http://www.example.org/contract/DoubleIt");
+            ns.put("ns2", "http://www.example.org/schema/DoubleIt");
             XPathUtils xp = new XPathUtils(ns);
             String o = (String)xp.getValue("//ns2:DoubleIt/numberToDouble", el, XPathConstants.STRING);
             int i = Integer.parseInt(o);
             
-            String req = "<ns2:DoubleItResponse xmlns:ns2=\"http://www.example.org/contract/DoubleIt\">"
+            String req = "<ns2:DoubleItResponse xmlns:ns2=\"http://www.example.org/schema/DoubleIt\">"
                 + "<doubledNumber>" + Integer.toString(i * 2) + "</doubledNumber></ns2:DoubleItResponse>";
             return new StreamSource(new StringReader(req));
         }
@@ -443,7 +410,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     
     
     @Test
-    @org.junit.Ignore
     public void testCXF3041() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
 
@@ -470,7 +436,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     }
 
     @Test
-    @org.junit.Ignore
     public void testCXF3042() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
 
@@ -497,7 +462,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     }
     
     @Test
-    @org.junit.Ignore
     public void testCXF3452() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
 
