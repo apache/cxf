@@ -363,7 +363,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     (WSSecurityEngineResult) timestampResults.get(i);
                 Timestamp timestamp = (Timestamp)result.get(WSSecurityEngineResult.TAG_TIMESTAMP);
 
-                if (timestamp != null && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
+                String futureTTL = 
+                    getString(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, reqData.getMsgContext());
+                int futureTimeToLive = 60;
+                if (futureTTL != null) {
+                    try {
+                        futureTimeToLive = Integer.parseInt(futureTTL);
+                    } catch (NumberFormatException e) {
+                        futureTimeToLive = 60;
+                    }
+                }
+                    
+                if (timestamp != null 
+                    && !verifyTimestamp(timestamp, decodeTimeToLive(reqData), futureTimeToLive)) {
                     LOG.warning("The timestamp could not be validated");
                     throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED);
                 }
