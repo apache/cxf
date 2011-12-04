@@ -78,6 +78,7 @@ import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.apache.cxf.jaxrs.ext.xml.SchemaLocation;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -210,6 +211,7 @@ public class BookStore {
     @Path("name-in-query")
     @Produces("application/xml")
     @XMLInstruction("<!DOCTYPE Something SYSTEM 'my.dtd'><?xmlstylesheet href='common.css'?>")
+    @SchemaLocation("book.xsd")
     public Book getBookFromQuery(@QueryParam("name") String name) {
         return new Book(name, 321L);
     }
