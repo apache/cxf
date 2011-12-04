@@ -348,11 +348,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     protected static void setNamespaceMapper(Marshaller ms, Map<String, String> map) throws Exception {
         NamespaceMapper nsMapper = new NamespaceMapper(map);
-        try {
-            ms.setProperty("com.sun.xml.bind.namespacePrefixMapper", nsMapper);
-        } catch (PropertyException ex) {
-            ms.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", nsMapper);
-        }
+        setMarshallerProp(ms, nsMapper, "namespacePrefixMapper");
     }
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
@@ -381,14 +377,24 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         XMLInstruction pi = AnnotationUtils.getAnnotation(anns, XMLInstruction.class);
         if (pi != null) {
             String value = pi.value();
-            // Should we even consider adding a base URI here ?
-            // Relative references may be resolved OK, to be verified
-            try {
-                ms.setProperty("com.sun.xml.bind.xmlHeaders", value);
-            } catch (PropertyException ex) {
-                ms.setProperty("com.sun.xml.internal.bind.xmlHeaders", value);
+            int ind = value.indexOf("href='");
+            if (ind > 0 && getContext() != null) {
+                String relRef = value.substring(ind + 6, value.length() - 3);
+                String absRef = 
+                    getContext().getUriInfo().getBaseUriBuilder().path(relRef).build().toString();
+                value = value.substring(0, ind + 6) + absRef + "'?>";
             }
+            setMarshallerProp(ms, value, "xmlHeaders");
         }
+    }
+    
+    private static void setMarshallerProp(Marshaller ms, Object value, String name) throws Exception {
+        try {
+            ms.setProperty("com.sun.xml.bind." + name, value);
+        } catch (PropertyException ex) {
+            ms.setProperty("com.sun.xml.internal.bind." + name, value);
+        }
+        
     }
     
     protected void addAttachmentMarshaller(Marshaller ms) {
