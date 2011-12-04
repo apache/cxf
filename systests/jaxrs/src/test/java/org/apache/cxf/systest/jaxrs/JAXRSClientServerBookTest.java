@@ -141,8 +141,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String name = "Many        spaces";
         wc.query("name", name);
         String content = wc.get(String.class);
+        System.out.println(content);
         assertTrue(content.contains("<!DOCTYPE Something SYSTEM 'my.dtd'>"));
         assertTrue(content.contains("<?xmlstylesheet href='" + base + "/common.css'?>"));
+        assertTrue(content.contains("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""));
+        assertTrue(content.contains("xsi:schemaLocation=\"" + base + "/book.xsd\""));
     }
     
     @Test

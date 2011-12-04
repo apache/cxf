@@ -57,6 +57,7 @@ import javax.xml.transform.Source;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.xml.SchemaLocation;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -74,13 +75,21 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
+    private static final String NS_MAPPER_PROPERTY = "com.sun.xml.bind.namespacePrefixMapper";
+    private static final String NS_MAPPER_PROPERTY_INT = "com.sun.xml.internal.bind.namespacePrefixMapper";
+    private static final String XML_PI_PROPERTY = "com.sun.xml.bind.xmlHeaders";
+    private static final String XML_PI_PROPERTY_INT = "com.sun.xml.internal.bind.xmlHeaders";
     
     private static final List<String> MARSHALLER_PROPERTIES =
         Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
                                     Marshaller.JAXB_FORMATTED_OUTPUT,
                                     Marshaller.JAXB_FRAGMENT,
                                     Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
-                                    Marshaller.JAXB_SCHEMA_LOCATION});
+                                    Marshaller.JAXB_SCHEMA_LOCATION,
+                                    NS_MAPPER_PROPERTY,
+                                    NS_MAPPER_PROPERTY_INT,
+                                    XML_PI_PROPERTY,
+                                    XML_PI_PROPERTY_INT});
     
     private Map<String, Object> mProperties = Collections.emptyMap();
     private Map<String, String> nsPrefixes = Collections.emptyMap();
@@ -348,7 +357,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     protected static void setNamespaceMapper(Marshaller ms, Map<String, String> map) throws Exception {
         NamespaceMapper nsMapper = new NamespaceMapper(map);
-        setMarshallerProp(ms, nsMapper, "namespacePrefixMapper");
+        setMarshallerProp(ms, nsMapper, NS_MAPPER_PROPERTY, NS_MAPPER_PROPERTY_INT);
     }
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
@@ -370,6 +379,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         addAttachmentMarshaller(ms);
         addProcessingInstructions(ms, anns);
+        addSchemaLocation(ms, anns);
         marshal(obj, cls, genericType, enc, os, mt, ms);
     }
     
@@ -384,15 +394,30 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                     getContext().getUriInfo().getBaseUriBuilder().path(relRef).build().toString();
                 value = value.substring(0, ind + 6) + absRef + "'?>";
             }
-            setMarshallerProp(ms, value, "xmlHeaders");
+            setMarshallerProp(ms, value, XML_PI_PROPERTY, XML_PI_PROPERTY_INT);
         }
     }
     
-    private static void setMarshallerProp(Marshaller ms, Object value, String name) throws Exception {
+    private void addSchemaLocation(Marshaller ms, Annotation[] anns) throws Exception {
+        SchemaLocation sl = AnnotationUtils.getAnnotation(anns, SchemaLocation.class);
+        if (sl != null) {
+            String value = sl.value();
+            if (getContext() != null) {
+                value = 
+                    getContext().getUriInfo().getBaseUriBuilder().path(value).build().toString();
+            }
+            String propName = !sl.noNamespace() 
+                ? Marshaller.JAXB_SCHEMA_LOCATION : Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+            ms.setProperty(propName, value);
+        }
+    }
+    
+    private static void setMarshallerProp(Marshaller ms, Object value, 
+                                          String name1, String name2) throws Exception {
         try {
-            ms.setProperty("com.sun.xml.bind." + name, value);
+            ms.setProperty(name1, value);
         } catch (PropertyException ex) {
-            ms.setProperty("com.sun.xml.internal.bind." + name, value);
+            ms.setProperty(name2, value);
         }
         
     }
