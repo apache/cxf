@@ -135,28 +135,24 @@ public class UsernameTokenValidator implements TokenValidator {
         if (tokenParameters.getTokenStore() != null) {
             secToken = tokenParameters.getTokenStore().getToken(usernameTokenType.getId());
         }
-        
-        Element rootElement = null;
+
+        // Marshall the received JAXB object into a DOM Element
         Element usernameTokenElement = null;
-        if (secToken == null) {
-            try {
-                JAXBContext jaxbContext = 
-                    JAXBContext.newInstance("org.apache.cxf.ws.security.sts.provider.model");
-                Marshaller marshaller = jaxbContext.createMarshaller();
-                Document doc = DOMUtils.createDocument();
-                rootElement = doc.createElement("root-element");
-                JAXBElement<UsernameTokenType> tokenType = 
-                    new JAXBElement<UsernameTokenType>(
-                        QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameTokenType
-                    );
-                marshaller.marshal(tokenType, rootElement);
-            } catch (JAXBException ex) {
-                LOG.log(Level.WARNING, "", ex);
-                return response;
-            }
+        try {
+            JAXBContext jaxbContext = 
+                JAXBContext.newInstance("org.apache.cxf.ws.security.sts.provider.model");
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            Document doc = DOMUtils.createDocument();
+            Element rootElement = doc.createElement("root-element");
+            JAXBElement<UsernameTokenType> tokenType = 
+                new JAXBElement<UsernameTokenType>(
+                    QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameTokenType
+                );
+            marshaller.marshal(tokenType, rootElement);
             usernameTokenElement = (Element)rootElement.getFirstChild();
-        } else {
-            usernameTokenElement = secToken.getToken();
+        } catch (JAXBException ex) {
+            LOG.log(Level.WARNING, "", ex);
+            return response;
         }
         
         //

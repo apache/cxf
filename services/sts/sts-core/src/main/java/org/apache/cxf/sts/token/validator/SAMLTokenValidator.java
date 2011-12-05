@@ -196,6 +196,9 @@ public class SAMLTokenValidator implements TokenValidator {
             }
             if (!(validFrom.isBeforeNow() && validTill.isAfterNow())) {
                 LOG.log(Level.WARNING, "SAML Token condition not met");
+                if (secToken != null) {
+                    tokenParameters.getTokenStore().remove(secToken);
+                }
                 return response;
             }
             
