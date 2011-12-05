@@ -53,6 +53,25 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         String javascript = IOUtils.readStringFromStream(fis);
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
     }
-    
+   
+    @Test
+    public void testCXF3891() throws Exception {
+        JavaScriptContainer container = new JavaScriptContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(ToolConstants.CFG_WSDLURL, getLocation("hello_world_ref.wsdl"));
+        context.put(ToolConstants.CFG_OUTPUTDIR, output.toString()); 
+        String[] prefixes = new String[1];
+        prefixes[0] = "http://apache.org/hello_world_soap_http=murble";
+        context.put(ToolConstants.CFG_JSPACKAGEPREFIX, prefixes);
+        container.setContext(context); 
+        container.execute();
+        // now we really want to check some results.
+        File resultFile = new File(output, "SOAPService.js");
+        assertTrue(resultFile.canRead());
+        FileInputStream fis = new FileInputStream(resultFile);
+        String javascript = IOUtils.readStringFromStream(fis);
+        assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
+    }
    
 }
