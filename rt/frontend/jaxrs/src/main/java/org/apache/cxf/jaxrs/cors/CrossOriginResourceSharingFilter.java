@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.cors;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,16 +28,23 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.Service;
 
 /**
  * An single class that provides both an input and an output filter for CORS, following
@@ -65,7 +73,6 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
      * deployment.
      */
     private List<String> allowOrigins = Collections.emptyList();
-    private List<String> allowMethods = Collections.emptyList();
     private List<String> allowHeaders = Collections.emptyList();
     private boolean allowAllOrigins;
     private boolean allowCredentials;
@@ -172,32 +179,18 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return null;
         }
         String requestMethod = requestMethodValues.get(0);
-
         /*
          * CORS doesn't send enough information with a preflight to accurately identity the single method
-         * that will handle the request. CrossOriginResourceSharingPaths provides annotations by path/method
-         * for this case. If none of those apply, a plain class level CrossOrginResourceSharing is the
-         * best we can do.
+         * that will handle the request. We ask the JAX-RS runtime to find the matching method which is
+         * expected to have a CrossOriginResourceSharing annotation set.
          */
-        String requestUri = HttpUtils.getPathToMatch(m, true);
-        CrossOriginResourceSharing ann = null;
-        CrossOriginResourceSharingPaths classPathsAnn = 
-            resourceClass.getResourceClass().getAnnotation(CrossOriginResourceSharingPaths.class);
-        if (classPathsAnn != null) {
-            /* search the path/method pair. */
-            for (CrossOriginResourceSharing pathAnn : classPathsAnn.value()) {
-                /* A very simple path policy! If someone wants to turn this into
-                 * searching up the tree, they are welcome.
-                 */
-                if (pathAnn.path() != null && pathAnn.path().equals(requestUri) 
-                    && Arrays.asList(pathAnn.allowMethods()).contains(requestMethod)) {
-                    ann = pathAnn;
-                    break;
-                }
-            }
-        }
+        
+        Method method = getPreflightMethod(m, requestMethod);
+        
+        CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
+        ann = ann == null ? optionAnn : ann; 
         if (ann == null) {
-            ann = resourceClass.getResourceClass().getAnnotation(CrossOriginResourceSharing.class);
+            return null;
         }
 
         // 5.2.2 must be on the list or we must be matching *.
@@ -210,11 +203,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         List<String> requestHeaders = getHeaderValues(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, false);
 
         // 5.2.5 reject if the method is not on the list.
-        List<String> effectiveAllowMethods = effectiveAllowMethods(ann);
-
-        if (!effectiveAllowMethods.contains(requestMethod)) {
-            return null;
-        }
+        // This was indirectly enforced by getCorsMethod()
 
         // 5.2.6 reject if the header is not listed.
         if (!effectiveAllowHeaders(ann).containsAll(requestHeaders)) {
@@ -248,6 +237,58 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     }
     //CHECKSTYLE:ON
 
+    private Method getPreflightMethod(Message m, String httpMethod) {
+        String requestUri = HttpUtils.getPathToMatch(m, true);
+        
+        Service service = m.getExchange().get(Service.class);
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)service).getClassResourceInfos();
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, 
+                                                                    requestUri, 
+                                                                    values,
+                                                                    m);
+        if (resource == null) {
+            return null;
+        }
+        OperationResourceInfo ori = findPreflightMethod(resource, requestUri, httpMethod, values, m);
+        return ori == null ? null : ori.getAnnotatedMethod();
+    }
+    
+    
+    private OperationResourceInfo findPreflightMethod(ClassResourceInfo resource, 
+                                                      String requestUri,
+                                                      String httpMethod,
+                                                      MultivaluedMap<String, String> values, 
+                                                      Message m) {
+        final String contentType = MediaType.WILDCARD;
+        final MediaType acceptType = MediaType.WILDCARD_TYPE;
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+                                    m, httpMethod, values, 
+                                    contentType, 
+                                    Collections.singletonList(acceptType), 
+                                    true); 
+        if (ori == null) {
+            return null;
+        }
+        if (ori.isSubResourceLocator()) {
+            Class<?> cls = ori.getMethodToInvoke().getReturnType();
+            ClassResourceInfo subcri = resource.getSubResource(cls, cls);
+            if (subcri == null) {
+                return null;
+            } else {
+                MultivaluedMap<String, String> newValues = new MetadataMap<String, String>();
+                newValues.putAll(values);
+                return findPreflightMethod(subcri, 
+                                           values.getFirst(URITemplate.FINAL_MATCH_GROUP),
+                                           httpMethod, 
+                                           newValues, 
+                                           m);
+            }
+        } else {
+            return ori;
+        }
+    }
+    
     private void commonRequestProcessing(Message m, CrossOriginResourceSharing ann, String origin) {
         
         m.getExchange().put(CorsHeaderConstants.HEADER_ORIGIN, origin);
@@ -331,17 +372,6 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
     }
     
-    private List<String> effectiveAllowMethods(CrossOriginResourceSharing ann) {
-        if (ann != null) {
-            if (ann.allowMethods() == null) {
-                return Collections.emptyList();
-            }
-            return Arrays.asList(ann.allowMethods());
-        } else {
-            return allowMethods;
-        }
-    }
-
     private List<String> effectiveAllowHeaders(CrossOriginResourceSharing ann) {
         if (ann != null) {
             if (ann.allowHeaders() == null) {
@@ -461,19 +491,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         this.allowAllOrigins = allowAllOrigins;
     }
 
-    public List<String> getAllowMethods() {
-        return allowMethods;
-    }
-
-    /**
-     * The list of allowed non-simple methods for preflight checks. Section 5.2.3.
-     * 
-     * @param allowedMethods a list of case-sensitive HTTP method names.
-     */
-    public void setAllowMethods(List<String> allowedMethods) {
-        this.allowMethods = allowedMethods;
-    }
-
+    
     public List<String> getAllowHeaders() {
         return allowHeaders;
     }

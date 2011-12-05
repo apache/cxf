@@ -55,11 +55,6 @@ public @interface CrossOriginResourceSharing {
      */
     String[] allowOrigins() default { };
     /**
-     * A list of HTTP methods. This is used only for preflight,
-     * and is only valid on a class.
-     */
-    String[] allowMethods() default { };
-    /**
      * A list of headers that the client may include
      * in an actual request.
      */
@@ -90,9 +85,4 @@ public @interface CrossOriginResourceSharing {
      */
     boolean localPreflight() default false;
     
-    /**
-     * For use inside @{@link CrossOriginResourceSharingPaths}. The path to apply the
-     * policies to.
-     */
-    String path() default "";
 }

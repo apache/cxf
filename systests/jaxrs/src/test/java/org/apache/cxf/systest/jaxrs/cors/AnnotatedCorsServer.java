@@ -39,9 +39,7 @@ import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharing;
  */
 @CrossOriginResourceSharing(allowOrigins = {
         "http://area51.mil:31415"
-        }, allowCredentials = true, maxAge = 1, allowMethods = {
-        "PUT"
-        }, allowHeaders = {
+        }, allowCredentials = true, maxAge = 1, allowHeaders = {
         "X-custom-1", "X-custom-2"
         }, exposeHeaders = {
         "X-custom-3", "X-custom-4"

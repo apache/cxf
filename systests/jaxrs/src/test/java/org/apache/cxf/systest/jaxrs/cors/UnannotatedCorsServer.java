@@ -29,20 +29,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharing;
-import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharingPaths;
 
 /**
  * Service bean with no class-level annotation for cross-script control.
  */
-@CrossOriginResourceSharingPaths(
- @CrossOriginResourceSharing(path = "/annotatedPut", 
-     allowOrigins = { "http://area51.mil:31415" }, 
-     allowCredentials = true, 
-     maxAge = 1, 
-     allowMethods = { "PUT" },
-     allowHeaders = { "X-custom-1", "X-custom-2" },
-     exposeHeaders = {"X-custom-3", "X-custom-4" }
- ))                                 
 public class UnannotatedCorsServer {
 
     @GET
@@ -78,6 +68,13 @@ public class UnannotatedCorsServer {
     @Consumes("text/plain")
     @Produces("text/plain")
     @Path("/annotatedPut")
+    @CrossOriginResourceSharing(
+        allowOrigins = { "http://area51.mil:31415" }, 
+        allowCredentials = true, 
+        maxAge = 1, 
+        allowHeaders = { "X-custom-1", "X-custom-2" },
+        exposeHeaders = {"X-custom-3", "X-custom-4" }
+    )
     public String annotatedPut(String input) {
         return input;
     }
