@@ -37,6 +37,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
+import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -91,7 +92,8 @@ public class LdapClaimsHandler implements ClaimsHandler {
         return uriList;
     }
 
-    public ClaimCollection retrieveClaimValues(Principal principal, RequestClaimCollection claims) {
+    public ClaimCollection retrieveClaimValues(
+            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
 
         String user = null;
         if (principal instanceof KerberosPrincipal) {

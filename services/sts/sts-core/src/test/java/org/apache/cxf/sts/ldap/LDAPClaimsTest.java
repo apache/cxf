@@ -89,7 +89,7 @@ public class LDAPClaimsTest {
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
 
         ClaimCollection retrievedClaims = 
-            claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims);
+            claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims, null, null);
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 
@@ -123,7 +123,7 @@ public class LDAPClaimsTest {
         claim.setOptional(false);
         requestedClaims.add(claim);
 
-        claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims);
+        claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims, null, null);
 
     }
 
@@ -149,7 +149,7 @@ public class LDAPClaimsTest {
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
 
         ClaimCollection retrievedClaims = 
-            claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims);
+            claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims, null, null);
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 

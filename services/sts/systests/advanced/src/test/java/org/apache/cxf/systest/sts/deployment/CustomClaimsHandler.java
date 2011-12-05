@@ -23,6 +23,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.ws.WebServiceContext;
+
 import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsHandler;
@@ -37,7 +39,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
     public static final URI ROLE = 
             URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
 
-    public ClaimCollection retrieveClaimValues(Principal principal, RequestClaimCollection claims) {
+    public ClaimCollection retrieveClaimValues(
+            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
         if (claims != null && claims.size() > 0) {
             ClaimCollection claimCollection = new ClaimCollection();
             for (RequestClaim requestClaim : claims) {

@@ -23,6 +23,8 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 
+import javax.xml.ws.WebServiceContext;
+
 /**
  * This interface provides a pluggable way to handle Claims.
  */
@@ -30,7 +32,8 @@ public interface ClaimsHandler {
 
     List<URI> getSupportedClaimTypes();
 
-    ClaimCollection retrieveClaimValues(Principal principal, RequestClaimCollection claims);
+    ClaimCollection retrieveClaimValues(
+            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm);
 
 }
  

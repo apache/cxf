@@ -61,7 +61,10 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         if (claimsManager != null) {
             retrievedClaims = 
                 claimsManager.retrieveClaimValues(
-                    providerParameters.getPrincipal(), providerParameters.getRequestedClaims()
+                    providerParameters.getPrincipal(),
+                    providerParameters.getRequestedClaims(),
+                    providerParameters.getWebServiceContext(),
+                    providerParameters.getRealm()
                 );
         }
         

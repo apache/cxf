@@ -24,6 +24,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.ws.WebServiceContext;
+
 /**
  * This class holds various ClaimsHandler implementations.
  */
@@ -51,11 +53,13 @@ public class ClaimsManager {
         }
     }
 
-    public ClaimCollection retrieveClaimValues(Principal principal, RequestClaimCollection claims) {
+    public ClaimCollection retrieveClaimValues(
+            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
         if (claimHandlers != null && claimHandlers.size() > 0) {
             ClaimCollection returnCollection = new ClaimCollection();
             for (ClaimsHandler handler : claimHandlers) {
-                ClaimCollection claimCollection = handler.retrieveClaimValues(principal, claims);
+                ClaimCollection claimCollection = handler.retrieveClaimValues(
+                        principal, claims, context, realm);
                 if (claimCollection != null && claimCollection.size() != 0) {
                     returnCollection.addAll(claimCollection);
                 }
