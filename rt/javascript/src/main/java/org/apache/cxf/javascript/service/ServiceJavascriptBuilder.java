@@ -740,7 +740,8 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                         if (element.getSchemaTypeName() != null) {
                             element.setSchemaType(xmlSchemaCollection
                                                   .getTypeByQName(element.getSchemaTypeName()));
-                        } else if (element.getRef().getTargetQName() != null) {
+                        } else if (element.getRef().getTargetQName() != null
+                            && element.getRef().getTarget().getSchemaTypeName() != null) {
                             element = element.getRef().getTarget();
                             element.setSchemaType(xmlSchemaCollection
                                                   .getTypeByQName(element.getSchemaTypeName()));
