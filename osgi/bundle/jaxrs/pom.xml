@@ -135,7 +135,6 @@
                             com.ctc.wstx.msv*;resolution:=optional,
                             org.codehaus.stax2*;resolution:=optional,
                             javax.ws.rs*,
-                            repackage;resolution:=optional,
                             javax.resource*;resolution:=optional,
                             junit.framework*;resolution:=optional,
                             net.sf.cglib*;resolution:=optional;version="[2.1.3, 3.0.0)",
