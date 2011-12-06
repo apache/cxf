@@ -104,6 +104,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         expect(exchange.getHttpContext()).andReturn(context).anyTimes();
         expect(exchange.getQueryString()).andReturn(null);
         expect(exchange.getPathInfo()).andReturn(null);
+        expect(exchange.getRequestURI()).andReturn(CONTEXT_PATH);
         expect(exchange.getContextPath()).andReturn(CONTEXT_PATH);
         Map<String, List<String>> reqHeaders = new HashMap<String, List<String>>();
         reqHeaders.put("Content-Type", Collections.singletonList("text/xml"));

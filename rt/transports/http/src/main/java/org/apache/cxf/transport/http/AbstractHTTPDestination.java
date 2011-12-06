@@ -269,15 +269,22 @@ public abstract class AbstractHTTPDestination
         }
         String contextServletPath = contextPath + servletPath;
         inMessage.put(Message.PATH_INFO, contextServletPath + req.getPathInfo());
-        int index = requestURL.indexOf(requestURI);
-        if (index > 0) {
-            // Can be useful for referencing resources with URIs not covered by CXFServlet.
-            // For example, if we a have web application name 'app' and CXFServlet listening 
-            // on "/services/*" then having HTTP_BASE_PATH pointing to say 
-            // http://localhost:8080/app will make it easy to refer to non CXF resources
-            String schemaInfo = requestURL.substring(0, index);
-            String basePathWithContextOnly = schemaInfo + contextPath;
-            inMessage.put(HTTP_BASE_PATH, basePathWithContextOnly);
+        if (!StringUtils.isEmpty(requestURI)) {
+            int index = requestURL.indexOf(requestURI);
+            if (index > 0) {
+                // Can be useful for referencing resources with URIs not covered by CXFServlet.
+                // For example, if we a have web application name 'app' and CXFServlet listening 
+                // on "/services/*" then having HTTP_BASE_PATH pointing to say 
+                // http://localhost:8080/app will make it easy to refer to non CXF resources
+                String schemaInfo = requestURL.substring(0, index);
+                String basePathWithContextOnly = schemaInfo + contextPath;
+                inMessage.put(HTTP_BASE_PATH, basePathWithContextOnly);
+            }
+        } else if (!StringUtils.isEmpty(servletPath) && requestURL.endsWith(servletPath)) {
+            int index = requestURL.lastIndexOf(servletPath);
+            if (index > 0) {
+                inMessage.put(HTTP_BASE_PATH, requestURL.substring(0, index));
+            }
         }
         String contentType = req.getContentType();
         inMessage.put(Message.CONTENT_TYPE, contentType);
