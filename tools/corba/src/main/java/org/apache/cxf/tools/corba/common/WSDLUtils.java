@@ -74,8 +74,7 @@ public final class WSDLUtils {
 
     public static void writeWSDL(Definition def, Writer outputWriter)
         throws WSDLException, IOException {
-        WSDLCorbaFactory wsdlfactory = WSDLCorbaFactory
-            .newInstance("org.apache.cxf.tools.corba.common.WSDLCorbaFactoryImpl");
+        WSDLCorbaFactory wsdlfactory = new WSDLCorbaFactoryImpl();
         WSDLWriter writer = wsdlfactory.newWSDLWriter();
         writer.writeWSDL(def, outputWriter);
 
@@ -85,8 +84,7 @@ public final class WSDLUtils {
 
 
     public static void writeSchema(Definition def, Writer outputWriter) throws WSDLException, IOException {
-        SchemaFactory sfactory = SchemaFactory
-            .newInstance("org.apache.cxf.tools.corba.common.SchemaFactoryImpl");
+        SchemaFactory sfactory = new SchemaFactoryImpl();
         WSDLWriter swriter = sfactory.newWSDLWriter();
         swriter.writeWSDL(def, outputWriter);
 

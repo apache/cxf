@@ -32,9 +32,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
+import javax.wsdl.BindingInput;
 import javax.wsdl.Definition;
 import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.mime.MIMEPart;
 import javax.wsdl.factory.WSDLFactory;
@@ -46,9 +48,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
-
-import com.ibm.wsdl.extensions.soap.SOAPHeaderImpl;
-import com.ibm.wsdl.extensions.soap.SOAPHeaderSerializer;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -98,15 +97,21 @@ public class WSDLManagerImpl implements WSDLManager {
             registry.registerSerializer(Types.class, 
                                         WSDLConstants.QNAME_SCHEMA,
                                         new SchemaSerializer());
-            QName header = new QName("http://schemas.xmlsoap.org/wsdl/soap/", 
-                                     "header");
+            // these will replace whatever may have already been registered
+            // in these places, but there's no good way to check what was 
+            // there before.
+            QName header = new QName(WSDLConstants.NS_SOAP, "header");
             registry.registerDeserializer(MIMEPart.class, 
                                           header, 
-                                          new SOAPHeaderSerializer());
+                                          registry.queryDeserializer(BindingInput.class, header));
             registry.registerSerializer(MIMEPart.class, 
                                         header, 
-                                        new SOAPHeaderSerializer());
-            registry.mapExtensionTypes(MIMEPart.class, header, SOAPHeaderImpl.class);
+                                        registry.querySerializer(BindingInput.class, header));
+            // get the original classname of the SOAPHeader
+            // implementation that was stored in the registry.  
+            Class<? extends ExtensibilityElement> clazz = 
+                registry.createExtension(BindingInput.class, header).getClass();
+            registry.mapExtensionTypes(MIMEPart.class, header, clazz);
         } catch (WSDLException e) {
             throw new BusException(e);
         }

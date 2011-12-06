@@ -36,9 +36,8 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.xml.namespace.QName;
-
-import com.ibm.wsdl.extensions.soap.SOAPBindingImpl;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -255,15 +254,14 @@ public class ClientImpl
 
                     if (bfo.getBindingId().equals("http://schemas.xmlsoap.org/wsdl/soap/")) {
                         for (Object o : bfo.getExtensors().get()) {
-                            if (o instanceof SOAPBindingImpl) {
-                                SOAPBindingImpl soapB = (SOAPBindingImpl)o;
+                            if (o instanceof SOAPBinding) {
+                                SOAPBinding soapB = (SOAPBinding)o;
                                 if (soapB.getTransportURI().equals("http://schemas.xmlsoap.org/soap/http")) {
                                     epfo = e;
                                     break;
                                 }
                             }
                         }
-
                     }
                 }
             }

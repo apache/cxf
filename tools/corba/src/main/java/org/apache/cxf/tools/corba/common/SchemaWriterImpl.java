@@ -19,10 +19,8 @@
 
 package org.apache.cxf.tools.corba.common;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.wsdl.Definition;
@@ -30,15 +28,14 @@ import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
+import javax.wsdl.xml.WSDLWriter;
 
-import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
-import com.ibm.wsdl.Constants;
-import com.ibm.wsdl.util.xml.DOM2Writer;
-import com.ibm.wsdl.xml.WSDLWriterImpl;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XMLUtils;
 
 
  /*
@@ -46,109 +43,48 @@ import com.ibm.wsdl.xml.WSDLWriterImpl;
   * extensibility elements of the schema into a separate file.
   * 
   */
-public class SchemaWriterImpl extends WSDLWriterImpl {
+public class SchemaWriterImpl implements WSDLWriter {
 
     public static final int DEFAULT_INDENT_LEVEL = 0;
 
     
-    /**
-     * Write the specified schema of the WSDL definition 
-     * to the specified Writer.
-     * 
-     * @param wsdlDef contains the schema to be written.
-     * @param sink the Writer to write the xml to.
-     */
-    public void writeWSDL(Definition wsdlDef, Writer sink) throws WSDLException {
-        PrintWriter pw = new PrintWriter(sink);
-        String javaEncoding = (sink instanceof OutputStreamWriter)
-            ? ((OutputStreamWriter)sink).getEncoding() : null;
-
-        String xmlEncoding = DOM2Writer.java2XMLEncoding(javaEncoding);
-
-        if (xmlEncoding == null) {
-            throw new WSDLException(WSDLException.CONFIGURATION_ERROR,
-                                    "Unsupported Java encoding for writing " + "schema file: '" + javaEncoding
-                                        + "'.");
-        }
-
-        pw.println(Constants.XML_DECL_START + xmlEncoding + Constants.XML_DECL_END);
-
-        printSchema(wsdlDef, pw);
-    }
-    
-        
-    protected void printSchema(Definition def, PrintWriter pw) throws WSDLException {
-        if (def == null) {
-            return;
-        }
-            
-        Types types = def.getTypes();          
+    public Element getElement(Definition wsdlDef) throws WSDLException {
+        Types types = wsdlDef.getTypes();          
         if (types != null) {
-            List extElements = types.getExtensibilityElements();
-            printExtensibilityElements(Types.class, extElements, def, pw);
-        }
-    
-        pw.flush();        
-    }
-    
+            List<ExtensibilityElement> l = CastUtils.cast(types.getExtensibilityElements());
+            if (l == null) {
+                return null;
+            }
 
-    public void printExtensibilityElements(Class class1,
-                                              List list,
-                                              Definition def,
-                                              PrintWriter pw)
-        throws WSDLException {
-        if (list != null) {
-            Iterator it = list.iterator();
-            while (it.hasNext()) {
-                ExtensibilityElement extElement = (ExtensibilityElement) it.next();                
-                if (extElement instanceof Schema) {                                       
-                    printDOMElement(((Schema) extElement).getElement(),
-                                    pw,
-                                    DEFAULT_INDENT_LEVEL);
-                    pw.println();
-                } else {
-                    super.printExtensibilityElements(class1, list, def, pw);
+            for (ExtensibilityElement e : l) {
+                if (e instanceof Schema) {
+                    Schema sc = (Schema)e;
+                    return sc.getElement();
                 }
             }
         }
+        return null;
+    }
+    public Document getDocument(Definition wsdlDef) throws WSDLException {
+        Element el = getElement(wsdlDef);
+        Document doc = DOMUtils.createDocument();
+        doc.appendChild(doc.importNode(el, true));
+        return doc;
     }
 
-    private void printDOMElement(Element element, PrintWriter pw, int indentCount) {
-        indent(pw, indentCount);        
-        if (element.getLocalName().equals("schema")) {
-            pw.print("<xs:" + element.getLocalName());
-        } else {
-            pw.print("<" + element.getNodeName());
-        }
-        NamedNodeMap attrs = element.getAttributes();
-        for (int i = 0; i < attrs.getLength(); i++) {
-            Attr attr = (Attr) attrs.item(i);                  
-            pw.print(" " + attr.getName() + "=\"" + attr.getValue() + "\"");            
-        }                
-        
-        pw.print(">");
-        Node node = element.getFirstChild();
-        pw.println();
-        while (node != null) {
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                printDOMElement((Element) node, pw, indentCount + 2);
-                pw.println();
-            }
-            node = node.getNextSibling();
-        }
-        
-        indent(pw, indentCount);
-        if (element.getLocalName().equals("schema")) {
-            pw.print("</xs:" + element.getLocalName() + ">");
-        } else {
-            pw.print("</" + element.getNodeName() + ">");
-        }
+
+
+    public void setFeature(String name, boolean value) throws IllegalArgumentException {
     }
 
-    public void indent(PrintWriter pw, int count) {
-        for (int i = 0; i < count; i++) {
-            pw.print(' ');
-        }
-    }       
-    
+    public boolean getFeature(String name) throws IllegalArgumentException {
+        return false;
+    }
+
+    public void writeWSDL(Definition wsdlDef, Writer sink) throws WSDLException {
+        XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+    }    
+    public void writeWSDL(Definition wsdlDef, OutputStream sink) throws WSDLException {
+        XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+    }   
 }

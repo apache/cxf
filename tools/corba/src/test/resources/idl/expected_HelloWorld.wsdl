@@ -24,16 +24,14 @@
       <xs:element name="greetMe">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return_message" type="xs:string">
-            </xs:element>
+            <xs:element name="return_message" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="greetMeResponse">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

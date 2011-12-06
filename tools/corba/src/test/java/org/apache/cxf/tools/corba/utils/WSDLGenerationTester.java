@@ -55,6 +55,7 @@ public class WSDLGenerationTester {
 
         boolean origEnd = false;
         boolean actualEnd = false;
+        QName elName = null;
         while (orig.hasNext() || actual.hasNext()) {
             int origTag = orig.next();
             while (!orig.isStartElement() && !orig.isEndElement() && !orig.isCharacters()) {
@@ -77,11 +78,12 @@ public class WSDLGenerationTester {
             if (!origEnd && !actualEnd) {
                 Assert.assertEquals("XML mismatch", origTag, actualTag);
                 if (orig.isStartElement()) {
+                    elName = orig.getName();
                     compareStartElement(orig, actual);
                 } else if (orig.isEndElement()) {
                     compareEndElement(orig, actual);
                 } else if (orig.isCharacters()) {
-                    compareCharacters(orig, actual);
+                    compareCharacters(elName, orig, actual);
                 }
             } else {
                 break;
@@ -126,9 +128,10 @@ public class WSDLGenerationTester {
         Assert.assertEquals("End element is not matched", orig.getName(), actual.getName());
     }
 
-    private void compareCharacters(XMLStreamReader orig, XMLStreamReader actual)
+    private void compareCharacters(QName elName, XMLStreamReader orig, XMLStreamReader actual)
         throws Exception {
-        Assert.assertEquals("Element Characters not matched", orig.getText(), actual.getText());
+        Assert.assertEquals("Element Characters not matched " + elName,
+                            orig.getText(), actual.getText());
     }
 
     public File writeDefinition(File targetDir, File defnFile) throws Exception {

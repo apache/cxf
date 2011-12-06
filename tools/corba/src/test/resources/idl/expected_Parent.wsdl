@@ -27,17 +27,14 @@
       <xs:element name="testOperation">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="arg1" type="xs:string">
-            </xs:element>
-            <xs:element name="arg2" type="xs:string">
-            </xs:element>
+            <xs:element name="arg1" type="xs:string"/>
+            <xs:element name="arg2" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="testOperationResponse">
         <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
+          <xs:sequence/>
         </xs:complexType>
       </xs:element>
     </xs:schema>
