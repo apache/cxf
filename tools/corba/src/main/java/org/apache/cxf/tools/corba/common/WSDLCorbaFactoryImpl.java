@@ -20,31 +20,32 @@
 package org.apache.cxf.tools.corba.common;
 
 import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
+import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.wsdl.xml.WSDLWriter;
 
-import com.ibm.wsdl.DefinitionImpl;
-import com.ibm.wsdl.extensions.PopulatedExtensionRegistry;
-import com.ibm.wsdl.xml.WSDLReaderImpl;
 
 /**
  * This class is a copy of the WSDLFactoryImpl from the wsdl4j implementation
  * It overwrites the newWSDLWriter method to return a WSDLCorbaWriter 
  */
 public class WSDLCorbaFactoryImpl extends WSDLCorbaFactory {
+    WSDLFactory factory;
+    
+    public WSDLCorbaFactoryImpl() throws WSDLException {
+        factory = WSDLFactory.newInstance();
+    }
+    
     /**
      * Create a new instance of a Definition, with an instance of a
      * PopulatedExtensionRegistry as its ExtensionRegistry.
-     * 
-     * @see com.ibm.wsdl.extensions.PopulatedExtensionRegistry
      */
     public Definition newDefinition() {
-        Definition def = new DefinitionImpl();
+        Definition def = factory.newDefinition();
         ExtensionRegistry extReg = newPopulatedExtensionRegistry();
-
         def.setExtensionRegistry(extReg);
-
         return def;
     }
 
@@ -52,14 +53,14 @@ public class WSDLCorbaFactoryImpl extends WSDLCorbaFactory {
      * Create a new instance of a WSDLReader.
      */
     public WSDLReader newWSDLReader() {
-        return new WSDLReaderImpl();
+        return factory.newWSDLReader();
     }
 
     /**
      * Create a new instance of a WSDLWriter.
      */
     public WSDLWriter newWSDLWriter() {
-        return new WSDLCorbaWriterImpl();
+        return new WSDLCorbaWriterImpl(factory.newWSDLWriter());
     }
 
     /**
@@ -69,6 +70,6 @@ public class WSDLCorbaFactoryImpl extends WSDLCorbaFactory {
      * extensions.
      */
     public ExtensionRegistry newPopulatedExtensionRegistry() {
-        return new PopulatedExtensionRegistry();
+        return factory.newPopulatedExtensionRegistry();
     }
 }

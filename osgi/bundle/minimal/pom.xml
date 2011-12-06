@@ -177,7 +177,6 @@
                             !schemas*,
                             org.apache.cxf.tools.*;version=${cxf.osgi.version.clean};resolution:=optional,
                             antlr*;resolution:=optional,
-                            com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
                             com.ctc.wstx.msv*;resolution:=optional,

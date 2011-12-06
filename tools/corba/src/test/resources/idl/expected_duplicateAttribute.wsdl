@@ -5,89 +5,77 @@
     <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/duplicateAttribute" xmlns="http://cxf.apache.org/bindings/corba/idl/duplicateAttribute" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:element name="_get_filter_string">
         <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
+          <xs:sequence/>
         </xs:complexType>
       </xs:element>
       <xs:element name="_get_filter_stringResult">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="store_filter">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="myfilter" type="xs:string">
-            </xs:element>
+            <xs:element name="myfilter" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="store_filterResponse">
         <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
+          <xs:sequence/>
         </xs:complexType>
       </xs:element>
       <xs:element name="retrieve_filter">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="id" type="xs:int">
-            </xs:element>
+            <xs:element name="id" type="xs:int"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="retrieve_filterResponse">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="testDuplicateAttribute.MapFilter._get_filter_string">
         <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
+          <xs:sequence/>
         </xs:complexType>
       </xs:element>
       <xs:element name="testDuplicateAttribute.MapFilter._get_filter_stringResult">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="store_map_filter">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="myfilter" type="xs:string">
-            </xs:element>
+            <xs:element name="myfilter" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="store_map_filterResponse">
         <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
+          <xs:sequence/>
         </xs:complexType>
       </xs:element>
       <xs:element name="retrieve_map_filter">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="id" type="xs:int">
-            </xs:element>
+            <xs:element name="id" type="xs:int"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="retrieve_map_filterResponse">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

@@ -21,10 +21,6 @@ package org.apache.cxf.binding.soap;
 
 import javax.wsdl.extensions.soap.SOAPAddress;
 
-
-import com.ibm.wsdl.extensions.soap.SOAPAddressImpl;
-
-
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -42,12 +38,16 @@ public class SoapDestinationFactoryTest extends Assert {
     public void testDestination() throws Exception {
         String wsdlSoapNs = "http://schemas.xmlsoap.org/wsdl/soap/";
         String transportURI = "http://foo/transport";
-        String location = "http://localhost/service";
+        // String location = "http://localhost/service";
 
         ServiceInfo si = new ServiceInfo();
         EndpointInfo ei = new EndpointInfo(si, wsdlSoapNs);
-        SOAPAddress add = new SOAPAddressImpl();
-        add.setLocationURI(location);
+        // this code used to call "new SOAPAddressImpl()", but the test
+        // is currently not testing anything, and needlessly ties the 
+        // code to a specific implementation of wsdl4j. When the SOAPAddress
+        // is really needed, it should be mocked.
+        SOAPAddress add = null;
+        // add.setLocationURI(location);
         ei.addExtensor(add);
 
         SoapBindingInfo bi = new SoapBindingInfo(si, "", Soap11.getInstance());

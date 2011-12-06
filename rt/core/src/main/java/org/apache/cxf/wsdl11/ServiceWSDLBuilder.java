@@ -49,7 +49,9 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.AttributeExtensible;
 import javax.wsdl.extensions.ElementExtensible;
 import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
+import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
 import javax.wsdl.extensions.schema.SchemaReference;
 import javax.xml.namespace.QName;
@@ -58,8 +60,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
-import com.ibm.wsdl.extensions.schema.SchemaImpl;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.helpers.CastUtils;
@@ -276,6 +276,22 @@ public class ServiceWSDLBuilder {
         }
     }
     
+    private Schema getSchemaImplementation(Definition def) {
+        ExtensionRegistry reg = def.getExtensionRegistry();
+        ExtensibilityElement extension;
+        try {
+            extension = reg.createExtension(javax.wsdl.Types.class, WSDLConstants.QNAME_SCHEMA);
+        } catch (WSDLException e) {
+            throw new RuntimeException("Problem creating schema implementation", e);
+        }
+        //  try to cast the resulting extension:
+        try {
+            return Schema.class.cast(extension);
+        } catch (ClassCastException e) {
+            throw new RuntimeException("Schema implementation problem", e);
+        }
+    }
+    
     protected void buildTypes(final Collection<SchemaInfo> schemas,
                               final Map<String, SchemaInfo> imports,
                               final Definition def) {
@@ -295,7 +311,7 @@ public class ServiceWSDLBuilder {
         for (SchemaInfo schemaInfo : schemas) {
             
             if (!useSchemaImports) {
-                SchemaImpl schemaImpl = new SchemaImpl();
+                Schema schemaImpl = getSchemaImplementation(def);
                 schemaImpl.setRequired(true);
                 schemaImpl.setElementType(WSDLConstants.QNAME_SCHEMA);
                 schemaImpl.setElement(schemaInfo.getElement());
@@ -308,7 +324,7 @@ public class ServiceWSDLBuilder {
                         imp.setNamespaceURI(((XmlSchemaImport)ext).getNamespace());
                         imp.setSchemaLocationURI(((XmlSchemaImport)ext).getSchemaLocation());
                         
-                        SchemaImpl schemaImpl2 = new SchemaImpl();
+                        Schema schemaImpl2 = getSchemaImplementation(def);
                         schemaImpl2.setRequired(true);
                         schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
                         schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
@@ -324,7 +340,7 @@ public class ServiceWSDLBuilder {
                         SchemaReference imp = schemaImpl.createInclude();
                         imp.setSchemaLocationURI(((XmlSchemaInclude)ext).getSchemaLocation());
 
-                        SchemaImpl schemaImpl2 = new SchemaImpl();
+                        Schema schemaImpl2 = getSchemaImplementation(def);
                         schemaImpl2.setRequired(true);
                         schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
                         schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
@@ -340,7 +356,7 @@ public class ServiceWSDLBuilder {
                         SchemaReference imp = schemaImpl.createRedefine();
                         imp.setSchemaLocationURI(((XmlSchemaRedefine)ext).getSchemaLocation());
                         
-                        SchemaImpl schemaImpl2 = new SchemaImpl();
+                        Schema schemaImpl2 = getSchemaImplementation(def);
                         schemaImpl2.setRequired(true);
                         schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
                         schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
@@ -370,7 +386,7 @@ public class ServiceWSDLBuilder {
 
         }
         if (useSchemaImports) {
-            SchemaImpl schemaImpl = new SchemaImpl();
+            Schema schemaImpl = getSchemaImplementation(def);
             schemaImpl.setRequired(true);
             schemaImpl.setElementType(WSDLConstants.QNAME_SCHEMA);
             schemaImpl.setElement(nd);

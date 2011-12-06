@@ -27,12 +27,12 @@ import java.util.logging.Logger;
 
 import javax.wsdl.Binding;
 import javax.wsdl.Definition;
+import javax.wsdl.Import;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
-import com.ibm.wsdl.ImportImpl;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.omg.CORBA.Object;
@@ -140,8 +140,8 @@ public final class CorbaObjectReferenceHelper {
             while (importLists.hasNext()) {
                 List imports = (List) importLists.next();
                 for (java.lang.Object imp : imports) {
-                    if (imp instanceof ImportImpl) {
-                        Definition importDef = ((ImportImpl)imp).getDefinition();
+                    if (imp instanceof Import) {
+                        Definition importDef = ((Import)imp).getDefinition();
                         LOG.log(Level.INFO, "Following import " + importDef.getDocumentBaseURI()); 
                         ret = getBindingForTypeId(repId, importDef);
                         if (ret.isValid()) {
@@ -215,8 +215,8 @@ public final class CorbaObjectReferenceHelper {
             while (info.getServiceQName() == null && importLists.hasNext()) {
                 List imports = (List) importLists.next();
                 for (java.lang.Object imp : imports) {
-                    if (imp instanceof ImportImpl) {
-                        Definition importDef = ((ImportImpl)imp).getDefinition();
+                    if (imp instanceof Import) {
+                        Definition importDef = ((Import)imp).getDefinition();
                         LOG.log(Level.FINE, "following wsdl import " + importDef.getDocumentBaseURI());
                         info.setCandidateWsdlDef(importDef);
                         populateEprInfo(info);

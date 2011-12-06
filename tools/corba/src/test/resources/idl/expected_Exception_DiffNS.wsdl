@@ -30,64 +30,50 @@
   </corba:typeMapping>
   <wsdl:types>
     <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <xs:element name="ExternalException" type="ExternalExceptionType">
-      </xs:element>
+      <xs:element name="ExternalException" type="ExternalExceptionType"/>
       <xs:complexType name="ExternalExceptionType">
         <xs:sequence>
-          <xs:element name="description" type="xs:string">
-          </xs:element>
+          <xs:element name="description" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
-      <xs:element name="InterfaceWithExceptions.EmptyException" type="InterfaceWithExceptions.EmptyExceptionType">
-      </xs:element>
+      <xs:element name="InterfaceWithExceptions.EmptyException" type="InterfaceWithExceptions.EmptyExceptionType"/>
       <xs:complexType name="InterfaceWithExceptions.EmptyExceptionType">
-        <xs:sequence>
-        </xs:sequence>
+        <xs:sequence/>
       </xs:complexType>
-      <xs:element name="InterfaceWithExceptions.LongException" type="InterfaceWithExceptions.LongExceptionType">
-      </xs:element>
+      <xs:element name="InterfaceWithExceptions.LongException" type="InterfaceWithExceptions.LongExceptionType"/>
       <xs:complexType name="InterfaceWithExceptions.LongExceptionType">
         <xs:sequence>
-          <xs:element name="error" type="xs:string">
-          </xs:element>
-          <xs:element name="code" type="xs:int">
-          </xs:element>
+          <xs:element name="error" type="xs:string"/>
+          <xs:element name="code" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:element name="method">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="in_string" type="xs:string">
-            </xs:element>
-            <xs:element name="inout_short" type="xs:short">
-            </xs:element>
+            <xs:element name="in_string" type="xs:string"/>
+            <xs:element name="inout_short" type="xs:short"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="methodResponse">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
-            <xs:element name="out_long" type="xs:int">
-            </xs:element>
-            <xs:element name="inout_short" type="xs:short">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
+            <xs:element name="out_long" type="xs:int"/>
+            <xs:element name="inout_short" type="xs:short"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="raiseExternalException">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="aString" type="xs:string">
-            </xs:element>
+            <xs:element name="aString" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="raiseExternalExceptionResponse">
         <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
+          <xs:sequence/>
         </xs:complexType>
       </xs:element>
     </xs:schema>

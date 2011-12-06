@@ -327,7 +327,6 @@
                             !META-INF.cxf,
                             !META-INF.cxf.osgi,
                             antlr*;resolution:=optional,
-                            com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
                             com.ctc.wstx.msv*;resolution:=optional,
                             org.codehaus.stax2*;resolution:=optional,

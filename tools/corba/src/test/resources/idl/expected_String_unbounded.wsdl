@@ -39,53 +39,41 @@
     <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/String" xmlns="http://cxf.apache.org/bindings/corba/idl/String" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:complexType name="strStruct">
         <xs:sequence>
-          <xs:element name="unboundedStr" type="xs:string">
-          </xs:element>
-          <xs:element name="boundedStr10" type="xs:string">
-          </xs:element>
-          <xs:element name="unboundedWStr" type="xs:string">
-          </xs:element>
-          <xs:element name="boundedWStr20" type="xs:string">
-          </xs:element>
-          <xs:element name="myStringStruct" type="xs:string">
-          </xs:element>
-          <xs:element name="myWStringStruct" type="xs:string">
-          </xs:element>
+          <xs:element name="unboundedStr" type="xs:string"/>
+          <xs:element name="boundedStr10" type="xs:string"/>
+          <xs:element name="unboundedWStr" type="xs:string"/>
+          <xs:element name="boundedWStr20" type="xs:string"/>
+          <xs:element name="myStringStruct" type="xs:string"/>
+          <xs:element name="myWStringStruct" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
       <xs:element name="combineStrings">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="string10Parm" type="xs:string">
-            </xs:element>
-            <xs:element name="myString10Parm" type="xs:string">
-            </xs:element>
+            <xs:element name="string10Parm" type="xs:string"/>
+            <xs:element name="myString10Parm" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="combineStringsResponse">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="combineWstrings">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="wstring20Parm" type="xs:string">
-            </xs:element>
-            <xs:element name="myWString20Parm" type="xs:string">
-            </xs:element>
+            <xs:element name="wstring20Parm" type="xs:string"/>
+            <xs:element name="myWString20Parm" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="combineWstringsResponse">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="return" type="xs:string">
-            </xs:element>
+            <xs:element name="return" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

@@ -121,420 +121,343 @@
     <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Anonboundedsequence" xmlns="http://cxf.apache.org/bindings/corba/idl/Anonboundedsequence" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:complexType name="SeqLong">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:unsignedInt">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:unsignedInt"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon1_SeqSeqLong">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="SeqSeqLong">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="_Anon1_SeqSeqLong">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="_Anon1_SeqSeqLong"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="SeqSeqSeqLong._Anon1_SeqSeqSeqLong">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon1_SeqSeqSeqLong">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="SeqSeqSeqLong._Anon1_SeqSeqSeqLong">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="SeqSeqSeqLong._Anon1_SeqSeqSeqLong"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="SeqSeqSeqLong">
         <xs:sequence>
-          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="_Anon1_SeqSeqSeqLong">
-          </xs:element>
+          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="_Anon1_SeqSeqSeqLong"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon1_anonStruct">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonStruct._Anon1_anonStruct">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon2_anonStruct">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonStruct._Anon1_anonStruct">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonStruct._Anon1_anonStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonStruct._Anon2_anonStruct">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonStruct._Anon3_anonStruct">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonStruct._Anon2_anonStruct">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonStruct._Anon2_anonStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon3_anonStruct">
         <xs:sequence>
-          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonStruct._Anon3_anonStruct">
-          </xs:element>
+          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonStruct._Anon3_anonStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonStruct">
         <xs:sequence>
-          <xs:element name="structSeqLong" type="_Anon1_anonStruct">
-          </xs:element>
-          <xs:element name="structSeqSeqLong" type="_Anon2_anonStruct">
-          </xs:element>
-          <xs:element name="structSeqSeqSeqLong" type="_Anon3_anonStruct">
-          </xs:element>
+          <xs:element name="structSeqLong" type="_Anon1_anonStruct"/>
+          <xs:element name="structSeqSeqLong" type="_Anon2_anonStruct"/>
+          <xs:element name="structSeqSeqSeqLong" type="_Anon3_anonStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon1_anonTypedefStruct">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:short">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:short"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefStruct._Anon1_anonTypedefStruct">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:short">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:short"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon2_anonTypedefStruct">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefStruct._Anon1_anonTypedefStruct">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefStruct._Anon1_anonTypedefStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefStruct._Anon2_anonTypedefStruct">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:short">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:short"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefStruct._Anon3_anonTypedefStruct">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefStruct._Anon2_anonTypedefStruct">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefStruct._Anon2_anonTypedefStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon3_anonTypedefStruct">
         <xs:sequence>
-          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonTypedefStruct._Anon3_anonTypedefStruct">
-          </xs:element>
+          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonTypedefStruct._Anon3_anonTypedefStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefStruct">
         <xs:sequence>
-          <xs:element name="typedefStructSeqShort" type="_Anon1_anonTypedefStruct">
-          </xs:element>
-          <xs:element name="typedefStructSeqSeqShort" type="_Anon2_anonTypedefStruct">
-          </xs:element>
-          <xs:element name="typedefStructSeqSeqSeqShort" type="_Anon3_anonTypedefStruct">
-          </xs:element>
+          <xs:element name="typedefStructSeqShort" type="_Anon1_anonTypedefStruct"/>
+          <xs:element name="typedefStructSeqSeqShort" type="_Anon2_anonTypedefStruct"/>
+          <xs:element name="typedefStructSeqSeqSeqShort" type="_Anon3_anonTypedefStruct"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon1_anonUnion">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonUnion._Anon1_anonUnion">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon2_anonUnion">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonUnion._Anon1_anonUnion">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonUnion._Anon1_anonUnion"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonUnion._Anon2_anonUnion">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonUnion._Anon3_anonUnion">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonUnion._Anon2_anonUnion">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonUnion._Anon2_anonUnion"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon3_anonUnion">
         <xs:sequence>
-          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonUnion._Anon3_anonUnion">
-          </xs:element>
+          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonUnion._Anon3_anonUnion"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonUnion">
         <xs:choice>
-          <xs:element name="unionSeqLong" type="_Anon1_anonUnion">
-          </xs:element>
-          <xs:element name="unionSeqLong" type="_Anon2_anonUnion">
-          </xs:element>
-          <xs:element name="unionSeqLong" type="_Anon3_anonUnion">
-          </xs:element>
+          <xs:element name="unionSeqLong" type="_Anon1_anonUnion"/>
+          <xs:element name="unionSeqLong" type="_Anon2_anonUnion"/>
+          <xs:element name="unionSeqLong" type="_Anon3_anonUnion"/>
         </xs:choice>
       </xs:complexType>
       <xs:complexType name="_Anon1_anonTypedefUnion">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefUnion._Anon1_anonTypedefUnion">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon2_anonTypedefUnion">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefUnion._Anon1_anonTypedefUnion">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefUnion._Anon1_anonTypedefUnion"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefUnion._Anon2_anonTypedefUnion">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefUnion._Anon3_anonTypedefUnion">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefUnion._Anon2_anonTypedefUnion">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonTypedefUnion._Anon2_anonTypedefUnion"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon3_anonTypedefUnion">
         <xs:sequence>
-          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonTypedefUnion._Anon3_anonTypedefUnion">
-          </xs:element>
+          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonTypedefUnion._Anon3_anonTypedefUnion"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonTypedefUnion">
         <xs:choice>
-          <xs:element name="typedefUnionSeqLong" type="_Anon1_anonTypedefUnion">
-          </xs:element>
-          <xs:element name="typedefUnionSeqLong" type="_Anon2_anonTypedefUnion">
-          </xs:element>
-          <xs:element name="typedefUnionSeqLong" type="_Anon3_anonTypedefUnion">
-          </xs:element>
+          <xs:element name="typedefUnionSeqLong" type="_Anon1_anonTypedefUnion"/>
+          <xs:element name="typedefUnionSeqLong" type="_Anon2_anonTypedefUnion"/>
+          <xs:element name="typedefUnionSeqLong" type="_Anon3_anonTypedefUnion"/>
         </xs:choice>
       </xs:complexType>
       <xs:complexType name="_Anon1_anonException">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonException._Anon1_anonException">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon2_anonException">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonException._Anon1_anonException">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonException._Anon1_anonException"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonException._Anon2_anonException">
         <xs:sequence>
-          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="10" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonException._Anon3_anonException">
         <xs:sequence>
-          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonException._Anon2_anonException">
-          </xs:element>
+          <xs:element maxOccurs="100" minOccurs="0" name="item" type="anonException._Anon2_anonException"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="_Anon3_anonException">
         <xs:sequence>
-          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonException._Anon3_anonException">
-          </xs:element>
+          <xs:element maxOccurs="1000" minOccurs="0" name="item" type="anonException._Anon3_anonException"/>
         </xs:sequence>
       </xs:complexType>
-      <xs:element name="anonException" type="anonExceptionType">
-      </xs:element>
+      <xs:element name="anonException" type="anonExceptionType"/>
       <xs:complexType name="anonExceptionType">
         <xs:sequence>
-          <xs:element name="exceptionSeqLong" type="_Anon1_anonException">
-          </xs:element>
-          <xs:element name="exceptionSeqSeqLong" type="_Anon2_anonException">
-          </xs:element>
-          <xs:element name="exceptionSeqSeqSeqLong" type="_Anon3_anonException">
-          </xs:element>
+          <xs:element name="exceptionSeqLong" type="_Anon1_anonException"/>
+          <xs:element name="exceptionSeqSeqLong" type="_Anon2_anonException"/>
+          <xs:element name="exceptionSeqSeqSeqLong" type="_Anon3_anonException"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myFloatBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:float">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:float"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myFloatBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myFloatBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myFloatBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myDoubleBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:double">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:double"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myDoubleBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myDoubleBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myDoubleBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myLongDoubleBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:double">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:double"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myLongDoubleBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myLongDoubleBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myLongDoubleBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myShortBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:short">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:short"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myShortBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myShortBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myShortBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myLongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:int">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:int"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myLongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myLongBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myLongBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myLonglongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:long">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:long"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myLonglongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myLonglongBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myLonglongBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myUnsignedShortBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:unsignedShort">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:unsignedShort"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myUnsignedShortBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myUnsignedShortBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myUnsignedShortBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myUnsignedLongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:unsignedInt">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:unsignedInt"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myUnsignedLongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myUnsignedLongBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myUnsignedLongBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myUnsignedLongLongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:unsignedLong">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:unsignedLong"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myUnsignedLongLongBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myUnsignedLongLongBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myUnsignedLongLongBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myCharBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:byte">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:byte"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myCharBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myCharBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myCharBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myWcharBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:string">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myWcharBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myWcharBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myWcharBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences._Anon1_myBooleanBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:boolean">
-          </xs:element>
+          <xs:element maxOccurs="5" minOccurs="0" name="item" type="xs:boolean"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myBooleanBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myBooleanBoundedSeqSeq">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="anonBoundedSequences._Anon1_myBooleanBoundedSeqSeq"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="anonBoundedSequences.myOctetBoundedSeqSeq">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:base64Binary">
-          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:complexType>
     </xs:schema>
