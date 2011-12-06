@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.staxutils.transform;
 
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -39,7 +38,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private QNamesMap elementsMap;
     private Map<QName, QName> appendMap = new HashMap<QName, QName>(5);
     private Map<String, String> nsMap = new HashMap<String, String>(5);
-    private Deque<Set<String>> writtenUris = new LinkedList<Set<String>>();
+    private List<Set<String>> writtenUris = new LinkedList<Set<String>>();
     
     private Set<QName> dropElements;
     private List<Integer> droppingIndexes = new LinkedList<Integer>();
@@ -78,7 +77,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         
         uri = value != null ? value : uri;
         
-        if (writtenUris.getFirst().contains(uri)) {
+        if (writtenUris.get(0).contains(uri)) {
             return;
         }
         
@@ -90,7 +89,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             }
             super.writeNamespace(prefix, uri);
         }
-        writtenUris.getFirst().add(uri);
+        writtenUris.get(0).add(uri);
     }
     
     @Override
@@ -100,9 +99,9 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         if (writtenUris.isEmpty()) {
             s = new HashSet<String>();
         } else {
-            s = new HashSet<String>(writtenUris.getFirst());
+            s = new HashSet<String>(writtenUris.get(0));
         }
-        writtenUris.addFirst(s);
+        writtenUris.add(0, s);
         QName currentQName = new QName(uri, local);
         
         QName appendQName = appendMap.get(currentQName);
@@ -127,7 +126,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     @Override
     public void writeEndElement() throws XMLStreamException {
         if (!writtenUris.isEmpty()) {
-            writtenUris.removeFirst();
+            writtenUris.remove(0);
         }
         --currentDepth;
         if (indexRemoved(droppingIndexes)) {
