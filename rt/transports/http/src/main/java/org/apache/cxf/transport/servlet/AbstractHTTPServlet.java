@@ -66,6 +66,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         STATIC_CONTENT_TYPES.put("txt", "text/plain");
         STATIC_CONTENT_TYPES.put("css", "text/css");
         STATIC_CONTENT_TYPES.put("pdf", "application/pdf");
+        STATIC_CONTENT_TYPES.put("xsd", "application/xml");
         // TODO : add more types if needed
     }
     
