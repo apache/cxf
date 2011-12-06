@@ -63,6 +63,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     protected List<Handler> handlers = new ArrayList<Handler>();
 
     private boolean blockPostConstruct;
+    private boolean blockInjection;
     
     public JaxWsServerFactoryBean() {
         this(new JaxWsServiceFactoryBean());
@@ -251,7 +252,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
      * @param instance
      */
     protected void injectResources(Object instance) {
-        if (instance != null) {
+        if (instance != null && !blockInjection) {
             ResourceManager resourceManager = getBus().getExtension(ResourceManager.class);
             List<ResourceResolver> resolvers = resourceManager.getResourceResolvers();
             resourceManager = new DefaultResourceManager(resolvers); 
@@ -272,7 +273,6 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     }
 
     /**
-     * 
      * @param blockPostConstruct @PostConstruct method will not be called 
      *  if this property is set to true - this may be necessary in cases
      *  when the @PostConstruct method needs to be called at a later stage,
@@ -280,6 +280,15 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
      */
     public void setBlockPostConstruct(boolean blockPostConstruct) {
         this.blockPostConstruct = blockPostConstruct;
+    }
+    /**
+     * No injection or PostContstuct will be called if this is set to true.
+     * If the container has already handled the injection, this should 
+     * be set to true.
+     * @param b
+     */
+    public void setBlockInjection(boolean b) {
+        this.blockInjection = b;
     }
       
 }

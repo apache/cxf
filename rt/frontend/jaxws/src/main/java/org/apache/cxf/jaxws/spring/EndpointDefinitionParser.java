@@ -152,6 +152,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         if (!StringUtils.isEmpty(val)) {
             if (val.startsWith("#")) {
                 bean.addConstructorArgReference(val.substring(1));
+                bean.addPropertyValue("checkBlockConstuct", Boolean.TRUE);
             } else {
                 try {
                     Object obj = ClassLoaderUtils.loadClass(val, getClass()).newInstance();
@@ -179,6 +180,8 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
     public static class SpringEndpointImpl extends EndpointImpl
         implements ApplicationContextAware {
     
+        boolean checkBlockConstruct;
+        
         public SpringEndpointImpl(Object o) {
             super(o instanceof Bus ? (Bus)o : null,
                 o instanceof Bus ? null : o);
@@ -188,8 +191,26 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
             super(bus, implementor);
         }
         
+        public void setCheckBlockConstuct(Boolean b) {
+            checkBlockConstruct = b;
+        }
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            if (checkBlockConstruct) {
+                try {
+                    Class<?> cls = Class
+                        .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
+                    if (ctx.getBeanNamesForType(cls, true, false).length != 0) {
+                        //Spring will handle the postconstruct, but won't inject the 
+                        // WebServiceContext so we do need to do that.
+                        super.getServerFactory().setBlockPostConstruct(true);
+                    } else {
+                        super.getServerFactory().setBlockInjection(true);
+                    }
+                } catch (ClassNotFoundException e) {
+                    //ignore
+                }
+            }
             if (getBus() == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
