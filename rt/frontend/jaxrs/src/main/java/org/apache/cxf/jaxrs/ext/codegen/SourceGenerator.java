@@ -984,8 +984,11 @@ public class SourceGenerator {
                                       Set <String> typeClassNames) {
         String clsName = matchClassName(typeClassNames, packageName, localName);
         if (clsName == null && gInfo != null) {
-            clsName = matchClassName(typeClassNames, packageName, 
-                                   gInfo.getElementTypeMap().get(localName));
+            String elementTypeName = gInfo.getElementTypeMap().get(localName);
+            clsName = matchClassName(typeClassNames, packageName, elementTypeName);
+            if (clsName == null && elementTypeName != null && elementTypeName.contains("_")) {
+                clsName = matchClassName(typeClassNames, packageName, elementTypeName.replaceAll("_", ""));
+            }
         }
         if (clsName == null && schemaTypesMap != null) {
             clsName = schemaTypesMap.get(packageName + "." + localName);
