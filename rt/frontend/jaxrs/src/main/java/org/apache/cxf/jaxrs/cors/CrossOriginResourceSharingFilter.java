@@ -65,6 +65,10 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
     private static final Pattern FIELD_COMMA_PATTERN = Pattern.compile(",\\w*");
     
+    private static final String PREFLIGHT_PASSED = "preflight_passed";
+    private static final String PREFLIGHT_FAILED = "preflight_failed";
+    private static final String SIMPLE_REQUEST = "simple_request";
+    
     @Context
     private HttpHeaders headers;
 
@@ -78,8 +82,10 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private boolean allowCredentials;
     private List<String> exposeHeaders = Collections.emptyList();
     private Integer maxAge;
+    private Integer preflightFailStatus = 200;
     private boolean defaultOptionsMethodsHandlePreflight;
-
+    
+    
     private CrossOriginResourceSharing getAnnotation(OperationResourceInfo ori) {
         if (ori == null) {
             return null;
@@ -130,7 +136,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
 
         // note what kind of processing we're doing.
-        m.getExchange().put(CrossOriginResourceSharingFilter.class.getName(), "simple");
+        m.getExchange().put(CrossOriginResourceSharingFilter.class.getName(), SIMPLE_REQUEST);
         return null;
     }
 
@@ -176,7 +182,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         // 5.2.3 must have access-control-request-method, must be single-valued
         // we should reject parse errors but we cannot.
         if (requestMethodValues == null || requestMethodValues.size() != 1) {
-            return null;
+            return createPreflightResponse(m, false);
         }
         String requestMethod = requestMethodValues.get(0);
         /*
@@ -186,17 +192,19 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
          */
         
         Method method = getPreflightMethod(m, requestMethod);
-        
+        if (method == null) {
+            return null;
+        }
         CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
         ann = ann == null ? optionAnn : ann; 
         if (ann == null) {
-            return null;
+            return createPreflightResponse(m, false);
         }
 
         // 5.2.2 must be on the list or we must be matching *.
         boolean effectiveAllowAllOrigins = effectiveAllowAllOrigins(ann);
         if (!effectiveAllowAllOrigins && !effectiveAllowOrigins(ann).contains(origin)) {
-            return null;
+            return createPreflightResponse(m, false);
         }
 
         // 5.2.4 get list of request headers. we should reject parse errors but we cannot.
@@ -207,7 +215,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
 
         // 5.2.6 reject if the header is not listed.
         if (!effectiveAllowHeaders(ann).containsAll(requestHeaders)) {
-            return null;
+            return createPreflightResponse(m, false);
         }
 
         // 5.2.7: add allow credentials and allow-origin as required: this lives in the Output filter
@@ -231,12 +239,17 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         // 5.2.7 is in here.
         commonRequestProcessing(m, ann, originResponse);
 
-        m.getExchange().put(CrossOriginResourceSharingFilter.class.getName(), "preflight");
-        // and allow things to proceed to the output filter.
-        return Response.ok().build();
+        return createPreflightResponse(m, true);
     }
     //CHECKSTYLE:ON
 
+    private Response createPreflightResponse(Message m, boolean passed) {
+        m.getExchange().put(CrossOriginResourceSharingFilter.class.getName(), 
+                            passed ? PREFLIGHT_PASSED : PREFLIGHT_FAILED);
+        int status = passed ? 200 : preflightFailStatus;
+        return Response.status(status).build();
+    }
+    
     private Method getPreflightMethod(Message m, String httpMethod) {
         String requestUri = HttpUtils.getPathToMatch(m, true);
         
@@ -300,8 +313,8 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
 
     public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
         String op = (String)m.getExchange().get(CrossOriginResourceSharingFilter.class.getName());
-        if (op == null) {
-            return response; // we're not here.
+        if (op == null || op == PREFLIGHT_FAILED) {
+            return response;
         }
 
         ResponseBuilder rbuilder = Response.fromResponse(response);
@@ -312,7 +325,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS,
                         Boolean.toString(allowCredentials));
         
-        if ("simple".equals(op)) {
+        if (SIMPLE_REQUEST.equals(op)) {
             /* 5.1.4 expose headers */
             List<String> effectiveExposeHeaders 
                 = getHeadersFromInput(m, CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS);
@@ -543,6 +556,15 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
      */
     public void setMaxAge(Integer maxAge) {
         this.maxAge = maxAge;
+    }
+    
+    /**
+     * Preflight error response status, default is 200.
+     * 
+     * @param status
+     */
+    public void setPreflightErrorStatus(Integer status) {
+        this.preflightFailStatus = status;
     }
 
 
