@@ -96,6 +96,7 @@ public abstract class AbstractHTTPDestination
     public static final String CXF_ASYNC_CONTEXT = "cxf.async.context";
 
     public static final String SERVICE_REDIRECTION = "http.service.redirection";
+    private static final String HTTP_BASE_PATH = "http.base.path";
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
@@ -254,8 +255,10 @@ public abstract class AbstractHTTPDestination
         inMessage.put(HTTP_CONTEXT_MATCH_STRATEGY, contextMatchStrategy);
         
         inMessage.put(Message.HTTP_REQUEST_METHOD, req.getMethod());
-        inMessage.put(Message.REQUEST_URI, req.getRequestURI());
-        inMessage.put(Message.REQUEST_URL, req.getRequestURL().toString());
+        String requestURI = req.getRequestURI();
+        inMessage.put(Message.REQUEST_URI, requestURI);
+        String requestURL = req.getRequestURL().toString();
+        inMessage.put(Message.REQUEST_URL, requestURL);
         String contextPath = req.getContextPath();
         if (contextPath == null) {
             contextPath = "";
@@ -266,6 +269,16 @@ public abstract class AbstractHTTPDestination
         }
         String contextServletPath = contextPath + servletPath;
         inMessage.put(Message.PATH_INFO, contextServletPath + req.getPathInfo());
+        int index = requestURL.indexOf(requestURI);
+        if (index > 0) {
+            // Can be useful for referencing resources with URIs not covered by CXFServlet.
+            // For example, if we a have web application name 'app' and CXFServlet listening 
+            // on "/services/*" then having HTTP_BASE_PATH pointing to say 
+            // http://localhost:8080/app will make it easy to refer to non CXF resources
+            String schemaInfo = requestURL.substring(0, index);
+            String basePathWithContextOnly = schemaInfo + contextPath;
+            inMessage.put(HTTP_BASE_PATH, basePathWithContextOnly);
+        }
         String contentType = req.getContentType();
         inMessage.put(Message.CONTENT_TYPE, contentType);
         setEncoding(inMessage, req, contentType);

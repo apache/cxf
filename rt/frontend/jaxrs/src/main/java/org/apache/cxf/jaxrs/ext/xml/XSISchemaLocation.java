@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SchemaLocation {
+public @interface XSISchemaLocation {
     /**
      * schema location relative to a base URI of the web application
      */

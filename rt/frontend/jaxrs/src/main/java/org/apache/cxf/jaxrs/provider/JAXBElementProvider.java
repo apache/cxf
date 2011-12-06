@@ -39,6 +39,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -57,9 +58,9 @@ import javax.xml.transform.Source;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.xml.SchemaLocation;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -93,9 +94,14 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     private Map<String, Object> mProperties = Collections.emptyMap();
     private Map<String, String> nsPrefixes = Collections.emptyMap();
+    private String xmlResourceOffset = "";
     
     public JAXBElementProvider() {
         
+    }
+    
+    public void setXmlResourceOffset(String value) {
+        xmlResourceOffset = value;
     }
     
     public void setNamespacePrefixes(Map<String, String> prefixes) {
@@ -388,10 +394,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         if (pi != null) {
             String value = pi.value();
             int ind = value.indexOf("href='");
-            if (ind > 0 && getContext() != null) {
+            if (ind > 0) {
                 String relRef = value.substring(ind + 6, value.length() - 3);
-                String absRef = 
-                    getContext().getUriInfo().getBaseUriBuilder().path(relRef).build().toString();
+                String absRef = buildAbsoluteXMLResourceURI(relRef);
                 value = value.substring(0, ind + 6) + absRef + "'?>";
             }
             setMarshallerProp(ms, value, XML_PI_PROPERTY, XML_PI_PROPERTY_INT);
@@ -399,16 +404,28 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     }
     
     private void addSchemaLocation(Marshaller ms, Annotation[] anns) throws Exception {
-        SchemaLocation sl = AnnotationUtils.getAnnotation(anns, SchemaLocation.class);
+        XSISchemaLocation sl = AnnotationUtils.getAnnotation(anns, XSISchemaLocation.class);
         if (sl != null) {
-            String value = sl.value();
-            if (getContext() != null) {
-                value = 
-                    getContext().getUriInfo().getBaseUriBuilder().path(value).build().toString();
-            }
+            String value = buildAbsoluteXMLResourceURI(sl.value());
             String propName = !sl.noNamespace() 
                 ? Marshaller.JAXB_SCHEMA_LOCATION : Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
             ms.setProperty(propName, value);
+        }
+    }
+    
+    private String buildAbsoluteXMLResourceURI(String path) {
+        MessageContext mc = getContext();
+        if (mc != null) {
+            String httpBasePath = (String)mc.get("http.base.path");
+            UriBuilder builder = null;
+            if (httpBasePath != null) {
+                builder = UriBuilder.fromPath(httpBasePath);
+            } else {
+                builder = mc.getUriInfo().getBaseUriBuilder();
+            }
+            return builder.path(path).path(xmlResourceOffset).build().toString();
+        } else {
+            return path; 
         }
     }
     
