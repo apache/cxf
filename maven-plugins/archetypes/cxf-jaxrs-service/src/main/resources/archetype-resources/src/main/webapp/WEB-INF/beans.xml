@@ -19,7 +19,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
    <jaxrs:server id="services" address="/">
     <jaxrs:serviceBeans>
-      <bean class="${packageName}.HelloWorld" />
+      <bean class="${package}.HelloWorld" />
     </jaxrs:serviceBeans>
     <jaxrs:providers>
         <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>

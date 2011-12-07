@@ -1,4 +1,4 @@
-package ${packageName};
+package ${package};
 
 
 public class JsonBean {
