@@ -71,15 +71,15 @@
         </profile>
         <profile>
             <id>Tomcat6</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <tomcat.url>http://localhost:8080/manager</tomcat.url>
             </properties>
         </profile>
         <profile>
             <id>Tomcat7</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <tomcat.url>http://localhost:8080/manager/text</tomcat.url>
             </properties>
