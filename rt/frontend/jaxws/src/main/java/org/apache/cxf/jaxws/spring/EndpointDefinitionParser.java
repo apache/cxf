@@ -152,7 +152,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         if (!StringUtils.isEmpty(val)) {
             if (val.startsWith("#")) {
                 bean.addConstructorArgReference(val.substring(1));
-                bean.addPropertyValue("checkBlockConstuct", Boolean.TRUE);
+                bean.addPropertyValue("checkBlockConstruct", Boolean.TRUE);
             } else {
                 try {
                     Object obj = ClassLoaderUtils.loadClass(val, getClass()).newInstance();
@@ -191,7 +191,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
             super(bus, implementor);
         }
         
-        public void setCheckBlockConstuct(Boolean b) {
+        public void setCheckBlockConstruct(Boolean b) {
             checkBlockConstruct = b;
         }
         
