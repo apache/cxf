@@ -225,6 +225,10 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             } else {
                 conduitInit = mgr.getConduitInitiatorForUri(address);
             }
+            if (conduitInit == null) {
+                throw new RuntimeException("Could not find conduit initiator for transport "
+                        + transId);
+            }
             return conduitInit.getConduit(ei);
         } catch (BusException e) {
             throw new RuntimeException("Could not find conduit initiator for transport "
