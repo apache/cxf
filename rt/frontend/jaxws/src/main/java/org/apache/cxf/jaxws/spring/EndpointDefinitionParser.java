@@ -29,6 +29,7 @@ import org.w3c.dom.NamedNodeMap;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.bus.spring.Jsr250BeanPostProcessor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
@@ -38,7 +39,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -147,19 +147,14 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         bean.setLazyInit(false);
     }
 
-    @SuppressWarnings("deprecation")
     private void loadImplementor(BeanDefinitionBuilder bean, String val) {
         if (!StringUtils.isEmpty(val)) {
+            bean.addPropertyValue("checkBlockConstruct", Boolean.TRUE);
             if (val.startsWith("#")) {
                 bean.addConstructorArgReference(val.substring(1));
-                bean.addPropertyValue("checkBlockConstruct", Boolean.TRUE);
             } else {
-                try {
-                    Object obj = ClassLoaderUtils.loadClass(val, getClass()).newInstance();
-                    bean.addConstructorArg(obj);
-                } catch (Exception e) {
-                    throw new FatalBeanException("Could not load class: " + val, e);
-                }
+                bean.addConstructorArgValue(BeanDefinitionBuilder
+                                            .genericBeanDefinition(val).getBeanDefinition());
             }
         }
     }
@@ -174,6 +169,23 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         }
         
         return id;
+    }
+    
+    public static final void setBlocking(ApplicationContext ctx, EndpointImpl impl) {
+        try {
+            Class<?> cls = Class
+                .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
+            if (ctx.getBeanNamesForType(cls, true, false).length != 0) {
+                //Spring will handle the postconstruct, but won't inject the 
+                // WebServiceContext so we do need to do that.
+                impl.getServerFactory().setBlockPostConstruct(true);
+            } else if (ctx.containsBean(Jsr250BeanPostProcessor.class.getName())) {
+                impl.getServerFactory().setBlockInjection(true);
+            }
+        } catch (ClassNotFoundException e) {
+            //ignore
+        }
+
     }
     
     @NoJSR250Annotations
@@ -197,19 +209,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (checkBlockConstruct) {
-                try {
-                    Class<?> cls = Class
-                        .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
-                    if (ctx.getBeanNamesForType(cls, true, false).length != 0) {
-                        //Spring will handle the postconstruct, but won't inject the 
-                        // WebServiceContext so we do need to do that.
-                        super.getServerFactory().setBlockPostConstruct(true);
-                    } else {
-                        super.getServerFactory().setBlockInjection(true);
-                    }
-                } catch (ClassNotFoundException e) {
-                    //ignore
-                }
+                setBlocking(ctx, this);
             }
             if (getBus() == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));

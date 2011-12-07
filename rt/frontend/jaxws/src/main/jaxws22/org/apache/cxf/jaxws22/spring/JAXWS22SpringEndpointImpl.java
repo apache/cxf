@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws22.spring;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.jaxws.spring.EndpointDefinitionParser;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -46,19 +47,7 @@ public class JAXWS22SpringEndpointImpl extends org.apache.cxf.jaxws22.EndpointIm
     
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         if (checkBlockConstruct) {
-            try {
-                Class<?> cls = Class
-                    .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
-                if (ctx.getBeanNamesForType(cls, true, false).length != 0) {
-                    //Spring will handle the postconstruct, but won't inject the 
-                    // WebServiceContext so we do need to do that.
-                    super.getServerFactory().setBlockPostConstruct(true);
-                } else {
-                    super.getServerFactory().setBlockInjection(true);
-                }
-            } catch (ClassNotFoundException e) {
-                //ignore
-            }
+            EndpointDefinitionParser.setBlocking(ctx, this);
         }
         if (getBus() == null) {
             setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
