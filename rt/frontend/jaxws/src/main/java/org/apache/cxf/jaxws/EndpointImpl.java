@@ -269,7 +269,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         return endpointName.toString() + ".jaxws-endpoint";
     }
 
-    protected JaxWsServerFactoryBean getServerFactory() {
+    public JaxWsServerFactoryBean getServerFactory() {
         return serverFactory;
     }
     

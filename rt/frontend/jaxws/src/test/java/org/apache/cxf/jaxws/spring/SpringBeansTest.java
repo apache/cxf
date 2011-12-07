@@ -431,5 +431,36 @@ public class SpringBeansTest extends Assert {
             }
         }
     }
+    
+    @Test
+    public void testCXF3959NormalImport() throws Exception {
+        PostConstructCalledCount.reset();
+        ClassPathXmlApplicationContext ctx 
+            = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/cxf3959a.xml");
+        assertNotNull(ctx);
+        assertEquals(2, PostConstructCalledCount.getCount());
+        assertEquals(2, PostConstructCalledCount.getInjectedCount());
+    }
+    @Test
+    public void testCXF3959NoImport() throws Exception {
+        PostConstructCalledCount.reset();
+        ClassPathXmlApplicationContext ctx 
+            = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/cxf3959b.xml");
+        assertNotNull(ctx);
+        assertEquals(2, PostConstructCalledCount.getCount());
+        assertEquals(2, PostConstructCalledCount.getInjectedCount());
+    }
+    @Test
+    public void testCXF3959SpringInject() throws Exception {
+        PostConstructCalledCount.reset();
+        ClassPathXmlApplicationContext ctx 
+            = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/cxf3959c.xml");
+        assertNotNull(ctx);
+        assertEquals(2, PostConstructCalledCount.getCount());
+        //only one will have the WebServiceContext injected in properly before PostConstruct
+        assertEquals(0, PostConstructCalledCount.getInjectedCount());
+        PostConstructCalledCount pc = ctx.getBean("theBean", PostConstructCalledCount.class);
+        assertNotNull(pc.getContext());
+    }
 }
 
