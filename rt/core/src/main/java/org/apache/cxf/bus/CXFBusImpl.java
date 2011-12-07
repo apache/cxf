@@ -55,8 +55,8 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     protected final Map<Class, Object> extensions;
     protected String id;
     private BusState state;      
-    private Collection<AbstractFeature> features;
-    private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
+    private final Collection<AbstractFeature> features = new CopyOnWriteArrayList<AbstractFeature>();
+    private final Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
     
     public CXFBusImpl() {
         this(null);
@@ -74,7 +74,6 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         
         CXFBusFactory.possiblySetDefaultBus(this);
         if (FORCE_LOGGING) {
-            features = new CopyOnWriteArrayList<AbstractFeature>();
             features.add(new LoggingFeature());
         }
     }
@@ -174,8 +173,13 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     protected void doInitializeInternal() {
         initializeFeatures();
     }
+
+    protected void loadAdditionalFeatures() {
+        
+    }
     
     protected void initializeFeatures() {
+        loadAdditionalFeatures();
         if (features != null) {
             for (AbstractFeature f : features) {
                 f.initialize(this);
@@ -226,7 +230,8 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     }
 
     public synchronized void setFeatures(Collection<AbstractFeature> features) {
-        this.features = new CopyOnWriteArrayList<AbstractFeature>(features);
+        this.features.clear();
+        this.features.addAll(features);
         if (FORCE_LOGGING) {
             this.features.add(new LoggingFeature());
         }

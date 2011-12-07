@@ -19,6 +19,7 @@
 
 package org.apache.cxf.bus.spring;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,6 @@ import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.osgi.framework.ServiceReference;
 import org.springframework.beans.Mergeable;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -154,7 +154,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             ReflectionUtil.setAccessible(m);
             Object o = m.invoke(bundleContext, type.getName());
             if (o != null) {
-                m = contextClass.getMethod("getService", ServiceReference.class);
+                m = contextClass.getMethod("getService", m.getReturnType());
                 ReflectionUtil.setAccessible(m);
                 o = m.invoke(bundleContext, o);
                 lst.add(type.cast(o));
@@ -251,6 +251,41 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             }
         }
         return orig.hasConfiguredPropertyValue(beanName, propertyName, searchValue);
+    }
+
+    public <T> List<T> getOSGiServices(Class<T> type) {
+        List<T> lst = new ArrayList<T>();
+        if (!osgi) {
+            return lst;
+        }
+        
+        Class<?> contextClass = findContextClass(bundleContext.getClass());
+        try {
+            Method m = contextClass.getMethod("getServiceReference", String.class);
+            Class<?> servRefClass = m.getReturnType();
+            m = contextClass.getMethod("getServiceReferences", String.class, String.class);
+            
+            Object o = ReflectionUtil.setAccessible(m).invoke(bundleContext, type.getName(), null);
+            if (o != null) {
+                m = contextClass.getMethod("getService", servRefClass);
+                ReflectionUtil.setAccessible(m);
+                for (int x = 0; x < Array.getLength(o); x++) {
+                    Object ref = Array.get(o, x);
+                    Object o2 = m.invoke(bundleContext, ref);
+                    if (o2 != null) {
+                        lst.add(type.cast(o2));
+                    }
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            //not using OSGi apparently
+            e.printStackTrace();
+        } catch (Throwable e) {
+            //ignore
+            e.printStackTrace();
+            LOG.log(Level.FINE, "Could not get services for " + type.getName(), e);
+        }
+        return lst;
     }
 
 }

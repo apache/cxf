@@ -45,6 +45,10 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.ConfiguredBeanLocator.BeanLoaderListener;
+import org.apache.cxf.endpoint.ClientLifeCycleListener;
+import org.apache.cxf.endpoint.ClientLifeCycleManager;
+import org.apache.cxf.endpoint.ServerLifeCycleListener;
+import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.framework.Bundle;
@@ -52,6 +56,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.Constants;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
@@ -199,12 +204,55 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                 && args[0] instanceof BundleContext) {
                 defaultContext = (BundleContext)args[0];
             }
-            bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+            BusLifeCycleManager manager = bus.getExtension(BusLifeCycleManager.class);
+            manager.registerLifeCycleListener(this);
             final ConfiguredBeanLocator cbl = bus.getExtension(ConfiguredBeanLocator.class);
             if (cbl instanceof ExtensionManagerImpl) {
                 // wire in the OSGi things
                 bus.setExtension(new OSGiBeanLocator(cbl, defaultContext), 
                                  ConfiguredBeanLocator.class);
+            }
+            
+            try {
+                ServiceReference refs[] = defaultContext
+                    .getServiceReferences(BusLifeCycleListener.class.getName(), null);
+                if (refs != null) {
+                    for (ServiceReference ref : refs) {
+                        BusLifeCycleListener listener 
+                            = (BusLifeCycleListener)defaultContext.getService(ref);
+                        manager.registerLifeCycleListener(listener);
+                    }
+                }
+            } catch (InvalidSyntaxException e) {
+                //ignore
+            }
+            try {
+                ServiceReference refs[] = defaultContext
+                    .getServiceReferences(ClientLifeCycleListener.class.getName(), null);
+                if (refs != null) {
+                    ClientLifeCycleManager clcm = bus.getExtension(ClientLifeCycleManager.class);
+                    for (ServiceReference ref : refs) {
+                        ClientLifeCycleListener listener 
+                            = (ClientLifeCycleListener)defaultContext.getService(ref);
+                        clcm.registerListener(listener);
+                    }
+                }
+            } catch (InvalidSyntaxException e) {
+                //ignore
+            }
+            try {
+                ServiceReference refs[] = defaultContext
+                    .getServiceReferences(ServerLifeCycleListener.class.getName(), null);
+                if (refs != null) {
+                    ServerLifeCycleManager clcm = bus.getExtension(ServerLifeCycleManager.class);
+                    for (ServiceReference ref : refs) {
+                        ServerLifeCycleListener listener 
+                            = (ServerLifeCycleListener)defaultContext.getService(ref);
+                        clcm.registerListener(listener);
+                    }
+                }
+            } catch (InvalidSyntaxException e) {
+                //ignore
             }
         }
         private Version getBundleVersion(Bundle bundle) {

@@ -136,7 +136,12 @@ public class ServerImpl implements Server {
             LOG.fine("register the server to serverRegistry ");
             serverRegistry.register(this);
         }
-        
+        if (slcMgr == null) {
+            slcMgr = bus.getExtension(ServerLifeCycleManager.class);
+            if (slcMgr != null && mep != null) {
+                slcMgr.registerListener(mep);
+            }
+        }
         if (slcMgr != null) {
             slcMgr.startServer(this);
         }

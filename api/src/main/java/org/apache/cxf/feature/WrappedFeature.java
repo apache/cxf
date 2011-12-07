@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.feature;
 
-import java.util.List;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
@@ -34,45 +32,26 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * If you're simply adding interceptors to a Server, Client, or Bus, this allows you to add
  * them easily.
  */
-public abstract class AbstractFeature implements Feature {
+public class WrappedFeature extends AbstractFeature implements Feature {
+    final Feature wrapped;
+    public WrappedFeature(Feature f) {
+        wrapped = f;
+    }
+    
     public void initialize(Server server, Bus bus) {
-        initializeProvider(server.getEndpoint(), bus);
+        wrapped.initialize(server, bus);
     }
     
     public void initialize(Client client, Bus bus) {
-        initializeProvider(client, bus);
+        wrapped.initialize(client, bus);
     }
     
     public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        initializeProvider(interceptorProvider, bus);
+        wrapped.initialize(interceptorProvider, bus);
     }
     
     public void initialize(Bus bus) {
-        initializeProvider(bus, bus);
+        wrapped.initialize(bus);
     }
     
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        
-    }
-
-    /**
-     * Convenience method to extract a feature by type from an active list.
-     * 
-     * @param features the given feature list
-     * @param type the feature type required
-     * @return the feature of the specified type if active
-     */
-    public static <T> T getActive(List<AbstractFeature> features,
-                                  Class<T> type) {
-        T active = null;
-        if (features != null) {
-            for (AbstractFeature feature : features) {
-                if (type.isInstance(feature)) {
-                    active = type.cast(feature);
-                    break;
-                }
-            }
-        }
-        return active;
-    }
 }
