@@ -54,7 +54,7 @@ public class ServerMixedStyle extends AbstractBusTestServerBase {
     }
     
     @WebService(targetNamespace = "http://example.com") 
-    public static interface MixedTest { 
+    public interface MixedTest { 
         @WebMethod(operationName = "Simple") 
         @WebResult(name = "SimpleResponse", targetNamespace = "http://example.com") 
         @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE) 
