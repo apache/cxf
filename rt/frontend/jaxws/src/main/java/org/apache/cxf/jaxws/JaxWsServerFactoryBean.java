@@ -282,7 +282,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
         this.blockPostConstruct = blockPostConstruct;
     }
     /**
-     * No injection or PostContstuct will be called if this is set to true.
+     * No injection or PostConstruct will be called if this is set to true.
      * If the container has already handled the injection, this should 
      * be set to true.
      * @param b
