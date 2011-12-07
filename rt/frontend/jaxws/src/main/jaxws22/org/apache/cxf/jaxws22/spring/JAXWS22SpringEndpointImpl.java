@@ -29,6 +29,8 @@ import org.springframework.context.ApplicationContextAware;
 public class JAXWS22SpringEndpointImpl extends org.apache.cxf.jaxws22.EndpointImpl
     implements ApplicationContextAware {
 
+    boolean checkBlockConstruct;
+
     public JAXWS22SpringEndpointImpl(Object o) {
         super(o instanceof Bus ? (Bus)o : null,
               o instanceof Bus ? null : o);
@@ -38,7 +40,26 @@ public class JAXWS22SpringEndpointImpl extends org.apache.cxf.jaxws22.EndpointIm
         super(bus, implementor);
     }
     
+    public void setCheckBlockConstruct(Boolean b) {
+        checkBlockConstruct = b;
+    }
+    
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        if (checkBlockConstruct) {
+            try {
+                Class<?> cls = Class
+                    .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
+                if (ctx.getBeanNamesForType(cls, true, false).length != 0) {
+                    //Spring will handle the postconstruct, but won't inject the 
+                    // WebServiceContext so we do need to do that.
+                    super.getServerFactory().setBlockPostConstruct(true);
+                } else {
+                    super.getServerFactory().setBlockInjection(true);
+                }
+            } catch (ClassNotFoundException e) {
+                //ignore
+            }
+        }
         if (getBus() == null) {
             setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
         }
