@@ -375,7 +375,13 @@ public class WSDL2JavaMojo extends AbstractMojo {
                                                                    Artifact.SCOPE_COMPILE, wsdlA.getType());
             wsdlArtifact = resolveRemoteWsdlArtifact(remoteRepos, wsdlArtifact);
             if (wsdlArtifact != null) {
-                String path = wsdlArtifact.getFile().getAbsolutePath();
+                File supposedFile = wsdlArtifact.getFile();
+                if (!supposedFile.exists() || !supposedFile.isFile()) {
+                    getLog().info("Apparent Maven bug: wsdl artifact 'resolved' to " 
+                        + supposedFile.getAbsolutePath() + " for " + wsdlArtifact.toString());
+                    continue;
+                }
+                String path = supposedFile.getAbsolutePath();
                 getLog().info("Resolved WSDL artifact to file " + path);
                 wsdlOption.setWsdl(path);
             }
