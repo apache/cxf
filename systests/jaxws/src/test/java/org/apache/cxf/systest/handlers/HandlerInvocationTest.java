@@ -58,7 +58,6 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.BusException;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -89,22 +88,17 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     }
 
     @Before
-    public void setUp() throws BusException {
-        try {
-            super.createBus();
+    public void setUp() throws Exception {
+        super.createBus();
 
-            wsdl = HandlerInvocationTest.class.getResource("/wsdl/handler_test.wsdl");
-            service = new HandlerTestService(wsdl, serviceName);
-            handlerTest = service.getPort(portName, HandlerTest.class);
-            setAddress(handlerTest, "http://localhost:" + port + "/HandlerTest/SoapPort");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail(ex.toString());
-        }
+        wsdl = HandlerInvocationTest.class.getResource("/wsdl/handler_test.wsdl");
+        service = new HandlerTestService(wsdl, serviceName);
+        handlerTest = service.getPort(portName, HandlerTest.class);
+        setAddress(handlerTest, "http://localhost:" + port + "/HandlerTest/SoapPort");
     }
 
     @Test
-    public void testAddHandlerThroughHandlerResolverClientSide() {
+    public void testAddHandlerThroughHandlerResolverClientSide() throws Exception {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
         TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false);
 
@@ -121,6 +115,16 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals("http://schemas.xmlsoap.org/wsdl/soap/http", bindingID);
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
+        
+        //CXF-3956 - check to make sure a Dispatch can also get the handlers
+        JAXBContext context = JAXBContext.newInstance(org.apache.handler_test.types.ObjectFactory.class);
+        Dispatch<Object> disp = service.createDispatch(portName, context, Service.Mode.PAYLOAD);
+        setAddress(disp, "http://localhost:" + port + "/HandlerTest/SoapPort");
+        disp.invokeOneWay(new org.apache.handler_test.types.PingOneWay());
+        
+        assertEquals(2, handler1.getHandleMessageInvoked());
+        assertEquals(2, handler2.getHandleMessageInvoked());
+
     }
 
     @Test
