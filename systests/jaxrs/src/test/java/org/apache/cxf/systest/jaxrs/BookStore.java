@@ -976,7 +976,14 @@ public class BookStore {
         return new BookSubresourceImpl();
     }
     
-    final void init() {
+    @GET
+    @Path("/reset")
+    public final String init() {
+        books.clear();
+        cds.clear();
+        bookId = 123;
+        cdId = 123;        
+        
         Book book = new Book();
         book.setId(bookId);
         book.setName("CXF in Action");
@@ -990,6 +997,7 @@ public class BookStore {
         cd1.setId(++cdId);
         cd1.setName("BICYCLE RACE");
         cds.put(cd1.getId(), cd1);
+        return "OK";
     }
     
     @XmlJavaTypeAdapter(BookInfoAdapter2.class)
