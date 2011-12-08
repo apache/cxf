@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.util.URIParserUtil;
+import org.apache.maven.plugin.MojoExecutionException;
 
 public class WsdlOption extends Option {
 
@@ -83,8 +84,11 @@ public class WsdlOption extends Option {
         return file;
     }
     
-    public URI getWsdlURI(URI baseURI) {
+    public URI getWsdlURI(URI baseURI) throws MojoExecutionException {
         String wsdlLocation = getWsdl();
+        if (wsdlLocation == null) {
+            throw new MojoExecutionException("No wsdl available for base URI " + baseURI);
+        }
         File wsdlFile = new File(wsdlLocation);
         return wsdlFile.exists() ? wsdlFile.toURI() 
             : baseURI.resolve(URIParserUtil.escapeChars(wsdlLocation));
