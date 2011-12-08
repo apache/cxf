@@ -25,8 +25,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
+import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.endpoint.ClientImpl;
@@ -123,5 +126,93 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         assertTrue("property is null from last thread execution", requestContext
                    .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
     }
+    
+    
+    
+    @Test
+    public void testRequestContextThreadSafetyDispatch() throws Throwable {
+
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        javax.xml.ws.Service s = javax.xml.ws.Service.create(url, serviceName);
+        JAXBContext c = JAXBContext.newInstance(org.apache.hello_world_soap_http.types.ObjectFactory.class);
+        final Dispatch<Object> disp = s.createDispatch(portName, c, Service.Mode.PAYLOAD);
+
+        disp.getRequestContext().put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT,
+                                     Boolean.TRUE);
+        
+        Map<String, Object> requestContext = disp.getRequestContext();
+        
+        String address = (String)requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
+
+        final Throwable errorHolder[] = new Throwable[1];
+
+        Runnable r = new Runnable() {
+            public void run() {
+                try {
+                    final String protocol = "http-" + Thread.currentThread().getId();
+                    for (int i = 0; i < 10; i++) {
+                        String threadSpecificaddress = protocol + "://localhost:80/" + i;
+                        Map<String, Object> requestContext = disp.getRequestContext();
+                        requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                           threadSpecificaddress);
+                        assertEquals("we get what we set", threadSpecificaddress, requestContext
+                                     .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
+                        try {
+                            org.apache.hello_world_soap_http.types.GreetMe gm
+                                = new org.apache.hello_world_soap_http.types.GreetMe();
+                            gm.setRequestType("Hi");
+                            disp.invoke(gm);
+                        } catch (WebServiceException expected) {
+                            //expected.getCause().printStackTrace();
+                            MalformedURLException mue = (MalformedURLException)expected
+                                .getCause();
+                            if (mue == null || mue.getMessage() == null) {
+                                throw expected;
+                            }
+                            assertTrue("protocol contains thread id from context", mue.getMessage()
+                                .indexOf(protocol) != 0);
+                        }
+                        
+                        requestContext.remove(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
+                        assertTrue("property is null", requestContext
+                                     .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
+                        
+                    }
+                } catch (Throwable t) {
+                    // capture assert failures
+                    errorHolder[0] = t;
+                }
+            }
+        };
+        
+        final int numThreads = 5;
+        Thread[] threads = new Thread[numThreads];
+        for (int i = 0; i < numThreads; i++) {
+            threads[i] = new Thread(r);
+        }
+        for (int i = 0; i < numThreads; i++) {
+            threads[i].start();
+        }
+        for (int i = 0; i < numThreads; i++) {
+            threads[i].join();
+        }
+        if (errorHolder[0] != null) {
+            throw errorHolder[0];
+        }
+
+        // main thread contextValues are un changed
+        assertTrue("address from existing context has not changed", address.equals(requestContext
+            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
+
+        // get the latest values
+        
+        ((ClientImpl.EchoContext)((WrappedMessageContext)requestContext).getWrappedMap()).reload();
+        assertTrue("address is different", !address.equals(requestContext
+            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
+        // verify value reflects what other threads were doing
+        assertTrue("property is null from last thread execution", requestContext
+                   .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
+    }
+
 }
 
