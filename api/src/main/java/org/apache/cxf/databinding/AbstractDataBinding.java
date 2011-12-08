@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
@@ -95,15 +96,17 @@ public abstract class AbstractDataBinding implements DataBinding {
          * Sanity check. The document has to remotely resemble a schema.
          */
         if (!XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(d.getDocumentElement().getNamespaceURI())) {
+            QName qn = DOMUtils.getElementQName(d.getDocumentElement());
             throw new RuntimeException("Invalid schema document passed to "
                                        + "AbstractDataBinding.addSchemaDocument, "
-                                       + "not in W3C schema namespace");
+                                       + "not in W3C schema namespace: " + qn);
         }
 
         if (!"schema".equals(d.getDocumentElement().getLocalName())) {
+            QName qn = DOMUtils.getElementQName(d.getDocumentElement());
             throw new RuntimeException("Invalid schema document passed to "
                                        + "AbstractDataBinding.addSchemaDocument, "
-                                       + "document element isn't 'schema'");
+                                       + "document element isn't 'schema': " + qn);
         }
 
         String ns = d.getDocumentElement().getAttribute("targetNamespace");
