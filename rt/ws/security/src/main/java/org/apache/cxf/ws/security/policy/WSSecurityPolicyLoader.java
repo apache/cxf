@@ -38,6 +38,7 @@ import org.apache.cxf.ws.security.policy.builders.ContentEncryptedElementsBuilde
 import org.apache.cxf.ws.security.policy.builders.EncryptedElementsBuilder;
 import org.apache.cxf.ws.security.policy.builders.EncryptedPartsBuilder;
 import org.apache.cxf.ws.security.policy.builders.HttpsTokenBuilder;
+import org.apache.cxf.ws.security.policy.builders.InitiatorSignatureTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.InitiatorTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.IssuedTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.KerberosTokenBuilder;
@@ -100,6 +101,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new EncryptedPartsBuilder());
         reg.registerBuilder(new HttpsTokenBuilder(pbuild));
         reg.registerBuilder(new InitiatorTokenBuilder(pbuild));
+        reg.registerBuilder(new InitiatorSignatureTokenBuilder(pbuild));
         reg.registerBuilder(new IssuedTokenBuilder(pbuild));
         reg.registerBuilder(new LayoutBuilder());
         reg.registerBuilder(new ProtectionTokenBuilder(pbuild));

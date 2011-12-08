@@ -171,9 +171,9 @@ public abstract class SPConstants {
     
     public static final String INITIATOR_TOKEN = "InitiatorToken";
     
+    public static final String INITIATOR_SIGNATURE_TOKEN = "InitiatorSignatureToken";
+    
     public static final String RECIPIENT_TOKEN = "RecipientToken";
-    
-    
     
     public static final String SUPPORTING_TOKENS = "SupportingTokens";
     
@@ -439,6 +439,7 @@ public abstract class SPConstants {
     public abstract QName getEncryptionToken();
     public abstract QName getHttpsToken();
     public abstract QName getInitiatorToken();
+    public abstract QName getInitiatorSignatureToken();
     public abstract QName getIssuedToken();
     public abstract QName getIncludeToken();
     public abstract QName getLayout();

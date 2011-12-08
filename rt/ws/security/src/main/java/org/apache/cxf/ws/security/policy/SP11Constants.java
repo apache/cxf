@@ -177,6 +177,9 @@ public final class SP11Constants extends SPConstants {
 
     public static final QName INITIATOR_TOKEN = new QName(SP11Constants.SP_NS,
             SPConstants.INITIATOR_TOKEN , SP11Constants.SP_PREFIX);
+    
+    public static final QName INITIATOR_SIGNATURE_TOKEN = new QName(SP11Constants.SP_NS,
+            SPConstants.INITIATOR_SIGNATURE_TOKEN , SP11Constants.SP_PREFIX);
 
     public static final QName RECIPIENT_TOKEN = new QName(SP11Constants.SP_NS,
             SPConstants.RECIPIENT_TOKEN , SP11Constants.SP_PREFIX);
@@ -341,6 +344,9 @@ public final class SP11Constants extends SPConstants {
     }
     public QName getInitiatorToken() {
         return INITIATOR_TOKEN;
+    }
+    public QName getInitiatorSignatureToken() {
+        return INITIATOR_SIGNATURE_TOKEN;
     }
     public QName getIssuedToken() {
         return ISSUED_TOKEN;
