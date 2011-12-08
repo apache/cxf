@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.endpoint.Client;
@@ -112,8 +114,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
         javax.xml.ws.Service s = javax.xml.ws.Service
             .create(url, serviceName);
-        Greeter greeter = s.getPort(portName, Greeter.class);
-        final InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
+        final Greeter handler = s.getPort(portName, Greeter.class);
 
         Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
@@ -129,6 +130,44 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Thread t = new Thread() {
             public void run() {
                 Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
+                result[0] = requestContext.get(key);
+                requestContext.remove(key);
+                result[1] = requestContext.get(key);
+            }
+        };
+        t.start();
+        t.join();
+
+        assertEquals("thread sees the put", "ho", result[0]);
+        assertNull("thread did not remove the put", result[1]);
+
+        assertEquals("main thread does not see removal",
+                     "ho", requestContext.get(key));
+    }
+    @Test
+    public void testRequestContextPutAndRemoveEchoDispatch() throws Exception {
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        javax.xml.ws.Service s = javax.xml.ws.Service
+            .create(url, serviceName);
+        
+        final Dispatch<DOMSource> disp = s.createDispatch(portName, DOMSource.class,
+                                                    javax.xml.ws.Service.Mode.PAYLOAD);
+        
+
+        Map<String, Object> requestContext = disp.getRequestContext();
+        requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
+
+        //re-get the context so it's not a thread safe variant
+        requestContext = disp.getRequestContext();
+
+        final String key = "Hi";
+
+        requestContext.put(key, "ho");
+
+        final Object[] result = new Object[2];
+        Thread t = new Thread() {
+            public void run() {
+                Map<String, Object> requestContext = disp.getRequestContext();
                 result[0] = requestContext.get(key);
                 requestContext.remove(key);
                 result[1] = requestContext.get(key);
