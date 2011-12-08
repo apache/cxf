@@ -46,8 +46,6 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
 
     static final Logger LOG = LogUtils.getL7dLogger(JAXWSHttpSpiDestination.class);
 
-    private static final long serialVersionUID = 1L;
-
     public JAXWSHttpSpiDestination(Bus b, 
                                    DestinationRegistry registry,
                                    EndpointInfo ei) throws IOException {
