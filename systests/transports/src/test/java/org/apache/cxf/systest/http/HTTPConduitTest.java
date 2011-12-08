@@ -155,6 +155,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             filters.getInclude().add(".*_EXPORT_.*");
             filters.getInclude().add(".*_EXPORT1024_.*");
             filters.getInclude().add(".*_WITH_DES_.*");
+            filters.getInclude().add(".*_WITH_AES_.*");
             filters.getInclude().add(".*_WITH_NULL_.*");
             filters.getInclude().add(".*_DH_anon_.*");
             tlsClientParameters.setCipherSuitesFilter(filters);
@@ -219,7 +220,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         System.setProperty("org.apache.cxf.bus.factory", 
             "org.apache.cxf.bus.CXFBusFactory");
     }
-        
+
     public static KeyStore getKeyStore(String ksType, String file, String ksPassword)
         throws GeneralSecurityException,
                IOException {

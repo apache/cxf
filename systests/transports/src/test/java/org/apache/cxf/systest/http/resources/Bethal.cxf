@@ -50,12 +50,12 @@
   <httpj:engine-factory bus="cxf">
 	 <httpj:engine port="${testutil.ports.BusServer.2}">
 	     <httpj:tlsServerParameters>
-	      <sec:keyManagers keyPassword="password">
-	           <sec:keyStore type="JKS" password="password" 
+	      <sec:keyManagers keyPassword="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v">
+	           <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v" 
 	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
-	          <sec:keyStore type="JKS" password="password"
+	          <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v"
 	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
 	      </sec:trustManagers>
 	      <sec:cipherSuitesFilter>
@@ -66,6 +66,7 @@
 	        <sec:include>.*_EXPORT_.*</sec:include>
 	        <sec:include>.*_EXPORT1024_.*</sec:include>
 	        <sec:include>.*_WITH_DES_.*</sec:include>
+            <sec:include>.*_WITH_AES_.*</sec:include>
 	        <sec:include>.*_WITH_NULL_.*</sec:include>
 	        <sec:exclude>.*_DH_anon_.*</sec:exclude>
 	      </sec:cipherSuitesFilter>
