@@ -35,6 +35,8 @@ import org.apache.neethi.PolicyComponent;
 public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
 
     private InitiatorToken initiatorToken;
+    
+    private InitiatorSignatureToken initiatorSignatureToken;
 
     private RecipientToken recipientToken;
 
@@ -54,6 +56,20 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
      */
     public void setInitiatorToken(InitiatorToken initiatorToken) {
         this.initiatorToken = initiatorToken;
+    }
+    
+    /**
+     * @return Returns the initiatorToken.
+     */
+    public InitiatorSignatureToken getInitiatorSignatureToken() {
+        return initiatorSignatureToken;
+    }
+
+    /**
+     * @param initiatorToken The initiatorToken to set.
+     */
+    public void setInitiatorSignatureToken(InitiatorSignatureToken initiatorSignatureToken) {
+        this.initiatorSignatureToken = initiatorSignatureToken;
     }
 
     /**
@@ -94,6 +110,9 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         */
         if (getInitiatorToken() != null) {
             all.addPolicyComponent(getInitiatorToken());
+        }
+        if (getInitiatorSignatureToken() != null) {
+            all.addPolicyComponent(getInitiatorSignatureToken());
         }
         if (getRecipientToken() != null) {
             all.addPolicyComponent(getRecipientToken());
@@ -145,13 +164,22 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
             .getNamespaceURI());
 
-        if (initiatorToken == null) {
-            throw new RuntimeException("InitiatorToken is not set");
+        if (initiatorToken == null && initiatorSignatureToken == null) {
+            throw new RuntimeException("InitiatorToken or InitiatorSignatureToken is not set");
         }
 
-        // <sp:InitiatorToken>
-        initiatorToken.serialize(writer);
-        // </sp:InitiatorToken>
+        if (initiatorToken != null) {
+            // <sp:InitiatorToken>
+            initiatorToken.serialize(writer);
+            // </sp:InitiatorToken>
+        }
+        
+        if (initiatorSignatureToken != null) {
+            // <sp:InitiatorSignatureToken>
+            initiatorSignatureToken.serialize(writer);
+            // </sp:InitiatorSignatureToken>
+        }
+        
 
         if (recipientToken == null) {
             throw new RuntimeException("RecipientToken is not set");

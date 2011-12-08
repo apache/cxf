@@ -123,6 +123,33 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
                 return false;
             }
         }
+        if (binding.getInitiatorSignatureToken() != null) {
+            Token token = binding.getInitiatorSignatureToken().getToken();
+            if (token instanceof X509Token) {
+                boolean foundCert = false;
+                for (WSSecurityEngineResult result : signedResults) {
+                    X509Certificate cert = 
+                        (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                    if (cert != null) {
+                        foundCert = true;
+                        break;
+                    }
+                }
+                if (!foundCert && !signedResults.isEmpty()) {
+                    String error = "An X.509 certificate was not used for the initiator signature token";
+                    notAssertPolicy(aim, binding.getInitiatorSignatureToken().getName(), error);
+                    ai.setNotAsserted(error);
+                    return false;
+                }
+            }
+            assertPolicy(aim, binding.getInitiatorSignatureToken());
+            if (!checkDerivedKeys(
+                binding.getInitiatorSignatureToken(), hasDerivedKeys, signedResults, encryptedResults
+            )) {
+                ai.setNotAsserted("Message fails the DerivedKeys requirement");
+                return false;
+            }
+        }
         if (binding.getRecipientToken() != null) {
             assertPolicy(aim, binding.getRecipientToken());
             if (!checkDerivedKeys(

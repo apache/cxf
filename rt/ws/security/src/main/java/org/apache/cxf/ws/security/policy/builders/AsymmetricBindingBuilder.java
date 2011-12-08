@@ -32,6 +32,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
+import org.apache.cxf.ws.security.policy.model.InitiatorSignatureToken;
 import org.apache.cxf.ws.security.policy.model.InitiatorToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.RecipientToken;
@@ -93,7 +94,10 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
             
             if (SPConstants.INITIATOR_TOKEN.equals(name.getLocalPart())) {
                 asymmetricBinding.setInitiatorToken((InitiatorToken)assertion);
-
+                
+            } else if (SPConstants.INITIATOR_SIGNATURE_TOKEN.equals(name.getLocalPart())) {
+                asymmetricBinding.setInitiatorSignatureToken((InitiatorSignatureToken)assertion);
+                
             } else if (SPConstants.RECIPIENT_TOKEN.equals(name.getLocalPart())) {
                 asymmetricBinding.setRecipientToken((RecipientToken)assertion);
 

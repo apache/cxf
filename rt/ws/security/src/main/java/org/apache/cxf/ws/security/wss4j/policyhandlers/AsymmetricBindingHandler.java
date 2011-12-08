@@ -102,6 +102,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     private void doSignBeforeEncrypt() {
         try {
             TokenWrapper initiatorWrapper = abinding.getInitiatorToken();
+            if (initiatorWrapper == null) {
+                initiatorWrapper = abinding.getInitiatorSignatureToken();
+            }
             boolean attached = false;
             if (initiatorWrapper != null) {
                 Token initiatorToken = initiatorWrapper.getToken();
@@ -141,7 +144,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
 
                 addSupportingTokens(sigs);
-                doSignature(sigs, attached);
+                doSignature(initiatorWrapper, sigs, attached);
                 doEndorse();
             } else {
                 //confirm sig
@@ -153,9 +156,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         convertToEncryptionPart(timestampEl.getElement());
                     sigs.add(timestampPart);
                 }
-
                 addSignatureConfirmation(sigs);
-                doSignature(sigs, attached);
+                doSignature(abinding.getRecipientToken(), sigs, attached);
             }
 
             List<WSEncryptionPart> enc = getEncryptedParts();
@@ -194,10 +196,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             wrapper = abinding.getRecipientToken();
         } else {
             wrapper = abinding.getInitiatorToken();
+            if (wrapper == null) {
+                wrapper = abinding.getInitiatorSignatureToken();
+            }
         }
         encryptionToken = wrapper.getToken();
         
         TokenWrapper initiatorWrapper = abinding.getInitiatorToken();
+        if (initiatorWrapper == null) {
+            initiatorWrapper = abinding.getInitiatorSignatureToken();
+        }
         boolean attached = false;
         if (initiatorWrapper != null) {
             Token initiatorToken = initiatorWrapper.getToken();
@@ -268,17 +276,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 addSignatureConfirmation(sigParts);
             }
             
-            if ((sigParts.size() > 0 
-                    && isRequestor()
-                    && abinding.getInitiatorToken() != null) 
-                || (!isRequestor() && abinding.getRecipientToken() != null)) {
-                try {
-                    doSignature(sigParts, attached);
-                } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
-                } catch (SOAPException ex) {
-                    throw new Fault(ex);
+            try {
+                if ((sigParts.size() > 0) && initiatorWrapper != null && isRequestor()) {
+                    doSignature(initiatorWrapper, sigParts, attached);
+                } else if (!isRequestor() && abinding.getRecipientToken() != null) {
+                    doSignature(abinding.getRecipientToken(), sigParts, attached);
                 }
+            } catch (WSSecurityException ex) {
+                throw new Fault(ex);
+            } catch (SOAPException ex) {
+                throw new Fault(ex);
             }
 
             if (isRequestor()) {
@@ -412,31 +419,36 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     }    
     
     private void assertUnusedTokens(TokenWrapper wrapper) {
+        if (wrapper == null) {
+            return;
+        }
         Collection<AssertionInfo> ais = aim.getAssertionInfo(wrapper.getName());
-        for (AssertionInfo ai : ais) {
-            if (ai.getAssertion() == wrapper) {
-                ai.setAsserted(true);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == wrapper) {
+                    ai.setAsserted(true);
+                }
             }
         }
         ais = aim.getAssertionInfo(wrapper.getToken().getName());
-        for (AssertionInfo ai : ais) {
-            if (ai.getAssertion() == wrapper.getToken()) {
-                ai.setAsserted(true);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == wrapper.getToken()) {
+                    ai.setAsserted(true);
+                }
             }
         }
     }
     
-    private void doSignature(List<WSEncryptionPart> sigParts, boolean attached) 
+    private void doSignature(TokenWrapper wrapper, List<WSEncryptionPart> sigParts, boolean attached) 
         throws WSSecurityException, SOAPException {
-        Token sigToken = null;
-        TokenWrapper wrapper = null;
-        if (isRequestor()) {
-            wrapper = abinding.getInitiatorToken();
-        } else {
-            wrapper = abinding.getRecipientToken();
+        
+        if (!isRequestor()) {
             assertUnusedTokens(abinding.getInitiatorToken());
+            assertUnusedTokens(abinding.getInitiatorSignatureToken());
         }
-        sigToken = wrapper.getToken();
+        
+        Token sigToken = wrapper.getToken();
         sigParts.addAll(this.getSignedParts());
         if (sigParts.isEmpty()) {
             // Add the BST to the security header if required
