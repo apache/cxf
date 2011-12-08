@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,19 +39,15 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
+import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectUtils;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
@@ -167,15 +164,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
     String excludes[];
 
     /**
-     * The local repository taken from Maven's runtime. Typically $HOME/.m2/repository.
-     * 
-     * @parameter expression="${localRepository}"
-     * @readonly
-     * @required
-     */
-    private ArtifactRepository localRepository;
-
-    /**
      * Artifact factory, needed to create artifacts.
      * 
      * @component
@@ -185,24 +173,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
     private ArtifactFactory artifactFactory;
 
     /**
-     * The remote repositories used as specified in your POM.
-     * 
-     * @parameter expression="${project.repositories}"
-     * @readonly
-     * @required
-     */
-    private List repositories;
-
-    /**
-     * Artifact repository factory component.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    /**
      * The Maven session.
      * 
      * @parameter expression="${session}"
@@ -210,13 +180,13 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * @required
      */
     private MavenSession mavenSession;
-
+    
     /**
      * @component
      * @readonly
      * @required
      */
-    private ArtifactResolver artifactResolver;
+    private ProjectDependenciesResolver projectDependencyResolver;
 
     /**
      * The plugin dependencies, needed for the fork mode.
@@ -320,50 +290,34 @@ public class WSDL2JavaMojo extends AbstractMojo {
         return effectiveWsdlOptions;
     }
     
-    @SuppressWarnings("unchecked")
-    private Artifact resolveRemoteWsdlArtifact(List remoteRepos, Artifact artifact)
+    private Artifact resolveRemoteWsdlArtifact(Artifact artifact)
         throws MojoExecutionException {
         
-        /**
-         * First try to find the artifact in the reactor projects of the maven session.
-         * So an artifact that is not yet built can be resolved
-         */
-        List<MavenProject> rProjects = mavenSession.getSortedProjects();
-        for (MavenProject rProject : rProjects) {
-            if (artifact.getGroupId().equals(rProject.getGroupId())
-                && artifact.getArtifactId().equals(rProject.getArtifactId()) 
-                && artifact.getVersion().equals(rProject.getVersion())) {
-                Set<Artifact> artifacts = rProject.getArtifacts();
-                for (Artifact pArtifact : artifacts) {
-                    if ("wsdl".equals(pArtifact.getType())) {
-                        return pArtifact;
-                    }
-                }
-            }
-        }
-        
-        /**
-         * If this did not work resolve the artifact using the artifactResolver
-         */
+        Collection<String> scopes = new ArrayList<String>();
+        scopes.add(artifact.getScope());
+        Set<Artifact> resolvedArtifacts = null;
         try {
-            artifactResolver.resolve(artifact, remoteRepos, localRepository);
+            resolvedArtifacts = projectDependencyResolver.resolve(project, scopes, mavenSession);
         } catch (ArtifactResolutionException e) {
             throw new MojoExecutionException("Error downloading wsdl artifact.", e);
         } catch (ArtifactNotFoundException e) {
             throw new MojoExecutionException("Resource can not be found.", e);
-        }
+        } 
         
-        return artifact;
+        if (resolvedArtifacts != null && resolvedArtifacts.size() != 0) {
+            for (Artifact pArtifact : resolvedArtifacts) {
+                if ("wsdl".equals(pArtifact.getType())) {
+                    getLog().info(String.format("%s resolved to %s", 
+                                                pArtifact.toString(), pArtifact.getFile().getAbsolutePath()));
+                    return pArtifact;
+                }
+            }
+        }
+        throw new MojoExecutionException(String.format("Failed to resolve WSDL artifact %s", 
+                                                       artifact.toString()));
     }
 
     private void downloadRemoteWsdls(List<WsdlOption> effectiveWsdlOptions) throws MojoExecutionException {
-        List remoteRepos;
-        try {
-            remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, artifactRepositoryFactory,
-                                                                 mavenSession.getContainer());
-        } catch (InvalidRepositoryException e) {
-            throw new MojoExecutionException("Error build repositories for remote wsdls", e);
-        }
         
         for (WsdlOption wsdlOption : effectiveWsdlOptions) {
             WsdlArtifact wsdlA = wsdlOption.getWsdlArtifact();
@@ -373,7 +327,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             Artifact wsdlArtifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA.getArtifactId(),
                                                                    wsdlA.getVersion(),
                                                                    Artifact.SCOPE_COMPILE, wsdlA.getType());
-            wsdlArtifact = resolveRemoteWsdlArtifact(remoteRepos, wsdlArtifact);
+            wsdlArtifact = resolveRemoteWsdlArtifact(wsdlArtifact);
             if (wsdlArtifact != null) {
                 File supposedFile = wsdlArtifact.getFile();
                 if (!supposedFile.exists() || !supposedFile.isFile()) {
