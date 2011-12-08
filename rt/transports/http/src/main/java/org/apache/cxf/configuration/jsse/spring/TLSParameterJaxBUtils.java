@@ -103,7 +103,7 @@ public final class TLSParameterJaxBUtils {
                     : KeyStore.getDefaultType();
 
         char[] password = kst.isSetPassword()
-                    ? kst.getPassword().toCharArray()
+                    ? deobfuscate(kst.getPassword())
                     : null;
 
         KeyStore keyStore = !kst.isSetProvider()
@@ -193,6 +193,26 @@ public final class TLSParameterJaxBUtils {
         return factory.generateCertificates(is);
     }
 
+    private static char[] deobfuscate(String s) {
+        // From the Jetty org.eclipse.jetty.http.security.Password class
+        if (!s.startsWith("OBF:")) {
+            return s.toCharArray();
+        }
+        s = s.substring(4);
+
+        char[] b = new char[s.length() / 2];
+        int l = 0;
+        for (int i = 0; i < s.length(); i += 4) {
+            String x = s.substring(i, i + 4);
+            int i0 = Integer.parseInt(x, 36);
+            int i1 = i0 / 256;
+            int i2 = i0 % 256;
+            b[l++] = (char) ((i1 + i2 - 254) / 2);
+        }
+
+        return new String(b, 0, l).toCharArray();
+    }    
+    
     /**
      * This method converts the JAXB KeyManagersType into a list of
      * JSSE KeyManagers.
@@ -212,7 +232,7 @@ public final class TLSParameterJaxBUtils {
                      : KeyManagerFactory.getDefaultAlgorithm();
 
         char[] keyPass = kmc.isSetKeyPassword()
-                     ? kmc.getKeyPassword().toCharArray()
+                     ? deobfuscate(kmc.getKeyPassword())
                      : null;
 
         KeyManagerFactory fac =
