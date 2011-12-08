@@ -644,7 +644,11 @@ public class ServiceImpl extends ServiceDelegate {
             && clientFac.getBus() != null) {
             clientBus = clientFac.getBus();
         }
-        endpoint.getJaxwsBinding().setHandlerChain(clientFac.getHandlers());
+        List<Handler> hc = clientFac.getHandlers();
+        //CXF-3956
+        hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));        
+        endpoint.getJaxwsBinding().setHandlerChain(hc);
+        
         // create the client object, then initialize the endpoint features against it
         Client client = new ClientImpl(clientBus, endpoint, clientFac.getConduitSelector());
         for (AbstractFeature af : endpoint.getFeatures()) {
