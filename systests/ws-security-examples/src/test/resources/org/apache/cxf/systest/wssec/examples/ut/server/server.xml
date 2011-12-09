@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:p="http://cxf.apache.org/policy"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
+        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
+        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
+        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
+    ">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
+    <cxf:bus>
+        <cxf:features>
+            <p:policies/>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+
+    <jaxws:endpoint 
+       id="Plaintext"
+       address="http://localhost:${testutil.ports.Server}/DoubleItUTPlaintext" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItPlaintextPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="PlaintextNoPassword"
+       address="http://localhost:${testutil.ports.Server}/DoubleItUTPlaintextNoPassword" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItPlaintextNoPasswordPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="Digest"
+       address="http://localhost:${testutil.ports.Server}/DoubleItUTDigest" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItDigestPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="TLSSupporting"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItUTTLSSupporting" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTLSSupportingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl"
+       depends-on="tls-settings">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="AsymmetricSESupporting"
+       address="http://localhost:${testutil.ports.Server}/DoubleItUTAsymmetricSESupporting" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricSESupportingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="alice.properties"/> 
+           <entry key="ws-security.encryption.username" value="alice"/>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="AsymmetricEncrSupporting"
+       address="http://localhost:${testutil.ports.Server}/DoubleItUTAsymmetricEncrSupporting" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricEncrSupportingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="SymmetricSESupporting"
+       address="http://localhost:${testutil.ports.Server}/DoubleItUTSymmetricSESupporting" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricSESupportingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/ut//DoubleItUt.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <!-- -->
+    <!-- Any services listening on port ${testutil.ports.Server} must use the following -->
+    <!-- Transport Layer Security (TLS) settings -->
+    <!-- -->
+    <httpj:engine-factory id="tls-settings">
+        <httpj:engine port="${testutil.ports.Server.2}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="Truststore.jks"/>
+                </sec:trustManagers> 
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="false" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+</beans>

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.ws.wssec10.client;
+package org.apache.cxf.systest.wssec.examples.ut;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,7 +30,6 @@ import org.apache.ws.security.WSPasswordCallback;
 
 /**
  */
-
 public class UTPasswordCallback implements CallbackHandler {
     
     private Map<String, String> passwords = 
@@ -39,9 +38,9 @@ public class UTPasswordCallback implements CallbackHandler {
     public UTPasswordCallback() {
         passwords.put("Alice", "ecilA");
         passwords.put("Frank", "knarF");
-        //for MS clients
         passwords.put("abcd", "dcba");
         passwords.put("alice", "password");
+        passwords.put("bob", "password");
     }
 
     /**
