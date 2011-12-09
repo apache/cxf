@@ -42,7 +42,7 @@
         <module>jaxrs</module>
         <module>ws-specs</module>
         <module>ws-security</module>
-        <module>ws-security-example</module>
+        <module>ws-security-examples</module>
         <module>rs-security</module>
         <module>wsdl_maven</module>
     </modules>
