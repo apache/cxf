@@ -218,9 +218,11 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                     .getServiceReferences(BusLifeCycleListener.class.getName(), null);
                 if (refs != null) {
                     for (ServiceReference ref : refs) {
-                        BusLifeCycleListener listener 
-                            = (BusLifeCycleListener)defaultContext.getService(ref);
-                        manager.registerLifeCycleListener(listener);
+                        if (allowService(ref)) {
+                            BusLifeCycleListener listener 
+                                = (BusLifeCycleListener)defaultContext.getService(ref);
+                            manager.registerLifeCycleListener(listener);
+                        }
                     }
                 }
             } catch (InvalidSyntaxException e) {
@@ -232,9 +234,11 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                 if (refs != null) {
                     ClientLifeCycleManager clcm = bus.getExtension(ClientLifeCycleManager.class);
                     for (ServiceReference ref : refs) {
-                        ClientLifeCycleListener listener 
-                            = (ClientLifeCycleListener)defaultContext.getService(ref);
-                        clcm.registerListener(listener);
+                        if (allowService(ref)) {
+                            ClientLifeCycleListener listener 
+                                = (ClientLifeCycleListener)defaultContext.getService(ref);
+                            clcm.registerListener(listener);
+                        }
                     }
                 }
             } catch (InvalidSyntaxException e) {
@@ -246,14 +250,29 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                 if (refs != null) {
                     ServerLifeCycleManager clcm = bus.getExtension(ServerLifeCycleManager.class);
                     for (ServiceReference ref : refs) {
-                        ServerLifeCycleListener listener 
-                            = (ServerLifeCycleListener)defaultContext.getService(ref);
-                        clcm.registerListener(listener);
+                        if (allowService(ref)) {
+                            ServerLifeCycleListener listener 
+                                = (ServerLifeCycleListener)defaultContext.getService(ref);
+                            clcm.registerListener(listener);
+                        }
                     }
                 }
             } catch (InvalidSyntaxException e) {
                 //ignore
             }
+        }
+        
+        private boolean allowService(ServiceReference ref) {
+            Object o = ref.getProperty("org.apache.cxf.bus.private.extension");
+            Boolean pvt = Boolean.FALSE;
+            if (o == null) {
+                pvt = Boolean.FALSE;
+            } else if (o instanceof String) {
+                pvt = Boolean.parseBoolean((String)o);
+            } else if (o instanceof Boolean) {
+                pvt = (Boolean)o;
+            }
+            return !pvt.booleanValue();
         }
         private Version getBundleVersion(Bundle bundle) {
             Dictionary headers = bundle.getHeaders();
