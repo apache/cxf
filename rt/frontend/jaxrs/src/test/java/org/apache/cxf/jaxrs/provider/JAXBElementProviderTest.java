@@ -41,6 +41,7 @@ import java.util.TreeSet;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
@@ -470,7 +471,7 @@ public class JAXBElementProviderTest extends Assert {
                          new MetadataMap<String, Object>(), bos);
         assertTrue(bos.toString().contains("thebook2"));
         assertTrue(bos.toString().contains("http://superbooks"));
-        
+        System.out.println(bos.toString());
         ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
         Book2 book2 = 
             (Book2)provider.readFrom(
@@ -1021,6 +1022,20 @@ public class JAXBElementProviderTest extends Assert {
         String data = "<Books><Book><id>123</id><name>CXF in Action</name>"
             + "</Book><Book><id>124</id><name>CXF Rocks</name></Book></Books>";
         doReadUnqualifiedCollection(data, "setBooks", List.class);
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testReadMalformedXML() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        try {
+            provider.readFrom((Class)Book.class, Book.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), 
+                       new ByteArrayInputStream("<Book>".getBytes()));
+            fail("404 is expected");
+        } catch (WebApplicationException ex) {
+            assertEquals(400, ex.getResponse().getStatus());
+        }
     }
     
     @SuppressWarnings("unchecked")

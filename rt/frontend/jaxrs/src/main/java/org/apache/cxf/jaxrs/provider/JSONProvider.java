@@ -224,7 +224,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             return response;
             
         } catch (JAXBException e) {
-            handleJAXBException(e);
+            handleJAXBException(e, true);
         } catch (XMLStreamException e) {
             throw new WebApplicationException(e);
         } catch (WebApplicationException e) {
@@ -342,7 +342,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             }
             
         } catch (JAXBException e) {
-            handleJAXBException(e);
+            handleJAXBException(e, false);
         } catch (XMLStreamException e) {
             throw new WebApplicationException(e);
         } catch (Exception e) {

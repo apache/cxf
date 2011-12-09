@@ -528,7 +528,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return sw.toString();
     }
     
-    protected static void handleJAXBException(JAXBException e) {
+    protected static void handleJAXBException(JAXBException e, boolean read) {
         LOG.warning(getStackTrace(e));
         StringBuilder sb = new StringBuilder();
         if (e.getMessage() != null) {
@@ -544,7 +544,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
                              BUNDLE, sb.toString()).toString();
-        Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+        Response.Status status = read 
+            ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR; 
+        Response r = Response.status(status)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
         throw new WebApplicationException(t, r);
     }
