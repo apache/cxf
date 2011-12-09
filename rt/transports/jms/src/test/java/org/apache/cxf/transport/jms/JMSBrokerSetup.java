@@ -82,6 +82,7 @@ public class JMSBrokerSetup {
                     broker.setTmpDataDirectory(new File("./target"));
                     broker.setPopulateJMSXUserID(true);
                     broker.addConnector(brokerUrl);
+                    broker.setUseJmx(false);
                     broker.start();
                     Thread.sleep(200);
                     notifyAll();
