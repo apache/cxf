@@ -60,6 +60,7 @@ import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -72,6 +73,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServer.class));
+    }
+    @After
+    public void resetBookServer() throws Exception {
+        new URL("http://localhost:" + PORT + "/bookstore/reset").openStream().close();
     }
     
     @Test
