@@ -53,9 +53,8 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
     private ConnectionFactory connectionFactory;
     private String requestMessageId;
 
-
-    @Test
-    public void testSendReceive() {
+    
+    public void sendAndReceive(String replyDestination) {
         BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
@@ -70,6 +69,7 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
         jmsConfig.setTargetDestination("queue:test");
         jmsConfig.setReplyDestination("queue:reply");
         jmsConfig.setConnectionFactory(connectionFactory);
+        jmsConfig.setReplyDestination(replyDestination);
 
         JMSConduit conduit = new JMSConduit(endpointInfo, target, jmsConfig, bus);
         Exchange exchange = new ExchangeImpl();
@@ -80,6 +80,16 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         Assert.assertEquals(requestMessageId, headers.getJMSCorrelationID());
         conduit.close();
+    }
+
+    @Test
+    public void testSendReceiveWithTempReplyQueue() {
+        sendAndReceive(null);
+    }
+    
+    @Test
+    public void testSendReceive() {
+        sendAndReceive("queue:testreply");
     }
 
     private void runReceiver() {
