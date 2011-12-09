@@ -33,6 +33,7 @@ public abstract class Token {
     private Client client;
     private List<String> scopes = Collections.emptyList();
     private List<String> uris = Collections.emptyList();
+    private UserSubject subject;
     
     protected Token(Client client, String tokenKey,
                     String tokenSecret, long lifetime, long issuedAt) {
@@ -115,4 +116,12 @@ public abstract class Token {
         this.uris = uris;
     }
     
+    public void setSubject(UserSubject subject) {
+        this.subject = subject;
+    }
+
+    public UserSubject getSubject() {
+        return subject;
+    }
+
 }

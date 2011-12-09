@@ -20,8 +20,12 @@ package org.apache.cxf.rs.security.oauth.services;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
 import net.oauth.OAuth;
@@ -40,10 +45,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.oauth.data.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
+import org.apache.cxf.rs.security.oauth.data.UserSubject;
 import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
+import org.apache.cxf.security.LoginSecurityContext;
 
 
 public class AuthorizationRequestHandler {
@@ -78,6 +85,21 @@ public class AuthorizationRequestHandler {
 
             Map<String, String> queryParams = new HashMap<String, String>();
             if (allow) {
+                SecurityContext sc = 
+                    (SecurityContext)request.getAttribute(SecurityContext.class.getName());
+                if (sc != null) {
+                    UserSubject subject = new UserSubject();
+                    subject.setLogin(sc.getUserPrincipal().getName());
+                    if (sc instanceof LoginSecurityContext) {
+                        List<String> roleNames = new ArrayList<String>();
+                        Set<Principal> roles = ((LoginSecurityContext)sc).getUserRoles();
+                        for (Principal p : roles) {
+                            roleNames.add(p.getName());
+                        }
+                        subject.setRoles(roleNames);
+                    }
+                    token.setSubject(subject);
+                }
                 String verifier = dataProvider.setRequestTokenVerifier(token);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
             } else {
@@ -167,4 +189,6 @@ public class AuthorizationRequestHandler {
         session.removeAttribute(OAuthConstants.AUTHENTICITY_TOKEN);
         return b;
     }
+
+    
 }

@@ -35,6 +35,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
+import org.apache.cxf.rs.security.oauth.data.UserSubject;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -43,7 +44,7 @@ import org.apache.cxf.security.SecurityContext;
  * Base OAuth filter which can be used to protect end-user endpoints
  */
 public class AbstractAuthFilter {
-
+    protected static final String USE_USER_SUBJECT = "org.apache.cxf.rs.security.oauth.use_user_subject";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthFilter.class);
     private static final String[] REQUIRED_PARAMETERS = 
         new String[] {
@@ -78,7 +79,8 @@ public class AbstractAuthFilter {
      * @throws Exception
      * @throws OAuthProblemException
      */
-    public OAuthInfo handleOAuthRequest(HttpServletRequest req) throws
+    protected OAuthInfo handleOAuthRequest(HttpServletRequest req,
+                                           boolean useUserSubject) throws
         Exception, OAuthProblemException {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "OAuth security filter for url: {0}", req.getRequestURL());
@@ -101,6 +103,9 @@ public class AbstractAuthFilter {
             client = accessToken.getClient(); 
             
         } else {
+            // TODO: the secret may not be included and only used to create a signature
+            //       so the header will effectively be similar to the one used during 
+            //       RequestToken requests; we'd need to handle this case too
             String consumerKey = oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY);
             String consumerSecret = oAuthMessage.getParameter("oauth_consumer_secret");
             client = dataProvider.getClient(consumerKey);
@@ -129,7 +134,7 @@ public class AbstractAuthFilter {
             checkNoAccessTokenIsAllowed(client, accessToken, perm);
         }
         
-        return new OAuthInfo(client, accessToken, permissions);
+        return new OAuthInfo(client, accessToken, permissions, useUserSubject);
         
     }
     
@@ -164,17 +169,26 @@ public class AbstractAuthFilter {
     protected SecurityContext createSecurityContext(HttpServletRequest request, 
                                                     final OAuthInfo info) {
         request.setAttribute("oauth_authorities", info.getRoles());
+        final UserSubject subject = info.getToken().getSubject();
         return new SecurityContext() {
 
             public Principal getUserPrincipal() {
-                return new SimplePrincipal(info.getClient().getLoginName());
+                String login = info.useUserSubject() 
+                    ? (subject != null ? subject.getLogin() : null)
+                    : info.getClient().getLoginName();  
+                return new SimplePrincipal(login);
             }
 
             public boolean isUserInRole(String role) {
-                List<String> roles = info.getRoles();
-                for (String authority : roles) {
-                    if (authority.equals(role)) {
-                        return true;
+                if (info.useUserSubject()) {
+                    return subject != null
+                        ? info.getToken().getSubject().getRoles().contains(role) : false;    
+                } else {
+                    List<String> roles = info.getRoles();
+                    for (String authority : roles) {
+                        if (authority.equals(role)) {
+                            return true;
+                        }
                     }
                 }
                 return false;

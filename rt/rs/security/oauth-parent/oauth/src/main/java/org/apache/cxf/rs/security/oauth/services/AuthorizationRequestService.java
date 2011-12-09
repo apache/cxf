@@ -19,12 +19,14 @@
 
 package org.apache.cxf.rs.security.oauth.services;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.rs.security.oauth.data.OAuthAuthorizationData;
 
@@ -48,7 +50,10 @@ public class AuthorizationRequestService extends AbstractOAuthService {
     @GET
     @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
     public Response authorize() {
-        Response response = handler.handle(getHttpRequest(), getDataProvider());
+        HttpServletRequest httpRequest = getHttpRequest();
+        httpRequest.setAttribute(SecurityContext.class.getName(),
+                                 super.getSecurityContext());
+        Response response = handler.handle(httpRequest, getDataProvider());
         if (response.getEntity() instanceof OAuthAuthorizationData) {
             String replyTo = getUriInfo().getAbsolutePathBuilder().path("decision").build().toString();
             ((OAuthAuthorizationData)response.getEntity()).setReplyTo(replyTo);

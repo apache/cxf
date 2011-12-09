@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth.services;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -53,5 +54,9 @@ public abstract class AbstractOAuthService {
     
     protected UriInfo getUriInfo() {
         return mc.getUriInfo();
+    }
+    
+    protected SecurityContext getSecurityContext() {
+        return mc.getSecurityContext();
     }
 }

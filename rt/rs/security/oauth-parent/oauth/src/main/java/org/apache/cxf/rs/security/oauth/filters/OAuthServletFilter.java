@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.oauth.OAuthProblemException;
 import net.oauth.server.OAuthServlet;
 
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
@@ -41,10 +42,11 @@ import org.apache.cxf.security.SecurityContext;
  * HTTP Servlet filter which can be used to protect end user endpoints
  */
 public class OAuthServletFilter extends AbstractAuthFilter implements javax.servlet.Filter {
-
+    private boolean useUserSubject;
     public void init(FilterConfig filterConfig) throws ServletException {
         ServletContext servletContext = filterConfig.getServletContext();
         super.setDataProvider(OAuthUtils.getOAuthDataProvider(servletContext));
+        useUserSubject = MessageUtils.isTrue(servletContext.getInitParameter(USE_USER_SUBJECT));
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
@@ -53,7 +55,7 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
         HttpServletResponse resp = (HttpServletResponse)response;
 
         try {
-            OAuthInfo info = handleOAuthRequest(req);
+            OAuthInfo info = handleOAuthRequest(req, useUserSubject);
             req = setSecurityContext(req, info);
             chain.doFilter(req, resp);
         } catch (OAuthProblemException e) {
