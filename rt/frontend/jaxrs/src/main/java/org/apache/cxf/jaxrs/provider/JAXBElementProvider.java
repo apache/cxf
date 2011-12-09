@@ -157,7 +157,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             return response;
             
         } catch (JAXBException e) {
-            handleJAXBException(e);
+            handleJAXBException(e, true);
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -230,7 +230,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 marshal(actualObject, actualClass, genericType, encoding, os, m);
             }
         } catch (JAXBException e) {
-            handleJAXBException(e);
+            handleJAXBException(e, true);
         }  catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {

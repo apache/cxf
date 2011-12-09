@@ -305,10 +305,11 @@ public final class InjectionUtils {
                 return PrimitiveUtils.read(value, pClass);
             } catch (NumberFormatException nfe) {
                 //
-                //  For a path parameter this is probably a 404,
-                //  for others a 400...
+                //  For path, query & matrix parameters this is 404,
+                //  for others 400...
                 //
-                if (pType == ParameterType.PATH) {
+                if (pType == ParameterType.PATH || pType == ParameterType.QUERY
+                    || pType == ParameterType.MATRIX) {
                     throw new WebApplicationException(nfe, Response.Status.NOT_FOUND);
                 }
                 throw new WebApplicationException(nfe, Response.Status.BAD_REQUEST);
