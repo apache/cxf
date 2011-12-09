@@ -66,7 +66,26 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         }
         return true;
     }
-
+    private boolean checkArray(String[] ar, String n) {
+        if (ar != null) {
+            if (ar.length == 0) {
+                return true;
+            }
+            for (String s : ar) {
+                if (s.equals(n)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private boolean checkBare(ToolContext context, String opName) {
+        String o[] = context.getArray(ToolConstants.CFG_BAREMETHODS);
+        if (checkArray(o, opName)) {
+            return true;
+        }
+        return false;
+    }
     private boolean isValidOperation(OperationInfo operation) {
         ToolContext context = service.getProperty(ToolContext.class.getName(), ToolContext.class);
         
@@ -76,20 +95,38 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         if (operation.getUnwrappedOperation() == null) {
             valid = true;
         }
+
+        String operationName = operation.getName().getLocalPart();
+        operationName = ProcessorUtil.mangleNameToVariableName(operationName);
+
         
         JAXWSBinding binding = (JAXWSBinding)operation.getExtensor(JAXWSBinding.class);
-        if (binding != null && !binding.isEnableWrapperStyle()) {
-            valid = true;
+        if (binding != null) {
+            if (!binding.isEnableWrapperStyle()) {
+                valid = true;
+            } else if (binding.getMethodName() != null) {
+                operationName = binding.getMethodName();
+            }
         }
         binding = operation.getInterface().getExtensor(JAXWSBinding.class);
-        if (binding != null && !binding.isEnableWrapperStyle()) {
-            valid = true;
+        if (binding != null) {
+            if (!binding.isEnableWrapperStyle()) {
+                valid = true;
+            } else if (binding.getMethodName() != null) {
+                operationName = binding.getMethodName();
+            }
         }
         binding = operation.getInterface().getService()
             .getDescription().getExtensor(JAXWSBinding.class);
-        if (binding != null && !binding.isEnableWrapperStyle()) {
-            valid = true;
+        if (binding != null) {
+            if (!binding.isEnableWrapperStyle()) {
+                valid = true;
+            } else if (binding.getMethodName() != null) {
+                operationName = binding.getMethodName();
+            }
         }
+        
+        valid |= checkBare(context, operationName);
         
         if (valid) {
             return true;
