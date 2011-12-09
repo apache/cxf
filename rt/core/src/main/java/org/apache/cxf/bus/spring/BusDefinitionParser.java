@@ -121,28 +121,28 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         
         public void setBus(Bus bb) {
             CXFBusImpl b = (CXFBusImpl)bb;
-            if (features != null) {
-                b.setFeatures(features);
-                features = null;
-            }
             if (properties != null) {
                 b.setProperties(properties);
                 properties = null;
             }
             if (!getInInterceptors().isEmpty()) {
-                b.setInInterceptors(getInInterceptors());
+                b.getInInterceptors().addAll(getInInterceptors());
             }
             if (!getOutInterceptors().isEmpty()) {
-                b.setOutInterceptors(getOutInterceptors());
+                b.getOutInterceptors().addAll(getOutInterceptors());
             }
             if (!getInFaultInterceptors().isEmpty()) {
-                b.setInFaultInterceptors(getInFaultInterceptors());
+                b.getInFaultInterceptors().addAll(getInFaultInterceptors());
             }
             if (!getOutFaultInterceptors().isEmpty()) {
-                b.setOutFaultInterceptors(getOutFaultInterceptors());
+                b.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
             }
             if (!StringUtils.isEmpty(id)) {
                 b.setId(id);
+            }
+            if (features != null) {
+                b.setFeatures(features);
+                features = null;
             }
             bus = b;
         }

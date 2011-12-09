@@ -52,19 +52,23 @@ public abstract class AbstractBasicInterceptorProvider  implements InterceptorPr
     }
 
     public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
-        in = interceptors;
+        in.clear();
+        in.addAll(interceptors);
     }
 
     public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
-        inFault = interceptors;
+        inFault.clear();
+        inFault.addAll(interceptors);
     }
 
     public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
-        out = interceptors;
+        out.clear();
+        out.addAll(interceptors);
     }
 
     public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
-        outFault = interceptors;
+        outFault.clear();
+        outFault.addAll(interceptors);
     }
     
     
