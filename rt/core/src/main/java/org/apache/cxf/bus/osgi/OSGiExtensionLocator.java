@@ -40,6 +40,7 @@ import org.apache.cxf.bus.extension.ExtensionFragmentParser;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
 import org.apache.cxf.bus.osgi.OSGiAutomaticWorkQueue.WorkQueueList;
+import org.apache.cxf.buslifecycle.BusCreationListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
@@ -215,21 +216,6 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             
             try {
                 ServiceReference refs[] = defaultContext
-                    .getServiceReferences(BusLifeCycleListener.class.getName(), null);
-                if (refs != null) {
-                    for (ServiceReference ref : refs) {
-                        if (allowService(ref)) {
-                            BusLifeCycleListener listener 
-                                = (BusLifeCycleListener)defaultContext.getService(ref);
-                            manager.registerLifeCycleListener(listener);
-                        }
-                    }
-                }
-            } catch (InvalidSyntaxException e) {
-                //ignore
-            }
-            try {
-                ServiceReference refs[] = defaultContext
                     .getServiceReferences(ClientLifeCycleListener.class.getName(), null);
                 if (refs != null) {
                     ClientLifeCycleManager clcm = bus.getExtension(ClientLifeCycleManager.class);
@@ -257,9 +243,26 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                         }
                     }
                 }
+                
             } catch (InvalidSyntaxException e) {
                 //ignore
             }
+            try {
+                ServiceReference refs[] = defaultContext
+                    .getServiceReferences(BusCreationListener.class.getName(), null);
+                if (refs != null) {
+                    for (ServiceReference ref : refs) {
+                        if (allowService(ref)) {
+                            BusCreationListener listener 
+                                = (BusCreationListener)defaultContext.getService(ref);
+                            listener.busCreated(bus);
+                        }
+                    }
+                }
+            } catch (InvalidSyntaxException e) {
+                //ignore
+            }
+
         }
         
         private boolean allowService(ServiceReference ref) {

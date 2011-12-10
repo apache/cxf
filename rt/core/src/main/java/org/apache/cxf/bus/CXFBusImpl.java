@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.buslifecycle.BusCreationListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
@@ -161,6 +162,13 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
 
     public void initialize() {
         setState(BusState.INITIALIZING);
+        
+        Collection<? extends BusCreationListener> ls = getExtension(ConfiguredBeanLocator.class)
+            .getBeansOfType(BusCreationListener.class);
+        for (BusCreationListener l : ls) {
+            l.busCreated(this);
+        }
+        
         doInitializeInternal();
         
         BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
