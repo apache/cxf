@@ -52,6 +52,10 @@ public class SpringBus extends ExtensionManagerBus
     public SpringBus() {
     }
     
+    public void setBusConfig(BusDefinitionParser.BusConfig bc) {
+        bc.setBus(this);
+    }
+    
     public void loadAdditionalFeatures() {
         super.loadAdditionalFeatures();
         ConfiguredBeanLocator loc = getExtension(ConfiguredBeanLocator.class);

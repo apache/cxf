@@ -37,6 +37,8 @@ import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -50,6 +52,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         super();
         setBeanClass(BusConfig.class);
     }
+
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         String bus = element.getAttribute("bus");        
         if (StringUtils.isEmpty(bus)) {
@@ -60,21 +63,46 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         }
         element.removeAttribute("name");
         if (StringUtils.isEmpty(bus)) {
-            addBusWiringAttribute(bean, BusWiringType.PROPERTY, null, ctx);
-        } else {
-            addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus, ctx);
-            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_CREATE, Boolean.TRUE);
+            bus = "cxf";
         }
         String id = element.getAttribute("id");
         if (!StringUtils.isEmpty(id)) {
             bean.addPropertyValue("id", id);
         }
 
-        bean.addConstructorArgValue(bus);
-        bean.setLazyInit(false);
+        String tmp = element.getAttribute("bus");
+        element.removeAttribute("bus");
         super.doParse(element, ctx, bean);
+        if (StringUtils.isEmpty(tmp)) {
+            element.setAttribute("bus", tmp);
+        }
+        
+        if (ctx.getRegistry().containsBeanDefinition(bus)) {
+            BeanDefinition def = ctx.getRegistry().getBeanDefinition(bus);
+            copyProps(bean, def);
+            bean.addConstructorArgValue(bus);
+        } else if (!"cxf".equals(bus)) {
+            bean.getRawBeanDefinition().setBeanClass(SpringBus.class);
+            bean.getRawBeanDefinition().getPropertyValues().removePropertyValue("bus");
+            element.setUserData("ID", bus, null);
+        } else {
+            addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus, ctx);
+            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_CREATE, 
+                                                     resolveId(element, null, ctx));
+            bean.addConstructorArgValue(bus);
+        }
     }
     
+    private void copyProps(BeanDefinitionBuilder src, BeanDefinition def) {
+        for (PropertyValue v : src.getBeanDefinition().getPropertyValues().getPropertyValues()) {
+            if (!"bus".equals(v.getName())) {
+                def.getPropertyValues().add(v.getName(), v.getValue());
+            }
+            src.getBeanDefinition().getPropertyValues().removePropertyValue(v);
+        }
+        
+    }
+
     @Override
     protected void mapElement(ParserContext ctx, 
                               BeanDefinitionBuilder bean, 
@@ -93,14 +121,18 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     @Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, 
                                ParserContext ctx) {
-        String bus = element.getAttribute("bus");        
-        if (StringUtils.isEmpty(bus)) {
-            bus = element.getAttribute("name");
-        }
-        if (StringUtils.isEmpty(bus)) {
-            bus = Bus.DEFAULT_BUS_ID + ".config" + counter.getAndIncrement();
-        } else {
-            bus = bus + ".config";
+        String bus = (String)element.getUserData("ID");
+        if (bus == null) {
+            bus = element.getAttribute("bus");        
+            if (StringUtils.isEmpty(bus)) {
+                bus = element.getAttribute("name");
+            }
+            if (StringUtils.isEmpty(bus)) {
+                bus = Bus.DEFAULT_BUS_ID + ".config" + counter.getAndIncrement();
+            } else {
+                bus = bus + ".config";
+            }
+            element.setUserData("ID", bus, null);
         }
         return bus;
     }
@@ -120,6 +152,9 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         }
         
         public void setBus(Bus bb) {
+            if (bus == bb) {
+                return;
+            }
             CXFBusImpl b = (CXFBusImpl)bb;
             if (properties != null) {
                 b.setProperties(properties);
@@ -151,11 +186,10 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             if (bus != null) {
                 return;
             }
-            if (busName == null) {
-                setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(applicationContext));
-            } else {
-                setBus(BusWiringBeanFactoryPostProcessor.addBus(applicationContext, busName));                
-            }
+            /*
+            bus = (CXFBusImpl)BusWiringBeanFactoryPostProcessor
+                    .addBus(applicationContext, busName);
+                    */                
         }
         
         public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
@@ -188,7 +222,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
 
         public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
-                bus.setInInterceptors(interceptors);
+                bus.getInInterceptors().addAll(interceptors);
             } else {
                 super.setInInterceptors(interceptors);
             }
@@ -196,7 +230,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
 
         public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
-                bus.setInFaultInterceptors(interceptors);
+                bus.getInFaultInterceptors().addAll(interceptors);
             } else {
                 super.setInFaultInterceptors(interceptors);
             }
@@ -204,7 +238,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
 
         public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
-                bus.setOutInterceptors(interceptors);
+                bus.getOutInterceptors().addAll(interceptors);
             } else {
                 super.setOutInterceptors(interceptors);
             }

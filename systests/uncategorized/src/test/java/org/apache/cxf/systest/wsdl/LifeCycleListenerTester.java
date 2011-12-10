@@ -21,6 +21,7 @@ package org.apache.cxf.systest.wsdl;
 
 import javax.annotation.Resource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 
@@ -34,9 +35,9 @@ public class LifeCycleListenerTester implements BusLifeCycleListener {
     public LifeCycleListenerTester() {
     }
     
-    @Resource(name = "org.apache.cxf.buslifecycle.BusLifeCycleManager")
-    public void setBusLifeCycleManager(BusLifeCycleManager mgr) {
-        mgr.registerLifeCycleListener(this);
+    @Resource(name = "cxf")
+    public void setBus(Bus b) {
+        b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
     }
     
     public static int getInitCount() {

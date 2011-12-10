@@ -78,11 +78,18 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
     }
     private Object getBusForName(String name,
                                  ConfigurableListableBeanFactory factory,
-                                 boolean create) {
+                                 boolean create,
+                                 String cn) {
         if (!factory.containsBeanDefinition(name) && (create || Bus.DEFAULT_BUS_ID.equals(name))) {
             DefaultListableBeanFactory df = (DefaultListableBeanFactory)factory;
-            df.registerBeanDefinition(name, 
-                                      new RootBeanDefinition(SpringBus.class));
+            RootBeanDefinition rbd = new RootBeanDefinition(SpringBus.class);
+            if (cn != null) {
+                rbd.setAttribute("busConfig", new RuntimeBeanReference(cn));
+            }
+            df.registerBeanDefinition(name, rbd);
+        } else if (cn != null) {
+            BeanDefinition bd = factory.getBeanDefinition(name);
+            bd.getPropertyValues().add("busConfig", new RuntimeBeanReference(cn));
         }
         return new RuntimeBeanReference(name);        
     }
@@ -90,7 +97,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
         Object inject = bus;
         if (inject == null) {
-            inject = getBusForName(Bus.DEFAULT_BUS_ID, factory, true);
+            inject = getBusForName(Bus.DEFAULT_BUS_ID, factory, true, null);
         } else {
             if (!factory.containsBeanDefinition(Bus.DEFAULT_BUS_ID)
                 && !factory.containsSingleton(Bus.DEFAULT_BUS_ID)) {
@@ -105,24 +112,26 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
                 continue;
             }
             String busname = (String)beanDefinition.getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_NAME);
-            Boolean create = (Boolean)beanDefinition
+            String create = (String)beanDefinition
                 .getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_CREATE);
             Object inj = inject;
             if (busname != null) {
                 if (bus != null) {
                     continue;
                 }
-                inj = getBusForName(busname, factory, create == null ? false : create);
+                inj = getBusForName(busname, factory, create != null, create);
             }
             beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_NAME);
             beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE);
             beanDefinition.removeAttribute(AbstractBeanDefinitionParser.WIRE_BUS_CREATE);
-            if (BusWiringType.PROPERTY == type) {
-                beanDefinition.getPropertyValues()
-                    .addPropertyValue("bus", inj);
-            } else if (BusWiringType.CONSTRUCTOR == type) {
-                ConstructorArgumentValues constructorArgs = beanDefinition.getConstructorArgumentValues();
-                insertConstructorArg(constructorArgs, inj);
+            if (create == null) {
+                if (BusWiringType.PROPERTY == type) {
+                    beanDefinition.getPropertyValues()
+                        .addPropertyValue("bus", inj);
+                } else if (BusWiringType.CONSTRUCTOR == type) {
+                    ConstructorArgumentValues constructorArgs = beanDefinition.getConstructorArgumentValues();
+                    insertConstructorArg(constructorArgs, inj);
+                }
             }
         }
     }

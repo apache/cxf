@@ -136,7 +136,7 @@ public class SpringBusFactoryTest extends Assert {
         Bus bus = new SpringBusFactory().createBus();
         BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
         lifeCycleManager.registerLifeCycleListener(bl);
-        
+        EasyMock.reset(bl);
         bl.preShutdown();
         EasyMock.expectLastCall();
         bl.postShutdown();

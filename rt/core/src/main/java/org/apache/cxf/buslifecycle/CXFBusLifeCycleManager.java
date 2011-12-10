@@ -25,12 +25,14 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class CXFBusLifeCycleManager implements BusLifeCycleManager {
 
     private final CopyOnWriteArrayList<BusLifeCycleListener> listeners;
     private Bus bus;
+    private boolean initCalled;
     private boolean preShutdownCalled;
     private boolean postShutdownCalled;
     
@@ -54,8 +56,11 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
      * @see org.apache.cxf.buslifecycle.BusLifeCycleManager#registerLifeCycleListener(
      * org.apache.cxf.buslifecycle.BusLifeCycleListener)
      */
-    public void registerLifeCycleListener(BusLifeCycleListener listener) {
+    public final void registerLifeCycleListener(BusLifeCycleListener listener) {
         listeners.addIfAbsent(listener);
+        if (initCalled) {
+            listener.initComplete();
+        }
         
     }
 
@@ -67,9 +72,15 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         listeners.remove(listener);      
     }
     
+    
     public void initComplete() {
+        if (bus != null) {
+            bus.getExtension(ConfiguredBeanLocator.class)
+                .getBeansOfType(BusLifeCycleListener.class);
+        }
         preShutdownCalled = false;
         postShutdownCalled = false;
+        initCalled = true;
         for (BusLifeCycleListener listener : listeners) {
             listener.initComplete();
         }
