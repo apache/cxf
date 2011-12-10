@@ -241,13 +241,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testAddInvalidXmlBook() throws Exception {
         
         doPost("http://localhost:" + PORT + "/the/bookstore/books/convert",
-               500,
+               400,
                "application/xml",
                "resources/add_book.txt",
                null);
         
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
-               500,
+               400,
                "application/xml",
                "resources/add_book.txt",
                null);
@@ -258,13 +258,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testAddInvalidJsonBook() throws Exception {
         
         doPost("http://localhost:" + PORT + "/the/bookstore/books/convert",
-               500,
+               400,
                "application/json",
                "resources/add_book2json_invalid.txt",
                null);
         
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
-               500,
+               400,
                "application/json",
                "resources/add_book2json_invalid.txt",
                null);
@@ -449,7 +449,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             int result = httpclient.executeMethod(post);
             assertEquals(expectedStatus, result);
             
-            if (expectedStatus != 500) {
+            if (expectedStatus != 400) {
                 InputStream expected = getClass().getResourceAsStream(expectedResource);
                 assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
             } else {
