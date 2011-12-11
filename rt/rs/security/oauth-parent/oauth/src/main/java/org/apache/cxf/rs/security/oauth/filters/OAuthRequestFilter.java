@@ -59,7 +59,7 @@ public class OAuthRequestFilter extends AbstractAuthFilter implements RequestHan
         
         SecurityContext sc = createSecurityContext(mc.getHttpServletRequest(), info);
         m.setContent(SecurityContext.class, sc);
-        m.put(OAuthContext.class.getName(), createOAuthContext(info));
+        m.setContent(OAuthContext.class, createOAuthContext(info));
         
     }
 }
