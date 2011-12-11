@@ -28,8 +28,9 @@
 
     <parent>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf</artifactId>
+        <artifactId>cxf-parent</artifactId>
         <version>2.5.1-SNAPSHOT</version>
+        <relativePath>../parent</relativePath>
     </parent>
 
     <modules>
@@ -41,4 +42,25 @@
         <module>archetypes</module>
     </modules>
 
+    <build>
+      <pluginManagement>
+	<plugins>
+	  <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-plugin-plugin</artifactId>
+	    <version>2.9</version>
+	  </plugin>
+	</plugins>
+      </pluginManagement>
+    </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>2.9</version>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
