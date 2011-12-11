@@ -46,7 +46,7 @@ import org.eclipse.jetty.util.component.Container;
  * caches the JettyHTTPServerEngines so that they may be 
  * retrieved if already previously configured.
  */
-public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
+public class JettyHTTPServerEngineFactory {
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPServerEngineFactory.class);    
     
@@ -134,8 +134,21 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
             bus.setExtension(this, JettyHTTPServerEngineFactory.class);
             lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
             if (null != lifeCycleManager) {
-                lifeCycleManager.registerLifeCycleListener(this);
+                lifeCycleManager.registerLifeCycleListener(new JettyBusLifeCycleListener());
             }        
+        }
+    }
+    private class JettyBusLifeCycleListener implements BusLifeCycleListener {
+        public void initComplete() {
+            JettyHTTPServerEngineFactory.this.initComplete();
+        }
+
+        public void preShutdown() {
+            JettyHTTPServerEngineFactory.this.preShutdown();
+        }
+
+        public void postShutdown() {
+            JettyHTTPServerEngineFactory.this.postShutdown();
         }
     }
     

@@ -84,6 +84,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         } else if (!"cxf".equals(bus)) {
             bean.getRawBeanDefinition().setBeanClass(SpringBus.class);
             bean.getRawBeanDefinition().getPropertyValues().removePropertyValue("bus");
+            bean.setDestroyMethodName("shutdown");
             element.setUserData("ID", bus, null);
         } else {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus, ctx);

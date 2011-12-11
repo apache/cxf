@@ -29,6 +29,7 @@ import org.apache.cxf.test.TestUtilities;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -53,6 +54,11 @@ public class CrossSchemaImportsTests extends AbstractJUnit4SpringContextTests {
                          + "xsd:import[@namespace='http://apache.org/type_test/types1']", wsdl);
         
         Assert.assertEquals(1, LifeCycleListenerTester.getInitCount());
+        
+        Assert.assertEquals(0, LifeCycleListenerTester.getShutdownCount());
+        
+        ((ConfigurableApplicationContext)applicationContext).close();
+        Assert.assertEquals(1, LifeCycleListenerTester.getShutdownCount());        
     }
 
 }

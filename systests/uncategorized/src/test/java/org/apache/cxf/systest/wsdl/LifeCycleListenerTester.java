@@ -31,6 +31,7 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 public class LifeCycleListenerTester implements BusLifeCycleListener {
 
     static int initCount;
+    static int shutdownCount;
     
     public LifeCycleListenerTester() {
     }
@@ -43,6 +44,9 @@ public class LifeCycleListenerTester implements BusLifeCycleListener {
     public static int getInitCount() {
         return initCount;
     }
+    public static int getShutdownCount() {
+        return shutdownCount;
+    }
     
     /** {@inheritDoc}*/
     public void initComplete() {
@@ -51,7 +55,7 @@ public class LifeCycleListenerTester implements BusLifeCycleListener {
 
     /** {@inheritDoc}*/
     public void postShutdown() {
-
+        shutdownCount++;
     }
 
     /** {@inheritDoc}*/

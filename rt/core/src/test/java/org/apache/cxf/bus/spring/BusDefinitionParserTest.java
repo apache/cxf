@@ -21,11 +21,14 @@ package org.apache.cxf.bus.spring;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -89,6 +92,7 @@ public class BusDefinitionParserTest extends Assert {
     @Test
     public void testBusConfigureCreateBus() {
         ClassPathXmlApplicationContext context = null;
+        final AtomicBoolean b = new AtomicBoolean();
         try {
             context = new ClassPathXmlApplicationContext("org/apache/cxf/bus/spring/customerBus2.xml");
             Bus cxf1 = (Bus)context.getBean("cxf1");
@@ -97,13 +101,29 @@ public class BusDefinitionParserTest extends Assert {
             assertTrue(cxf1.getInInterceptors().size() == 0);
             
             Bus cxf2 = (Bus)context.getBean("cxf2");
+            
             assertTrue(cxf2.getInInterceptors().size() == 1);
             assertTrue(cxf2.getOutInterceptors().size() == 0);
+            
+            cxf2.getExtension(BusLifeCycleManager.class)
+                .registerLifeCycleListener(new BusLifeCycleListener() {
+                    public void initComplete() {
+                    }
+
+                    public void preShutdown() {
+                    }
+
+                    public void postShutdown() {
+                        b.set(true);
+                    }
+                    
+                });
         } finally {
             if (context != null) {
                 context.close();
             }
         }
+        assertTrue("postShutdown not called", b.get());
     }
     @Test
     public void testLazyInit() {
