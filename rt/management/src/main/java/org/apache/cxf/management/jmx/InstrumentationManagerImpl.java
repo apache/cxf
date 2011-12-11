@@ -88,7 +88,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         return bus;
     }
 
-    @Resource(name = "cxf")
+    @Resource
     public void setBus(Bus bus) {        
         this.bus = bus;
     }
