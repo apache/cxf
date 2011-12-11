@@ -35,6 +35,7 @@ import net.oauth.OAuthProblemException;
 import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
@@ -85,6 +86,7 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
                 return "OAuth";
             }
         };
+        newRequest.setAttribute(OAuthContext.class.getName(), createOAuthContext(info));
         return newRequest;
     }
     

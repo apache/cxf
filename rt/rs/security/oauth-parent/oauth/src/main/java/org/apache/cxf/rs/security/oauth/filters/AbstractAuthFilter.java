@@ -34,6 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.Client;
+import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.UserSubject;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
@@ -195,5 +196,13 @@ public class AbstractAuthFilter {
             }
              
         };
+    }
+    
+    protected OAuthContext createOAuthContext(OAuthInfo info) {
+        OAuthContext context = new OAuthContext();
+        if (info.getToken() != null) {
+            context.setSubject(info.getToken().getSubject());
+        }
+        return context;
     }
 }

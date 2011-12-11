@@ -29,6 +29,7 @@ import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.security.SecurityContext;
 
 /**
@@ -58,5 +59,7 @@ public class OAuthRequestFilter extends AbstractAuthFilter implements RequestHan
         
         SecurityContext sc = createSecurityContext(mc.getHttpServletRequest(), info);
         m.setContent(SecurityContext.class, sc);
+        m.put(OAuthContext.class.getName(), createOAuthContext(info));
+        
     }
 }

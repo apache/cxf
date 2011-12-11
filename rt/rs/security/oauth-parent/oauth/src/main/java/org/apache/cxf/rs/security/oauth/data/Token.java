@@ -116,10 +116,22 @@ public abstract class Token {
         this.uris = uris;
     }
     
+    /**
+     * Sets a subject capturing the login name 
+     * the end user used to login to the resource server
+     * when authorizing a given client request
+     * @param subject
+     */
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
 
+    /**
+     * Returns a subject capturing the login name 
+     * the end user used to login to the resource server
+     * when authorizing a given client request
+     * @return UserSubject
+     */
     public UserSubject getSubject() {
         return subject;
     }
