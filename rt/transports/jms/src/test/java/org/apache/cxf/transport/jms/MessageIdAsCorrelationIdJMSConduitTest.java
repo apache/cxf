@@ -67,7 +67,6 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
 
         JMSConfiguration jmsConfig = new JMSConfiguration();
         jmsConfig.setTargetDestination("queue:test");
-        jmsConfig.setReplyDestination("queue:reply");
         jmsConfig.setConnectionFactory(connectionFactory);
         jmsConfig.setReplyDestination(replyDestination);
 
