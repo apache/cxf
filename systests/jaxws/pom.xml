@@ -73,10 +73,6 @@
             <artifactId>xercesImpl</artifactId>
         </dependency>
         <dependency>
-            <groupId>${cxf.servlet-api.group}</groupId>
-            <artifactId>${cxf.servlet-api.artifact}</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-javamail_1.4_spec</artifactId>
         </dependency>

@@ -56,10 +56,6 @@
        		<artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>${cxf.servlet-api.group}</groupId>
-            <artifactId>${cxf.servlet-api.artifact}</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-common-utilities</artifactId>
             <version>${project.version}</version>

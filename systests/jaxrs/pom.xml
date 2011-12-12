@@ -77,10 +77,6 @@
            <groupId>org.eclipse.jetty</groupId>
            <artifactId>jetty-jsp-2.1</artifactId>
            <version>${cxf.jetty.version}</version>
-       </dependency>
-        <dependency>
-            <groupId>${cxf.servlet-api.group}</groupId>
-            <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
