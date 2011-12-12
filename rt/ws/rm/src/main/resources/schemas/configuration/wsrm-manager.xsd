@@ -23,7 +23,6 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            xmlns:wsrmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" 
            xmlns:s-beans="http://www.springframework.org/schema/beans" 
-           xmlns:bp-beans="http://www.osgi.org/xmlns/blueprint/v1.0.0" 
            xmlns:cxf-beans="http://cxf.apache.org/configuration/beans" 
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified">
@@ -36,7 +35,9 @@
 
   <xs:include schemaLocation="wsrm-manager-types.xsd"/>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
+  <!-- problem in refering to this schema when parsed by spring; this needs to be placed in the spring.handlers
   <xs:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0" schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
+   -->
   <xs:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
   <xs:import namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" schemaLocation="wsrm-policy.xsd"/>
 
@@ -63,7 +64,7 @@
         <xs:extension base="s-beans:identifiedType">
           <xs:group ref="tns:rmElements"/>
           <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
-          <xs:attribute name="activation" type="bp-beans:Tactivation"/>
+          <xs:attribute name="activation" type="tns:activationType"/>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -137,7 +138,7 @@
       <xs:complexContent>
         <xs:extension base="s-beans:identifiedType">
           <xs:attributeGroup ref="cxf-beans:beanAttributes"/>        
-          <xs:attribute name="activation" type="bp-beans:Tactivation"/>
+          <xs:attribute name="activation" type="tns:activationType"/>
           <xs:attribute name="driverClassName" type="xs:string" default="org.apache.derby.jdbc.EmbeddedDriver">
             <xs:annotation>
               <xs:documentation>
@@ -170,5 +171,18 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+
+  <!--  this can be removed when blueprint Tactivation type is directly referenced (see the import above) -->
+  <xs:simpleType name="activationType">
+    <xs:annotation>
+      <xs:documentation>
+        activationType is a workaround to reuse the Tactivation type from blueprint schema.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="eager" />
+      <xs:enumeration value="lazy" />
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>
