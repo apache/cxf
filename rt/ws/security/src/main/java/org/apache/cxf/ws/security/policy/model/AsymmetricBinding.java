@@ -37,8 +37,14 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
     private InitiatorToken initiatorToken;
     
     private InitiatorSignatureToken initiatorSignatureToken;
+    
+    private InitiatorEncryptionToken initiatorEncryptionToken;
 
     private RecipientToken recipientToken;
+    
+    private RecipientSignatureToken recipientSignatureToken;
+    
+    private RecipientEncryptionToken recipientEncryptionToken;
 
     public AsymmetricBinding(SPConstants version, PolicyBuilder b) {
         super(version, b);
@@ -59,19 +65,33 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
     }
     
     /**
-     * @return Returns the initiatorToken.
+     * @return Returns the initiatorSignatureToken.
      */
     public InitiatorSignatureToken getInitiatorSignatureToken() {
         return initiatorSignatureToken;
     }
 
     /**
-     * @param initiatorToken The initiatorToken to set.
+     * @param initiatorSignatureToken The initiatorSignatureToken to set.
      */
     public void setInitiatorSignatureToken(InitiatorSignatureToken initiatorSignatureToken) {
         this.initiatorSignatureToken = initiatorSignatureToken;
     }
+    
+    /**
+     * @return Returns the initiatorEncryptionToken.
+     */
+    public InitiatorEncryptionToken getInitiatorEncryptionToken() {
+        return initiatorEncryptionToken;
+    }
 
+    /**
+     * @param initiatorEncryptionToken The initiatorEncryptionToken to set.
+     */
+    public void setInitiatorEncryptionToken(InitiatorEncryptionToken initiatorEncryptionToken) {
+        this.initiatorEncryptionToken = initiatorEncryptionToken;
+    }
+    
     /**
      * @return Returns the recipientToken.
      */
@@ -86,6 +106,34 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         this.recipientToken = recipientToken;
     }
 
+    /**
+     * @return Returns the recipientSignatureToken.
+     */
+    public RecipientSignatureToken getRecipientSignatureToken() {
+        return recipientSignatureToken;
+    }
+
+    /**
+     * @param recipientSignatureToken The recipientSignatureToken to set.
+     */
+    public void setRecipientSignatureToken(RecipientSignatureToken recipientSignatureToken) {
+        this.recipientSignatureToken = recipientSignatureToken;
+    }    
+
+    /**
+     * @return Returns the recipientEncryptionToken.
+     */
+    public RecipientEncryptionToken getRecipientEncryptionToken() {
+        return recipientEncryptionToken;
+    }
+
+    /**
+     * @param recipientEncryptionToken The recipientEncryptionToken to set.
+     */
+    public void setRecipientEncryptionToken(RecipientEncryptionToken recipientEncryptionToken) {
+        this.recipientEncryptionToken = recipientEncryptionToken;
+    }        
+    
     public QName getRealName() {
         return constants.getAsymmetricBinding();
     }
@@ -114,8 +162,17 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         if (getInitiatorSignatureToken() != null) {
             all.addPolicyComponent(getInitiatorSignatureToken());
         }
+        if (getInitiatorEncryptionToken() != null) {
+            all.addPolicyComponent(getInitiatorEncryptionToken());
+        }
         if (getRecipientToken() != null) {
             all.addPolicyComponent(getRecipientToken());
+        }
+        if (getRecipientSignatureToken() != null) {
+            all.addPolicyComponent(getRecipientSignatureToken());
+        }
+        if (getRecipientEncryptionToken() != null) {
+            all.addPolicyComponent(getRecipientEncryptionToken());
         }
         /*
         if (isEntireHeadersAndBodySignatures()) {
@@ -180,14 +237,33 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
             // </sp:InitiatorSignatureToken>
         }
         
-
-        if (recipientToken == null) {
-            throw new RuntimeException("RecipientToken is not set");
+        if (initiatorEncryptionToken != null) {
+            // <sp:InitiatorEncryptionToken>
+            initiatorEncryptionToken.serialize(writer);
+            // </sp:InitiatorEncryptionToken>
+        }
+        
+        if (recipientToken == null && recipientSignatureToken == null) {
+            throw new RuntimeException("RecipientToken or RecipientSignatureToken is not set");
         }
 
-        // <sp:RecipientToken>
-        recipientToken.serialize(writer);
-        // </sp:RecipientToken>
+        if (recipientToken != null) {
+            // <sp:RecipientToken>
+            recipientToken.serialize(writer);
+            // </sp:RecipientToken>
+        }
+        
+        if (recipientSignatureToken != null) {
+            // <sp:RecipientSignatureToken>
+            recipientSignatureToken.serialize(writer);
+            // </sp:RecipientSignatureToken>
+        }
+        
+        if (recipientEncryptionToken != null) {
+            // <sp:RecipientEncryptionToken>
+            recipientEncryptionToken.serialize(writer);
+            // </sp:RecipientEncryptionToken>
+        }
 
         AlgorithmSuite algorithmSuite = getAlgorithmSuite();
         if (algorithmSuite == null) {

@@ -171,11 +171,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.1.3.1 (WSS 1.0) Encrypted UsernameToken with X.509v3
-     * TODO Implement when InitiatorEncryption and RecipientSignature policies
-     * are supported
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricEncrSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

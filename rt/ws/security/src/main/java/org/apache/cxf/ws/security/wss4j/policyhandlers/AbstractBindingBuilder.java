@@ -1420,7 +1420,7 @@ public abstract class AbstractBindingBuilder {
                 
                 Wss10 wss = getWss10();
                 policyAsserted(wss);
-                if (wss.isMustSupportRefKeyIdentifier()) {
+                if (wss == null || wss.isMustSupportRefKeyIdentifier()) {
                     secBase.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
                 } else if (wss.isMustSupportRefIssuerSerial()) {
                     secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);

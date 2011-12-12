@@ -173,7 +173,13 @@ public abstract class SPConstants {
     
     public static final String INITIATOR_SIGNATURE_TOKEN = "InitiatorSignatureToken";
     
+    public static final String INITIATOR_ENCRYPTION_TOKEN = "InitiatorEncryptionToken";
+    
     public static final String RECIPIENT_TOKEN = "RecipientToken";
+    
+    public static final String RECIPIENT_SIGNATURE_TOKEN = "RecipientSignatureToken";
+    
+    public static final String RECIPIENT_ENCRYPTION_TOKEN = "RecipientEncryptionToken";
     
     public static final String SUPPORTING_TOKENS = "SupportingTokens";
     
@@ -440,11 +446,14 @@ public abstract class SPConstants {
     public abstract QName getHttpsToken();
     public abstract QName getInitiatorToken();
     public abstract QName getInitiatorSignatureToken();
+    public abstract QName getInitiatorEncryptionToken();
     public abstract QName getIssuedToken();
     public abstract QName getIncludeToken();
     public abstract QName getLayout();
     public abstract QName getProtectionToken();
     public abstract QName getRecipientToken();
+    public abstract QName getRecipientSignatureToken();
+    public abstract QName getRecipientEncryptionToken();
     public abstract QName getRequiredElements();
     public abstract QName getSecureConversationToken();
     public abstract QName getSecurityContextToken();
