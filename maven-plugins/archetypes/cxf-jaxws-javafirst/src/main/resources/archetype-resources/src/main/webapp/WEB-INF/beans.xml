@@ -28,7 +28,7 @@
 
 	<jaxws:endpoint 
 	  id="helloWorld" 
-	  implementor="${packageName}.HelloWorldImpl" 
+	  implementor="${package}.HelloWorldImpl" 
 	  address="/HelloWorld" />
 	  
 </beans>

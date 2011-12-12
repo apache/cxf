@@ -15,11 +15,11 @@
 ##    specific language governing permissions and limitations
 ##    under the License.
 
-package ${packageName};
+package ${package};
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "${packageName}.HelloWorld")
+@WebService(endpointInterface = "${package}.HelloWorld")
 public class HelloWorldImpl implements HelloWorld {
 
     public String sayHi(String text) {
