@@ -33,7 +33,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityEngineResult;
-//import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.transform.STRTransform;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey or
@@ -120,8 +120,7 @@ public class AlgorithmSuitePolicyValidator {
                 );
                 return false;
             }
-            /*
-             * TODO Re-enable once we upgrade to WSS4J 1.6.4
+            
             List<String> transformAlgorithms = dataRef.getTransformAlgorithms();
             // Only a max of 2 transforms per reference is allowed
             if (transformAlgorithms == null || transformAlgorithms.size() > 2) {
@@ -135,7 +134,6 @@ public class AlgorithmSuitePolicyValidator {
                     return false;
                 }
             }
-            */
         }
         return true;
     }
