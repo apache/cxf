@@ -36,6 +36,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.ObjectFactory;
@@ -89,6 +90,11 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
         parseChildElements(element, context, bean);
 
         bean.setId(beanClass.getName() + context.generateId());
+        
+        if (beanClass.equals(RMManager.class)) {
+            bean.addProperty("bus", getBusRef(context, bus));
+            bean.setDestroyMethod("shutdown");
+        }
 
         return bean;
     }

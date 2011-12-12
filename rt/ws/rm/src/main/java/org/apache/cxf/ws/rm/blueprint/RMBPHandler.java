@@ -37,7 +37,7 @@ public class RMBPHandler implements NamespaceHandler {
     public URL getSchemaLocation(String s) {
         if ("http://cxf.apache.org/ws/rm/manager".equals(s)) {
             return getClass().getClassLoader().
-                getResource("/schemas/configuration/blueprint/wsrm-manager.xsd");
+                getResource("/schemas/configuration/wsrm-manager.xsd");
         } else if ("http://schemas.xmlsoap.org/ws/2005/02/rm/policy".equals(s)) {
             return getClass().getClassLoader().
                 getResource("/schemas/configuration/wsrm-policy.xsd");
