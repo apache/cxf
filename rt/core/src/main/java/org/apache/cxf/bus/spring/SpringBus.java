@@ -104,10 +104,11 @@ public class SpringBus extends ExtensionManagerBus
     public String getId() {
         if (id == null) {
             try {
-                Class<?> cls = Class.forName("org.osgi.framework.BundleContext");
-                Object o = getExtension(cls);
-                Object o2 = o.getClass().getMethod("getBundle").invoke(o);
-                String s = (String)o2.getClass().getMethod("getSymbolicName").invoke(o2);
+                Class<?> clsbc = Class.forName("org.osgi.framework.BundleContext");
+                Class<?> clsb = Class.forName("org.osgi.framework.Bundle");
+                Object o = getExtension(clsbc);
+                Object o2 = clsbc.getMethod("getBundle").invoke(o);
+                String s = (String)clsb.getMethod("getSymbolicName").invoke(o2);
                 id = s + "-" + DEFAULT_BUS_ID + Integer.toString(this.hashCode());
             } catch (Throwable t) {
                 id = super.getId();
