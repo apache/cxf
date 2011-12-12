@@ -22,7 +22,6 @@
            xmlns:tns="http://cxf.apache.org/ws/rm/manager"
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            xmlns:wsrmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" 
-           xmlns:s-beans="http://www.springframework.org/schema/beans" 
            xmlns:cxf-beans="http://cxf.apache.org/configuration/beans" 
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified">
@@ -34,12 +33,13 @@
   </xs:annotation>
 
   <xs:include schemaLocation="wsrm-manager-types.xsd"/>
-  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
-  <!-- problem in refering to this schema when parsed by spring; this needs to be placed in the spring.handlers
-  <xs:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0" schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
-   -->
   <xs:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
   <xs:import namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" schemaLocation="wsrm-policy.xsd"/>
+
+
+  <xs:complexType name="identifiedType" abstract="true">
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
 
   <xs:element name="reliableMessaging">
     <xs:annotation>
@@ -61,10 +61,10 @@
   <xs:element name="rmManager">   
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="s-beans:identifiedType">
+        <xs:extension base="tns:identifiedType">
           <xs:group ref="tns:rmElements"/>
-          <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
           <xs:attribute name="activation" type="tns:activationType"/>
+          <xs:attributeGroup ref="cxf-beans:beanAttributes"></xs:attributeGroup>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -123,20 +123,21 @@
           </xs:documentation>          
         </xs:annotation>
       </xs:element>
-      <xs:element ref="s-beans:property" minOccurs="0" maxOccurs="unbounded">
-         <xs:annotation>
+      <xs:any minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
           <xs:documentation>
-              Deprecated.
-          </xs:documentation>          
+              Deprecated.  To support the older spring:property element that is no longer used
+          </xs:documentation>
         </xs:annotation>
-      </xs:element>
+      </xs:any>
+
     </xs:sequence>
   </xs:group>
 
   <xs:element name="jdbcStore">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="s-beans:identifiedType">
+        <xs:extension base="tns:identifiedType">
           <xs:attributeGroup ref="cxf-beans:beanAttributes"/>        
           <xs:attribute name="activation" type="tns:activationType"/>
           <xs:attribute name="driverClassName" type="xs:string" default="org.apache.derby.jdbc.EmbeddedDriver">
