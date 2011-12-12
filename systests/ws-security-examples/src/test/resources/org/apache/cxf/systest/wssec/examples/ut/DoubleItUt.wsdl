@@ -313,10 +313,13 @@
     </wsp:Policy>
     
     <!-- 2.1.3.1 (WSS 1.0) Encrypted UsernameToken with X.509v3 -->
+    <!-- NOTE that the policy as specified in the spec appears to be incorrect - where it gives a -->
+    <!-- InitiatorEncryptionToken instead of a RecipientEncryptionToken policy -->
+    <!-- Also, a Timestamp must be signed, and so this is also excluded -->
     <wsp:Policy wsu:Id="DoubleItAsymmetricEncrSupportingPolicy">
         <sp:AsymmetricBinding>
             <wsp:Policy>
-                <sp:InitiatorEncryptionToken>
+                <sp:RecipientEncryptionToken>
                     <wsp:Policy>
                         <sp:X509Token
                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
@@ -325,7 +328,7 @@
                             </wsp:Policy>
                         </sp:X509Token>
                     </wsp:Policy>
-                </sp:InitiatorEncryptionToken>
+                </sp:RecipientEncryptionToken>
                 <sp:RecipientSignatureToken>
                     <wsp:Policy>
                         <sp:X509Token
@@ -346,7 +349,6 @@
                         <sp:Lax/>
                     </wsp:Policy>
                 </sp:Layout>
-                <sp:IncludeTimestamp/>
                 <sp:OnlySignEntireHeadersAndBody/>
             </wsp:Policy>
         </sp:AsymmetricBinding>

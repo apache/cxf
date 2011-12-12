@@ -31,6 +31,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.TokenWrapper;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -85,6 +86,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         return true;
     }
     
+    
     /**
      * Check various tokens of the binding
      */
@@ -96,70 +98,86 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
+        boolean result = true;
         if (binding.getInitiatorToken() != null) {
-            Token token = binding.getInitiatorToken().getToken();
-            if (token instanceof X509Token) {
-                boolean foundCert = false;
-                for (WSSecurityEngineResult result : signedResults) {
-                    X509Certificate cert = 
-                        (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    if (cert != null) {
-                        foundCert = true;
-                        break;
-                    }
-                }
-                if (!foundCert && !signedResults.isEmpty()) {
-                    String error = "An X.509 certificate was not used for the initiator token";
-                    notAssertPolicy(aim, binding.getInitiatorToken().getName(), error);
-                    ai.setNotAsserted(error);
-                    return false;
-                }
-            }
-            assertPolicy(aim, binding.getInitiatorToken());
-            if (!checkDerivedKeys(
-                binding.getInitiatorToken(), hasDerivedKeys, signedResults, encryptedResults
-            )) {
-                ai.setNotAsserted("Message fails the DerivedKeys requirement");
-                return false;
-            }
+            result &= checkInitiatorTokens(binding.getInitiatorToken(), binding, ai, aim, hasDerivedKeys,
+                                        signedResults, encryptedResults);            
         }
         if (binding.getInitiatorSignatureToken() != null) {
-            Token token = binding.getInitiatorSignatureToken().getToken();
-            if (token instanceof X509Token) {
-                boolean foundCert = false;
-                for (WSSecurityEngineResult result : signedResults) {
-                    X509Certificate cert = 
-                        (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    if (cert != null) {
-                        foundCert = true;
-                        break;
-                    }
-                }
-                if (!foundCert && !signedResults.isEmpty()) {
-                    String error = "An X.509 certificate was not used for the initiator signature token";
-                    notAssertPolicy(aim, binding.getInitiatorSignatureToken().getName(), error);
-                    ai.setNotAsserted(error);
-                    return false;
-                }
-            }
-            assertPolicy(aim, binding.getInitiatorSignatureToken());
-            if (!checkDerivedKeys(
-                binding.getInitiatorSignatureToken(), hasDerivedKeys, signedResults, encryptedResults
-            )) {
-                ai.setNotAsserted("Message fails the DerivedKeys requirement");
-                return false;
-            }
+            result &= checkInitiatorTokens(binding.getInitiatorSignatureToken(), binding, ai, aim,
+                                        hasDerivedKeys, signedResults, encryptedResults);
+        }
+        if (binding.getInitiatorEncryptionToken() != null) {
+            result &= checkInitiatorTokens(binding.getInitiatorEncryptionToken(), binding, ai, aim,
+                                        hasDerivedKeys, signedResults, encryptedResults);
         }
         if (binding.getRecipientToken() != null) {
-            assertPolicy(aim, binding.getRecipientToken());
-            if (!checkDerivedKeys(
-                binding.getRecipientToken(), hasDerivedKeys, signedResults, encryptedResults
-            )) {
-                ai.setNotAsserted("Message fails the DerivedKeys requirement");
+            result &= checkRecipientTokens(binding.getRecipientToken(), binding, ai, aim, hasDerivedKeys,
+                                        signedResults, encryptedResults);
+        }
+        if (binding.getRecipientSignatureToken() != null) {
+            result &= checkRecipientTokens(binding.getRecipientSignatureToken(), binding, ai, aim,
+                                        hasDerivedKeys, signedResults, encryptedResults);
+        }
+        if (binding.getRecipientEncryptionToken() != null) {
+            result &= checkRecipientTokens(binding.getRecipientEncryptionToken(), binding, ai, aim,
+                                        hasDerivedKeys, signedResults, encryptedResults);
+        }
+        
+        return result;
+    }
+    
+    private boolean checkInitiatorTokens(
+        TokenWrapper wrapper, 
+        AsymmetricBinding binding, 
+        AssertionInfo ai,
+        AssertionInfoMap aim, 
+        boolean hasDerivedKeys,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults) {
+
+        Token token = wrapper.getToken();
+        if (token instanceof X509Token) {
+            boolean foundCert = false;
+            for (WSSecurityEngineResult result : signedResults) {
+                X509Certificate cert = (X509Certificate)result
+                    .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                if (cert != null) {
+                    foundCert = true;
+                    break;
+                }
+            }
+            if (!foundCert && !signedResults.isEmpty()) {
+                String error = "An X.509 certificate was not used for the " + wrapper.getName();
+                notAssertPolicy(aim, wrapper.getName(), error);
+                ai.setNotAsserted(error);
                 return false;
             }
         }
-        
+        assertPolicy(aim, wrapper);
+        if (!checkDerivedKeys(wrapper, hasDerivedKeys, signedResults, encryptedResults)) {
+            ai.setNotAsserted("Message fails the DerivedKeys requirement");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean checkRecipientTokens(
+        TokenWrapper wrapper, 
+        AsymmetricBinding binding, 
+        AssertionInfo ai,
+        AssertionInfoMap aim, 
+        boolean hasDerivedKeys,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults) {
+
+        assertPolicy(aim, wrapper);
+        if (!checkDerivedKeys(wrapper, hasDerivedKeys, signedResults, encryptedResults)) {
+            ai.setNotAsserted("Message fails the DerivedKeys requirement");
+            return false;
+        }
+
         return true;
     }
     

@@ -32,9 +32,12 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
+import org.apache.cxf.ws.security.policy.model.InitiatorEncryptionToken;
 import org.apache.cxf.ws.security.policy.model.InitiatorSignatureToken;
 import org.apache.cxf.ws.security.policy.model.InitiatorToken;
 import org.apache.cxf.ws.security.policy.model.Layout;
+import org.apache.cxf.ws.security.policy.model.RecipientEncryptionToken;
+import org.apache.cxf.ws.security.policy.model.RecipientSignatureToken;
 import org.apache.cxf.ws.security.policy.model.RecipientToken;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
@@ -98,8 +101,18 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
             } else if (SPConstants.INITIATOR_SIGNATURE_TOKEN.equals(name.getLocalPart())) {
                 asymmetricBinding.setInitiatorSignatureToken((InitiatorSignatureToken)assertion);
                 
+            } else if (SPConstants.INITIATOR_ENCRYPTION_TOKEN.equals(name.getLocalPart())) {
+                asymmetricBinding.setInitiatorEncryptionToken(
+                    (InitiatorEncryptionToken)assertion);                
+                
             } else if (SPConstants.RECIPIENT_TOKEN.equals(name.getLocalPart())) {
                 asymmetricBinding.setRecipientToken((RecipientToken)assertion);
+
+            } else if (SPConstants.RECIPIENT_SIGNATURE_TOKEN.equals(name.getLocalPart())) {
+                asymmetricBinding.setRecipientSignatureToken((RecipientSignatureToken)assertion);
+
+            } else if (SPConstants.RECIPIENT_ENCRYPTION_TOKEN.equals(name.getLocalPart())) {
+                asymmetricBinding.setRecipientEncryptionToken((RecipientEncryptionToken)assertion);
 
             } else if (SPConstants.ALGO_SUITE.equals(name.getLocalPart())) {
                 asymmetricBinding.setAlgorithmSuite((AlgorithmSuite)assertion);

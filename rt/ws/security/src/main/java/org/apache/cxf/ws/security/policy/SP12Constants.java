@@ -216,10 +216,19 @@ public final class SP12Constants extends SPConstants {
     
     public static final QName INITIATOR_SIGNATURE_TOKEN = new QName(SP12Constants.SP_NS,
             SPConstants.INITIATOR_SIGNATURE_TOKEN , SP12Constants.SP_PREFIX);
-        
+
+    public static final QName INITIATOR_ENCRYPTION_TOKEN = new QName(SP12Constants.SP_NS,
+            SPConstants.INITIATOR_ENCRYPTION_TOKEN , SP12Constants.SP_PREFIX);
+    
     public static final QName RECIPIENT_TOKEN = new QName(SP12Constants.SP_NS,
             SPConstants.RECIPIENT_TOKEN , SP12Constants.SP_PREFIX);
 
+    public static final QName RECIPIENT_SIGNATURE_TOKEN = new QName(SP12Constants.SP_NS,
+            SPConstants.RECIPIENT_SIGNATURE_TOKEN , SP12Constants.SP_PREFIX);
+
+    public static final QName RECIPIENT_ENCRYPTION_TOKEN = new QName(SP12Constants.SP_NS,
+            SPConstants.RECIPIENT_ENCRYPTION_TOKEN , SP12Constants.SP_PREFIX);
+    
     public static final QName ENCRYPT_SIGNATURE = new QName(SP12Constants.SP_NS,
             SPConstants.ENCRYPT_SIGNATURE , SP12Constants.SP_PREFIX);
 
@@ -407,6 +416,9 @@ public final class SP12Constants extends SPConstants {
     public QName getInitiatorSignatureToken() {
         return INITIATOR_SIGNATURE_TOKEN;
     }
+    public QName getInitiatorEncryptionToken() {
+        return INITIATOR_ENCRYPTION_TOKEN;
+    }
     public QName getIssuedToken() {
         return ISSUED_TOKEN;
     }
@@ -418,6 +430,12 @@ public final class SP12Constants extends SPConstants {
     }
     public QName getRecipientToken() {
         return RECIPIENT_TOKEN;
+    }
+    public QName getRecipientSignatureToken() {
+        return RECIPIENT_SIGNATURE_TOKEN;
+    }
+    public QName getRecipientEncryptionToken() {
+        return RECIPIENT_ENCRYPTION_TOKEN;
     }
     public QName getRequiredElements() {
         return REQUIRED_ELEMENTS;
