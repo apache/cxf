@@ -22,10 +22,8 @@
            xmlns:tns="http://cxf.apache.org/ws/rm/manager"
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            xmlns:wsrmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" 
-           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
            elementFormDefault="qualified" 
-           attributeFormDefault="unqualified"
-           jaxb:version="2.0">
+           attributeFormDefault="unqualified">
            
     <xs:annotation>
       <xs:documentation>

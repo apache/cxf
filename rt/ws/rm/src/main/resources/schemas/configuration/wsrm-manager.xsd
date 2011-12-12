@@ -22,7 +22,6 @@
            xmlns:tns="http://cxf.apache.org/ws/rm/manager"
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            xmlns:wsrmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" 
-           xmlns:beans="http://www.springframework.org/schema/beans" 
            xmlns:cxf-beans="http://cxf.apache.org/configuration/beans" 
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified">
@@ -34,9 +33,13 @@
   </xs:annotation>
 
   <xs:include schemaLocation="http://cxf.apache.org/schemas/configuration/wsrm-manager-types.xsd"/>
-  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
   <xs:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
   <xs:import namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd"/>
+
+
+  <xs:complexType name="identifiedType" abstract="true">
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
 
   <xs:element name="reliableMessaging">
     <xs:annotation>
@@ -58,9 +61,10 @@
   <xs:element name="rmManager">   
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="beans:identifiedType">
+        <xs:extension base="tns:identifiedType">
           <xs:group ref="tns:rmElements"/>
-          <xs:attributeGroup ref="cxf-beans:beanAttributes"/>
+          <xs:attribute name="activation" type="tns:activationType"/>
+          <xs:attributeGroup ref="cxf-beans:beanAttributes"></xs:attributeGroup>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -109,21 +113,23 @@
           </xs:documentation>          
         </xs:annotation>
       </xs:element>
-      <xs:element ref="beans:property" minOccurs="0" maxOccurs="unbounded">
-         <xs:annotation>
+      <xs:any namespace="http://www.springframework.org/schema/beans" processContents="lax" minOccurs="0" maxOccurs="unbounded" >
+        <xs:annotation>
           <xs:documentation>
-              Deprecated.
-          </xs:documentation>          
+              Deprecated.  To support the older spring:property element that is no longer used
+          </xs:documentation>
         </xs:annotation>
-      </xs:element>
+      </xs:any>
+
     </xs:sequence>
   </xs:group>
 
   <xs:element name="jdbcStore">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="beans:identifiedType">
+        <xs:extension base="tns:identifiedType">
           <xs:attributeGroup ref="cxf-beans:beanAttributes"/>        
+          <xs:attribute name="activation" type="tns:activationType"/>
           <xs:attribute name="driverClassName" type="xs:string" default="org.apache.derby.jdbc.EmbeddedDriver">
             <xs:annotation>
               <xs:documentation>
@@ -156,5 +162,18 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+
+  <!--  this can be removed when blueprint Tactivation type is directly referenced (see the import above) -->
+  <xs:simpleType name="activationType">
+    <xs:annotation>
+      <xs:documentation>
+        activationType is a workaround to reuse the Tactivation type from blueprint schema.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="eager" />
+      <xs:enumeration value="lazy" />
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>
