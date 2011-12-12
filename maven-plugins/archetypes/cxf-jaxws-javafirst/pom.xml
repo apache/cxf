@@ -18,23 +18,23 @@
     under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>2.5.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
+
     <groupId>org.apache.cxf.archetype</groupId>
     <artifactId>cxf-jaxws-javafirst</artifactId>
-    <name>Apache CXF Archetype - Simple JAX-WS Java First</name>
-  <description>Creates a project for developing a Web service starting from Java code</description>
     <version>2.5.1-SNAPSHOT</version>
-    <url>http://cxf.apache.org</url>
-    <properties>
-        <maven.test.skip>true</maven.test.skip>
-        <eclipse.skip>true</eclipse.skip>
-    </properties>
+    <packaging>maven-archetype</packaging>
+
+    <name>Apache CXF Archetype - Simple JAX-WS Java First</name>
+    <description>Creates a project for developing a Web service starting from Java code</description>
+
     <build>
         <resources>
             <resource>
@@ -42,5 +42,22 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.archetype</groupId>
+                <artifactId>archetype-packaging</artifactId>
+                <version>2.1</version>
+            </extension>
+        </extensions>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-archetype-plugin</artifactId>
+                    <version>2.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>
