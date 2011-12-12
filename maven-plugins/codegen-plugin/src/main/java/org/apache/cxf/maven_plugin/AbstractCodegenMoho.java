@@ -238,6 +238,13 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             classLoaderSwitcher.restoreClassLoader();
         }
 
+        // add the generated source into compile source
+        if (project != null && getGeneratedSourceRoot() != null && getGeneratedSourceRoot().exists()) {
+            project.addCompileSourceRoot(getGeneratedSourceRoot().getAbsolutePath());
+        }
+        if (project != null && getGeneratedTestRoot() != null && getGeneratedTestRoot().exists()) {
+            project.addTestCompileSourceRoot(getGeneratedTestRoot().getAbsolutePath());
+        }
 
         System.gc();
     }
