@@ -123,7 +123,7 @@
           </xs:documentation>          
         </xs:annotation>
       </xs:element>
-      <xs:any minOccurs="0" maxOccurs="unbounded">
+      <xs:any namespace="http://www.springframework.org/schema/beans" processContents="lax" minOccurs="0" maxOccurs="unbounded" >
         <xs:annotation>
           <xs:documentation>
               Deprecated.  To support the older spring:property element that is no longer used
