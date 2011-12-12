@@ -19,13 +19,20 @@
 
 package org.apache.cxf.common.logging;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.cxf.common.util.StringUtils;
 
 /**
  * This is called from LogUtils as LogUtils is almost always one of the VERY
@@ -42,6 +49,41 @@ import javax.xml.parsers.DocumentBuilderFactory;
 final class JDKBugHacks {
     private JDKBugHacks() {
         //not constructed
+    }
+    
+    private static boolean skipHack(final String key) {
+        String cname = null;
+        try {
+            cname = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                public String run() {
+                    return System.getProperty(key);
+                }
+            });
+            if (StringUtils.isEmpty(cname)) {
+                InputStream ins = Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("META-INF/cxf/" + key);
+                if (ins == null) {
+                    ins = ClassLoader.getSystemResourceAsStream("META-INF/cxf/" + key);
+                }
+                if (ins != null) {
+                    BufferedReader din = new BufferedReader(new InputStreamReader(ins));
+                    try {
+                        cname = din.readLine();
+                        if (cname != null) {
+                            cname.trim();
+                        }
+                    } finally {
+                        din.close();
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            //ignore
+        }
+        if (cname == null) {
+            cname = "false";
+        }
+        return Boolean.parseBoolean(cname);
     }
     
     public static void doHacks() {
@@ -64,14 +106,17 @@ final class JDKBugHacks {
                     // JAXB does this and thus affects us pretty badly.
                     // Doesn't matter that this JAR doesn't exist - just as long as
                     // the URL is well-formed
-                    URL url = new URL("jar:file://dummy.jar!/");
-                    URLConnection uConn = new URLConnection(url) {
-                        @Override
-                        public void connect() throws IOException {
-                            // NOOP
-                        }
-                    };
-                    uConn.setDefaultUseCaches(false);
+                    boolean skip = skipHack("org.apache.cxf.JDKBugHacks.defaultUsesCaches");
+                    if (!skip) {
+                        URL url = new URL("jar:file://dummy.jar!/");
+                        URLConnection uConn = new URLConnection(url) {
+                            @Override
+                            public void connect() throws IOException {
+                                // NOOP
+                            }
+                        };
+                        uConn.setDefaultUseCaches(false);
+                    }
                 } catch (Throwable e) {
                     //ignore
                 }

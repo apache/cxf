@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -66,7 +68,17 @@ public final class LogUtils {
         JDKBugHacks.doHacks();
         
         try {
-            String cname = System.getProperty(KEY);
+            String cname = null;
+            try {
+                cname = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                    public String run() {
+                        return System.getProperty(KEY);
+                    }
+                });
+            } catch (Throwable t) {
+                //ignore - likely security exception or similar that won't allow
+                //access to the system properties.   We'll continue with other methods
+            }
             if (StringUtils.isEmpty(cname)) {
                 InputStream ins = Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream("META-INF/cxf/" + KEY);
