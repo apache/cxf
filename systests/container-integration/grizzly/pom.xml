@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-container-integration</artifactId>
-        <version>2.3.8</version>
+        <version>2.3.9-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-ci-grizzly</artifactId>
     <name>Apache CXF Container Integration Test Grizzly</name>
-    <version>2.3.8</version>
+    <version>2.3.9-SNAPSHOT</version>
     <description>Apache CXF Container Integration Test Grizzly</description>
 
     <repositories>
