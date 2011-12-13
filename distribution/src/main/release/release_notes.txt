@@ -1,4 +1,4 @@
-Apache CXF 2.5.0 Release Notes
+Apache CXF 2.5.1 Release Notes
 
 1. Overview
 
@@ -17,7 +17,11 @@ New features include:
 
 Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/25-migration-guide.html
-for further information and requirements for upgrading to 2.5.0.
+for further information and requirements for upgrading to 2.5.x.
+
+
+
+2.5.1 fixes over 75 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -57,4 +61,92 @@ See the migration guide at:
 http://cxf.apache.org/docs/25-migration-guide.html
 for caveats when upgrading from CXF 2.4.x to 2.5.x.
 
+7. Specific issues, features, and improvements fixed in this version
 
+** Sub-task
+    * [CXF-2880] - Add required features
+    * [CXF-2881] - Add unit tests and refactor code
+    * [CXF-2882] - Add JavaDocs, documentation and tutorial how to configure log browser in user's application
+    * [CXF-2883] - Add optional features
+    * [CXF-2987] - Add search capabilities
+    * [CXF-3940] - A SAML Token requested OnBehalfOf should hide the actual requestor and should only contain the OnBehalfOf Identity
+
+** Bug
+    * [CXF-3666] - Wrong code in MessageBodyWriter example
+    * [CXF-3719] - NullPointerException When using TransformOutInterceptor
+    * [CXF-3836] - Missing output parameters in wrapped method implementations generate NPE
+    * [CXF-3867] - Fix for CXF-1816 causes startup performance regression
+    * [CXF-3891] - WSDL2JS Null Pointer Exception
+    * [CXF-3897] - Better handling on invalid JAXRS '_type' parameter
+    * [CXF-3900] - InjectionUtils do not handle correctly collections inside query bean
+    * [CXF-3903] - WADL contains wrong parameter names for multipart/form-data
+    * [CXF-3904] - CXF and Java 7
+    * [CXF-3905] - The archetype is missing
+    * [CXF-3908] - ExceptionMappers for IOExceptions thrown by JAX-RS MessageBodyReaders are ignored 
+    * [CXF-3911] - Exception mapping not applied to exceptions thrown from providers mapping data to brans
+    * [CXF-3912] - Add an archetype for jax-rs
+    * [CXF-3916] - partial response problem with SOAP 1.1 use of WS-Addressing
+    * [CXF-3920] - transportUri in SoapindingInfo is http even when jms is used
+    * [CXF-3925] - WebFaultOutInterceptor expects the Fault.
+    * [CXF-3929] - Present realm ignored by TokenValidateOperation for TokenValidator
+    * [CXF-3931] - STS SAMLTokenValidator doesn't validate condition
+    * [CXF-3934] - JaxWsClientProxy clears stacktrace of custom exception
+    * [CXF-3937] - UriInfo does not report base address correctly in some cases
+    * [CXF-3938] - JAX-RS Contexts are not available to MessageBodyReader and MessageBodyWriter providers at the selection stage
+    * [CXF-3939] - UriInfo returns the list of matched uris and resources in the wrong order
+    * [CXF-3941] - WADLgenerator ignores Description annotation targeting the input parameter if it is set inside a method-level Descriptions annotation
+    * [CXF-3942] - CounterRepository cannot be assigned to a named bus
+    * [CXF-3946] - <property name="namespacePrefixes" ref="namespaceMap" /> causes exception due to immutable Map being used in JAXBElementProvider
+    * [CXF-3947] - AbstractBeanDefinitionParser loses Bus names
+    * [CXF-3951] - Spring and blueprint silently create named busses when needed
+    * [CXF-3953] - wadl2java doesn't find types with underscore in their name
+    * [CXF-3956] - JAX-WS HandlerResolver consulted for ServiceImpl.createPort, but not for createDispatch
+    * [CXF-3958] - Unmarshalling error when using collections of subtypes with the StaxTransformFeature and 'out' transformations
+    * [CXF-3959] - CXF JAX-WS: @PostConstruct methods invoked twice in Spring-based projects
+    * [CXF-3961] - SoapTransportFactory: confused exception by unknown transport protocol
+    * [CXF-3962] - When using spring/spring-dm servers are started before the bus is initialized
+    * [CXF-3964] - Codegen plugin tries to use classes dir as wsdl
+    * [CXF-3966] - When client sends invalid XML, JAX-RS returns 500 instead of 4xx
+    * [CXF-3968] - WSDLToJava Error: ...is already defined at... when referencing deployed wsdl
+    * [CXF-3969] - WrapperStyleNameCollisionValidator doesn't take the -bareMethods flag into consideration
+    * [CXF-3973] - Making non-default bus instances also appear in the JMX monitoring
+
+** Improvement
+    * [CXF-3040] - Upgrade to XMLBeans 2.5.0
+    * [CXF-3380] - JAX-RS: Support writing to DataSources
+    * [CXF-3831] - Provide deploy-to-Tomcat options for Java-first and WSDL-first examples
+    * [CXF-3893] - CXF uses wsdl4j implementation classes
+    * [CXF-3894] - Improve the logging support for RequestDispatcherProvider and FormUtils in case of form values stored as http request parameters
+    * [CXF-3895] - add support for Jetty's password obfuscation methods
+    * [CXF-3901] - Pick up Features from OSGi
+    * [CXF-3902] - Simplify WADL queries
+    * [CXF-3914] - [workqueue] reuse StringBuilder for all concat operations
+    * [CXF-3921] - Making RMTxStore's table exists error state/code configurable
+    * [CXF-3924] - Support to configure keystore per SAML realm
+    * [CXF-3926] - Supporting JAXWS Provider's null response handling (the provider's invoke may return a null to indicate no response should be sent back)
+    * [CXF-3928] - Add token validation for OnBehalfOf element in TokenIssueOperation
+    * [CXF-3930] - Extend ClaimsHandler interface to pass current realm and WebServiceContext
+    * [CXF-3933] - Introduce an exception class for reporting problems encountered during reading the multiparts 
+    * [CXF-3936] - Update Multipart annotation to indicate that null should optionally represent a missing multipart part 
+    * [CXF-3943] - Support CORS in JAX-RS
+    * [CXF-3960] - Patch for InitiatorSignatureToken Support in WS-Policy definition
+    * [CXF-3965] - Enhancement of the exception message when configuring the schema location in the jaxws endpoint.
+    * [CXF-3967] - OAuth Tokens need to be able to keep the end-user name used to authorize the client request 
+    * [CXF-3970] - Patch: InitiatorEncryptionToken, RecipientSignatureToken, RecipientEncryptionToken support in WS Sec Policy
+    * [CXF-3971] - SpringBus.getId() may fail to determine the symbolic bundle name
+    * [CXF-3974] - Clean up the servlet dependency of CXF systest
+    * [CXF-3975] - Consolidate ws-rm configuration schema for spring and blueprint
+
+** New Feature
+    * [CXF-3225] - Add support for saml tokens in sp:InitiatorToken
+    * [CXF-3913] - Blueprint WS-RM
+    * [CXF-3922] - Support for KerberosToken in RST if LdapClaimsHandler used
+    * [CXF-3923] - Support for OnBehalfOf in SAMLTokenProvider
+    * [CXF-3950] - Add XMLInstruction annotation to simplify adding DOCType and custom processing instructions
+
+** Task
+    * [CXF-1243] - Resolve JBoss common jax-ws testsuite issues 
+    * [CXF-3892] - upgrade to servicemix specs 1.9.0
+
+** Wish
+    * [CXF-3915] - [OSGi] Redeploy bundle with shared bus cause warning
