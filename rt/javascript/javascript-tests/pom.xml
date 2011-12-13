@@ -100,5 +100,29 @@
             <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
         </dependency>
+	<dependency>
+	  <groupId>org.apache.cxf</groupId>
+	  <artifactId>cxf-rt-bindings-soap</artifactId>
+            <version>${project.version}</version>
+	    <scope>test</scope>
+	</dependency>
+	<dependency>
+	  <groupId>org.apache.cxf</groupId>
+	  <artifactId>cxf-rt-transports-http</artifactId>
+	  <version>${project.version}</version>
+	  <scope>test</scope>
+	</dependency>
+	<dependency>
+	  <groupId>org.apache.cxf</groupId>
+	  <artifactId>cxf-rt-transports-local</artifactId>
+	  <version>${project.version}</version>
+	  <scope>test</scope>
+	</dependency>
+	<dependency>
+	  <groupId>org.apache.cxf</groupId>
+	  <artifactId>cxf-rt-frontend-simple</artifactId>
+	  <version>${project.version}</version>
+	  <scope>test</scope>
+	</dependency>
     </dependencies>
 </project>

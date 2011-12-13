@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
+
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -53,7 +54,6 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAny;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -866,7 +866,8 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 if (WSDLConstants.NS_SOAP11_HTTP_TRANSPORT.equals(sbi.getTransportURI())
                     || WSDLConstants.NS_SOAP12_HTTP_BINDING.equals(sbi.getTransportURI())
                     // we may want this for testing.
-                    || LocalTransportFactory.TRANSPORT_ID.equals(sbi.getTransportURI())) {
+                    // we do NOT want a dependency on the local transport.
+                    || "http://cxf.apache.org/transports/local".equals(sbi.getTransportURI())) {
                     soapBindingInfo = sbi;
                     break;
                 }
