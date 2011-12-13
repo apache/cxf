@@ -53,7 +53,7 @@
        wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -67,7 +67,7 @@
        wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -81,7 +81,7 @@
        wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -96,7 +96,7 @@
        depends-on="tls-settings">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -110,7 +110,7 @@
        wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.properties" value="alice.properties"/> 
            <entry key="ws-security.encryption.username" value="alice"/>
@@ -127,7 +127,7 @@
        wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="bob.properties"/> 
        </jaxws:properties> 
     </jaxws:endpoint>
@@ -142,7 +142,7 @@
        wsdlLocation="org/apache/cxf/systest/wssec/examples/ut//DoubleItUt.wsdl">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.ut.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="bob.properties"/> 
        </jaxws:properties> 
     </jaxws:endpoint>
