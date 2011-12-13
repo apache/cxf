@@ -44,26 +44,26 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-                <plugin>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1</version>
-                    <configuration>
-                        <webXml>${cxf.release.base}/etc/web.xml</webXml>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>tomcat-maven-plugin</artifactId>
-                    <version>1.1</version>
-                    <configuration>
-                        <server>myTomcat</server>
-                        <!-- if using Tomcat 6 (see README) -->
-                        <!--url>http://localhost:8080/manager</url-->
-                        <!-- if using Tomcat 7 (see README) -->
-                        <url>http://localhost:8080/manager/text</url>
-                        <path>/${project.build.finalName}</path>
-                    </configuration>
-                </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <webXml>${cxf.release.base}/etc/web.xml</webXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>tomcat-maven-plugin</artifactId>
+                <version>1.1</version>
+                <configuration>
+                    <server>myTomcat</server>
+                    <!-- if using Tomcat 6 (see README) -->
+                    <!--url>http://localhost:8080/manager</url -->
+                    <!-- if using Tomcat 7 (see README) -->
+                    <url>http://localhost:8080/manager/text</url>
+                    <path>/${project.build.finalName}</path>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -131,6 +131,11 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>2.4.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
