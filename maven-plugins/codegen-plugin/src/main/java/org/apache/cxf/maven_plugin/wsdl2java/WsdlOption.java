@@ -17,18 +17,19 @@
  * under the License.
  */
 
-package org.apache.cxf.maven_plugin;
+package org.apache.cxf.maven_plugin.wsdl2java;
 
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.maven_plugin.WsdlArtifact;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.maven.plugin.MojoExecutionException;
 
-public class WsdlOption extends Option {
+public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.GenericWsdlOption {
 
     /**
      * The WSDL file to process.
@@ -50,6 +51,10 @@ public class WsdlOption extends Option {
 
     public WsdlArtifact getWsdlArtifact() {
         return wsdlArtifact;
+    }
+    
+    public void setArtifact(WsdlArtifact artifact) {
+        wsdlArtifact = artifact;
     }
 
     public void setWsdlArtifact(WsdlArtifact wsdlArtifact) {
@@ -110,6 +115,8 @@ public class WsdlOption extends Option {
     public int hashCode() {
         if (wsdl != null) {
             return wsdl.hashCode();
+        } else if (wsdlArtifact != null) {
+            return wsdlArtifact.hashCode();
         }
         return -1;
     }
@@ -130,6 +137,9 @@ public class WsdlOption extends Option {
         builder.append("Extraargs: ").append(extraargs).append('\n');
         builder.append("XJCargs: ").append(xjcargs).append('\n');
         builder.append("Packagenames: ").append(packagenames).append('\n');
+        if (wsdlArtifact != null) {
+            builder.append("Artifact: ").append(wsdlArtifact.toString()).append('\n');
+        }
         builder.append('\n');
         return builder.toString();
     }
@@ -235,4 +245,15 @@ public class WsdlOption extends Option {
         destList.add(b.toString());
     }
 
+    public WsdlArtifact getArtifact() {
+        return wsdlArtifact;
+    }
+
+    public String getUri() {
+        return wsdl;
+    }
+
+    public void setUri(String uri) {
+        wsdl = uri;
+    }
 }

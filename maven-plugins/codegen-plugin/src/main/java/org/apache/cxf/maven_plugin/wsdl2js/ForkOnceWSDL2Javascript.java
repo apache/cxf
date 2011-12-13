@@ -17,20 +17,20 @@
  * under the License.
  */
 
-package org.apache.cxf.maven_plugin;
+package org.apache.cxf.maven_plugin.wsdl2js;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
 import org.apache.cxf.tools.common.ToolContext;
-import org.apache.cxf.tools.wsdlto.WSDLToJava;
+import org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript;
 
 /**
  * 
  */
-public final class ForkOnceWSDL2Java {
-    private ForkOnceWSDL2Java() {
+public final class ForkOnceWSDL2Javascript {
+    private ForkOnceWSDL2Javascript() {
         //utility
     }
     public static void main(String args[]) throws Exception {
@@ -47,7 +47,7 @@ public final class ForkOnceWSDL2Java {
                 wargs[x] = reader.readLine();
             }
             
-            new WSDLToJava(wargs).run(new ToolContext());
+            new WSDLToJavaScript(wargs).run(new ToolContext());
             
             line = reader.readLine();
         }

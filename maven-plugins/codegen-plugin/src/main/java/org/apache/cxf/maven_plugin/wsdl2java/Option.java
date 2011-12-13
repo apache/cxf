@@ -17,11 +17,13 @@
  * under the License.
  */
 
-package org.apache.cxf.maven_plugin;
+package org.apache.cxf.maven_plugin.wsdl2java;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Option {
@@ -30,7 +32,7 @@ public class Option {
 
     /**
      * As maven will set null for an empty parameter we need
-     * this horrid inital value to tell if it has been 
+     * this horrid initial value to tell if it has been 
      * configured or not yet.
      */
     private static final String DEFAULT_WSDL_LOCATION = "DEFAULTWSDLLOCATION - WORKAROUND";
@@ -82,7 +84,7 @@ public class Option {
     Boolean defaultNamespacePackageMapping;
 
     /**
-     * A set of dependent files used to detect the generator must process WSDL, even 
+     * A set of dependent files used to detect that the generator must process WSDL, even 
      * if generator marker files are up to date.
      */
     File dependencies[];
@@ -95,7 +97,7 @@ public class Option {
     /**
      * Specifies JAXWS or JAXB binding files. Use spaces to separate multiple entries.
      */
-    String bindingFiles[] = new String[0];
+    Set<String> bindingFiles = new HashSet<String>();
 
     /**
      * Specifies the value of the @WebServiceClient annotation's wsdlLocation property. 
@@ -261,17 +263,14 @@ public class Option {
         outputDir = f;
     }
     
-    public void setBindingFiles(String files[]) {
+    public void setBindingFiles(Set<String> files) {
         bindingFiles = files;
     }
-    public String[] getBindingFiles() {
+    public Set<String> getBindingFiles() {
         return bindingFiles;
     }
     public void addBindingFile(File file) {
-        String tmp[] = new String[bindingFiles.length + 1];
-        System.arraycopy(bindingFiles, 0, tmp, 0, bindingFiles.length);
-        bindingFiles = tmp;
-        bindingFiles[bindingFiles.length - 1] = file.getAbsolutePath();
+        bindingFiles.add(file.getAbsolutePath());
     }
     
     public void addDefaultBindingFileIfExists(File baseDir) {
@@ -493,7 +492,7 @@ public class Option {
         outputDir = setIfNull(outputDir, defaultOptions.outputDir);
         extraargs.addAll(defaultOptions.extraargs);
         xjcargs.addAll(defaultOptions.xjcargs);
-        bindingFiles = mergeList(bindingFiles, defaultOptions.bindingFiles, String.class);
+        bindingFiles.addAll(defaultOptions.getBindingFiles());
         dependencies = mergeList(dependencies, defaultOptions.dependencies, File.class);
         redundantDirs = mergeList(redundantDirs, defaultOptions.redundantDirs, File.class);
         packagenames.addAll(defaultOptions.packagenames);

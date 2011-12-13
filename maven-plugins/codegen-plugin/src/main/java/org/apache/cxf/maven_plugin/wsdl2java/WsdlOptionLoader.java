@@ -17,34 +17,36 @@
  * under the License.
  */
 
-package org.apache.cxf.maven_plugin;
+package org.apache.cxf.maven_plugin.wsdl2java;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.maven_plugin.GenericWsdlOption;
+import org.apache.cxf.maven_plugin.WsdlUtilities;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 public final class WsdlOptionLoader {
-    private static final String WSDL_TYPE = "wsdl";
     private static final String WSDL_OPTIONS = "-options$";
     private static final String WSDL_BINDINGS = "-binding-?\\d*.xml$";
     
     private WsdlOptionLoader() {
     }
     
-    @SuppressWarnings("unchecked")
-    public static List<WsdlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
-                                                                   Option defaultOptions, File outputDir) {
-        List<WsdlOption> options = new ArrayList<WsdlOption>();
-        Set<Artifact> dependencies = project.getDependencyArtifacts();
+    public static List<GenericWsdlOption> 
+    loadWsdlOptionsFromDependencies(MavenProject project, 
+                                    Option defaultOptions, 
+                                    File outputDir) {
+        List<GenericWsdlOption> options = new ArrayList<GenericWsdlOption>();
+        Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {
             WsdlOption option = generateWsdlOptionFromArtifact(artifact, outputDir);
             if (option != null) {
@@ -58,18 +60,12 @@ public final class WsdlOptionLoader {
     }
 
     private static WsdlOption generateWsdlOptionFromArtifact(Artifact artifact, File outputDir) {
-        if (!WSDL_TYPE.equals(artifact.getType())) {
+        WsdlOption option = new WsdlOption();
+        if (WsdlUtilities.fillWsdlOptionFromArtifact(option, artifact, outputDir)) {
+            return option;
+        } else {
             return null;
         }
-        WsdlOption option = new WsdlOption();
-        WsdlArtifact wsdlArtifact = new WsdlArtifact();
-        wsdlArtifact.setArtifactId(artifact.getArtifactId());
-        wsdlArtifact.setGroupId(artifact.getGroupId());
-        wsdlArtifact.setType(artifact.getType());
-        wsdlArtifact.setVersion(artifact.getVersion());
-        option.setWsdlArtifact(wsdlArtifact);
-        option.setOutputDir(outputDir);
-        return option;
     }
 
     /**
@@ -84,21 +80,23 @@ public final class WsdlOptionLoader {
      * @return list of one WsdlOption object for each wsdl found
      * @throws MojoExecutionException
      */
-    public static List<WsdlOption> loadWsdlOptionsFromFiles(File wsdlBasedir, String includes[],
-                                                            String excludes[], Option defaultOptions,
-                                                            File defaultOutputDir)
+    public static List<GenericWsdlOption> 
+    loadWsdlOptionsFromFiles(File wsdlBasedir, String includes[],
+                                 String excludes[], Option defaultOptions,
+                                 File defaultOutputDir)
         throws MojoExecutionException {
 
         if (wsdlBasedir == null) {
-            return new ArrayList<WsdlOption>();
+            return Collections.emptyList();
         }
 
         if (!wsdlBasedir.exists()) {
             throw new MojoExecutionException(wsdlBasedir + " does not exist");
         }
 
-        List<File> wsdlFiles = getWsdlFiles(wsdlBasedir, includes, excludes);
-        List<WsdlOption> wsdlOptions = new ArrayList<WsdlOption>();
+        List<File> wsdlFiles = WsdlUtilities.getWsdlFiles(wsdlBasedir, includes, excludes);
+        List<GenericWsdlOption> wsdlOptions 
+            = new ArrayList<GenericWsdlOption>();
         for (File wsdl : wsdlFiles) {
             WsdlOption wsdlOption = generateWsdlOptionFromFile(wsdl, defaultOptions, defaultOutputDir);
             if (wsdlOption != null) {
@@ -106,43 +104,6 @@ public final class WsdlOptionLoader {
             }
         }
         return wsdlOptions;
-    }
-
-    private static String joinWithComma(String[] arr) {
-        if (arr == null) {
-            return "";
-        }
-        StringBuilder str = new StringBuilder();
-
-        if (arr != null) {
-            for (String s : arr) {
-                if (str.length() > 0) {
-                    str.append(',');
-                }
-                str.append(s);
-            }
-        }
-        return str.toString();
-    }
-
-    private static List<File> getWsdlFiles(File dir, String includes[], String excludes[])
-        throws MojoExecutionException {
-
-        List<String> exList = new ArrayList<String>();
-        if (excludes != null) {
-            exList.addAll(Arrays.asList(excludes));
-        }
-        exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
-
-        String inc = joinWithComma(includes);
-        String ex = joinWithComma(exList.toArray(new String[exList.size()]));
-
-        try {
-            List newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
-            return CastUtils.cast(newfiles);
-        } catch (IOException exc) {
-            throw new MojoExecutionException(exc.getMessage(), exc);
-        }
     }
 
     private static String[] readOptionsFromFile(File dir, String wsdlName) throws MojoExecutionException {
@@ -167,7 +128,8 @@ public final class WsdlOptionLoader {
         }
     }
 
-    protected static WsdlOption generateWsdlOptionFromFile(final File wsdl, final Option defaultOptions,
+    protected static WsdlOption generateWsdlOptionFromFile(final File wsdl, 
+                                                           final Option defaultOptions,
                                                            File defaultOutputDir)
         throws MojoExecutionException {
 

@@ -35,6 +35,7 @@ import java.util.Set;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -61,12 +62,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @required
      */
     protected String classesDirectory;
-    /**
-     * Default options to be used when a wsdl has not had it's options explicitly specified.
-     * 
-     * @parameter
-     */
-    protected Option defaultOptions = new Option();
+   
     /**
      * By default all maven dependencies of type "wsdl" are added to the effective wsdlOptions. Setting this
      * parameter to true disables this functionality
@@ -75,9 +71,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      */
     protected boolean disableDependencyScan;
     /**
-     * Disables the scanning of the wsdlRoot/testWsdlRoot directories configured above.
+     * Disables the scanning of the wsdlRoot/testWsdlRoot directories.
      * By default, we scan for *.wsdl (see include/exclude params as well) in the wsdlRoot
-     * directories and run wsdl2java on all the wsdl's we find.    This disables that scan
+     * directories and run the tool on all the wsdls we find. This disables that scan
      * and requires an explicit wsdlOption to be set for each wsdl that needs to be processed.
      * @parameter expression="${cxf.disableDirectoryScan}" default-value="false"
      */
@@ -129,19 +125,16 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * 
      * @parameter
      */
-    String excludes[];
+    protected String excludes[];
     /**
      * @parameter expression="${cxf.testWsdlRoot}" default-value="${basedir}/src/test/resources/wsdl"
      */
-    File testWsdlRoot;
-    /**
-     * @parameter
-     */
-    WsdlOption wsdlOptions[];
+    protected File testWsdlRoot;
+   
     /**
      * @parameter expression="${cxf.wsdlRoot}" default-value="${basedir}/src/main/resources/wsdl"
      */
-    File wsdlRoot;
+    protected File wsdlRoot;
     /**
      * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
      * 
@@ -197,12 +190,12 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 "*.wsdl"
             };
         }
-        defaultOptions.addDefaultBindingFileIfExists(project.getBasedir());
+       
         markerDirectory.mkdirs();
 
         configureProxyServerSettings();
 
-        List<WsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
+        List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
 
         if (effectiveWsdlOptions.size() == 0) {
             getLog().info("Nothing to generate");
@@ -219,7 +212,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if ("once".equals(fork) || "true".equals(fork)) {
                 forkOnce(cp, effectiveWsdlOptions);
             } else {
-                for (WsdlOption o : effectiveWsdlOptions) {
+                for (GenericWsdlOption o : effectiveWsdlOptions) {
                     bus = generate(o, bus, cp);
     
                     File dirs[] = o.getDeleteDirs();
@@ -249,7 +242,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         System.gc();
     }
 
-    protected abstract Bus generate(WsdlOption o, Bus bus, Set<URI> cp) throws MojoExecutionException;
+    protected abstract Bus generate(GenericWsdlOption o, 
+                                    Bus bus, Set<URI> cp) throws MojoExecutionException;
 
     protected void addPluginArtifact(Set<URI> artifactsPath) {
         // for Maven 2.x, the actual artifact isn't in the list.... need to try and find it
@@ -298,40 +292,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
     }
     
-    /**
-     * @return effective WsdlOptions
-     * @throws MojoExecutionException
-     */
-    protected List<WsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions()
-        throws MojoExecutionException {
-        List<WsdlOption> effectiveWsdlOptions = new ArrayList<WsdlOption>();
-        List<WsdlOption> temp;
-        if (wsdlRoot != null && wsdlRoot.exists() && !disableDirectoryScan) {
-            temp = WsdlOptionLoader.loadWsdlOptionsFromFiles(wsdlRoot, includes, excludes, defaultOptions,
-                                                             getGeneratedSourceRoot());
-            effectiveWsdlOptions.addAll(temp);
-        }
-        if (testWsdlRoot != null && testWsdlRoot.exists() && !disableDirectoryScan) {
-            temp = WsdlOptionLoader.loadWsdlOptionsFromFiles(testWsdlRoot, includes, excludes,
-                                                             defaultOptions, getGeneratedTestRoot());
-            effectiveWsdlOptions.addAll(temp);
-        }
-        if (!disableDependencyScan) {
-            temp = WsdlOptionLoader.loadWsdlOptionsFromDependencies(project, 
-                                                                    defaultOptions, 
-                                                                    getGeneratedSourceRoot());
-            effectiveWsdlOptions.addAll(temp);
-        }
-        mergeOptions(effectiveWsdlOptions);
-        downloadRemoteWsdls(effectiveWsdlOptions);
-        // String buildDir = project.getBuild().getDirectory();
-        // File tempBindingDir = new File(buildDir, TEMPBINDINGS_DIR);
-        // for (WsdlOption o : effectiveWsdlOptions) {
-        // BindingFileHelper.setWsdlLocationInBindingsIfNotSet(project.getBasedir(), tempBindingDir, o,
-        // getLog());
-        // }
-        return effectiveWsdlOptions;
-    }
+    protected abstract List<GenericWsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions() 
+        throws MojoExecutionException;
 
     /**
      * Recursively delete the given directory
@@ -354,16 +316,16 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         return true;
     }
     
-    protected void forkOnce(Set<URI> classPath, List<WsdlOption> effectiveWsdlOptions)
+    protected void forkOnce(Set<URI> classPath, List<GenericWsdlOption> effectiveWsdlOptions)
         throws MojoExecutionException {
-        List<WsdlOption> toDo = new LinkedList<WsdlOption>();
+        List<GenericWsdlOption> toDo = new LinkedList<GenericWsdlOption>();
         List<List<String>> wargs = new LinkedList<List<String>>();
-        for (WsdlOption wsdlOption : effectiveWsdlOptions) {
+        for (GenericWsdlOption wsdlOption : effectiveWsdlOptions) {
             File outputDirFile = wsdlOption.getOutputDir();
             outputDirFile.mkdirs();
             URI basedir = project.getBasedir().toURI();
-            URI wsdlURI = wsdlOption.getWsdlURI(basedir);
-            File doneFile = getDoneFile(basedir, wsdlURI);
+            URI wsdlURI = getWsdlURI(wsdlOption, basedir);
+            File doneFile = getDoneFile(basedir, wsdlURI, "java");
 
             if (!shouldRun(wsdlOption, doneFile, wsdlURI)) {
                 continue;
@@ -392,9 +354,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         artifactsPath.addAll(classPath);
 
         String args[] = createForkOnceArgs(wargs);
-        runForked(artifactsPath, ForkOnceWSDL2Java.class, args);
+        runForked(artifactsPath, getForkClass().getName(), args);
 
-        for (WsdlOption wsdlOption : toDo) {
+        for (GenericWsdlOption wsdlOption : toDo) {
             File dirs[] = wsdlOption.getDeleteDirs();
             if (dirs != null) {
                 for (int idx = 0; idx < dirs.length; ++idx) {
@@ -402,8 +364,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 }
             }
             URI basedir = project.getBasedir().toURI();
-            URI wsdlURI = wsdlOption.getWsdlURI(basedir);
-            File doneFile = getDoneFile(basedir, wsdlURI);
+            URI wsdlURI = getWsdlURI(wsdlOption, basedir);
+            File doneFile = getDoneFile(basedir, wsdlURI, "java");
             try {
                 doneFile.createNewFile();
             } catch (Throwable e) {
@@ -413,7 +375,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
     }
     
-    protected File getDoneFile(URI basedir, URI wsdlURI) {
+    protected abstract Class<?> getForkClass();
+    
+    protected File getDoneFile(URI basedir, URI wsdlURI, String mojo) {
         String doneFileName = wsdlURI.toString();
 
         // Strip the basedir from the doneFileName
@@ -426,14 +390,16 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         doneFileName = doneFileName.replace('?', '_').replace('&', '_').replace('/', '_').replace('\\', '_')
             .replace(':', '_');
 
-        return new File(markerDirectory, "." + doneFileName + ".DONE");
+        return new File(markerDirectory, "." + doneFileName + "." + mojo + ".DONE");
     }
 
     protected abstract File getGeneratedSourceRoot();
 
     protected abstract File getGeneratedTestRoot();
 
-    protected void runForked(Set<URI> classPath, Class cls, String[] args) throws MojoExecutionException {
+    protected void runForked(Set<URI> classPath, 
+                             String mainClassName, 
+                             String[] args) throws MojoExecutionException {
         getLog().info("Running wsdl2java in fork mode...");
         getLog().debug("Running wsdl2java in fork mode with args " + Arrays.asList(args));
 
@@ -469,7 +435,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
             attr = new Attribute();
             attr.setName("Main-Class");
-            attr.setValue(cls.getName());
+            attr.setValue(mainClassName);
             manifest.getMainSection().addConfiguredAttribute(attr);
 
             jar.addConfiguredManifest(manifest);
@@ -526,7 +492,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
 
     }
-
+    
     /**
      * Determine if code should be generated from the given wsdl
      * 
@@ -535,37 +501,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @param wsdlURI
      * @return
      */
-    protected boolean shouldRun(WsdlOption wsdlOption, File doneFile, URI wsdlURI) {
-        long timestamp = 0;
-        if ("file".equals(wsdlURI.getScheme())) {
-            timestamp = new File(wsdlURI).lastModified();
-        } else {
-            try {
-                timestamp = wsdlURI.toURL().openConnection().getDate();
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-        boolean doWork = false;
-        if (!doneFile.exists()) {
-            doWork = true;
-        } else if (timestamp > doneFile.lastModified()) {
-            doWork = true;
-        } else if (wsdlOption.isDefServiceName()) {
-            doWork = true;
-        } else {
-            File files[] = wsdlOption.getDependencies();
-            if (files != null) {
-                for (int z = 0; z < files.length; ++z) {
-                    if (files[z].lastModified() > doneFile.lastModified()) {
-                        doWork = true;
-                    }
-                }
-            }
-        }
-        return doWork;
-    }
+    protected abstract boolean shouldRun(GenericWsdlOption wsdlOption, File doneFile, URI wsdlURI);
 
+   
     private String[] createForkOnceArgs(List<List<String>> wargs) throws MojoExecutionException {
         try {
             File f = FileUtils.createTempFile("cxf-w2j", "args");
@@ -585,11 +523,50 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             throw new MojoExecutionException("Could not create argument file", ex);
         }
     }
+    
+    /**
+     * Try to find a file matching the wsdl path (either absolutely, relatively to the current dir or to
+     * the project base dir)
+     * 
+     * @return wsdl file
+     */
+    public File getWsdlFile(GenericWsdlOption option, File baseDir) {
+        if (option.getUri() == null) {
+            return null;
+        }
+        File file = null;
+        try {
+            URI uri = new URI(option.getUri());
+            if (uri.isAbsolute()) {
+                file = new File(uri);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        if (file == null || !file.exists()) {
+            file = new File(option.getUri());
+        }
+        if (!file.exists()) {
+            file = new File(baseDir, option.getUri());
+        }
+        return file;
+    }
+    
+    public URI getWsdlURI(GenericWsdlOption option, URI baseURI) throws MojoExecutionException {
+        String wsdlLocation = option.getUri();
+        if (wsdlLocation == null) {
+            throw new MojoExecutionException("No wsdl available for base URI " + baseURI);
+        }
+        File wsdlFile = new File(wsdlLocation);
+        return wsdlFile.exists() ? wsdlFile.toURI() 
+            : baseURI.resolve(URIParserUtil.escapeChars(wsdlLocation));
+    }
 
-    private void downloadRemoteWsdls(List<WsdlOption> effectiveWsdlOptions) throws MojoExecutionException {
+    protected void downloadRemoteWsdls(List<GenericWsdlOption> effectiveWsdlOptions) 
+        throws MojoExecutionException {
 
-        for (WsdlOption wsdlOption : effectiveWsdlOptions) {
-            WsdlArtifact wsdlA = wsdlOption.getWsdlArtifact();
+        for (GenericWsdlOption wsdlOption : effectiveWsdlOptions) {
+            WsdlArtifact wsdlA = wsdlOption.getArtifact();
             if (wsdlA == null) {
                 return;
             }
@@ -606,7 +583,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 }
                 String path = supposedFile.getAbsolutePath();
                 getLog().info("Resolved WSDL artifact to file " + path);
-                wsdlOption.setWsdl(path);
+                wsdlOption.setUri(path);
             }
         }
     }
@@ -625,43 +602,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
         return javaExe;
     }
-
-    /**
-     * Merge WsdlOptions that point to the same file by adding the extraargs to the first option and deleting
-     * the second from the options list
-     * 
-     * @param options
-     */
-    private void mergeOptions(List<WsdlOption> effectiveWsdlOptions) {
-        if (wsdlOptions == null) {
-            return;
-        }
-        File outputDirFile = getGeneratedTestRoot() == null 
-                ? getGeneratedSourceRoot() : getGeneratedTestRoot();
-        for (WsdlOption o : wsdlOptions) {
-            if (defaultOptions != null) {
-                o.merge(defaultOptions);
-            }
-            if (o.getOutputDir() == null) {
-                o.setOutputDir(outputDirFile);
-            }
-
-            File file = o.getWsdlFile(project.getBasedir());
-            if (file != null && file.exists()) {
-                file = file.getAbsoluteFile();
-                for (WsdlOption o2 : effectiveWsdlOptions) {
-                    File file2 = o2.getWsdlFile(project.getBasedir());
-                    if (file2 != null && file2.exists() && file2.getAbsoluteFile().equals(file)) {
-                        o.getExtraargs().addAll(0, o2.getExtraargs());
-                        effectiveWsdlOptions.remove(o2);
-                        break;
-                    }
-                }
-            }
-            effectiveWsdlOptions.add(o);
-        }
-    }
-
+    
     private Artifact resolveRemoteWsdlArtifact(Artifact artifact) throws MojoExecutionException {
 
         Collection<String> scopes = new ArrayList<String>();
