@@ -93,5 +93,24 @@
        </jaxws:properties> 
     </jaxws:endpoint>
     
+    <jaxws:endpoint 
+       id="SymmetricEndorsing"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricEndorsing" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricEndorsingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/x509/DoubleItX509.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <!-- TODO Fix the way these properties are inverted -->
+           <entry key="ws-security.signature.username" value="bob"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
+           <entry key="ws-security.encryption.username" value="alice"/>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
     
 </beans>

@@ -90,6 +90,26 @@
         </wsdl:operation>
     </wsdl:binding>
     
+    <wsdl:binding name="DoubleItSymmetricEndorsingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricEndorsingPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItAsymmetricSignEncryptPort" 
                    binding="tns:DoubleItAsymmetricSignEncryptBinding">
@@ -102,6 +122,10 @@
         <wsdl:port name="DoubleItSymmetricSignEncryptPort" 
                    binding="tns:DoubleItSymmetricSignEncryptBinding">
             <soap:address location="http://localhost:9009/DoubleItX509SymmetricSignEncrypt" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricEndorsingPort" 
+                   binding="tns:DoubleItSymmetricEndorsingBinding">
+            <soap:address location="http://localhost:9009/DoubleItX509SymmetricEndorsing" />
         </wsdl:port>
     </wsdl:service>
 
@@ -236,6 +260,61 @@
                         <sp:OnlySignEntireHeadersAndBody/>
                     </wsp:Policy>
                 </sp:SymmetricBinding>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:MustSupportRefKeyIdentifier/>
+                        <sp:MustSupportRefIssuerSerial/>
+                        <sp:MustSupportRefThumbprint/>
+                        <sp:MustSupportRefEncryptedKey/>
+                        <sp:RequireSignatureConfirmation/>
+                    </wsp:Policy>
+                </sp:Wss11>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <!-- 2.2.4 (WSS1.1) Mutual Authentication with X.509 Certificates, Sign, Encrypt -->
+    <wsp:Policy wsu:Id="DoubleItSymmetricEndorsingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                                <sp:X509Token
+                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:RequireDerivedKeys/>
+                                        <sp:RequireThumbprintReference />
+                                        <sp:WssX509V3Token11/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+                <sp:EndorsingSupportingTokens>
+                    <wsp:Policy>
+                       <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                           <wsp:Policy>
+                               <sp:RequireThumbprintReference/>
+                               <sp:WssX509V3Token11/>
+                           </wsp:Policy>
+                       </sp:X509Token>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
                 <sp:Wss11>
                     <wsp:Policy>
                         <sp:MustSupportRefKeyIdentifier/>

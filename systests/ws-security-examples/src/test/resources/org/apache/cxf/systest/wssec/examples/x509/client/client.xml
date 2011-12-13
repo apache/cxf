@@ -73,5 +73,17 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricEndorsingPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
+           <entry key="ws-security.signature.username" value="alice"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
     
 </beans>

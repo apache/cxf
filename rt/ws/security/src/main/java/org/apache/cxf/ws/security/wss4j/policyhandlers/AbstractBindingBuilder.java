@@ -126,6 +126,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.util.WSSecurityUtil;
 
+import org.opensaml.common.SAMLVersion;
+
 /**
  * 
  */
@@ -840,6 +842,11 @@ public abstract class AbstractBindingBuilder {
         
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(handler);
+        if (token.isUseSamlVersion11Profile10() || token.isUseSamlVersion11Profile11()) {
+            samlParms.setSAMLVersion(SAMLVersion.VERSION_11);
+        } else if (token.isUseSamlVersion20Profile11()) {
+            samlParms.setSAMLVersion(SAMLVersion.VERSION_20);
+        }
         info.setAsserted(true);
         AssertionWrapper assertion = new AssertionWrapper(samlParms);
         
