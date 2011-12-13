@@ -104,13 +104,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-tools-wsdlto-frontend-javascript</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <optional>true</optional>
