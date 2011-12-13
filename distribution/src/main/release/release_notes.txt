@@ -1,5 +1,5 @@
 
-Apache CXF 2.3.7 Release Notes
+Apache CXF 2.3.8 Release Notes
 
 1. Overview
 
@@ -34,8 +34,7 @@ New features include:
    for the Stax parser
 
 
-2.3.7 fixes over 45 JIRA issues reported by users and the community.
-
+2.3.8 fixes over 32 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -108,55 +107,38 @@ for caveats when upgrading from CXF 2.2.x to 2.3.x.
 
 
 ** Bug
-    * [CXF-2952] - Corba Use Case: CXF/JAX-WS Server and CXF/JAX-WS Client with corba:sequence produces Unmarshalling Error: null 
-    * [CXF-3054] - wsdl12js.bat doesn't immediately exit after return result from version query
-    * [CXF-3611] - JAXBEncoderDecoder.marshallException fails if exception object contains a map
-    * [CXF-3715] - AbstractClient.java split Cookie "BC=0; expires=Fri,  05-Aug-2011 22:04:41 GMT; path=/; domain=.jolira.com" into two cookies "BC=0; expires=Fri," and "05-Aug-2011 22:04:41 GMT; path=/; domain=.jolira.com"
-    * [CXF-3720] - SOAP over JMS miss SOAPJMS_soapAction property when use soap12
-    * [CXF-3747] - Dispatch client fails to set WS-Addressing Action header when WSDL's soap:operation does not have a style attribute
-    * [CXF-3748] - Using Dispatch API with SOAPMessage type fails to set WS-Addressing action header properly if there's whitespace after the soap:body
-    * [CXF-3749] - Using Dispatch API with Source type fails to set WS-Addressing action header properly in MESSAGE mode with SOAP 1.2
-    * [CXF-3750] - Sometimes, CXF servlet will blocked until bussiness logical finished for one-way operation
-    * [CXF-3754] - Dispatch API's ServiceImpl class fails to copy address/properties/bus/handlers from jaxws:client spring configuration
-    * [CXF-3755] - setting wsa:addressing feature in cxf:bus causes wrong action header to be sent when using Dispatch API
-    * [CXF-3758] - when web container be redeployed WebServiceContextImpl's static atrribute ThreadLocal<MessageContext> may not be release successfully.
-    * [CXF-3760] - Problematic inheritance of @Produces/@Consumes
-    * [CXF-3761] - STSClient can't process EncryptedKey elements received from an STS
-    * [CXF-3764] - JARS does not respect encoding when reading application/x-www-form-urlencoded;charset=Iso-8859-1 parameters
-    * [CXF-3775] - Cache-Control header provider won't emit the right values if multiple privateFields or noCacheFields are provided
-    * [CXF-3780] - DynamicClientFactory trying to resolve wsdl URL prior to calling into service factories
-    * [CXF-3784] - incorrect OSGi metadata header for the jbi tansport and binding
-    * [CXF-3785] - Calling start on a server that already is started resets things
-    * [CXF-3788] - Allow CXF HTTP Client to handle HTTP 202 for twoway calls when the real response is sent back to the decoupled endpoint.
-    * [CXF-3789] - org.apache.cxf.endpoint.ClientImpl.invoke(BindingOperationInfo, Object[], Exchange) wastes cycles
-    * [CXF-3790] - org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor.handleMessage(Message) contains cruft code
-    * [CXF-3802] - jaxws Provider doesn't allow override of outbound ws addressing headers
-    * [CXF-3821] - FormEncodingProvider does not check for null incoming object
-    * [CXF-3822] - JAX-RS: A 406 status could should be returned for an improperly formatted Accept header
-    * [CXF-3834] - Array JAXRS parameters are not supported
+    * [CXF-3829] - NPE in wsdl2java if soap:binding tag is omitted
+    * [CXF-3836] - Missing output parameters in wrapped method implementations generate NPE
+    * [CXF-3840] - WS-Addressing and WS-RM: Nested Reference Parameters in request are not supported and become concatenated in the response to client
+    * [CXF-3845] - Incompatibility between Derby 10.8 and WS-RM RMTxStore
+    * [CXF-3846] - NullPointerException when requesting ?wsdl using AegisDatabinding and @SchemaValidation
+    * [CXF-3847] - ResponseBuilderImpl.status - validation against instance var instead of parameter
+    * [CXF-3853] - RMTxStore: Vendor specific condition check
+    * [CXF-3855] - Incorrect character escaping by URIParserUtil
+    * [CXF-3860] - CXF sample "restful_dispatch" Readme.txt need to be updated
+    * [CXF-3867] - Fix for CXF-1816 causes startup performance regression
+    * [CXF-3871] - NPE is thrown when ws-addr is configured using policy and ws-addr Action is absent
+    * [CXF-3878] - org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper does not print the WebApplicationException stack trace even when log level is set to FINEST
+    * [CXF-3884] - [JAXB] DynamicClientFactory#setupClasspath does not handle URL encoded file names correctly
+    * [CXF-3897] - Better handling on invalid JAXRS '_type' parameter
+    * [CXF-3900] - InjectionUtils do not handle correctly collections inside query bean
+    * [CXF-3925] - WebFaultOutInterceptor expects the Fault.
+    * [CXF-3934] - JaxWsClientProxy clears stacktrace of custom exception
+    * [CXF-3938] - JAX-RS Contexts are not available to MessageBodyReader and MessageBodyWriter providers at the selection stage
+    * [CXF-3939] - UriInfo returns the list of matched uris and resources in the wrong order
+    * [CXF-3948] - CXF 2.3.x does not configure the Future TTL value for Timestamp processing
+    * [CXF-3956] - JAX-WS HandlerResolver consulted for ServiceImpl.createPort, but not for createDispatch
+    * [CXF-3961] - SoapTransportFactory: confused exception by unknown transport protocol
+    * [CXF-3966] - When client sends invalid XML, JAX-RS returns 500 instead of 4xx
 
 ** Improvement
-    * [CXF-2053] - wsdl2java should log reason for switching from wrapped to bare in verbose mode
-    * [CXF-3055] - Adding -version, -V and -Q switches to all command line tools
-    * [CXF-3245] - Command line options are not uniform across CXF tools
-    * [CXF-3323] - Update "description" elements in all CXF POM files. 
-    * [CXF-3686] - Adjust sample project method calls that should be accessed in a static manner.
-    * [CXF-3690] - Refactor packaging for uniformity across examples.
-    * [CXF-3736] - Send the cause of exception stack trace
-    * [CXF-3752] - Allow ability to reset values in ResponseTimeCounter via JMX
-    * [CXF-3796] - Introduce an header to disable the handling the PartialResponse when the response code is 202
-    * [CXF-3814] - update JDK download url in examples README.txt
-    * [CXF-3815] - Add bin script for wsdl2idl in the CXF kit
-    * [CXF-3817] - Add maven support on examples
-    * [CXF-3824] - CLI tool -help should be able to list all switch in toolspec
-    * [CXF-3825] - Add a README file in the CXF_HOME/etc
-    * [CXF-3833] - Add maxIdleTime attribute support on the engine element
-
-** New Feature
-    * [CXF-3125] - Add -validate option to the following utilities:  wsdl2xml, wsdl2soap, wsdl2service and wsdl2corba.
-    * [CXF-3743] - register extensions with CXFNonSpringJaxrsServlet
-
-** Task
-    * [CXF-3737] - Comments reference incorrect tool names in several files.
-    * [CXF-3810] - exclude ws_security/interopfest example from kit
+    * [CXF-3380] - JAX-RS: Support writing to DataSources
+    * [CXF-3849] - JAXBElementProvider prints Exception on System.err
+    * [CXF-3858] - It will be helpful to add the cause exception message, when throw the fault from XMLStreamDataReader and XMLStreamDataWriter
+    * [CXF-3863] - Warning info since build service from wsdl of JaxWsServiceFactoryBean once I located the wsdl location
+    * [CXF-3872] - Confusing error message "Problem writing SAAJ model to stream" in case if service not avalable (patch)
+    * [CXF-3879] - Add the ability to enforce a maximum attachment size
+    * [CXF-3887] - wsdl2java only shows first error from JAXB/xjc
+    * [CXF-3921] - Making RMTxStore's table exists error state/code configurable
+    * [CXF-3965] - Enhancement of the exception message when configuring the schema location in the jaxws endpoint.
 
