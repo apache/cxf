@@ -31,5 +31,6 @@
     </parent>
     <modules>
       <module>javascript-rt</module>
+      <module>javascript-tests</module>
     </modules>
 </project>
