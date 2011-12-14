@@ -29,6 +29,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
+import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
@@ -82,6 +83,10 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                 boolean processingFailed = false;
                 if (token instanceof KerberosToken) {
                     if (!processKerberosTokens()) {
+                        processingFailed = true;
+                    }
+                } else if (token instanceof SamlToken) {
+                    if (!processSAMLTokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
