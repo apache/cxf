@@ -70,12 +70,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             bean.addPropertyValue("id", id);
         }
 
-        String tmp = element.getAttribute("bus");
-        element.removeAttribute("bus");
         super.doParse(element, ctx, bean);
-        if (StringUtils.isEmpty(tmp)) {
-            element.setAttribute("bus", tmp);
-        }
         
         if (ctx.getRegistry().containsBeanDefinition(bus)) {
             BeanDefinition def = ctx.getRegistry().getBeanDefinition(bus);
@@ -93,7 +88,11 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             bean.addConstructorArgValue(bus);
         }
     }
-    
+    protected boolean processBusAttribute(Element element, ParserContext ctx, 
+                                          BeanDefinitionBuilder bean,
+                                          String val) {
+        return false;
+    }
     private void copyProps(BeanDefinitionBuilder src, BeanDefinition def) {
         for (PropertyValue v : src.getBeanDefinition().getPropertyValues().getPropertyValues()) {
             if (!"bus".equals(v.getName())) {

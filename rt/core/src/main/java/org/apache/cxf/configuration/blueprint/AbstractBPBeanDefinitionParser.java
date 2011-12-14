@@ -160,21 +160,24 @@ public abstract class AbstractBPBeanDefinitionParser {
                     bean.addDependsOn(val);
                 } else if ("name".equals(name)) {
                     processNameAttribute(element, ctx, bean, val);
+                } else if ("bus".equals(name)) {
+                    processBusAttribute(element, ctx, bean, val);
                 } else if (!"id".equals(name) && isAttribute(pre, name)) {
-                    if ("bus".equals(name)) {
-                        if (this.hasBusProperty()) {
-                            bean.addProperty("bus", getBusRef(ctx, val));
-                        } else {
-                            bean.addArgument(getBusRef(ctx, val), null, 0);
-                        }
-                    } else {
-                        mapAttribute(bean, element, name, val, ctx);
-                    }
+                    mapAttribute(bean, element, name, val, ctx);
                 }
             }
         }
         return setBus;
     }
+    protected void processBusAttribute(Element element, ParserContext ctx, 
+                                       MutableBeanMetadata bean, String val) {
+        if (this.hasBusProperty()) {
+            bean.addProperty("bus", getBusRef(ctx, val));
+        } else {
+            bean.addArgument(getBusRef(ctx, val), null, 0);
+        }
+    }
+
     protected void processNameAttribute(Element element,
                                         ParserContext ctx,
                                         MutableBeanMetadata bean,

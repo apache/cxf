@@ -102,23 +102,29 @@ public abstract class AbstractBeanDefinitionParser
                 bean.addDependsOn(val);
             } else if ("name".equals(name)) {
                 processNameAttribute(element, ctx, bean, val);
+            } else if ("bus".equals(name)) {
+                setBus = processBusAttribute(element, ctx, bean, val);
             } else if (!"id".equals(name) && isAttribute(pre, name)) {
-                if ("bus".equals(name)) {                                     
-                    if (val != null && val.trim().length() > 0) {
-                        if (ctx.getRegistry().containsBeanDefinition(val)) {
-                            bean.addPropertyReference(name, val);
-                        } else {
-                            addBusWiringAttribute(bean, BusWiringType.PROPERTY,
-                                                  val, ctx);
-                        }
-                        setBus = true;                         
-                    }
-                } else {
-                    mapAttribute(bean, element, name, val);
-                }    
+                mapAttribute(bean, element, name, val);
             }
         } 
         return setBus;
+    }
+
+    
+    protected boolean processBusAttribute(Element element, ParserContext ctx, 
+                                        BeanDefinitionBuilder bean,
+                                        String val) {
+        if (val != null && val.trim().length() > 0) {
+            if (ctx.getRegistry().containsBeanDefinition(val)) {
+                bean.addPropertyReference("bus", val);
+            } else {
+                addBusWiringAttribute(bean, BusWiringType.PROPERTY,
+                                      val, ctx);
+            }
+            return true;                         
+        }
+        return false;
     }
 
     protected void processNameAttribute(Element element,
