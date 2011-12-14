@@ -78,4 +78,50 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         samlPort.doubleIt(25);
     }
     
+    /**
+     * 2.3.1.2 (WSS1.0) SAML1.1 Assertion (Sender Vouches) over SSL
+     */
+    @org.junit.Test
+    public void testTLSSenderVouches() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesPort");
+        DoubleItPortType samlPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(samlPort, PORT2);
+        
+        samlPort.doubleIt(25);
+    }
+    
+    /**
+     * 2.3.1.3 (WSS1.0) SAML1.1 Assertion (HK) over SSL
+     */
+    @org.junit.Test
+    public void testTLSHOKSignedEndorsing() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingPort");
+        DoubleItPortType samlPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(samlPort, PORT2);
+        
+        samlPort.doubleIt(25);
+    }
+    
 }

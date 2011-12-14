@@ -55,6 +55,33 @@
        </jaxws:properties> 
     </jaxws:endpoint>
     
+    <jaxws:endpoint 
+       id="TLSSenderVouches"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSamlTLSSenderVouches" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTLSSenderVouchesPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
+       <jaxws:properties>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="TLSHOKSignedEndorsing"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSamlTLSHOKSignedEndorsing" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTLSHOKSignedEndorsingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
+       <jaxws:properties>
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
     <!-- -->
     <!-- Any services listening on port ${testutil.ports.Server} must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
@@ -63,10 +90,10 @@
         <httpj:engine port="${testutil.ports.Server.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="Bethal.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="bob.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="Truststore.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="cxfca.jks"/>
                 </sec:trustManagers> 
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_EXPORT_.*</sec:include>
@@ -76,7 +103,7 @@
                     <sec:include>.*_WITH_NULL_.*</sec:include>
                     <sec:exclude>.*_DH_anon_.*</sec:exclude>
                 </sec:cipherSuitesFilter>
-                <sec:clientAuthentication want="false" required="false"/>
+                <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
