@@ -200,11 +200,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
 
 
     public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException {
-        return getConduit(ei);
-    }
-
-    public Conduit getConduit(EndpointInfo ei) throws IOException {
-        String address = ei.getAddress();
+        String address = target.getAddress().getValue();
         if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp://")) {
             //TODO - examine policies and stuff to look for the sun tcp policies
             return new TCPConduit(ei);
@@ -229,11 +225,15 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                 throw new RuntimeException("Could not find conduit initiator for transport "
                         + transId);
             }
-            return conduitInit.getConduit(ei);
+            return conduitInit.getConduit(ei, target);
         } catch (BusException e) {
             throw new RuntimeException("Could not find conduit initiator for transport "
                                        + transId);
         }
+    }
+
+    public Conduit getConduit(EndpointInfo ei) throws IOException {
+        return getConduit(ei, ei.getTarget());
     }
 
     @Resource(name = "cxf")
