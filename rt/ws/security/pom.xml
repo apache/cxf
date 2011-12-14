@@ -56,12 +56,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-policy</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -114,11 +108,6 @@
             <artifactId>bcprov-jdk15</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <optional>true</optional>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -144,10 +133,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-testutils</artifactId>
+            <artifactId>cxf-rt-ws-policy</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
