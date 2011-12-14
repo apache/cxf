@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements. See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership. The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License. You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	KIND, either express or implied. See the License for the
+	specific language governing permissions and limitations
+	under the License.
+-->
+<wsdl:definitions name="HelloWorld"
+	targetNamespace="http://apache.org/hello_world_rpclit"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://apache.org/hello_world_rpclit"
+	xmlns:x1="http://apache.org/hello_world_rpclit/types"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<wsdl:types>
+		<schema
+			targetNamespace="http://apache.org/hello_world_rpclit/types"
+			xmlns="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified">
+			<complexType name="myComplexStruct">
+				<sequence>
+					<element name="elem1" type="xsd:string" />
+					<element name="elem2" type="xsd:string" />
+					<element name="elem3" type="xsd:int" />
+				</sequence>
+			</complexType>
+		</schema>
+	</wsdl:types>
+
+	<wsdl:message name="sayHiRequest" />
+
+	<wsdl:message name="sayHiResponse">
+		<wsdl:part type="xsd:string" name="out" />
+	</wsdl:message>
+
+	<wsdl:message name="greetMeRequest">
+		<wsdl:part type="xsd:string" name="in" />
+	</wsdl:message>
+
+	<wsdl:message name="greetMeResponse">
+		<wsdl:part type="xsd:string" name="out" />
+	</wsdl:message>
+	
+	<wsdl:message name="greetUsRequest">
+		<wsdl:part type="xsd:string" name="you" />
+		<wsdl:part type="xsd:string" name="me" />
+	</wsdl:message>
+
+	<wsdl:message name="greetUsResponse">
+		<wsdl:part type="xsd:string" name="out" />
+	</wsdl:message>	
+
+	<wsdl:message name="sendReceiveDataRequest">
+		<wsdl:part type="x1:myComplexStruct" name="in" />
+	</wsdl:message>
+
+	<wsdl:message name="sendReceiveDataResponse">
+		<wsdl:part type="x1:myComplexStruct" name="out" />
+	</wsdl:message>
+
+	<wsdl:portType name="GreeterRPCLit">
+		<wsdl:operation name="sayHi">
+			<wsdl:input message="tns:sayHiRequest" name="sayHiRequest" />
+			<wsdl:output message="tns:sayHiResponse"
+				name="sayHiResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="greetMe">
+			<wsdl:input message="tns:greetMeRequest"
+				name="greetMeRequest" />
+			<wsdl:output message="tns:greetMeResponse"
+				name="greetMeResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="sendReceiveData">
+			<wsdl:input message="tns:sendReceiveDataRequest"
+				name="SendReceiveDataRequest" />
+			<wsdl:output message="tns:sendReceiveDataResponse"
+				name="SendReceiveDataResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="greetUs">
+			<wsdl:input message="tns:greetUsRequest"
+				name="greetUsRequest" />
+			<wsdl:output message="tns:greetUsResponse"
+				name="greetUsResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="Greeter_SOAPBinding_RPCLit"
+		type="tns:GreeterRPCLit">
+
+		<soap:binding style="rpc"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="sayHi">
+			<soap:operation soapAction="" style="rpc" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="greetMe">
+			<soap:operation soapAction="" style="rpc" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="greetUs">
+			<soap:operation soapAction="" style="rpc" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="sendReceiveData">
+			<soap:operation soapAction="" style="rpc" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://apache.org/hello_world_rpclit" use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:service name="SOAPServiceRPCLit">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort" />
+		</wsdl:port>
+
+		<!-- Bug in CXF runtime the below port is not recognised-->
+		<!--
+			<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit" name="SoapPortRPCLit1">
+			<soap:address location="http://localhost:9002/SOAPServiceRPCLit/SoapPort1"/>
+			</wsdl:port>        
+		-->
+	</wsdl:service>
+
+	<wsdl:service name="SOAPServiceProviderRPCLit">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit1">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit1" />
+		</wsdl:port>
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit2">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit2" />
+		</wsdl:port>
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit3">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit3" />
+		</wsdl:port>
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit4">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit4" />
+		</wsdl:port>
+
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit5">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit5" />
+		</wsdl:port>
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit6">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit6" />
+		</wsdl:port>
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit7">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit7" />
+		</wsdl:port>
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortProviderRPCLit8">
+			<soap:address
+				location="http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8" />
+		</wsdl:port>
+        </wsdl:service>
+
+	<wsdl:service name="SOAPServiceRPCLit1">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit1">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort1" />
+		</wsdl:port>
+	</wsdl:service>
+
+	<wsdl:service name="SOAPServiceRPCLit2">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit2">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort2" />
+		</wsdl:port>
+	</wsdl:service>
+
+	<wsdl:service name="SOAPServiceRPCLit3">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit3">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort3" />
+		</wsdl:port>
+	</wsdl:service>
+
+	<wsdl:service name="SOAPServiceRPCLit4">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit4">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort4" />
+		</wsdl:port>
+	</wsdl:service>
+
+	<wsdl:service name="SOAPServiceRPCLit5">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit5">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort5" />
+		</wsdl:port>
+	</wsdl:service>
+
+	<wsdl:service name="SOAPServiceRPCLit6">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit6">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort6" />
+		</wsdl:port>
+	</wsdl:service>
+	
+	<wsdl:service name="SOAPServiceRPCLit8">
+		<wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit"
+			name="SoapPortRPCLit8">
+			<soap:address
+				location="http://localhost:9002/SOAPServiceRPCLit/SoapPort8" />
+		</wsdl:port>
+	</wsdl:service>
+	
+</wsdl:definitions>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<schema
+    targetNamespace="http://apache.org/hello_world_rpclit/types"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+    <complexType name="myComplexStruct">
+        <sequence>
+            <element name="elem1" type="xsd:string" />
+            <element name="elem2" type="xsd:string" />
+            <element name="elem3" type="xsd:int" />
+        </sequence>
+    </complexType>
+</schema>
+

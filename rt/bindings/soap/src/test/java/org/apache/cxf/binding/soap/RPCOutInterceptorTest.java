@@ -39,7 +39,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.hello_world_rpclit.types.MyComplexStruct;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
@@ -59,7 +58,8 @@ public class RPCOutInterceptorTest extends TestBase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        ServiceInfo si = getMockedServiceModel(this.getClass().getResource("/wsdl/hello_world_rpc_lit.wsdl")
+        ServiceInfo si = getMockedServiceModel(this.getClass()
+                                               .getResource("/wsdl_soap/hello_world_rpc_lit.wsdl")
                 .toString());
         BindingInfo bi = si.getBinding(new QName(TNS, "Greeter_SOAPBinding_RPCLit"));
         BindingOperationInfo boi = bi.getOperation(new QName(TNS, OPNAME));

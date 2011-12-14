@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<schema targetNamespace="http://apache.org/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
+    <element name="sayHi">
+        <complexType/>
+    </element>
+    <element name="sayHiResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMe">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="testNillable">
+        <complexType>
+            <sequence>
+                <element name="NillElem" nillable="true" type="string"/>
+                <element name="intElem" type="int"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="testNillableResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" nillable="true" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="greetMeLater">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="long"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeLaterResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeSometime">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeSometimeResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeOneWay">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="testDocLitFault">
+        <complexType>
+            <sequence>
+                <element name="faultType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="testDocLitFaultResponse">
+        <complexType>
+            <sequence/>
+        </complexType>
+    </element>
+    <complexType name="ErrorCode">
+        <sequence>
+            <element name="minor" type="short"/>
+            <element name="major" type="short"/>
+        </sequence>
+    </complexType>
+    <element name="NoSuchCodeLit">
+        <complexType>
+            <sequence>
+                <element name="code" type="x1:ErrorCode"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="BadRecordLit" type="string"/>
+    <complexType name="BadRecord">
+        <sequence>
+            <element name="reason" type="string"/>
+            <element name="code" type="short"/>
+        </sequence>
+    </complexType>
+    <complexType name="addNumbers">
+        <sequence>
+            <element name="arg0" type="int"/>
+            <element name="arg1" type="int"/>
+        </sequence>
+    </complexType>
+    <element name="addNumbers" type="x1:addNumbers"/>
+    <complexType name="addNumbersResponse">
+        <sequence>
+            <element name="return" type="int"/>
+        </sequence>
+    </complexType>
+    <element name="addNumbersResponse" type="x1:addNumbersResponse"/>
+    <complexType name="stringStruct">
+        <sequence>
+            <element name="arg0" type="string"/>
+            <element name="arg1" type="string"/>
+        </sequence>
+    </complexType>
+    <element name="BareDocument" type="string"/>
+    <element name="BareDocumentResponse">
+        <complexType>
+            <sequence>
+                <element name="company" type="string"/>
+            </sequence>
+            <attribute name="id" type="int"/>
+        </complexType>
+    </element>
+</schema>

@@ -50,6 +50,15 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/form_test.xsd</xsd>
                                 </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/test/resources/wsdl/jaxb/hello_world.xsd</xsd>
+                                </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/test/resources/wsdl/jaxb/doc_lit_bare.xsd</xsd>
+                                </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/test/resources/wsdl/jaxb/rpc_lit.xsd</xsd>
+                                </xsdOption>
                             </xsdOptions>
                         </configuration>
                         <goals>
@@ -88,12 +97,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-testutils</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>

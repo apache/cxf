@@ -58,7 +58,7 @@ import org.apache.cxf.jaxb_misc.ObjectFactory;
 import org.apache.cxf.jaxb_misc.TestJAXBClass;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
-import org.apache.hello_world.types.GreetMe;
+import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -70,7 +70,7 @@ import org.junit.Test;
 public class JAXBDataBindingTest extends Assert {
 
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBindingTest.class);
-    private static final String WSDL_PATH = "/wsdl/hello_world.wsdl";
+    private static final String WSDL_PATH = "/wsdl/jaxb/hello_world.wsdl";
     private Definition def;
     private Service service;
 

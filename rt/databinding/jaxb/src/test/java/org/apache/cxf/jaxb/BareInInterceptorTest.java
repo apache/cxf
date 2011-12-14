@@ -191,7 +191,7 @@ public class BareInInterceptorTest extends Assert {
     private void setUpUsingHelloWorld() throws Exception {
         String ns = "http://apache.org/hello_world_soap_http";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()
-            .getResource("/wsdl/hello_world.wsdl"),
+            .getResource("/wsdl/jaxb/hello_world.wsdl"),
                                                             new QName(ns, "SOAPService"));
 
         service = factory.create();
@@ -221,7 +221,7 @@ public class BareInInterceptorTest extends Assert {
     private void setUpUsingDocLit() throws Exception {
         String ns = "http://apache.org/hello_world_doc_lit_bare";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()
-            .getResource("/wsdl/doc_lit_bare.wsdl"),
+            .getResource("/wsdl/jaxb/doc_lit_bare.wsdl"),
                                                             new QName(ns, "SOAPService"));
 
         service = factory.create();

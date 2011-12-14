@@ -35,7 +35,6 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.mime.types.XopType;
 
 public final class TestUtil {
 

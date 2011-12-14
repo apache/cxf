@@ -44,6 +44,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.ws.RequestWrapper;
+import javax.xml.ws.ResponseWrapper;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,12 +57,9 @@ import org.apache.cxf.jaxb_misc.Base64WithDefaultValueType;
 import org.apache.cxf.jaxb_misc.ObjectFactory;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxStreamFilter;
-import org.apache.cxf.testutil.common.TestUtil;
-import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.apache.hello_world_soap_http.types.StringStruct;
-import org.apache.type_test.doc.TypeTestPortType;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -93,7 +91,7 @@ public class JAXBEncoderDecoderTest extends Assert {
             StringStruct.class,
             ObjectWithQualifiedElementElement.class
         });
-        Method method = TestUtil.getMethod(Greeter.class, "greetMe");
+        Method method = getMethod("greetMe");
         wrapperAnnotation = method.getAnnotation(RequestWrapper.class);
         
         InputStream is =  getClass().getResourceAsStream("resources/StringStruct.xsd");
@@ -102,6 +100,27 @@ public class JAXBEncoderDecoderTest extends Assert {
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schema = factory.newSchema(schemaSource);
         assertNotNull(schema);
+    }
+    private Method getMethod(String methodName) {
+        Method[] declMethods = this.getClass().getDeclaredMethods();
+        for (Method method : declMethods) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        return null;
+    }
+    
+    @RequestWrapper(localName = "greetMe", 
+        targetNamespace = "http://apache.org/hello_world_soap_http/types", 
+        className = "org.apache.hello_world_soap_http.types.GreetMe")
+    @ResponseWrapper(localName = "greetMeResponse", 
+        targetNamespace = "http://apache.org/hello_world_soap_http/types", 
+        className = "org.apache.hello_world_soap_http.types.GreetMeResponse")
+    public java.lang.String greetMe(
+        java.lang.String requestType
+    ) {
+        return "Hello " + requestType;
     }
 
     
@@ -444,7 +463,7 @@ public class JAXBEncoderDecoderTest extends Assert {
     
     @Test
     public void testGetClassFromType() throws Exception {
-        Method testByte = TestUtil.getMethod(TypeTestPortType.class, "testByte");
+        Method testByte = getMethod("testByte");
         Type[] genericParameterTypes = testByte.getGenericParameterTypes();
         Class<?>[] paramTypes = testByte.getParameterTypes();
  
@@ -455,7 +474,7 @@ public class JAXBEncoderDecoderTest extends Assert {
             idx++;
         }
         
-        Method testBase64Binary = TestUtil.getMethod(TypeTestPortType.class, "testBase64Binary");
+        Method testBase64Binary = getMethod("testBase64Binary");
         genericParameterTypes = testBase64Binary.getGenericParameterTypes();
         paramTypes = testBase64Binary.getParameterTypes();
  
@@ -473,5 +492,34 @@ public class JAXBEncoderDecoderTest extends Assert {
         byte[] checkValue = testData.getAttributeWithDefaultValue();
         assertNotNull(checkValue);
     }
+    
+    
+    @RequestWrapper(localName = "testByte",
+        targetNamespace = "http://apache.org/type_test/doc", 
+        className = "org.apache.type_test.doc.TestByte")
+    @ResponseWrapper(localName = "testByteResponse", 
+        targetNamespace = "http://apache.org/type_test/doc", 
+        className = "org.apache.type_test.doc.TestByteResponse")
+    public byte testByte(
+        byte x,
+        javax.xml.ws.Holder<java.lang.Byte> y,
+        javax.xml.ws.Holder<java.lang.Byte> z) {
+        return 24;
+    }
+    
+    @RequestWrapper(localName = "testBase64Binary", 
+        targetNamespace = "http://apache.org/type_test/doc", 
+        className = "org.apache.type_test.doc.TestBase64Binary")
+    @ResponseWrapper(localName = "testBase64BinaryResponse", 
+        targetNamespace = "http://apache.org/type_test/doc", 
+        className = "org.apache.type_test.doc.TestBase64BinaryResponse")
+    public byte[] testBase64Binary(
+        byte[] x,
+        javax.xml.ws.Holder<byte[]> y,
+        javax.xml.ws.Holder<byte[]> z) {
+        return null;
+    }
+
+
 }
 

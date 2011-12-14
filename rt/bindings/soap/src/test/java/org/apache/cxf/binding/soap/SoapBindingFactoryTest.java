@@ -75,7 +75,7 @@ public class SoapBindingFactoryTest extends Assert {
     
     @Test
     public void testNoBodyParts() throws Exception {
-        Definition d = createDefinition("/wsdl/no_body_parts.wsdl");
+        Definition d = createDefinition("/wsdl_soap/no_body_parts.wsdl");
         Bus bus = getMockBus();
 
         BindingFactoryManager bfm = getBindingFactoryManager(WSDLConstants.NS_SOAP11, bus);
@@ -123,7 +123,7 @@ public class SoapBindingFactoryTest extends Assert {
 
     @Test
     public void testFactory() throws Exception {        
-        Definition d = createDefinition("/wsdl/hello_world.wsdl");
+        Definition d = createDefinition("/wsdl_soap/hello_world.wsdl");
 
         Bus bus = getMockBus();
 
@@ -170,7 +170,7 @@ public class SoapBindingFactoryTest extends Assert {
     
     @Test
     public void testSoap12Factory() throws Exception {        
-        Definition d = createDefinition("/wsdl/hello_world_soap12.wsdl");
+        Definition d = createDefinition("/wsdl_soap/hello_world_soap12.wsdl");
 
         Bus bus = getMockBus();
 

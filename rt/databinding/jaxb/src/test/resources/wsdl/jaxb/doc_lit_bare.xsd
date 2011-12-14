@@ -1,0 +1,15 @@
+<schema targetNamespace="http://apache.org/hello_world_doc_lit_bare/types" 
+    xmlns:tns="http://apache.org/hello_world_doc_lit_bare/types" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <complexType name="TradePriceData">
+        <sequence>
+            <element name="tickerSymbol" type="xsd:string"/>
+            <element name="tickerPrice" type="xsd:float"/>
+        </sequence>
+    </complexType>
+    <element name="in" type="tns:TradePriceData"/>
+    <element name="inout" type="tns:TradePriceData"/>
+    <element name="stringRespType" type="xsd:string"/>
+    <element name="inDecimal" nillable="true" type="xsd:decimal" />
+    <element name="outString" nillable="true" type="xsd:string" />
+</schema>
