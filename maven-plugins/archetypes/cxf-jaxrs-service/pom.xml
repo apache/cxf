@@ -32,7 +32,7 @@
     <version>2.5.1-SNAPSHOT</version>
     <packaging>maven-archetype</packaging>
 
-    <name>cxf-jaxrs-service-archetype</name>
+    <name>Apache CXF Archetype - Simple JAX-RS webapp</name>
     <description>Simple CXF JAX-RS webapp service using Spring configuration</description>
 
     <build>
