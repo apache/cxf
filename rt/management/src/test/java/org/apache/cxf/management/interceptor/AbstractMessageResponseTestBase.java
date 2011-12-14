@@ -32,7 +32,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Before;

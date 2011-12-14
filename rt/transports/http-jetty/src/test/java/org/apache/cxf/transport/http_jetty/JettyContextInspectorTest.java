@@ -19,8 +19,8 @@
 
 package org.apache.cxf.transport.http_jetty;
 
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.eclipse.jetty.server.handler.ContextHandler;
 

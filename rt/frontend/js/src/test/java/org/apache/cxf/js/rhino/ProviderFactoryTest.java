@@ -24,7 +24,7 @@ import java.io.File;
 import javax.xml.ws.Service;
 
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Before;

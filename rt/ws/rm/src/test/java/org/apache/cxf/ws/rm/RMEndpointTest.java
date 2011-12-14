@@ -52,8 +52,8 @@ import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -139,7 +139,8 @@ public class RMEndpointTest extends Assert {
             .getDeclaredMethod("createEndpoint", new Class[] {org.apache.cxf.transport.Destination.class});
         Method m3 = RMEndpoint.class.getDeclaredMethod("setPolicies", new Class[] {});
 
-        rme = control.createMock(RMEndpoint.class, new Method[] {m1, m2, m3});
+        rme = EasyMock.createMockBuilder(RMEndpoint.class)
+            .addMockedMethods(m1, m2 , m3).createMock(control);
         rme.createService();
         EasyMock.expectLastCall();
         rme.createEndpoint(null);
@@ -171,7 +172,8 @@ public class RMEndpointTest extends Assert {
     @Test
     public void testCreateEndpoint() throws NoSuchMethodException {
         Method m = RMEndpoint.class.getDeclaredMethod("getUsingAddressing", new Class[] {EndpointInfo.class});
-        rme = control.createMock(RMEndpoint.class, new Method[] {m});
+        rme = EasyMock.createMockBuilder(RMEndpoint.class)
+            .addMockedMethod(m).createMock(control);
         rme.setAplicationEndpoint(ae);
         rme.setManager(manager);
         rme.setProtocol(ProtocolVariation.RM10WSA200408);
@@ -272,7 +274,8 @@ public class RMEndpointTest extends Assert {
     @Test
     public void testSetPolicies() throws NoSuchMethodException {
         Method m = RMEndpoint.class.getDeclaredMethod("getEndpoint", new Class[] {});
-        rme = control.createMock(RMEndpoint.class, new Method[] {m});
+        rme = EasyMock.createMockBuilder(RMEndpoint.class)
+            .addMockedMethod(m).createMock(control);
         rme.setAplicationEndpoint(ae);
         rme.setManager(manager);
         Endpoint e = control.createMock(Endpoint.class);

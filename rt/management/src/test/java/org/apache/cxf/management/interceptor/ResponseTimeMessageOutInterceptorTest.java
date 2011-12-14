@@ -23,7 +23,7 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageResponseTestBase {

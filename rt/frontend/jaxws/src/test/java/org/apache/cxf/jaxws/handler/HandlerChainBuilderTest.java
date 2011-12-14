@@ -33,7 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.javaee.FullyQualifiedClassType;
 import org.apache.cxf.jaxws.javaee.ParamValueType;
 import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 

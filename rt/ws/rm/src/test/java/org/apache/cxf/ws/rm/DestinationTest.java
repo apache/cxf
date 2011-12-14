@@ -26,8 +26,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -131,7 +131,8 @@ public class DestinationTest extends Assert {
     NoSuchMethodException {
         
         Method m1 = Destination.class.getDeclaredMethod("getSequence", new Class[] {Identifier.class});
-        destination = control.createMock(Destination.class, new Method[] {m1});
+        destination = EasyMock.createMockBuilder(Destination.class)
+            .addMockedMethod(m1).createMock(control);
         Message message = setupMessage();
         RMProperties rmps = control.createMock(RMProperties.class);
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);

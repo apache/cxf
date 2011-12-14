@@ -71,15 +71,15 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManagerImpl;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 
+import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createNiceControl;
 
 public class SOAPHandlerInterceptorTest extends Assert {
 

@@ -39,8 +39,8 @@ import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -305,7 +305,7 @@ public class RMTxStoreTest extends Assert {
         control.verify();
         
         control.reset();
-        EasyMock.expect(seq.getLastMessageNumber()).andReturn(null);
+        EasyMock.expect(seq.getLastMessageNumber()).andReturn(Long.valueOf(0));
         EasyMock.expect(seq.getAcknowledgment()).andReturn(ack1);        
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         

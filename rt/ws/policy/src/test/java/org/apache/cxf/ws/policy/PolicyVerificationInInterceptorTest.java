@@ -28,8 +28,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.neethi.Policy;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,7 +91,8 @@ public class PolicyVerificationInInterceptorTest extends Assert {
         Method m = AbstractPolicyInterceptor.class.getDeclaredMethod("getTransportAssertions",
             new Class[] {Message.class});
         PolicyVerificationInInterceptor interceptor = 
-            control.createMock(PolicyVerificationInInterceptor.class, new Method[] {m});
+            EasyMock.createMockBuilder(PolicyVerificationInInterceptor.class)
+                .addMockedMethod(m).createMock(control);
         setupMessage(true, true, true, true);
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE);
         interceptor.getTransportAssertions(message);

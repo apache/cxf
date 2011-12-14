@@ -39,8 +39,8 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyOperator;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -116,8 +116,8 @@ public class EndpointPolicyImplTest extends Assert {
             new Class[] {});
         Method m5 = EndpointPolicyImpl.class.getDeclaredMethod("initializeInterceptors",
             new Class[] {});
-        EndpointPolicyImpl epi = control.createMock(EndpointPolicyImpl.class, 
-                                                    new Method[] {m1, m2, m3, m4, m5});
+        EndpointPolicyImpl epi = EasyMock.createMockBuilder(EndpointPolicyImpl.class)
+            .addMockedMethods(m1, m2, m3, m4, m5).createMock(control);
          
         epi.initializePolicy();
         EasyMock.expectLastCall();

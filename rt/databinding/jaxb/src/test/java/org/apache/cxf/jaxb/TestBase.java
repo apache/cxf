@@ -52,13 +52,13 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createNiceControl;
 
 public class TestBase extends Assert {
 

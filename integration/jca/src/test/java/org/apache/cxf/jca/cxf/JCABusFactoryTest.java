@@ -28,7 +28,7 @@ import javax.resource.ResourceException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 import org.apache.cxf.test.AbstractCXFTest;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 

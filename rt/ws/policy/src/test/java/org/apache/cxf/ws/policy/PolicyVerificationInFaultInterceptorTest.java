@@ -29,8 +29,8 @@ import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.neethi.Policy;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +64,8 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
             new Class[] {Message.class});
         
         PolicyVerificationInFaultInterceptor interceptor = 
-            control.createMock(PolicyVerificationInFaultInterceptor.class, new Method[] {m});
+            EasyMock.createMockBuilder(PolicyVerificationInFaultInterceptor.class)
+                .addMockedMethod(m).createMock(control);
         
         setupMessage(false, false, false, false, false, false);
         control.replay();

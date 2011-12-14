@@ -62,7 +62,7 @@ public class ForkedCommandTest extends Assert {
         assertEquals(cmdline1, cmdline2);
         
         new ForkedCommandException(new NullPointerException());
-        Message msg = org.easymock.classextension.EasyMock.createMock(Message.class);
+        Message msg = org.easymock.EasyMock.createMock(Message.class);
         new ForkedCommandException(msg, new NullPointerException());
     }
 

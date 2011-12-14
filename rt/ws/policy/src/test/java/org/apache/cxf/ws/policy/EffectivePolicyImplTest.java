@@ -38,8 +38,8 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,7 +91,8 @@ public class EffectivePolicyImplTest extends Assert {
     public void testInitialiseFromEndpointPolicy() throws NoSuchMethodException {
         Method m = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
                                                           new Class[] {PolicyEngineImpl.class});
-        EffectivePolicyImpl effectivePolicy = control.createMock(EffectivePolicyImpl.class, new Method[] {m});
+        EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
+            .addMockedMethod(m).createMock(control);
         EndpointPolicyImpl endpointPolicy = control.createMock(EndpointPolicyImpl.class);
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(endpointPolicy.getPolicy()).andReturn(p);
@@ -118,8 +119,8 @@ public class EffectivePolicyImplTest extends Assert {
             new Class[] {PolicyEngineImpl.class, Assertor.class});
         Method m3 = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
                                                           new Class[] {PolicyEngineImpl.class});
-        EffectivePolicyImpl effectivePolicy = 
-            control.createMock(EffectivePolicyImpl.class, new Method[] {m1, m2, m3});        
+        EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
+            .addMockedMethods(m1, m2, m3).createMock(control);        
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
         PolicyEngineImpl pe = new PolicyEngineImpl();
@@ -147,8 +148,8 @@ public class EffectivePolicyImplTest extends Assert {
             new Class[] {PolicyEngineImpl.class, Assertor.class});
         Method m3 = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
                                                           new Class[] {PolicyEngineImpl.class});
-        EffectivePolicyImpl effectivePolicy = 
-            control.createMock(EffectivePolicyImpl.class, new Method[] {m1, m2, m3});        
+        EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
+            .addMockedMethods(m1, m2, m3).createMock(control);        
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
         PolicyEngineImpl pe = new PolicyEngineImpl();

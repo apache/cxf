@@ -59,8 +59,8 @@ import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -103,7 +103,9 @@ public class RMSoapInterceptorTest extends Assert {
     public void testHandleMessage() throws NoSuchMethodException {
         Method m = RMSoapInterceptor.class.getDeclaredMethod("mediate", 
             new Class[] {SoapMessage.class});
-        RMSoapInterceptor codec = control.createMock(RMSoapInterceptor.class, new Method[] {m});
+        RMSoapInterceptor codec = 
+            EasyMock.createMockBuilder(RMSoapInterceptor.class)
+                .addMockedMethod(m).createMock(control);
         SoapMessage msg = control.createMock(SoapMessage.class);
         codec.mediate(msg);
         EasyMock.expectLastCall();
@@ -119,7 +121,9 @@ public class RMSoapInterceptorTest extends Assert {
                                                              new Class[] {SoapMessage.class});
         Method m2 = RMSoapInterceptor.class.getDeclaredMethod("decode", 
                                                               new Class[] {SoapMessage.class});
-        RMSoapInterceptor codec = control.createMock(RMSoapInterceptor.class, new Method[] {m1, m2});
+        RMSoapInterceptor codec =
+            EasyMock.createMockBuilder(RMSoapInterceptor.class)
+                .addMockedMethods(m1, m2).createMock(control);
         
         SoapMessage msg = control.createMock(SoapMessage.class);
         Exchange exchange = control.createMock(Exchange.class);

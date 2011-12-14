@@ -33,8 +33,8 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;

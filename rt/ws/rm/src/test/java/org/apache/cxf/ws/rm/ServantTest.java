@@ -39,8 +39,8 @@ import org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200502.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200502.Expires;
 import org.apache.cxf.ws.rm.v200502.OfferType;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;

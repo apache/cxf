@@ -29,7 +29,7 @@ import javax.resource.spi.ResourceAdapter;
 
 import org.apache.cxf.Bus;
 //import org.apache.cxf.jca.cxf.test.DummyBus;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectionFactoryImplTest {

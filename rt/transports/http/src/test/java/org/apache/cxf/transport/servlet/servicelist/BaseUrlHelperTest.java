@@ -21,7 +21,7 @@ package org.apache.cxf.transport.servlet.servicelist;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.transport.servlet.BaseUrlHelper;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Test;

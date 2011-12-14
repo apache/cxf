@@ -40,8 +40,8 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -213,7 +213,8 @@ public class PolicyInterceptorsTest extends Assert {
             new Class[] {Message.class, Exception.class, BindingOperationInfo.class});
         
         ServerPolicyOutFaultInterceptor interceptor = 
-            control.createMock(ServerPolicyOutFaultInterceptor.class, new Method[] {m});
+            EasyMock.createMockBuilder(ServerPolicyOutFaultInterceptor.class)
+                .addMockedMethod(m).createMock(control);
         
         doTestBasics(interceptor, false, true);
         

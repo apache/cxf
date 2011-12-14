@@ -54,12 +54,12 @@ public class JsonpInterceptorTest {
 
         // Mock up an output stream as a strict mock. We want to verify that its
         // being written to correctly.
-        ServletOutputStream out = org.easymock.classextension.EasyMock
+        ServletOutputStream out = org.easymock.EasyMock
                 .createMock(ServletOutputStream.class);
         out.write((byte[]) EasyMock.anyObject());
         // the interceptors write both "myCallback(" and ")"
-        org.easymock.classextension.EasyMock.expectLastCall().times(2);
-        org.easymock.classextension.EasyMock.replay(out);
+        org.easymock.EasyMock.expectLastCall().times(2);
+        org.easymock.EasyMock.replay(out);
 
         // Mock up an HTTP request
         HttpServletRequest request = EasyMock
@@ -98,18 +98,18 @@ public class JsonpInterceptorTest {
         postStream.handleMessage(message);
 
         // Verify that the mock response stream was written to as expected
-        org.easymock.classextension.EasyMock.verify(out);
+        org.easymock.EasyMock.verify(out);
     }
 
     @Test
     public void testJsonWithoutPadding() throws Exception {
         // Mock up an output stream as a strict mock. We want to verify that its
         // being written to correctly.
-        ServletOutputStream out = org.easymock.classextension.EasyMock
+        ServletOutputStream out = org.easymock.EasyMock
                 .createMock(ServletOutputStream.class);
         // the interceptors write nothing, so we expect no behaviors from the
         // mock
-        org.easymock.classextension.EasyMock.replay(out);
+        org.easymock.EasyMock.replay(out);
 
         // Mock up an HTTP request
         HttpServletRequest request = EasyMock
@@ -148,7 +148,7 @@ public class JsonpInterceptorTest {
         postStream.handleMessage(message);
 
         // Verify that the mock response stream was written to as expected
-        org.easymock.classextension.EasyMock.verify(out);
+        org.easymock.EasyMock.verify(out);
     }
 
     

@@ -61,8 +61,8 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -678,7 +678,7 @@ public class RMManagerTest extends Assert {
         }
         
         <T> T createMock(Class<T> cls, Method[] m) {
-            T mock = c.createMock(cls, m);
+            T mock = EasyMock.createMockBuilder(cls).addMockedMethods(m).createMock(c);
             mocks.add(mock);
             return mock;
         }

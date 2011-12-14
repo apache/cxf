@@ -40,8 +40,8 @@ import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;

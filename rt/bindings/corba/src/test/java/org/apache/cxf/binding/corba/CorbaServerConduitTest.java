@@ -38,8 +38,8 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -176,7 +176,9 @@ public class CorbaServerConduitTest extends Assert {
         
         Method m = CorbaServerConduit.class.getDeclaredMethod("buildRequestResult", 
             new Class[] {CorbaMessage.class});
-        CorbaServerConduit conduit = EasyMock.createMock(CorbaServerConduit.class, new Method[] {m});       
+        CorbaServerConduit conduit = EasyMock.createMockBuilder(CorbaServerConduit.class)
+            .addMockedMethod(m)
+            .createMock();
         
         CorbaMessage msg = control.createMock(CorbaMessage.class);        
         conduit.buildRequestResult(msg);
