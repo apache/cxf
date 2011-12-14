@@ -47,13 +47,42 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSenderVouchesPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
+    <bean id="saml1SenderVouchesHandler" 
+          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:sender-vouches"/>
+    </bean>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
+           <entry key="ws-security.signature.username" value="alice"/>
+           <entry key="ws-security.self-sign-saml-assertion" value="true"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
+    <bean id="saml1HOKHandler" 
+          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:holder-of-key"/>
+    </bean>
+    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="Morpit.jks"/>
+                <sec:keyStore type="jks" password="password" resource="alice.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="Truststore.jks"/>
+                <sec:keyStore type="jks" password="password" resource="cxfca.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>  
