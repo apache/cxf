@@ -367,7 +367,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             }
             URI basedir = project.getBasedir().toURI();
             URI wsdlURI = getWsdlURI(wsdlOption, basedir);
-            File doneFile = getDoneFile(basedir, wsdlURI, "java");
+            File doneFile = getDoneFile(basedir, wsdlURI, getMarkerSuffix());
             try {
                 doneFile.createNewFile();
             } catch (Throwable e) {
@@ -461,7 +461,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);
         }
-
+        
         String output = StringUtils.isEmpty(out.getOutput()) ? null : '\n' + out.getOutput().trim();
 
         String cmdLine = CommandLineUtils.toString(cmd.getCommandline());
