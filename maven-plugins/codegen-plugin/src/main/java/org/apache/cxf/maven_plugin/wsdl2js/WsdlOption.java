@@ -111,5 +111,11 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
          */
         options.add(wsdl);
         return options;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("WsdlOption [wsdl=%s, artifact=%s, %s]", wsdl, artifact,
+                             super.toString());
     } 
 }

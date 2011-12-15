@@ -60,6 +60,9 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
     File sourceRoot;
     
     /**
+     * Options that specify WSDLs to process and/or control the processing of wsdls. 
+     * If you have enabled wsdl scanning, these elements attach options to particular wsdls.
+     * If you have not enabled wsdl scanning, these options call out the wsdls to process. 
      * @parameter
      */
     WsdlOption wsdlOptions[];

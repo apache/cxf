@@ -36,7 +36,6 @@
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
-                    <execution>
                         <!-- Codegen with default settings.
                              This test shows some of the defaults that work without configuration.  
                              In this case the wsdl dependency to the service "cxf-systests-java2ws"
@@ -45,7 +44,8 @@
                              this binding will be applied.
                              The binding file contains an empty wsdlLocation. This means that
                              the binding will be applied to the wsdl currently processed.  -->
-                        <id>generate-sources</id>
+                    <execution>
+                        <id>generate-java-sources</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>wsdl2java</goal>
@@ -56,6 +56,24 @@
                                 <markGenerated>true</markGenerated>
                                 <asyncMethods />
                             </defaultOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Codegen with default settings.
+                             This test shows some of the defaults that work without configuration.  
+                             In this case the wsdl dependency to the service "cxf-systests-java2ws"
+                             will be processed.
+                             As we have a file named defaultBinding.xml in the classpath
+                             this binding will be applied.
+                             The binding file contains an empty wsdlLocation. This means that
+                             the binding will be applied to the wsdl currently processed.  -->
+                        <id>generate-js-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2js</goal>
+                        </goals>
+                        <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
                         </configuration>
                     </execution>
                 </executions>

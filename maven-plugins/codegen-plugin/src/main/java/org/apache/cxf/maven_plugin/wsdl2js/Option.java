@@ -19,6 +19,7 @@
 package org.apache.cxf.maven_plugin.wsdl2js;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class Option {
 
@@ -158,7 +159,7 @@ public class Option {
     /**
      * @return Validating the WSDL?
      */
-    public boolean isValidate() {
+    public Boolean isValidate() {
         return validate;
     }
 
@@ -166,7 +167,7 @@ public class Option {
      * Control WSDL validation.
      * @param validate true to validate.
      */
-    public void setValidate(boolean validate) {
+    public void setValidate(Boolean validate) {
         this.validate = validate;
     }
 
@@ -192,6 +193,15 @@ public class Option {
 
     public void setDependencies(File[] dependencies) {
         this.dependencies = dependencies;
+    }
+
+    @Override
+    public String toString() {
+        return String
+            .format("Option [packagePrefixes=%s, catalog=%s, output=%s, "
+                    + " validate=%s, wsdlVersion=%s, dependencies=%s]",
+                    Arrays.toString(packagePrefixes), catalog, output, validate, wsdlVersion,
+                    Arrays.toString(dependencies));
     }
 
 }

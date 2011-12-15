@@ -51,14 +51,6 @@ import org.apache.maven.project.MavenProject;
 public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
 
     /**
-     * WSDL files to process. Each wsdl file is specified as an option element, with possible options.
-     * 
-     * @parameter
-     * @required
-     */
-    WsdlOption[] wsdls;
-
-    /**
      * @parameter expression="${cxf.testJavascriptRoot}"
      */
     File testSourceRoot;
@@ -77,9 +69,12 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
      * 
      * @parameter
      */
-    Option defaultOptions;
+    Option defaultOptions = new Option();
     
     /**
+     * Options that specify WSDLs to process and/or control the processing of wsdls. 
+     * If you have enabled wsdl scanning, these elements attach options to particular wsdls.
+     * If you have not enabled wsdl scanning, these options call out the wsdls to process. 
      * @parameter
      */
     WsdlOption wsdlOptions[];
@@ -199,9 +194,14 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
     }
 
     protected void mergeOptions(List<GenericWsdlOption> effectiveWsdlOptions) {
-        for (GenericWsdlOption wo : wsdls) {
+        File outputDirFile = getGeneratedTestRoot() == null 
+            ? getGeneratedSourceRoot() : getGeneratedTestRoot();
+        for (GenericWsdlOption wo : effectiveWsdlOptions) {
             WsdlOption option = (WsdlOption)wo;
             option.merge(defaultOptions);
+            if (option.getOutput() == null) {
+                option.setOutput(outputDirFile);
+            }
         }
     }
 
@@ -211,8 +211,10 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<GenericWsdlOption>();
         List<GenericWsdlOption> temp;
         
-        for (WsdlOption wo : wsdlOptions) {
-            effectiveWsdlOptions.add(wo);
+        if (wsdlOptions != null) {
+            for (WsdlOption wo : wsdlOptions) {
+                effectiveWsdlOptions.add(wo);
+            }
         }
         
         if (wsdlRoot != null && wsdlRoot.exists() && !disableDirectoryScan) {
@@ -263,8 +265,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {
             WsdlOption option = new WsdlOption();
-            WsdlUtilities.fillWsdlOptionFromArtifact(new WsdlOption(), artifact, outputDir);
-            if (option != null) {
+            if (WsdlUtilities.fillWsdlOptionFromArtifact(option, artifact, outputDir)) {
                 if (defaultOptions != null) {
                     option.merge(defaultOptions);
                 }
