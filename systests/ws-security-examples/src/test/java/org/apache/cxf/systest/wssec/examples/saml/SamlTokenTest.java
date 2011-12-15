@@ -124,4 +124,96 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         samlPort.doubleIt(25);
     }
     
+    /**
+     * 2.3.1.4 (WSS1.0) SAML1.1 Sender Vouches with X.509 Certificates, Sign, Optional Encrypt
+     */
+    @org.junit.Test
+    public void testAsymmetricSigned() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignedPort");
+        DoubleItPortType samlPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(samlPort, PORT);
+        
+        samlPort.doubleIt(25);
+    }
+    
+    /**
+     * 2.3.1.5 (WSS1.0) SAML1.1 Holder of Key, Sign, Optional Encrypt
+     */
+    @org.junit.Test
+    public void testAsymmetricInitiator() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricInitiatorPort");
+        DoubleItPortType samlPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(samlPort, PORT);
+        
+        samlPort.doubleIt(25);
+    }
+    
+    
+    /**
+     * 2.3.2.1 (WSS1.1) SAML 2.0 Bearer
+     */
+    @org.junit.Test
+    public void testAsymmetricSaml2Bearer() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSaml2BearerPort");
+        DoubleItPortType samlPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(samlPort, PORT);
+        
+        samlPort.doubleIt(25);
+    }
+    
+    /**
+     * 2.3.2.2 (WSS1.1) SAML2.0 Sender Vouches over SSL
+     */
+    @org.junit.Test
+    public void testTLSSenderVouchesSaml2() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesSaml2Port");
+        DoubleItPortType samlPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(samlPort, PORT2);
+        
+        samlPort.doubleIt(25);
+    }
 }
