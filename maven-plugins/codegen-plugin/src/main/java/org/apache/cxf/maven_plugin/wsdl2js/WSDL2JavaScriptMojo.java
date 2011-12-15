@@ -280,4 +280,9 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         return ForkOnceWSDL2Javascript.class;
     }
 
+    @Override
+    protected String getMarkerSuffix() {
+        return "js";
+    }
+
 }

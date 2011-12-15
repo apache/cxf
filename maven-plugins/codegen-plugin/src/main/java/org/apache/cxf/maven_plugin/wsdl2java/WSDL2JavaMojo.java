@@ -288,4 +288,9 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         super.execute();
     }
 
+    @Override
+    protected String getMarkerSuffix() {
+        return "java";
+    }
+
 }

@@ -316,6 +316,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         return true;
     }
     
+    protected abstract String getMarkerSuffix();
+    
     protected void forkOnce(Set<URI> classPath, List<GenericWsdlOption> effectiveWsdlOptions)
         throws MojoExecutionException {
         List<GenericWsdlOption> toDo = new LinkedList<GenericWsdlOption>();
@@ -325,7 +327,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             outputDirFile.mkdirs();
             URI basedir = project.getBasedir().toURI();
             URI wsdlURI = getWsdlURI(wsdlOption, basedir);
-            File doneFile = getDoneFile(basedir, wsdlURI, "js");
+            File doneFile = getDoneFile(basedir, wsdlURI, getMarkerSuffix());
 
             if (!shouldRun(wsdlOption, doneFile, wsdlURI)) {
                 continue;
