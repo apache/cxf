@@ -146,6 +146,39 @@
        </jaxws:properties> 
     </jaxws:endpoint>
     
+    <jaxws:endpoint 
+       id="TLSHOKSignedEndorsingSaml2"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSamlTLSHOKSignedEndorsingSaml2" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTLSHOKSignedEndorsingSaml2Port"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
+       <jaxws:properties>
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="SymmetricSV"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSamlSymmetricSV" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricSVPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <!-- TODO Fix the way these properties are inverted -->
+           <entry key="ws-security.signature.username" value="bob"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
+           <entry key="ws-security.encryption.username" value="alice"/>
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
     <!-- -->
     <!-- Any services listening on port ${testutil.ports.Server} must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
