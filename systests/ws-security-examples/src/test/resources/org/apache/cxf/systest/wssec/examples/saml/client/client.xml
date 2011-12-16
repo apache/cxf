@@ -113,6 +113,31 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingSaml2Port" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.saml-callback-handler" value-ref="saml2HOKHandler"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
+           <entry key="ws-security.signature.username" value="alice"/>
+           <entry key="ws-security.self-sign-saml-assertion" value="true"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSVPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
+           <entry key="ws-security.signature.username" value="alice"/>
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
     <bean id="saml1SenderVouchesHandler" 
           class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
           <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:sender-vouches"/>
@@ -127,6 +152,12 @@
     <bean id="saml1HOKHandler" 
           class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
           <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:holder-of-key"/>
+    </bean>
+    
+    <bean id="saml2HOKHandler" 
+          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:holder-of-key"/>
+          <property name="saml2" value="true"/>
     </bean>
     
     <bean id="saml2BearerHandler" 
