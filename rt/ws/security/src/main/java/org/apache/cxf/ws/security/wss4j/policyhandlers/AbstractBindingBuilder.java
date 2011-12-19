@@ -1967,8 +1967,6 @@ public abstract class AbstractBindingBuilder {
             WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
                     WSConstants.SIGN, signatureActions);
             WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.ST_SIGNED, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
                     WSConstants.UT_SIGN, signatureActions);
         }
         

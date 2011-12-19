@@ -22,12 +22,16 @@ package org.apache.cxf.systest.wssec.examples.saml;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.saml.server.Server;
+import org.apache.cxf.systest.wssec.examples.sts.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
 
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -40,6 +44,7 @@ import org.junit.BeforeClass;
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
+    static final String STS_PORT = allocatePort(STSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -51,6 +56,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             // run the server in the same process
             // set this to false to fork
             launchServer(Server.class, true)
+        );
+        assertTrue(
+            "Server failed to launch",
+            // run the server in the same process
+            // set this to false to fork
+            launchServer(STSServer.class, true)
         );
     }
 
@@ -261,5 +272,41 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         
         samlPort.doubleIt(25);
+    }
+    
+    /**
+     * 2.3.2.5 (WSS1.1) SAML1.1/2.0 Holder of Key, Sign, Encrypt
+     */
+    @org.junit.Test
+    public void testSymmetricIssuedToken() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricIssuedTokenPort");
+        DoubleItPortType samlPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(samlPort, PORT);
+        updateSTSPort((BindingProvider)samlPort, STS_PORT);
+        
+        samlPort.doubleIt(25);
+    }
+    
+    private static void updateSTSPort(BindingProvider p, String port) {
+        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
     }
 }
