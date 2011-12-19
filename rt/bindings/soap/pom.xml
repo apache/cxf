@@ -108,34 +108,6 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-xjc-plugin</artifactId>
-                <version>${cxf.xjc-utils.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/test/resources/wsdl_soap/rpc_lit.xsd</xsd>
-                                </xsdOption>
-                            </xsdOptions>
-                        </configuration>
-                        <goals>
-                            <goal>xsdtojava-tests</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-
 
     <profiles>
         <profile>
