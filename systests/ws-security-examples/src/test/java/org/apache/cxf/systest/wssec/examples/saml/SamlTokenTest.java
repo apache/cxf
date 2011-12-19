@@ -69,7 +69,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
      * 2.3.1.1 (WSS1.0) SAML1.1 Assertion (Bearer)
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testBearer() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
