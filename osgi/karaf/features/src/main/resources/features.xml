@@ -116,7 +116,7 @@
         <bundle dependency="true">mvn:org.apache.velocity/velocity/${cxf.velocity.version}</bundle>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/${cxf.jdom.bundle.version}</bundle>
 
-        <bundle>mvn:org.apache.cxf/cxf-bundle/${project.version}</bundle>
+        <bundle start-level='30'>mvn:org.apache.cxf/cxf-bundle/${project.version}</bundle>
     </feature>
 
 </features>
