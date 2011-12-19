@@ -138,6 +138,38 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricIssuedTokenPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
+           <entry key="ws-security.signature.username" value="alice"/>
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="http://localhost:8080/SecurityTokenService/Symmetric?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Symmetric_Port"/>
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.username" value="alice"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+                           <entry key="ws-security.encryption.properties" value="alice.properties"/> 
+                           <entry key="ws-security.encryption.username" value="cxfca"/>
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+       </jaxws:properties>
+    </jaxws:client>
+    
     <bean id="saml1SenderVouchesHandler" 
           class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
           <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:sender-vouches"/>

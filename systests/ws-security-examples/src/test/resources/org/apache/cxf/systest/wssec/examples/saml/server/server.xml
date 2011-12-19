@@ -179,6 +179,22 @@
        </jaxws:properties> 
     </jaxws:endpoint>
     
+    <jaxws:endpoint 
+       id="SymmetricIssuedToken"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSamlSymmetricIssuedToken" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricIssuedTokenPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/wssec/examples/saml/DoubleItSaml.wsdl">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+           <entry key="ws-security.signature.username" value="bob"/> 
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
+       </jaxws:properties> 
+    </jaxws:endpoint>
+    
     <!-- -->
     <!-- Any services listening on port ${testutil.ports.Server} must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
