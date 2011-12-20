@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -184,6 +185,10 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
     public void testQueryBean(@QueryParam("") CustomerBean cb) {
+        
+    }
+    
+    public void testLocaleParam(@QueryParam("p1") Locale l) {
         
     }
     

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.servlet.ServletConfig;
@@ -62,6 +63,7 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.SimpleFactory;
 import org.apache.cxf.jaxrs.Timezone;
+import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -88,6 +90,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.easymock.EasyMock;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -812,6 +815,24 @@ public class JAXRSUtilsTest extends Assert {
             // expected
         }
         
+    }
+    
+    @Test
+    public void testLocaleParameter() throws Exception {
+        Message messageImpl = createMessage();
+        ProviderFactory.getInstance(messageImpl).registerUserProvider(
+            new LocaleParameterHandler());
+        Class[] argType = {Locale.class};
+        Method m = Customer.class.getMethod("testLocaleParam", argType);
+        
+        messageImpl.put(Message.QUERY_STRING, "p1=en_us");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        Locale l = (Locale)params.get(0);
+        assertEquals("en", l.getLanguage());
+        assertEquals("US", l.getCountry());
     }
     
     @Test
@@ -1753,5 +1774,14 @@ public class JAXRSUtilsTest extends Assert {
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;
+    }
+    
+    private static class LocaleParameterHandler implements ParameterHandler<Locale> {
+
+        public Locale fromString(String s) {
+            String[] values = s.split("_");
+            return values.length == 2 ? new Locale(values[0], values[1]) : new Locale(s);
+        }
+        
     }
 }
