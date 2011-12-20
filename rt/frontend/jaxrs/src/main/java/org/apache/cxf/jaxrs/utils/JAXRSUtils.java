@@ -745,7 +745,7 @@ public final class JAXRSUtils {
                 if (mt != null && "multipart".equalsIgnoreCase(mt.getType()) 
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
                     MultipartBody body = AttachmentUtils.getMultipartBody(mc);
-                    FormUtils.populateMapFromMultipart(params, paramAnns, body, decode);
+                    FormUtils.populateMapFromMultipart(params, body, decode);
                 } else {
                     org.apache.cxf.common.i18n.Message errorMsg = 
                         new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE", 

@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -41,7 +40,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -140,23 +138,20 @@ public final class FormUtils {
     }
     
     public static void populateMapFromMultipart(MultivaluedMap<String, String> params,
-                                                Annotation[] anns,
                                                 MultipartBody body, 
                                                 boolean decode) {
         List<Attachment> atts = body.getAllAttachments();
         for (Attachment a : atts) {
             ContentDisposition cd = a.getContentDisposition();
-            if (cd == null || !MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())
-                || cd.getParameter("name") == null) {
-                Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
-                
-                if (id == null || id.required()) {
-                    throw new WebApplicationException(400);
-                } else {
-                    return;
-                }
+            if (cd == null || !MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())) {
+                continue;
             }
-            String name = cd.getParameter("name").replace("\"", "").replace("'", "");
+            String cdName = cd.getParameter("name");
+            String contentId = a.getContentId();
+            String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
+            if (StringUtils.isEmpty(name)) { 
+                throw new WebApplicationException(400);
+            }
             try {
                 String value = IOUtils.toString(a.getDataHandler().getInputStream());
                 params.add(HttpUtils.urlDecode(name),
