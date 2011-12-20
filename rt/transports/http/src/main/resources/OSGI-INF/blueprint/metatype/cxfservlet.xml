@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+    <OCD
+        description="CXF Servlet See: http://cxf.apache.org/docs/servlet-transport.html"
+        name="CXF Servlet Transport" id="org.apache.cxf.osgi">
+        <AD name="Servlet context path" id="org.apache.cxf.servlet.context"
+            type="String" default="/cxf" description="" />
+        <AD name="Servlet name" id="org.apache.cxf.servlet.name"
+            type="String" default="cxf-osgi-transport-servlet"
+            description="" />
+        <AD name="Hide service list" id="org.apache.cxf.servlet.hide-service-list-page"
+            type="String" default="false" description="" />
+        <AD name="Disable address updates" id="org.apache.cxf.servlet.disable-address-updates"
+            type="String" default="false" description="" />
+        <AD name="Base address" id="org.apache.cxf.servlet.base-address"
+            type="String" default="" description="" />
+        <AD name="Service list path" id="org.apache.cxf.servlet.service-list-path"
+            type="String" default="" description="" />
+        <AD name="Static resources list" id="org.apache.cxf.servlet.static-resources-list"
+            type="String" default="" description="" />
+        <AD name="Redirects list" id="org.apache.cxf.servlet.redirects-list"
+            type="String" default="" description="" />
+        <AD name="Redirect servlet name" id="org.apache.cxf.servlet.redirect-servlet-name"
+            type="String" default="" description="" />
+        <AD name="Redirect servlet path" id="org.apache.cxf.servlet.redirect-servlet-path"
+            type="String" default="" description="" />
+        <AD name="List all contexts" id="org.apache.cxf.servlet.service-list-all-contexts"
+            type="String" default="" description="" />
+    </OCD>
+    <Designate pid="org.apache.cxf.osgi">
+        <Object ocdref="org.apache.cxf.osgi" />
+    </Designate>
+</metatype:MetaData>
