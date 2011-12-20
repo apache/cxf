@@ -353,11 +353,11 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                "resources/add_book2json_invalid.txt",
                null);
         
-//        doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
-//               400,
-//               "application/json",
-//               "resources/add_book2json_invalid.txt",
-//               null);
+        doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
+               400,
+               "application/json",
+               "resources/add_book2json_invalid.txt",
+               null);
                 
     }
     
