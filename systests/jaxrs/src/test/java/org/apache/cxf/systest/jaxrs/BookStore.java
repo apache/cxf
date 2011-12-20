@@ -377,6 +377,14 @@ public class BookStore {
     }
     
     @GET
+    @Path("/segment/matrix-middle")
+    public Book getBookByMatrixParamsMiddle(@MatrixParam("first") String s1,
+                                      @MatrixParam("second") String s2) throws Exception {
+        
+        return doGetBook(s1 + s2);
+    }
+    
+    @GET
     @Path("/segment/matrix-list")
     public Book getBookByMatrixListParams(@MatrixParam("first") List<String> list) throws Exception {
         if (list.size() != 2) {

@@ -75,7 +75,7 @@ public class BookStoreSpring {
     
     @GET
     @Path("/books/{id}")
-    @Produces({"application/jettison", "application/json" })
+    @Produces({"application/json", "application/vnd.example-com.foo+json" })
     public Book getBookById(@PathParam("id") Long id) {
         return books.get(id);
     }
@@ -139,8 +139,8 @@ public class BookStoreSpring {
 
     @POST
     @Path("books/convert")
-    @Consumes({"application/xml", "application/json", "application/jettison" })
-    @Produces("application/xml")
+    @Consumes({"application/jettison" })
+    @Produces("application/vnd.example-com.foo+json")
     public Book convertBook(Book2 book) {
         // how to have Book2 populated ?
         Book b = new Book();
