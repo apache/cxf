@@ -139,8 +139,8 @@ public class BookStoreSpring {
 
     @POST
     @Path("books/convert")
-    @Consumes({"application/jettison" })
-    @Produces("application/vnd.example-com.foo+json")
+    @Consumes({"application/xml", "application/json", "application/vnd.example-com.foo+json" })
+    @Produces({"application/xml", "application/vnd.example-com.foo+json" })
     public Book convertBook(Book2 book) {
         // how to have Book2 populated ?
         Book b = new Book();
