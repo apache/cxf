@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -323,7 +324,10 @@ public final class InjectionUtils {
             adapterHasToBeUsed = true;
         }
         
-        Object result = null;
+        Object result = instantiateFromParameterHandler(value, pClass, message);
+        if (result != null) {
+            return result;
+        }
         // check constructors accepting a single String value
         try {
             Constructor<?> c = pClass.getConstructor(new Class<?>[]{String.class});
@@ -374,6 +378,19 @@ public final class InjectionUtils {
         return result;
     }
 
+    private static Object instantiateFromParameterHandler(String value, 
+                                                     Class<?> pClass,
+                                                     Message message) {
+        // TODO: Consider always checking custom parameter handlers first.
+        // Right now, Locale and Date are two special cases so it's very cheap
+        // just to check if it is Locale or not; 
+        if (Locale.class == pClass) {
+            return createFromParameterHandler(value, pClass, message);
+        } else {
+            return null;
+        }
+    }
+    
     private static Object createFromParameterHandler(String value, 
                                                      Class<?> pClass,
                                                      Message message) {
