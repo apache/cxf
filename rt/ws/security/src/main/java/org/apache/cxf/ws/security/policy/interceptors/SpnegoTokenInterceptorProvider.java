@@ -29,43 +29,34 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
-import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.ws.security.WSSConfig;
 
 /**
  * 
  */
-public class SecureConversationTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    static final Logger LOG = LogUtils.getL7dLogger(SecureConversationTokenInterceptorProvider.class);
+public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
+    static final Logger LOG = LogUtils.getL7dLogger(SpnegoTokenInterceptorProvider.class);
 
-
-    public SecureConversationTokenInterceptorProvider() {
-        super(Arrays.asList(SP11Constants.SECURE_CONVERSATION_TOKEN,
-                            SP12Constants.SECURE_CONVERSATION_TOKEN));
-        this.getOutInterceptors().add(new SecureConversationOutInterceptor());
-        this.getOutFaultInterceptors().add(new SecureConversationOutInterceptor());
-        this.getInInterceptors().add(new SecureConversationInInterceptor());
-        this.getInFaultInterceptors().add(new SecureConversationInInterceptor());
+    public SpnegoTokenInterceptorProvider() {
+        super(Arrays.asList(SP11Constants.SPNEGO_CONTEXT_TOKEN, SP12Constants.SPNEGO_CONTEXT_TOKEN));
+        this.getOutInterceptors().add(new SpnegoContextTokenOutInterceptor());
+        this.getOutFaultInterceptors().add(new SpnegoContextTokenOutInterceptor());
+        this.getInInterceptors().add(new SpnegoContextTokenInInterceptor());
+        this.getInFaultInterceptors().add(new SpnegoContextTokenInInterceptor());
     }
     
-    static String setupClient(STSClient client,
-                            SoapMessage message,
-                            AssertionInfoMap aim,
-                            SecureConversationToken itok,
-                            boolean endorse) {
+    static String setupClient(STSClient client, SoapMessage message, AssertionInfoMap aim) {
         client.setTrust(NegotiationUtils.getTrust10(aim));
         client.setTrust(NegotiationUtils.getTrust13(aim));
-        Policy pol = itok.getBootstrapPolicy();
+        
         Policy p = new Policy();
         ExactlyOne ea = new ExactlyOne();
         p.addPolicyComponent(ea);
@@ -73,21 +64,15 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         all.addPolicyComponent(NegotiationUtils.getAddressingPolicy(aim, false));
         ea.addPolicyComponent(all);
         
-        if (endorse) {
-            SupportingToken st = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_ENDORSING,
-                                                     SP12Constants.INSTANCE,
-                                                     message.getExchange()
-                                                         .getBus().getExtension(PolicyBuilder.class));
-            st.addToken(itok);
-            all.addPolicyComponent(st);
-        }
-        pol = p.merge(pol);
-        
-        client.setPolicy(pol);
+        client.setPolicy(p);
         client.setSoap11(message.getVersion() == Soap11.getInstance());
-        client.setSecureConv(true);
-        String s = message
-            .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+        client.setSpnego(true);
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        String context = config.getIdAllocator().createSecureId("_", null);
+        client.setContext(context);
+        
+        String s = message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
         client.setLocation(s);
         AlgorithmSuite suite = NegotiationUtils.getAlgorithmSuite(aim);
         if (suite != null) {
@@ -97,18 +82,21 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                 client.setKeySize(x);
             }
         }
+        
         Map<String, Object> ctx = client.getRequestContext();
         mapSecurityProps(message, ctx);
+        
         return s;
     }
     
     private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
         for (String s : SecurityConstants.ALL_PROPERTIES) {
-            Object v = message.getContextualProperty(s + ".sct");
+            Object v = message.getContextualProperty(s);
             if (v != null) {
                 ctx.put(s, v);
             }
         }
     }
     
+
 }

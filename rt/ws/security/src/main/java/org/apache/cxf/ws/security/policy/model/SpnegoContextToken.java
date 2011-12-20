@@ -40,7 +40,7 @@ public class SpnegoContextToken extends Token {
     }
     
     public QName getName() {
-        return SP12Constants.INSTANCE.getKerberosToken();
+        return SP12Constants.INSTANCE.getSpnegoContextToken();
     }
     
     /**

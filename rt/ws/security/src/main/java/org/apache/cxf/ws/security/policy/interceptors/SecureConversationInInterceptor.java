@@ -21,44 +21,26 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.transform.dom.DOMSource;
-
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.Service;
-import org.apache.cxf.service.invoker.Invoker;
-import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
-import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.EndpointPolicy;
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.Binding;
@@ -69,7 +51,6 @@ import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
-import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -79,15 +60,8 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.SecurityContextToken;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     static final Logger LOG = LogUtils.getL7dLogger(SecureConversationInInterceptor.class);
@@ -111,6 +85,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         }
         return null;
     }
+    
     public void handleMessage(SoapMessage message) throws Fault {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
@@ -157,8 +132,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     ExactlyOne ea = new ExactlyOne();
                     p.addPolicyComponent(ea);
                     All all = new All();
-                    Assertion ass = SecureConversationTokenInterceptorProvider
-                        .getAddressingPolicy(aim, false);
+                    Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
                     all.addPolicyComponent(ass);
                     ea.addPolicyComponent(all);
                     PolicyBuilder pbuilder = message.getExchange().getBus()
@@ -194,8 +168,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     ExactlyOne ea = new ExactlyOne();
                     p.addPolicyComponent(ea);
                     All all = new All();
-                    Assertion ass = SecureConversationTokenInterceptorProvider
-                        .getAddressingPolicy(aim, false);
+                    Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
                     all.addPolicyComponent(ass);
                     ea.addPolicyComponent(all);
                     pol = p.merge(pol);
@@ -207,60 +180,13 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 if (s.startsWith(STSUtils.WST_NS_05_02)) {
                     ns = STSUtils.WST_NS_05_02;
                 }
-                recalcEffectivePolicy(message, ns, pol);
+                NegotiationUtils.recalcEffectivePolicy(message, ns, pol, new SecureConversationSTSInvoker());
             } else {
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
             }
         }
     }
-    private void recalcEffectivePolicy(SoapMessage message, 
-                                       String namespace,
-                                       Policy policy) {
-        Exchange ex = message.getExchange();
-        Bus bus = ex.getBus();
-        PolicyEngine pe = bus.getExtension(PolicyEngine.class);
-        if (null == pe) {
-            return;
-        }
-        Destination destination = ex.getDestination();
-        try {
-            Endpoint endpoint = message.getExchange().getEndpoint();
-            
-            TokenStore store = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-            if (store == null) {
-                store = new MemoryTokenStore();
-                endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
-            }
-            endpoint = STSUtils.createSTSEndpoint(bus, 
-                                                  namespace,
-                                                  endpoint.getEndpointInfo().getTransportId(),
-                                                  destination.getAddress().getAddress().getValue(),
-                                                  message.getVersion().getBindingId(), 
-                                                  policy,
-                                                  null);
-            endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
-            message.getExchange().put(TokenStore.class.getName(), store);
-        
-            EndpointPolicy ep = pe.getServerEndpointPolicy(endpoint.getEndpointInfo(), destination);
-            List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
-            for (Interceptor<? extends Message> i : interceptors) {
-                message.getInterceptorChain().add(i);
-            }
-            
-            Collection<Assertion> assertions = ep.getVocabulary();
-            if (null != assertions) {
-                message.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-            }
-            endpoint.getService().setInvoker(new STSInvoker());
-            ex.put(Endpoint.class, endpoint);
-            ex.put(Service.class, endpoint.getService());
-            ex.put(org.apache.cxf.binding.Binding.class, endpoint.getBinding());
-            ex.remove(BindingOperationInfo.class);
-            message.put(MAPAggregator.ACTION_VERIFIED, Boolean.TRUE);
-        } catch (Exception exc) {
-            throw new Fault(exc);
-        }
-    }
+
     private void unmapSecurityProps(Message message) {
         Exchange ex = message.getExchange();
         for (String s : SecurityConstants.ALL_PROPERTIES) {
@@ -271,95 +197,24 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         }
     }
 
-    public class STSInvoker implements Invoker {
+    public class SecureConversationSTSInvoker extends STSInvoker {
 
-        public Object invoke(Exchange exchange, Object o) {
-            AddressingProperties inProps = (AddressingProperties)exchange.getInMessage()
-                .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
-            if (inProps != null) {
-                AddressingProperties props = new AddressingPropertiesImpl(inProps.getNamespaceURI());
-                AttributedURIType action = new AttributedURIType();
-                action.setValue(inProps.getAction().getValue().replace("/RST/", "/RSTR/"));
-                props.setAction(action);
-                exchange.getOutMessage().put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND,
-                                             props);
+        void doIssue(
+            Element requestEl,
+            Exchange exchange,
+            Element binaryExchange,
+            W3CDOMStreamWriter writer,
+            String prefix, 
+            String namespace
+        ) throws Exception {
+            if (STSUtils.WST_NS_05_12.equals(namespace)) {
+                writer.writeStartElement(prefix, "RequestSecurityTokenResponseCollection", namespace);
             }
+            writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
             
-            MessageContentsList lst = (MessageContentsList)o;
-            DOMSource src = (DOMSource)lst.get(0);
-            Node nd = src.getNode();
-            Element requestEl = null;
-            if (nd instanceof Document) {
-                requestEl = ((Document)nd).getDocumentElement();
-            } else {
-                requestEl = (Element)nd;
-            }
-            String namespace = requestEl.getNamespaceURI();
-            String prefix = requestEl.getPrefix();
-            SecurityToken cancelToken = null;
-            if ("RequestSecurityToken".equals(requestEl.getLocalName())) {
-                try {
-                    W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-                    writer.setNsRepairing(true);
-                    if (STSUtils.WST_NS_05_12.equals(namespace)) {
-                        writer.writeStartElement(prefix, "RequestSecurityTokenResponseCollection",
-                                                 namespace);
-                    }
-                    writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
-                    
-                    String requestType = null;
-                    Element el = DOMUtils.getFirstElement(requestEl);
-                    while (el != null) {
-                        String localName = el.getLocalName();
-                        if (namespace.equals(el.getNamespaceURI())) {
-                            if ("RequestType".equals(localName)) {
-                                requestType = el.getTextContent();
-                            } else if ("CancelTarget".equals(localName)) {
-                                cancelToken = findCancelToken(exchange, el);
-                            }
-                        }
-                        
-                        el = DOMUtils.getNextElement(el);
-                    }
-                    if (requestType == null) {
-                        requestType = "/Issue";
-                    }
-                    
-                    if (requestType.endsWith("/Issue")) { 
-                        doIssue(requestEl, exchange, writer, prefix, namespace);
-                    } else if (requestType.endsWith("/Cancel")) {
-                        TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
-                            .getProperty(TokenStore.class.getName());
-                        cancelToken.setState(SecurityToken.State.CANCELLED);
-                        store.update(cancelToken);
-                        writer.writeEmptyElement(prefix, "RequestedTokenCancelled", namespace);
-                        exchange.put(SecurityConstants.TOKEN, cancelToken);
-                    } //else if (requestType.endsWith("/Renew")) {
-                        //REVISIT - implement
-                    //}
-                    writer.writeEndElement();
-                    if (STSUtils.WST_NS_05_12.equals(namespace)) {
-                        writer.writeEndElement();
-                    }
-                    return new MessageContentsList(new DOMSource(writer.getDocument()));
-                } catch (RuntimeException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    throw new Fault(ex);
-                }
-            } else {
-                throw new Fault("Unknown SecureConversation element: " + requestEl.getLocalName(),
-                                LOG);
-            }
-        }
-
-        private void doIssue(Element requestEl,
-                             Exchange exchange, W3CDOMStreamWriter writer,
-                             String prefix, String namespace) 
-            throws Exception {
             byte clientEntropy[] = null;
             int keySize = 256;
-            long ttl = 300000;
+            long ttl = 300000L;
             String tokenType = null;
             Element el = DOMUtils.getFirstElement(requestEl);
             while (el != null) {
@@ -380,10 +235,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 el = DOMUtils.getNextElement(el);
             }
             
+            // Check received KeySize
+            if (keySize < 128 || keySize > 512) {
+                keySize = 256;
+            }
+            
             writer.writeStartElement(prefix, "RequestedSecurityToken", namespace);
             SecurityContextToken sct =
-                new SecurityContextToken(SecureConversationTokenInterceptorProvider
-                                              .getWSCVersion(tokenType), writer.getDocument());
+                new SecurityContextToken(NegotiationUtils.getWSCVersion(tokenType), writer.getDocument());
             
             Date created = new Date();
             Date expires = new Date();
@@ -391,53 +250,35 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
-            token.setTokenType(WSConstants.WSC_SCT);
+            token.setTokenType(sct.getTokenType());
             
             writer.getCurrentNode().appendChild(sct.getElement());
             writer.writeEndElement();        
             
             writer.writeStartElement(prefix, "RequestedAttachedReference", namespace);
-            token.setAttachedReference(SecureConversationTokenInterceptorProvider
-                                           .writeSecurityTokenReference(writer,
-                                                                   "#" + sct.getID(), 
-                                                                   tokenType));
+            token.setAttachedReference(
+                writeSecurityTokenReference(writer, "#" + sct.getID(), tokenType)
+            );
             writer.writeEndElement();
             
             writer.writeStartElement(prefix, "RequestedUnattachedReference", namespace);
-            token.setUnattachedReference(SecureConversationTokenInterceptorProvider
-                                             .writeSecurityTokenReference(writer,
-                                                                     sct.getIdentifier(),
-                                                                     tokenType));
+            token.setUnattachedReference(
+                writeSecurityTokenReference(writer, sct.getIdentifier(), tokenType)
+            );
             writer.writeEndElement();
             
-            XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-            writer.writeStartElement(prefix, "Lifetime", namespace);
-            writer.writeNamespace("wsu", WSConstants.WSU_NS);
-            writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
-            writer.writeCharacters(fmt.format(created.getTime()));
-            writer.writeEndElement();
-            
-            writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
-            writer.writeCharacters(fmt.format(expires.getTime()));
-            writer.writeEndElement();
-            writer.writeEndElement();
+            writeLifetime(writer, created, expires, prefix, namespace);
 
-            byte[] secret = SecureConversationTokenInterceptorProvider.writeProofToken(prefix, 
-                                            namespace,
-                                            writer,
-                                            clientEntropy, 
-                                            keySize);
+            byte[] secret = writeProofToken(prefix, namespace, writer, clientEntropy, keySize);
+            
             token.setSecret(secret);
             ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
-        }
-
-        private SecurityToken findCancelToken(Exchange exchange, Element el) throws WSSecurityException {
-            SecurityTokenReference ref = new SecurityTokenReference(DOMUtils.getFirstElement(el));
-            String uri = ref.getReference().getURI();
-            TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
-                    .getProperty(TokenStore.class.getName());
-            return store.getToken(uri);
+            
+            writer.writeEndElement();
+            if (STSUtils.WST_NS_05_12.equals(namespace)) {
+                writer.writeEndElement();
+            }
         }
 
     }
@@ -455,34 +296,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
-            //Find the SC token
-            boolean found = false;
-            List<WSHandlerResult> results = 
-                CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
-            if (results != null) {
-                for (WSHandlerResult rResult : results) {
-                    List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
-    
-                    for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                        Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                        if (actInt.intValue() == WSConstants.SCT) {
-                            SecurityContextToken tok
-                                = (SecurityContextToken)wser
-                                    .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
-                            message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
-                            byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                            if (secret != null) {
-                                SecurityToken token = new SecurityToken(tok.getIdentifier());
-                                token.setToken(tok.getElement());
-                                token.setSecret(secret);
-                                token.setTokenType(WSConstants.WSC_SCT);
-                                message.getExchange().put(SecurityConstants.TOKEN, token);
-                            }
-                            found = true;
-                        }
-                    }
-                }
-            }
+            boolean foundSCT = NegotiationUtils.parseSCTResult(message);
+
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
@@ -491,7 +306,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     return;
                 }
                 for (AssertionInfo inf : ais) {
-                    if (found) {
+                    if (foundSCT) {
                         inf.setAsserted(true);
                     } else {
                         inf.setNotAsserted("No SecureConversation token found in message.");
@@ -534,8 +349,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (tok == null) {
                 String tokId = (String)m2.getContextualProperty(SecurityConstants.TOKEN_ID);
                 if (tokId != null) {
-                    tok = SecureConversationTokenInterceptorProvider
-                        .getTokenStore(m2).getToken(tokId);
+                    tok = NegotiationUtils.getTokenStore(m2).getToken(tokId);
                 }
             }
 
@@ -558,8 +372,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     }
                     
                     client.cancelSecurityToken(tok);
-                    SecureConversationTokenInterceptorProvider
-                        .getTokenStore(m2).remove(tok);
+                    NegotiationUtils.getTokenStore(m2).remove(tok);
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {

@@ -56,6 +56,7 @@ import org.apache.cxf.ws.security.policy.builders.SecureConversationTokenBuilder
 import org.apache.cxf.ws.security.policy.builders.SecurityContextTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.SignedElementsBuilder;
 import org.apache.cxf.ws.security.policy.builders.SignedPartsBuilder;
+import org.apache.cxf.ws.security.policy.builders.SpnegoContextTokenBuilder;
 import org.apache.cxf.ws.security.policy.builders.SupportingTokens12Builder;
 import org.apache.cxf.ws.security.policy.builders.SupportingTokensBuilder;
 import org.apache.cxf.ws.security.policy.builders.SymmetricBindingBuilder;
@@ -72,6 +73,7 @@ import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProv
 import org.apache.cxf.ws.security.policy.interceptors.KerberosTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.SamlTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.SecureConversationTokenInterceptorProvider;
+import org.apache.cxf.ws.security.policy.interceptors.SpnegoTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.UsernameTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
@@ -121,6 +123,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new SecurityContextTokenBuilder());
         reg.registerBuilder(new SignedElementsBuilder());
         reg.registerBuilder(new SignedPartsBuilder());
+        reg.registerBuilder(new SpnegoContextTokenBuilder(pbuild));
         reg.registerBuilder(new SupportingTokens12Builder(pbuild));
         reg.registerBuilder(new SupportingTokensBuilder(pbuild));
         reg.registerBuilder(new SymmetricBindingBuilder(pbuild));
@@ -184,6 +187,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.register(new UsernameTokenInterceptorProvider(bus));
         reg.register(new SamlTokenInterceptorProvider());
         reg.register(new SecureConversationTokenInterceptorProvider());
+        reg.register(new SpnegoTokenInterceptorProvider());
     }
 
 }

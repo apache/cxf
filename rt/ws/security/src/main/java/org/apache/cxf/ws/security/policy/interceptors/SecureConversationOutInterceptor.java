@@ -61,7 +61,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 if (tok == null) {
                     String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                     if (tokId != null) {
-                        tok = SecureConversationTokenInterceptorProvider
+                        tok = NegotiationUtils
                             .getTokenStore(message).getToken(tokId);
                     }
                 }
@@ -78,7 +78,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                                                                   tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN_ID, 
                                               tok.getId());
-                    SecureConversationTokenInterceptorProvider.getTokenStore(message).add(tok);
+                    NegotiationUtils.getTokenStore(message).add(tok);
                     
                 }
             } else {
@@ -157,7 +157,11 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     client.setAddressingNamespace(maps.getNamespaceURI());
                 }
                 tok = client.requestSecurityToken(s);
-                tok.setTokenType(WSConstants.WSC_SCT);
+                String tokenType = tok.getTokenType();
+                tok.setTokenType(tokenType);
+                if (tokenType == null || "".equals(tokenType)) {
+                    tok.setTokenType(WSConstants.WSC_SCT);
+                }
                 return tok;
             } catch (RuntimeException e) {
                 throw e;
