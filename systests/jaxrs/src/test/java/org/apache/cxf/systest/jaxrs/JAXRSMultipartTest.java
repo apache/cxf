@@ -336,8 +336,18 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testNullableParams() throws Exception {
+    public void testNullableParamsMultipartAnnotation() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/testnullpart";
+        doTestNullPart(address);
+    }
+    
+    @Test
+    public void testNullableParamsFormParamAnnotation() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/testnullpartFormParam";
+        doTestNullPart(address);
+    }
+    
+    private void doTestNullPart(String address) throws Exception {
         WebClient client = WebClient.create(address);
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
         client.type("multipart/form-data").accept("text/plain");

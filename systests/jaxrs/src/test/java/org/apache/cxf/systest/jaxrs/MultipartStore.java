@@ -156,6 +156,15 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/testnullpartFormParam")
+    @Consumes("multipart/form-data")
+    @Produces("text/plain")
+    public String testNullPartFormParam(@FormParam(value = "someid") String value) {
+        return testNullPart(value);
+    }
+    
+    
+    @POST
     @Path("/books/jaxbjsonimage")
     @Consumes("multipart/mixed")
     @Produces("multipart/mixed")
