@@ -18,19 +18,30 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+
 @Provider
 public class BookExceptionMapper implements ExceptionMapper<BookNotFoundFault> {
 
+    @Context
+    private MessageContext mc;
     private boolean toHandle;
     
     public Response toResponse(BookNotFoundFault ex) {
         // status is 200 just to simplify the test client code
         if (toHandle) {
+            OperationResourceInfo ori = 
+                (OperationResourceInfo)mc.getContextualProperty(OperationResourceInfo.class);
+            if (ori == null) {
+                throw new RuntimeException();
+            }
             return Response.status(500).type(MediaType.TEXT_PLAIN_TYPE)     
                       .entity("No book found at all : " + ex.getFaultInfo().getId()).build();
         }
