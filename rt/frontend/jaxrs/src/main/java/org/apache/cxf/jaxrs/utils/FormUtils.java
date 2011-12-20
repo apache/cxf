@@ -143,10 +143,10 @@ public final class FormUtils {
         List<Attachment> atts = body.getAllAttachments();
         for (Attachment a : atts) {
             ContentDisposition cd = a.getContentDisposition();
-            if (cd == null || !MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())) {
+            if (cd != null && !MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())) {
                 continue;
             }
-            String cdName = cd.getParameter("name");
+            String cdName = cd == null ? null : cd.getParameter("name");
             String contentId = a.getContentId();
             String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
             if (StringUtils.isEmpty(name)) { 
