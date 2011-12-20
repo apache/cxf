@@ -64,7 +64,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class, true));
+                   launchServer(BookServerSpring.class));
     }
     
     @Test
@@ -353,11 +353,11 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                "resources/add_book2json_invalid.txt",
                null);
         
-        doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
-               400,
-               "application/json",
-               "resources/add_book2json_invalid.txt",
-               null);
+//        doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
+//               400,
+//               "application/json",
+//               "resources/add_book2json_invalid.txt",
+//               null);
                 
     }
     
@@ -520,7 +520,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
                200,
-               "application/jettison",
+               "application/vnd.example-com.foo+json",
                "resources/add_book2json.txt",
                "resources/expected_get_book123.txt");
     }
