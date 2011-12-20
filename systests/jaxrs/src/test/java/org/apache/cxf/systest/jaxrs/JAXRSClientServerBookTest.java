@@ -952,6 +952,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookByMatrixParametersInTheMiddle() throws Exception {
+        getAndCompareAsStrings(
+            "http://localhost:" + PORT + "/bookstore/segment;first=12;second=3/matrix-middle",
+            "resources/expected_get_book123.txt",
+            "application/xml", 200);
+    }
+    
+    @Test
     public void testGetBookByHeader() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/bookheaders",
                                "resources/expected_get_book123.txt",

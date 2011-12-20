@@ -56,7 +56,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class));
+                   launchServer(BookServerSpring.class, true));
     }
     
     @Test
@@ -128,7 +128,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             "http://localhost:" + PORT + "/the/bookstore/books/123"; 
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
         getBook(endpointAddress, "resources/expected_get_book123json.txt",
-                "application/jettison");
+                "application/vnd.example-com.foo+json");
     }
     
     

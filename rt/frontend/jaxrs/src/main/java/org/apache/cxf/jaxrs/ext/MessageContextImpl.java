@@ -100,7 +100,12 @@ public class MessageContextImpl implements MessageContext {
     }
     
     public Object getContextualProperty(Object key) {
-        return m.getContextualProperty(key.toString());
+        Object value = m.getContextualProperty(key.toString());
+        if (value == null && key.getClass() == Class.class) {
+            return m.getExchange().get((Class<?>)key);
+        } else {
+            return value;
+        }
     }
 
     public <T> T getContext(Class<T> contextClass) {

@@ -198,7 +198,7 @@ http://cxf.apache.org/schemas/core.xsd">
   
   <util:list id="jsonTypes">
     <value>application/json</value>
-    <value>application/jettison</value>
+    <value>application/vnd.example-com.foo+json</value>
   </util:list>
   
   <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
