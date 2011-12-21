@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -28,11 +27,13 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 
 @Provider
-public class BookExceptionMapper implements ExceptionMapper<BookNotFoundFault> {
-
-    @Context
+public class BookExceptionMapper implements ContextAware, ExceptionMapper<BookNotFoundFault> {
     private MessageContext mc;
     private boolean toHandle;
+    
+    public void setMessageContext(MessageContext context) {
+        mc = context;
+    }
     
     public Response toResponse(BookNotFoundFault ex) {
         // status is 200 just to simplify the test client code
