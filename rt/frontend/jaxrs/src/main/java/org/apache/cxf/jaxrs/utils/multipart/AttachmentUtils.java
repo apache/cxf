@@ -117,6 +117,8 @@ public final class AttachmentUtils {
                 LOG.warning(errorMsg.toString());
                 throw new WebApplicationException(
                           new MultipartReadException(id.value(), id.type(), errorMsg.toString()));
+            } else {
+                return null;
             }
         }
         
