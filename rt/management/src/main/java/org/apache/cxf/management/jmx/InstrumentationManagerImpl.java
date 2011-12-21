@@ -30,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -84,12 +83,35 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         super();
     }
     
+    public InstrumentationManagerImpl(Bus bus) {
+        this();
+        readJMXProperties(bus);
+        this.bus = bus;
+    }
+    
     public Bus getBus() {
         return bus;
     }
 
-    @Resource
-    public void setBus(Bus bus) {        
+    public void setBus(Bus bus) {
+        if (this.bus == null) {
+            readJMXProperties(bus);
+        } else {
+            // possibly this bus was reassigned from another im bean
+            InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
+            if (this != im) {
+                bus.setExtension(this, InstrumentationManager.class);
+                try {
+                    ManagedBus mbus = new ManagedBus(bus);
+                    im.unregister(mbus);
+                    if (LOG.isLoggable(Level.INFO)) {
+                        LOG.info("unregistered " + mbus.getObjectName());
+                    }
+                } catch (JMException e) {
+                    // ignore
+                }
+            }
+        }
         this.bus = bus;
     }
 
@@ -169,6 +191,9 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                     //infrastructure has been initialized.
                     ManagedBus mbus = new ManagedBus(bus);                    
                     register(mbus);
+                    if (LOG.isLoggable(Level.INFO)) {
+                        LOG.info("registered " + mbus.getObjectName());
+                    }
                 } catch (JMException jmex) {
                     LOG.log(Level.SEVERE, "REGISTER_FAILURE_MSG", new Object[]{bus, jmex});
                 }
@@ -360,6 +385,27 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
             }
         }
         return str.toString();
+    }
+    
+    private void readJMXProperties(Bus b) {
+        if (b != null) {
+            persistentBusId = getBusProperty(b, "bus.jmx.persistentBusId", null);
+            mbeanServerName = 
+                getBusProperty(b, "bus.jmx.serverName", ManagementConstants.DEFAULT_DOMAIN_NAME);
+            usePlatformMBeanServer = 
+                Boolean.valueOf(getBusProperty(b, "bus.jmx.usePlatformMBeanServer", null));
+            createMBServerConnectorFactory = 
+                Boolean.valueOf(getBusProperty(b, "bus.jmx.createMBServerConnectorFactory", null));
+            daemon = Boolean.valueOf(getBusProperty(b, "bus.jmx.daemon", null));
+            threaded = Boolean.valueOf(getBusProperty(b, "bus.jmx.threaded", null));
+            enabled = Boolean.valueOf(getBusProperty(b, "bus.jmx.enabled", null));
+            jmxServiceURL = getBusProperty(b, "bus.jmx.JMXServiceURL", null);
+        }
+    }
+
+    private static String getBusProperty(Bus b, String key, String dflt) {
+        String v = (String)b.getProperty(key);
+        return v != null ? v : dflt;
     }
 }
 

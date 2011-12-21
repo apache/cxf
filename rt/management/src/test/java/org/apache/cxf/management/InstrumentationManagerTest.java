@@ -27,6 +27,7 @@ import javax.management.ObjectName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.management.counters.CounterRepository;
+import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
 import org.apache.cxf.workqueue.WorkQueueManagerImpl;
 
 import org.junit.After;
@@ -133,5 +134,41 @@ public class InstrumentationManagerTest extends Assert {
         }
     }
     
+    @Test
+    public void testInstrumentBusWithBusProperties() {
+        ClassPathXmlApplicationContext context = null;
+        Bus cxf1 = null;
+        Bus cxf2 = null;
+        try {
+            context = new ClassPathXmlApplicationContext("managed-spring-twobuses2.xml");
+
+            cxf1 = (Bus)context.getBean("cxf1");
+            InstrumentationManagerImpl im1 = 
+                (InstrumentationManagerImpl)cxf1.getExtension(InstrumentationManager.class);
+            assertNotNull("Instrumentation Manager of cxf1 should not be null", im1);
+            
+            assertTrue(im1.isEnabled());
+            assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi", im1.getJMXServiceURL());
+            
+            cxf2 = (Bus)context.getBean("cxf2");
+            InstrumentationManagerImpl im2 = 
+                (InstrumentationManagerImpl)cxf2.getExtension(InstrumentationManager.class);
+            assertNotNull("Instrumentation Manager of cxf2 should not be null", im2);
+
+            assertFalse(im2.isEnabled());
+            assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi", im2.getJMXServiceURL());
+            
+        } finally {
+            if (cxf1 != null) {
+                cxf1.shutdown(true);
+            }
+            if (cxf2 != null) {
+                cxf2.shutdown(true);
+            }
+            if (context != null) {
+                context.close();
+            }
+        }
+    }
 
 }

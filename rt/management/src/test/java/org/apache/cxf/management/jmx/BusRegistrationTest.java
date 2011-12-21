@@ -35,6 +35,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+
 /**
  * 
  */
@@ -62,9 +63,19 @@ public class BusRegistrationTest extends Assert {
 
     @Test
     public void testRegisterMultipleBuses() throws Exception {
-        final SpringBusFactory factory = new SpringBusFactory();
+        // classic external IM-bean
+        testRegisterMultipleBuses("managed-spring.xml");
+    }
 
-        serverBus =  factory.createBus("managed-spring.xml");
+    @Test
+    public void testRegisterMultipleBuses2() throws Exception {
+        // integrated IM configuration in bus
+        testRegisterMultipleBuses("managed-spring2.xml");
+    }
+    
+    private void testRegisterMultipleBuses(String conf) throws Exception {
+        final SpringBusFactory factory = new SpringBusFactory();
+        serverBus =  factory.createBus(conf);
         assertEquals("CXF-Test-Bus", serverBus.getId());
         serverIM = serverBus.getExtension(InstrumentationManager.class);
         assertTrue("Instrumentation Manager should not be null", serverIM != null);
@@ -114,13 +125,17 @@ public class BusRegistrationTest extends Assert {
         }
     }
     
+        
     private static ObjectName getObjectName(Bus bus) throws JMException {
         String busId = bus.getId();
+        return getObjectName(busId);
+    }
+
+    private static ObjectName getObjectName(String id) throws JMException {
         StringBuilder buffer = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-        buffer.append(ManagementConstants.BUS_ID_PROP + "=" +  busId + ",");
+        buffer.append(ManagementConstants.BUS_ID_PROP + "=" +  id + ",");
         buffer.append(ManagementConstants.TYPE_PROP + "=Bus");
         
         return new ObjectName(buffer.toString());
     }
-
 }
