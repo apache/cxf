@@ -85,6 +85,7 @@ import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -590,11 +591,19 @@ public class WadlGenerator implements RequestHandler {
 
     protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, 
                                 Type genericType, String paramName, Annotation[] anns, boolean isJson) {
+        ParameterType pType = pm.getType();
+        boolean isForm = isFormParameter(pm, type, anns);
+        if (paramName == null && isForm) {
+            Multipart m = AnnotationUtils.getAnnotation(anns, Multipart.class);
+            if (m != null) {
+                paramName = m.value();
+            }
+        }
         sb.append("<param name=\"").append(paramName).append("\" ");
-        String style = ParameterType.PATH == pm.getType() ? "template"
-                       : ParameterType.FORM == pm.getType() ? "query"
-                       : ParameterType.REQUEST_BODY == pm.getType() ? "plain"    
-                       : pm.getType().toString().toLowerCase();
+        String style = ParameterType.PATH == pType ? "template"
+                       : isForm ? "query"
+                       : ParameterType.REQUEST_BODY == pType ? "plain"    
+                       : pType.toString().toLowerCase();
         sb.append("style=\"").append(style).append("\"");
         if (pm.getDefaultValue() != null) {
             sb.append(" default=\"").append(pm.getDefaultValue()).append("\"");
@@ -748,9 +757,12 @@ public class WadlGenerator implements RequestHandler {
                 sb.append("/>");
             } else {
                 sb.append(">");
-                for (Parameter pm : ori.getParameters()) {
-                    if (pm.getType() == ParameterType.FORM) {
-                        writeParam(sb, pm, ori, false);
+                List<Parameter> params = ori.getParameters();
+                for (int i = 0; i < params.size(); i++) {
+                    if (isFormParameter(params.get(i), 
+                                        getMethod(ori).getParameterTypes()[i],
+                                        getMethod(ori).getParameterAnnotations()[i])) {
+                        writeParam(sb, params.get(i), ori, false);
                     }
                 }
                 sb.append("</representation>");
@@ -967,7 +979,9 @@ public class WadlGenerator implements RequestHandler {
         for (Parameter p : ori.getParameters()) {
             if (p.getType() == ParameterType.FORM
                 || p.getType() == ParameterType.REQUEST_BODY 
-                && getMethod(ori).getParameterTypes()[p.getIndex()] == MultivaluedMap.class) {
+                && (getMethod(ori).getParameterTypes()[p.getIndex()] == MultivaluedMap.class 
+                    || AnnotationUtils.getAnnotation(getMethod(ori).getParameterAnnotations()[p.getIndex()],
+                                                     Multipart.class) != null)) {
                 return true;
             }
         }
@@ -975,14 +989,23 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private Class<?> getFormClass(OperationResourceInfo ori) {
-        for (Parameter p : ori.getParameters()) {
-            if (p.getType() == ParameterType.FORM) {
+        List<Parameter> params = ori.getParameters();
+        for (int i = 0; i < params.size(); i++) {
+            if (isFormParameter(params.get(i), 
+                                getMethod(ori).getParameterTypes()[i],
+                                getMethod(ori).getParameterAnnotations()[i])) {
                 return null;
             }
         } 
         return MultivaluedMap.class;
     }
 
+    private boolean isFormParameter(Parameter pm, Class<?> type, Annotation[] anns) {
+        return ParameterType.FORM == pm.getType() || ParameterType.REQUEST_BODY == pm.getType()
+            && AnnotationUtils.getAnnotation(anns, Multipart.class) != null 
+            && InjectionUtils.isPrimitive(type);
+    }
+    
     // TODO : can we reuse this block with JAXBBinding somehow ?
     public boolean addSchemaDocument(SchemaCollection col,
                                      Document d,
