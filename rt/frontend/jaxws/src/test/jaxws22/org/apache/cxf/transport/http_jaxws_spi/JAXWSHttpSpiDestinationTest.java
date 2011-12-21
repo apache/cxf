@@ -33,15 +33,15 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.classextension.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.isA;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
 
 public class JAXWSHttpSpiDestinationTest extends Assert {
     

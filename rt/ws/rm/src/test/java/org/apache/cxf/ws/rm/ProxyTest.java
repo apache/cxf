@@ -43,8 +43,8 @@ import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -106,7 +106,8 @@ public class ProxyTest extends Assert {
     public void testAcknowledge() throws NoSuchMethodException, RMException {
         Method m = Proxy.class.getDeclaredMethod("invoke", 
             new Class[] {OperationInfo.class, Object[].class, Map.class});
-        Proxy proxy = control.createMock(Proxy.class, new Method[] {m});
+        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
+            .addMockedMethod(m).createMock(control);
         proxy.setReliableEndpoint(rme);
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         EndpointReferenceType acksToEPR = control.createMock(EndpointReferenceType.class);
@@ -135,7 +136,8 @@ public class ProxyTest extends Assert {
     public void testLastMessage() throws NoSuchMethodException, RMException {
         Method m = Proxy.class.getDeclaredMethod("invoke", 
             new Class[] {OperationInfo.class, Object[].class, Map.class});
-        Proxy proxy = control.createMock(Proxy.class, new Method[] {m});
+        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
+            .addMockedMethod(m).createMock(control);
         proxy.setReliableEndpoint(rme);
         SourceSequence ss = control.createMock(SourceSequence.class);
         EasyMock.expect(ss.getTarget()).andReturn(null);
@@ -175,7 +177,8 @@ public class ProxyTest extends Assert {
     public void testTerminate() throws NoSuchMethodException, RMException {
         Method m = Proxy.class.getDeclaredMethod("invoke", 
             new Class[] {OperationInfo.class, Object[].class, Map.class});
-        Proxy proxy = control.createMock(Proxy.class, new Method[] {m});
+        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
+            .addMockedMethod(m).createMock(control);
         proxy.setReliableEndpoint(rme);        
         Endpoint endpoint = control.createMock(Endpoint.class);
         EasyMock.expect(rme.getEndpoint()).andReturn(endpoint);
@@ -199,7 +202,8 @@ public class ProxyTest extends Assert {
     public void testCreateSequenceResponse() throws NoSuchMethodException, RMException {
         Method m = Proxy.class.getDeclaredMethod("invoke", 
             new Class[] {OperationInfo.class, Object[].class, Map.class});
-        Proxy proxy = control.createMock(Proxy.class, new Method[] {m});
+        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
+            .addMockedMethod(m).createMock(control);
         proxy.setReliableEndpoint(rme);
         Endpoint endpoint = control.createMock(Endpoint.class);
         EasyMock.expect(rme.getEndpoint()).andReturn(endpoint);
@@ -233,7 +237,8 @@ public class ProxyTest extends Assert {
         Method m = Proxy.class.getDeclaredMethod("createClient", 
             new Class[] {Bus.class, Endpoint.class, Conduit.class, 
                          org.apache.cxf.ws.addressing.EndpointReferenceType.class});
-        Proxy proxy = control.createMock(Proxy.class, new Method[] {m});
+        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
+            .addMockedMethod(m).createMock(control);
         proxy.setReliableEndpoint(rme);
 
         RMManager manager = control.createMock(RMManager.class);
@@ -295,7 +300,8 @@ public class ProxyTest extends Assert {
     private void testCreateSequence(boolean isServer) throws NoSuchMethodException, RMException {
         Method m = Proxy.class.getDeclaredMethod("invoke", 
             new Class[] {OperationInfo.class, Object[].class, Map.class});
-        Proxy proxy = control.createMock(Proxy.class, new Method[] {m});
+        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
+            .addMockedMethod(m).createMock(control);
         proxy.setReliableEndpoint(rme);
         
         RMManager manager = control.createMock(RMManager.class);

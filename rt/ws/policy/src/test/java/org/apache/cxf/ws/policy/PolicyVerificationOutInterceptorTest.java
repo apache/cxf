@@ -22,8 +22,8 @@ package org.apache.cxf.ws.policy;
 import java.lang.reflect.Method;
 
 import org.apache.cxf.message.Message;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,8 @@ public class PolicyVerificationOutInterceptorTest extends Assert {
         Method m = AbstractPolicyInterceptor.class.getDeclaredMethod("getTransportAssertions",
             new Class[] {Message.class});
         PolicyVerificationOutInterceptor interceptor = 
-            control.createMock(PolicyVerificationOutInterceptor.class, new Method[] {m});
+            EasyMock.createMockBuilder(PolicyVerificationOutInterceptor.class)
+                .addMockedMethod(m).createMock(control);
         
         Message message = control.createMock(Message.class);
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.TRUE);

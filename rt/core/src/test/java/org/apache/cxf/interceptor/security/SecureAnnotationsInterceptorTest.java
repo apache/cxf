@@ -34,7 +34,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Before;

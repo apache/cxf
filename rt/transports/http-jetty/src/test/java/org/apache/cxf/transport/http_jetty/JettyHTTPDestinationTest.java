@@ -71,7 +71,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;

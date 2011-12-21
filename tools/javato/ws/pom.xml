@@ -93,13 +93,6 @@
 
 
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
-        <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <scope>test</scope>

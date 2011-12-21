@@ -41,7 +41,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 public class JBIConduitTest extends AbstractJBITest {

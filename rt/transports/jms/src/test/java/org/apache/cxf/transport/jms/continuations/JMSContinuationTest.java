@@ -32,7 +32,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.JMSConfiguration;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

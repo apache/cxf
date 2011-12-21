@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.connector.Connection;
 import org.apache.cxf.jca.cxf.handlers.ProxyInvocationHandler;
 import org.apache.hello_world_soap_http.Greeter;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 

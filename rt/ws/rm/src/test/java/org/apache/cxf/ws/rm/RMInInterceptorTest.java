@@ -36,8 +36,8 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -127,7 +127,9 @@ public class RMInInterceptorTest extends Assert {
     NoSuchMethodException {
         Method m = RMInInterceptor.class.getDeclaredMethod("processAcknowledgments",
             new Class[] {Source.class, RMProperties.class});
-        interceptor = control.createMock(RMInInterceptor.class, new Method[] {m});
+        interceptor =
+            EasyMock.createMockBuilder(RMInInterceptor.class)
+                .addMockedMethod(m).createMock(control);
         Message message = setupInboundMessage(RMConstants.getSequenceAckAction(), onServer);
         rme.receivedControlMessage();
         EasyMock.expectLastCall();
@@ -192,8 +194,9 @@ public class RMInInterceptorTest extends Assert {
                                                             new Class[] {Destination.class, Message.class});
         Method m4 = RMInInterceptor.class.getDeclaredMethod("processDeliveryAssurance",
                                                             new Class[] {RMProperties.class});
-        interceptor = control
-            .createMock(RMInInterceptor.class, new Method[] {m1, m2, m3, m4});
+        interceptor =
+            EasyMock.createMockBuilder(RMInInterceptor.class)
+                .addMockedMethods(m1, m2, m3, m4).createMock(control);
         Message message = setupInboundMessage("greetMe", true);
         Destination d = control.createMock(Destination.class);
         EasyMock.expect(manager.getDestination(message)).andReturn(d);

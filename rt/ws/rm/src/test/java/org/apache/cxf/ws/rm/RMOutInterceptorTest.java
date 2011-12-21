@@ -35,8 +35,8 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,7 +71,9 @@ public class RMOutInterceptorTest extends Assert {
         Method[] mocked = new Method[] {                                                
             RMOutInterceptor.class.getDeclaredMethod("isRuntimeFault", new Class[] {Message.class})
         };
-        RMOutInterceptor interceptor = control.createMock(RMOutInterceptor.class, mocked);
+        RMOutInterceptor interceptor = 
+            EasyMock.createMockBuilder(RMOutInterceptor.class)
+                .addMockedMethods(mocked).createMock(control);
         Message message = control.createMock(Message.class);        
         EasyMock.expect(interceptor.isRuntimeFault(message)).andReturn(true);
         control.replay();
@@ -84,7 +86,9 @@ public class RMOutInterceptorTest extends Assert {
         Method[] mocked = new Method[] {                                                
             RMOutInterceptor.class.getDeclaredMethod("isRuntimeFault", new Class[] {Message.class})
         };
-        RMOutInterceptor interceptor = control.createMock(RMOutInterceptor.class, mocked);
+        RMOutInterceptor interceptor =
+            EasyMock.createMockBuilder(RMOutInterceptor.class)
+                .addMockedMethods(mocked).createMock(control);
         Message message = control.createMock(Message.class);        
         EasyMock.expect(interceptor.isRuntimeFault(message)).andReturn(false);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();        
@@ -106,7 +110,9 @@ public class RMOutInterceptorTest extends Assert {
                 new Class[] {Destination.class, RMProperties.class, Identifier.class, 
                              AttributedURI.class})            
         };
-        RMOutInterceptor interceptor = control.createMock(RMOutInterceptor.class, mocked);         
+        RMOutInterceptor interceptor =
+            EasyMock.createMockBuilder(RMOutInterceptor.class)
+                .addMockedMethods(mocked).createMock(control);
         RMManager manager = control.createMock(RMManager.class);
         EasyMock.expect(interceptor.getManager()).andReturn(manager).times(5);
         

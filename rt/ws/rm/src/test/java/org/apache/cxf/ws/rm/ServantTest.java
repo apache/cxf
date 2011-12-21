@@ -35,8 +35,8 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;

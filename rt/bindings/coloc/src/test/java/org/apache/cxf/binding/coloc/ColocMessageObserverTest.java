@@ -40,8 +40,8 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;

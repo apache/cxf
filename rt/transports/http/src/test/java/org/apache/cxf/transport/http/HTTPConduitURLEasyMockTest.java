@@ -46,8 +46,8 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;

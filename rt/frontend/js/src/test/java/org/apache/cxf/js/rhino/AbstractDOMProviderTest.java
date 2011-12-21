@@ -21,7 +21,7 @@
 package org.apache.cxf.js.rhino;
 
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Before;

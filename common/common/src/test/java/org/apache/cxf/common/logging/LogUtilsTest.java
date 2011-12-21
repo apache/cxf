@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 
+import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
-import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -22,7 +22,7 @@ import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.management.InstrumentationManager;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -45,8 +45,8 @@ import org.apache.headers.coloc.types.FaultDetailT;
 import org.apache.headers.coloc.types.InHeaderT;
 import org.apache.headers.coloc.types.OutHeaderT;
 import org.apache.headers.rpc_lit.PingMeFault;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.After;
 import org.junit.Assert;

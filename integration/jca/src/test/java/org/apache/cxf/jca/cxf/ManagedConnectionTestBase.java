@@ -32,7 +32,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.Greeter;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 

@@ -32,7 +32,7 @@ import javax.resource.spi.ResourceAdapterInternalException;
 import javax.security.auth.Subject;
 
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 

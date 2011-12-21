@@ -39,16 +39,16 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.handlers.types.AddNumbersResponse;
 import org.easymock.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createNiceControl;
 
 public class LogicalHandlerInterceptorTest extends Assert {
 

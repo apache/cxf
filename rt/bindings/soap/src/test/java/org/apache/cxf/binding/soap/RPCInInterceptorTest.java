@@ -34,8 +34,8 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 

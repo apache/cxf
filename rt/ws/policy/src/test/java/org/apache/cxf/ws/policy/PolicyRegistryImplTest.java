@@ -20,8 +20,8 @@
 package org.apache.cxf.ws.policy;
 
 import org.apache.neethi.Policy;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Test;
 

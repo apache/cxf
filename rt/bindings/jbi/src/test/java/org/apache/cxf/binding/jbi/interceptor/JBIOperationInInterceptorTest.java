@@ -40,7 +40,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 

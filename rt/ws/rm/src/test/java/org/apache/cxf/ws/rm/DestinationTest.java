@@ -29,8 +29,8 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -132,7 +132,8 @@ public class DestinationTest extends Assert {
     NoSuchMethodException {
         
         Method m1 = Destination.class.getDeclaredMethod("getSequence", new Class[] {Identifier.class});
-        destination = control.createMock(Destination.class, new Method[] {m1});
+        destination = EasyMock.createMockBuilder(Destination.class)
+            .addMockedMethod(m1).createMock(control);
         Message message = setupMessage();
         RMProperties rmps = control.createMock(RMProperties.class);
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);

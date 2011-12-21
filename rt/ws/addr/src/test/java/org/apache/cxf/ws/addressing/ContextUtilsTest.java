@@ -27,8 +27,8 @@ import javax.xml.namespace.QName;
 import junit.framework.Assert;
 
 import org.apache.cxf.service.model.Extensible;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 import org.junit.Before;
 import org.junit.Test;

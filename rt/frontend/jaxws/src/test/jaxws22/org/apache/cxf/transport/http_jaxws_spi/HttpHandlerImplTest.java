@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.spi.http.HttpExchange;
 import javax.xml.ws.spi.http.HttpHandler;
 
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
