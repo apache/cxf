@@ -210,10 +210,10 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
      *
      * @param xPaths the XPath expressions to check for
      */
-    public final void setXPaths(List<XPathExpression> xPaths) {
+    public final void setXPaths(List<XPathExpression> xpaths) {
         this.xPaths.clear();
-        if (xPaths != null) {
-            this.xPaths.addAll(xPaths);
+        if (xpaths != null) {
+            this.xPaths.addAll(xpaths);
         }
     }
 
