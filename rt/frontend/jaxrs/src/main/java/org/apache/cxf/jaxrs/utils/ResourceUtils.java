@@ -73,7 +73,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -318,18 +317,9 @@ public final class ResourceUtils {
             return new Parameter(ParameterType.MATRIX, index, m.value(), isEncoded, dValue);
         }  
     
-        Parameter formParam = null;
         FormParam f = AnnotationUtils.getAnnotation(anns, FormParam.class);
         if (f != null) {
-            formParam = new Parameter(ParameterType.FORM, index, f.value(), isEncoded, dValue);
-        } else {    
-            Multipart multipart = AnnotationUtils.getAnnotation(anns, Multipart.class);
-            if (multipart != null && InjectionUtils.isPrimitive(type)) {
-                formParam = new Parameter(ParameterType.FORM, index, multipart.value(), isEncoded, dValue);
-            }
-        }
-        if (formParam != null) {
-            return formParam;
+            return new Parameter(ParameterType.FORM, index, f.value(), isEncoded, dValue);
         }
         
         HeaderParam h = AnnotationUtils.getAnnotation(anns, HeaderParam.class);
