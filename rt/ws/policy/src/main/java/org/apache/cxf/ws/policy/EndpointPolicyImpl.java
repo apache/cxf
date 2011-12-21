@@ -135,7 +135,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return faultInterceptors;
     }
     
-    void initialize() {
+    public void initialize() {
         initializePolicy();
         checkExactlyOnes();
         finalizeConfig();

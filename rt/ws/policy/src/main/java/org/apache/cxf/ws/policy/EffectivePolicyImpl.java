@@ -69,8 +69,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         return chosenAlternative;
     }
     
-    
-    void initialise(EndpointPolicyImpl epi, PolicyEngineImpl engine, boolean inbound) {
+    public void initialise(EndpointPolicyImpl epi, PolicyEngineImpl engine, boolean inbound) {
         policy = epi.getPolicy();
         chosenAlternative = epi.getChosenAlternative();
         if (chosenAlternative == null) {
@@ -79,7 +78,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         initialiseInterceptors(engine, inbound);  
     }
     
-    void initialise(EndpointInfo ei, 
+    public void initialise(EndpointInfo ei, 
                     BindingOperationInfo boi, 
                     PolicyEngineImpl engine, 
                     Assertor assertor,
@@ -88,7 +87,8 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         chooseAlternative(engine, assertor);
         initialiseInterceptors(engine, false);  
     }
-    void initialise(EndpointInfo ei, 
+    
+    public void initialise(EndpointInfo ei, 
                     BindingOperationInfo boi, 
                     PolicyEngineImpl engine, 
                     boolean requestor, boolean request) {
@@ -97,7 +97,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         initialiseInterceptors(engine, requestor);  
     }
     
-    void initialise(EndpointInfo ei, 
+    public void initialise(EndpointInfo ei, 
                     BindingOperationInfo boi, 
                     BindingFaultInfo bfi, 
                     PolicyEngineImpl engine, 
