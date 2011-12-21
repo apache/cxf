@@ -33,6 +33,14 @@ import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
+/**
+ * This class represents an attachment; generally a multipart part. 
+ * Some constructors in here are intended only for
+ * internal use in CXF, others are suitable or preparing 
+ * attachments to pass to the {@link org.apache.cxf.jaxrs.client.WebClient} API. 
+ * See the {@link AttachmentBuilder} for a convenient 
+ * way to create attachments for use with {@link org.apache.cxf.jaxrs.client.WebClient}.
+ */
 public class Attachment {
 
     private DataHandler handler;
@@ -84,6 +92,12 @@ public class Attachment {
         }
         headers.putSingle("Content-ID", id);
         headers.putSingle("Content-Type", "application/octet-stream");
+    }
+    
+    Attachment(MultivaluedMap<String, String> headers, DataHandler handler, Object object) {
+        this.headers = headers;
+        this.handler = handler;
+        this.object = object;
     }
     
     public ContentDisposition getContentDisposition() {
