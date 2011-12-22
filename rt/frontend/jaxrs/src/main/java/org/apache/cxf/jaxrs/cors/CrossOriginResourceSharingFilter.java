@@ -96,7 +96,18 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
 
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         OperationResourceInfo opResInfo = m.getExchange().get(OperationResourceInfo.class);
+        /*
+         * If there is an actual method annotated with @OPTIONS, this is the annotation (if any) from it.
+         * The lookup falls back to it.
+         */
         CrossOriginResourceSharing annotation = getAnnotation(opResInfo);
+        /*
+         * If we don't have an annotation on the target method or an @OPTION method, perhaps
+         * we've got one on the class?
+         */
+        if (annotation == null) {
+            annotation = resourceClass.getServiceClass().getAnnotation(CrossOriginResourceSharing.class);
+        }
 
         if ("OPTIONS".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
           
@@ -196,7 +207,8 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return null;
         }
         CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
-        ann = ann == null ? optionAnn : ann; 
+        ann = ann == null ? optionAnn : ann;
+        
         if (ann == null) {
             return createPreflightResponse(m, false);
         }

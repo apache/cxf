@@ -151,6 +151,31 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void preflightPostClassAnnotation() throws ClientProtocolException, IOException {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
+        httpoptions.addHeader("Origin", "http://in.org");
+        // nonsimple header
+        httpoptions.addHeader("Content-Type", "application/json");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "POST");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1");
+        HttpResponse response = httpclient.execute(httpoptions);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+    }
+    
+    @Test
+    public void simplePostClassAnnotation() throws ClientProtocolException, IOException {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
+        httpoptions.addHeader("Origin", "http://in.org");
+        // nonsimple header
+        httpoptions.addHeader("Content-Type", "text/plain");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "POST");
+        HttpResponse response = httpclient.execute(httpoptions);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+    }
+    
+    @Test
     public void allowStarPassNone() throws Exception {
         // allow *, no origin
         assertAllOrigin(true, null, null, false);
