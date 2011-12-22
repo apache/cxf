@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.rm.blueprint;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
@@ -39,7 +41,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
-import org.apache.cxf.ws.rm.manager.ObjectFactory;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -53,7 +54,7 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMBPBeanDefinitionParser.class);
 
-    private JAXBContext jaxbContext;
+    private Map<Class<?>, JAXBContext> jaxbContexts = new HashMap<Class<?>, JAXBContext>();
 
     private Class<?> beanClass;
     
@@ -119,7 +120,7 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
         Element data = DOMUtils.getFirstElement(parent);
         
         try {
-            Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
+            Unmarshaller unmarshaller = getJAXBContext(c).createUnmarshaller();
             MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
             value.setObject(unmarshaller.unmarshal(data, c).getValue());
             bean.addProperty(propertyName, value);
@@ -128,10 +129,12 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
         }
     }
 
-    private synchronized JAXBContext getJAXBContext() throws JAXBException {
+    private synchronized JAXBContext getJAXBContext(Class<?> c) throws JAXBException {
+        JAXBContext jaxbContext = jaxbContexts.get(c);
         if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(ObjectFactory.class), 
-                                                  ObjectFactory.class.getClassLoader());
+            jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(c), 
+                                                  c.getClassLoader());
+            jaxbContexts.put(c, jaxbContext);
         }
         return jaxbContext;
     }
