@@ -84,6 +84,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private Integer maxAge;
     private Integer preflightFailStatus = 200;
     private boolean defaultOptionsMethodsHandlePreflight;
+    private boolean allowAnyHeaders;
     
     
     private CrossOriginResourceSharing getAnnotation(OperationResourceInfo ori) {
@@ -209,9 +210,9 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
         ann = ann == null ? optionAnn : ann;
         
-        if (ann == null) {
-            return createPreflightResponse(m, false);
-        }
+        /* We aren't required to have any annotation at all. If no annotation,
+         * the properties of this filter make all the decisions.
+         */
 
         // 5.2.2 must be on the list or we must be matching *.
         boolean effectiveAllowAllOrigins = effectiveAllowAllOrigins(ann);
@@ -226,7 +227,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         // This was indirectly enforced by getCorsMethod()
 
         // 5.2.6 reject if the header is not listed.
-        if (!effectiveAllowHeaders(ann).containsAll(requestHeaders)) {
+        if (!effectiveAllowAnyHeaders(ann) && !effectiveAllowHeaders(ann).containsAll(requestHeaders)) {
             return createPreflightResponse(m, false);
         }
 
@@ -391,6 +392,14 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return Arrays.asList(ann.allowOrigins());
         } else {
             return allowOrigins;
+        }
+    }
+    
+    private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
+        if (ann != null) {
+            return ann.allowAnyHeaders();
+        } else {
+            return allowAnyHeaders;
         }
     }
     
@@ -570,7 +579,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     /**
      * Preflight error response status, default is 200.
      * 
-     * @param status
+     * @param status HTTP status code.
      */
     public void setPreflightErrorStatus(Integer status) {
         this.preflightFailStatus = status;
@@ -591,6 +600,21 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
      */
     public void setDefaultOptionsMethodsHandlePreflight(boolean defaultOptionsMethodsHandlePreflight) {
         this.defaultOptionsMethodsHandlePreflight = defaultOptionsMethodsHandlePreflight;
+    }
+
+    public boolean isAllowAnyHeaders() {
+        return allowAnyHeaders;
+    }
+
+    /**
+     * Completely relax the Access-Control-Request-Headers check. 
+     * Any headers in this header will be permitted. Handy for 
+     * dealing with Chrome / Firefox / Safari incompatibilities.
+     * @param allowAnyHeader whether to allow any header. If <tt>false</tt>,
+     * respect the allowHeaders property.
+     */
+    public void setAllowAnyHeaders(boolean allowAnyHeader) {
+        this.allowAnyHeaders = allowAnyHeader;
     }
 
 }

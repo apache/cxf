@@ -59,6 +59,12 @@ public @interface CrossOriginResourceSharing {
      * in an actual request.
      */
     String[] allowHeaders() default { };
+    
+    /**
+     * Act as if whatever headers are listed in the Access-Control-Request-Headers are 
+     * listed in allowHeaders. Convenient for dealing with Browser bugs. 
+     */
+    boolean allowAnyHeaders() default false;
     /**
      * If true, this resource will return 
      * <pre>Access-Control-Allow-Credentials: true</pre>
