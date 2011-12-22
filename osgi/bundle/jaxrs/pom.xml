@@ -173,8 +173,8 @@
                         <Bundle-Activator>org.apache.cxf.bus.osgi.OSGiExtensionLocator</Bundle-Activator>
                         <Export-Package>
                             org.apache.cxf.*;version=${cxf.osgi.version.clean};-split-package:=merge-first,
-                            '=META-INF.cxf.osgi',
-                            '=META-INF.cxf'
+                            '=META-INF.cxf.osgi';version=${cxf.osgi.version.clean},
+                            '=META-INF.cxf';version=${cxf.osgi.version.clean}
                         </Export-Package>
                         <_failok>true</_failok>
                         <_nouses>true</_nouses>
