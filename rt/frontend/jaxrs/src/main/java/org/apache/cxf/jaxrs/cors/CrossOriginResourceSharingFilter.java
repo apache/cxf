@@ -317,10 +317,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private void commonRequestProcessing(Message m, CrossOriginResourceSharing ann, String origin) {
         
         m.getExchange().put(CorsHeaderConstants.HEADER_ORIGIN, origin);
-        
         m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, effectiveAllowCredentials(ann));
-
-
     }
 
     public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
