@@ -39,13 +39,11 @@ import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionFragmentParser;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
-import org.apache.cxf.bus.osgi.OSGiAutomaticWorkQueue.WorkQueueList;
 import org.apache.cxf.buslifecycle.BusCreationListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.configuration.ConfiguredBeanLocator.BeanLoaderListener;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
@@ -62,8 +60,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
-import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * 
@@ -75,7 +74,8 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     private long id;
     private Extension listener;
 
-    private WorkQueueList workQueues = new WorkQueueList();
+    private ManagedWorkQueueList workQueues = new ManagedWorkQueueList();
+    private ServiceTracker configAdminTracker;
     
     /** {@inheritDoc}*/
     public void bundleChanged(BundleEvent event) {
@@ -104,32 +104,26 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
                 register(bundle);
             }
         }
-        ServiceReference configAdminServiceRef =  
-            context.getServiceReference(ConfigurationAdmin.class.getName());
         
-              
-        if (configAdminServiceRef != null) {  
-            ConfigurationAdmin configAdmin = (ConfigurationAdmin)  
-                    context.getService(configAdminServiceRef);  
-            Configuration config = configAdmin.getConfiguration("org.apache.cxf.workqueues");
-            
-            workQueues.register(context, config);
-            
-            Dictionary d = config.getProperties();
-                        
-            if (d != null) {
-                workQueues.updated(d);
+        configAdminTracker = new ServiceTracker(context, ConfigurationAdmin.class.getName(), null);
+        configAdminTracker.open();
+        workQueues.setConfigAdminTracker(configAdminTracker);
+
+        Properties props = new Properties();
+        props.put(Constants.SERVICE_PID, workQueues.getName());  
+        context.registerService(ManagedServiceFactory.class.getName(), workQueues, props);
+
+        Extension ext = new Extension(ManagedWorkQueueList.class) {
+            public Object getLoadedObject() {
+                return workQueues;
             }
-            Extension ext = new Extension(WorkQueueList.class) {
-                public Object getLoadedObject() {
-                    return workQueues;
-                }
-                public Extension cloneNoObject() {
-                    return this;
-                }
-            };
-            ExtensionRegistry.addExtensions(Collections.singletonList(ext));
-        }
+
+            public Extension cloneNoObject() {
+                return this;
+            }
+        };
+        ExtensionRegistry.addExtensions(Collections.singletonList(ext));
+
     }
 
     /** {@inheritDoc}*/
@@ -144,6 +138,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             wq.shutdown(true);
         }
         workQueues.queues.clear();
+        configAdminTracker.close();
     }
     private void registerBusListener(final BundleContext context) {
         listener = new Extension(OSGIBusListener.class);
@@ -285,7 +280,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
  
         public void initComplete() {
             WorkQueueManager m = bus.getExtension(WorkQueueManager.class);
-            WorkQueueList l = bus.getExtension(WorkQueueList.class);
+            ManagedWorkQueueList l = bus.getExtension(ManagedWorkQueueList.class);
             if (l != null && m != null) {
                 for (AutomaticWorkQueueImpl wq : l.queues.values()) {
                     if (m.getNamedWorkQueue(wq.getName()) == null) {

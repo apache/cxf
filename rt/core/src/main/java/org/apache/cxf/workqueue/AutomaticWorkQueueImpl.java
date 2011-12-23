@@ -19,10 +19,17 @@
 
 package org.apache.cxf.workqueue;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -44,7 +51,7 @@ import org.apache.cxf.common.util.ReflectionUtil;
 
 @NoJSR250Annotations
 public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
-
+    public static final String PROPERTY_NAME = "name";
     static final int DEFAULT_MAX_QUEUE_SIZE = 256;
     private static final Logger LOG =
         LogUtils.getL7dLogger(AutomaticWorkQueueImpl.class);
@@ -67,6 +74,8 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     
     boolean shared;
     int sharedCount;
+    
+    private List<PropertyChangeListener> changeListenerList;
     
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
@@ -104,10 +113,25 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         this.lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
         this.dequeueTimeout = dequeueTimeout;
         this.name = name;
+        this.changeListenerList = new ArrayList<PropertyChangeListener>();
     }
     
-    public void setShared(boolean b) {
-        shared = b;
+    public void addChangeListener(PropertyChangeListener listener) {
+        this.changeListenerList.add(listener);
+    }
+    
+    public void removeChangeListener(PropertyChangeListener listener) {
+        this.changeListenerList.remove(listener);
+    }
+    
+    public void notifyChangeListeners(PropertyChangeEvent event) {
+        for (PropertyChangeListener listener : changeListenerList) {
+            listener.propertyChange(event);
+        }
+    }
+    
+    public void setShared(boolean shared) {
+        this.shared = shared;
     }
     public boolean isShared() {
         return shared;
@@ -478,6 +502,8 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public void setHighWaterMark(int hwm) {
         highWaterMark = hwm < 0 ? Integer.MAX_VALUE : hwm;
         if (executor != null) {
+            notifyChangeListeners(new PropertyChangeEvent(this, "highWaterMark", 
+                                                          this.executor.getMaximumPoolSize(), hwm));
             executor.setMaximumPoolSize(highWaterMark);
         }
     }
@@ -485,19 +511,24 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public void setLowWaterMark(int lwm) {
         lowWaterMark = lwm < 0 ? 0 : lwm;
         if (executor != null) {
+            notifyChangeListeners(new PropertyChangeEvent(this, "lowWaterMark",
+                                                          this.executor.getCorePoolSize(), lwm)); 
             executor.setCorePoolSize(lowWaterMark);
         }
     }
 
     public void setInitialSize(int initialSize) {
+        notifyChangeListeners(new PropertyChangeEvent(this, "initialSize", this.initialThreads, initialSize));
         this.initialThreads = initialSize;
     }
     
     public void setQueueSize(int size) {
+        notifyChangeListeners(new PropertyChangeEvent(this, "queueSize", this.maxQueueSize, size));
         this.maxQueueSize = size;
     }
     
     public void setDequeueTimeout(long l) {
+        notifyChangeListeners(new PropertyChangeEvent(this, "dequeueTimeout", this.dequeueTimeout, l));
         this.dequeueTimeout = l;
     }
     
@@ -524,5 +555,38 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             return 0;
         }
         return executor.getActiveCount();
+    }
+    public void update(Dictionary config) {
+        String s = (String)config.get("highWaterMark");
+        if (s != null) {
+            this.highWaterMark = Integer.parseInt(s);
+        }
+        s = (String)config.get("lowWaterMark");
+        if (s != null) {
+            this.lowWaterMark = Integer.parseInt(s);
+        }
+        s = (String)config.get("initialSize");
+        if (s != null) {
+            this.initialThreads = Integer.parseInt(s);
+        }
+        s = (String)config.get("dequeueTimeout");
+        if (s != null) {
+            this.dequeueTimeout = Long.parseLong(s);
+        }
+        s = (String)config.get("queueSize");
+        if (s != null) {
+            this.maxQueueSize = Integer.parseInt(s);
+        } 
+    }
+    public Dictionary getProperties() {
+        Dictionary<String, String> properties = new Hashtable<String, String>();
+        NumberFormat nf = NumberFormat.getIntegerInstance();
+        properties.put("name", nf.format(getName()));
+        properties.put("highWaterMark", nf.format(getHighWaterMark()));
+        properties.put("lowWaterMark", nf.format(getLowWaterMark()));
+        properties.put("initialSize", nf.format(getLowWaterMark()));
+        properties.put("dequeueTimeout", nf.format(getLowWaterMark()));
+        properties.put("queueSize", nf.format(getLowWaterMark()));
+        return properties;
     }
 }
