@@ -65,30 +65,34 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
         if (null == pe) {
             return;
         }
+
+        // 1. Check overridden policy
+        Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
+        if (p != null) {
+            EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
+            EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
+            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true);
+            msg.put(EffectivePolicy.class, effectivePolicy);
+            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
+                                  effectivePolicy.getPolicy());
+            
+            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
+            for (Interceptor<? extends Message> i : interceptors) {            
+                msg.getInterceptorChain().add(i);
+                LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+            }
+            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
+            if (null != assertions && !assertions.isEmpty()) {
+                msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
+                msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
+            }
+        }
         
+        // 2. Process client policy
         if (MessageUtils.isRequestor(msg)) {
             
             BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
-            Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
-            if (p != null) {
-                EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
-                EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-                effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true);
-                msg.put(EffectivePolicy.class, effectivePolicy);
-                PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
-                                      effectivePolicy.getPolicy());
-                
-                List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
-                for (Interceptor<? extends Message> i : interceptors) {            
-                    msg.getInterceptorChain().add(i);
-                    LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
-                }
-                Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
-                if (null != assertions && !assertions.isEmpty()) {
-                    msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-                    msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
-                }
-            } else if (boi == null) {
+            if (boi == null) {
                 Conduit conduit = exchange.getConduit(msg);
             
                 EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);
@@ -100,8 +104,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                     }
                 }
                 
-                // insert assertions of endpoint's vocabulary into message
-                
+                // Insert assertions of endpoint's vocabulary into message
                 Collection<Assertion> assertions = ep.getVocabulary();
                 if (null != assertions && !assertions.isEmpty()) {
                     msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
@@ -126,6 +129,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 }
             }
         } else {            
+            // 3. Process server policy
             Destination destination = exchange.getDestination();
             
             // We do not know the underlying message type yet - so we pre-emptively add interceptors 
