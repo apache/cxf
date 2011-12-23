@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+	 <OCD description="" name="CXF work queue" id="workqueues">
+	 	<AD name="Name" id="name" type="String" default="" description=""/>
+	 	<AD name="High water mark" id="highWaterMark" type="String" default="" description=""/>
+	 	<AD name="Low water mark" id="lowWaterMark" type="String" default="" description=""/>
+	 	<AD name="Initial size" id="initialSize" type="String" default="" description=""/>
+	 	<AD name="Dequeue timeout" id="dequeueTimeout" type="String" default="" description=""/>
+	 	<AD name="Queue size" id="queueSize" type="String" default="" description=""/>
+	 </OCD>
+	 <Designate pid="org.apache.cxf.workqueues">
+	 	<Object ocdref="workqueues"/>
+	 </Designate>
+</metatype:MetaData>
