@@ -456,7 +456,6 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
-    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-104 gets resolved")
     public void testReadQualifiedArray() throws Exception {
         String data = "{\"ns1.thetag\":[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]}";
@@ -530,9 +529,9 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
-    @Ignore("This is hitting http://jira.codehaus.org/browse/JETTISON-44")
+    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-75 gets fixed")
     public void testWriteMixedContent() throws Exception {
-        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125,\"$\":\"\\n     \\n\"}}",
+        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125}}",
                            false, "book.xml");
     }
     
