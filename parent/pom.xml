@@ -100,7 +100,7 @@
         <cxf.xmlschema.version>2.0.1</cxf.xmlschema.version>
         <cxf.jibx.version>1.2.3</cxf.jibx.version>
         <cxf.axiom.version>1.2.10</cxf.axiom.version>
-        <cxf.jettison.version>1.3</cxf.jettison.version>
+        <cxf.jettison.version>1.3.1</cxf.jettison.version>
         <cxf.wss4j.version>1.6.4</cxf.wss4j.version>
         <cxf.joda.time.version>1.6.2</cxf.joda.time.version>
         <cxf.opensaml.version>2.5.1</cxf.opensaml.version>
