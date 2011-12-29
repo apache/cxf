@@ -146,7 +146,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String name = "Many        spaces";
         wc.query("name", name);
         String content = wc.get(String.class);
-        System.out.println(content);
         assertTrue(content.contains("<!DOCTYPE Something SYSTEM 'my.dtd'>"));
         assertTrue(content.contains("<?xmlstylesheet href='" + base + "/common.css'?>"));
         assertTrue(content.contains("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""));
@@ -982,6 +981,33 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/simplebooks/simple");
         Book book = wc.get(Book.class);
         assertEquals(444L, book.getId());
+    }
+    
+    @Test
+    public void testFormattedJSON() {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
+        wc.accept("application/json");
+        String response = wc.get(String.class);
+        // {"Book":{"id":123,"name":"CXF in Action"}}
+        
+        assertTrue(response.startsWith("{"));
+        assertTrue(response.endsWith("}"));
+        assertTrue(response.contains("\"Book\":{"));
+        assertTrue(response.indexOf("\"Book\":{") == 1);
+        
+        wc.query("_format", "");
+        response = wc.get(String.class);
+        //{
+        //    "Book":{
+        //      "id":123,
+        //      "name":"CXF in Action"
+        //    }
+        //}
+        assertTrue(response.startsWith("{"));
+        assertTrue(response.endsWith("}"));
+        assertTrue(response.contains("\"Book\":{"));
+        assertFalse(response.indexOf("\"Book\":{") == 1);
+        
     }
     
     @Test

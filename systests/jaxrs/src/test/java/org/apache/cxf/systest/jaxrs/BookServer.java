@@ -52,7 +52,7 @@ public class BookServer extends AbstractBusTestServerBase {
         jaxbElementClassMap.put(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement");
         jaxbProvider.setJaxbElementClassMap(jaxbElementClassMap);
         providers.add(jaxbProvider);
-        
+        providers.add(new FormatResponseHandler());
         providers.add(new GenericHandlerWriter());
         providers.add(new FaultyRequestHandler());
         sf.setProviders(providers);
