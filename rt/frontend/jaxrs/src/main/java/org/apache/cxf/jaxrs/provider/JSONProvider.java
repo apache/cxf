@@ -24,7 +24,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
+import java.io.StringReader;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -54,16 +57,20 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.SimpleConverter;
 import org.codehaus.jettison.mapped.TypeConverter;
+import org.codehaus.jettison.util.StringIndenter;
 
 @Produces("application/json")
 @Consumes("application/json")
@@ -430,11 +437,23 @@ public class JSONProvider extends AbstractJAXBProvider  {
     
     protected void marshal(Marshaller ms, Object actualObject, Class<?> actualClass, 
                   Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
+        OutputStream actualOs = os; 
         
+        MessageContext mc = getContext();
+        if (mc != null && MessageUtils.isTrue(mc.get(Marshaller.JAXB_FORMATTED_OUTPUT))) {
+            actualOs = new CachedOutputStream();    
+        }
         XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc, 
-                                              os, isCollection);
+                                              actualOs, isCollection);
         ms.marshal(actualObject, writer);
         writer.close();
+        if (os != actualOs) {
+            StringIndenter formatter = new StringIndenter(
+                IOUtils.newStringFromBytes(((CachedOutputStream)actualOs).getBytes()));
+            Writer outWriter = new OutputStreamWriter(os, enc);
+            IOUtils.copy(new StringReader(formatter.result()), outWriter, 2048);
+            outWriter.close();
+        }
     }
     
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
