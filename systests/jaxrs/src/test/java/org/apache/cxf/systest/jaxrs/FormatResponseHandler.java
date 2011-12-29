@@ -31,7 +31,6 @@ public class FormatResponseHandler implements ResponseHandler {
     @Context
     private MessageContext mc;
     
-    @Override
     public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
         if (mc.getUriInfo().getQueryParameters().containsKey("_format")) {
             mc.put(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
