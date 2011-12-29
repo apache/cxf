@@ -25,6 +25,7 @@ import java.net.URLConnection;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,10 +40,34 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
     }
     
     @Test
+    public void testGetBookSimple() throws Exception {
+        
+        String address =
+            "http://localhost:" + PORT + "/webapp/rest/simplebooks/444";
+        assertEquals(444L, WebClient.create(address).get(Book.class).getId());
+    }
+    
+    @Test
+    public void testGetBookSimpleMatrixEnd() throws Exception {
+        
+        String address =
+            "http://localhost:" + PORT + "/webapp/rest/simplebooks/444;bookId=ssn";
+        assertEquals(444L, WebClient.create(address).get(Book.class).getId());
+    }
+    
+    @Test
+    public void testGetBookSimpleMatrixMiddle() throws Exception {
+        
+        String address =
+            "http://localhost:" + PORT + "/webapp/rest/simplebooks/444;bookId=ssn/book";
+        assertEquals(444L, WebClient.create(address).get(Book.class).getId());
+    }
+    
+    @Test
     public void testGetBook123() throws Exception {
         
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/bookstore/books/123"; 
+            "http://localhost:" + PORT + "/webapp/rest/bookstore/books/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -59,7 +84,7 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
     public void testPetStore() throws Exception {
         
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/petstore/pets/24"; 
+            "http://localhost:" + PORT + "/webapp/rest/petstore/pets/24"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "text/xml");
