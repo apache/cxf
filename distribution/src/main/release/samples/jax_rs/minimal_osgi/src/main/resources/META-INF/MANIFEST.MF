@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Bundle-Activator: minimalosgi.Activator
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-Name: minimalosgi
+Bundle-SymbolicName: minimalosgi
+Import-Package: javax.activation,
+ javax.annotation,
+ javax.management,
+ javax.naming,
+ javax.servlet,
+ javax.servlet.http,
+ javax.xml.bind,
+ javax.xml.bind.attachment,
+ javax.xml.namespace,
+ javax.xml.parsers,
+ javax.xml.stream,
+ javax.xml.transform,
+ javax.xml.validation,
+ javax.ws.rs,
+ javax.ws.rs.core,
+ org.apache.cxf.jaxrs,
+ org.apache.cxf.jaxrs.servlet,
+ org.apache.cxf.jaxrs.utils,
+ org.apache.cxf.message,
+ org.osgi.framework,
+ org.osgi.service.http,
+ org.osgi.util.tracker,
+ org.w3c.dom,
+ org.w3c.dom.ls
+
+
