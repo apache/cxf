@@ -61,6 +61,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     
     private static final String ABSOLUTE_PATH_PARAMETER = "absolute.path";
     private static final String BASE_PATH_PARAMETER = "base.path";
+    private static final String WEBAPP_BASE_PATH_PARAMETER = "webapp.base.path";
     private static final String RELATIVE_PATH_PARAMETER = "relative.path";
     
     private static final String REQUEST_SCOPE = "request";
@@ -247,6 +248,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             request.setParameter(ABSOLUTE_PATH_PARAMETER, ui.getAbsolutePath().toString());
             request.setParameter(RELATIVE_PATH_PARAMETER, ui.getPath());
             request.setParameter(BASE_PATH_PARAMETER, ui.getBaseUri().toString());
+            request.setParameter(WEBAPP_BASE_PATH_PARAMETER, (String)mc.get("http.base.path"));
         }
     }
     
