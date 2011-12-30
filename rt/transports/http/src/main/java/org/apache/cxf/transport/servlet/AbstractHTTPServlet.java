@@ -187,6 +187,9 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     
     private boolean matchPath(List<String> values, HttpServletRequest request) {
         String path = request.getPathInfo();
+        if (path == null) {
+            path = "/";
+        }
         if (redirectQueryCheck) {
             String queryString = request.getQueryString();
             if (queryString != null && queryString.length() > 0) {
