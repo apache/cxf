@@ -180,6 +180,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     }
     
     private static boolean matchPath(List<String> values, String pathInfo) {
+        if (pathInfo == null) {
+            pathInfo = "/";
+        }
+
         for (String value : values) {
             if (pathInfo.matches(value)) {
                 return true;
