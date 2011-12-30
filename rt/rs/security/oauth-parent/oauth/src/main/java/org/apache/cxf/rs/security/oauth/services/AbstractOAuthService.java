@@ -18,10 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
@@ -40,6 +37,10 @@ public abstract class AbstractOAuthService {
         this.mc = context;    
     }
     
+    public MessageContext getMessageContext() {
+        return mc;
+    }
+    
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
@@ -48,15 +49,5 @@ public abstract class AbstractOAuthService {
         return OAuthUtils.getOAuthDataProvider(dataProvider, mc.getServletContext());
     }
     
-    protected HttpServletRequest getHttpRequest() {
-        return mc.getHttpServletRequest();
-    }
     
-    protected UriInfo getUriInfo() {
-        return mc.getUriInfo();
-    }
-    
-    protected SecurityContext getSecurityContext() {
-        return mc.getSecurityContext();
-    }
 }

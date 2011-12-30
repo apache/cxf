@@ -43,6 +43,7 @@ import net.oauth.OAuthProblemException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.data.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.UserSubject;
@@ -61,11 +62,11 @@ public class AuthorizationRequestHandler {
             OAuth.OAUTH_TOKEN
         };
     
-    public Response handle(HttpServletRequest request, OAuthDataProvider dataProvider) {
-
+    public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
+        HttpServletRequest request = mc.getHttpServletRequest();
         try {
             OAuthMessage oAuthMessage = 
-                OAuthUtils.getOAuthMessage(request, REQUIRED_PARAMETERS);
+                OAuthUtils.getOAuthMessage(mc, request, REQUIRED_PARAMETERS);
             new DefaultOAuthValidator().checkSingleParameter(oAuthMessage);
 
             RequestToken token = dataProvider.getRequestToken(oAuthMessage.getToken());
@@ -85,21 +86,20 @@ public class AuthorizationRequestHandler {
 
             Map<String, String> queryParams = new HashMap<String, String>();
             if (allow) {
-                SecurityContext sc = 
-                    (SecurityContext)request.getAttribute(SecurityContext.class.getName());
-                if (sc != null) {
-                    UserSubject subject = new UserSubject();
-                    subject.setLogin(sc.getUserPrincipal().getName());
-                    if (sc instanceof LoginSecurityContext) {
-                        List<String> roleNames = new ArrayList<String>();
-                        Set<Principal> roles = ((LoginSecurityContext)sc).getUserRoles();
-                        for (Principal p : roles) {
-                            roleNames.add(p.getName());
-                        }
-                        subject.setRoles(roleNames);
+                SecurityContext sc = mc.getSecurityContext();
+                
+                UserSubject subject = new UserSubject();
+                subject.setLogin(sc.getUserPrincipal().getName());
+                if (sc instanceof LoginSecurityContext) {
+                    List<String> roleNames = new ArrayList<String>();
+                    Set<Principal> roles = ((LoginSecurityContext)sc).getUserRoles();
+                    for (Principal p : roles) {
+                        roleNames.add(p.getName());
                     }
-                    token.setSubject(subject);
+                    subject.setRoles(roleNames);
                 }
+                token.setSubject(subject);
+                
                 String verifier = dataProvider.setRequestTokenVerifier(token);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
             } else {

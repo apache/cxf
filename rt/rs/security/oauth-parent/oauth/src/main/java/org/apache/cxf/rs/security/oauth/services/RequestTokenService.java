@@ -42,12 +42,12 @@ public class RequestTokenService extends AbstractOAuthService {
     @GET
     @Produces("application/x-www-form-urlencoded")
     public Response getRequestTokenWithGET() {
-        return handler.handle(getHttpRequest(), getDataProvider());
+        return getRequestToken();
     }
     
     @POST
     @Produces("application/x-www-form-urlencoded")
     public Response getRequestToken() {
-        return handler.handle(getHttpRequest(), getDataProvider());
+        return handler.handle(getMessageContext(), getDataProvider());
     }
 }

@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
@@ -34,6 +33,7 @@ import net.oauth.OAuthProblemException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
@@ -58,10 +58,10 @@ public class RequestTokenHandler {
     private String defaultScope;
     private String defaultURI;
     
-    public Response handle(HttpServletRequest request, OAuthDataProvider dataProvider) {
+    public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
         try {
             OAuthMessage oAuthMessage = 
-                OAuthUtils.getOAuthMessage(request, REQUIRED_PARAMETERS);
+                OAuthUtils.getOAuthMessage(mc, mc.getHttpServletRequest(), REQUIRED_PARAMETERS);
 
             Client client = dataProvider
                 .getClient(oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY));

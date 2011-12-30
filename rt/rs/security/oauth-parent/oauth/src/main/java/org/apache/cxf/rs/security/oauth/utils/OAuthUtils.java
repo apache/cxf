@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.FormUtils;
@@ -122,23 +124,27 @@ public final class OAuthUtils {
         }
     }
     
-    public static OAuthMessage getOAuthMessage(HttpServletRequest request,
+    public static OAuthMessage getOAuthMessage(MessageContext mc,
+                                               HttpServletRequest request,
                                                String[] requiredParams) throws Exception {
         OAuthMessage oAuthMessage = OAuthServlet.getMessage(request, request.getRequestURL().toString());
-        OAuthUtils.addParametersIfNeeded(request, oAuthMessage);
+        OAuthUtils.addParametersIfNeeded(mc, request, oAuthMessage);
         oAuthMessage.requireParameters(requiredParams);
         return oAuthMessage;
     }
     
-    public static void addParametersIfNeeded(HttpServletRequest request,
-            OAuthMessage oAuthMessage) throws IOException {
+    public static void addParametersIfNeeded(MessageContext mc,
+                                             HttpServletRequest request,
+                                             OAuthMessage oAuthMessage) throws IOException {
         List<Entry<String, String>> params = oAuthMessage.getParameters();
         String enc = oAuthMessage.getBodyEncoding();
         enc = enc == null ? "UTF-8" : enc;
         
         if (params.isEmpty() 
             && MediaType.APPLICATION_FORM_URLENCODED.equals(oAuthMessage.getBodyType())) {
-            String body = FormUtils.readBody(oAuthMessage.getBodyAsStream(), enc);
+            InputStream stream = mc != null 
+                ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
+            String body = FormUtils.readBody(stream, enc);
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
             FormUtils.populateMapFromString(map, body, enc, true, request);
             for (String key : map.keySet()) {
