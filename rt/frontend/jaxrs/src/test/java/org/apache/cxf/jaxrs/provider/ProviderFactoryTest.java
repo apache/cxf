@@ -897,7 +897,6 @@ public class ProviderFactoryTest extends Assert {
     private static class AbstractTestExceptionMapper<T extends RuntimeException> 
         implements ExceptionMapper<T> {
 
-        @Override
         public Response toResponse(T arg0) {
             // TODO Auto-generated method stub
             return null;
