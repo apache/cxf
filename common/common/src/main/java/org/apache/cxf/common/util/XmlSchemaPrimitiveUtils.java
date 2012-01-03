@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.util;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,12 @@ public final class XmlSchemaPrimitiveUtils {
         registerPrimitiveClasses("float", Float.class, float.class);
         registerPrimitiveClasses("double", Double.class, double.class);
         registerPrimitiveClasses("string", String.class);
+        
+        registerPrimitiveClasses("dateTime", java.sql.Date.class, 
+                                 java.util.Date.class, 
+                                 Calendar.class,
+                                 java.sql.Timestamp.class);
+        registerPrimitiveClasses("time", java.sql.Time.class);
         // add more as needed
     }
     
