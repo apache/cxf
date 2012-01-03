@@ -247,23 +247,22 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         
         List<GenericWsdlOption> temp;
         if (wsdlRoot != null && wsdlRoot.exists() && !disableDirectoryScan) {
-            temp = WsdlOptionLoader.loadWsdlOptionsFromFiles(wsdlRoot, includes, excludes, defaultOptions,
+            temp = WsdlOptionLoader.loadWsdlOptionsFromFiles(wsdlRoot, includes, excludes,
                                                              getGeneratedSourceRoot());
             effectiveWsdlOptions.addAll(temp);
         }
         if (testWsdlRoot != null && testWsdlRoot.exists() && !disableDirectoryScan) {
             temp = WsdlOptionLoader.loadWsdlOptionsFromFiles(testWsdlRoot, includes, excludes,
-                                                             defaultOptions, getGeneratedTestRoot());
+                                                             getGeneratedTestRoot());
             effectiveWsdlOptions.addAll(temp);
         }
         if (!disableDependencyScan) {
             temp = WsdlOptionLoader.loadWsdlOptionsFromDependencies(project, 
-                                                                    defaultOptions, 
                                                                     getGeneratedSourceRoot());
             effectiveWsdlOptions.addAll(temp);
         }
-        downloadRemoteWsdls(effectiveWsdlOptions);
         mergeOptions(effectiveWsdlOptions);
+        downloadRemoteWsdls(effectiveWsdlOptions);
         return effectiveWsdlOptions;
     }
 

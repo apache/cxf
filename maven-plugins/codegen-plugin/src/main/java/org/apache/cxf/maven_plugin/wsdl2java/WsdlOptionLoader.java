@@ -43,16 +43,12 @@ public final class WsdlOptionLoader {
     
     public static List<GenericWsdlOption> 
     loadWsdlOptionsFromDependencies(MavenProject project, 
-                                    Option defaultOptions, 
                                     File outputDir) {
         List<GenericWsdlOption> options = new ArrayList<GenericWsdlOption>();
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {
             WsdlOption option = generateWsdlOptionFromArtifact(artifact, outputDir);
             if (option != null) {
-                if (defaultOptions != null) {
-                    option.merge(defaultOptions);
-                }
                 options.add(option);
             }
         }
@@ -82,7 +78,7 @@ public final class WsdlOptionLoader {
      */
     public static List<GenericWsdlOption> 
     loadWsdlOptionsFromFiles(File wsdlBasedir, String includes[],
-                                 String excludes[], Option defaultOptions,
+                                 String excludes[],
                                  File defaultOutputDir)
         throws MojoExecutionException {
 
@@ -98,7 +94,7 @@ public final class WsdlOptionLoader {
         List<GenericWsdlOption> wsdlOptions 
             = new ArrayList<GenericWsdlOption>();
         for (File wsdl : wsdlFiles) {
-            WsdlOption wsdlOption = generateWsdlOptionFromFile(wsdl, defaultOptions, defaultOutputDir);
+            WsdlOption wsdlOption = generateWsdlOptionFromFile(wsdl, defaultOutputDir);
             if (wsdlOption != null) {
                 wsdlOptions.add(wsdlOption);
             }
@@ -129,7 +125,6 @@ public final class WsdlOptionLoader {
     }
 
     protected static WsdlOption generateWsdlOptionFromFile(final File wsdl, 
-                                                           final Option defaultOptions,
                                                            File defaultOutputDir)
         throws MojoExecutionException {
 
@@ -152,9 +147,6 @@ public final class WsdlOptionLoader {
         final String[] options = readOptionsFromFile(wsdl.getParentFile(), wsdlName);
         if (options.length > 0) {
             wsdlOption.getExtraargs().addAll(Arrays.asList(options));
-        } else if (defaultOptions != null) {
-            // no options specified use the defaults
-            defaultOptions.copyOptions(wsdlOption);
         }
 
         List<File> bindingFiles = FileUtils.getFiles(wsdl.getParentFile(), wsdlName + WSDL_BINDINGS);

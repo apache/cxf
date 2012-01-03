@@ -160,11 +160,15 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <sourceRoot>target/generated/src/main/java</sourceRoot>
                             <wsdlRoot>src/main/resources/wsdl</wsdlRoot>
-			    <includes>
-			      <include>*.wsdl</include>
-			      <include>rt-javascript/*.wsdl</include>
-			    </includes>
-
+                            <includes>
+                                <include>*.wsdl</include>
+                                <include>rt-javascript/*.wsdl</include>
+                            </includes>
+                            <defaultOptions>
+                                <extraargs>
+                                    <extraarg>-verbose</extraarg>
+                                </extraargs>
+                            </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>target/generated/src/main/resources/wsdl/type_test/type_test_xml.wsdl</wsdl>
