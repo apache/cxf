@@ -20,6 +20,7 @@ package org.apache.cxf.configuration.jsse.spring;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -45,6 +46,7 @@ import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.KeyStoreType;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TrustManagersType;
+import org.apache.cxf.transport.https.SSLUtils;
 
 /**
  * This class provides some functionality to convert the JAXB
@@ -98,17 +100,24 @@ public final class TLSParameterJaxBUtils {
         if (kst == null) {
             return null;
         }
-        String type = kst.isSetType()
-                    ? kst.getType()
-                    : KeyStore.getDefaultType();
+        String type = SSLUtils.getKeystoreType(kst.isSetType()
+                                 ? kst.getType() : null, LOG, KeyStore.getDefaultType());
 
         char[] password = kst.isSetPassword()
                     ? deobfuscate(kst.getPassword())
                     : null;
-
-        KeyStore keyStore = !kst.isSetProvider()
+        if (password == null) {
+            String tmp = SSLUtils.getKeystorePassword(null, LOG);
+            if (tmp != null) {
+                password = tmp.toCharArray();
+            }
+        }
+        String provider = SSLUtils.getKeystoreProvider(kst.isSetProvider() 
+                                                       ? kst.getProvider() : null,
+                                                       LOG);
+        KeyStore keyStore = provider == null
                     ? KeyStore.getInstance(type)
-                    : KeyStore.getInstance(type, kst.getProvider());
+                    : KeyStore.getInstance(type, provider);
 
         if (kst.isSetFile()) {
             keyStore.load(new FileInputStream(kst.getFile()), password);
@@ -125,7 +134,12 @@ public final class TLSParameterJaxBUtils {
         } else if (kst.isSetUrl()) {
             keyStore.load(new URL(kst.getUrl()).openStream(), password);
         } else {
-            keyStore.load(null, password);
+            String loc = SSLUtils.getKeystore(null, LOG);
+            InputStream ins = null;
+            if (loc != null) {
+                ins = new FileInputStream(loc);
+            }
+            keyStore.load(ins, password);
         }
         return keyStore;
     }

@@ -261,15 +261,38 @@ public final class SSLUtils {
     }
     
     public static String getKeystoreType(String keyStoreType, Logger log) {
+        return getKeystoreType(keyStoreType, log, DEFAULT_KEYSTORE_TYPE);
+    }
+    public static String getKeystoreType(String keyStoreType, Logger log, String def) {
         String logMsg = null;
         if (keyStoreType != null) {
             logMsg = "KEY_STORE_TYPE_SET";
         } else {
-            keyStoreType = DEFAULT_KEYSTORE_TYPE;
-            logMsg = "KEY_STORE_TYPE_NOT_SET";
+            keyStoreType = SystemPropertyAction.getProperty("javax.net.ssl.keyStoreType", null);
+            if (keyStoreType == null) {
+                keyStoreType = def;
+                logMsg = "KEY_STORE_TYPE_NOT_SET";
+            } else {
+                logMsg = "KEY_STORE_TYPE_SYSTEM_SET";                
+            }
         }
         LogUtils.log(log, Level.FINE, logMsg, keyStoreType);
         return keyStoreType;
+    }  
+    public static String getKeystoreProvider(String keyStoreProvider, Logger log) {
+        String logMsg = null;
+        if (keyStoreProvider != null) {
+            logMsg = "KEY_STORE_PROVIDER_SET";
+        } else {
+            keyStoreProvider = SystemPropertyAction.getProperty("javax.net.ssl.keyStoreProvider", null);
+            if (keyStoreProvider == null) {
+                logMsg = "KEY_STORE_PROVIDER_NOT_SET";
+            } else {
+                logMsg = "KEY_STORE_PROVIDER_SYSTEM_SET";                
+            }
+        }
+        LogUtils.log(log, Level.FINE, logMsg, keyStoreProvider);
+        return keyStoreProvider;
     }  
     
     public static String getKeystorePassword(String keyStorePassword,
@@ -294,7 +317,11 @@ public final class SSLUtils {
             logMsg = "KEY_PASSWORD_SET";
         } else {
             keyPassword =
-                SystemPropertyAction.getProperty("javax.net.ssl.keyStorePassword");
+                SystemPropertyAction.getProperty("javax.net.ssl.keyPassword");
+            if (keyPassword == null) {
+                keyPassword =
+                    SystemPropertyAction.getProperty("javax.net.ssl.keyStorePassword");
+            }
             logMsg = keyPassword != null
                      ? "KEY_PASSWORD_SYSTEM_PROPERTY_SET"
                      : "KEY_PASSWORD_NOT_SET";
@@ -478,8 +505,13 @@ public final class SSLUtils {
             logMsg = "TRUST_STORE_TYPE_SET";
         } else {
             //Can default to JKS
-            trustStoreType = DEFAULT_TRUST_STORE_TYPE;
-            logMsg = "TRUST_STORE_TYPE_NOT_SET";
+            trustStoreType = SystemPropertyAction.getProperty("javax.net.ssl.trustStoreType");
+            if (trustStoreType == null) {    
+                trustStoreType = DEFAULT_TRUST_STORE_TYPE;
+                logMsg = "TRUST_STORE_TYPE_NOT_SET";
+            } else {
+                logMsg = "TRUST_STORE_TYPE_SYSTEM_SET";
+            }
         }
         LogUtils.log(log, Level.FINE, logMsg, trustStoreType);
         return trustStoreType;
