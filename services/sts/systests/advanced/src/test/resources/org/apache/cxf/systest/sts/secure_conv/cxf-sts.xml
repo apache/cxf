@@ -120,7 +120,6 @@
 
 	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
 		<property name="endpoints" ref="transportEndpoints" />
-		<property name="encryptionProperties" ref="encProperties" />
 	</bean>
 
 	<util:list id="transportEndpoints">
@@ -140,6 +139,7 @@
 		<property name="callbackHandlerClass"
 			value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
 		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
+		<property name="encryptionProperties" ref="encProperties" />
 		<property name="issuer" value="DoubleItSTSIssuer" />
 		<property name="encryptionUsername" value="myservicekey" />
 	</bean>

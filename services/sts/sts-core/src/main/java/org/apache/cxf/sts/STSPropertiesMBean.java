@@ -21,6 +21,7 @@ package org.apache.cxf.sts;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.ws.security.components.crypto.Crypto;
 
@@ -97,6 +98,18 @@ public interface STSPropertiesMBean {
      * @return the username/alias to use to encrypt any issued tokens
      */
     String getEncryptionUsername();
+    
+    /**
+     * Set the EncryptionProperties to use.
+     * @param encryptionProperties the EncryptionProperties to use.
+     */
+    void setEncryptionProperties(EncryptionProperties encryptionProperties);
+    
+    /**
+     * Get the EncryptionProperties to use.
+     * @return the EncryptionProperties to use.
+     */
+    EncryptionProperties getEncryptionProperties();
     
     /**
      * Set the STS issuer name

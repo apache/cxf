@@ -439,7 +439,7 @@ public abstract class AbstractOperation {
         RequestClaimCollection claims = tokenRequirements.getClaims();
         providerParameters.setRequestedClaims(claims);
         
-        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        EncryptionProperties encryptionProperties = stsProperties.getEncryptionProperties();
         if (address != null) {
             boolean foundService = false;
             // Get the stored Service object corresponding to the Service endpoint

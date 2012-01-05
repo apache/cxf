@@ -31,6 +31,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -54,6 +55,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     private String encryptionUsername;
     private String issuer;
     private SignatureProperties signatureProperties = new SignatureProperties();
+    private EncryptionProperties encryptionProperties = new EncryptionProperties();
     private RealmParser realmParser;
     private IdentityMapper identityMapper;
 
@@ -209,6 +211,22 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public String getEncryptionUsername() {
         return encryptionUsername;
+    }
+    
+    /**
+     * Set the EncryptionProperties to use.
+     * @param encryptionProperties the EncryptionProperties to use.
+     */
+    public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
+        this.encryptionProperties = encryptionProperties;
+    }
+    
+    /**
+     * Get the EncryptionProperties to use.
+     * @return the EncryptionProperties to use.
+     */
+    public EncryptionProperties getEncryptionProperties() {
+        return encryptionProperties;
     }
     
     /**
