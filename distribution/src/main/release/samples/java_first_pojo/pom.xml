@@ -22,12 +22,12 @@
     <artifactId>java_first_pojo</artifactId>
     <name>Java First POJO Sample</name>
     <description>Java First POJO Sample</description>
-    <version>2.5.2-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.5.2-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -96,18 +96,18 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>2.5.2-SNAPSHOT</version>
+            <version>2.6.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>2.5.2-SNAPSHOT</version>
+            <version>2.6.0-SNAPSHOT</version>
         </dependency>
         <!-- Jetty is needed if you're using the CXFServlet -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>2.5.2-SNAPSHOT</version>
+            <version>2.6.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
