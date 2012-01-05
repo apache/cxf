@@ -85,7 +85,8 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
                     faultMessage.put(FaultMode.class, mode);
                 }
                 //CXF-3981
-                if (message.get("javax.xml.ws.addressing.context.inbound") != null) {
+                if (message.get("org.apache.cxf.ws.rm.inbound") == null 
+                    &&  message.get("javax.xml.ws.addressing.context.inbound") != null) {
                     faultMessage.put("javax.xml.ws.addressing.context.inbound",
                                      message.get("javax.xml.ws.addressing.context.inbound"));
                 }
