@@ -202,7 +202,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
 
 
     public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException {
-        String address = target.getAddress().getValue();
+        String address = target == null ? ei.getAddress() : target.getAddress().getValue();
         if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp://")) {
             //TODO - examine policies and stuff to look for the sun tcp policies
             return new TCPConduit(ei);
