@@ -25,7 +25,7 @@ package org.apache.cxf.configuration.spring;
  */
 public class SimpleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
-    public SimpleBeanDefinitionParser(Class beanClass) {
+    public SimpleBeanDefinitionParser(Class<?> beanClass) {
         super();
         setBeanClass(beanClass);
     }

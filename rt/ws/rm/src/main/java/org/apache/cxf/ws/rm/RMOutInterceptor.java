@@ -125,7 +125,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             synchronized (source) {
                 SourceSequence seq = null;
                 if (isLastMessage) {
-                    Map<?, ?> invocationContext = (Map)msg.get(Message.INVOCATION_CONTEXT);
+                    Map<?, ?> invocationContext = (Map<?, ?>)msg.get(Message.INVOCATION_CONTEXT);
                     seq = (SourceSequence)invocationContext.get(SourceSequence.class.getName());
                 } else {
                     seq = getManager().getSequence(inSeqId, msg, maps);

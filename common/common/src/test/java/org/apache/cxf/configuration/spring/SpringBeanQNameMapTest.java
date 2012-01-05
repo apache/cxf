@@ -38,7 +38,7 @@ public class SpringBeanQNameMapTest extends Assert {
         ClassPathXmlApplicationContext context = 
             new ClassPathXmlApplicationContext("org/apache/cxf/configuration/spring/beanQNameMap.xml");
 
-        Map<QName, Person> beans = CastUtils.cast(((MapProvider)context.getBean("committers"))
+        Map<QName, Person> beans = CastUtils.cast(((MapProvider<?, ?>)context.getBean("committers"))
                                                    .createMap());
         assertNotNull(beans);
 

@@ -452,10 +452,10 @@ public final class JAXBEncoderDecoder {
             Class<?> cls = part.getTypeClass();
             Object obj = null;
             try {
-                Constructor cons = cls.getConstructor();
+                Constructor<?> cons = cls.getConstructor();
                 obj = cons.newInstance();
             } catch (NoSuchMethodException nse) {
-                Constructor cons = cls.getConstructor(new Class[] {String.class});
+                Constructor<?> cons = cls.getConstructor(new Class[] {String.class});
                 obj = cons.newInstance(new Object[1]);
             }
 

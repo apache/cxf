@@ -21,16 +21,14 @@ package org.apache.cxf.helpers;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Input;
-import javax.wsdl.Message;
 import javax.wsdl.Operation;
 import javax.wsdl.Output;
 import javax.wsdl.Part;
@@ -45,10 +43,11 @@ public class WSDLHelper {
         if (operationName == null) {
             return null;
         }
-        Iterator ite = def.getBindings().values().iterator();
+        Iterator<Binding> ite = CastUtils.cast(def.getBindings().values().iterator());
         while (ite.hasNext()) {
             Binding binding = (Binding)ite.next();
-            Iterator ite1 = binding.getBindingOperations().iterator();
+            Iterator<BindingOperation> ite1 
+                = CastUtils.cast(binding.getBindingOperations().iterator());
             while (ite1.hasNext()) {
                 BindingOperation bop = (BindingOperation)ite1.next();
                 if (bop.getName().equals(operationName)) {
@@ -67,9 +66,8 @@ public class WSDLHelper {
         if (operationName == null) {
             return null;
         }
-        List bindingOperations = binding.getBindingOperations();
-        for (Iterator iter = bindingOperations.iterator(); iter.hasNext();) {
-            BindingOperation bindingOperation = (BindingOperation)iter.next();
+        List<BindingOperation> bindingOperations = CastUtils.cast(binding.getBindingOperations());
+        for (BindingOperation bindingOperation : bindingOperations) {
             if (operationName.equals(bindingOperation.getName())) {
                 return bindingOperation;
             }
@@ -77,23 +75,10 @@ public class WSDLHelper {
         return null;
     }
 
-    public Map getParts(Operation operation, boolean out) {
-        Message message = null;
-        if (out) {
-            Output output = operation.getOutput();
-            message = output.getMessage();
-        } else {
-            Input input = operation.getInput();
-            message = input.getMessage();
-        }
-        return message.getParts() == null ? new HashMap() : message.getParts();
-    }
-
     public List<PortType> getPortTypes(Definition def) {
         List<PortType> portTypes = new ArrayList<PortType>();
-        Iterator ite = def.getPortTypes().values().iterator();
-        while (ite.hasNext()) {
-            PortType portType = (PortType)ite.next();
+        Collection<PortType> ite = CastUtils.cast(def.getPortTypes().values());
+        for (PortType portType : ite) {
             portTypes.add(portType);
         }
         return portTypes;
@@ -103,9 +88,9 @@ public class WSDLHelper {
         Input input = operation.getInput();
         List<Part> partsList = new ArrayList<Part>();
         if (input != null && input.getMessage() != null) {
-            Iterator ite = input.getMessage().getParts().values().iterator();
-            while (ite.hasNext()) {
-                partsList.add((Part)ite.next());
+            Collection<Part> parts = CastUtils.cast(input.getMessage().getParts().values());
+            for (Part p : parts) {
+                partsList.add(p);
             }
         }
         return partsList;
@@ -115,20 +100,19 @@ public class WSDLHelper {
         Output output = operation.getOutput();
         List<Part> partsList = new ArrayList<Part>();
         if (output != null && output.getMessage() != null) {
-            Iterator ite = output.getMessage().getParts().values().iterator();
-            while (ite.hasNext()) {
-                partsList.add((Part)ite.next());
+            Collection<Part> parts = CastUtils.cast(output.getMessage().getParts().values());
+            for (Part p : parts) {
+                partsList.add(p);
             }
         }
         return partsList;
     }
 
     public Binding getBinding(BindingOperation bop, Definition def) {
-        Iterator ite = def.getBindings().values().iterator();
-        while (ite.hasNext()) {
-            Binding binding = (Binding)ite.next();
-            for (Iterator ite2 = binding.getBindingOperations().iterator(); ite2.hasNext();) {
-                BindingOperation bindingOperation = (BindingOperation)ite2.next();
+        Collection<Binding> ite = CastUtils.cast(def.getBindings().values());
+        for (Binding binding : ite) {
+            List<BindingOperation> bos = CastUtils.cast(binding.getBindingOperations());
+            for (BindingOperation bindingOperation : bos) {
                 if (bindingOperation.getName().equals(bop.getName())) {
                     return binding;
                 }

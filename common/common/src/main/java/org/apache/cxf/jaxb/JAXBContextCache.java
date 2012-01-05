@@ -302,7 +302,7 @@ public final class JAXBContextCache {
         while (matcher.find()) {
             String pkgName = JAXBUtils.namespaceURIToPackage(matcher.group());
             try {
-                Class clz = JAXBContextCache.class.getClassLoader()
+                Class<?> clz = JAXBContextCache.class.getClassLoader()
                     .loadClass(pkgName + "." + "ObjectFactory");
 
                 if (!classes.contains(clz)) {

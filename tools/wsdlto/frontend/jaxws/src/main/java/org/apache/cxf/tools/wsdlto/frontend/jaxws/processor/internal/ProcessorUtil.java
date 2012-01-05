@@ -236,7 +236,7 @@ public final class ProcessorUtil {
         }
 
         if (!primitiveType && dataBinding == null) {
-            Class holderClass = JAXBUtils.holderClass(xmlTypeName.getLocalPart());
+            Class<?> holderClass = JAXBUtils.holderClass(xmlTypeName.getLocalPart());
             jtype = holderClass == null ? null : holderClass.getName();
             if (jtype == null) {
                 jtype = JAXBUtils.builtInTypeToJavaType(xmlTypeName.getLocalPart());

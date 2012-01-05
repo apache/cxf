@@ -63,7 +63,7 @@ public abstract class AbstractBeanDefinitionParser
         = "org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBeanDefinitionParser.class);
     
-    private Class beanClass;
+    private Class<?> beanClass;
     private JAXBContext context;
     private Set<Class<?>> classes;
 
@@ -147,16 +147,16 @@ public abstract class AbstractBeanDefinitionParser
         }
     }
 
-    public Class getBeanClass() {
+    public Class<?> getBeanClass() {
         return beanClass;
     }
 
-    public void setBeanClass(Class beanClass) {
+    public void setBeanClass(Class<?> beanClass) {
         this.beanClass = beanClass;
     }
 
     @Override
-    protected Class getBeanClass(Element e) {
+    protected Class<?> getBeanClass(Element e) {
         return beanClass;
     }
 

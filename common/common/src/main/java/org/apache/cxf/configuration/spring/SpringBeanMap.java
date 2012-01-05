@@ -84,7 +84,7 @@ public class SpringBeanMap<V>
                 
                 if (ids instanceof ManagedSet || ids instanceof ManagedList) {
                     List<String> newIds = new ArrayList<String>();
-                    for (Iterator itr = ids.iterator(); itr.hasNext();) {
+                    for (Iterator<?> itr = ids.iterator(); itr.hasNext();) {
                         Object o = itr.next();
                         if (o instanceof TypedStringValue) {
                             newIds.add(((TypedStringValue) o).getValue());

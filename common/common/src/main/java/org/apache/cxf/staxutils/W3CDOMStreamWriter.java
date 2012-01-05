@@ -44,7 +44,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     private Node currentNode;
     private NamespaceContext context = new W3CNamespaceContext();
     private boolean nsRepairing;
-    private Map properties = Collections.EMPTY_MAP;
+    private Map<String, Object> properties = Collections.emptyMap();
 
     public W3CDOMStreamWriter() throws ParserConfigurationException {
         document = XMLUtils.newDocument();
@@ -88,7 +88,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     public boolean isNsRepairing() {
         return nsRepairing;
     }
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
 

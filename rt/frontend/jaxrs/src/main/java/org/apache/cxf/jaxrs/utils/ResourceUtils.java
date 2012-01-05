@@ -238,9 +238,9 @@ public final class ResourceUtils {
         cri.setMethodDispatcher(md);
     }
     
-    public static Constructor findResourceConstructor(Class<?> resourceClass, boolean perRequest) {
-        List<Constructor> cs = new LinkedList<Constructor>();
-        for (Constructor c : resourceClass.getConstructors()) {
+    public static Constructor<?> findResourceConstructor(Class<?> resourceClass, boolean perRequest) {
+        List<Constructor<?>> cs = new LinkedList<Constructor<?>>();
+        for (Constructor<?> c : resourceClass.getConstructors()) {
             Class<?>[] params = c.getParameterTypes();
             Annotation[][] anns = c.getParameterAnnotations();
             boolean match = true;
@@ -260,9 +260,9 @@ public final class ResourceUtils {
                 cs.add(c);
             }
         }
-        Collections.sort(cs, new Comparator<Constructor>() {
+        Collections.sort(cs, new Comparator<Constructor<?>>() {
 
-            public int compare(Constructor c1, Constructor c2) {
+            public int compare(Constructor<?> c1, Constructor<?> c2) {
                 int p1 = c1.getParameterTypes().length;
                 int p2 = c2.getParameterTypes().length;
                 return p1 > p2 ? -1 : p1 < p2 ? 1 : 0;
@@ -554,7 +554,7 @@ public final class ResourceUtils {
     }
     
     @SuppressWarnings("unchecked")
-    public static Object[] createConstructorArguments(Constructor c, Message m) {
+    public static Object[] createConstructorArguments(Constructor<?> c, Message m) {
         Class<?>[] params = c.getParameterTypes();
         Annotation[][] anns = c.getParameterAnnotations();
         Type[] genericTypes = c.getGenericParameterTypes();
@@ -580,7 +580,7 @@ public final class ResourceUtils {
         
         List<Class> resourceClasses = new ArrayList<Class>();
         List<Object> providers = new ArrayList<Object>();
-        Map<Class, ResourceProvider> map = new HashMap<Class, ResourceProvider>();
+        Map<Class<?>, ResourceProvider> map = new HashMap<Class<?>, ResourceProvider>();
         
         // Note, app.getClasse() returns a list of per-resource classes
         // or singleton provider classes
@@ -621,7 +621,7 @@ public final class ResourceUtils {
         bean.setAddress(address);
         bean.setResourceClasses(resourceClasses);
         bean.setProviders(providers);
-        for (Map.Entry<Class, ResourceProvider> entry : map.entrySet()) {
+        for (Map.Entry<Class<?>, ResourceProvider> entry : map.entrySet()) {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
         bean.setApplication(app);
@@ -667,7 +667,7 @@ public final class ResourceUtils {
     }
     
     //TODO : consider moving JAXBDataBinding.createContext to JAXBUtils
-    public static JAXBContext createJaxbContext(Set<Class<?>> classes, Class[] extraClass, 
+    public static JAXBContext createJaxbContext(Set<Class<?>> classes, Class<?>[] extraClass, 
                                           Map<String, Object> contextProperties) {
         if (classes == null || classes.isEmpty()) {
             return null;

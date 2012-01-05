@@ -46,7 +46,7 @@ public final class CorbaAnyHelper {
     private static final Map<QName, QName> SCHEMA_TO_IDL_TYPES = new HashMap<QName, QName>();
     private static final Map<QName, QName> IDL_TO_SCHEMA_TYPES = new HashMap<QName, QName>();
     
-    private static Constructor fixedAnyConstructor;
+    private static Constructor<?> fixedAnyConstructor;
     
     private CorbaAnyHelper() {
         //utility class

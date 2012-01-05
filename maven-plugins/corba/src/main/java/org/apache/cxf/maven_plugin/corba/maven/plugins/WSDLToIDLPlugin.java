@@ -91,7 +91,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
         buf.append(File.pathSeparatorChar);
 
 
-        List artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
+        List<?> artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
         for (Artifact a : CastUtils.cast(artifacts, Artifact.class)) {
             try {
                 if (a.getFile() != null

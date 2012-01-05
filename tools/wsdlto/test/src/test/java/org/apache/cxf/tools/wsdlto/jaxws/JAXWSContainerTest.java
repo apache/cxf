@@ -159,7 +159,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             assertEquals(0, output.list().length);
 
             // Now you can get the JavaModel from the context.
-            Map<QName, JavaModel> map = CastUtils.cast((Map)context.get(WSDLToJavaProcessor.MODEL_MAP));
+            Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)context.get(WSDLToJavaProcessor.MODEL_MAP));
             JavaModel javaModel = map.get(new QName("http://cxf.apache.org/w2j/hello_world_soap_http",
                                                     "SOAPService"));
             assertNotNull(javaModel);

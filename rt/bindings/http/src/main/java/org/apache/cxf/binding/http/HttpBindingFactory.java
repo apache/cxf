@@ -110,7 +110,7 @@ public class HttpBindingFactory extends AbstractBindingFactory {
             Method m = md.getMethod(bop);
             
             try {
-                Class<?> c = (Class) service.get(ReflectionServiceFactoryBean.ENDPOINT_CLASS);
+                Class<?> c = (Class<?>) service.get(ReflectionServiceFactoryBean.ENDPOINT_CLASS);
                 if (c != null) {
                     m = c.getMethod(m.getName(), m.getParameterTypes());
                 }

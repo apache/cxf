@@ -35,7 +35,7 @@ public class SpringBeanMapTest extends Assert {
             new ClassPathXmlApplicationContext("org/apache/cxf/configuration/spring/beanMap.xml");
 
         
-        Map<String, Person> beans = CastUtils.cast(((MapProvider)context.getBean("mapOfPersons"))
+        Map<String, Person> beans = CastUtils.cast(((MapProvider<?, ?>)context.getBean("mapOfPersons"))
                                                        .createMap());
         assertNotNull(beans);
 

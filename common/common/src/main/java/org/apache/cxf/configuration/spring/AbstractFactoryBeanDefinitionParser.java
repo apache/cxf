@@ -49,7 +49,7 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
     @SuppressWarnings("deprecation")
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        Class factoryClass = getFactoryClass();
+        Class<?> factoryClass = getFactoryClass();
         BeanDefinitionBuilder factoryBean = bean;
         if (!FactoryBean.class.isAssignableFrom(factoryClass)) {
             factoryBean = BeanDefinitionBuilder.rootBeanDefinition(getFactoryClass());
@@ -140,9 +140,9 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
         }
     }
 
-    protected abstract Class getFactoryClass();
+    protected abstract Class<?> getFactoryClass();
 
-    protected Class getRawFactoryClass() {
+    protected Class<?> getRawFactoryClass() {
         return getFactoryClass();
     }
 

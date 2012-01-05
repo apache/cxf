@@ -33,7 +33,7 @@ public class StringBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
     }
 
     @Override
-    protected Class getBeanClass(Element arg0) {
+    protected Class<?> getBeanClass(Element arg0) {
         return String.class;
     }
 

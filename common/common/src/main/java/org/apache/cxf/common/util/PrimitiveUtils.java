@@ -25,8 +25,8 @@ public final class PrimitiveUtils {
         
     }
     
-    public static Class getClass(String value) {
-        Class clz = null;        
+    public static Class<?> getClass(String value) {
+        Class<?> clz = null;        
         if ("int".equals(value)) {
             clz = int.class;
         }
@@ -54,7 +54,7 @@ public final class PrimitiveUtils {
         return clz;
     }
 
-    public static Object read(String value, Class type) {
+    public static Object read(String value, Class<?> type) {
         Object ret = value;
         if (Integer.TYPE.equals(type)) {
             ret = Integer.valueOf(value);

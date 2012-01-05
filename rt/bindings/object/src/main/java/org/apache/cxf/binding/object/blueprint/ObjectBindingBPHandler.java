@@ -36,6 +36,7 @@ public class ObjectBindingBPHandler implements NamespaceHandler {
         return getClass().getClassLoader().getResource("/schemas/bindings/blueprint/object.xsd");
     }
 
+    @SuppressWarnings("rawtypes")
     public Set<Class> getManagedClasses() {
         return null;
     }

@@ -193,7 +193,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     @Override
     public Boolean isInParam(Method method, int j) {
         if (j >= 0) {
-            Class c = method.getParameterTypes()[j];
+            Class<?> c = method.getParameterTypes()[j];
             if (Exchange.class.equals(c)) {
                 return false;
             }
@@ -274,17 +274,17 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         return null;
     }   
     
-    private static Class getHolderClass(ParameterizedType paramType) {
+    private static Class<?> getHolderClass(ParameterizedType paramType) {
         Object rawType = paramType.getActualTypeArguments()[0];
-        Class rawClass;
+        Class<?> rawClass;
         if (rawType instanceof GenericArrayType) {
-            rawClass = (Class)((GenericArrayType)rawType).getGenericComponentType();
+            rawClass = (Class<?>)((GenericArrayType)rawType).getGenericComponentType();
             rawClass = Array.newInstance(rawClass, 0).getClass();
         } else {
             if (rawType instanceof ParameterizedType) {
-                rawType = (Class)((ParameterizedType)rawType).getRawType();
+                rawType = (Class<?>)((ParameterizedType)rawType).getRawType();
             }
-            rawClass = (Class)rawType;
+            rawClass = (Class<?>)rawType;
         }
         return rawClass;
     }

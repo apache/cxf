@@ -37,7 +37,6 @@ import org.w3c.dom.Text;
 import org.w3c.dom.TypeInfo;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.staxutils.AbstractDOMStreamReader.ElementFrame;
 
 public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     private Node content;

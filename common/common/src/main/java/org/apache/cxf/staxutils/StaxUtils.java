@@ -1398,12 +1398,12 @@ public final class StaxUtils {
         } else {
             writer.writeStartElement(localName);
         }
-        Iterator it = start.getNamespaces();
+        Iterator<XMLEvent> it = CastUtils.cast(start.getNamespaces());
         while (it != null && it.hasNext()) {
             writeEvent((XMLEvent)it.next(), writer);
         }
         
-        it = start.getAttributes();
+        it = CastUtils.cast(start.getAttributes());
         while (it != null && it.hasNext()) {
             writeAttributeEvent((Attribute)it.next(), writer);            
         }

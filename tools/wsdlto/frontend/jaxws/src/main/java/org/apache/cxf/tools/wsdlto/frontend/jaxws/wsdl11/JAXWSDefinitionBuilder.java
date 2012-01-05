@@ -98,7 +98,7 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
         registerJAXWSBinding(registry, BindingOperation.class);
     }
 
-    private void registerJAXWSBinding(ExtensionRegistry registry, Class clz) {
+    private void registerJAXWSBinding(ExtensionRegistry registry, Class<?> clz) {
         registry.registerSerializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingSerializer());
         registry.registerDeserializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingDeserializer());
         registry.mapExtensionTypes(clz, ToolConstants.JAXWS_BINDINGS, JAXWSBinding.class);
@@ -143,12 +143,12 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
     }
 
     private boolean isRPCEncoded(Definition def) {
-        Iterator ite1 = def.getBindings().values().iterator();
+        Iterator<?> ite1 = def.getBindings().values().iterator();
         while (ite1.hasNext()) {
             Binding binding = (Binding)ite1.next();
             String bindingStyle = SOAPBindingUtil.getBindingStyle(binding);
 
-            Iterator ite2 = binding.getBindingOperations().iterator();
+            Iterator<?> ite2 = binding.getBindingOperations().iterator();
             while (ite2.hasNext()) {
                 BindingOperation bop = (BindingOperation)ite2.next();
                 String bopStyle = SOAPBindingUtil.getSOAPOperationStyle(bop);

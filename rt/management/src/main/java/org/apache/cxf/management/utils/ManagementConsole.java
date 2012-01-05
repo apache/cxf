@@ -115,8 +115,8 @@ public final class ManagementConsole {
         try {
             queryEndpointName = getEndpointObjectName();
             Set<ObjectName> endpointNames = CastUtils.cast(mbsc.queryNames(queryEndpointName, null));
-            // now get the ObjectName with the busId 
-            Iterator it = endpointNames.iterator();
+            // now get the ObjectName with the busId
+            Iterator<ObjectName> it = endpointNames.iterator();
         
             if (it.hasNext()) {
                 // only deal with the first endpoint object which retrun from the list.

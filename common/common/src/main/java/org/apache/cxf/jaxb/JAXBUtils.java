@@ -514,7 +514,7 @@ public final class JAXBUtils {
             if (cls.getName().equals("javax.xml.ws.wsaddressing.W3CEndpointReference")) {
                 return cls;
             }
-            Constructor cons = ReflectionUtil.getDeclaredConstructor(cls);
+            Constructor<?> cons = ReflectionUtil.getDeclaredConstructor(cls);
             if (cons == null) {
                 cons = ReflectionUtil.getConstructor(cls);
             }
@@ -805,12 +805,12 @@ public final class JAXBUtils {
         scanPackages(classes, null, objectFactoryCache);
     }
     public static void scanPackages(Set<Class<?>> classes,
-                                    Class[] extraClass,
+                                    Class<?>[] extraClass,
                                     Map<Package, CachedClass> objectFactoryCache) {
         
         // add user extra class into jaxb context
         if (extraClass != null && extraClass.length > 0) {
-            for (Class clz : extraClass) {
+            for (Class<?> clz : extraClass) {
                 classes.add(clz);
             }
         }

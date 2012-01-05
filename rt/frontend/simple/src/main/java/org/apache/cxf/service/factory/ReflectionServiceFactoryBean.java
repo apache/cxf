@@ -36,7 +36,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -213,13 +212,13 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
         if (retVal == null) {
             JAXBDataBinding db = new JAXBDataBinding(getQualifyWrapperSchema());
-            Map props = this.getProperties();
+            Map<String, Object> props = this.getProperties();
             if (props != null && props.get("jaxb.additionalContextClasses") != null) {
                 Object o = this.getProperties().get("jaxb.additionalContextClasses");
                 if (o instanceof Class) {
-                    o = new Class[] {(Class)o};
+                    o = new Class[] {(Class<?>)o};
                 }
-                Class[] extraClass = (Class[])o;
+                Class<?>[] extraClass = (Class[])o;
                 db.setExtraClass(extraClass);
             }
             retVal = db;
@@ -743,7 +742,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             if (Exchange.class.equals(paramTypes[i])) {
                 continue;
             }
-            Class paramType = paramTypes[i];
+            Class<?> paramType = paramTypes[i];
             Type genericType = genericTypes[i];
             if (!initializeParameter(o, method, i, paramType, genericType)) {
                 return false;
@@ -751,7 +750,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
         sendEvent(Event.OPERATIONINFO_IN_MESSAGE_SET, origOp, method, origOp.getInput());
         // Initialize return type
-        Class paramType = method.getReturnType();
+        Class<?> paramType = method.getReturnType();
         Type genericType = method.getGenericReturnType();
 
         if (o.hasOutput()
@@ -766,7 +765,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return true;
     }
     private boolean initializeParameter(OperationInfo o, Method method, int i,
-                                     Class paramType, Type genericType) {
+                                     Class<?> paramType, Type genericType) {
         boolean isIn = isInParam(method, i);
         boolean isOut = isOutParam(method, i);
         boolean isHeader = isHeader(method, i);
@@ -848,10 +847,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return true;
     }
     private void setFaultClassInfo(OperationInfo o, Method selected) {
-        Class[] types = selected.getExceptionTypes();
+        Class<?>[] types = selected.getExceptionTypes();
         for (int i = 0; i < types.length; i++) {
-            Class exClass = types[i];
-            Class beanClass = getBeanClass(exClass);
+            Class<?> exClass = types[i];
+            Class<?> beanClass = getBeanClass(exClass);
             if (beanClass == null) {
                 continue;
             }
@@ -1256,7 +1255,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             el = new XmlSchemaElement(schema, false);
             // We hope that we can't have parts that different only in namespace.
             el.setName(mpi.getName().getLocalPart());
-            Map<Class, Boolean> jaxbAnnoMap = getJaxbAnnoMap(mpi);
+            Map<Class<?>, Boolean> jaxbAnnoMap = getJaxbAnnoMap(mpi);
             if (mpi.isElement()) {
                 addImport(schema, mpi.getElementQName().getNamespaceURI());
                 el.setName(null);
@@ -1365,8 +1364,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
 
-    private Map<Class, Boolean> getJaxbAnnoMap(MessagePartInfo mpi) {
-        Map<Class, Boolean> map = new ConcurrentHashMap<Class, Boolean>();
+    private Map<Class<?>, Boolean> getJaxbAnnoMap(MessagePartInfo mpi) {
+        Map<Class<?>, Boolean> map = new ConcurrentHashMap<Class<?>, Boolean>();
         Annotation[] anns = getMethodParameterAnnotations(mpi);
 
         if (anns != null) {
@@ -1432,7 +1431,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected void createMessageParts(InterfaceInfo intf, OperationInfo op, Method method) {
-        final Class[] paramClasses = method.getParameterTypes();
+        final Class<?>[] paramClasses = method.getParameterTypes();
         // Setup the input message
         op.setProperty(METHOD, method);
         MessageInfo inMsg = op.createMessage(this.getInputMessageName(op, method), MessageInfo.Type.INPUT);
@@ -1557,7 +1556,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
 
-    private void setParameterOrder(Method method, Class[] paramClasses, OperationInfo op) {
+    private void setParameterOrder(Method method, Class<?>[] paramClasses, OperationInfo op) {
         if (isRPC(method) || !isWrapped(method)) {
             List<String> paramOrdering = new LinkedList<String>();
             boolean hasOut = false;
@@ -1584,8 +1583,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     protected void createInputWrappedMessageParts(OperationInfo op, Method method, MessageInfo inMsg) {
         String partName = null;
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             partName = c.getRequestWrapperPartName(op, method);
             if (partName != null) {
                 break;
@@ -1596,8 +1594,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
         MessagePartInfo part = inMsg.addMessagePart(partName);
         part.setElement(true);
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getRequestWrapperName(op, method);
             if (q != null) {
                 part.setElementQName(q);
@@ -1640,8 +1637,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     protected void createOutputWrappedMessageParts(OperationInfo op, Method method, MessageInfo outMsg) {
         String partName = null;
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             partName = c.getResponseWrapperPartName(op, method);
             if (partName != null) {
                 break;
@@ -1661,8 +1657,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         MessagePartInfo part = outMsg.addMessagePart(partName);
         part.setElement(true);
         part.setIndex(0);
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getResponseWrapperName(op, method);
             if (q != null) {
                 part.setElementQName(q);
@@ -1691,15 +1686,15 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
 
-    private static Class createArrayClass(GenericArrayType atp) {
+    private static Class<?> createArrayClass(GenericArrayType atp) {
         Type tp = ((GenericArrayType)atp).getGenericComponentType();
-        Class rawClass = null;
+        Class<?> rawClass = null;
         if (tp instanceof Class) {
-            rawClass = (Class)tp;
+            rawClass = (Class<?>)tp;
         } else if (tp instanceof GenericArrayType) {
             rawClass = createArrayClass((GenericArrayType)tp);
         } else if (tp instanceof ParameterizedType) {
-            rawClass = (Class)((ParameterizedType)tp).getRawType();
+            rawClass = (Class<?>)((ParameterizedType)tp).getRawType();
             if (List.class.isAssignableFrom(rawClass)) {
                 rawClass = getClass((ParameterizedType)tp);
                 rawClass = Array.newInstance(rawClass, 0).getClass();
@@ -1708,20 +1703,20 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return Array.newInstance(rawClass, 0).getClass();
     }
 
-    private static Class getClass(Type paramType) {
-        Class rawClass = null;
+    private static Class<?> getClass(Type paramType) {
+        Class<?> rawClass = null;
         if (paramType instanceof Class) {
-            rawClass = (Class)paramType;
+            rawClass = (Class<?>)paramType;
         } else if (paramType instanceof GenericArrayType) {
             rawClass = createArrayClass((GenericArrayType)paramType);
         } else if (paramType instanceof ParameterizedType) {
-            rawClass = (Class)((ParameterizedType)paramType).getRawType();
+            rawClass = (Class<?>)((ParameterizedType)paramType).getRawType();
         }
         return rawClass;
     }
 
 
-    protected void initializeParameter(MessagePartInfo part, Class rawClass, Type type) {
+    protected void initializeParameter(MessagePartInfo part, Class<?> rawClass, Type type) {
         if (isHolder(rawClass, type)) {
             Type c = getHolderType(rawClass, type);
             if (c != null) {
@@ -1733,7 +1728,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             if (parameterizedTypes == null) {
                 processParameterizedTypes();
             }
-            TypeVariable var = (TypeVariable)type;
+            TypeVariable<?> var = (TypeVariable<?>)type;
             Map<String, Class<?>> mp = parameterizedTypes.get(var.getGenericDeclaration());
             if (mp != null) {
                 Class<?> c = parameterizedTypes.get(var.getGenericDeclaration()).get(var.getName());
@@ -1922,8 +1917,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected boolean isOutParam(Method method, int j) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isOutParam(method, j);
             if (b != null) {
                 return b.booleanValue();
@@ -1933,8 +1927,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected boolean isInParam(Method method, int j) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isInParam(method, j);
             if (b != null) {
                 return b.booleanValue();
@@ -1944,8 +1937,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected QName getInputMessageName(final OperationInfo op, final Method method) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getInputMessageName(op, method);
             if (q != null) {
                 return q;
@@ -1955,8 +1947,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected QName createOutputMessageName(final OperationInfo op, final Method method) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getOutputMessageName(op, method);
             if (q != null) {
                 return q;
@@ -1966,8 +1957,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected boolean hasOutMessage(Method m) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.hasOutMessage(m);
             if (b != null) {
                 return b.booleanValue();
@@ -1979,9 +1969,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     protected void initializeFaults(final InterfaceInfo service,
                                     final OperationInfo op, final Method method) {
         // Set up the fault messages
-        final Class[] exceptionClasses = method.getExceptionTypes();
+        final Class<?>[] exceptionClasses = method.getExceptionTypes();
         for (int i = 0; i < exceptionClasses.length; i++) {
-            Class exClazz = exceptionClasses[i];
+            Class<?> exClazz = exceptionClasses[i];
 
             // Ignore XFireFaults because they don't need to be declared
             if (Fault.class.isAssignableFrom(exClazz)
@@ -2003,14 +1993,14 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         getService().getOutFaultInterceptors().add(new FaultOutInterceptor());
     }
 
-    protected FaultInfo addFault(final InterfaceInfo service, final OperationInfo op, Class exClass) {
-        Class beanClass = getBeanClass(exClass);
+    protected FaultInfo addFault(final InterfaceInfo service, final OperationInfo op,
+                                 Class<?> exClass) {
+        Class<?> beanClass = getBeanClass(exClass);
         if (beanClass == null) {
             return null;
         }
         String faultMsgName = null;
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             faultMsgName = c.getFaultMessageName(op, exClass, beanClass);
             if (faultMsgName != null) {
                 break;
@@ -2064,9 +2054,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return exClass;
     }
 
-    protected QName getFaultName(InterfaceInfo service, OperationInfo o, Class exClass, Class beanClass) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+    protected QName getFaultName(InterfaceInfo service, OperationInfo o,
+                                 Class<?> exClass, Class<?> beanClass) {
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getFaultName(service, o, exClass, beanClass);
             if (q != null) {
                 return q;
@@ -2076,8 +2066,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected String getAction(OperationInfo op, Method method) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             String s = c.getAction(op, method);
             if (s != null) {
                 return s;
@@ -2087,8 +2076,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     public boolean isHeader(Method method, int j) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isHeader(method, j);
             if (b != null) {
                 return b.booleanValue();
@@ -2108,8 +2096,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
      * @param method
      */
     protected QName getOperationName(InterfaceInfo service, Method method) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName s = c.getOperationName(service, method);
             if (s != null) {
                 return s;
@@ -2119,8 +2106,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected boolean isAsync(final Method method) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isAsync(method);
             if (b != null) {
                 return b.booleanValue();
@@ -2138,8 +2124,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             return getInParameterName(op, method, paramNumber);
         }
 
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getInPartName(op, method, paramNumber);
             if (q != null) {
                 return q;
@@ -2153,8 +2138,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (paramNumber == -1) {
             return null;
         }
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getInParameterName(op, method, paramNumber);
             if (q != null) {
                 return q;
@@ -2164,8 +2148,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected QName getOutParameterName(final OperationInfo op, final Method method, final int paramNumber) {
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getOutParameterName(op, method, paramNumber);
             if (q != null) {
                 return q;
@@ -2179,8 +2162,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             return getOutParameterName(op, method, paramNumber);
         }
 
-        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
-            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
             QName q = c.getOutPartName(op, method, paramNumber);
             if (q != null) {
                 return q;
@@ -2189,9 +2171,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         throw new IllegalStateException("ServiceConfiguration must provide a value!");
     }
 
-    protected Class getResponseWrapper(Method selected) {
+    protected Class<?> getResponseWrapper(Method selected) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {
-            Class cls = c.getResponseWrapper(selected);
+            Class<?> cls = c.getResponseWrapper(selected);
             if (cls != null) {
                 return cls;
             }
@@ -2209,9 +2191,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return null;
     }
 
-    protected Class getRequestWrapper(Method selected) {
+    protected Class<?> getRequestWrapper(Method selected) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {
-            Class cls = c.getRequestWrapper(selected);
+            Class<?> cls = c.getRequestWrapper(selected);
             if (cls != null) {
                 return cls;
             }
@@ -2295,17 +2277,17 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             processTypes(serviceClass.getSuperclass(), serviceClass.getGenericSuperclass());
         }
     }
-    protected void processTypes(Class sc, Type tp) {
+    protected void processTypes(Class<?> sc, Type tp) {
         if (tp instanceof ParameterizedType) {
             ParameterizedType ptp = (ParameterizedType)tp;
-            Type c = (Class)ptp.getRawType();
+            Type c = (Class<?>)ptp.getRawType();
             Map<String, Class<?>> m = new HashMap<String, Class<?>>();
             parameterizedTypes.put(c, m);
             for (int x = 0; x < ptp.getActualTypeArguments().length; x++) {
                 Type t = ptp.getActualTypeArguments()[x];
                 TypeVariable<?> tv = sc.getTypeParameters()[x];
                 if (t instanceof Class) {
-                    m.put(tv.getName(), (Class)t);
+                    m.put(tv.getName(), (Class<?>)t);
                 }
             }
         }

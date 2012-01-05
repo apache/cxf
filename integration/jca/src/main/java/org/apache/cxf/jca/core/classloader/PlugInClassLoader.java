@@ -107,7 +107,7 @@ public class PlugInClassLoader extends SecureClassLoader {
 
         LOG.fine(props.toString());
 
-        Enumeration keys = props.keys();
+        Enumeration<Object> keys = props.keys();
 
         while (keys.hasMoreElements()) {
             String key = (String)keys.nextElement();

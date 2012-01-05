@@ -19,7 +19,7 @@
 
 package org.apache.cxf.aegis.type.array;
 
-public class DuplicateArrayReturnItem implements Comparable {
+public class DuplicateArrayReturnItem implements Comparable<Object> {
     
     String name;
 

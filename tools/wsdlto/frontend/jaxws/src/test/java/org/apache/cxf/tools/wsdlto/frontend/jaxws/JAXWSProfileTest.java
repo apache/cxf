@@ -82,11 +82,11 @@ public class JAXWSProfileTest extends Assert {
         assertNotNull(processor);
         assertTrue(processor instanceof WSDLToJavaProcessor);
 
-        AbstractWSDLBuilder builder = profile.getWSDLBuilder();
+        AbstractWSDLBuilder<?> builder = profile.getWSDLBuilder();
         assertNotNull(builder);
         assertTrue(builder instanceof JAXWSDefinitionBuilder);
 
-        Class container = profile.getContainerClass();
+        Class<?> container = profile.getContainerClass();
         assertEquals(container, JAXWSContainer.class);
         assertEquals("/org/apache/cxf/tools/wsdlto/frontend/jaxws/jaxws-toolspec.xml", profile.getToolspec());
     }

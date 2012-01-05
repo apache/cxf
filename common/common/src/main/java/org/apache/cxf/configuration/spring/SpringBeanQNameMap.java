@@ -33,6 +33,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -108,8 +109,9 @@ public class SpringBeanQNameMap<V>
                             BeanDefinitionHolder bdh = (BeanDefinitionHolder)id;
                             if (QName.class.getName().equals(bdh.getBeanDefinition().getBeanClassName())) {
                                 try {
-                                    java.util.List l = bdh.getBeanDefinition().getConstructorArgumentValues()
-                                        .getGenericArgumentValues();
+                                    java.util.List<ValueHolder> l 
+                                        = bdh.getBeanDefinition().getConstructorArgumentValues()
+                                            .getGenericArgumentValues();
                                     
                                     ConstructorArgumentValues.ValueHolder v 
                                         = (ConstructorArgumentValues.ValueHolder)l.get(0);

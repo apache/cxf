@@ -42,12 +42,12 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
     }
     
     
-    protected Class getRawFactoryClass() {
+    protected Class<?> getRawFactoryClass() {
         return JaxWsProxyFactoryBean.class;
     }
 
     @Override
-    protected Class getFactoryClass() {
+    protected Class<?> getFactoryClass() {
         return JAXWSSpringClientProxyFactoryBean.class;
     }
 

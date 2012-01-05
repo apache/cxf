@@ -227,7 +227,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        Dispatch dispatch = service.createDispatch(PORT_1, Source.class, Service.Mode.PAYLOAD);
+        Dispatch<Source> dispatch = service.createDispatch(PORT_1, Source.class, Service.Mode.PAYLOAD);
         assertNotNull(dispatch);
     }
 

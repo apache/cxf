@@ -276,7 +276,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     protected Object createSingletonInstance(Class<?> cls, Map<String, String> props, ServletConfig sc) 
         throws ServletException {
-        Constructor c = ResourceUtils.findResourceConstructor(cls, false);
+        Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
         if (c == null) {
             throw new ServletException("No valid constructor found for " + cls.getName());
         }

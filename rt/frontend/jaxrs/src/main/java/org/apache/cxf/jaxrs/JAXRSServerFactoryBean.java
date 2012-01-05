@@ -243,7 +243,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * setResourceClasses method accepting the array of Class parameters.
      * @param clazz the service/resource class
      */
-    public void setServiceClass(Class clazz) {
+    public void setServiceClass(Class<?> clazz) {
         serviceFactory.setResourceClasses(clazz);
     }
 

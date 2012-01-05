@@ -164,11 +164,11 @@ public class Extension {
             try {
                 //if there is a Bus constructor, use it.
                 if (b != null && args == null) {
-                    Constructor con = cls.getConstructor(Bus.class);
+                    Constructor<?> con = cls.getConstructor(Bus.class);
                     obj = con.newInstance(b);
                     return obj;
                 } else if (b != null && args != null) {
-                    Constructor con;
+                    Constructor<?> con;
                     boolean noBus = false;
                     try {
                         con = cls.getConstructor(Bus.class, Object[].class);
@@ -183,7 +183,7 @@ public class Extension {
                     }
                     return obj;                    
                 } else if (args != null) {
-                    Constructor con = cls.getConstructor(Object[].class);
+                    Constructor<?> con = cls.getConstructor(Object[].class);
                     obj = con.newInstance(args);
                     return obj;                    
                 }
@@ -199,7 +199,7 @@ public class Extension {
         return obj;
     }
     
-    public Class loadInterface(ClassLoader cl) {
+    public Class<?> loadInterface(ClassLoader cl) {
         if (intf != null) {
             return intf;
         }

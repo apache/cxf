@@ -71,7 +71,7 @@ public final class PlugInClassLoaderHelper {
             } else {
                 String enclosingJar = name.substring(0, name.lastIndexOf("!/") + 2);
                 String resourceName = name.substring(name.lastIndexOf("!/") + 2);
-                Map jarMap = JarLoader.getJarContents(enclosingJar);
+                Map<?, ?> jarMap = JarLoader.getJarContents(enclosingJar);
 
                 if (null != jarMap && jarMap.containsKey(resourceName)) {
                     byte bytes[] = (byte[])jarMap.get(resourceName);

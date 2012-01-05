@@ -222,7 +222,7 @@ public class BeanType extends AegisType {
     protected Object createFromFault(Context context) throws SecurityException, InstantiationException,
         IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Class<?> clazz = getTypeClass();
-        Constructor ctr;
+        Constructor<?> ctr;
         Object o;
 
         Fault fault = context.getFault();
@@ -262,7 +262,8 @@ public class BeanType extends AegisType {
     /**
      * Write the specified property to a field.
      */
-    protected void writeProperty(QName name, Object object, Object property, Class impl, BeanTypeInfo inf)
+    protected void writeProperty(QName name, Object object, Object property, 
+                                 Class<?> impl, BeanTypeInfo inf)
         throws DatabindingException {
 
         if (object instanceof InterfaceInvocationHandler) {

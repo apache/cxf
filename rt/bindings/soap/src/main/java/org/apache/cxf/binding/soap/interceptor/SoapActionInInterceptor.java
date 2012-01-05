@@ -53,7 +53,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         SoapMessage message = (SoapMessage)m;
         if (message.getVersion() instanceof Soap11) {
             Map<String, List<String>> headers 
-                = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
+                = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             if (headers != null) {
                 List<String> sa = headers.get(SoapBindingConstants.SOAP_ACTION);
                 if (sa != null && sa.size() > 0) {

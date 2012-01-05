@@ -19,7 +19,7 @@
 
 package org.apache.cxf.phase;
 
-public class Phase implements Comparable {
+public class Phase implements Comparable<Object> {
     
     // can be removed from once defined as default value in configuration metadata for bus
   
@@ -99,12 +99,15 @@ public class Phase implements Comparable {
     }
 
     public int compareTo(Object o) {
-        Phase p = (Phase)o;
-        
-        if (priority == p.priority) {
-            return name.compareTo(p.name); 
+        if (o instanceof Phase) {
+            Phase p = (Phase)o;
+            
+            if (priority == p.priority) {
+                return name.compareTo(p.name); 
+            }
+            return priority - p.priority;
         }
-        return priority - p.priority;
+        return 1;
     }
     
     public String toString() {

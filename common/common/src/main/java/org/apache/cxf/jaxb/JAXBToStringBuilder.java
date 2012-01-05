@@ -37,7 +37,7 @@ public final class JAXBToStringBuilder {
             return (String)object;
         }
         if (object instanceof Collection) {
-            object = ((Collection) object).toArray();
+            object = ((Collection<?>) object).toArray();
         }
         return ToStringBuilder.reflectionToString(object, style);        
     }

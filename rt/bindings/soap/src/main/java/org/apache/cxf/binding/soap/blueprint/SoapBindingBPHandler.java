@@ -35,6 +35,7 @@ public class SoapBindingBPHandler implements NamespaceHandler {
         return getClass().getClassLoader().getResource("/schemas/configuration/blueprint/soap.xsd");
     }
 
+    @SuppressWarnings("rawtypes")
     public Set<Class> getManagedClasses() {
         return null;
     }

@@ -58,7 +58,7 @@ public abstract class AddressingBuilder implements AddressingType {
             if (builder == null) {
                 String className = DEFAULT_ADDRESSING_BUILDER;
                 try {
-                    Class cls = Class.forName(className);
+                    Class<?> cls = Class.forName(className);
                     builder = (AddressingBuilder)cls.newInstance();
                 } catch (ClassNotFoundException cnfe) {
                     cnfe.printStackTrace();

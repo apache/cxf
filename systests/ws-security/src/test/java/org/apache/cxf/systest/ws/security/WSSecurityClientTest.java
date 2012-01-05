@@ -287,7 +287,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             "POST"
         );
         if (decoupled) {
-            HTTPConduit cond = (HTTPConduit)((DispatchImpl)dispatcher).getClient().getConduit();
+            HTTPConduit cond = (HTTPConduit)((DispatchImpl<?>)dispatcher).getClient().getConduit();
             cond.getClient().setDecoupledEndpoint("http://localhost:" + DEC_PORT + "/decoupled");
         }
         return dispatcher;
