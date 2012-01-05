@@ -484,7 +484,7 @@ public class WrappedMessageContext implements MessageContext {
     }
 
     public final void setScope(String key, Scope arg1) {
-        if (!this.containsKey(key)) {
+        if (!this.containsKey(key) && !scopes.containsKey(key)) {
             throw new IllegalArgumentException("non-existant property-" + key + "is specified");    
         }
         scopes.put(key, arg1);        

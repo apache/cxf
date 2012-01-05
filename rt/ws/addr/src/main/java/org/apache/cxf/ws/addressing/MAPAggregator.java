@@ -464,10 +464,12 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                         || (aicNonAnon2 != null && !aicNonAnon2.isEmpty());
                 
             if (hasAnonymous && hasNonAnon && !hasAnon) {
+                message.put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
                 throw new SoapFault("Found anonymous address but non-anonymous required",
                                     new QName(Names.WSA_NAMESPACE_NAME,
                                               "OnlyNonAnonymousAddressSupported"));
             } else if (!onlyAnonymous && !hasNonAnon && hasAnon) {
+                message.put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
                 throw new SoapFault("Found non-anonymous address but only anonymous supported",
                                     new QName(Names.WSA_NAMESPACE_NAME,
                                               "OnlyAnonymousAddressSupported"));
