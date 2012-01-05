@@ -47,7 +47,7 @@ public final class Client {
         URL wsdlURL;
         File wsdlFile = new File(args[0]);
         if (wsdlFile.exists()) {
-            wsdlURL = wsdlFile.toURL();
+            wsdlURL = wsdlFile.toURI().toURL();
         } else {
             wsdlURL = new URL(args[0]);
         }
