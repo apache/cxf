@@ -64,6 +64,8 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 public class SoapTransportFactory extends AbstractTransportFactory implements DestinationFactory,
     WSDLEndpointFactory, ConduitInitiator {
     
+    public static final String CANNOT_GET_CONDUIT_ERROR 
+        = "Could not find conduit initiator for address: %s and transport: %s";
     public static final String SOAP_11_HTTP_BINDING = "http://schemas.xmlsoap.org/soap/http";
     public static final String SOAP_12_HTTP_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
     
@@ -222,13 +224,11 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                 conduitInit = mgr.getConduitInitiatorForUri(address);
             }
             if (conduitInit == null) {
-                throw new RuntimeException("Could not find conduit initiator for transport "
-                        + transId);
+                throw new RuntimeException(String.format(CANNOT_GET_CONDUIT_ERROR, address, transId));
             }
             return conduitInit.getConduit(ei);
         } catch (BusException e) {
-            throw new RuntimeException("Could not find conduit initiator for transport "
-                                       + transId);
+            throw new RuntimeException(String.format(CANNOT_GET_CONDUIT_ERROR, address, transId));
         }
     }
 
