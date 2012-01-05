@@ -370,7 +370,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192;
         } else if (SPConstants.ALGO_SUITE_BASIC128.equals(algoSuite)) {
             this.digest = SPConstants.SHA1;
             this.encryption = SPConstants.AES128;
@@ -381,7 +380,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 128;
             this.signatureDerivedKeyLength = 128;
             this.minimumSymmetricKeyLength = 128;
-            this.maximumSymmetricKeyLength = 128;
         } else if (SPConstants.ALGO_SUITE_TRIPLE_DES.equals(algoSuite)) {
             this.digest = SPConstants.SHA1;
             this.encryption = SPConstants.TRIPLE_DES;
@@ -392,7 +390,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192; // due to use of 3des
         } else if (SPConstants.ALGO_SUITE_BASIC256_RSA15.equals(algoSuite)) {
             this.digest = SPConstants.SHA1;
             this.encryption = SPConstants.AES256;
@@ -413,7 +410,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192;
         } else if (SPConstants.ALGO_SUITE_BASIC128_RSA15.equals(algoSuite)) {
             this.digest = SPConstants.SHA1;
             this.encryption = SPConstants.AES128;
@@ -424,7 +420,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 128;
             this.signatureDerivedKeyLength = 128;
             this.minimumSymmetricKeyLength = 128;
-            this.maximumSymmetricKeyLength = 128;
         } else if (SPConstants.ALGO_SUITE_TRIPLE_DES_RSA15.equals(algoSuite)) {
             this.digest = SPConstants.SHA1;
             this.encryption = SPConstants.TRIPLE_DES;
@@ -435,7 +430,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192; // due to use of 3des
         } else if (SPConstants.ALGO_SUITE_BASIC256_SHA256.equals(algoSuite)) {
             this.digest = SPConstants.SHA256;
             this.encryption = SPConstants.AES256;
@@ -456,7 +450,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192;
         } else if (SPConstants.ALGO_SUITE_BASIC128_SHA256.equals(algoSuite)) {
             this.digest = SPConstants.SHA256;
             this.encryption = SPConstants.AES128;
@@ -467,7 +460,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 128;
             this.signatureDerivedKeyLength = 128;
             this.minimumSymmetricKeyLength = 128;
-            this.maximumSymmetricKeyLength = 128;
         } else if (SPConstants.ALGO_SUITE_TRIPLE_DES_SHA256.equals(algoSuite)) {
             this.digest = SPConstants.SHA256;
             this.encryption = SPConstants.TRIPLE_DES;
@@ -478,7 +470,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192; // due to use of 3des
         } else if (SPConstants.ALGO_SUITE_BASIC256_SHA256_RSA15.equals(algoSuite)) {
             this.digest = SPConstants.SHA256;
             this.encryption = SPConstants.AES256;
@@ -499,7 +490,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192;
         } else if (SPConstants.ALGO_SUITE_BASIC128_SHA256_RSA15.equals(algoSuite)) {
             this.digest = SPConstants.SHA256;
             this.encryption = SPConstants.AES128;
@@ -510,7 +500,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 128;
             this.signatureDerivedKeyLength = 128;
             this.minimumSymmetricKeyLength = 128;
-            this.maximumSymmetricKeyLength = 128;
         } else if (SPConstants.ALGO_SUITE_TRIPLE_DES_SHA256_RSA15.equals(algoSuite)) {
             this.digest = SPConstants.SHA256;
             this.encryption = SPConstants.TRIPLE_DES;
@@ -521,7 +510,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             this.encryptionDerivedKeyLength = 192;
             this.signatureDerivedKeyLength = 192;
             this.minimumSymmetricKeyLength = 192;
-            this.maximumSymmetricKeyLength = 192; // due to use of 3des
         } else {
             throw new WSSPolicyException(new Message("INVALID_ALGORITHM", LOG, algoSuite));
         }
