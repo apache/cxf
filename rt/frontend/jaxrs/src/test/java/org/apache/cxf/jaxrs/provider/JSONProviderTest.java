@@ -529,7 +529,6 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
-    @Ignore("Enable once http://jira.codehaus.org/browse/JETTISON-75 gets fixed")
     public void testWriteMixedContent() throws Exception {
         doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125}}",
                            false, "book.xml");
