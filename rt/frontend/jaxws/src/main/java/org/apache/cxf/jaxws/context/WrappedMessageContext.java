@@ -484,19 +484,20 @@ public class WrappedMessageContext implements MessageContext {
     }
 
     public final void setScope(String key, Scope arg1) {
-        if (!this.containsKey(key) && !scopes.containsKey(key)) {
+        String mappedKey = mapKey(key);
+        if (!this.containsKey(mappedKey) && !scopes.containsKey(mappedKey)) {
             throw new IllegalArgumentException("non-existant property-" + key + "is specified");    
         }
-        scopes.put(key, arg1);        
+        scopes.put(mappedKey, arg1);        
     }
 
     public final Scope getScope(String key) {
-        if (containsKey(key)) {
-            if (scopes.containsKey(key)) {
-                return scopes.get(key);
-            } else {
-                return defaultScope;
-            }
+        String mappedKey = mapKey(key);
+        if (scopes.containsKey(mappedKey)) {
+            return scopes.get(mappedKey);
+        }
+        if (containsKey(mappedKey)) {
+            return defaultScope;
         }
         throw new IllegalArgumentException("non-existant property-" + key + "is specified");
     }
