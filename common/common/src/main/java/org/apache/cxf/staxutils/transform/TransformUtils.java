@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -95,7 +97,7 @@ public final class TransformUtils {
                 QName lname = XMLUtils.convertStringToQName(entry.getKey());
                 QName rname = XMLUtils.convertStringToQName(entry.getValue());
                 elementsMap.put(lname, rname);
-                if (nsMap != null) {
+                if (nsMap != null && !isEmptyQName(rname)) {
                     nsMap.put(lname.getNamespaceURI(), rname.getNamespaceURI());
                 }
             }
@@ -156,4 +158,21 @@ public final class TransformUtils {
             }
         }
     }
+    
+    static boolean isEmptyQName(QName qname) {
+        return XMLConstants.NULL_NS_URI.equals(qname.getNamespaceURI()) && "".equals(qname.getLocalPart());
+    }
+
+    static ParsingEvent createStartElementEvent(QName name) {
+        return new ParsingEvent(XMLStreamConstants.START_ELEMENT, name, null);
+    }
+
+    static ParsingEvent createEndElementEvent(QName name) {
+        return new ParsingEvent(XMLStreamConstants.END_ELEMENT, name, null);
+    }
+
+    static ParsingEvent createCharactersEvent(String value) {
+        return new ParsingEvent(XMLStreamConstants.CHARACTERS, null, value);
+    }
+
 }

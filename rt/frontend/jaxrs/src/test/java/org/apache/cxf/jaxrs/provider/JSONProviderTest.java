@@ -967,8 +967,10 @@ public class JSONProviderTest extends Assert {
         JSONProvider provider = new JSONProvider();
         List<String> list = new ArrayList<String>();
         list.add("{http://tags}thetag");
-        list.add("name");
         provider.setOutDropElements(list);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("name", "");
+        provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(tag, TagVO2.class, TagVO2.class,

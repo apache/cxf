@@ -26,14 +26,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -41,7 +37,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class InTransformReaderTest extends Assert {
-    private static final Logger LOG = LogUtils.getLogger(InTransformReaderTest.class);
 
     @Test
     public void testReadWithDefaultNamespace() throws Exception {
@@ -107,6 +102,8 @@ public class InTransformReaderTest extends Assert {
         assertEquals("<ps1:test xmlns:ps1=\"http://bar\"><subtest xmlns=\"\"/></ps1:test>",
                      value);        
     }
+    
+    // additional test cases
     @Test
     public void testReadWithComplexRequestSameNamespace() throws Exception {
         XMLStreamReader reader = 
@@ -123,7 +120,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq1.xml"));
-        verifyReaders(reader, reader2, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true);
     }
     
     @Test
@@ -145,7 +142,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq2.xml"));        
-        verifyReaders(reader, reader2, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true);
     }
     
     @Test
@@ -169,7 +166,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq3.xml"));        
-        verifyReaders(reader, reader2, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true);
     }
 
     @Test
@@ -191,7 +188,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq1partial.xml"));        
-        verifyReaders(filteredReader, reader2, false);
+        TransformTestUtils.verifyReaders(reader2, filteredReader, false);
     }
     
     @Test
@@ -216,7 +213,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq2partial.xml"));        
-        verifyReaders(filteredReader, reader2, false);
+        TransformTestUtils.verifyReaders(reader2, filteredReader, false);
     }
     
     @Test
@@ -244,7 +241,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                   InTransformReader.class.getResourceAsStream("../resources/complexReq3partial.xml"));        
-        verifyReaders(filteredReader, reader2, false);
+        TransformTestUtils.verifyReaders(reader2, filteredReader, false);
     }
     
     
@@ -258,7 +255,8 @@ public class InTransformReaderTest extends Assert {
         appendElements.put("requestValue",
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
 
-        transformStreamAndCompare("../resources/greetMeReqIn1.xml", "../resources/greetMeReq.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn1.xml", 
+                                                     "../resources/greetMeReq.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
@@ -281,7 +279,8 @@ public class InTransformReaderTest extends Assert {
         transformAttributes.put("num", "");
         transformAttributes.put("nombre", "{http://cxf.apache.org/hello_world_soap_http/types}name");
         
-        transformStreamAndCompare("../resources/greetMeReqIn2.xml", "../resources/greetMeReq.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn2.xml", 
+                                                     "../resources/greetMeReq.xml",
                                   transformElements, appendElements, dropElements, 
                                   transformAttributes, null);
     }
@@ -292,7 +291,8 @@ public class InTransformReaderTest extends Assert {
         transformElements.put("*",
                               "{http://cxf.apache.org/hello_world_soap_http/types}*");
 
-        transformStreamAndCompare("../resources/greetMeReqIn3.xml", "../resources/greetMeReq.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn3.xml", 
+                                                     "../resources/greetMeReq.xml",
                                   transformElements, null, null, null, null);
     }
 
@@ -302,7 +302,8 @@ public class InTransformReaderTest extends Assert {
         transformAttributes.put("{http://www.w3.org/2001/XMLSchema-instance}type",
                                 "");
 
-        transformStreamAndCompare("../resources/greetMeReqIn4.xml", "../resources/greetMeReq.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn4.xml", 
+                                                     "../resources/greetMeReq.xml",
                                   null, null, null, transformAttributes, null);
     }
     
@@ -311,7 +312,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
-        transformStreamAndCompare("../resources/amazonIn1.xml", "../resources/amazon.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1.xml", 
+                                                     "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -321,7 +323,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
-        transformStreamAndCompare("../resources/amazonIn1nospace.xml", "../resources/amazon.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1nospace.xml", 
+                                                     "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -334,7 +337,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
-        transformStreamAndCompare("../resources/AddRequestIn2.xml", "../resources/AddRequest.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2.xml", 
+                                                     "../resources/AddRequest.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
@@ -346,7 +350,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
-        transformStreamAndCompare("../resources/AddRequestIn2nospace.xml", "../resources/AddRequest.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2nospace.xml", 
+                                                     "../resources/AddRequest.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
@@ -355,7 +360,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
-        transformStreamAndCompare("../resources/amazonIn2.xml", "../resources/amazon.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2.xml", 
+                                                     "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -365,7 +371,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
-        transformStreamAndCompare("../resources/amazonIn2nospace.xml", "../resources/amazon.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2nospace.xml", 
+                                                     "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -375,7 +382,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
                            "{http://apache.org/cxf/calculator/types}add");
-        transformStreamAndCompare("../resources/AddRequestIn1.xml", "../resources/AddRequest.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1.xml", 
+                                                     "../resources/AddRequest.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -385,7 +393,8 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
                            "{http://apache.org/cxf/calculator/types}add");
-        transformStreamAndCompare("../resources/AddRequestIn1nospace.xml", "../resources/AddRequest.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1nospace.xml", 
+                                                     "../resources/AddRequest.xml",
                                   null, appendElements, null, null, null);
         
     }
@@ -409,119 +418,10 @@ public class InTransformReaderTest extends Assert {
         List<String> dropElements = new ArrayList<String>();
         dropElements.add("param");
 
-        transformStreamAndCompare("../resources/AddRequestIn3.xml", "../resources/AddRequest.xml",
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn3.xml", 
+                                                     "../resources/AddRequest.xml",
                                   transformElements, appendElements, dropElements, null, null);
         
     }
 
-    // test utilities methods 
-    
-    private void transformStreamAndCompare(String inname, String outname, 
-                                           Map<String, String> transformElements,
-                                           Map<String, String> appendElements,
-                                           List<String> dropElements,
-                                           Map<String, String> transformAttributes,
-                                           Map<String, String> appendAttributes) 
-        throws XMLStreamException {
-        
-        XMLStreamReader reader = 
-            StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream(inname));
-
-        reader = new InTransformReader(reader,
-                                        transformElements, appendElements, dropElements, 
-                                        transformAttributes, false);
-
-        XMLStreamReader teacher = 
-            StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream(outname));
-        
-        verifyReaders(reader, teacher, false);
-    }
-
-    /**
-     * Verifies the two stream events are equivalent and throws an assertion 
-     * exception at the first mismatch.
-     * @param reader
-     * @param teacher
-     * @param eec
-     * @throws XMLStreamException
-     */
-    private void verifyReaders(XMLStreamReader reader, XMLStreamReader teacher, 
-                               boolean eec) throws XMLStreamException {
-        // compare the elements and attributes while ignoring comments, line breaks, etc
-        for (;;) {
-            int revent = getNextEvent(reader);
-            int tevent = getNextEvent(teacher);
-            
-            if (revent == -1 && tevent == -1) {
-                break;
-            }
-            LOG.fine("Event: " + tevent + " ? " + revent);
-            assertEquals(tevent, revent);
-
-            switch (revent) {
-            case XMLStreamConstants.START_ELEMENT:
-                LOG.fine("Start Element " + teacher.getName() + " ? " + reader.getName());
-                assertEquals(teacher.getName(), reader.getName());
-                verifyAttributes(reader, teacher);
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                LOG.fine("End Element " + teacher.getName() + " ? " + reader.getName());
-                if (eec) {
-                    // perform end-element-check
-                    assertEquals(teacher.getName(), reader.getName());
-                }
-                break;
-            case XMLStreamConstants.CHARACTERS:
-                LOG.fine("Characters " + teacher.getText() + " ? " + reader.getText());
-                assertEquals(teacher.getText(), reader.getText());
-                break;
-            default:
-            }
-        }
-    }
-
-    private void verifyAttributes(XMLStreamReader reader, XMLStreamReader teacher) {
-        int acount = teacher.getAttributeCount();
-        assertEquals(acount, reader.getAttributeCount());
-        Map<QName, String> attributesMap = new HashMap<QName, String>();
-        // temporarily store all the attributes
-        for (int i = 0; i < acount; i++) {
-            attributesMap.put(reader.getAttributeName(i), reader.getAttributeValue(i));
-        }
-        // compares each attribute
-        for (int i = 0; i < acount; i++) {
-            String avalue = attributesMap.remove(teacher.getAttributeName(i));
-            assertEquals(avalue, teacher.getAttributeValue(i));
-        }
-        // attributes must be exhausted
-        assertTrue(attributesMap.isEmpty());
-    }
-
-    /**
-     * Returns the next relevant reader event.
-     *  
-     * @param reader
-     * @return
-     * @throws XMLStreamException
-     */
-    private int getNextEvent(XMLStreamReader reader) throws XMLStreamException {
-        while (reader.hasNext()) {
-            int e = reader.next();
-            if (e == XMLStreamConstants.END_DOCUMENT) {
-                return e;
-            }
-            if (e == XMLStreamConstants.START_ELEMENT || e == XMLStreamConstants.END_ELEMENT) {
-                return e;
-            } else if (e == XMLStreamConstants.CHARACTERS) {
-                String text = reader.getText();
-                if (text.trim().length() == 0) {
-                    continue;
-                }
-                return e;
-            }
-        }
-        return -1;
-    }
 }

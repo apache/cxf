@@ -18,15 +18,19 @@
  */
 package org.apache.cxf.staxutils.transform;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -36,28 +40,43 @@ import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private String defaultNamespace;
     private QNamesMap elementsMap;
-    private Map<QName, QName> appendMap = new HashMap<QName, QName>(5);
+    private QNamesMap attributesMap;
+    private Map<QName, ElementProperty> appendMap = new HashMap<QName, ElementProperty>(5);
     private Map<String, String> nsMap = new HashMap<String, String>(5);
     private List<Set<String>> writtenUris = new LinkedList<Set<String>>();
     
     private Set<QName> dropElements;
-    private List<Integer> droppingIndexes = new LinkedList<Integer>();
-    private List<QName> appendedElements = new LinkedList<QName>();
-    private List<Integer> appendedIndexes = new LinkedList<Integer>();
+    private Stack<List<ParsingEvent>> pushedAheadEvents = new Stack<List<ParsingEvent>>();
+    private Stack<QName> elementsStack = new Stack<QName>();
+    private String replaceText;
     private int currentDepth;
+    private int dropDepth;
     private boolean attributesToElements;
     private DelegatingNamespaceContext namespaceContext;
-    
+
     public OutTransformWriter(XMLStreamWriter writer, 
                               Map<String, String> outMap,
                               Map<String, String> append,
                               List<String> dropEls,
                               boolean attributesToElements,
                               String defaultNamespace) {
+        this(writer, outMap, append, dropEls, null, attributesToElements, defaultNamespace);
+    }
+    
+    public OutTransformWriter(XMLStreamWriter writer, 
+                              Map<String, String> outEMap,
+                              Map<String, String> append,
+                              List<String> dropEls,
+                              Map<String, String> outAMap,
+                              boolean attributesToElements,
+                              String defaultNamespace) {
         super(writer);
-        elementsMap = new QNamesMap(outMap == null ? 0 : outMap.size());
-        TransformUtils.convertToQNamesMap(outMap, elementsMap, nsMap);
-        TransformUtils.convertToMapOfQNames(append, appendMap);
+        elementsMap = new QNamesMap(outEMap == null ? 0 : outEMap.size());
+        attributesMap = new QNamesMap(outAMap == null ? 0 : outAMap.size());
+        TransformUtils.convertToQNamesMap(outEMap, elementsMap, nsMap);
+        TransformUtils.convertToQNamesMap(outAMap, attributesMap, null);
+
+        TransformUtils.convertToMapOfElementProperties(append, appendMap);
         dropElements = XMLUtils.convertStringsToQNames(dropEls);
         this.attributesToElements = attributesToElements;
         namespaceContext = new DelegatingNamespaceContext(
@@ -67,7 +86,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     @Override
     public void writeNamespace(String prefix, String uri) throws XMLStreamException {
-        if (matchesDropped()) {
+        if (matchesDropped(true)) {
             return;
         }
         String value = nsMap.get(uri);
@@ -95,6 +114,9 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     @Override
     public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
         currentDepth++;
+        if (matchesDropped(false)) {
+            return;
+        }
         Set<String> s;
         if (writtenUris.isEmpty()) {
             s = new HashSet<String>();
@@ -102,93 +124,199 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             s = new HashSet<String>(writtenUris.get(0));
         }
         writtenUris.add(0, s);
-        QName currentQName = new QName(uri, local);
         
-        QName appendQName = appendMap.get(currentQName);
-        if (appendQName != null && !appendedElements.contains(appendQName)) {
-            currentDepth++;
-            String theprefix = uri.equals(appendQName.getNamespaceURI()) ? prefix : "";
-            write(new QName(appendQName.getNamespaceURI(), appendQName.getLocalPart(), theprefix));
-            if (theprefix.length() > 0) {
-                this.writeNamespace(theprefix, uri);
-            }
-            appendedElements.add(appendQName);
-            appendedIndexes.add(currentDepth - 1);
+        final QName theName = new QName(uri, local, prefix);
+        final ElementProperty appendProp = appendMap.remove(theName);
+        final boolean replaceContent = appendProp != null && theName.equals(appendProp.getName());
+
+        final boolean dropped = dropElements.contains(theName);
+        QName expected = elementsMap.get(theName);
+        if (expected == null) {
+            expected = theName;
+        } else {
+            expected = new QName(expected.getNamespaceURI(), expected.getLocalPart(), prefix);
         }
-        
-        if (dropElements.contains(currentQName)) {
-            droppingIndexes.add(currentDepth - 1);
+        List<ParsingEvent> pe = null;
+        if (appendProp != null && !replaceContent) {
+            if (!appendProp.isChild()) {
+                // ap-pre-*
+                QName appendQName = appendProp.getName();
+                String theprefix = namespaceContext.getPrefix(appendQName.getNamespaceURI()); 
+                boolean nsadded = false;
+                if (theprefix == null) {
+                    nsadded = true;
+                    theprefix = getPrefix(appendQName.getNamespaceURI());
+                    if (theprefix == null 
+                        && (appendQName.getNamespaceURI().equals(expected.getNamespaceURI()) 
+                            && expected.getPrefix().length() > 0)) {
+                        theprefix = expected.getPrefix();
+                    } else if (theprefix == null) {
+                        theprefix = namespaceContext.findUniquePrefix(appendQName.getNamespaceURI());
+                    }
+                    if (theprefix == null) {
+                        theprefix = "";
+                    }
+                }
+                write(new QName(appendQName.getNamespaceURI(), appendQName.getLocalPart(), theprefix));
+                if (nsadded && theprefix.length() > 0) {
+                    writeNamespace(theprefix, appendQName.getNamespaceURI());
+                }
+                if (appendProp.getText() == null) {
+                    // ap-pre-wrap
+                    currentDepth++;
+                    pe = new ArrayList<ParsingEvent>();
+                    pe.add(TransformUtils.createEndElementEvent(expected));
+                    pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
+                    pushedAheadEvents.push(null);
+                    elementsStack.push(appendQName);
+                } else {
+                    // ap-pre-incl
+                    super.writeCharacters(appendProp.getText());
+                    super.writeEndElement();
+                }
+            }
+        } else if (replaceContent) {
+            //
+            replaceText = appendProp.getText();
+        } else if (dropped) {
+            // unwrap the current element (shallow drop)
+            elementsStack.push(theName);
+            return;
+        } else if (TransformUtils.isEmptyQName(expected)) {
+            // skip the current element (deep drop));
+            dropDepth = currentDepth - 1;
             return;
         }
-        write(new QName(uri, local, prefix));
+        write(expected);
+        pushedAheadEvents.push(pe);
+        elementsStack.push(expected);
+
+        if (appendProp != null && !replaceContent && appendProp.isChild()) {
+            // ap-post-*
+            QName appendQName = appendProp.getName();
+            String theprefix = getPrefix(appendQName.getNamespaceURI());
+                
+            if (appendProp.getText() == null) {
+                // ap-post-wrap
+                write(new QName(appendQName.getNamespaceURI(), appendQName.getLocalPart(), 
+                                theprefix == null ? "" : theprefix));
+                if (getNamespaceContext().getPrefix(appendQName.getNamespaceURI()) == null) {
+                    this.writeNamespace(theprefix, uri);
+                }
+                currentDepth++;
+                pe = new ArrayList<ParsingEvent>();
+                pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
+                pe.add(TransformUtils.createEndElementEvent(expected));
+                pushedAheadEvents.push(pe);
+                elementsStack.push(appendQName);
+            } else {
+                // ap-post-incl
+                pushedAheadEvents.pop();
+                pe = new ArrayList<ParsingEvent>();
+                pe.add(TransformUtils.createStartElementEvent(appendProp.getName()));
+                pe.add(TransformUtils.createCharactersEvent(appendProp.getText()));
+                pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
+                pe.add(TransformUtils.createEndElementEvent(expected));
+                pushedAheadEvents.push(pe);
+            }
+        }
     }
+
     
     @Override
+    public void writeStartElement(String uri, String local) throws XMLStreamException {
+        pushedAheadEvents.push(null);
+        elementsStack.push(new QName(uri, local));
+        super.writeStartElement(uri, local);
+    }
+
+    @Override
+    public void writeStartElement(String local) throws XMLStreamException {
+        writeStartElement("", local, "");
+    }
+
+    @Override
     public void writeEndElement() throws XMLStreamException {
+        --currentDepth;
+        if (matchesDropped(false)) {
+            return;
+        } else if (dropDepth > 0) {
+            dropDepth = 0;
+        }
         if (!writtenUris.isEmpty()) {
             writtenUris.remove(0);
         }
-        --currentDepth;
-        if (indexRemoved(droppingIndexes)) {
-            return;
-        }
-        super.writeEndElement();
-        if (indexRemoved(appendedIndexes)) {
-            super.writeEndElement();
+        QName theName = elementsStack.pop();
+        final boolean dropped = dropElements.contains(theName);
+        if (!dropped) {
+            List<ParsingEvent> pes = pushedAheadEvents.pop();
+            if (null != pes) {
+                for (ParsingEvent pe : pes) {
+                    switch (pe.getEvent()) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        write(pe.getName());
+                        break;
+                    case XMLStreamConstants.END_ELEMENT:
+                        super.writeEndElement();
+                        break;
+                    case XMLStreamConstants.CHARACTERS:
+                        super.writeCharacters(pe.getValue());
+                        break;
+                    default:
+                    }
+                }
+            } else {
+                super.writeEndElement();
+            }
         }
     }
     
     @Override
     public void writeCharacters(String text) throws XMLStreamException {
-        if (matchesDropped()) {
+        if (matchesDropped(false)) {
             return;
+        }
+        if (replaceText != null) {
+            text = replaceText;
+            replaceText = null;
         }
         super.writeCharacters(text);
     }
     
     private void write(QName qname) throws XMLStreamException {
-        QName name = elementsMap.get(qname);
-        if (name == null) {
-            name = qname;
-        }
         boolean writeNs = false;
         String prefix = "";
-        if (name.getNamespaceURI().length() > 0) {
+        if (qname.getNamespaceURI().length() > 0) {
             if (qname.getPrefix().length() == 0) {
-                prefix = namespaceContext.findUniquePrefix(name.getNamespaceURI());
-                writeNs = true;
+                prefix = getPrefix(qname.getNamespaceURI());
+                if (prefix == null) {
+                    prefix = namespaceContext.findUniquePrefix(qname.getNamespaceURI());
+                    writeNs = true;
+                }
             } else {
                 prefix = qname.getPrefix();
                 namespaceContext.addPrefix(prefix, qname.getNamespaceURI());    
             }
             
         }
-        if (defaultNamespace != null && defaultNamespace.equals(name.getNamespaceURI())) {
+        if (defaultNamespace != null && defaultNamespace.equals(qname.getNamespaceURI())) {
             prefix = "";
         }
         
-        super.writeStartElement(prefix, name.getLocalPart(), name.getNamespaceURI());
+        super.writeStartElement(prefix, qname.getLocalPart(), qname.getNamespaceURI());
         if (writeNs) {
-            this.writeNamespace(prefix, name.getNamespaceURI());
+            this.writeNamespace(prefix, qname.getNamespaceURI());
         }
     }
     
-    private boolean matchesDropped() {
-        int size = droppingIndexes.size();
-        if (size > 0 && droppingIndexes.get(size - 1) == currentDepth - 1) {
+    private boolean matchesDropped(boolean shallow) {
+        if ((dropDepth > 0 && dropDepth <= currentDepth) 
+            || (shallow && (elementsStack.size() > 0 && dropElements.contains(elementsStack.peek())))) {
             return true;
         }
         return false;
     }
     
-    private boolean indexRemoved(List<Integer> indexes) {
-        int size = indexes.size();
-        if (size > 0 && indexes.get(size - 1) == currentDepth) {
-            indexes.remove(size - 1);
-            return true;
-        }
-        return false;
-    }
     
     @Override
     public NamespaceContext getNamespaceContext() {
@@ -196,9 +324,18 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     }
     
     @Override
-    public void writeAttribute(String uri, String local, String value) throws XMLStreamException {
+    public void writeAttribute(String prefix, String uri, String local, String value) 
+        throws XMLStreamException {
+        QName expected = attributesMap.get(new QName(uri, local, prefix));
+        if (expected != null) {
+            if (TransformUtils.isEmptyQName(expected)) {
+                return;
+            }
+            uri = expected.getNamespaceURI();
+            local = expected.getLocalPart();
+        }
         if (!attributesToElements) {
-            super.writeAttribute(uri, local, value);
+            super.writeAttribute(prefix, uri, local, value);
         } else {
             writeAttributeAsElement(uri, local, value);
         }
@@ -206,10 +343,23 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     @Override
     public void writeAttribute(String local, String value) throws XMLStreamException {
+        String uri = XMLConstants.NULL_NS_URI;
+        QName expected = attributesMap.get(new QName("", local));
+        if (expected != null) {
+            if (TransformUtils.isEmptyQName(expected)) {
+                return;
+            }
+            uri = expected.getNamespaceURI();
+            local = expected.getLocalPart();
+        }
         if (!attributesToElements) {
-            super.writeAttribute(local, value);
+            if (uri.length() > 0) {
+                super.writeAttribute(uri, local, value);
+            } else {
+                super.writeAttribute(local, value);                
+            }
         } else {
-            writeAttributeAsElement("", local, value);
+            writeAttributeAsElement(uri, local, value);
         }
     }
     

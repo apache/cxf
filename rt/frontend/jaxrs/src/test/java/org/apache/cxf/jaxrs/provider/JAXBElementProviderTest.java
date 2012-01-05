@@ -471,7 +471,6 @@ public class JAXBElementProviderTest extends Assert {
                          new MetadataMap<String, Object>(), bos);
         assertTrue(bos.toString().contains("thebook2"));
         assertTrue(bos.toString().contains("http://superbooks"));
-        System.out.println(bos.toString());
         ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
         Book2 book2 = 
             (Book2)provider.readFrom(
@@ -1005,8 +1004,10 @@ public class JAXBElementProviderTest extends Assert {
         JAXBElementProvider provider = new JAXBElementProvider();
         List<String> list = new ArrayList<String>();
         list.add("{http://tags}thetag");
-        list.add("name");
         provider.setOutDropElements(list);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("name", "");
+        provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(tag, TagVO2.class, TagVO2.class,
