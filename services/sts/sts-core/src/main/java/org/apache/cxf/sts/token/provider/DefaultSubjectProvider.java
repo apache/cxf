@@ -177,6 +177,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
         encrKey.setEphemeralKey(secret);
+        encrKey.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionAlgorithm());
         encrKey.setUseThisCert(certificate);
         encrKey.prepare(doc, encryptionCrypto);
         Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
