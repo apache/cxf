@@ -49,6 +49,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                    <property name="endpointName" 
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+                   <property name="keySize" value="128"/>
                    <property name="properties">
                        <map>
                            <entry key="ws-security.username" value="alice"/>
@@ -75,6 +76,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                    <property name="endpointName" 
                              value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+                   <property name="keySize" value="128"/>
                    <property name="properties">
                        <map>
                            <entry key="ws-security.username" value="alice"/>
