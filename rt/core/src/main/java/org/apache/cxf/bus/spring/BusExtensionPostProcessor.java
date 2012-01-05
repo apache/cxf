@@ -48,15 +48,17 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
         return bean;
     }
 
-    @SuppressWarnings("unchecked")
     public Object postProcessBeforeInitialization(Object bean, String beanId) throws BeansException {
         if (bean instanceof BusExtension && null != getBus()) {
-            Class cls = ((BusExtension)bean).getRegistrationType();
-            getBus().setExtension(bean, cls);
+            Class<? extends Object> cls = ((BusExtension)bean).getRegistrationType();
+            registerExt(bean, cls);
         } else if (bean instanceof Bus && Bus.DEFAULT_BUS_ID.equals(beanId)) {
             bus = (Bus)bean;
         }
         return bean;
+    }
+    private <T> void registerExt(Object bean, Class<T> cls) {
+        getBus().setExtension(cls.cast(bean), cls);
     }
     
     private Bus getBus() {

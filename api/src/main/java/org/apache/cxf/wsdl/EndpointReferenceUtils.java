@@ -339,7 +339,7 @@ public final class EndpointReferenceUtils {
                     return new QName(namespaceURI, service);
                 }
             } else if (obj instanceof JAXBElement) {
-                Object val = ((JAXBElement)obj).getValue();
+                Object val = ((JAXBElement<?>)obj).getValue();
                 if (val instanceof ServiceNameType) {
                     return ((ServiceNameType)val).getValue();
                 }
@@ -369,7 +369,7 @@ public final class EndpointReferenceUtils {
                         return item != null ? item.getTextContent() : null;
                     }
                 } else if (obj instanceof JAXBElement) {
-                    Object val = ((JAXBElement)obj).getValue();
+                    Object val = ((JAXBElement<?>)obj).getValue();
                     if (val instanceof ServiceNameType) {
                         return ((ServiceNameType)val).getEndpointName();
                     }
@@ -399,7 +399,7 @@ public final class EndpointReferenceUtils {
                         node.setAttribute(JAXWSAConstants.WSAM_ENDPOINT_NAME, portName);
                     }
                 } else if (obj instanceof JAXBElement) {
-                    Object val = ((JAXBElement)obj).getValue();
+                    Object val = ((JAXBElement<?>)obj).getValue();
                     if (val instanceof ServiceNameType) {
                         ((ServiceNameType)val).setEndpointName(portName);
                     }
@@ -459,7 +459,7 @@ public final class EndpointReferenceUtils {
                     return new QName(namespaceURI, content);
                 }
             } else if (obj instanceof JAXBElement) {
-                Object val = ((JAXBElement)obj).getValue();
+                Object val = ((JAXBElement<?>)obj).getValue();
                 if (val instanceof AttributedQNameType) {
                     return ((AttributedQNameType)val).getValue();
                 }
@@ -761,7 +761,7 @@ public final class EndpointReferenceUtils {
         for (Object obj : metadata.getAny()) {
             
             if (obj instanceof JAXBElement) {
-                Object jaxbVal = ((JAXBElement)obj).getValue();
+                Object jaxbVal = ((JAXBElement<?>)obj).getValue();
 
                 if (jaxbVal instanceof ServiceNameType) {
                     Port port = null;
@@ -1011,7 +1011,7 @@ public final class EndpointReferenceUtils {
      * @param messageContext the current message context 
      * @return the id embedded in the current endpoint reference or null if not found
      */
-    public static String getEndpointReferenceId(Map messageContext) {
+    public static String getEndpointReferenceId(Map<String, Object> messageContext) {
         String id = null;
         Destination destination = (Destination) messageContext.get(Destination.class.getName());
         if (destination instanceof MultiplexDestination) {

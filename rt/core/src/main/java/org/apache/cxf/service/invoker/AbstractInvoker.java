@@ -222,7 +222,7 @@ public abstract class AbstractInvoker implements Invoker {
      */
     private static Method matchMethod(Method methodToMatch, Object targetObject) {
         if (isJdkDynamicProxy(targetObject)) {
-            Class[] interfaces = targetObject.getClass().getInterfaces();
+            Class<?>[] interfaces = targetObject.getClass().getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
                 Method m = getMostSpecificMethod(methodToMatch, interfaces[i]);
                 if (!methodToMatch.equals(m)) {

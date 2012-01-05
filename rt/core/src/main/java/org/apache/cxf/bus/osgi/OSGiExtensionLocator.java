@@ -48,6 +48,7 @@ import org.apache.cxf.endpoint.ClientLifeCycleListener;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.framework.Bundle;
@@ -152,7 +153,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
     
     protected void register(final Bundle bundle) throws IOException {
         List<Extension> list = extensions.get(bundle.getBundleId());
-        Enumeration e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
+        Enumeration<URL> e = CastUtils.cast(bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false));
         if (e != null) {
             while (e.hasMoreElements()) {
                 final URL u = (URL)e.nextElement();
@@ -273,6 +274,7 @@ public class OSGiExtensionLocator implements BundleActivator, SynchronousBundleL
             return !pvt.booleanValue();
         }
         private Version getBundleVersion(Bundle bundle) {
+            @SuppressWarnings("rawtypes")
             Dictionary headers = bundle.getHeaders();
             String version = (String) headers.get(Constants.BUNDLE_VERSION);
             return (version != null) ? Version.parseVersion(version) : Version.emptyVersion;

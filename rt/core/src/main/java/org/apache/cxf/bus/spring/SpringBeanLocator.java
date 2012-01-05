@@ -236,7 +236,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             } 
             
             if (ids != null) {
-                for (Iterator itr = ids.iterator(); itr.hasNext();) {
+                for (Iterator<?> itr = ids.iterator(); itr.hasNext();) {
                     Object o = itr.next();
                     if (o instanceof TypedStringValue) {
                         if (searchValue.equals(((TypedStringValue) o).getValue())) {

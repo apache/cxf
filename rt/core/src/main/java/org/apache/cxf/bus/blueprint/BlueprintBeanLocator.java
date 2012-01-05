@@ -72,7 +72,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             if (cls == null) {
                 try {
                     Method m = ReflectionUtil.findMethod(container.getClass(), "loadClass", String.class);
-                    cls = (Class)ReflectionUtil.setAccessible(m).invoke(container, bm.getClassName());
+                    cls = (Class<?>)ReflectionUtil.setAccessible(m).invoke(container, bm.getClassName());
                 } catch (Exception e) {
                     //ignore
                 }

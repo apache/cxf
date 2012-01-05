@@ -181,18 +181,17 @@ public class PhaseInterceptorChain implements InterceptorChain {
             return;
         }
 
-        for (Interceptor handler : newhandlers) {
+        for (Interceptor<? extends Message> handler : newhandlers) {
             add(handler, force);
         }
     }
 
-    public void add(Interceptor i) {
+    public void add(Interceptor<? extends Message> i) {
         add(i, false);
     }
     
-    public void add(Interceptor i, boolean force) {
-        @SuppressWarnings("unchecked")
-        PhaseInterceptor<? extends Message> pi = (PhaseInterceptor)i;
+    public void add(Interceptor<? extends Message> i, boolean force) {
+        PhaseInterceptor<? extends Message> pi = (PhaseInterceptor<? extends Message>)i;
 
         String phaseName = pi.getPhase();        
         Integer phase = nameMap.get(phaseName);
@@ -255,7 +254,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
             }
             while (state == State.EXECUTING && iterator.hasNext()) {
                 try {
-                    Interceptor currentInterceptor = iterator.next();
+                    Interceptor<Message> currentInterceptor = (Interceptor<Message>)iterator.next();
                     if (isFineLogging) {
                         LOG.fine("Invoking handleMessage on interceptor " + currentInterceptor);
                     }
@@ -381,7 +380,8 @@ public class PhaseInterceptorChain implements InterceptorChain {
                                                          String startingAfterInterceptorID) {
         updateIterator();
         while (state == State.EXECUTING && iterator.hasNext()) {
-            PhaseInterceptor currentInterceptor = (PhaseInterceptor)iterator.next();
+            PhaseInterceptor<? extends Message> currentInterceptor 
+                = (PhaseInterceptor<? extends Message>)iterator.next();
             if (currentInterceptor.getId().equals(startingAfterInterceptorID)) {
                 break;
             }
@@ -401,7 +401,8 @@ public class PhaseInterceptorChain implements InterceptorChain {
                                                          String startingAtInterceptorID) {
         updateIterator();
         while (state == State.EXECUTING && iterator.hasNext()) {
-            PhaseInterceptor currentInterceptor = (PhaseInterceptor)iterator.next();
+            PhaseInterceptor<? extends Message> currentInterceptor 
+                = (PhaseInterceptor<? extends Message>)iterator.next();
             if (currentInterceptor.getId().equals(startingAtInterceptorID)) {
                 iterator.previous();
                 break;
@@ -423,7 +424,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     @SuppressWarnings("unchecked")
     public void unwind(Message message) {
         while (iterator.hasPrevious()) {
-            Interceptor currentInterceptor = iterator.previous();
+            Interceptor<Message> currentInterceptor = (Interceptor<Message>)iterator.previous();
             if (isFineLogging) {
                 LOG.fine("Invoking handleFault on interceptor " + currentInterceptor);
             }
@@ -439,7 +440,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
     }
 
-    public void remove(Interceptor i) {
+    public void remove(Interceptor<? extends Message> i) {
         PhaseInterceptorIterator it = new PhaseInterceptorIterator(heads);
         while (it.hasNext()) {
             InterceptorHolder holder = it.nextInterceptorHolder();
@@ -549,7 +550,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
             
                 InterceptorHolder ih2 = heads[phase];
                 while (ih2 != tails[phase].next) {
-                    PhaseInterceptor cmp = ih2.interceptor;
+                    PhaseInterceptor<? extends Message> cmp = ih2.interceptor;
                     String cmpId = cmp.getId();
                     if (cmpId != null && firstBefore == null
                         && (beforeList.contains(cmpId)
@@ -715,7 +716,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
             return prev.next != null;
         }
 
-        @SuppressWarnings("unchecked")
         public Interceptor<? extends Message> next() {
             if (prev == null) {
                 if (first == null) {
@@ -748,7 +748,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
         public boolean hasPrevious() {
             return prev != null;
         }
-        @SuppressWarnings("unchecked")
         public Interceptor<? extends Message> previous() {
             if (prev == null) {
                 throw new NoSuchElementException();
@@ -764,10 +763,10 @@ public class PhaseInterceptorChain implements InterceptorChain {
         public int previousIndex() {
             throw new UnsupportedOperationException();
         }
-        public void add(Interceptor o) {
+        public void add(Interceptor<? extends Message> o) {
             throw new UnsupportedOperationException();
         }
-        public void set(Interceptor o) {
+        public void set(Interceptor<? extends Message> o) {
             throw new UnsupportedOperationException();
         }
         public void remove() {
@@ -777,12 +776,12 @@ public class PhaseInterceptorChain implements InterceptorChain {
 
     
     static final class InterceptorHolder {
-        PhaseInterceptor interceptor;
+        PhaseInterceptor<? extends Message> interceptor;
         InterceptorHolder next;
         InterceptorHolder prev;
         int phaseIdx;
         
-        InterceptorHolder(PhaseInterceptor i, int p) {
+        InterceptorHolder(PhaseInterceptor<? extends Message> i, int p) {
             interceptor = i;
             phaseIdx = p;
         }

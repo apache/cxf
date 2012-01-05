@@ -124,7 +124,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private boolean isDOMSupported(DataBinding db) {
         boolean supportsDOM = false;
-        for (Class c : db.getSupportedWriterFormats()) {
+        for (Class<?> c : db.getSupportedWriterFormats()) {
             if (c.equals(Node.class)) {
                 supportsDOM = true;
             }
@@ -155,11 +155,11 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @param class1
      * @return
      */
-    public FaultInfo getFaultForClass(BindingOperationInfo op, Class class1) {
+    public FaultInfo getFaultForClass(BindingOperationInfo op, Class<?> class1) {
         for (BindingFaultInfo bfi : op.getFaults()) {
 
             FaultInfo faultInfo = bfi.getFaultInfo();
-            Class<?> c = (Class)faultInfo.getProperty(Class.class.getName());
+            Class<?> c = (Class<?>)faultInfo.getProperty(Class.class.getName());
             if (c.isAssignableFrom(class1)) {
                 return faultInfo;
             }

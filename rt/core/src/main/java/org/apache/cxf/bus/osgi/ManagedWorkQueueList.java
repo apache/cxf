@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.cm.Configuration;
@@ -49,10 +50,12 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         return FACTORY_PID;
     }
 
-    public void updated(String pid, Dictionary properties) throws ConfigurationException {
+    public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary props) 
+        throws ConfigurationException {
         if (pid == null) {
             return;
         }
+        Dictionary<String, String> properties = CastUtils.cast(props);
         String queueName = (String)properties.get(AutomaticWorkQueueImpl.PROPERTY_NAME);
         if (queues.containsKey(queueName)) {
             queues.get(queueName).update(properties);
@@ -76,7 +79,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
             if (configurationAdmin != null) {
                 Configuration selectedConfig = findConfigForQueueName(queue, configurationAdmin);
                 if (selectedConfig != null) {
-                    Dictionary properties = queue.getProperties();
+                    Dictionary<String, String> properties = queue.getProperties();
                     selectedConfig.update(properties);
                 }
             }
@@ -91,6 +94,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         String filter = "(service.factoryPid=" + ManagedWorkQueueList.FACTORY_PID + ")";
         Configuration[] configs = configurationAdmin.listConfigurations(filter);
         for (Configuration configuration : configs) {
+            @SuppressWarnings("rawtypes")
             Dictionary props = configuration.getProperties();
             String name = (String)props.get(AutomaticWorkQueueImpl.PROPERTY_NAME);
             if (queue.getName().equals(name)) {

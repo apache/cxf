@@ -24,10 +24,10 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.test.assertions.foo.FooType;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.All;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
@@ -111,7 +111,7 @@ public class JaxbAssertionTest extends Assert {
         assertion.setName(qn);
         assertion.setData(data);
 
-        JaxbAssertion normalised = (JaxbAssertion)assertion.normalize();
+        JaxbAssertion<?> normalised = (JaxbAssertion<?>)assertion.normalize();
         assertTrue(normalised.equal(assertion));       
         assertSame(assertion.getData(), normalised.getData()); 
         
@@ -119,12 +119,11 @@ public class JaxbAssertionTest extends Assert {
         PolicyComponent pc = assertion.normalize();
         assertEquals(Constants.TYPE_POLICY, pc.getType());
         Policy p = (Policy)pc; 
-        Iterator alternatives = p.getAlternatives();
+        Iterator<List<Assertion>> alternatives = p.getAlternatives();
 
         int total = 0;
         for (int i = 0; i < 2; i++) {
-            List<PolicyComponent> pcs = 
-                CastUtils.cast((List<?>)(alternatives.next()), PolicyComponent.class);
+            List<Assertion> pcs = alternatives.next();
             if (!pcs.isEmpty()) {
                 assertTrue(assertion.equal(pcs.get(0)));
                 total += pcs.size();

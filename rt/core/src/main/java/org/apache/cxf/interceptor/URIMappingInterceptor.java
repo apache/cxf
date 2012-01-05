@@ -147,10 +147,10 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             LOG.fine(order.size()
                      + " parameters definded in WSDL but found " 
                      + params.size() + " in request!");            
-            Collection rest = CollectionUtils.diff(order, params.keySet());
+            Collection<String> rest = CollectionUtils.diff(order, params.keySet());
             if (rest != null && rest.size() > 0) {
                 LOG.fine("Set the following parameters to null: " + rest);
-                for (Iterator iter = rest.iterator(); iter.hasNext();) {
+                for (Iterator<String> iter = rest.iterator(); iter.hasNext();) {
                     String key = (String)iter.next();
                     orderedParameters.put(key, null);
                 }
@@ -186,7 +186,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         
         Method method = getMethod(message, operation);        
         
-        Class[] types = method.getParameterTypes();        
+        Class<?>[] types = method.getParameterTypes();        
         
         for (String key : queries.keySet()) {
             MessagePartInfo inf = null;

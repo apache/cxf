@@ -42,13 +42,13 @@ public class JaxbAssertionBuilderTest extends Assert {
     public void testConstructors() throws Exception {        
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
         try {
-            new JaxbAssertionBuilder("org.apache.cxf.test.assertions.foo.UnknownType", qn);
+            new JaxbAssertionBuilder<Object>("org.apache.cxf.test.assertions.foo.UnknownType", qn);
             fail("Expected ClassNotFoundException not thrown.");
         } catch (ClassNotFoundException ex) {
             // expected
         }
-        assertNotNull(new JaxbAssertionBuilder(qn)); 
-        assertNotNull(new JaxbAssertionBuilder(FooType.class.getName(), qn));   
+        assertNotNull(new JaxbAssertionBuilder<Object>(qn)); 
+        assertNotNull(new JaxbAssertionBuilder<Object>(FooType.class.getName(), qn));   
         assertNotNull(new JaxbAssertionBuilder<FooType>(FooType.class, qn));
     }
     

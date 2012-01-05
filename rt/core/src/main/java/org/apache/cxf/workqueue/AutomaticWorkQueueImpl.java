@@ -556,7 +556,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
         return executor.getActiveCount();
     }
-    public void update(Dictionary config) {
+    public void update(Dictionary<String, String> config) {
         String s = (String)config.get("highWaterMark");
         if (s != null) {
             this.highWaterMark = Integer.parseInt(s);
@@ -578,7 +578,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             this.maxQueueSize = Integer.parseInt(s);
         } 
     }
-    public Dictionary getProperties() {
+    public Dictionary<String, String> getProperties() {
         Dictionary<String, String> properties = new Hashtable<String, String>();
         NumberFormat nf = NumberFormat.getIntegerInstance();
         properties.put("name", nf.format(getName()));

@@ -48,7 +48,7 @@ public class BusDefinitionParserTest extends Assert {
         
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
-        for (Interceptor i : in) {
+        for (Interceptor<? extends Message> i : in) {
             if (i instanceof LoggingInInterceptor) {
                 found = true;
             }
@@ -132,7 +132,7 @@ public class BusDefinitionParserTest extends Assert {
 
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
-        for (Interceptor i : in) {
+        for (Interceptor<? extends Message> i : in) {
             if (i instanceof LoggingInInterceptor) {
                 found = true;
             }

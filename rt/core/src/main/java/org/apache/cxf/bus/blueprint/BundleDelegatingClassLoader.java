@@ -105,7 +105,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class clazz;
+        Class<?> clazz;
         try {
             clazz = findClass(name);
         } catch (ClassNotFoundException cnfe) {
