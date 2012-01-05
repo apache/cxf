@@ -469,7 +469,11 @@ public class JettyHTTPServerEngine
         if (isSetThreadingParameters()) {
             ThreadPool pool = aconn.getThreadPool();
             if (pool == null) {
+                pool = aconn.getServer().getThreadPool();
+            }
+            if (pool == null) {
                 pool = new QueuedThreadPool();
+                aconn.getServer().setThreadPool(pool);
                 aconn.setThreadPool(pool);
             }
             if (pool instanceof QueuedThreadPool) {
