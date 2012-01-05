@@ -45,6 +45,8 @@ public final class JAXBToStringStyle {
 }
 
 class JAXBToStringStyleImpl extends ToStringStyle {
+    private static final long serialVersionUID = -584903238590491314L;
+
     JAXBToStringStyleImpl() {
         super();
     }

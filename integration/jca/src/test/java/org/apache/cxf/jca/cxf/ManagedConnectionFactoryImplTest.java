@@ -309,6 +309,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
 }
 
 class ManagedConnectionFactoryImplTester extends ManagedConnectionFactoryImpl {
+    private static final long serialVersionUID = -8395934187036842099L;
     int initCalledCount;
 
     ManagedConnectionFactoryImplTester() {

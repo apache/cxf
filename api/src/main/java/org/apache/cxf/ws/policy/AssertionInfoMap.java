@@ -42,6 +42,7 @@ import org.apache.neethi.PolicyOperator;
 
 public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> {
     
+    private static final long serialVersionUID = -4059701923851991413L;
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AssertionInfoMap.class, "APIMessages");
     
     public AssertionInfoMap(Policy p) {

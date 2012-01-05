@@ -22,6 +22,7 @@ import org.apache.cxf.frontend.FaultInfoException;
 
 public class HelloException extends FaultInfoException {
     
+    private static final long serialVersionUID = 6037321444071981393L;
     String faultInfo;
     
     public HelloException() {

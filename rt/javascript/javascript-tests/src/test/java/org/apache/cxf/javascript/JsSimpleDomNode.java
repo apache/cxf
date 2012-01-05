@@ -36,6 +36,7 @@ import org.mozilla.javascript.ScriptableObject;
  * A Rhino wrapper around org.w3c.dom.Node. Not comprehensive, but enough to test CXF JavaScript.
  */
 public class JsSimpleDomNode extends ScriptableObject {
+    private static final long serialVersionUID = -299162863985870752L;
     private Node wrappedNode;
     private boolean childrenWrapped;
     private boolean attributesWrapped;

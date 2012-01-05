@@ -42,6 +42,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringBeanQNameMap<V> 
     extends AbstractSpringBeanMap<QName, V> {
 
+    private static final long serialVersionUID = -3351437036057367923L;
+
     protected void processBeans(ApplicationContext beanFactory) {
         if (beanFactory == null) {
             return;

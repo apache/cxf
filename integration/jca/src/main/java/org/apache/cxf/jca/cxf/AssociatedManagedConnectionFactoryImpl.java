@@ -34,6 +34,7 @@ import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 public class AssociatedManagedConnectionFactoryImpl 
     extends ManagedConnectionFactoryImpl implements ResourceAdapterAssociation {
 
+    private static final long serialVersionUID = 4305487562182780773L;
     private static final Logger LOG = LogUtils.getL7dLogger(AssociatedManagedConnectionFactoryImpl.class);
     private ResourceAdapter ra;
 

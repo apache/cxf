@@ -19,4 +19,6 @@
 package org.apache.cxf.tools.fortest.cxf523;
 
 public class DBServiceFault extends Exception {
+
+    private static final long serialVersionUID = 5033675001269978859L;
 }

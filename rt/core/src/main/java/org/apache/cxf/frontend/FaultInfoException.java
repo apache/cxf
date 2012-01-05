@@ -21,6 +21,8 @@ package org.apache.cxf.frontend;
 
 public class FaultInfoException extends Exception {
 
+    private static final long serialVersionUID = 1392427062502667841L;
+
     public FaultInfoException(String arg0, Throwable arg1) {
         super(arg0, arg1);
     }

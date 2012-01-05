@@ -100,6 +100,8 @@ import org.apache.neethi.Constants;
  */
 public class JaxWsEndpointImpl extends EndpointImpl {
     
+    private static final long serialVersionUID = 4718088821386100282L;
+
     private static final Logger LOG = LogUtils.getL7dLogger(JaxWsEndpointImpl.class);
 
     private Binding jaxwsBinding;

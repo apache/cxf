@@ -42,6 +42,7 @@ import org.springframework.context.ApplicationContextAware;
 
 abstract class AbstractSpringBeanMap<X, V> 
     implements ApplicationContextAware, InitializingBean, MapProvider<X, V>, Serializable {
+    private static final long serialVersionUID = -6825008027450218536L;
     protected ApplicationContext context;
     protected Class<?> type;
     protected String idsProperty;
@@ -230,6 +231,8 @@ abstract class AbstractSpringBeanMap<X, V>
     }
     
     private class SpringBeanMapWrapper extends ConcurrentHashMap<X, V> implements Map<X, V> {
+
+        private static final long serialVersionUID = -8693455914470226111L;
 
         public void clear() {
             AbstractSpringBeanMap.this.clear();

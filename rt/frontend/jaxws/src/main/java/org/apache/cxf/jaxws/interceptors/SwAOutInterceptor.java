@@ -260,7 +260,9 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         }
         
         // Wait until the image is completely loaded
-        MediaTracker tracker = new MediaTracker(new Component() { });
+        MediaTracker tracker = new MediaTracker(new Component() {
+            private static final long serialVersionUID = 6412221228374321325L; 
+        });
         tracker.addImage(image, 0);
         try {
             tracker.waitForAll();

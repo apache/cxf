@@ -31,6 +31,8 @@ import org.w3c.dom.*;
 
 public class JAXWSBindingDeserializer implements ExtensionDeserializer, Serializable {
 
+    private static final long serialVersionUID = -4016144719848135088L;
+
     public JAXWSBindingDeserializer() {
 
     }

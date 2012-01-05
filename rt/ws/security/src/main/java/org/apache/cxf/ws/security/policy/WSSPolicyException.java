@@ -22,6 +22,8 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
 public class WSSPolicyException extends UncheckedException {
+    private static final long serialVersionUID = -1820931045955310166L;
+
     public WSSPolicyException(Message msg, Throwable t) {
         super(msg, t);
     }

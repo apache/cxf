@@ -39,6 +39,8 @@ public class SpringBeanMap<V>
     extends AbstractSpringBeanMap<String, V> {
 
     
+    private static final long serialVersionUID = 283807699147781432L;
+
     protected void processBeans(ApplicationContext beanFactory) {
         if (beanFactory == null) {
             return;

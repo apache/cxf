@@ -97,6 +97,7 @@
 
 
 
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
@@ -170,6 +171,10 @@
                                     <wsdl>${basedir}/src/test/resources/attachment/wsdl11/calculator-binding.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
+                            <defaultOptions>
+                                <markGenerated>true</markGenerated>
+                                <faultSerialVersionUID>1</faultSerialVersionUID>
+                            </defaultOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>

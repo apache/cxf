@@ -52,6 +52,10 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <sourceRoot>${basedir}/target/jaxws</sourceRoot>
+                            <defaultOptions>
+                                <markGenerated>true</markGenerated>
+                                <faultSerialVersionUID>1</faultSerialVersionUID>
+                            </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/org/apache/cxf/wsn/wsdl/wsn.wsdl</wsdl>

@@ -24,6 +24,7 @@ package org.apache.cxf.aegis.inheritance.ws1;
  * @author xfournet
  */
 public class WS1Exception extends Exception {
+    private static final long serialVersionUID = -6302805071638456660L;
     private int errorCode;
     private Object simpleBean;
 

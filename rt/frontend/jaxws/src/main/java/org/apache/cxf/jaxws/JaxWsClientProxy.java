@@ -26,7 +26,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 

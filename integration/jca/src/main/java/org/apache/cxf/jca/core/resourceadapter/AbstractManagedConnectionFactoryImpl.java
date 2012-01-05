@@ -40,6 +40,8 @@ import org.apache.cxf.jca.core.logging.LoggerHelper;
 public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean 
     implements ManagedConnectionFactory {
 
+    private static final long serialVersionUID = 1886331424891906960L;
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractManagedConnectionFactoryImpl.class);
 
     private PrintWriter printWriter;

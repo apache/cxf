@@ -23,6 +23,8 @@ import org.apache.cxf.common.i18n.UncheckedException;
 
 public class WSDLQueryException extends UncheckedException {
 
+    private static final long serialVersionUID = -3254386739668987981L;
+
     public WSDLQueryException(Message msg, Throwable t) {
         super(msg, t);
     }

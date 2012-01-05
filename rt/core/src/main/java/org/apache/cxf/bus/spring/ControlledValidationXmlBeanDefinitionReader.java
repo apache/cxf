@@ -70,6 +70,8 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
      */
     private static class StaleFastinfosetException extends Exception {
 
+        private static final long serialVersionUID = -3594973504794187383L;
+
     }
 
     // the following flag allows performance comparisons with and 

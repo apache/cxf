@@ -20,6 +20,8 @@
 package org.apache.cxf.tools.fortest.classnoanno.docwrapped;
 
 public class AddException extends Exception {
+    private static final long serialVersionUID = 6540833952002339750L;
+
     public AddException(String message) {
         super(message);
     }

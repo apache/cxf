@@ -47,6 +47,7 @@ import org.apache.cxf.jca.inbound.MDBActivationWork;
 
 public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter {
 
+    private static final long serialVersionUID = 5318740621610762307L;
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceAdapterImpl.class);
     private BootstrapContext ctx;
     private Set <Bus> busCache = new HashSet<Bus>();

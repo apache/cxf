@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.helpers.FileUtils;

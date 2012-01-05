@@ -29,6 +29,8 @@ import java.util.Comparator;
  */
 public class MethodComparator implements Comparator<Method>, Serializable {
 
+    private static final long serialVersionUID = 6723063699608000703L;
+
     public int compare(Method m1, Method m2) {
 
         int val = m1.getName().compareTo(m2.getName());

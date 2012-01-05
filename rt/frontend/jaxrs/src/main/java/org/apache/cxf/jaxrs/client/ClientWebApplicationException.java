@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
  */
 public class ClientWebApplicationException extends RuntimeException {
 
+    private static final long serialVersionUID = 1045799648347063772L;
     private Response response;
     
     public ClientWebApplicationException() {

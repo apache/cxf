@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jaxrs.jaxws;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

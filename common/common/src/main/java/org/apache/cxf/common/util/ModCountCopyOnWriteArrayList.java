@@ -24,6 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<T> {
+    private static final long serialVersionUID = 1783937035760941219L;
     AtomicInteger modCount = new AtomicInteger();
     
     public ModCountCopyOnWriteArrayList() {

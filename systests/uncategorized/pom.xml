@@ -45,6 +45,11 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest</testWsdlRoot>
+                            <defaultOptions>
+                                <markGenerated>true</markGenerated>
+                                <faultSerialVersionUID>1</faultSerialVersionUID>
+                             </defaultOptions>
+
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest/hello_world_corba.wsdl</wsdl>

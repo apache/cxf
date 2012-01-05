@@ -132,6 +132,8 @@ public class PolicyExtensionsTest extends Assert {
     
     public static class TestPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
         
+        private static final long serialVersionUID = -4588883556748035959L;
+
         public TestPolicyInterceptorProvider() {
             super(KNOWN);
         }

@@ -168,6 +168,8 @@
                                 <extraargs>
                                     <extraarg>-verbose</extraarg>
                                 </extraargs>
+                                <markGenerated>true</markGenerated>
+                                <faultSerialVersionUID>1</faultSerialVersionUID>
                             </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>

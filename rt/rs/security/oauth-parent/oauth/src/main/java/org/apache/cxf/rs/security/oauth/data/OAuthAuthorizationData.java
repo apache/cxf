@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "authorizationData", 
                 namespace = "http://org.apache.cxf.rs.security.oauth")
 public class OAuthAuthorizationData implements Serializable {
+    private static final long serialVersionUID = -7755998413495017637L;
     private String oauthToken;
     private String authenticityToken;
     private String applicationName;

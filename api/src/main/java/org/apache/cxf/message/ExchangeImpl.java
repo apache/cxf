@@ -32,6 +32,7 @@ import org.apache.cxf.transport.Session;
 
 public class ExchangeImpl extends StringMapImpl implements Exchange {
     
+    private static final long serialVersionUID = -3112077559217623594L;
     private Destination destination;
     private boolean oneWay;
     private boolean synchronous = true;

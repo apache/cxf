@@ -25,6 +25,7 @@ package org.apache.cxf.aegis.inheritance.ws1;
  */
 public class WS1ExtendedException extends WS1Exception {
     
+    private static final long serialVersionUID = 346325404400568680L;
     private int extendedCode;
 
     public WS1ExtendedException() {

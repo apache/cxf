@@ -35,6 +35,7 @@ import org.apache.cxf.message.Message;
 public abstract class AbstractPolicyInterceptorProvider extends AbstractAttributedInterceptorProvider 
     implements PolicyInterceptorProvider {
     
+    private static final long serialVersionUID = 7076292509741199877L;
     private Collection<QName> assertionTypes;
     
     public AbstractPolicyInterceptorProvider(QName type) {

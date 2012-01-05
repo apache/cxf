@@ -75,6 +75,8 @@ public interface SportsService {
 
 
     public class SimpleMapResult extends HashMap<String, Integer> {
+
+        private static final long serialVersionUID = -5599483363035948690L;
     }
 
     Map<String, Map<Integer, Integer>> testComplexMapResult();

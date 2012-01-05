@@ -22,8 +22,6 @@ package org.apache.cxf.systest.coloc;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
-import static junit.framework.Assert.assertEquals;
-
 import org.apache.headers.coloc.types.HeaderInfo;
 import org.apache.headers.coloc.types.InHeaderResponseT;
 import org.apache.headers.coloc.types.InHeaderT;

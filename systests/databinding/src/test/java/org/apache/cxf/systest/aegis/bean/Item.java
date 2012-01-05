@@ -25,6 +25,7 @@ import java.io.Serializable;
  * 
  */
 public class Item implements Serializable, AnInterface {
+    private static final long serialVersionUID = -247285407387540770L;
     private Integer key;
     private String data;
 

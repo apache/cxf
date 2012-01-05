@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.ws.addr_fromjava.server;
 
 public class AddNumbersException extends Exception {
+    private static final long serialVersionUID = 4629689348515005826L;
     String detail;
 
     public AddNumbersException(String message, String detail) {

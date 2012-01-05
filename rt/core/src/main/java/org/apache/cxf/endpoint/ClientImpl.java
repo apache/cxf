@@ -1019,6 +1019,7 @@ public class ClientImpl
      * modification are echoed back to the shared map
      */
     public static class EchoContext extends HashMap<String, Object> {
+        private static final long serialVersionUID = 5199023273052841289L;
         final Map<String, Object> shared;
         public EchoContext(Map<String, Object> sharedMap) {
             super(sharedMap);

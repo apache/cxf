@@ -42,6 +42,7 @@ public class ManagedConnectionFactoryImpl
     extends AbstractManagedConnectionFactoryImpl
     implements CXFManagedConnectionFactory {
 
+    private static final long serialVersionUID = -891927761318109853L;
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedConnectionFactoryImpl.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ManagedConnectionFactoryImpl.class);
     

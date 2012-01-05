@@ -24,8 +24,6 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
 
-import static junit.framework.Assert.assertEquals;
-
 import org.apache.cxf.message.Message;
 import org.apache.headers.coloc.types.FaultDetailT;
 import org.apache.headers.coloc.types.HeaderInfo;

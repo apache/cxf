@@ -26,6 +26,8 @@ package org.apache.cxf.aegis.util.date;
  */
 public class TimezoneLessXsDateFormat extends XsDateTimeFormat {
     
+    private static final long serialVersionUID = -2584986778843863501L;
+
     /**
      * Creates a new instance.
      */

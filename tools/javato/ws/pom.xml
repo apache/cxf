@@ -177,6 +177,10 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <testWsdlRoot>${basedir}/src/test/resources/java2wsdl_wsdl</testWsdlRoot>
+                            <defaultOptions>
+                                <markGenerated>true</markGenerated>
+                                <faultSerialVersionUID>1</faultSerialVersionUID>
+                            </defaultOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>

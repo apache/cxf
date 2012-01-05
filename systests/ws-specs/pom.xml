@@ -50,6 +50,10 @@
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_wsspec/addr-jaxwsmm.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
+                            <defaultOptions>
+                                <markGenerated>true</markGenerated>
+                                <faultSerialVersionUID>1</faultSerialVersionUID>
+                            </defaultOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
@@ -173,9 +177,9 @@
         </dependency>
 
         <dependency>
-             <groupId>com.sun.xml.fastinfoset</groupId>
-             <artifactId>FastInfoset</artifactId>
-         </dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
@@ -223,25 +227,26 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
-                             <execution>
-                                 <id>create-endorsed-dir</id>
-                                 <phase>validate</phase>
-                                 <goals>
-                                     <goal>copy</goal>
-                                 </goals>
-                                 <configuration>
-                                     <artifactItems>
-                                         <artifactItem>
-                                             <groupId>org.apache.geronimo.specs</groupId>
-                                             <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                                             <outputDirectory>${basedir}/target/endorsed</outputDirectory>
-                                         </artifactItem>
-                                     </artifactItems>
-                                 </configuration>
-                             </execution>
-                         </executions>
+                            <execution>
+                                <id>create-endorsed-dir</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.geronimo.specs</groupId>
+                                            <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                                            <outputDirectory>${basedir}/target/endorsed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     
+
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
@@ -250,15 +255,16 @@
                                 <endorseddirs>${basedir}/target/endorsed</endorseddirs>
                             </compilerArguments>
                         </configuration>
-                     </plugin>
+                    </plugin>
                      
-                     <plugin>
-                         <groupId>org.apache.maven.plugins</groupId>
-                         <artifactId>maven-surefire-plugin</artifactId>
-                         <configuration>
-                             <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
-                         </configuration>
-                     </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

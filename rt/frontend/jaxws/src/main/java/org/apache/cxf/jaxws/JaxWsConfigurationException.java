@@ -27,6 +27,8 @@ import org.apache.cxf.common.i18n.UncheckedException;
  */
 public class JaxWsConfigurationException extends UncheckedException {
 
+    private static final long serialVersionUID = -7657280729669754145L;
+
     /**
      * @param msg
      */

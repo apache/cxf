@@ -55,7 +55,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.test.AbstractCXFTest.TestMessageObserver;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;

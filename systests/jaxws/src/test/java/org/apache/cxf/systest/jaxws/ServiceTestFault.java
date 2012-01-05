@@ -23,6 +23,7 @@ import javax.xml.ws.WebFault;
 
 @WebFault()
 public class ServiceTestFault extends Exception {
+    private static final long serialVersionUID = 5264515601561673284L;
     private ServiceTestDetails details;
     
     public ServiceTestFault(String msg) {

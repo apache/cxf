@@ -30,6 +30,7 @@ import org.apache.cxf.common.i18n.UncheckedException;
  * by the policy framework.
  */
 public class PolicyException extends UncheckedException {
+    private static final long serialVersionUID = -6384955089085130084L;
     private static final ResourceBundle BUNDLE 
         = BundleUtils.getBundle(PolicyException.class, "APIMessages");
 

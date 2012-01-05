@@ -49,6 +49,7 @@ import org.apache.cxf.message.MessageImpl;
  */
 public class ServerWebApplicationException extends WebApplicationException {
 
+    private static final long serialVersionUID = -97862759448606951L;
     private String errorMessage;
     
     public ServerWebApplicationException() {

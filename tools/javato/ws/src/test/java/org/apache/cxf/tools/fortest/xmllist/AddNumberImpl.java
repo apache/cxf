@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.jws.WebService;
 
-import org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType.UserObject;
 @WebService(endpointInterface = "org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType")
 public class AddNumberImpl implements AddNumbersPortType {
     public List<Integer> addNumbers(List<String> arg) {
