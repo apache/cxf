@@ -59,7 +59,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
 
         getInFaultInterceptors().add(rmIn);
         getInFaultInterceptors().add(rmSoap);
-        getInInterceptors().add(rmDelivery);
+        getInFaultInterceptors().add(rmDelivery);
 
         getOutFaultInterceptors().add(rmOut);
         getOutFaultInterceptors().add(rmSoap);
