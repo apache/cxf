@@ -21,7 +21,13 @@ package org.apache.cxf.jaxws.context;
 
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.MessageContext.Scope;
 
 import org.apache.cxf.message.MessageImpl;
 import org.junit.After;
@@ -71,5 +77,19 @@ public class WebServiceContextImplTest extends Assert {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    } 
+    }
+    
+    // CXF-3989
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSetHttpRequestHeadersScope() {
+        MessageImpl msg = new MessageImpl();
+        MessageContext context = new WrappedMessageContext(msg);
+        Map headers = new HashMap<String, List<String>>();
+        List<String> values = new ArrayList<String>();
+        values.add("Value1");
+        headers.put("Header1", values);
+        context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
+        context.setScope(MessageContext.HTTP_REQUEST_HEADERS, Scope.APPLICATION);
+    }
 }
