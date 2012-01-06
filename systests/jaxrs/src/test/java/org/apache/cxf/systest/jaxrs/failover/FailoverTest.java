@@ -316,7 +316,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     }
     
         
-    protected void verifyStrategy(Object proxy, Class clz) {
+    protected void verifyStrategy(Object proxy, Class<?> clz) {
         ConduitSelector conduitSelector =
             WebClient.getConfig(proxy).getConduitSelector();
         if (conduitSelector instanceof FailoverTargetSelector) {
