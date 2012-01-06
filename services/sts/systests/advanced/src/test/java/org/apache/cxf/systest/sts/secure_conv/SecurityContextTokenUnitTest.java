@@ -131,7 +131,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         stsClient.setProperties(properties);
         stsClient.setSecureConv(true);
         stsClient.setRequiresEntropy(enableEntropy);
-        stsClient.setKeySize(192);
+        stsClient.setKeySize(128);
         stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");
 
         return stsClient.requestSecurityToken("http://localhost:8081/doubleit/services/doubleitsymmetric");

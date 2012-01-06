@@ -446,7 +446,11 @@ public abstract class AbstractOperation {
             if (services != null) {
                 for (ServiceMBean service : services) {
                     if (service.isAddressInEndpoints(address)) {
-                        encryptionProperties = service.getEncryptionProperties();
+                        EncryptionProperties svcEncryptionProperties = 
+                            service.getEncryptionProperties();
+                        if (svcEncryptionProperties != null) {
+                            encryptionProperties = svcEncryptionProperties;
+                        }
                         if (tokenRequirements.getTokenType() == null) {
                             String tokenType = service.getTokenType();
                             tokenRequirements.setTokenType(tokenType);
