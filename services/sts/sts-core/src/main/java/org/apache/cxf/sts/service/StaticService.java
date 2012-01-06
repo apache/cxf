@@ -113,9 +113,6 @@ public class StaticService implements ServiceMBean {
      * Get the EncryptionProperties to be used to encrypt tokens issued for this service
      */
     public EncryptionProperties getEncryptionProperties() {
-        if (encryptionProperties == null) {
-            return new EncryptionProperties();
-        }
         return encryptionProperties;
     }
     
