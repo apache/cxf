@@ -146,6 +146,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
         load(resource, loader);
     }
+    @SuppressWarnings("deprecation")
     final void load(String resource, ClassLoader l) throws IOException {
         
         Enumeration<URL> urls = l.getResources(resource);
