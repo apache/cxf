@@ -326,7 +326,7 @@ public class BeanTypeInfo {
         classes.add(clazz);
 
         try {
-            Class[] interfaces = clazz.getInterfaces();
+            Class<?>[] interfaces = clazz.getInterfaces();
 
             /**
              * add base interface information

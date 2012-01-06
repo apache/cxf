@@ -253,7 +253,7 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
     // TODO: assertFileEquals
     @Test
     public void testCXF188() throws Exception {
-        Class clz = AnnotationUtil.loadClass("org.apache.cxf.tools.fortest.cxf188.Demo", getClass()
+        Class<?> clz = AnnotationUtil.loadClass("org.apache.cxf.tools.fortest.cxf188.Demo", getClass()
             .getClassLoader());
         builder.setServiceClass(clz);
         ServiceInfo service = builder.createService();

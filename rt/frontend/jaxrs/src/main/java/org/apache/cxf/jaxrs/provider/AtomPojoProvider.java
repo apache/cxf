@@ -87,13 +87,13 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     @Context
     public void setMessageContext(MessageContext context) {
         mc = context;
-        for (AbstractAtomElementBuilder builder : atomBuilders.values()) {
+        for (AbstractAtomElementBuilder<?> builder : atomBuilders.values()) {
             builder.setMessageContext(context);
         }
-        for (AtomElementWriter writer : atomWriters.values()) {
+        for (AtomElementWriter<?, ?> writer : atomWriters.values()) {
             tryInjectMessageContext(writer);
         }
-        for (AtomElementReader reader : atomReaders.values()) {
+        for (AtomElementReader<?, ?> reader : atomReaders.values()) {
             tryInjectMessageContext(reader);
         }
     }
@@ -201,7 +201,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         if (methodName == null) {
             try {
                 methodName = (getter ? "get" : "set") + cls.getSimpleName();
-                Class[] params = getter ? new Class[]{} : new Class[]{List.class};
+                Class<?>[] params = getter ? new Class[]{} : new Class[]{List.class};
                 cls.getMethod(methodName, params);
             } catch (Exception ex) {
                 String type = getter ? "getter" : "setter";

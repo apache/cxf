@@ -234,9 +234,9 @@ public class JavascriptUtils {
             return false;
         }
         
-        Map metaInfoMap = schemaObject.getMetaInfoMap();
+        Map<Object, Object> metaInfoMap = schemaObject.getMetaInfoMap();
         if (metaInfoMap != null) {
-            Map attribMap = (Map)metaInfoMap.get(Constants.MetaDataConstants.EXTERNAL_ATTRIBUTES);
+            Map<?, ?> attribMap = (Map<?, ?>)metaInfoMap.get(Constants.MetaDataConstants.EXTERNAL_ATTRIBUTES);
             Attr ctAttr = (Attr)attribMap.get(MimeAttribute.MIME_QNAME);
             if (ctAttr != null) {
                 return true;

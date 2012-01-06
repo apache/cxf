@@ -153,12 +153,12 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
         BindingInfo bInfo = destination.getBindingInfo();              
         InterfaceInfo info = bInfo.getInterface();
         String opName = exchange.get(String.class);
-        Iterator i = bInfo.getOperations().iterator();
+        Iterator<BindingOperationInfo> i = bInfo.getOperations().iterator();
         OperationType opType = null;
         BindingOperationInfo bopInfo = null;
         QName opQName = null;
         while (i.hasNext()) {
-            bopInfo = (BindingOperationInfo)i.next();
+            bopInfo = i.next();
             if (bopInfo.getName().getLocalPart().equals(opName)) {
                 opType = bopInfo.getExtensor(OperationType.class);
                 opQName = bopInfo.getName();

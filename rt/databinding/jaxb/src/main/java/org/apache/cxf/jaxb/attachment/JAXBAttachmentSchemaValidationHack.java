@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -37,7 +36,8 @@ import org.apache.cxf.phase.Phase;
  * 
  */
 public final class JAXBAttachmentSchemaValidationHack extends AbstractPhaseInterceptor<Message> {
-    public static final Interceptor INSTANCE = new JAXBAttachmentSchemaValidationHack();
+    public static final JAXBAttachmentSchemaValidationHack INSTANCE 
+        = new JAXBAttachmentSchemaValidationHack();
     private static final String SAVED_DATASOURCES 
         = JAXBAttachmentSchemaValidationHack.class.getName() + ".SAVED_DATASOURCES";
 

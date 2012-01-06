@@ -192,7 +192,7 @@ public class SamlTokenInterceptor extends AbstractSoapInterceptor {
                         if (o instanceof Validator) {
                             return (Validator)o;
                         } else if (o instanceof Class) {
-                            return (Validator)((Class)o).newInstance();
+                            return (Validator)((Class<?>)o).newInstance();
                         } else if (o instanceof String) {
                             return (Validator)ClassLoaderUtils.loadClass(o.toString(),
                                                                          SamlTokenInterceptor.class)

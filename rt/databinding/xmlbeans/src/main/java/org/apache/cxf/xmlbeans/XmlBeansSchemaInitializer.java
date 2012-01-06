@@ -237,7 +237,7 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
         }
         mapClass(part, clazz);
     }
-    private void mapClass(MessagePartInfo part, Class clazz) {
+    private void mapClass(MessagePartInfo part, Class<?> clazz) {
         
         if (!XmlObject.class.isAssignableFrom(clazz)) {
             

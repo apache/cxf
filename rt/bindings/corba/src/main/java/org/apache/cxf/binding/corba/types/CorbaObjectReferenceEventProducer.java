@@ -20,9 +20,7 @@ package org.apache.cxf.binding.corba.types;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +37,7 @@ import org.apache.cxf.binding.corba.utils.CorbaUtils;
 import org.apache.cxf.binding.corba.utils.EprMetaData;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.omg.CORBA.ORB;
@@ -144,10 +143,8 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         // get the list of all bindings and compare their local parts against our name.
         if (wsdlBinding == null && bindingName.getNamespaceURI().equals("")
             && !bindingName.getLocalPart().equals("")) {
-            Map bindings = wsdlDef.getBindings();
-            Collection bindingsCollection = bindings.values();
-            for (Iterator i = bindingsCollection.iterator(); i.hasNext();) {
-                Binding b = (Binding)i.next();
+            Collection<Binding> bindingsCollection = CastUtils.cast(wsdlDef.getBindings().values());
+            for (Binding b: bindingsCollection) {
                 if (b.getQName().getLocalPart().equals(bindingName.getLocalPart())) {
                     wsdlBinding = b;
                     break;

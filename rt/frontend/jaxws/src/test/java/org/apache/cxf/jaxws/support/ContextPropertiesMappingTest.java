@@ -32,6 +32,7 @@ import javax.xml.ws.handler.MessageContext.Scope;
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.ByteDataSource;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
@@ -89,11 +90,10 @@ public class ContextPropertiesMappingTest extends Assert {
         Object inAttachments = ctx.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
         assertNotNull("inbound attachments object must be initialized", inAttachments);
         assertTrue("inbound attachments must be in a Map", inAttachments instanceof Map);
-        assertTrue("no inbound attachments expected", ((Map)inAttachments).isEmpty());
+        assertTrue("no inbound attachments expected", ((Map<?, ?>)inAttachments).isEmpty());
     }
     
     @Test
-    @SuppressWarnings("unchecked")
     public void testCreateWebServiceContextWithInAttachments() {
         Exchange exchange = new ExchangeImpl();
         Message inMessage = new MessageImpl();
@@ -117,7 +117,7 @@ public class ContextPropertiesMappingTest extends Assert {
         Object inAttachments = ctx.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
         assertNotNull("inbound attachments object must be initialized", inAttachments);
         assertTrue("inbound attachments must be in a Map", inAttachments instanceof Map);
-        Map<String, DataHandler> dataHandlers = (Map)inAttachments;
+        Map<String, DataHandler> dataHandlers = CastUtils.cast((Map<?, ?>)inAttachments);
         assertEquals("two inbound attachments expected", 2, dataHandlers.size());
         
         assertTrue("part1 attachment is missing", dataHandlers.containsKey("part1"));

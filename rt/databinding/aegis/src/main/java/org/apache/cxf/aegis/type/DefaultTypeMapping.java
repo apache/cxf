@@ -205,7 +205,8 @@ public class DefaultTypeMapping implements TypeMapping {
         return nextTM;
     }
 
-    private static void defaultRegister(TypeMapping tm, boolean defaultNillable, Class class1, QName name,
+    private static void defaultRegister(TypeMapping tm, boolean defaultNillable, Class<?> class1, 
+                                        QName name,
                                         AegisType type) {
         if (!defaultNillable) {
             type.setNillable(false);

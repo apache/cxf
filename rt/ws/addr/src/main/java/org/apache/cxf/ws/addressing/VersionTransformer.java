@@ -484,7 +484,7 @@ public class VersionTransformer {
         JAXBContext ctx = getExposedJAXBContext(tns);
         Object o = ctx.createUnmarshaller().unmarshal(ref, getExposedReferenceType(tns));
         if (o instanceof JAXBElement) {
-            o = ((JAXBElement)o).getValue();
+            o = ((JAXBElement<?>)o).getValue();
         }
         return convertToNative(o);
         
@@ -585,7 +585,7 @@ public class VersionTransformer {
         public static JAXBContext getJAXBContext() throws JAXBException {
             synchronized (Names200408.class) {
                 if (jaxbContext == null) {
-                    Class clz = org.apache.cxf.ws.addressing.v200408.ObjectFactory.class;
+                    Class<?> clz = org.apache.cxf.ws.addressing.v200408.ObjectFactory.class;
                     jaxbContext =
                         JAXBContext.newInstance(PackageUtils.getPackageName(clz),
                                                 clz.getClassLoader());
@@ -631,7 +631,7 @@ public class VersionTransformer {
         public static JAXBContext getJAXBContext() throws JAXBException {
             synchronized (Names200403.class) {
                 if (jaxbContext == null) {
-                    Class clz = org.apache.cxf.ws.addressing.v200403.ObjectFactory.class;
+                    Class<?> clz = org.apache.cxf.ws.addressing.v200403.ObjectFactory.class;
                     jaxbContext = JAXBContext.newInstance(clz.getPackage().getName(), clz.getClassLoader());
                 }
             }

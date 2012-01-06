@@ -75,7 +75,7 @@ public class ArrayTypeInfo {
             type = tm.getType(typeName);
 
             if (ranks > 0) {
-                Class componentType = type.getTypeClass();
+                Class<?> componentType = type.getTypeClass();
                 for (int i = 1; i < ranks + dimensions.size(); i++) {
                     componentType = Array.newInstance(componentType, 0).getClass();
                 }

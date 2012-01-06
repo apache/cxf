@@ -57,7 +57,6 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         assertNotNull(server);
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testJaxbExtraClass() {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -65,7 +64,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         sf.setAddress("http://localhost:9000/test");
         sf.setServiceClass(Hello.class);
         sf.setStart(false);
-        Map props = sf.getProperties();
+        Map<String, Object> props = sf.getProperties();
         if (props == null) {
             props = new HashMap<String, Object>();
         }
@@ -74,7 +73,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         sf.setProperties(props);
         Server server = sf.create();
         assertNotNull(server);
-        Class[] extraClass = ((JAXBDataBinding)sf.getServiceFactory().getDataBinding()).getExtraClass();
+        Class<?>[] extraClass = ((JAXBDataBinding)sf.getServiceFactory().getDataBinding()).getExtraClass();
         assertEquals(extraClass.length, 2);
         assertEquals(extraClass[0], DescriptionType.class);
         assertEquals(extraClass[1], DisplayNameType.class);

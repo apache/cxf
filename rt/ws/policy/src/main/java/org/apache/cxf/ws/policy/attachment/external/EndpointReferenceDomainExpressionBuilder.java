@@ -90,7 +90,7 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
         }
         
         try {
-            Class clz = EndpointReferenceType.class;
+            Class<?> clz = EndpointReferenceType.class;
             String pkg = PackageUtils.getPackageName(clz);
             JAXBContext context = JAXBContext.newInstance(pkg, clz.getClassLoader());
             unmarshaller = context.createUnmarshaller();

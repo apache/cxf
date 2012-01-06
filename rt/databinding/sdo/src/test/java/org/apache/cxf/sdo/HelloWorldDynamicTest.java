@@ -69,7 +69,7 @@ public class HelloWorldDynamicTest extends AbstractHelloWorldTest {
     }
     
     
-    protected ServerFactoryBean createServiceFactory(Class serviceClass, 
+    protected ServerFactoryBean createServiceFactory(Class<?> serviceClass, 
                                                      Object serviceBean, 
                                                      String address, 
                                                      QName name,

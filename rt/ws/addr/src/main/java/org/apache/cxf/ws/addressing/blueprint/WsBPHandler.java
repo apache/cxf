@@ -36,6 +36,7 @@ public class WsBPHandler implements NamespaceHandler {
         return getClass().getClassLoader().getResource("/schemas/ws-addr-conf.xsd");
     }
 
+    @SuppressWarnings("rawtypes")
     public Set<Class> getManagedClasses() {
         return null;
     }

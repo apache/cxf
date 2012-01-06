@@ -113,7 +113,7 @@ public class TestBase extends Assert {
         return null;
     }
     
-    protected void common(String wsdl, QName portName, Class... jaxbClasses) throws Exception {
+    protected void common(String wsdl, QName portName, Class<?>... jaxbClasses) throws Exception {
         control = EasyMock.createNiceControl();
         
         bus = control.createMock(Bus.class);

@@ -45,7 +45,7 @@ public class PolicyBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
     }
 
     @Override
-    protected Class getBeanClass(Element el) {
+    protected Class<?> getBeanClass(Element el) {
         return PolicyBean.class;
     }
 

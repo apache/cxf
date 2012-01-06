@@ -46,7 +46,9 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
     }
      
     @Override
-    protected Object invoke(Exchange exchange, final Object serviceObject, Method m, List<Object> params) {
+    protected Object invoke(Exchange exchange, 
+                            final Object serviceObject, Method m,
+                            List<Object> params) {
         // set up the webservice request context 
         WrappedMessageContext ctx = new WrappedMessageContext(exchange.getInMessage(), Scope.APPLICATION);
         
@@ -58,7 +60,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             if ((params == null || params.isEmpty()) && m.getDeclaringClass().equals(Provider.class)) {
                 params = Collections.singletonList(null);
             }
-            res = CastUtils.cast((List)super.invoke(exchange, serviceObject, m, params));
+            res = CastUtils.cast((List<?>)super.invoke(exchange, serviceObject, m, params));
             if ((serviceObject instanceof Provider) 
                 && Boolean.TRUE.equals(exchange.getInMessage().
                                        getContextualProperty("jaxws.provider.interpretNullAsOneway"))

@@ -45,7 +45,7 @@ public class InvokingInvocationHandlerTest
         data = new CXFInvocationHandlerDataImpl();
         data.setTarget(target);
         handler = new InvokingInvocationHandler(data);
-        Class[] interfaces = {TestInterface.class};
+        Class<?>[] interfaces = {TestInterface.class};
 
         test = (TestInterface)Proxy.newProxyInstance(TestInterface.class.getClassLoader(), interfaces,
                                                      handler);

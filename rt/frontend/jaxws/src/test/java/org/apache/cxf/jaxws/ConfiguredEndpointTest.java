@@ -347,7 +347,7 @@ public class ConfiguredEndpointTest extends Assert {
       
     
     private TestInterceptor findTestInterceptor(List<Interceptor<? extends Message>> interceptors) {
-        for (Interceptor i : interceptors) {
+        for (Interceptor<? extends Message> i : interceptors) {
             if (i instanceof TestInterceptor) {
                 return (TestInterceptor)i;
             }
@@ -363,7 +363,7 @@ public class ConfiguredEndpointTest extends Assert {
     }
     
     
-    static final class TestInterceptor extends AbstractPhaseInterceptor {
+    static final class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         public TestInterceptor(String name) {
             super(name, "");
         }

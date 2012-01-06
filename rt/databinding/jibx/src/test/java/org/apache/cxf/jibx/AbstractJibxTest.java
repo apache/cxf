@@ -79,12 +79,13 @@ public abstract class AbstractJibxTest extends AbstractCXFTest {
         addNamespace("xsd", SOAPConstants.XSD);
     }
 
-    public Server createService(Class serviceClass, Object serviceBean, String address, QName name) {
+    public Server createService(Class<?> serviceClass, Object serviceBean, String address, QName name) {
         ServerFactoryBean sf = createServiceFactory(serviceClass, serviceBean, address, name, null);
         return sf.create();
     }
 
-    protected ServerFactoryBean createServiceFactory(Class serviceClass, Object serviceBean, String address,
+    protected ServerFactoryBean createServiceFactory(Class<?> serviceClass, 
+                                                     Object serviceBean, String address,
                                                      QName name, JibxDataBinding binding) {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceClass(serviceClass);

@@ -78,7 +78,7 @@ public class XMLFormatValidator extends ServiceValidator {
                     + "):BindingOperation(" + bo.getName() + ")";
                 List<ExtensibilityElement> inExtensors =
                     bo.getInput().getExtensors(ExtensibilityElement.class);
-                Iterator itIn = null;
+                Iterator<ExtensibilityElement> itIn = null;
                 if (inExtensors != null) {
                     itIn = inExtensors.iterator();
                 }
@@ -95,7 +95,7 @@ public class XMLFormatValidator extends ServiceValidator {
                     if (needRootNode) {
                         List<ExtensibilityElement> outExtensors =
                             bo.getOutput().getExtensors(ExtensibilityElement.class);
-                        Iterator itOut = null;
+                        Iterator<ExtensibilityElement> itOut = null;
                         if (outExtensors != null) {
                             itOut = outExtensors.iterator();
                         }
@@ -111,9 +111,11 @@ public class XMLFormatValidator extends ServiceValidator {
         return true;
     }
 
-    private boolean findXMLFormatRootNode(Iterator it, BindingOperationInfo bo, String errorPath) {
+    private boolean findXMLFormatRootNode(Iterator<ExtensibilityElement> it, 
+                                          BindingOperationInfo bo,
+                                          String errorPath) {
         while (it != null && it.hasNext()) {
-            Object ext = it.next();
+            ExtensibilityElement ext = it.next();
             if (ext instanceof XMLBindingMessageFormat) {
                 XMLBindingMessageFormat xmlFormat = (XMLBindingMessageFormat)ext;
                 if (xmlFormat.getRootNode() == null) {

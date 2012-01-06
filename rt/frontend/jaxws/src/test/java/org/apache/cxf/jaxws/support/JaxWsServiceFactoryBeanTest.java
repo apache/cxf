@@ -105,10 +105,10 @@ public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
         
         OperationInfo op = intf.getOperation(new QName(ns, "sayHi"));
         
-        Class wrapper = (Class) op.getInput().getMessageParts().get(0).getTypeClass();
+        Class<?> wrapper = op.getInput().getMessageParts().get(0).getTypeClass();
         assertNotNull(wrapper);
         
-        wrapper = (Class) op.getOutput().getMessageParts().get(0).getTypeClass();
+        wrapper = op.getOutput().getMessageParts().get(0).getTypeClass();
         assertNotNull(wrapper);
     
         assertEquals(invoker, service.getInvoker());
@@ -119,7 +119,7 @@ public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
         
         FaultInfo f = op.getFault(new QName(ns, "BadRecordLitFault"));
         assertNotNull(f);
-        Class c = f.getProperty(Class.class.getName(), Class.class);
+        Class<?> c = f.getProperty(Class.class.getName(), Class.class);
         assertNotNull(c);
         
         assertEquals(1, f.getMessageParts().size());

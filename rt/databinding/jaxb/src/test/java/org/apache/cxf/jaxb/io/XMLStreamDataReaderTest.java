@@ -135,7 +135,7 @@ public class XMLStreamDataReaderTest extends Assert {
         assertEquals(new Float(1.0f), new Float(((TradePriceData)val).getTickerPrice()));
     }
 
-    private JAXBDataBinding getDataBinding(Class... clz) throws Exception {
+    private JAXBDataBinding getDataBinding(Class<?>... clz) throws Exception {
         JAXBContext ctx = JAXBContext.newInstance(clz);
         return new JAXBDataBinding(ctx);
     }

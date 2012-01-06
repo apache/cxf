@@ -677,7 +677,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     if (o instanceof Validator) {
                         return (Validator)o;
                     } else if (o instanceof Class) {
-                        return (Validator)((Class)o).newInstance();
+                        return (Validator)((Class<?>)o).newInstance();
                     } else if (o instanceof String) {
                         return (Validator)ClassLoaderUtils.loadClass(o.toString(),
                                                                      WSS4JInInterceptor.class)

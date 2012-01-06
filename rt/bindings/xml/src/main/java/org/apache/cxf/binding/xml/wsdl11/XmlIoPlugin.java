@@ -33,7 +33,7 @@ public final class XmlIoPlugin extends AbstractWSDLPlugin {
     public ExtensibilityElement createExtension(final Map<String, Object> args) throws WSDLException {
         XMLBindingMessageFormat xmlFormat = null;
 
-        Class clz = getOption(args, Class.class);
+        Class<?> clz = getOption(args, Class.class);
         QName qname = getOption(args, QName.class);
 
         xmlFormat = (XMLBindingMessageFormat)registry.createExtension(clz, ToolConstants.XML_FORMAT);

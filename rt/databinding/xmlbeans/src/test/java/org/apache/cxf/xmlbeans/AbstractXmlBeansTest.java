@@ -114,26 +114,26 @@ public abstract class AbstractXmlBeansTest extends AbstractCXFTest {
         return invoke("local://" + service, LocalTransportFactory.TRANSPORT_ID, message);
     }
     
-    public Server createService(Class serviceClass, QName name) {
+    public Server createService(Class<?> serviceClass, QName name) {
         return createService(serviceClass, null, name);
     }
     
-    public Server createService(Class serviceClass, Object serviceBean, QName name) {
+    public Server createService(Class<?> serviceClass, Object serviceBean, QName name) {
         return createService(serviceClass, serviceBean, serviceClass.getSimpleName(), name);
     }
     
-    protected Server createService(Class serviceClass, QName name, XmlBeansDataBinding binding) {
+    protected Server createService(Class<?> serviceClass, QName name, XmlBeansDataBinding binding) {
         return createService(serviceClass, serviceClass.getSimpleName(), name, binding);
     }
 
-    protected Server createService(Class serviceClass, 
+    protected Server createService(Class<?> serviceClass, 
                                    String address, QName name, 
                                     XmlBeansDataBinding binding) {
         ServerFactoryBean sf = createServiceFactory(serviceClass, null, address, name, binding);
         return sf.create();
     }
     
-    public Server createService(Class serviceClass,
+    public Server createService(Class<?> serviceClass,
                                 Object serviceBean, 
                                 String address,
                                 QName name) {
@@ -141,7 +141,7 @@ public abstract class AbstractXmlBeansTest extends AbstractCXFTest {
         return sf.create();
     }
 
-    protected ServerFactoryBean createServiceFactory(Class serviceClass, 
+    protected ServerFactoryBean createServiceFactory(Class<?> serviceClass, 
                                                      Object serviceBean, 
                                                      String address, 
                                                      QName name,

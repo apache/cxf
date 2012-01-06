@@ -31,7 +31,7 @@ public class FaultBeanTest extends Assert {
 
     @Test
     public void testTransform() throws Exception {
-        Class faultClass = Class.forName("org.apache.cxf.tools.fortest.cxf523.DBServiceFault");
+        Class<?> faultClass = Class.forName("org.apache.cxf.tools.fortest.cxf523.DBServiceFault");
         FaultBean bean = new FaultBean();
         WrapperBeanClass beanClass = bean.transform(faultClass, "org.apache.cxf.tools.fortest.cxf523.jaxws");
 

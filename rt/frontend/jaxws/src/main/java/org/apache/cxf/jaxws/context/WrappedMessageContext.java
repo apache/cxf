@@ -233,14 +233,14 @@ public class WrappedMessageContext implements MessageContext {
                     ret = reqMessage.get(Message.PROTOCOL_HEADERS);
                 }
             } else if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
-                Map mp = null;
+                Map<?, ?> mp = null;
                 if (isResponse()) {
-                    mp = (Map)message.get(Message.PROTOCOL_HEADERS);
+                    mp = (Map<?, ?>)message.get(Message.PROTOCOL_HEADERS);
                 } else if (exchange != null) {
                     //may have to create the out message and add the headers
                     Message tmp = createResponseMessage();
                     if (tmp != null) {
-                        ret = (Map)tmp.get(Message.PROTOCOL_HEADERS);
+                        ret = (Map<?, ?>)tmp.get(Message.PROTOCOL_HEADERS);
                     }
                 }
                 ret = mp;
