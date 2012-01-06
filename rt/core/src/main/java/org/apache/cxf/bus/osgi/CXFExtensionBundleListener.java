@@ -67,7 +67,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
     }
     
     protected void register(final Bundle bundle) {
-        Enumeration e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
+        Enumeration<?> e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
         while (e != null && e.hasMoreElements()) {
             List<Extension> orig = new TextExtensionFragmentParser().getExtensions((URL)e.nextElement());
             addExtensions(bundle, orig);

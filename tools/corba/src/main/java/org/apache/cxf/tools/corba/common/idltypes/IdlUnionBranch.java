@@ -20,19 +20,18 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 
 public final class IdlUnionBranch extends IdlField {
     private boolean isDefault;
-    private List<Object> cases;
+    private List<String> cases;
 
     private IdlUnionBranch(IdlUnion union, String name, IdlType type, boolean hasDefault) {
         super(union, name, type);
         this.isDefault = hasDefault;
-        cases = new Vector<Object>();
+        cases = new Vector<String>();
     }
     
     public static IdlUnionBranch create(IdlUnion union, String name, IdlType type, boolean isDefault) {
@@ -51,10 +50,8 @@ public final class IdlUnionBranch extends IdlField {
         if (isDefault) {
             pw.println(indent() + "default:");
         } else {
-            Iterator it = cases.iterator();
-
-            while (it.hasNext()) {
-                pw.println(indent() + "case " + it.next() + ":");
+            for (String s : cases) {
+                pw.println(indent() + "case " + s + ":");
             }
         }
 

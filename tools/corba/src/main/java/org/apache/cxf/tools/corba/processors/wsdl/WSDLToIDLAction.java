@@ -23,9 +23,9 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,6 +62,7 @@ import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.common.idltypes.CorbaUtils;
 import org.apache.cxf.tools.corba.common.idltypes.IdlAnonArray;
 import org.apache.cxf.tools.corba.common.idltypes.IdlAnonFixed;
@@ -136,17 +137,15 @@ public class WSDLToIDLAction {
         } else {
             // generate idl for all bindings in the file.
             // each idl file will have the name of the binding.
-            Map bindingList = def.getAllBindings();
-            if (bindingList.size() == 0) {
+            Collection<Binding> bindings = CastUtils.cast(def.getAllBindings().values());
+            if (bindings.size() == 0) {
                 String msgStr = "No bindings exists within this WSDL.";
                 org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
                 throw new Exception(msg.toString());
             } else {
                 List<QName> portTypes = new ArrayList<QName>();
-                Iterator iter = bindingList.values().iterator();
-                while (iter.hasNext()) {
-                    Binding binding = (Binding)iter.next();
-                    List ext = binding.getExtensibilityElements();
+                for (Binding binding : bindings) {
+                    List<?> ext = binding.getExtensibilityElements();
                     if (!(ext.get(0) instanceof BindingType)) {
                         continue;
                     }
@@ -191,7 +190,7 @@ public class WSDLToIDLAction {
     }    
 
     private void generateIDL(Definition definition, Binding binding) {
-        List ext = binding.getExtensibilityElements();
+        List<?> ext = binding.getExtensibilityElements();
         if (!(ext.get(0) instanceof BindingType)) {
             // throw an error not a corba binding
             throw new RuntimeException(binding.getQName() + " is not a corba binding, "
@@ -229,7 +228,7 @@ public class WSDLToIDLAction {
     
     private void collectIdlDefns(Binding binding) throws Exception {
         boolean isOneway = false;
-        Iterator iterator = binding.getBindingOperations().iterator();
+        Iterator<?> iterator = binding.getBindingOperations().iterator();
         while (iterator.hasNext()) {
             BindingOperation bindingOperation = (BindingOperation)iterator.next();
             if (bindingOperation.getBindingOutput() == null) {
@@ -244,7 +243,7 @@ public class WSDLToIDLAction {
                               boolean isOneway) throws Exception {
 
         String name = null;
-        Iterator i = bindingOperation.getExtensibilityElements().iterator();
+        Iterator<?> i = bindingOperation.getExtensibilityElements().iterator();
         while (i.hasNext()) {
             org.apache.cxf.binding.corba.wsdl.OperationType opType = 
                 (org.apache.cxf.binding.corba.wsdl.OperationType)i
@@ -272,8 +271,7 @@ public class WSDLToIDLAction {
                 attr = IdlAttribute.create(intf, attrNm, 
                                            findType(t.getIdltype()), true);                               
             } else {
-                Iterator it = opType.getParam().iterator();
-                ParamType arg = (ParamType)it.next();                
+                ParamType arg = opType.getParam().iterator().next();
                 attr = IdlAttribute.create(intf, attrNm, findType(arg.getIdltype()), false);                
             }
             intf.addAttribute(attr);
@@ -299,20 +297,14 @@ public class WSDLToIDLAction {
             idlOp.addReturnType(rt);
         }
 
-        Iterator it = opType.getParam().iterator();
-
-        while (it.hasNext()) {
-            ParamType arg = (ParamType)it.next();
+        for (ParamType arg : opType.getParam()) {
             IdlType type = findType(arg.getIdltype());            
             String mode = arg.getMode().value();
             IdlParam param = IdlParam.create(idlOp, arg.getName(), type, mode);
             idlOp.addParameter(param);
         }
-        
-        Iterator iter = opType.getRaises().iterator();
 
-        while (iter.hasNext()) {
-            RaisesType rs = (RaisesType)iter.next();
+        for (RaisesType rs : opType.getRaises()) {
             IdlType type = findType(rs.getException());            
 
             if (type instanceof IdlException) {
@@ -332,17 +324,10 @@ public class WSDLToIDLAction {
     private void getAllIdlTypes() throws Exception {
 
         try {
-            Iterator types = def.getExtensibilityElements().iterator();
-            TypeMappingType typeMappingType = null;            
-            if (types != null) {
-                while (types.hasNext()) {                    
-                    typeMappingType = (TypeMappingType)types.next();
-                }
-            }
+            TypeMappingType typeMappingType = getTypeMappingType();
             if (typeMappingType != null) {
-                Iterator i = typeMappingType.getStructOrExceptionOrUnion().iterator();
-                while (i.hasNext()) {
-                    CorbaTypeImpl corbaTypeImpl = (CorbaTypeImpl)i.next();                                
+                for (CorbaTypeImpl corbaTypeImpl 
+                    : typeMappingType.getStructOrExceptionOrUnion()) {                                
                     findCorbaIdlType(corbaTypeImpl);
                 }
             }
@@ -355,19 +340,12 @@ public class WSDLToIDLAction {
         CorbaTypeImpl corbaTypeImpl = null;
 
         try {
-
-            Iterator types = def.getExtensibilityElements().iterator();
-            TypeMappingType typeMappingType = null;
-            if (types != null) {
-                while (types.hasNext()) {
-                    typeMappingType = (TypeMappingType)types.next();
-                }
-            }
-            Iterator i = typeMappingType.getStructOrExceptionOrUnion().iterator();
-            while (i.hasNext()) {
-                CorbaTypeImpl corbaType = (CorbaTypeImpl)i.next();
-                if (corbaType.getName().equals(qname.getLocalPart())) {                    
-                    return corbaType;
+            TypeMappingType typeMappingType = getTypeMappingType();
+            if (typeMappingType != null) {
+                for (CorbaTypeImpl corbaType : typeMappingType.getStructOrExceptionOrUnion()) {
+                    if (corbaType.getName().equals(qname.getLocalPart())) {                    
+                        return corbaType;
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -376,7 +354,15 @@ public class WSDLToIDLAction {
                 
         return corbaTypeImpl;         
     }
-
+    private TypeMappingType getTypeMappingType() {
+        Iterator<?> types = def.getExtensibilityElements().iterator();
+        if (types != null) {
+            while (types.hasNext()) {
+                return (TypeMappingType)types.next();
+            }
+        }
+        return null;
+    }
     private IdlType findType(QName qname) throws Exception {        
         String local = qname.getLocalPart();        
         return findIdlType(local, qname, null);                
@@ -610,16 +596,11 @@ public class WSDLToIDLAction {
         } else {
             IdlException exc = IdlException.create(scope, local);
             scope.holdForScope(exc);
-
-            Iterator it = e.getMember().iterator();
-
-            while (it.hasNext()) {
-                MemberType m = (MemberType)it.next();
+            for (MemberType m : e.getMember()) {
                 QName qname = m.getIdltype();
                 IdlType type = findType(qname);                
                 exc.addToScope(IdlField.create(exc, m.getName(), type));
             }
-
             result = exc;
             scope.promoteHeldToScope();
         }
@@ -635,9 +616,7 @@ public class WSDLToIDLAction {
         IdlUnion union = IdlUnion.create(scope, local, disc);
         scope.holdForScope(union);
 
-        Iterator it = u.getUnionbranch().iterator();
-        while (it.hasNext()) {
-            Unionbranch ub = (Unionbranch)it.next();
+        for (Unionbranch ub : u .getUnionbranch()) {
             QName qname = ub.getIdltype();
             IdlType bt = findType(qname);
             boolean isDefault = false;
@@ -646,9 +625,8 @@ public class WSDLToIDLAction {
             }
             IdlUnionBranch b = IdlUnionBranch.create(union, ub.getName(), bt, isDefault);
 
-            Iterator it2 = ub.getCase().iterator();
-            while (it2.hasNext()) {                
-                b.addCase(((CaseType)it2.next()).getLabel());
+            for (CaseType cs : ub.getCase()) {
+                b.addCase(cs.getLabel());
             }
 
             // Ensure that this union will not  be written until all of its circular members are
@@ -682,9 +660,7 @@ public class WSDLToIDLAction {
         IdlStruct struct = IdlStruct.create(scope, local);
         scope.holdForScope(struct);
 
-        Iterator it = s.getMember().iterator();
-        while (it.hasNext()) {
-            MemberType m = (MemberType)it.next();
+        for (MemberType m : s.getMember()) {
             QName qname = m.getIdltype();
             IdlType type = findType(qname);            
             
@@ -803,12 +779,12 @@ public class WSDLToIDLAction {
     private IdlType createEnum(CorbaTypeImpl ctype, IdlScopeBase scope, String local) {
         Enum e = (Enum)ctype;
         IdlEnum enum1 = IdlEnum.create(scope, local);
-        Iterator it = e.getEnumerator().iterator();
+        Iterator<Enumerator> it = e.getEnumerator().iterator();
 
         while (it.hasNext()) {
             // Enumerators are created in the same scope
             // as the enum, according to IDL grammar rules.
-            String n = ((Enumerator)it.next()).getValue();
+            String n = it.next().getValue();
             IdlEnumerator enumerator = IdlEnumerator.create(scope, n);
             scope.addToScope(enumerator);
             enum1.addEnumerator(enumerator);
@@ -838,21 +814,18 @@ public class WSDLToIDLAction {
 
     private Binding findBinding(Definition definition) {
         Binding binding = null;
-        Map bindings = definition.getBindings();
-        Iterator i = bindings.values().iterator();
-        
-        if (bindingName != null) {                    
-            while (i.hasNext()) {
-                binding = (Binding)i.next();
+        Collection<Binding> bindings = CastUtils.cast(definition.getBindings().values());
+        if (bindingName != null) {
+            for (Binding b : bindings) {
+                binding = b;
                 if (binding.getQName().getLocalPart().equals(bindingName)) {
                     return binding;
                 }
             }
         } else {
             if (bindings.size() >= 1) {
-                binding = (Binding)i.next();
+                binding = bindings.iterator().next();
             }
-            
         }
         return binding;
     }

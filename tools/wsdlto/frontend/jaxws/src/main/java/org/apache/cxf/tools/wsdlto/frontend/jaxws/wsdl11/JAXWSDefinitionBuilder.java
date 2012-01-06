@@ -58,7 +58,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSeri
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
-public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
+public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
 
     protected static final Logger LOG = LogUtils.getL7dLogger(JAXWSDefinitionBuilder.class);
     protected CustomizationParser cusParser;

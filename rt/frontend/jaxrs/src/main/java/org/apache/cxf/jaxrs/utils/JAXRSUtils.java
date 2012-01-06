@@ -555,7 +555,7 @@ public final class JAXRSUtils {
         
         
         Method method = ori.getMethodToInvoke();
-        Class[] parameterTypes = method.getParameterTypes();
+        Class<?>[] parameterTypes = method.getParameterTypes();
         Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[]{});  
         Method annotatedMethod = ori.getAnnotatedMethod();
         Type[] genericParameterTypes = annotatedMethod == null ? method.getGenericParameterTypes() 
@@ -568,10 +568,10 @@ public final class JAXRSUtils {
             Type genericParam = genericParameterTypes[i];
             if (genericParam instanceof TypeVariable) {
                 genericParam = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
-                                                           (TypeVariable)genericParam);
+                                                           (TypeVariable<?>)genericParam);
             }
             if (param == Object.class) {
-                param = (Class)genericParam; 
+                param = (Class<?>)genericParam; 
             } else if (genericParam == Object.class) {
                 genericParam = param;
             }
@@ -1202,10 +1202,9 @@ public final class JAXRSUtils {
         return types;
     }
     
-    @SuppressWarnings("unchecked")
-    public static Response convertFaultToResponse(Throwable ex, Message inMessage) {
+    public static <T extends Throwable> Response convertFaultToResponse(T ex, Message inMessage) {
         
-        ExceptionMapper mapper = 
+        ExceptionMapper<T> mapper = 
             ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
             try {

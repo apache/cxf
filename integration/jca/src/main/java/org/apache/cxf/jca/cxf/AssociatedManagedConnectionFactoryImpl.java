@@ -73,7 +73,7 @@ public class AssociatedManagedConnectionFactoryImpl
     protected void mergeResourceAdapterProps() {
         Properties raProps = ((ResourceAdapterImpl)ra).getPluginProps();
         Properties props = getPluginProps();
-        Enumeration raPropsEnum = raProps.propertyNames();
+        Enumeration<?> raPropsEnum = raProps.propertyNames();
         while (raPropsEnum.hasMoreElements()) {
             String key = (String)raPropsEnum.nextElement();
             if (!props.containsKey(key)) {

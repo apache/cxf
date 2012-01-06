@@ -68,13 +68,13 @@ public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
         throws ResourceAdapterInternalException;
 
     public ManagedConnection matchManagedConnections(
-        Set aMCSet, Subject subject, ConnectionRequestInfo crInfo)
+        @SuppressWarnings("rawtypes") Set aMCSet, Subject subject, ConnectionRequestInfo crInfo)
         throws ResourceException {
         
         LOG.log(Level.FINE, "MATCHING_CONNECTIONS",
             new Object[] {new Integer(aMCSet.size()), crInfo, subject});
 
-        for (Iterator iterator = aMCSet.iterator(); iterator.hasNext();) {
+        for (@SuppressWarnings("rawtypes") Iterator iterator = aMCSet.iterator(); iterator.hasNext();) {
             AbstractManagedConnectionImpl conn = (AbstractManagedConnectionImpl)iterator.next();
 
             LOG.log(Level.FINE, "MATCH_CONNECTION_AGAINST", 

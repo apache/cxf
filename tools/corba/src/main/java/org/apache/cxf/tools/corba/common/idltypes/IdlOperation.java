@@ -27,12 +27,12 @@ import java.util.Vector;
 
 public final class IdlOperation extends IdlScopeBase {
     private IdlType returnType;
-    private List<Object> exceptions;
+    private List<IdlException> exceptions;
     private boolean oneway;
 
     private IdlOperation(IdlScopeBase parent, String name, boolean isOneway) {
         super(parent, name);
-        exceptions = new Vector<Object>();
+        exceptions = new Vector<IdlException>();
         oneway = isOneway;
     }
     
@@ -72,15 +72,14 @@ public final class IdlOperation extends IdlScopeBase {
 
         pw.print(indent() + localName() + "(");
 
-        Collection defns = definitions();
+        Collection<IdlDefn> defns = definitions();
 
         if (defns.size() != 0) {
             pw.println();
             indentMore();
 
             int needComma = defns.size() - 1;
-            Iterator it = defns.iterator();
-
+            Iterator<IdlDefn> it = defns.iterator();
             while (it.hasNext()) {
                 IdlParam def = (IdlParam)it.next();
                 def.write(pw);
@@ -102,10 +101,8 @@ public final class IdlOperation extends IdlScopeBase {
             indentMore();
 
             int needComma = exceptions.size() - 1;
-            Iterator it = exceptions.iterator();
 
-            while (it.hasNext()) {
-                IdlException exc = (IdlException)it.next();
+            for (IdlException exc : exceptions) {
                 pw.print(indent() + exc.fullName(scopeName()));
 
                 if (needComma-- != 0) {

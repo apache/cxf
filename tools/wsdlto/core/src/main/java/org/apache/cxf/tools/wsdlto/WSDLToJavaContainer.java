@@ -162,9 +162,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
             // Build the ServiceModel from the WSDLModel
             if (version == WSDLConstants.WSDLVersion.WSDL11) {
-                @SuppressWarnings("unchecked")
-                AbstractWSDLBuilder<Definition> builder = (AbstractWSDLBuilder<Definition>)frontend
-                    .getWSDLBuilder();
+                AbstractWSDLBuilder builder = frontend.getWSDLBuilder();
                 builder.setContext(context);
                 builder.setBus(getBus());
                 context.put(Bus.class, getBus());

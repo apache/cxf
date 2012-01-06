@@ -22,19 +22,18 @@ package org.apache.cxf.tools.corba.common.idltypes;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 
 public final class IdlRoot extends IdlScopeBase {
-    private Map<Object, Object> primitiveTypes;
-    private List<Object> includeList;
+    private Map<String, IdlType> primitiveTypes;
+    private List<String> includeList;
 
     private IdlRoot() {
         super(null, "");
-        primitiveTypes = new HashMap<Object, Object>();
-        includeList = new ArrayList<Object>();
+        primitiveTypes = new HashMap<String, IdlType>();
+        includeList = new ArrayList<String>();
 
         for (short i = IdlPrimitive.MINIMUM; i <= IdlPrimitive.MAXIMUM; ++i) {
             IdlPrimitive prim = IdlPrimitive.create(this, i);
@@ -77,10 +76,7 @@ public final class IdlRoot extends IdlScopeBase {
 
     public void write(PrintWriter pw) {
         //Write the Include files
-        Iterator it = includeList.iterator();
-
-        while (it.hasNext()) {
-            String s = (String)it.next();
+        for (String s : includeList) {
             pw.println("#include " + s);
         }
 

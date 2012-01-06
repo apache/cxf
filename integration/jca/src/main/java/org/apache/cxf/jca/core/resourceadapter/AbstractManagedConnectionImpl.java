@@ -129,10 +129,8 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
     }
 
     protected void sendEvent(ConnectionEvent coEvent) {
-        Iterator iter = connectionEventListeners.iterator();
-
-        while (iter.hasNext()) {
-            sendEventToListener(coEvent, (ConnectionEventListener)iter.next());
+        for (ConnectionEventListener l : connectionEventListeners) {
+            sendEventToListener(coEvent, l);
         }
     }
 

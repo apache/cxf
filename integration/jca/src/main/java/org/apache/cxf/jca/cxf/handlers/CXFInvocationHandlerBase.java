@@ -30,7 +30,7 @@ import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
 import org.apache.cxf.jca.cxf.CXFManagedConnection;
 
-abstract class CXFInvocationHandlerBase<T> implements CXFInvocationHandler {
+abstract class CXFInvocationHandlerBase implements CXFInvocationHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFInvocationHandlerBase.class);
 

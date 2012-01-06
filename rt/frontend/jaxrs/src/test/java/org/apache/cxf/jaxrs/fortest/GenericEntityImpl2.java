@@ -24,7 +24,7 @@ import javax.ws.rs.Path;
 import org.apache.cxf.jaxrs.resources.Book;
 
 @Path("/books")
-public class GenericEntityImpl2<T extends Book> implements GenericEntity2 {
+public class GenericEntityImpl2<T extends Book> implements GenericEntity2<T> {
 
     private T book;
     

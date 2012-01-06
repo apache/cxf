@@ -154,7 +154,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     }
 
     private Version getBundleVersion(Bundle bundle) {
-        Dictionary headers = bundle.getHeaders();
+        Dictionary<?, ?> headers = bundle.getHeaders();
         String version = (String) headers.get(Constants.BUNDLE_VERSION);
         return (version != null) ? Version.parseVersion(version) : Version.emptyVersion;
     }

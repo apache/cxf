@@ -60,11 +60,11 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         boolean client = Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE));
         if (client) {
-            List<Holder> outHolders = CastUtils.cast((List)message.getExchange()
+            List<Holder<?>> outHolders = CastUtils.cast((List<?>)message.getExchange()
                 .getOutMessage().get(CLIENT_HOLDERS));
             for (MessagePartInfo part : parts) {
                 if (part.getIndex() != 0 && part.getTypeClass() != null) {
-                    Holder holder = (Holder)outHolders.get(part.getIndex() - 1);
+                    Holder<Object> holder = (Holder<Object>)outHolders.get(part.getIndex() - 1);
                     if (holder != null) {
                         holder.value = inObjects.get(part);
                         inObjects.put(part, holder);

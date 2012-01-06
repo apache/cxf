@@ -716,7 +716,6 @@ public abstract class AbstractHTTPDestination
      * 
      * @see org.apache.cxf.transport.AbstractMultiplexDestination#getId(java.util.Map)
      */
-    @SuppressWarnings("rawtypes")
     @Override
     public String getId(Map<String, Object> context) {
         String id = null;

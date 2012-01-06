@@ -23,7 +23,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -575,11 +574,9 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
 
             TypeMappingType mapType = (TypeMappingType)model.getExtensibilityElements().get(0);
             assertEquals(5, mapType.getStructOrExceptionOrUnion().size());
-            Iterator i = mapType.getStructOrExceptionOrUnion().iterator();
             int strcnt = 0;
             int unioncnt = 0;
-            while (i.hasNext()) {
-                CorbaTypeImpl corbaType = (CorbaTypeImpl)i.next();
+            for (CorbaTypeImpl corbaType: mapType.getStructOrExceptionOrUnion()) {
                 if (corbaType instanceof Struct) {
                     strcnt++;
                 }

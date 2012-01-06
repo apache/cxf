@@ -240,7 +240,7 @@ public final class ProviderFactory {
         return candidates.get(0);
     }
     
-    private static void handleMapper(List<Object> candidates, 
+    private static <T> void handleMapper(List<Object> candidates, 
                                      ProviderInfo em, 
                                      Class<?> expectedType, 
                                      Message m, 
@@ -256,7 +256,7 @@ public final class ProviderFactory {
                 for (int i = 0; i < args.length; i++) {
                     Type arg = args[i];
                     if (arg instanceof TypeVariable) {
-                        TypeVariable var = (TypeVariable)arg;
+                        TypeVariable<?> var = (TypeVariable<?>)arg;
                         Type[] bounds = var.getBounds();
                         boolean isResolved = false;
                         for (int j = 0; j < bounds.length; j++) {

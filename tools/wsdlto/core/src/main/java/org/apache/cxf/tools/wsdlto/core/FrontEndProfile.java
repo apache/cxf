@@ -30,7 +30,7 @@ public class FrontEndProfile {
     Processor processor;
     Class<? extends ToolContainer> containerClz;
     String toolspec;
-    AbstractWSDLBuilder<? extends Object> builder;
+    AbstractWSDLBuilder builder;
 
     public void setContainerClass(Class<? extends ToolContainer> c) {
         this.containerClz = c;
@@ -64,7 +64,7 @@ public class FrontEndProfile {
         this.processor = prs;
     }
 
-    public void setWSDLBuilder(AbstractWSDLBuilder<? extends Object> b) {
+    public void setWSDLBuilder(AbstractWSDLBuilder b) {
         this.builder = b;
     }
 

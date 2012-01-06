@@ -173,7 +173,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS);
         if (firstTry && theHeaders != null) {
             // some headers might've been setup by custom cxf interceptors
-            theHeaders.putAll((Map)response.getMetadata());
+            theHeaders.putAll(response.getMetadata());
         } else {
             theHeaders = response.getMetadata();
         }
@@ -181,7 +181,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (!(theHeaders instanceof MultivaluedMap)) {
             responseHeaders = new MetadataMap<String, Object>(theHeaders);
         } else {
-            responseHeaders = (MultivaluedMap)theHeaders;
+            responseHeaders = (MultivaluedMap<String, Object>)theHeaders;
         }
         message.put(Message.PROTOCOL_HEADERS, responseHeaders);
         
@@ -211,7 +211,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Type genericType = getGenericResponseType(ori == null ? null : invoked, responseObj, targetType);
         if (genericType instanceof TypeVariable) {
             genericType = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
-                                                       (TypeVariable)genericType);
+                                                       (TypeVariable<?>)genericType);
         }
         
         Annotation[] annotations = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
@@ -285,11 +285,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
     private boolean isResponseNull(Object o) {
         return o == null || GenericEntity.class.isAssignableFrom(o.getClass()) 
-                            && ((GenericEntity)o).getEntity() == null; 
+                            && ((GenericEntity<?>)o).getEntity() == null; 
     }
     
     private Object getEntity(Object o) {
-        return GenericEntity.class.isAssignableFrom(o.getClass()) ? ((GenericEntity)o).getEntity() : o; 
+        return GenericEntity.class.isAssignableFrom(o.getClass()) ? ((GenericEntity<?>)o).getEntity() : o; 
     }
     
     private boolean checkBufferingMode(Message m, MessageBodyWriter w, boolean firstTry) {
@@ -409,7 +409,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
     private Class<?> getRawResponseClass(Object targetObject) {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
-            return ((GenericEntity)targetObject).getRawType();
+            return ((GenericEntity<?>)targetObject).getRawType();
         } else {
             return ClassHelper.getRealClassFromClass(targetObject.getClass());
         }
@@ -417,7 +417,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
     private Type getGenericResponseType(Method invoked, Object targetObject, Class<?> targetType) {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
-            return ((GenericEntity)targetObject).getType();
+            return ((GenericEntity<?>)targetObject).getType();
         } else if (invoked == null || !invoked.getReturnType().isAssignableFrom(targetType)) {
             // when a method has been invoked it is still possible that either an ExceptionMapper
             // or a ResponseHandler filter overrides a response entity; if it happens then 

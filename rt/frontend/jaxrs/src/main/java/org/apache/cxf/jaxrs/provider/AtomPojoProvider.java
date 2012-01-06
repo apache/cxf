@@ -225,7 +225,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     protected void setFeedFromCollection(Factory factory, Feed feed, Object wrapper, Object collection,
         Class<?> collectionCls, Type collectionType, boolean writerUsed) throws Exception {
         
-        Object[] arr = collectionCls.isArray() ? (Object[])collection : ((Collection)collection).toArray();
+        Object[] arr = collectionCls.isArray() ? (Object[])collection : ((Collection<?>)collection).toArray();
         Class<?> memberClass = InjectionUtils.getActualType(collectionType);
         
         for (Object o : arr) {
@@ -330,7 +330,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     protected boolean buildEntry(Entry entry, Object o) {
         AtomElementWriter<?, ?> builder = atomWriters.get(o.getClass().getName());
         if (builder != null) {
-            ((AtomElementWriter)builder).writeTo(entry, o);
+            ((AtomElementWriter<Entry, Object>)builder).writeTo(entry, o);
             return true;
         }
         return false;

@@ -347,7 +347,7 @@ public class WebClient extends AbstractClient {
                                                     Class<T> memberClass) {
         Response r = doInvoke(httpMethod, body, null, 
                               Collection.class, new ParameterizedCollectionType<T>(memberClass));
-        return CastUtils.cast((Collection)r.getEntity(), memberClass);
+        return CastUtils.cast((Collection<?>)r.getEntity(), memberClass);
     }
     
     /**
@@ -387,7 +387,7 @@ public class WebClient extends AbstractClient {
                                                                   Class<T2> responseClass) {
         Response r = doInvoke("POST", collection, new ParameterizedCollectionType<T1>(memberClass), 
                               Collection.class, new ParameterizedCollectionType<T2>(responseClass));
-        return CastUtils.cast((Collection)r.getEntity(), responseClass);
+        return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
     }
         
     /**
@@ -689,10 +689,10 @@ public class WebClient extends AbstractClient {
                                  Exchange exchange, 
                                  Map<String, Object> invContext) throws Throwable {
         
-        Map<String, Object> reqContext = CastUtils.cast((Map)invContext.get(REQUEST_CONTEXT));
+        Map<String, Object> reqContext = CastUtils.cast((Map<?, ?>)invContext.get(REQUEST_CONTEXT));
         String httpMethod = (String)reqContext.get(Message.HTTP_REQUEST_METHOD);
         Type inType = (Type)reqContext.get(REQUEST_TYPE);
-        Class<?> respClass = (Class)reqContext.get(RESPONSE_CLASS);
+        Class<?> respClass = (Class<?>)reqContext.get(RESPONSE_CLASS);
         Type outType = (Type)reqContext.get(RESPONSE_TYPE);
         return doChainedInvocation(httpMethod, headers, body, inType, 
                                    respClass, outType, exchange, invContext);
@@ -792,7 +792,7 @@ public class WebClient extends AbstractClient {
                 return;
             }
             MultivaluedMap<String, String> headers = 
-                (MultivaluedMap)outMessage.get(Message.PROTOCOL_HEADERS);
+                (MultivaluedMap<String, String>)outMessage.get(Message.PROTOCOL_HEADERS);
             Object body = objs.get(0);
             
             Map<String, Object> requestContext = WebClient.this.getRequestContext(outMessage);

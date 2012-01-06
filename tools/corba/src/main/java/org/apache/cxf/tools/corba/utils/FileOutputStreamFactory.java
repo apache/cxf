@@ -31,17 +31,17 @@ import java.util.List;
 
 public class FileOutputStreamFactory implements OutputStreamFactory {
     String dirName = "";
-    List <Object>fileNames;
+    List<String> fileNames;
     FileOutputStreamFactory parent;
 
     public FileOutputStreamFactory() {
-        fileNames = new LinkedList<Object>();
+        fileNames = new LinkedList<String>();
     }
 
 
     public FileOutputStreamFactory(String dir) {        
         this(dir, null);
-        fileNames = new LinkedList<Object>();
+        fileNames = new LinkedList<String>();
     }
 
 
@@ -182,7 +182,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
     }
 
 
-    public Iterator getStreamNames() throws IOException {
+    public Iterator<String> getStreamNames() throws IOException {
         return fileNames.iterator();
     }
 

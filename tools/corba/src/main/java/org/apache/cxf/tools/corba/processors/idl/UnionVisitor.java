@@ -268,11 +268,11 @@ public class UnionVisitor extends VisitorBase {
     private void processForwardUnionActions(Scope unionScope) {
         if (wsdlVisitor.getDeferredActions() != null) {
             DeferredActionCollection deferredActions = wsdlVisitor.getDeferredActions();
-            List list = deferredActions.getActions(unionScope);
+            List<DeferredAction> list = deferredActions.getActions(unionScope);
             if ((list != null) && !list.isEmpty()) {
                 XmlSchemaType stype = getSchemaType();
                 CorbaTypeImpl ctype = getCorbaType();
-                Iterator iterator = list.iterator();
+                Iterator<DeferredAction> iterator = list.iterator();
                 while (iterator.hasNext()) {
                     SchemaDeferredAction action = (SchemaDeferredAction)iterator.next();
                     action.execute(stype, ctype);

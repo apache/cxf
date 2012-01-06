@@ -21,7 +21,7 @@ package org.apache.cxf.tools.corba.processors.wsdl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +50,7 @@ import org.apache.cxf.binding.corba.wsdl.W3CConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.common.CorbaPrimitiveMap;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
 import org.apache.cxf.tools.corba.common.WSDLUtils;
@@ -73,6 +74,7 @@ import org.apache.ws.commons.schema.XmlSchemaLengthFacet;
 import org.apache.ws.commons.schema.XmlSchemaMaxLengthFacet;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContent;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContentRestriction;
@@ -81,6 +83,7 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.XmlSchemaUse;
+import org.apache.ws.commons.schema.utils.XmlSchemaObjectBase;
 
 public class WSDLToCorbaHelper {
 
@@ -153,13 +156,13 @@ public class WSDLToCorbaHelper {
         return corbaTypeImpl;
     }
 
-    protected List processContainerAsMembers(XmlSchemaParticle particle,
+    protected List<MemberType> processContainerAsMembers(XmlSchemaParticle particle,
                                              QName defaultName,
                                              QName schemaTypeName)
         throws Exception {
         List<MemberType> members = new ArrayList<MemberType>();
 
-        Iterator iterL = null;
+        Iterator<? extends XmlSchemaObjectBase> iterL = null;
         if (particle instanceof XmlSchemaSequence) {
             XmlSchemaSequence scontainer = (XmlSchemaSequence)particle;
             iterL = scontainer.getItems().iterator();
@@ -171,7 +174,7 @@ public class WSDLToCorbaHelper {
             iterL = acontainer.getItems().iterator();
         } else {
             LOG.warning("Unknown particle type " + particle.getClass().getName());
-            iterL = Collections.emptyList().iterator();
+            iterL = new ArrayList<XmlSchemaObjectBase>().iterator();
         }
 
         while (iterL.hasNext()) {
@@ -417,9 +420,8 @@ public class WSDLToCorbaHelper {
         struct.setRepositoryID(REPO_STRING + seqName.getLocalPart().replace('.', '/') + IDL_VERSION);
         struct.setType(schemaTypeName);
 
-        List members = processContainerAsMembers(seq, defaultName, schemaTypeName);
-        for (Iterator iterator = members.iterator(); iterator.hasNext();) {
-            MemberType memberType = (MemberType)iterator.next();
+        List<MemberType> members = processContainerAsMembers(seq, defaultName, schemaTypeName);
+        for (MemberType memberType : members) {
             struct.getMember().add(memberType);
         }
 
@@ -464,9 +466,8 @@ public class WSDLToCorbaHelper {
         type.setQName(allName);
         type.setType(schematypeName);
 
-        List members = processContainerAsMembers(seq, defaultName, schematypeName);
-        for (Iterator iterator = members.iterator(); iterator.hasNext();) {
-            MemberType memberType = (MemberType)iterator.next();
+        List<MemberType> members = processContainerAsMembers(seq, defaultName, schematypeName);
+        for (MemberType memberType : members) {
             type.getMember().add(memberType);
         }
 
@@ -995,7 +996,7 @@ public class WSDLToCorbaHelper {
             } else {
                 uri = defaultName.getNamespaceURI();
             }
-            List attlist2 = processAttributesAsMembers(complex.getAttributes(), uri);
+            List<MemberType> attlist2 = processAttributesAsMembers(complex.getAttributes(), uri);
             for (int i = 0; i < attlist2.size(); i++) {
                 MemberType member = (MemberType)attlist2.get(i);
                 corbaStruct.getMember().add(member);
@@ -1003,10 +1004,10 @@ public class WSDLToCorbaHelper {
         }
 
         if (complex.getParticle() != null) {
-            List members = processContainerAsMembers(complex.getParticle(), defaultName, schematypeName);
+            List<MemberType> members = processContainerAsMembers(complex.getParticle(),
+                                                                 defaultName, schematypeName);
 
-            for (Iterator it = members.iterator(); it.hasNext();) {
-                MemberType memberType = (MemberType)it.next();
+            for (MemberType memberType : members) {
                 corbaStruct.getMember().add(memberType);
             }
         }
@@ -1020,7 +1021,7 @@ public class WSDLToCorbaHelper {
                                                 QName defaultName, Struct corbaStruct, QName schematypeName)
         throws Exception {
         XmlSchemaType base = null;
-        List attrMembers = null;
+        List<MemberType> attrMembers = null;
         CorbaTypeImpl basetype = null;
 
         String uri;
@@ -1138,7 +1139,7 @@ public class WSDLToCorbaHelper {
         corbaStruct.getMember().add(memberType);
 
         // process attributes at complexContent level
-        List attlist1 = processAttributesAsMembers(list, uri);
+        List<MemberType> attlist1 = processAttributesAsMembers(list, uri);
         for (int i = 0; i < attlist1.size(); i++) {
             MemberType member = (MemberType)attlist1.get(i);
             corbaStruct.getMember().add(member);
@@ -1287,8 +1288,8 @@ public class WSDLToCorbaHelper {
         if (complex.getParticle() instanceof XmlSchemaSequence) {
             XmlSchemaSequence seq = (XmlSchemaSequence)complex.getParticle();
 
-            Iterator iterator = seq.getItems().iterator();
-            Iterator iter = seq.getItems().iterator();
+            Iterator<XmlSchemaSequenceMember> iterator = seq.getItems().iterator();
+            Iterator<XmlSchemaSequenceMember> iter = seq.getItems().iterator();
             while (iterator.hasNext()) {
                 if (iter.next() instanceof XmlSchemaElement) {
                     arrayEl = (XmlSchemaElement)iterator.next();
@@ -1366,7 +1367,7 @@ public class WSDLToCorbaHelper {
         corbaUnion.setType(schematypeName);
 
         XmlSchemaSequence stype = (XmlSchemaSequence)complex.getParticle();
-        Iterator it = stype.getItems().iterator();
+        Iterator<XmlSchemaSequenceMember> it = stype.getItems().iterator();
         XmlSchemaParticle st1 = (XmlSchemaParticle)it.next();
         XmlSchemaParticle st2 = (XmlSchemaParticle)it.next();
         XmlSchemaElement discEl = null;
@@ -1384,13 +1385,13 @@ public class WSDLToCorbaHelper {
             .getSchemaType(), null, false);
         corbaUnion.setDiscriminator(disctype.getQName());
 
-        List fields = processContainerAsMembers(choice, defaultName, schematypeName);
+        List<MemberType> fields = processContainerAsMembers(choice, defaultName, schematypeName);
 
         List<String> caselist = new ArrayList<String>();
 
         if (disctype instanceof Enum) {
             Enum corbaenum = (Enum)disctype;
-            Iterator iterator = corbaenum.getEnumerator().iterator();
+            Iterator<Enumerator> iterator = corbaenum.getEnumerator().iterator();
 
             while (iterator.hasNext()) {
                 Enumerator enumerator = (Enumerator)iterator.next();
@@ -1470,7 +1471,7 @@ public class WSDLToCorbaHelper {
         // add to the list of possible recursive types
         recursionMap.put(name, corbaUnion);
 
-        List fields = processContainerAsMembers(choice, defaultName, schematypeName);
+        List<MemberType> fields = processContainerAsMembers(choice, defaultName, schematypeName);
 
         //Choose an Integer as a Discriminator
         List<String> caselist = new ArrayList<String>();
@@ -1497,9 +1498,9 @@ public class WSDLToCorbaHelper {
             return true;
         }
         if (!typeMappingType.getStructOrExceptionOrUnion().isEmpty()) {
-            Iterator i = typeMappingType.getStructOrExceptionOrUnion().iterator();
+            Iterator<CorbaTypeImpl> i = typeMappingType.getStructOrExceptionOrUnion().iterator();
             while (i.hasNext()) {
-                CorbaTypeImpl type = (CorbaTypeImpl)i.next();
+                CorbaTypeImpl type = i.next();
                 if ((corbaName != null) && type.getType() != null && corbaType != null
                     && (corbaName.equals(type.getName()))
                     && (corbaType.getLocalPart().equals(type.getType().getLocalPart()))
@@ -1517,9 +1518,9 @@ public class WSDLToCorbaHelper {
         String corbaName = corbaTypeImpl.getName();
         String corbaType = corbaTypeImpl.getType().getLocalPart();
         if (!typeMappingType.getStructOrExceptionOrUnion().isEmpty()) {
-            Iterator i = typeMappingType.getStructOrExceptionOrUnion().iterator();
+            Iterator<CorbaTypeImpl> i = typeMappingType.getStructOrExceptionOrUnion().iterator();
             while (i.hasNext()) {
-                CorbaTypeImpl type = (CorbaTypeImpl)i.next();
+                CorbaTypeImpl type = i.next();
                 if (corbaName.equals(type.getName())
                     && corbaType.equals(type.getType().getLocalPart())
                     && type instanceof Struct) {
@@ -1584,10 +1585,8 @@ public class WSDLToCorbaHelper {
     }
 
     protected static boolean queryBinding(Definition definition, QName bqname) {
-        Map bindings = definition.getBindings();
-        Iterator i = bindings.values().iterator();
-        while (i.hasNext()) {
-            Binding binding = (Binding)i.next();
+        Collection<Binding> bindings = CastUtils.cast(definition.getBindings().values());
+        for (Binding binding : bindings) {
             if (binding.getQName().getLocalPart().equals(bqname.getLocalPart())) {
                 return true;
             }

@@ -45,7 +45,7 @@ public interface OutputStreamFactory {
         throws IOException;
 
 
-    Iterator getStreamNames() throws IOException;
+    Iterator<String> getStreamNames() throws IOException;
 
 
     void clearStreams();

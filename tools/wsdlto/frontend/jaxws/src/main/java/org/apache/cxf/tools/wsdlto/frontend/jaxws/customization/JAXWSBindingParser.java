@@ -50,7 +50,7 @@ public class JAXWSBindingParser {
         extReg = ext;
     }
 
-    public JAXWSBinding parse(Class parentType, Element element, String namespace) throws WSDLException {
+    public JAXWSBinding parse(Class<?> parentType, Element element, String namespace) throws WSDLException {
         JAXWSBinding jaxwsBinding = (JAXWSBinding)extReg.createExtension(parentType,
                                                                          ToolConstants.JAXWS_BINDINGS);
 

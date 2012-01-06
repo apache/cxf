@@ -287,6 +287,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     }
                     XmlJavaTypeAdapter xjta = cls.getAnnotation(XmlJavaTypeAdapter.class);
                     if (xjta != null) {
+                        @SuppressWarnings("rawtypes")
                         Class<? extends XmlAdapter> c2 = xjta.value();
                         inspectTypeAdapter(c2);
                     }
@@ -300,7 +301,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
     }
 
-    private void inspectTypeAdapter(Class<? extends XmlAdapter> aclass) {
+    private void inspectTypeAdapter(@SuppressWarnings("rawtypes") Class<? extends XmlAdapter> aclass) {
         Class<?> c2 = aclass;
         Type sp = c2.getGenericSuperclass();
         while (!XmlAdapter.class.equals(c2) && c2 != null) {

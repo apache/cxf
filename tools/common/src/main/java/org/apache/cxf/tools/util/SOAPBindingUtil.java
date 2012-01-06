@@ -387,7 +387,7 @@ public final class SOAPBindingUtil {
         return getSoapAddress(extElement);
     }
 
-    public static SoapBody createSoapBody(ExtensionRegistry extReg, Class clz, boolean isSOAP12)
+    public static SoapBody createSoapBody(ExtensionRegistry extReg, Class<?> clz, boolean isSOAP12)
         throws WSDLException {
         ExtensibilityElement extElement = null;
         if (isSOAP12) {
@@ -447,7 +447,7 @@ public final class SOAPBindingUtil {
         return getSoapFault(extElement);
     }
 
-    public static SoapHeader createSoapHeader(ExtensionRegistry extReg, Class clz, boolean isSOAP12)
+    public static SoapHeader createSoapHeader(ExtensionRegistry extReg, Class<?> clz, boolean isSOAP12)
         throws WSDLException {
         ExtensibilityElement extElement = null;
         if (isSOAP12) {

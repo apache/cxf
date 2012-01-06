@@ -111,7 +111,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     private boolean skipJaxbChecks;
     private boolean singleJaxbContext;
-    private Class[] extraClass;
+    private Class<?>[] extraClass;
     
     private boolean validateOutput;
     private boolean validateBeforeWrite;
@@ -125,7 +125,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         singleJaxbContext = useSingleContext;
     }
     
-    public void setExtraClass(Class[] userExtraClass) {
+    public void setExtraClass(Class<?>[] userExtraClass) {
         extraClass = userExtraClass;
     }
     
@@ -273,7 +273,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         throws Exception {
         
         if (cls == JAXBElement.class) {
-            return object != null ? ((JAXBElement)object).getName() : null;
+            return object != null ? ((JAXBElement<?>)object).getName() : null;
         }
         
         XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
@@ -382,7 +382,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
             if (context == null) {
-                Class[] classes = null;
+                Class<?>[] classes = null;
                 if (extraClass != null) {
                     classes = new Class[extraClass.length + 1];
                     classes[0] = type;
@@ -471,7 +471,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         throws JAXBException {
         
         Class<?> objClazz = JAXBElement.class.isAssignableFrom(cls) 
-                            ? ((JAXBElement)obj).getDeclaredType() : cls;
+                            ? ((JAXBElement<?>)obj).getDeclaredType() : cls;
                             
         JAXBContext context = getJAXBContext(objClazz, genericType);
         Marshaller marshaller = context.createMarshaller();
@@ -644,7 +644,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                     List<Object> newList = new ArrayList<Object>(theList.size());
                     for (Object o : theList) {
                         newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(
-                                        ((JAXBElement)o).getValue(), adapter, false));
+                                        ((JAXBElement<?>)o).getValue(), adapter, false));
                     }
                     theList = newList;
                 }
@@ -665,7 +665,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                     theList = newList;
                 }
                 if (origType == Set.class) {
-                    return new HashSet(theList);
+                    return new HashSet<Object>(theList);
                 } else {
                     return theList;
                 }

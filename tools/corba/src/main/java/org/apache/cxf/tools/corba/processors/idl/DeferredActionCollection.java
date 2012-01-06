@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.helpers.CastUtils;
 
 /**
  * Class that holds a fully qualified name as the key that represents
@@ -35,21 +34,18 @@ import org.apache.cxf.helpers.CastUtils;
  */
 
 public final class DeferredActionCollection {    
-    Map<String, List<Object>> deferredActions = new HashMap<String, List<Object>>();
+    Map<String, List<DeferredAction>> deferredActions = new HashMap<String, List<DeferredAction>>();
     public void add(Scope scope, DeferredAction action) {
-        Object obj = deferredActions.get(scope.toString());
-        List<Object> list;
-        if (obj == null) {
-            list = new ArrayList<Object>();
+        List<DeferredAction> list = deferredActions.get(scope.toString());
+        if (list == null) {
+            list = new ArrayList<DeferredAction>();
             deferredActions.put(scope.toString(), list);
-        } else {
-            list = CastUtils.cast((List)obj);
         }
         list.add(action);
     }
     
     public void remove(Scope scope, DeferredAction action) {
-        List list = deferredActions.get(scope.toString());
+        List<DeferredAction> list = deferredActions.get(scope.toString());
         if (list != null) {
             list.remove(action);
         }
@@ -63,7 +59,7 @@ public final class DeferredActionCollection {
         return deferredActions.size();
     }
     
-    public List getActions(Scope scope) {   
+    public List<DeferredAction> getActions(Scope scope) {   
         return deferredActions.get(scope.toString());
     }
 }

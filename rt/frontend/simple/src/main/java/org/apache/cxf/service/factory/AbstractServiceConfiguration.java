@@ -166,11 +166,11 @@ public abstract class AbstractServiceConfiguration {
         return null;        
     }  
  
-    public Class getResponseWrapper(Method selected) {
+    public Class<?> getResponseWrapper(Method selected) {
         return null;
     }
     
-    public Class getRequestWrapper(Method selected) {
+    public Class<?> getRequestWrapper(Method selected) {
         return null;
     }
     public String getResponseWrapperClassName(Method selected) {

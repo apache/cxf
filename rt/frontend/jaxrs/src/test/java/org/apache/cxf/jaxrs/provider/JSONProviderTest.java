@@ -54,6 +54,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -264,7 +265,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tag, (Class)TagVO.class, TagVO.class, TagVO.class.getAnnotations(), 
+        p.writeTo(tag, TagVO.class, TagVO.class, TagVO.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -296,7 +297,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        new JAXBElementProvider().writeTo(tag, (Class)TagVO.class, TagVO.class, 
+        new JAXBElementProvider().writeTo(tag, TagVO.class, TagVO.class, 
                   TagVO.class.getAnnotations(), MediaType.APPLICATION_XML_TYPE, 
                   new MetadataMap<String, Object>(), os);
         Document doc = DOMUtils.readXml(new StringReader(os.toString()));
@@ -320,7 +321,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(book, (Class)Book.class, Book.class, Book.class.getAnnotations(), 
+        p.writeTo(book, Book.class, Book.class, Book.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -336,7 +337,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tag, (Class)TagVO.class, TagVO.class, TagVO.class.getAnnotations(), 
+        p.writeTo(tag, TagVO.class, TagVO.class, TagVO.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -354,7 +355,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+        p.writeTo(tag, TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -369,7 +370,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+        p.writeTo(tag, TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -388,7 +389,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+        p.writeTo(tag, TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -477,7 +478,7 @@ public class JSONProviderTest extends Assert {
             b1 = ((Book[])o)[0];
             b2 = ((Book[])o)[1];
         } else if (type == Set.class) {
-            Set<Book> set = (Set)o;
+            Set<Book> set = CastUtils.cast((Set<?>)o);
             List<Book> books = new ArrayList<Book>(new TreeSet<Book>(set));
             b1 = books.get(0);
             b2 = books.get(1);
@@ -532,9 +533,9 @@ public class JSONProviderTest extends Assert {
         TagVO2 t1 = null;
         TagVO2 t2 = null;
         if (!isArray) {
-            assertEquals(2, ((List)o).size());
-            t1 = (TagVO2)((List)o).get(0);
-            t2 = (TagVO2)((List)o).get(1);
+            assertEquals(2, ((List<?>)o).size());
+            t1 = (TagVO2)((List<?>)o).get(0);
+            t2 = (TagVO2)((List<?>)o).get(1);
         } else {
             assertEquals(2, ((Object[])o).length);
             t1 = (TagVO2)((Object[])o)[0];
@@ -554,7 +555,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+        p.writeTo(tag, TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -584,12 +585,12 @@ public class JSONProviderTest extends Assert {
         InputStream is = getClass().getResourceAsStream(fileName);
         JAXBContext context = JAXBContext.newInstance(new Class[]{Books.class, Book.class});
         Unmarshaller um = context.createUnmarshaller();
-        JAXBElement jaxbEl = um.unmarshal(new StreamSource(is), Books.class);
+        JAXBElement<?> jaxbEl = um.unmarshal(new StreamSource(is), Books.class);
         JSONProvider p = new JSONProvider();
         p.setIgnoreMixedContent(ignore);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(jaxbEl, (Class)JAXBElement.class, JAXBElement.class, JAXBElement.class.getAnnotations(), 
+        p.writeTo(jaxbEl, JAXBElement.class, JAXBElement.class, JAXBElement.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         String s = os.toString();
         assertEquals(data, s);
@@ -606,7 +607,7 @@ public class JSONProviderTest extends Assert {
                             new SuperBook("CXF Rocks", 123L, 124L)));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(books2, (Class)Books2.class, Books2.class, Books2.class.getAnnotations(), 
+        p.writeTo(books2, Books2.class, Books2.class, Books2.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         String s = os.toString();
         String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
@@ -664,7 +665,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tags, (Class)Tags.class, Tags.class, Tags.class.getAnnotations(), 
+        p.writeTo(tags, Tags.class, Tags.class, Tags.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -683,7 +684,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(tags, (Class)Tags.class, Tags.class, Tags.class.getAnnotations(), 
+        p.writeTo(tags, Tags.class, Tags.class, Tags.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -708,7 +709,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(post, (Class)Post.class, Post.class, Post.class.getAnnotations(), 
+        p.writeTo(post, Post.class, Post.class, Post.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
@@ -731,7 +732,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        p.writeTo(many, (Class)ManyTags.class, ManyTags.class, ManyTags.class.getAnnotations(), 
+        p.writeTo(many, ManyTags.class, ManyTags.class, ManyTags.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();

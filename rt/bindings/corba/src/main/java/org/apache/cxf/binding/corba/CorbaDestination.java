@@ -450,7 +450,7 @@ public class CorbaDestination implements MultiplexDestination {
         return ref;
     }
 
-    public String getId(Map contextMap) {
+    public String getId(Map<String, Object> contextMap) {
         String id = null;
         try {
             Current currentPoa = (Current) orb

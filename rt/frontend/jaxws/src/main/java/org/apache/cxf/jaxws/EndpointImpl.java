@@ -99,7 +99,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     private String publishedEndpointUrl;
     private QName endpointName;
     private QName serviceName;
-    private Class implementorClass;
+    private Class<?> implementorClass;
     
     private List<String> schemaLocations;
     private List<AbstractFeature> features;
@@ -201,7 +201,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
      * Gets the class of the implementor.
      * @return the class of the implementor object
      */
-    public Class getImplementorClass() {
+    public Class<?> getImplementorClass() {
         return implementorClass != null ? implementorClass : ClassHelper.getRealClass(implementor);
     }
 
@@ -745,7 +745,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         this.invoker = invoker;
     }
 
-    public void setImplementorClass(Class implementorClass) {
+    public void setImplementorClass(Class<?> implementorClass) {
         this.implementorClass = implementorClass;
     }
     

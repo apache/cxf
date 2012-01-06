@@ -107,7 +107,7 @@ public final class InjectionUtils {
         return !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers());
     }
     
-    public static Type getSuperType(Class<?> serviceClass, TypeVariable var) {
+    public static Type getSuperType(Class<?> serviceClass, TypeVariable<?> var) {
         
         int pos = 0;
         TypeVariable<?>[] vars = var.getGenericDeclaration().getTypeParameters();

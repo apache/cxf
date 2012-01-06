@@ -108,7 +108,7 @@ public final class WSDLTypes {
                             obj.setBinding(bName);
                             // get the repository id of the binding.
                             String repId = null;
-                            Iterator bindIter = binding.getExtensibilityElements().iterator();
+                            Iterator<?> bindIter = binding.getExtensibilityElements().iterator();
                             while (bindIter.hasNext()) {
                                 BindingType type = (BindingType)bindIter.next();
                                 repId = type.getRepositoryID();
@@ -239,7 +239,8 @@ public final class WSDLTypes {
         return corbaTypeImpl;
     }
 
-    public static Union processUnionBranches(Union corbaUnion, List fields, List<String> caselist) {
+    public static Union processUnionBranches(Union corbaUnion, List<MemberType> fields,
+                                             List<String> caselist) {
         int caseIndex = 0;
 
         for (int i = 0; i < fields.size(); i++) {

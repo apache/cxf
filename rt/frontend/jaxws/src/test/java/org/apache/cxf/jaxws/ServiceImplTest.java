@@ -137,7 +137,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         assertNotNull(wsdl1);
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
-        Iterator iter = service.getPorts();
+        Iterator<QName> iter = service.getPorts();
         assertNotNull(iter);
         assertTrue(iter.hasNext());
         assertEquals(PORT_1, iter.next());

@@ -168,7 +168,7 @@ public final class JibxUtil {
                || "void".equals(type);
     }
 
-    public static boolean isSimpleValue(final Class type) {
+    public static boolean isSimpleValue(final Class<?> type) {
         return isSimpleValue(type.getName());
     }
 

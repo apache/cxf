@@ -66,6 +66,7 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2NoRootElement;
@@ -1056,7 +1057,7 @@ public class JAXBElementProviderTest extends Assert {
             b1 = ((Book[])o)[0];
             b2 = ((Book[])o)[1];
         } else if (type == Set.class) {
-            Set<Book> set = (Set)o;
+            Set<Book> set = CastUtils.cast((Set<?>)o);
             List<Book> books = new ArrayList<Book>(new TreeSet<Book>(set));
             b1 = books.get(0);
             b2 = books.get(1);
@@ -1108,9 +1109,9 @@ public class JAXBElementProviderTest extends Assert {
         TagVO2 t1 = null;
         TagVO2 t2 = null;
         if (!isArray) {
-            assertEquals(2, ((List)o).size());
-            t1 = (TagVO2)((List)o).get(0);
-            t2 = (TagVO2)((List)o).get(1);
+            assertEquals(2, ((List<?>)o).size());
+            t1 = (TagVO2)((List<?>)o).get(0);
+            t2 = (TagVO2)((List<?>)o).get(1);
         } else {
             assertEquals(2, ((Object[])o).length);
             t1 = (TagVO2)((Object[])o)[0];
@@ -1276,10 +1277,11 @@ public class JAXBElementProviderTest extends Assert {
             
         }
         
-        public Map getProperties() {
+        public Map<String, Object> getProperties() {
             return props;
         }
         
+        @SuppressWarnings("rawtypes")
         public <A extends XmlAdapter> A getAdapter(Class<A> type) {
             // TODO Auto-generated method stub
             return null;
@@ -1353,11 +1355,13 @@ public class JAXBElementProviderTest extends Assert {
             
         }
 
+        @SuppressWarnings("rawtypes")
         public void setAdapter(XmlAdapter adapter) {
             // TODO Auto-generated method stub
             
         }
 
+        @SuppressWarnings("rawtypes")
         public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
             // TODO Auto-generated method stub
             

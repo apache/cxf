@@ -261,7 +261,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         return null;
     }
 
-    private JAXBBeanInfo findFromTypeAdapter(Class<? extends XmlAdapter> aclass) {
+    private JAXBBeanInfo findFromTypeAdapter(@SuppressWarnings("rawtypes") 
+                                             Class<? extends XmlAdapter> aclass) {
         Class<?> c2 = aclass;
         Type sp = c2.getGenericSuperclass();
         while (!XmlAdapter.class.equals(c2) && c2 != null) {

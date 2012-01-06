@@ -383,11 +383,11 @@ public class JAXBDataBinding extends AbstractDataBinding
         return tns;
     }
 
-    public void setExtraClass(Class[] userExtraClass) {
+    public void setExtraClass(Class<?>[] userExtraClass) {
         extraClass = userExtraClass;
     }
 
-    public Class[] getExtraClass() {
+    public Class<?>[] getExtraClass() {
         return extraClass;
     }
 

@@ -122,7 +122,7 @@ public class StaxBuilder {
     private JDOMFactory factory;
 
 
-    private Map additionalNamespaces;
+    private Map<String, String> additionalNamespaces;
     // This is set to 'true' when we are reading the middle of a stream,
     // and need to stop at the end of the element we start.
     private boolean isReadingMidStream;
@@ -133,16 +133,16 @@ public class StaxBuilder {
     public StaxBuilder() {
     }
 
-    public StaxBuilder(Map namespaces) {
+    public StaxBuilder(Map<String, String> namespaces) {
         this.additionalNamespaces = namespaces;
     }
 
 
-    public Map getAdditionalNamespaces() {
+    public Map<String, String>  getAdditionalNamespaces() {
         return additionalNamespaces;
     }
 
-    public void setAdditionalNamespaces(Map additionalNamespaces) {
+    public void setAdditionalNamespaces(Map<String, String>  additionalNamespaces) {
         this.additionalNamespaces = additionalNamespaces;
     }
 
@@ -325,9 +325,9 @@ public class StaxBuilder {
                 if (current == null) { // at root
                     doc.setRootElement(newElem);
                     if (additionalNamespaces != null) {
-                        for (Iterator iter = additionalNamespaces.keySet().iterator(); iter.hasNext();) {
-                            String prefix = (String)iter.next();
-                            String uri = (String)additionalNamespaces.get(prefix);
+                        for (Iterator<String> iter = additionalNamespaces.keySet().iterator(); iter.hasNext();) {
+                            String prefix = iter.next();
+                            String uri = additionalNamespaces.get(prefix);
 
                             newElem.addNamespaceDeclaration(Namespace.getNamespace(prefix, uri));
                         }

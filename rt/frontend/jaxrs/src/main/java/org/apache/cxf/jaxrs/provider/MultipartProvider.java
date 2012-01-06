@@ -55,6 +55,7 @@ import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -254,17 +255,16 @@ public class MultipartProvider extends AbstractConfigurableProvider
         handlers.get(0).getDataHandler().writeTo(os);
     }
     
-    @SuppressWarnings("unchecked")
     private List<Attachment> convertToDataHandlers(Object obj,
                                                    Class<?> type, Type genericType,                          
                                                    Annotation[] anns, MediaType mt) {
         if (Map.class.isAssignableFrom(obj.getClass())) {
-            Map<Object, Object> objects = (Map)obj;
+            Map<Object, Object> objects = CastUtils.cast((Map<?, ?>)obj);
             List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
             int i = 0;
             for (Iterator<Map.Entry<Object, Object>> iter = objects.entrySet().iterator(); 
                 iter.hasNext();) {
-                Map.Entry entry = iter.next();
+                Map.Entry<Object, Object> entry = iter.next();
                 Object value = entry.getValue();
                 Attachment handler = createDataHandler(value, value.getClass(), value.getClass(), 
                                                        new Annotation[]{},
@@ -277,7 +277,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         } else {
             String rootMediaType = getRootMediaType(anns, mt); 
             if (List.class.isAssignableFrom(obj.getClass())) {
-                return getAttachments((List)obj, rootMediaType);
+                return getAttachments((List<?>)obj, rootMediaType);
             } else {
                 if (MultipartBody.class.isAssignableFrom(type)) {
                     List<Attachment> atts = ((MultipartBody)obj).getAllAttachments();

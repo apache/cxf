@@ -58,7 +58,6 @@ public class CollectionTest extends AbstractAegisTest {
         tm.setTypeCreator(creator);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testType() throws Exception {
         Method m = CollectionService.class.getMethod("getStrings", new Class[0]);
@@ -78,7 +77,6 @@ public class CollectionTest extends AbstractAegisTest {
         assertTrue(type.getTypeClass().isAssignableFrom(String.class));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testRecursiveCollections() throws Exception {
         Method m = CollectionService.class.getMethod("getStringCollections", new Class[0]);
@@ -105,7 +103,6 @@ public class CollectionTest extends AbstractAegisTest {
         assertTrue(type.getTypeClass().isAssignableFrom(String.class));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testPDType() throws Exception {
         PropertyDescriptor pd = Introspector.getBeanInfo(CollectionDTO.class, Object.class)

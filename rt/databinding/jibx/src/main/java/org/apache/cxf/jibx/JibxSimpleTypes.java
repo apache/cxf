@@ -169,13 +169,13 @@ public final class JibxSimpleTypes {
         return value.toString();
     }
 
-    public static boolean isSimpleType(final Class type) {
+    public static boolean isSimpleType(final Class<?> type) {
         String jtype = type.getName();
         return simplePrimitiveTypeMap.containsKey(jtype) || simpleObjectTypeMap.containsKey(jtype)
                || "void".equals(jtype);
     }
 
-    public static QName schemaType(final Class type) {
+    public static QName schemaType(final Class<?> type) {
         String jtype = type.getName();
         QName stype = (QName)simplePrimitiveTypeMap.get(jtype);
         if (stype == null) {

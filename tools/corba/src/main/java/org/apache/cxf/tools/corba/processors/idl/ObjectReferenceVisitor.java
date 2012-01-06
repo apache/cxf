@@ -38,6 +38,7 @@ import antlr.collections.AST;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
 import org.apache.cxf.binding.corba.wsdl.Object;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
@@ -367,20 +368,16 @@ public class ObjectReferenceVisitor extends VisitorBase {
         // We need to find the binding which corresponds with the given repository ID.
         // This is specified in the schema definition for a custom endpoint
         // reference type.
-        Collection bindings = wsdlDef.getBindings().values();
+        Collection<Binding> bindings = CastUtils.cast(wsdlDef.getBindings().values());
         if (bindings.isEmpty() && !wsdlVisitor.getModuleToNSMapper().isDefaultMapping()) {
             // If we are not using the default mapping, then the binding definitions are not
             // located in the current Definition object, but nistead in the root Definition
-            bindings = wsdlVisitor.getDefinition().getBindings().values();
+            bindings = CastUtils.cast(wsdlVisitor.getDefinition().getBindings().values());
         }
 
-        for (Iterator iter = bindings.iterator(); iter.hasNext();) {
-            Binding b = (Binding)iter.next();
-            List extElements = b.getExtensibilityElements();
-
-            for (Iterator extIter = extElements.iterator(); extIter.hasNext();) {
-                java.lang.Object element = extIter.next();
-
+        for (Binding b : bindings) {
+            List<?> extElements = b.getExtensibilityElements();
+            for (java.lang.Object element: extElements) {
                 if (element instanceof BindingType) {
                     BindingType bt = (BindingType)element;
                     if (bt.getRepositoryID().equals(repositoryID)) {

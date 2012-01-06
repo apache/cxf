@@ -192,7 +192,7 @@ public class ManagedConnectionImpl
     private Object createConnectionProxy(Object obj, CXFConnectionRequestInfo cri, Subject subject)
         throws ResourceException {
 
-        Class classes[] = {Connection.class, BindingProvider.class, cri.getInterface()};
+        Class<?> classes[] = {Connection.class, BindingProvider.class, cri.getInterface()};
 
         return Proxy.newProxyInstance(cri.getInterface().getClassLoader(), classes, 
                                       createInvocationHandler(obj, subject));

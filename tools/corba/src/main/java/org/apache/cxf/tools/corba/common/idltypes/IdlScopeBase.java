@@ -21,7 +21,6 @@ package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
@@ -29,15 +28,15 @@ import java.util.Vector;
 
 
 public abstract class IdlScopeBase extends IdlDefnImplBase {
-    private List<Object> defns;
-    private Stack<Object> hold;
-    private List<Object> park;
+    private List<IdlDefn> defns;
+    private Stack<IdlDefn> hold;
+    private List<IdlDefn> park;
 
     protected IdlScopeBase(IdlScopeBase parent, String name) {
         super(parent, name);
-        defns = new Vector<Object>();
-        hold = new Stack<Object>();
-        park = new Vector<Object>();
+        defns = new Vector<IdlDefn>();
+        hold = new Stack<IdlDefn>();
+        park = new Vector<IdlDefn>();
     }
 
     public IdlDefn addToScope(IdlDefn def) {
@@ -80,10 +79,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     public IdlDefn lookup(String nm, boolean undefined) {
         IdlDefn result = null;
-        Iterator it = park.iterator();       
-
-        while (it.hasNext()) {
-            IdlDefn nextDef = (IdlDefn)it.next();
+        for (IdlDefn nextDef : park) {
             if (nextDef.localName().equals(nm)) {
                 result = nextDef;
                 break;
@@ -91,10 +87,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
         }
 
         if (result == null) {
-            it = hold.iterator();      
-
-            while (it.hasNext()) {
-                IdlDefn nextDef = (IdlDefn)it.next();
+            for (IdlDefn nextDef : hold) {
                 if (nextDef.localName().equals(nm)) {
                     result = nextDef;
                     break;
@@ -106,10 +99,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
             return result;
         }
         
-        it = defns.iterator();
-
-        while (it.hasNext()) {
-            IdlDefn nextDef = (IdlDefn)it.next();
+        for (IdlDefn nextDef : defns) {
             if (nextDef.localName().equals(nm)) {
                 result = nextDef;
                 break;
@@ -188,9 +178,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
         }
         doneDefn.add(this);
 
-        Iterator it = definitions().iterator();
-        while (it.hasNext()) {
-            IdlDefn defn = (IdlDefn)it.next();
+        for (IdlDefn defn : definitions()) {
             IdlScopeBase circularScope = defn.getCircularScope(startScope, doneDefn);
             if (circularScope != null) {
                 return circularScope;
@@ -203,20 +191,17 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
 
     public void write(PrintWriter pw) {
-        Iterator it = defns.iterator();
-
-        while (it.hasNext()) {
-            IdlDefn defn = (IdlDefn)it.next();
+        for (IdlDefn defn : defns) {
             defn.write(pw);
         }
     }
 
 
     public void writeFwd(PrintWriter pw) {
-        ListIterator it = defns.listIterator(defns.size());
+        ListIterator<IdlDefn> it = defns.listIterator(defns.size());
 
         while (it.hasPrevious()) {
-            IdlDefn defn = (IdlDefn)it.previous();
+            IdlDefn defn = it.previous();
             defn.writeFwd(pw);
         }
     }
@@ -224,25 +209,19 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     public void flush() {
         promoteParkedToScope();
-        
-        Iterator it = definitions().iterator();
-        while (it.hasNext()) {
-            IdlDefn defn = (IdlDefn)it.next();
+        for (IdlDefn defn : definitions()) {
             defn.flush();
         }
     }
 
 
-    protected Collection definitions() {
+    protected Collection<IdlDefn> definitions() {
         return defns;
     }
 
 
     private void promoteParkedToScope() {
-        Iterator it = park.iterator();
-
-        while (it.hasNext()) {
-            IdlDefn nextDef = (IdlDefn)it.next();
+        for (IdlDefn nextDef : park) {
             defns.add(nextDef);
         }
 

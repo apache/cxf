@@ -33,7 +33,7 @@ public class ErrorVisitor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ErrorVisitor.class);
 
-    private final Set<Object> errors = new HashSet<Object>();
+    private final Set<CommandLineError> errors = new HashSet<CommandLineError>();
 
     public static class MissingOption implements CommandLineError {
         private final Option o;
@@ -167,7 +167,7 @@ public class ErrorVisitor {
         }
     }
 
-    public Collection getErrors() {
+    public Collection<CommandLineError> getErrors() {
         return errors;
     }
 

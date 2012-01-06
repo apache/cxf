@@ -21,7 +21,6 @@ package org.apache.cxf.tools.corba.common.idltypes;
 
 
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -60,9 +59,7 @@ public abstract class IdlStructBase extends IdlScopeBase implements IdlType {
             return true;
         }
         boolean hasNonEmptyMembers = false;
-        Iterator it = definitions().iterator();
-        while (it.hasNext()) {
-            IdlDefn defn = (IdlDefn)it.next();
+        for (IdlDefn defn : definitions()) {
             if (!defn.isEmptyDef()) {
                 hasNonEmptyMembers = true;
                 break;

@@ -44,9 +44,9 @@ public final class IdlEnum extends IdlScopeBase implements IdlType {
         pw.println(indent() + "enum " + localName() + " {");
         indentMore();
 
-        Collection enums = definitions();
+        Collection<IdlDefn> enums = definitions();
         int needComma = enums.size() - 1;
-        Iterator it = enums.iterator();
+        Iterator<IdlDefn> it = enums.iterator();
 
         while (it.hasNext()) {
             IdlEnumerator en = (IdlEnumerator)it.next();

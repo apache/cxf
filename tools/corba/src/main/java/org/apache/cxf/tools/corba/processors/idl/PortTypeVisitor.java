@@ -20,9 +20,9 @@
 package org.apache.cxf.tools.corba.processors.idl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -205,7 +205,7 @@ public class PortTypeVisitor extends VisitorBase {
     private void handleDeferredActions(DeferredActionCollection deferredActions,
                                        Scope scopedName,
                                        AST identifierNode) {
-        List list = deferredActions.getActions(scopedName);
+        List<DeferredAction> list = deferredActions.getActions(scopedName);
         if ((list != null) && !list.isEmpty()) {
             XmlSchemaType stype = null;
             CorbaTypeImpl ctype = null;
@@ -219,9 +219,7 @@ public class PortTypeVisitor extends VisitorBase {
                 stype = visitor.getSchemaType();
                 ctype = visitor.getCorbaType();
             }
-            Iterator iterator = list.iterator();
-            while (iterator.hasNext()) {
-                DeferredAction action = (DeferredAction) iterator.next();
+            for (DeferredAction action : list) {
                 if (action instanceof SchemaDeferredAction
                     && (stype != null) && (ctype != null)) {
                     SchemaDeferredAction schemaAction = (SchemaDeferredAction) action;
@@ -266,10 +264,8 @@ public class PortTypeVisitor extends VisitorBase {
     }
 
     private boolean queryBinding(QName bqname) {
-        Map bindings = definition.getBindings();
-        Iterator i = bindings.values().iterator();
-        while (i.hasNext()) {
-            Binding binding = (Binding)i.next();
+        Collection<Binding> bindings = CastUtils.cast(definition.getBindings().values());
+        for (Binding binding : bindings) {
             if (binding.getQName().getLocalPart().equals(bqname.getLocalPart())) {
                 return true;
             }
@@ -445,7 +441,7 @@ public class PortTypeVisitor extends VisitorBase {
     }
 
     private BindingType findCorbaBinding(Binding binding) {
-        java.util.List list = binding.getExtensibilityElements();
+        List<?> list = binding.getExtensibilityElements();
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof BindingType) {
                 return (BindingType) list.get(i);

@@ -82,7 +82,7 @@ public class JAXWSProfileTest extends Assert {
         assertNotNull(processor);
         assertTrue(processor instanceof WSDLToJavaProcessor);
 
-        AbstractWSDLBuilder<?> builder = profile.getWSDLBuilder();
+        AbstractWSDLBuilder builder = profile.getWSDLBuilder();
         assertNotNull(builder);
         assertTrue(builder instanceof JAXWSDefinitionBuilder);
 
