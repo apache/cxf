@@ -419,6 +419,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, signedResults);
+        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
         for (WSSecurityEngineResult result : signedResults) {
             List<WSDataRef> sl = 
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
