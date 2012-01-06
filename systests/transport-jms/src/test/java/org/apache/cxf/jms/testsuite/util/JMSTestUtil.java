@@ -89,7 +89,7 @@ public final class JMSTestUtil {
     private static void loadTestCases() throws Exception {
         JAXBContext context = JAXBContext.newInstance("org.apache.cxf.testsuite.testcase");
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        JAXBElement e = (JAXBElement)unmarshaller.unmarshal(new JMSTestUtil().getClass()
+        JAXBElement<?> e = (JAXBElement<?>)unmarshaller.unmarshal(new JMSTestUtil().getClass()
             .getResource("/org/apache/cxf/jms/testsuite/util/testcases.xml"));
         testcases = (TestCasesType)e.getValue();
         for (TestCaseType tct : testcases.getTestCase()) {

@@ -23,7 +23,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.wsdl.Binding;
@@ -105,9 +104,7 @@ public final class SOAPBindingUtil {
     }
 
     public static boolean isSOAPBinding(Binding binding) {
-        Iterator ite = binding.getExtensibilityElements().iterator();
-        while (ite.hasNext()) {
-            Object obj = ite.next();
+        for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
                 return true;
             }
@@ -116,9 +113,7 @@ public final class SOAPBindingUtil {
     }
 
     public static String getBindingStyle(Binding binding) {
-        Iterator ite = binding.getExtensibilityElements().iterator();
-        while (ite.hasNext()) {
-            Object obj = ite.next();
+        for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
                 return getSoapBinding(obj).getStyle();
             }
@@ -147,9 +142,7 @@ public final class SOAPBindingUtil {
     public static String getSOAPOperationStyle(BindingOperation bop) {
         String style = "";
         if (bop != null) {
-            Iterator ite = bop.getExtensibilityElements().iterator();
-            while (ite.hasNext()) {
-                Object obj = ite.next();
+            for (Object obj : bop.getExtensibilityElements()) {
                 if (isSOAPOperation(obj)) {
                     style = getSoapOperation(obj).getStyle();
                     break;
@@ -162,9 +155,7 @@ public final class SOAPBindingUtil {
     public static SoapBody getBindingInputSOAPBody(BindingOperation bop) {
         BindingInput bindingInput = bop.getBindingInput();
         if (bindingInput != null) {
-            Iterator ite = bindingInput.getExtensibilityElements().iterator();
-            while (ite.hasNext()) {
-                Object obj = ite.next();
+            for (Object obj : bindingInput.getExtensibilityElements()) {
                 if (isSOAPBody(obj)) {
                     return getSoapBody(obj);
                 }
@@ -177,9 +168,7 @@ public final class SOAPBindingUtil {
     public static SoapBody getBindingOutputSOAPBody(BindingOperation bop) {
         BindingOutput bindingOutput = bop.getBindingOutput();
         if (bindingOutput != null) {
-            Iterator ite = bindingOutput.getExtensibilityElements().iterator();
-            while (ite.hasNext()) {
-                Object obj = ite.next();
+            for (Object obj : bindingOutput.getExtensibilityElements()) {
                 if (isSOAPBody(obj)) {
                     return getSoapBody(obj);
                 }
@@ -248,9 +237,7 @@ public final class SOAPBindingUtil {
     public static SoapHeader getBindingInputSOAPHeader(BindingOperation bop) {
         BindingInput bindingInput = bop.getBindingInput();
         if (bindingInput != null) {
-            Iterator ite = bindingInput.getExtensibilityElements().iterator();
-            while (ite.hasNext()) {
-                Object obj = ite.next();
+            for (Object obj : bindingInput.getExtensibilityElements()) {
                 if (isSOAPHeader(obj)) {
                     return getProxy(SoapHeader.class, obj);
                 }
@@ -263,9 +250,7 @@ public final class SOAPBindingUtil {
     public static SoapHeader getBindingOutputSOAPHeader(BindingOperation bop) {
         BindingOutput bindingOutput = bop.getBindingOutput();
         if (bindingOutput != null) {
-            Iterator ite = bindingOutput.getExtensibilityElements().iterator();
-            while (ite.hasNext()) {
-                Object obj = ite.next();
+            for (Object obj : bindingOutput.getExtensibilityElements()) {
                 if (isSOAPHeader(obj)) {
                     return getProxy(SoapHeader.class, obj);
                 }
@@ -297,15 +282,13 @@ public final class SOAPBindingUtil {
 
     public static List<SoapFault> getBindingOperationSoapFaults(BindingOperation bop) {
         List<SoapFault> faults = new ArrayList<SoapFault>();
-        Map bindingFaults = bop.getBindingFaults();
-        for (Object obj : bindingFaults.values()) {
+        for (Object obj : bop.getBindingFaults().values()) {
             if (!(obj instanceof BindingFault)) {
                 continue;
             }
             BindingFault faultElement = (BindingFault) obj;
-            Iterator ite = faultElement.getExtensibilityElements().iterator();
-            while (ite.hasNext()) {
-                SoapFault fault = getSoapFault(ite.next());
+            for (Object flt : faultElement.getExtensibilityElements()) {
+                SoapFault fault = getSoapFault(flt);
                 if (fault != null) {
                     faults.add(fault);
                 }
@@ -322,12 +305,11 @@ public final class SOAPBindingUtil {
     }
 
     public static boolean isMixedStyle(Binding binding) {
-        Iterator ite = binding.getExtensibilityElements().iterator();
         String bindingStyle = "";
         String previousOpStyle = "";
         String style = "";
-        while (ite.hasNext()) {
-            Object obj = ite.next();
+        
+        for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
                 SoapBinding soapBinding = getSoapBinding(obj);
                 bindingStyle = soapBinding.getStyle();
@@ -336,13 +318,9 @@ public final class SOAPBindingUtil {
                 }
             }
         }
-        Iterator ite2 = binding.getBindingOperations().iterator();
-        while (ite2.hasNext()) {
-            BindingOperation bop = (BindingOperation)ite2.next();
-            Iterator ite3 = bop.getExtensibilityElements().iterator();
-            while (ite3.hasNext()) {
-                Object obj = ite3.next();
-
+        for (Object bobj : binding.getBindingOperations()) {
+            BindingOperation bop = (BindingOperation)bobj;
+            for (Object obj : bop.getExtensibilityElements()) {
                 if (isSOAPOperation(obj)) {
                     SoapOperation soapOperation = getSoapOperation(obj);
                     style = soapOperation.getStyle();
@@ -369,9 +347,7 @@ public final class SOAPBindingUtil {
 
             }
         }
-
         return false;
-
     }
 
     public static String getCanonicalBindingStyle(Binding binding) {
@@ -379,8 +355,8 @@ public final class SOAPBindingUtil {
         if (!StringUtils.isEmpty(bindingStyle)) {
             return bindingStyle;
         }
-        for (Iterator ite2 = binding.getBindingOperations().iterator(); ite2.hasNext();) {
-            BindingOperation bindingOp = (BindingOperation)ite2.next();
+        for (Object bobj : binding.getBindingOperations()) {
+            BindingOperation bindingOp = (BindingOperation)bobj;
             String bopStyle = getSOAPOperationStyle(bindingOp);
             if (!StringUtils.isEmpty(bopStyle)) {
                 return bopStyle;
@@ -488,7 +464,7 @@ public final class SOAPBindingUtil {
 
 
     public static void addSOAPNamespace(Definition definition, boolean isSOAP12) {
-        Map namespaces = definition.getNamespaces();
+        Map<?, ?> namespaces = definition.getNamespaces();
         if (isSOAP12
             && !namespaces.values().contains(WSDLConstants.NS_SOAP12)) {
             definition.addNamespace("soap12", WSDLConstants.NS_SOAP12);

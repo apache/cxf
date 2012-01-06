@@ -1017,8 +1017,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             assertEquals("StructWithAny soap element text nodes don't match",
                 soapA.getValue(), soapB.getValue());
             
-            Iterator itExp = soapA.getChildElements();
-            Iterator itGen = soapB.getChildElements();
+            Iterator<?> itExp = soapA.getChildElements();
+            Iterator<?> itGen = soapB.getChildElements();
             while (itExp.hasNext()) {
                 if (!itGen.hasNext()) {
                     fail("Incorrect number of child elements inside any");

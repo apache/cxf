@@ -255,7 +255,7 @@ public class BookStore {
     
     @GET
     @Path("wrongparametertype")
-    public void wrongParameterType(@QueryParam("p") Map p) {
+    public void wrongParameterType(@QueryParam("p") Map<?, ?> p) {
         throw new IllegalStateException("This op is not expected to be invoked");
     }
     

@@ -139,15 +139,6 @@ public abstract class AbstractGreeterImpl implements Greeter {
         /*not called */
     }
     
-    public Future<?> testDocLitFaultAsync(String faultType, AsyncHandler ah) {  
-        return null; 
-        /*not called */
-    }
-    
-    public Future<?> testDocLitBareAsync(String bare, AsyncHandler ah) {
-        return null;
-        /* not called */
-    }
     
     public Response<BareDocumentResponse> testDocLitBareAsync(String bare) {
         return null;
@@ -185,7 +176,6 @@ public abstract class AbstractGreeterImpl implements Greeter {
     }
 
     public String testNillable(String nillElem, int intElem) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -199,5 +189,9 @@ public abstract class AbstractGreeterImpl implements Greeter {
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
         return null;
     }
-    
+    public Future<?> testDocLitFaultAsync(String faultType,
+                                          AsyncHandler<TestDocLitFaultResponse> asyncHandler) {
+        return null;
+    }
+
 }

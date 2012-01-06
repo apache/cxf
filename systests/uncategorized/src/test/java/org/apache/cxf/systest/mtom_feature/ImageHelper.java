@@ -39,9 +39,9 @@ public final class ImageHelper {
 
         BufferedImage bufImage = convertToBufferedImage(image);
         ImageWriter writer = null;
-        Iterator i = ImageIO.getImageWritersByMIMEType(type);
+        Iterator<ImageWriter> i = ImageIO.getImageWritersByMIMEType(type);
         if (i.hasNext()) {
-            writer = (ImageWriter)i.next();
+            writer = i.next();
         }
         if (writer != null) {
             ImageOutputStream stream = null;

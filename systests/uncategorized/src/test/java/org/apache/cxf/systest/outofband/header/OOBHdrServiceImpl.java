@@ -103,15 +103,15 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
         boolean success = false;
         MessageContext ctx = context == null ? null : context.getMessageContext();
         if (ctx.containsKey(Header.HEADER_LIST)) {
-            List oobHdr = (List) ctx.get(Header.HEADER_LIST);
-            Iterator iter = oobHdr.iterator();
+            List<?> oobHdr = (List<?>) ctx.get(Header.HEADER_LIST);
+            Iterator<?> iter = oobHdr.iterator();
             while (iter.hasNext()) {
                 Object hdr = iter.next();
                 if (hdr instanceof Header && ((Header) hdr).getObject() instanceof Node) {
                     Header hdr1 = (Header) hdr;
                     //System.out.println("Node conains : " + hdr1.getObject().toString());
                     try {
-                        JAXBElement job = (JAXBElement) JAXBContext.newInstance(ObjectFactory.class)
+                        JAXBElement<?> job = (JAXBElement<?>) JAXBContext.newInstance(ObjectFactory.class)
                             .createUnmarshaller()
                             .unmarshal((Node) hdr1.getObject());
                         OutofBandHeader ob = (OutofBandHeader) job.getValue();

@@ -21,7 +21,6 @@ package org.apache.cxf.tools.misc.processor;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Iterator;
 import java.util.Map;
 import javax.wsdl.Binding;
 import javax.wsdl.Port;
@@ -33,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.misc.processor.address.Address;
@@ -43,9 +43,9 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
 
     private static final String NEW_FILE_NAME_MODIFIER = "-service";
 
-    private Map services;
+    private Map<QName, Service> services;
     private Service service;
-    private Map ports;
+    private Map<String, Port> ports;
     private Port port;
     private Binding binding;
 
@@ -67,13 +67,11 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isServiceExisted() {
-        services = wsdlDefinition.getServices();
+        services = CastUtils.cast(wsdlDefinition.getServices());
         if (services == null) {
             return false;
         }
-        Iterator it = services.keySet().iterator();
-        while (it.hasNext()) {
-            QName serviceQName = (QName)it.next();
+        for (QName serviceQName: services.keySet()) {
             String serviceName = serviceQName.getLocalPart();
             if (serviceName.equals(env.get(ToolConstants.CFG_SERVICE))) {
                 service = (Service)services.get(serviceQName);
@@ -84,15 +82,13 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isPortExisted() {
-        ports = service.getPorts();
+        ports = CastUtils.cast(service.getPorts());
         if (ports == null) {
             return false;
         }
-        Iterator it = ports.keySet().iterator();
-        while (it.hasNext()) {
-            String portName = (String)it.next();
+        for (String portName: ports.keySet()) {
             if (portName.equals(env.get(ToolConstants.CFG_PORT))) {
-                port = (Port)ports.get(portName);
+                port = ports.get(portName);
                 break;
             }
         }
@@ -100,17 +96,15 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isBindingExisted() {
-        Map bindings = wsdlDefinition.getBindings();
+        Map<QName, Binding> bindings = CastUtils.cast(wsdlDefinition.getBindings());
         if (bindings == null) {
             return false;
         }
-        Iterator it = bindings.keySet().iterator();
-        while (it.hasNext()) {
-            QName bindingQName = (QName)it.next();
+        for (QName bindingQName: bindings.keySet()) {
             String bindingName = bindingQName.getLocalPart();
             String attrBinding = (String)env.get(ToolConstants.CFG_BINDING_ATTR);
             if (attrBinding.equals(bindingName)) {
-                binding = (Binding)bindings.get(bindingQName);
+                binding = bindings.get(bindingQName);
             }
         }
         return (binding == null) ? false : true;

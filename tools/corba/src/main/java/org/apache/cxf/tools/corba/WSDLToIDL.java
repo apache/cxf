@@ -52,7 +52,7 @@ public class WSDLToIDL extends AbstractCXFToolContainer {
         super(TOOL_NAME, toolspec);
     }
 
-    private Set getArrayKeys() {
+    private Set<String> getArrayKeys() {
         return new HashSet<String>();
     }
 

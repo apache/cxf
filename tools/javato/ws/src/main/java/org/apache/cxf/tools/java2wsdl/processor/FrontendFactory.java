@@ -38,6 +38,8 @@ public final class FrontendFactory {
     private static FrontendFactory instance;
     private Class<?> serviceClass;
     private List<Method> wsMethods;
+    
+    @SuppressWarnings("unchecked")
     private Class<? extends Annotation>[] annotations 
         = new Class[] {SOAPBinding.class,
                        WebService.class,

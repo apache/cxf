@@ -135,10 +135,10 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
     private Collection<Import> getImports(final Definition wsdlDef) {
         Collection<Import> importList = new ArrayList<Import>();
-        Map imports = wsdlDef.getImports();
-        for (Iterator iter = imports.keySet().iterator(); iter.hasNext();) {
+        Map<?, ?> imports = wsdlDef.getImports();
+        for (Iterator<?> iter = imports.keySet().iterator(); iter.hasNext();) {
             String uri = (String)iter.next();
-            List<Import> lst = CastUtils.cast((List)imports.get(uri));
+            List<Import> lst = CastUtils.cast((List<?>)imports.get(uri));
             importList.addAll(lst);
         }
         return importList;
@@ -257,9 +257,9 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     private void addServices(final Definition wsdlDef) {
-        Iterator sNames = wsdlDef.getServices().keySet().iterator();
+        Iterator<QName> sNames = CastUtils.cast(wsdlDef.getServices().keySet().iterator());
         while (sNames.hasNext()) {
-            QName sName = (QName) sNames.next();
+            QName sName = sNames.next();
             services.put(sName, definition.getService(sName));
         }
     }
@@ -279,9 +279,8 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         if (service.getPorts().values().size() == 0) {
             throw new ToolException("Service " + service.getQName() + " does not contain any usable ports");
         }
-        Iterator portIte = service.getPorts().values().iterator();
-        while (portIte.hasNext()) {
-            Port port = (Port)portIte.next();
+        Collection<Port> ports = CastUtils.cast(service.getPorts().values());
+        for (Port port : ports) {
             Binding binding = port.getBinding();
             bindings.put(binding.getQName(), getXNode(service, port));
             if (WSDLConstants.NS_WSDL11.equals(binding.getQName().getNamespaceURI())) {
@@ -296,8 +295,8 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
 
     private Map<QName, Operation> getOperations(PortType portType) {
         Map<QName, Operation> operations = new HashMap<QName, Operation>();
-        for (Iterator iter = portType.getOperations().iterator(); iter.hasNext();) {
-            Operation op = (Operation) iter.next();
+        Collection<Operation> pops = CastUtils.cast(portType.getOperations());
+        for (Operation op : pops) {
             operations.put(new QName(portType.getQName().getNamespaceURI(), op.getName()), op);
         }
         return operations;
@@ -435,8 +434,8 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
             XNode vPortTypeNode = getXNode(binding.getPortType());
             vPortTypeNode.setFailurePoint(vBindingNode);
             vNodes.add(vPortTypeNode);
-            for (Iterator iter = binding.getBindingOperations().iterator(); iter.hasNext();) {
-                BindingOperation bop = (BindingOperation) iter.next();
+            Collection<BindingOperation> bops = CastUtils.cast(binding.getBindingOperations());
+            for (BindingOperation bop : bops) {
                 XNode vOpNode = getOperationXNode(vPortTypeNode, bop.getName());
                 XNode vBopNode = getOperationXNode(vBindingNode, bop.getName());
                 vOpNode.setFailurePoint(vBopNode);
@@ -457,7 +456,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
                         vNodes.add(vOutputNode);
                     }
                 }
-                for (Iterator iter1 = bop.getBindingFaults().keySet().iterator(); iter1.hasNext();) {
+                for (Iterator<?> iter1 = bop.getBindingFaults().keySet().iterator(); iter1.hasNext();) {
                     String faultName = (String) iter1.next();
                     XNode vFaultNode = getFaultXNode(vOpNode, faultName);
                     vFaultNode.setFailurePoint(getFaultXNode(vBopNode, faultName));
@@ -483,7 +482,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     private void collectValidationPointsForMessages() {
         for (QName msgName : messageRefNames) {
             javax.wsdl.Message message = getMessage(msgName);
-            for (Iterator iter = message.getParts().values().iterator(); iter.hasNext();) {
+            for (Iterator<?> iter = message.getParts().values().iterator(); iter.hasNext();) {
                 Part part = (Part) iter.next();
                 QName elementName = part.getElementName();
                 QName typeName = part.getTypeName();
@@ -574,7 +573,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
                         messageRefNames.add(outMsg.getQName());
                     }
                 }
-                for (Iterator iter = operation.getFaults().values().iterator(); iter.hasNext();) {
+                for (Iterator<?> iter = operation.getFaults().values().iterator(); iter.hasNext();) {
                     Fault fault = (Fault) iter.next();
                     javax.wsdl.Message faultMsg = fault.getMessage();
                     XNode vFaultMsgNode = getXNode(faultMsg);

@@ -73,7 +73,7 @@ public class PublishedEndpointUrlTest extends Assert {
         for (Service service : services) {
             Collection<Port> ports = CastUtils.cast(service.getPorts().values());
             for (Port port : ports) {
-                List extensions = port.getExtensibilityElements();
+                List<?> extensions = port.getExtensibilityElements();
                 for (Object extension : extensions) {
                     String actualUrl = null;
                     if (extension instanceof SOAP12Address) {

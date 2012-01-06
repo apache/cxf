@@ -21,7 +21,6 @@ package org.apache.cxf.tools.common.toolspec.parser;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -182,8 +181,8 @@ public class ErrorVisitor {
     public String toString() {
         StringBuilder res = new StringBuilder();
 
-        for (Iterator it = errors.iterator(); it.hasNext();) {
-            res.append(it.next().toString()).append(System.getProperty("line.separator"));
+        for (Object o : errors) {
+            res.append(o.toString()).append(System.getProperty("line.separator"));
         }
         return res.toString();
     }

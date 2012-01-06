@@ -98,7 +98,7 @@ public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
         MBeanServer mbs = im.getMBeanServer();
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                                          + ":type=Bus.Service.Endpoint,*");
-        Set s = mbs.queryNames(name, null);
+        Set<?> s = mbs.queryNames(name, null);
         assertEquals(1, s.size());
         name = (ObjectName)s.iterator().next();
 

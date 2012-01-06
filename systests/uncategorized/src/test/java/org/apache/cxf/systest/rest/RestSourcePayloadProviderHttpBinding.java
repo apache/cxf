@@ -59,7 +59,7 @@ public class RestSourcePayloadProviderHttpBinding implements Provider<DOMSource>
         String httpMethod = (String)mc.get(MessageContext.HTTP_REQUEST_METHOD);
         
         Map<String, List<String>> responseHeader =
-            CastUtils.cast((Map)mc.get(MessageContext.HTTP_RESPONSE_HEADERS));
+            CastUtils.cast((Map<?, ?>)mc.get(MessageContext.HTTP_RESPONSE_HEADERS));
         if (responseHeader == null) {
             responseHeader = new HashMap<String, List<String>>();
             mc.put(MessageContext.HTTP_RESPONSE_HEADERS, responseHeader);

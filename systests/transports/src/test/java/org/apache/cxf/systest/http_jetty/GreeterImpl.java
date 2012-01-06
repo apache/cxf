@@ -94,14 +94,6 @@ public class GreeterImpl implements Greeter {
         return null; 
     }
     
-    public Future<?> testDocLitFaultAsync(String faultType, AsyncHandler ah) {  
-        return null; 
-    }
-    
-    public Future<?> testDocLitBareAsync(String bare, AsyncHandler ah) {
-        return null;
-    }
-    
     public Response<BareDocumentResponse> testDocLitBareAsync(String bare) {
         return null;
     }
@@ -142,6 +134,11 @@ public class GreeterImpl implements Greeter {
     public Future<?> testNillableAsync(String nillElem, 
                                        int intElem,
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
+        return null;
+    }
+
+    public Future<?> testDocLitFaultAsync(String faultType,
+                                          AsyncHandler<TestDocLitFaultResponse> asyncHandler) {
         return null;
     }
     

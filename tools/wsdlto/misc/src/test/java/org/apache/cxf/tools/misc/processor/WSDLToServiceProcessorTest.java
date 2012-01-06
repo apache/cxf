@@ -68,7 +68,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
             if (service == null) {
                 fail("Element wsdl:service serviceins Missed!");
             }
-            Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
+            Iterator<?> it = service.getPort("portins").getExtensibilityElements().iterator();
             if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
@@ -116,7 +116,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
             if (service == null) {
                 fail("Element wsdl:service serviceins Missed!");
             }
-            Iterator it = service.getPort("SoapPort").getExtensibilityElements().iterator();
+            Iterator<?> it = service.getPort("SoapPort").getExtensibilityElements().iterator();
             if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
@@ -158,7 +158,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
             if (service == null) {
                 fail("Element wsdl:service serviceins Missed!");
             }
-            Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
+            Iterator<?> it = service.getPort("portins").getExtensibilityElements().iterator();
             if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
@@ -207,7 +207,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
             if (service == null) {
                 fail("Element wsdl:service serviceins Missed!");
             }
-            Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
+            Iterator<?> it = service.getPort("portins").getExtensibilityElements().iterator();
             if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
@@ -264,7 +264,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
             if (service == null) {
                 fail("Element wsdl:service serviceins Missed!");
             }
-            Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
+            Iterator<?> it = service.getPort("portins").getExtensibilityElements().iterator();
             if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }

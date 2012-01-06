@@ -77,7 +77,7 @@ public class ManagedBusTest extends Assert {
             
             ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
                                              + ":type=Bus.Service.Endpoint,*");
-            Set s = mbs.queryMBeans(name, null);
+            Set<?> s = mbs.queryMBeans(name, null);
             assertEquals(2, s.size());
         } finally {
             bus.shutdown(true);
@@ -132,7 +132,7 @@ public class ManagedBusTest extends Assert {
         MBeanServer mbs = im.getMBeanServer();      
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
                                          + ":type=WorkQueueManager,*");
-        Set s = mbs.queryNames(name, null);
+        Set<?> s = mbs.queryNames(name, null);
         StringBuilder b = new StringBuilder();
         for (ObjectName o : CastUtils.cast(s, ObjectName.class)) {
             b.append(o.toString());
@@ -161,7 +161,7 @@ public class ManagedBusTest extends Assert {
         }
         assertEquals("Size is wrong: " + b.toString(), 2, s.size());
         
-        Iterator it = s.iterator();
+        Iterator<?> it = s.iterator();
         while (it.hasNext()) {
             ObjectName n = (ObjectName)it.next();            
             Long result = 

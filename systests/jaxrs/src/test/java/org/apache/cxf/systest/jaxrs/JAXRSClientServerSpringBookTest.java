@@ -317,7 +317,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     private void getBookAegis(String endpointAddress, String type, String mHeader) throws Exception {
         WebClient client = WebClient.create(endpointAddress,
-            Collections.singletonList(new AegisElementProvider()));
+            Collections.singletonList(new AegisElementProvider<Object>()));
         if (mHeader != null) {
             client = client.header("X-HTTP-Method-Override", mHeader);
         }

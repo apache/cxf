@@ -116,15 +116,15 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         //assertEquals(response, reply);  
         
         assertEquals("The Counters are not create yet", 4, cr.getCounters().size());
-        Set counterNames = mbs.queryNames(name, null);
+        Set<?> counterNames = mbs.queryNames(name, null);
         assertEquals("The Counters are not export to JMX: " + counterNames, 
                      4 + 3 , counterNames.size());
        
         ObjectName sayHiCounter =  new ObjectName(
             ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"sayHi\",*"); 
         
-        Set s = mbs.queryNames(sayHiCounter, null);        
-        Iterator it = s.iterator();
+        Set<?> s = mbs.queryNames(sayHiCounter, null);        
+        Iterator<?> it = s.iterator();
         
         while (it.hasNext()) {
             ObjectName counterName = (ObjectName)it.next();

@@ -183,7 +183,7 @@ public class StructureImpl extends DataObjectBase implements Structure {
      * @ordered
      */
 
-    protected List texts = null;
+    protected List<?> texts = null;
 
     /**
      * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -375,7 +375,7 @@ public class StructureImpl extends DataObjectBase implements Structure {
      * 
      * @generated
      */
-    public List getTexts() {
+    public List<?> getTexts() {
         if (texts == null) {
             texts = createPropertyList(ListKind.DATATYPE, String.class, TEXTS, 0);
         }
@@ -406,7 +406,7 @@ public class StructureImpl extends DataObjectBase implements Structure {
      * 
      * @generated
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void set(int propertyIndex, Object newValue) {
         switch (propertyIndex) {
         case TEXT:

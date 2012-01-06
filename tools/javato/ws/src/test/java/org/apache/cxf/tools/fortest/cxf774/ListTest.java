@@ -37,6 +37,6 @@ public interface ListTest {
     @RequestWrapper(className = "apache.cxf.SayHi", 
                     localName = "sayHi", 
                     targetNamespace = "http://cxf.apache/")
-    List sayHi(String hi);
+    List<?> sayHi(String hi);
 
 }

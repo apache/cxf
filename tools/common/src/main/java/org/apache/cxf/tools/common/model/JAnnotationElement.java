@@ -130,7 +130,7 @@ public final class JAnnotationElement {
     }
 
     private void appendEnumValue(final StringBuilder sb, final Object obj) {
-        Enum e = (Enum) obj;
+        Enum<?> e = (Enum<?>) obj;
 
         String clzName = e.getClass().getName();
         if (clzName.contains("$")) {

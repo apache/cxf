@@ -19,16 +19,15 @@
 
 package org.apache.cxf.tools.corba.common.idltypes;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 public class CorbaUtils {
     
-    protected static final Set<Object> IDL_RESERVED_WORDS = new TreeSet<Object>();
-    protected static final Set<Object> IGNORED_MODULES = new TreeSet<Object>();    
-    protected static final Set<Object> TIMEBASE_IDL_DEFS = new TreeSet<Object>();
+    protected static final Set<String> IDL_RESERVED_WORDS = new TreeSet<String>();
+    protected static final Set<String> IGNORED_MODULES = new TreeSet<String>();    
+    protected static final Set<String> TIMEBASE_IDL_DEFS = new TreeSet<String>();
     
     static {
         /* IDL Key Words */
@@ -160,9 +159,7 @@ public class CorbaUtils {
     }
     
     public static boolean isCollideWithKeyWord(String name) {
-        Iterator it = IDL_RESERVED_WORDS.iterator();
-        while (it.hasNext()) {
-            String key = (String)it.next();
+        for (String key : IDL_RESERVED_WORDS) {
             if (key.equalsIgnoreCase(name)) {
                 return true;
             }

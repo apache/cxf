@@ -30,7 +30,7 @@ public class WSDLGeneratorFactoryTest extends Assert {
     public void testNewWSDL11Generator() {
         WSDLGeneratorFactory factory = new WSDLGeneratorFactory();
         factory.setWSDLVersion(WSDLConstants.WSDLVersion.WSDL11);
-        AbstractGenerator generator = factory.newGenerator();
+        AbstractGenerator<?> generator = factory.newGenerator();
         assertNotNull(generator);
         assertTrue(generator instanceof WSDL11Generator);
     }
