@@ -19,7 +19,6 @@
 
 package org.apache.cxf.bus.extension;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -27,12 +26,16 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ExtensionFragmentParserTest extends Assert {
+/**
+ * Use text based extension descriptors instead
+ */
+@Deprecated
+public class XmlExtensionFragmentParserTest extends Assert {
 
     @Test
-    public void testGetExtensionsFromXml() {
-        InputStream is = ExtensionFragmentParserTest.class.getResourceAsStream("extension1.xml");
-        List<Extension> extensions = new ExtensionFragmentParser().getExtensionsFromXML(is);
+    public void testGetExtensions() {
+        InputStream is = XmlExtensionFragmentParserTest.class.getResourceAsStream("extension1.xml");
+        List<Extension> extensions = new XmlExtensionFragmentParser().getExtensions(is);
         assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
         
         Extension e = extensions.get(0);
@@ -56,23 +59,5 @@ public class ExtensionFragmentParserTest extends Assert {
         }
         assertEquals("Unexpected number of namespace elements.", 1, namespaces.size());
     }
-    
-    @Test
-    public void testGetExtensionsFromText() throws IOException {
-        InputStream is = ExtensionFragmentParserTest.class.getResourceAsStream("extension2.txt");
-        List<Extension> extensions = new ExtensionFragmentParser().getExtensionsFromText(is);
-        assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
-        
-        Extension e = extensions.get(0);
-        assertTrue("Extension is deferred.", !e.isDeferred());
-        assertEquals("Unexpected class name.", 
-                     "org.apache.cxf.foo.FooImpl", e.getClassname());
-        assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());
-        e = extensions.get(1);
-        assertTrue("Extension is not deferred.", e.isDeferred());
-        assertEquals("Unexpected implementation class name.", 
-                     "java.lang.Boolean", e.getClassname());
-        assertNull("Interface should be null", e.getInterfaceName());
-        assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());
-    }
+
 }

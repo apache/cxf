@@ -19,10 +19,7 @@
 
 package org.apache.cxf.bus.extension;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +31,8 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class ExtensionFragmentParser {
+@Deprecated
+public class XmlExtensionFragmentParser {
 
     private static final String EXTENSION_ELEM_NAME = "extension";
     private static final String NAMESPACE_ELEM_NAME = "namespace";
@@ -42,7 +40,7 @@ public class ExtensionFragmentParser {
     private static final String INTERFACE_ATTR_NAME = "interface";
     private static final String DEFERRED_ATTR_NAME = "deferred";
     
-    public List<Extension> getExtensionsFromXML(InputStream is) {
+    public List<Extension> getExtensions(InputStream is) {
         Document document = null;
         try {
             document = StaxUtils.read(is);
@@ -53,54 +51,7 @@ public class ExtensionFragmentParser {
         return deserialiseExtensions(document);
     }
     
-    /**
-     * Reads extension definitions from a Text file and instantiates them
-     * The text file has the following syntax
-     * classname:interfacename:deferred(true|false)
-     * 
-     * @param is stream to read the extension from
-     * @return list of Extensions
-     * @throws IOException
-     */
-    public List<Extension> getExtensionsFromText(InputStream is) throws IOException {
-        List<Extension> extensions = new ArrayList<Extension>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        String line = reader.readLine();
-        while (line != null) {
-            final Extension extension = getExtensionFromTextLine(line);
-            if (extension != null) {
-                extensions.add(extension);
-            }
-            line = reader.readLine();
-        }
-        return extensions;
-    }
-
-    private Extension getExtensionFromTextLine(String line) {
-        line = line.trim();
-        if (line.length() == 0 || line.charAt(0) == '#') {
-            return null;
-        }
-        final Extension ext = new Extension();
-        String[] parts = line.split(":");
-        ext.setClassname(parts[0]);
-        if (ext.getClassname() == null) {
-            return null;
-        }
-        if (parts.length >= 2) {
-            String interfaceName = parts[1];
-            if (interfaceName != null && "".equals(interfaceName)) {
-                interfaceName = null;
-            }
-            ext.setInterfaceName(interfaceName);
-        }
-        if (parts.length >= 3) {
-            ext.setDeferred(Boolean.parseBoolean(parts[2]));
-        }
-        return ext;
-    }
-    
-    List<Extension> deserialiseExtensions(Document document) {
+    private List<Extension> deserialiseExtensions(Document document) {
         List<Extension> extensions = new ArrayList<Extension>();
         
         Element root = document.getDocumentElement();
@@ -122,7 +73,7 @@ public class ExtensionFragmentParser {
         return extensions;
     }
         
-    void deserialiseNamespaces(Element extensionElem, Extension e) {
+    private void deserialiseNamespaces(Element extensionElem, Extension e) {
         for (Node nd  = extensionElem.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType() && NAMESPACE_ELEM_NAME.equals(nd.getLocalName())) {
                 e.getNamespaces().add(nd.getTextContent());

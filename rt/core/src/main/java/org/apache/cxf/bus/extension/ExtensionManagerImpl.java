@@ -158,9 +158,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                 if (resource.endsWith("xml")) {
                     LOG.log(Level.WARNING, "DEPRECATED_EXTENSIONS", 
                             new Object[] {resource, url, BUS_EXTENSION_RESOURCE});
-                    exts = new ExtensionFragmentParser().getExtensionsFromXML(is);
+                    exts = new XmlExtensionFragmentParser().getExtensions(is);
                 } else {
-                    exts = new ExtensionFragmentParser().getExtensionsFromText(is);
+                    exts = new TextExtensionFragmentParser().getExtensions(is);
                 }
                 for (Extension e : exts) {
                     if (loader != l) {

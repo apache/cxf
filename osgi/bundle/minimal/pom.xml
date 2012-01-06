@@ -220,7 +220,7 @@
                             javax.xml.ws*;version="[0.0,3)",
                             *
                         </Import-Package>
-                        <Bundle-Activator>org.apache.cxf.bus.osgi.OSGiExtensionLocator</Bundle-Activator>
+                        <Bundle-Activator>org.apache.cxf.bus.osgi.CXFActivator</Bundle-Activator>
                         <Export-Package>
                             org.apache.cxf.*;version=${cxf.osgi.version.clean};-split-package:=merge-first,
                             '=META-INF.cxf';version=${cxf.osgi.version.clean},

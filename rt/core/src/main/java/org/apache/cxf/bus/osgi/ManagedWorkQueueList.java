@@ -37,7 +37,7 @@ import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
- * List of work queues that cane be managed using the OSGi config admin service
+ * List of work queues that can be managed using the OSGi configuration admin service
  */
 public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChangeListener {
     public static final String FACTORY_PID = "org.apache.cxf.workqueues";    
