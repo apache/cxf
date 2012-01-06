@@ -145,7 +145,7 @@ public final class JibxUtil {
             String serializeMethod = format.getSerializeMethod();
             if (serializeMethod != null) {
                 String jtype = format.getTypeName();
-                Class[] paraTypes = (JibxUtil.isPrimitiveType(jtype)) ? new Class[] {
+                Class<?>[] paraTypes = (JibxUtil.isPrimitiveType(jtype)) ? new Class[] {
                     JibxUtil.getPrimitiveType(jtype)
                 } : new Class[] {
                     value.getClass()

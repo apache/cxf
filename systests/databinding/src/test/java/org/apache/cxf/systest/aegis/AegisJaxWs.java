@@ -37,7 +37,7 @@ public interface AegisJaxWs {
                  Item item);
 
     @WebMethod(operationName = "getItemsAsMap")
-    Map getItemsMap();
+    Map<?, ?> getItemsMap();
 
     @WebMethod(operationName = "getItemsAsMapSpecified")
     Map<Integer, Item> getItemsMapSpecified();

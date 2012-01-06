@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.jms.uri;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -47,9 +46,7 @@ public class JMSEndpoint extends JMSEndpointType {
         String requestUri = "jms:" + (jmsVariant == JMSURIConstants.JNDI_TOPIC ? "jndi" : jmsVariant)
             + ":" + destinationName;
         boolean first = true;
-        Iterator iter = parameters.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String)iter.next();
+        for (String key : parameters.keySet()) {
             if ("targetService".equals(key)) {
                 continue;
             }

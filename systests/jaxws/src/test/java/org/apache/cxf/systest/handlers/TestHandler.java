@@ -236,10 +236,6 @@ public class TestHandler<T extends LogicalMessageContext>
         methodCalled("close");
     }
 
-    public void init(Map arg0) {
-        methodCalled("init");
-    }
-
     public void destroy() {
         methodCalled("destroy");
     }

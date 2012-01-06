@@ -216,7 +216,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
         assertEquals(handlerNames.length, resp.size());
 
-        Iterator iter = resp.iterator();
+        Iterator<String> iter = resp.iterator();
         for (String expected : handlerNames) {
             assertEquals(expected, iter.next());
         }
@@ -341,7 +341,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             }
         };
         TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);
-        TestSOAPHandler soapHandler2 = new TestSOAPHandler<SOAPMessageContext>(false) {
+        TestSOAPHandler soapHandler2 = new TestSOAPHandler(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
                 super.handleMessage(ctx);
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -378,7 +378,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
         TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false);
         TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);
-        TestSOAPHandler soapHandler2 = new TestSOAPHandler<SOAPMessageContext>(false) {
+        TestSOAPHandler soapHandler2 = new TestSOAPHandler(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
                 super.handleMessage(ctx);
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -618,7 +618,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
         TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false);
-        TestSOAPHandler soapHandler1 = new TestSOAPHandler<SOAPMessageContext>(false) {
+        TestSOAPHandler soapHandler1 = new TestSOAPHandler(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
                 super.handleMessage(ctx);
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -663,7 +663,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
         TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false);
-        TestSOAPHandler soapHandler1 = new TestSOAPHandler<SOAPMessageContext>(false) {
+        TestSOAPHandler soapHandler1 = new TestSOAPHandler(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
                 super.handleMessage(ctx);
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -708,7 +708,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
         TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false);
-        TestSOAPHandler soapHandler1 = new TestSOAPHandler<SOAPMessageContext>(false) {
+        TestSOAPHandler soapHandler1 = new TestSOAPHandler(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
                 super.handleMessage(ctx);
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -1125,7 +1125,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 return true;
             }
         };
-        TestSOAPHandler soapHandler = new TestSOAPHandler<SOAPMessageContext>(false) {
+        TestSOAPHandler soapHandler = new TestSOAPHandler(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
                 super.handleMessage(ctx);
                 assertTrue("wsdl description not found or invalid", isValidWsdlDescription(ctx
@@ -1185,7 +1185,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         List<String> resp = getHandlerNames(inMsg.getSOAPBody());
         assertEquals(handlerNames.length, resp.size());
 
-        Iterator iter = resp.iterator();
+        Iterator<String> iter = resp.iterator();
         for (String expected : handlerNames) {
             assertEquals(expected, iter.next());
         }

@@ -575,7 +575,7 @@ public class MAPCodecTest extends Assert {
             boolean ret = false;
             expectedIndex++;
             if (obj instanceof JAXBElement) {
-                JAXBElement other = (JAXBElement)obj;
+                JAXBElement<?> other = (JAXBElement<?>)obj;
                 ret = name.equals(other.getName()) && declaredType.isAssignableFrom(other.getDeclaredType())
                       && compare(value, other.getValue());
             }

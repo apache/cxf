@@ -19,7 +19,6 @@
 package org.apache.cxf.systest.handlers;
 
 import java.io.PrintStream;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -42,9 +41,6 @@ public class LoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
     protected final void setLogStream(PrintStream ps) {
         out = ps;
-    }
-
-    public void init(Map c) {
     }
 
     public Set<QName> getHeaders() {

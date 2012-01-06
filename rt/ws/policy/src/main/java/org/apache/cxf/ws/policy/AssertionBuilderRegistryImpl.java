@@ -94,7 +94,7 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
             ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
             if (c != null) {
                 c.getBeansOfType(AssertionBuilderLoader.class);
-                for (AssertionBuilder b : c.getBeansOfType(AssertionBuilder.class)) {
+                for (AssertionBuilder<?> b : c.getBeansOfType(AssertionBuilder.class)) {
                     registerBuilder(b);
                 }
             }

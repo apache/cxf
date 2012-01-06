@@ -129,9 +129,9 @@ public class MapTest extends AbstractAegisTest {
         tm.setTypeCreator(creator);
 
         AegisType dto = creator.createType(MapDTO.class);
-        Set deps = dto.getDependencies();
+        Set<AegisType> deps = dto.getDependencies();
 
-        AegisType type = (AegisType)deps.iterator().next();
+        AegisType type = deps.iterator().next();
         assertTrue(type instanceof MapType);
 
         MapType mapType = (MapType)type;

@@ -362,13 +362,13 @@ public class MAPCodec extends AbstractSoapInterceptor {
             if (null != params) {
                 for (Object o : params.getAny()) {
                     if (o instanceof Element || o instanceof JAXBElement) {
-                        JAXBElement jaxbEl = null;
+                        JAXBElement<?> jaxbEl = null;
                         if (o instanceof Element) {
                             Element e = (Element)o;
                             Node importedNode = header.getOwnerDocument().importNode(e, true);
                             header.appendChild(importedNode);                            
                         } else {
-                            jaxbEl = (JAXBElement) o;
+                            jaxbEl = (JAXBElement<?>) o;
                             marshaller.marshal(jaxbEl, header);
                         }
                                                

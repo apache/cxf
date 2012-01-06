@@ -432,11 +432,11 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         // as RM protocol messages use parameter style BARE
 
         InterceptorChain chain = message.getInterceptorChain();
-        ListIterator it = chain.getIterator();            
+        ListIterator<Interceptor<? extends Message>> it = chain.getIterator();            
         boolean bareIn = false;
         boolean wrappedIn = false;
         while (it.hasNext() && !wrappedIn && !bareIn) {
-            PhaseInterceptor pi = (PhaseInterceptor)it.next();
+            PhaseInterceptor<? extends Message> pi = (PhaseInterceptor<? extends Message>)it.next();
             if (WrappedInInterceptor.class.getName().equals(pi.getId())) {
                 wrappedIn = true;
                 it.remove();
@@ -454,11 +454,11 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
 
     private RMManager getManager(SoapMessage message) {
         InterceptorChain chain = message.getInterceptorChain();
-        ListIterator it = chain.getIterator();
+        ListIterator<Interceptor<? extends Message>> it = chain.getIterator();
         while (it.hasNext()) {
-            Interceptor i = (Interceptor)it.next();
+            Interceptor<? extends Message> i = it.next();
             if (i instanceof AbstractRMInterceptor) {
-                return ((AbstractRMInterceptor)i).getManager();
+                return ((AbstractRMInterceptor<? extends Message>)i).getManager();
             }
         }
         return null;

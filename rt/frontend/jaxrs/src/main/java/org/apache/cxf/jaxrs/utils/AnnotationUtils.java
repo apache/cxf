@@ -59,9 +59,9 @@ public final class AnnotationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AnnotationUtils.class);
 
-    private static final Set<Class> CONTEXT_CLASSES;
-    private static final Set<Class> PARAM_ANNOTATION_CLASSES;
-    private static final Set<Class> METHOD_ANNOTATION_CLASSES;
+    private static final Set<Class<?>> CONTEXT_CLASSES;
+    private static final Set<Class<?>> PARAM_ANNOTATION_CLASSES;
+    private static final Set<Class<?>> METHOD_ANNOTATION_CLASSES;
     static {
         CONTEXT_CLASSES = initContextClasses();
         PARAM_ANNOTATION_CLASSES = initParamAnnotationClasses();
@@ -72,8 +72,8 @@ public final class AnnotationUtils {
 
     }
 
-    private static Set<Class> initContextClasses() {
-        Set<Class> classes = new HashSet<Class>();
+    private static Set<Class<?>> initContextClasses() {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(UriInfo.class);
         classes.add(SecurityContext.class);
         classes.add(HttpHeaders.class);
@@ -98,8 +98,8 @@ public final class AnnotationUtils {
         return classes;
     }
 
-    private static Set<Class> initParamAnnotationClasses() {
-        Set<Class> classes = new HashSet<Class>();
+    private static Set<Class<?>> initParamAnnotationClasses() {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(PathParam.class);
         classes.add(QueryParam.class);
         classes.add(MatrixParam.class);
@@ -109,8 +109,8 @@ public final class AnnotationUtils {
         return classes;
     }
 
-    private static Set<Class> initMethodAnnotationClasses() {
-        Set<Class> classes = new HashSet<Class>();
+    private static Set<Class<?>> initMethodAnnotationClasses() {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(HttpMethod.class);
         classes.add(Path.class);
         classes.add(Produces.class);

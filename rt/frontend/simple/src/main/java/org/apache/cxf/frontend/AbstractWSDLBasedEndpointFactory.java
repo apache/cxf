@@ -52,7 +52,7 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractWSDLBasedEndpointFactory.class);
 
-    private Class serviceClass;
+    private Class<?> serviceClass;
     private ReflectionServiceFactoryBean serviceFactory;
     
     protected AbstractWSDLBasedEndpointFactory(ReflectionServiceFactoryBean sbean) {
@@ -226,7 +226,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
     }
 
     protected void initializeServiceFactory() {
-        Class cls = getServiceClass();
+        Class<?> cls = getServiceClass();
 
         serviceFactory.setServiceClass(cls);
         serviceFactory.setBus(getBus());

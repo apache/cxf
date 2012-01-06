@@ -44,13 +44,13 @@ public class TestSOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
             SOAPEnvelope env = msg.getSOAPPart().getEnvelope();
             SOAPBody body = env.getBody();
-            Iterator it = body.getChildElements();
+            Iterator<?> it = body.getChildElements();
             while (it.hasNext()) {
                 
                 Object elem = it.next();
                 if (elem instanceof SOAPElement) {
 
-                    Iterator it2 = ((SOAPElement)elem).getChildElements();
+                    Iterator<?> it2 = ((SOAPElement)elem).getChildElements();
                     while (it2.hasNext()) {
                         Object elem2 = it2.next();
                         if (elem2 instanceof SOAPElement) {

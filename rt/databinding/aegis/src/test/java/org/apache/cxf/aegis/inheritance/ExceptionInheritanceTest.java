@@ -69,7 +69,7 @@ public class ExceptionInheritanceTest extends AbstractAegisTest {
     }
 
     @Override
-    protected ServerFactoryBean createServiceFactory(Class serviceClass,
+    protected ServerFactoryBean createServiceFactory(Class<?> serviceClass,
                                                      Object serviceBean,
                                                      String address,
                                                      QName name,

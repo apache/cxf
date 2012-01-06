@@ -224,7 +224,7 @@ public class XMLStreamDataWriterTest extends Assert {
         assertEquals("TESTOUTPUTMESSAGE", reader.getText());
     }
 
-    private JAXBDataBinding getTestWriterFactory(Class... clz) throws Exception {
+    private JAXBDataBinding getTestWriterFactory(Class<?>... clz) throws Exception {
         JAXBContext ctx = JAXBContext.newInstance(clz);
         return new JAXBDataBinding(ctx);
     }

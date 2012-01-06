@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ClassArrayFactoryBean implements FactoryBean {
+public class ClassArrayFactoryBean implements FactoryBean<Object> {
 
     private List<String> classNames;
 

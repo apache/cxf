@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.handlers;
 
-import java.util.Map;
-
 import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
@@ -50,10 +48,6 @@ public class TestUnusedHandler<T extends LogicalMessageContext>
 
     public void close(MessageContext arg0) {
         methodCalled("close");
-    }
-
-    public void init(Map arg0) {
-        methodCalled("init");
     }
 
     public void destroy() {

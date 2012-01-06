@@ -108,7 +108,7 @@ public class HandlerTestImpl implements HandlerTest {
     }
 
     private List<String> getHandlersInfo(MessageContext ctx) {
-        List<String> ret = CastUtils.cast((List)ctx.get("handler.info"));
+        List<String> ret = CastUtils.cast((List<?>)ctx.get("handler.info"));
         if (ret == null) {
             ret = new ArrayList<String>();
         }

@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.handlers;
 
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBContext;
@@ -72,7 +70,7 @@ public class SmallNumberHandler extends TestHandlerBase implements LogicalHandle
                 JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
                 Object payload = msg.getPayload(jaxbContext);
                 if (payload instanceof JAXBElement) {
-                    payload = ((JAXBElement)payload).getValue();
+                    payload = ((JAXBElement<?>)payload).getValue();
                 }
 
                 if (payload instanceof AddNumbers) {
@@ -99,7 +97,7 @@ public class SmallNumberHandler extends TestHandlerBase implements LogicalHandle
                         
                         payload = msg.getPayload(jaxbContext);
                         if (payload instanceof JAXBElement) {
-                            payload = ((JAXBElement)payload).getValue();
+                            payload = ((JAXBElement<?>)payload).getValue();
                         }
                         
                         AddNumbersResponse resp2 = (AddNumbersResponse)payload;
@@ -132,9 +130,6 @@ public class SmallNumberHandler extends TestHandlerBase implements LogicalHandle
         //System.out.println("LogicalHandler close called");
     }
 
-    public void init(Map config) {
-        //System.out.println("LogicalHandler init called");
-    }
 
     public void destroy() {
         //System.out.println("LogicalHandler close called");

@@ -66,8 +66,8 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative((List)iterator.next(), asymmetricBinding, consts);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternative(iterator.next(), asymmetricBinding, consts);
 
             /*
              * since there should be only one alternative
@@ -78,15 +78,13 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
         return asymmetricBinding;
     }
 
-    private void processAlternative(List assertions, 
+    private void processAlternative(List<Assertion> assertions, 
                                     AsymmetricBinding asymmetricBinding,
                                     SPConstants consts) {
 
-        Assertion assertion;
         QName name;
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-            assertion = (Assertion)iterator.next();
+        for (Assertion assertion : assertions) {
             name = assertion.getName();
 
             if (!consts.getNamespace().equals(name.getNamespaceURI())

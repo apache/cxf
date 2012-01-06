@@ -64,9 +64,9 @@ public class JaxbTypeTest extends AbstractAegisTest {
         AnnotatedTypeInfo info = new AnnotatedTypeInfo(tm, JaxbBean1.class, "urn:foo",
                                                        new TypeCreationOptions());
 
-        Iterator elements = info.getElements().iterator();
+        Iterator<QName> elements = info.getElements().iterator();
         assertTrue(elements.hasNext());
-        QName element = (QName)elements.next();
+        QName element = elements.next();
         assertTrue(elements.hasNext());
 
         AegisType custom = info.getType(element);
@@ -91,7 +91,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
             fail("Unexpected element name: " + element.getLocalPart());
         }
 
-        Iterator atts = info.getAttributes().iterator();
+        Iterator<QName> atts = info.getAttributes().iterator();
         assertTrue(atts.hasNext());
         atts.next();
         assertFalse(atts.hasNext());
@@ -110,9 +110,9 @@ public class JaxbTypeTest extends AbstractAegisTest {
 
         assertEquals(0, type.getTypeInfo().getAttributes().size());
 
-        Iterator itr = type.getTypeInfo().getElements().iterator();
+        Iterator<QName> itr = type.getTypeInfo().getElements().iterator();
         assertTrue(itr.hasNext());
-        QName q = (QName)itr.next();
+        QName q = itr.next();
         assertEquals("attProp", q.getLocalPart());
     }
 
@@ -128,10 +128,10 @@ public class JaxbTypeTest extends AbstractAegisTest {
     public void testNillableAndMinOccurs() {
         BeanType type = (BeanType)tm.getTypeCreator().createType(JaxbBean4.class);
         AnnotatedTypeInfo info = (AnnotatedTypeInfo)type.getTypeInfo();
-        Iterator elements = info.getElements().iterator();
+        Iterator<QName> elements = info.getElements().iterator();
         assertTrue(elements.hasNext());
         // nillable first
-        QName element = (QName)elements.next();
+        QName element = elements.next();
         if ("minOccursProperty".equals(element.getLocalPart())) {
             assertEquals(1, info.getMinOccurs(element));
         } else {

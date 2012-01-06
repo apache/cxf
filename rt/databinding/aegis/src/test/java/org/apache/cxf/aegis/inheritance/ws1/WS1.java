@@ -35,8 +35,8 @@ public interface WS1 {
 
     ResultBean getResultBean();
 
-    Map echoMap(Map beans);
-    Map echoRawMap(Map rawMap);
+    Map<?, ?> echoMap(Map<?, ?> beans);
+    Map<?, ?> echoRawMap(Map<?, ?> rawMap);
 
     void throwException(boolean extendedOne) throws WS1Exception;
 }

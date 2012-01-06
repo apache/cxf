@@ -78,7 +78,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
             }
             
             Map<String, DataHandler> dataHandlers = CastUtils.cast(
-                (Map)mc.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
+                (Map<?, ?>)mc.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
             StringBuilder buf = new StringBuilder();
             buf.append("<response>");
             int i = 0;
@@ -114,7 +114,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
             respHeaders.put(Message.CONTENT_TYPE, contentTypeValues);
 
             Map<String, DataHandler> outDataHandlers 
-                = CastUtils.cast((Map)mc.get(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS));
+                = CastUtils.cast((Map<?, ?>)mc.get(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS));
             byte[] data = new byte[50];
             for (int x = 0; x < data.length; x++) {
                 data[x] = (byte)(x + (int)'0');

@@ -64,7 +64,7 @@ public class JmsTopicExpressionConverter {
     public ActiveMQTopic toActiveMQTopic(TopicExpressionType topic) throws InvalidTopicException {
         String dialect = topic.getDialect();
         if (dialect == null || SIMPLE_DIALECT.equals(dialect)) {
-            for (Iterator iter = topic.getContent().iterator(); iter.hasNext();) {
+            for (Iterator<Object> iter = topic.getContent().iterator(); iter.hasNext();) {
                 ActiveMQTopic answer = createActiveMQTopicFromContent(iter.next());
                 if (answer != null) {
                     return answer;

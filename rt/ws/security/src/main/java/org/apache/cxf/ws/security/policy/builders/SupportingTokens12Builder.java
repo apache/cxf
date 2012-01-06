@@ -107,8 +107,8 @@ public class SupportingTokens12Builder implements AssertionBuilder<Element> {
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy) policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative((List) iterator.next(), supportingToken);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternative(iterator.next(), supportingToken);
             /*
              * for the moment we will say there should be only one alternative 
              */
@@ -119,11 +119,9 @@ public class SupportingTokens12Builder implements AssertionBuilder<Element> {
     }
 
 
-    private void processAlternative(List assertions, SupportingToken supportingToken) {
+    private void processAlternative(List<Assertion> assertions, SupportingToken supportingToken) {
         
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-
-            Assertion primitive = (Assertion) iterator.next();
+        for (Assertion primitive : assertions) {
             QName qname = primitive.getName();
 
             if (SP12Constants.ALGORITHM_SUITE.equals(qname)) {

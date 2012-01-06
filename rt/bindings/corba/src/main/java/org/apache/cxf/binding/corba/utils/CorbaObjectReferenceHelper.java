@@ -84,13 +84,11 @@ public final class CorbaObjectReferenceHelper {
     
     public static Binding getDefaultBinding(Object obj, Definition wsdlDef) {
         LOG.log(Level.FINEST, "Getting binding for a default object reference");
-        Collection bindings = wsdlDef.getBindings().values();
-        for (Iterator iter = bindings.iterator(); iter.hasNext();) {
-            Binding b = (Binding)iter.next();
-            List extElements = b.getExtensibilityElements();
-            
+        Collection<Binding> bindings = CastUtils.cast(wsdlDef.getBindings().values());
+        for (Binding b: bindings) {
+            List<?> extElements = b.getExtensibilityElements();
             // Get the list of all extensibility elements
-            for (Iterator extIter = extElements.iterator(); extIter.hasNext();) {
+            for (Iterator<?> extIter = extElements.iterator(); extIter.hasNext();) {
                 java.lang.Object element = extIter.next();
 
                 // Find a binding type so we can check against its repository ID
@@ -102,7 +100,6 @@ public final class CorbaObjectReferenceHelper {
                 }
             }
         }
-        
         return null;
     }
 
@@ -110,13 +107,12 @@ public final class CorbaObjectReferenceHelper {
         LOG.log(Level.FINE, "RepositoryId " + repId 
                 + ", wsdl namespace " + wsdlDef.getTargetNamespace());
         EprMetaData ret = new EprMetaData();
-        Collection bindings = wsdlDef.getBindings().values();
-        for (Iterator iter = bindings.iterator(); iter.hasNext();) {
-            Binding b = (Binding)iter.next();
-            List extElements = b.getExtensibilityElements();
+        Collection<Binding> bindings = CastUtils.cast(wsdlDef.getBindings().values());
+        for (Binding b : bindings) {
+            List<?> extElements = b.getExtensibilityElements();
             
             // Get the list of all extensibility elements
-            for (Iterator extIter = extElements.iterator(); extIter.hasNext();) {
+            for (Iterator<?> extIter = extElements.iterator(); extIter.hasNext();) {
                 java.lang.Object element = extIter.next();
 
                 // Find a binding type so we can check against its repository ID
@@ -133,9 +129,9 @@ public final class CorbaObjectReferenceHelper {
         
         if (!ret.isValid()) {
             // recursivly check imports
-            Iterator importLists = wsdlDef.getImports().values().iterator();
+            Iterator<?> importLists = wsdlDef.getImports().values().iterator();
             while (importLists.hasNext()) {
-                List imports = (List) importLists.next();
+                List<?> imports = (List<?>) importLists.next();
                 for (java.lang.Object imp : imports) {
                     if (imp instanceof Import) {
                         Definition importDef = ((Import)imp).getDefinition();
@@ -193,12 +189,10 @@ public final class CorbaObjectReferenceHelper {
         }
         Binding match = info.getBinding();
         Definition wsdlDef = info.getCandidateWsdlDef();
-        Collection services = wsdlDef.getServices().values();
-        for (Iterator iter = services.iterator(); iter.hasNext();) {
-            Service serv = (Service)iter.next();
-            Collection ports = serv.getPorts().values();
-            for (Iterator portIter = ports.iterator(); portIter.hasNext();) {
-                Port pt = (Port)portIter.next();
+        Collection<Service> services = CastUtils.cast(wsdlDef.getServices().values());
+        for (Service serv : services) {
+            Collection<Port> ports = CastUtils.cast(serv.getPorts().values());
+            for (Port pt : ports) {
                 if (pt.getBinding().equals(match)) {
                     info.setPortName(pt.getName());
                     info.setServiceQName(serv.getQName());
@@ -208,9 +202,9 @@ public final class CorbaObjectReferenceHelper {
         }
         
         if (info.getServiceQName() == null) {
-            Iterator importLists = wsdlDef.getImports().values().iterator();
+            Iterator<?> importLists = wsdlDef.getImports().values().iterator();
             while (info.getServiceQName() == null && importLists.hasNext()) {
-                List imports = (List) importLists.next();
+                List<?> imports = (List<?>) importLists.next();
                 for (java.lang.Object imp : imports) {
                     if (imp instanceof Import) {
                         Definition importDef = ((Import)imp).getDefinition();

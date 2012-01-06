@@ -70,7 +70,7 @@ public class PolicyInterceptorsTest extends Assert {
     
     @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
-        Interceptor i = control.createMock(Interceptor.class);
+        Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
         List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
         a.add(m);

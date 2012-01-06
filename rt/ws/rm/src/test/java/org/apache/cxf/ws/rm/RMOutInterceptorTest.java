@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
@@ -63,7 +64,7 @@ public class RMOutInterceptorTest extends Assert {
         RMOutInterceptor rmi = new RMOutInterceptor();        
         chain.add(rmi);
         chain.add(map);
-        Iterator it = chain.iterator();
+        Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame("Unexpected order.", map, it.next());
         assertSame("Unexpected order.", rmi, it.next());                      
     } 

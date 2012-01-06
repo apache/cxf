@@ -93,7 +93,7 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
         BusFactory.getDefaultBus().getInInterceptors().add(new MalformedResponseInterceptor());
     }
     
-    private void waitForFuture(Future fd) throws Exception {
+    private void waitForFuture(Future<?> fd) throws Exception {
         int count = 0;
         while (!fd.isDone()) {
             ++count;
@@ -128,7 +128,7 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
         SOAPMessage soapReqMsg3 = MessageFactory.newInstance().createMessage(null, is3);
         assertNotNull(soapReqMsg3);
         TestSOAPMessageHandler tsmh = new TestSOAPMessageHandler();
-        Future f = disp.invokeAsync(soapReqMsg3, tsmh);
+        Future<?> f = disp.invokeAsync(soapReqMsg3, tsmh);
         assertNotNull(f);
         waitForFuture(f);
         assertEquals("AsyncHandler shouldn't get invoked more than once", asyncHandlerInvokedCount, 1);

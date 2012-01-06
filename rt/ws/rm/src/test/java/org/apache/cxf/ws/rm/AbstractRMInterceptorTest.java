@@ -160,7 +160,7 @@ public class AbstractRMInterceptorTest extends Assert {
         
     }
 
-    class RMInterceptor extends AbstractRMInterceptor {
+    class RMInterceptor extends AbstractRMInterceptor<Message> {
 
         private SequenceFault sequenceFault;
         private RMException rmException;

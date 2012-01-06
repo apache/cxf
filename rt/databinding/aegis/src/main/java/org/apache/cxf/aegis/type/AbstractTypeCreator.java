@@ -92,7 +92,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     
     public TypeClassInfo createBasicClassInfo(Type type) {
         TypeClassInfo info = new TypeClassInfo();
-        Class typeClass = TypeUtil.getTypeClass(type, false);
+        Class<?> typeClass = TypeUtil.getTypeClass(type, false);
         if (typeClass != null) {
             info.setDescription("class '" + typeClass.getName() + "'");
         } else {
@@ -105,7 +105,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     public AegisType createTypeForClass(TypeClassInfo info) {
         
-        Class javaClass = TypeUtil.getTypeRelatedClass(info.getType());
+        Class<?> javaClass = TypeUtil.getTypeRelatedClass(info.getType());
         AegisType result = null;
         boolean newType = true;
         if (info.getType() instanceof TypeVariable) {

@@ -105,7 +105,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         setAddress(disp, addNumbersAddress);
 
         SmallNumberHandler sh = new SmallNumberHandler();
-        TestSOAPHandler soapHandler = new TestSOAPHandler<SOAPMessageContext>(false) {
+        TestSOAPHandler soapHandler = new TestSOAPHandler(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
                 super.handleMessage(ctx);
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -129,9 +129,9 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         req.setArg0(10);
         req.setArg1(20);        
         ObjectFactory factory = new ObjectFactory();        
-        JAXBElement e = factory.createAddNumbers(req);        
+        JAXBElement<org.apache.handlers.types.AddNumbers> e = factory.createAddNumbers(req);        
 
-        JAXBElement response = (JAXBElement)disp.invoke(e);
+        JAXBElement<?> response = (JAXBElement<?>)disp.invoke(e);
         assertNotNull(response);
         AddNumbersResponse value = (AddNumbersResponse)response.getValue();
         assertEquals(200, value.getReturn());

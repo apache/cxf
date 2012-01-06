@@ -227,7 +227,7 @@ public class ArrayType extends AegisType {
             return;
         }
         if (values instanceof Collection) {
-            Collection c = (Collection)values;
+            Collection<?> c = (Collection<?>)values;
             values = c.toArray();
         }
 
@@ -260,7 +260,7 @@ public class ArrayType extends AegisType {
             name = type.getSchemaType().getLocalPart();
         }
 
-        Class arrayType = type.getTypeClass();
+        Class<?> arrayType = type.getTypeClass();
 
         boolean oldXsiWrite = context.getGlobalContext().isWriteXsiTypes();
         try {
@@ -422,7 +422,7 @@ public class ArrayType extends AegisType {
      * @return
      */
     public AegisType getComponentType() {
-        Class compType = getTypeClass().getComponentType();
+        Class<?> compType = getTypeClass().getComponentType();
 
         AegisType type;
 

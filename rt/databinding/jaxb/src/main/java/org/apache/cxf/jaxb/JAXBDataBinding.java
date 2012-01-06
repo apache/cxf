@@ -159,7 +159,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
     }
 
-    Class[] extraClass;
+    Class<?>[] extraClass;
 
     JAXBContext context;
     Set<Class<?>> contextClasses;
@@ -409,7 +409,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         throws JAXBException {
         //add user extra class into jaxb context
         if (extraClass != null && extraClass.length > 0) {
-            for (Class clz : extraClass) {
+            for (Class<?> clz : extraClass) {
                 classes.add(clz);
             }
         }
@@ -676,7 +676,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                     t = ((ParameterizedType)t).getActualTypeArguments()[0];
                 }
                 if (t instanceof Class) {
-                    pcls = (Class)t;
+                    pcls = (Class<?>)t;
                 }
 
                 String methodName = "create" + wrapperType.getSimpleName()

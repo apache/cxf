@@ -61,8 +61,8 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternatives((List)iterator.next(), symmetricBinding, consts);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternatives(iterator.next(), symmetricBinding, consts);
 
             /*
              * since there should be only one alternative ..
@@ -73,12 +73,10 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
     }
 
 
-    private void processAlternatives(List assertions, SymmetricBinding symmetricBinding, SPConstants consts) {
-        Assertion assertion;
+    private void processAlternatives(List<Assertion> assertions,
+                                     SymmetricBinding symmetricBinding, SPConstants consts) {
         QName name;
-
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-            assertion = (Assertion)iterator.next();
+        for (Assertion assertion : assertions) {
             name = assertion.getName();
 
             if (!consts.getNamespace().equals(name.getNamespaceURI())

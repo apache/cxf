@@ -34,7 +34,7 @@ public interface MapTest {
     ObjectWithAMap returnObjectWithAMap();
     void takeMap(ObjectWithAMap map);
     Map<String, Long> getMapStringToLong();
-    Map getRawMapStringToInteger();
+    Map<?, ?> getRawMapStringToInteger();
     Map<Long, String> getMapLongToString();
     
     ObjectWithAMapNs2 returnObjectWithAMapNs2();

@@ -38,7 +38,7 @@ public class StaxSerializer {
     public void writeDocument(Document doc, XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartDocument("1.0");
 
-        for (Iterator itr = doc.getContent().iterator(); itr.hasNext();) {
+        for (Iterator<?> itr = doc.getContent().iterator(); itr.hasNext();) {
             Content content = (Content)itr.next();
 
             if (content instanceof Element) {
@@ -63,8 +63,8 @@ public class StaxSerializer {
 
         writer.writeStartElement(elPrefix, e.getName(), elUri);
 
-        List namespaces = e.getAdditionalNamespaces();
-        for (Iterator itr = namespaces.iterator(); itr.hasNext();) {
+        List<?> namespaces = e.getAdditionalNamespaces();
+        for (Iterator<?> itr = namespaces.iterator(); itr.hasNext();) {
             Namespace ns = (Namespace)itr.next();
 
             String prefix = ns.getPrefix();
@@ -78,7 +78,7 @@ public class StaxSerializer {
             }
         }
 
-        for (Iterator itr = e.getAttributes().iterator(); itr.hasNext();) {
+        for (Iterator<?> itr = e.getAttributes().iterator(); itr.hasNext();) {
             Attribute attr = (Attribute)itr.next();
             String attPrefix = attr.getNamespacePrefix();
             String attUri = attr.getNamespaceURI();
@@ -111,7 +111,7 @@ public class StaxSerializer {
             }
         }
 
-        for (Iterator itr = e.getContent().iterator(); itr.hasNext();) {
+        for (Iterator<?> itr = e.getContent().iterator(); itr.hasNext();) {
             Content n = (Content)itr.next();
             if (n instanceof CDATA) {
                 writer.writeCData(n.getValue());
@@ -137,7 +137,7 @@ public class StaxSerializer {
      * @throws XMLStreamException
      */
     private boolean isDeclared(XMLStreamWriter writer, String prefix, String uri) throws XMLStreamException {
-        for (Iterator pxs = writer.getNamespaceContext().getPrefixes(uri); pxs.hasNext();) {
+        for (Iterator<?> pxs = writer.getNamespaceContext().getPrefixes(uri); pxs.hasNext();) {
             String px = (String)pxs.next();
             if (px.equals(prefix)) {
                 return true;

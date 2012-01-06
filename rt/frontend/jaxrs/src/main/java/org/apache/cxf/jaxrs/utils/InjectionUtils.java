@@ -110,7 +110,7 @@ public final class InjectionUtils {
     public static Type getSuperType(Class<?> serviceClass, TypeVariable var) {
         
         int pos = 0;
-        TypeVariable[] vars = var.getGenericDeclaration().getTypeParameters();
+        TypeVariable<?>[] vars = var.getGenericDeclaration().getTypeParameters();
         for (; pos < vars.length; pos++) {
             if (vars[pos].getName().equals(var.getName())) {
                 break;
@@ -153,11 +153,10 @@ public final class InjectionUtils {
         return methodToInvoke; 
     }
  
-    @SuppressWarnings("unchecked")
     public static void injectFieldValue(final Field f, 
                                         final Object o, 
                                         final Object v) {
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 f.setAccessible(true);
                 try {
@@ -172,10 +171,9 @@ public final class InjectionUtils {
         
     }
 
-    @SuppressWarnings("unchecked")
     public static Object extractFieldValue(final Field f, 
                                         final Object o) {
-        return AccessController.doPrivileged(new PrivilegedAction() {
+        return AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 f.setAccessible(true);
                 try {
@@ -201,7 +199,7 @@ public final class InjectionUtils {
         }
         if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
             if (genericType instanceof TypeVariable) {
-                genericType = getType(((TypeVariable)genericType).getBounds(), pos);
+                genericType = getType(((TypeVariable<?>)genericType).getBounds(), pos);
             } else if (genericType instanceof WildcardType) { 
                 WildcardType wildcardType = (WildcardType)genericType;
                 Type[] bounds = wildcardType.getLowerBounds();
@@ -231,12 +229,12 @@ public final class InjectionUtils {
         if (genericType == null) {
             return null;
         } else if (genericType instanceof Class) {
-            return (Class) genericType;
+            return (Class<?>) genericType;
         } else if (genericType instanceof ParameterizedType) {
             ParameterizedType paramType = (ParameterizedType)genericType;
             Type t = paramType.getRawType();
             if (t instanceof Class) {
-                return (Class)t;
+                return (Class<?>)t;
             }
         }
         // it might be a TypeVariable, or a GenericArray.
@@ -570,7 +568,7 @@ public final class InjectionUtils {
         if (first == null) {
             return second;
         } else if (first instanceof Map) {
-            Map.class.cast(first).putAll((Map) second);
+            Map.class.cast(first).putAll((Map<?, ?>) second);
             return first;
         }
         return null;
@@ -696,7 +694,7 @@ public final class InjectionUtils {
         if (first == null) {
             return second;
         } else if (first instanceof Collection) {
-            Collection.class.cast(first).addAll((Collection) second);
+            Collection.class.cast(first).addAll((Collection<?>) second);
             return first;
         } else {
             int firstLen = Array.getLength(first);
@@ -874,7 +872,7 @@ public final class InjectionUtils {
         return name.startsWith("javax.servlet.");
     }
     
-    private static ThreadLocalProxy createThreadLocalServletApiContext(String name) {
+    private static ThreadLocalProxy<?> createThreadLocalServletApiContext(String name) {
         String proxyClassName = null;
         if (HTTP_SERVLET_REQUEST_CLASS_NAME.equals(name)) {
             proxyClassName = "org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest";
@@ -886,7 +884,7 @@ public final class InjectionUtils {
             proxyClassName = "org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig";
         }
         try {
-            return (ThreadLocalProxy)ClassLoaderUtils.loadClass(proxyClassName, InjectionUtils.class)
+            return (ThreadLocalProxy<?>)ClassLoaderUtils.loadClass(proxyClassName, InjectionUtils.class)
                 .newInstance();
         } catch (Throwable t) {
             throw new RuntimeException(t);
@@ -913,7 +911,7 @@ public final class InjectionUtils {
         }
         
         for (Field f : cri.getResourceFields()) {
-            ThreadLocalProxy proxy = cri.getResourceFieldProxy(f);
+            ThreadLocalProxy<?> proxy = cri.getResourceFieldProxy(f);
             InjectionUtils.injectFieldValue(f, instance, proxy);
         }
     }

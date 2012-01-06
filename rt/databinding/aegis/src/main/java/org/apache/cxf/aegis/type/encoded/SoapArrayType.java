@@ -252,7 +252,7 @@ public class SoapArrayType extends AegisType {
             }
             Object[] array = (Object[]) Array.newInstance(componentType, dimensions.get(0));
             for (int i = 0; i < array.length; i++) {
-                List chunk = values.subList(i * chunkSize, (i + 1) * chunkSize);
+                List<?> chunk = values.subList(i * chunkSize, (i + 1) * chunkSize);
                 Object value = makeArray(chunk,
                         dimensions.subList(1, dimensions.size()),
                         componentType.getComponentType());
@@ -384,7 +384,7 @@ public class SoapArrayType extends AegisType {
      * When reading the type is solely determined by the required arrayType soap attribute.
      */
     public AegisType getComponentType() {
-        Class compType = getTypeClass().getComponentType();
+        Class<?> compType = getTypeClass().getComponentType();
 
         AegisType type;
         if (componentName == null) {
@@ -427,7 +427,7 @@ public class SoapArrayType extends AegisType {
      */
     private int getDimensions() {
         int dimensions = 0;
-        for (Class type = getTypeClass(); type.isArray(); type = type.getComponentType()) {
+        for (Class<?> type = getTypeClass(); type.isArray(); type = type.getComponentType()) {
             dimensions++;
         }
         return dimensions;

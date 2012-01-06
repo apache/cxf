@@ -49,7 +49,7 @@ public class ModifyNumberHandler implements LogicalHandler<LogicalMessageContext
             Object payload = msg.getPayload(jaxbContext);
             Object value = payload;
             if (payload instanceof JAXBElement) {
-                value = ((JAXBElement)payload).getValue();
+                value = ((JAXBElement<?>)payload).getValue();
             }
 
             if (value instanceof AddNumbers) {
