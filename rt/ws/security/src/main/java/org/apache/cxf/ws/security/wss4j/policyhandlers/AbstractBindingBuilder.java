@@ -806,6 +806,46 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
+    protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, boolean useMac) {
+        AssertionInfo info = null;
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
+        for (AssertionInfo ai : ais) {
+            if (ai.getAssertion() == token) {
+                info = ai;
+                if (!isRequestor()) {
+                    info.setAsserted(true);
+                    return null;
+                }
+            }
+        }
+        
+        String userName = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+        if (!StringUtils.isEmpty(userName)) {
+            WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
+            
+            String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
+            if (StringUtils.isEmpty(password)) {
+                password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
+            }
+
+            if (!StringUtils.isEmpty(password)) {
+                // If the password is available then build the token
+                utBuilder.setUserInfo(userName, password);
+                utBuilder.addDerivedKey(useMac, null, 1000);
+                utBuilder.prepare(saaj.getSOAPPart());
+            } else {
+                policyNotAsserted(token, "No password available");
+                return null;
+            }
+            
+            info.setAsserted(true);
+            return utBuilder;
+        } else {
+            policyNotAsserted(token, "No username available");
+            return null;
+        }
+    }
+    
     protected AssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {
         AssertionInfo info = null;
         Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
@@ -922,19 +962,7 @@ public abstract class AbstractBindingBuilder {
     
     public String getPassword(String userName, Assertion info, int type) {
         //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
+        CallbackHandler handler = getCallbackHandler();
         if (handler == null) {
             policyNotAsserted(info, "No callback handler and no password available");
             return null;
@@ -949,6 +977,24 @@ public abstract class AbstractBindingBuilder {
         
         //get the password
         return cb[0].getPassword();
+    }
+    
+    protected CallbackHandler getCallbackHandler() {
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        
+        CallbackHandler handler = null;
+        if (o instanceof CallbackHandler) {
+            handler = (CallbackHandler)o;
+        } else if (o instanceof String) {
+            try {
+                handler = (CallbackHandler)ClassLoaderUtils
+                    .loadClass((String)o, this.getClass()).newInstance();
+            } catch (Exception e) {
+                handler = null;
+            }
+        }
+        
+        return handler;
     }
 
     /**

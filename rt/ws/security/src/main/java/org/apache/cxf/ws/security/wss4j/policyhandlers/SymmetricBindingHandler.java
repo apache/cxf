@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -47,6 +49,7 @@ import org.apache.cxf.ws.security.policy.model.SpnegoContextToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
+import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -58,6 +61,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.WSSecBase;
@@ -68,6 +72,7 @@ import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecTimestamp;
+import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -167,6 +172,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
                     } else {
                         tokenId = getEncryptedKey();
+                    }
+                } else if (encryptionToken instanceof UsernameToken) {
+                    if (isRequestor()) {
+                        tokenId = setupUTDerivedKey((UsernameToken)encryptionToken);
+                    } else {
+                        tokenId = getUTDerivedKey();
                     }
                 }
                 if (tok == null) {
@@ -287,6 +298,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     } else {
                         sigTokId = getEncryptedKey();
                     }
+                } else if (sigToken instanceof UsernameToken) {
+                    if (isRequestor()) {
+                        sigTokId = setupUTDerivedKey((UsernameToken)sigToken);
+                    } else {
+                        sigTokId = getUTDerivedKey();
+                    }
                 }
             } else {
                 policyNotAsserted(sbinding, "No signature token");
@@ -319,8 +336,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 tokIncluded = false;
             }
         
-            List<WSEncryptionPart> sigs = getSignedParts();
             //Add timestamp
+            List<WSEncryptionPart> sigs = getSignedParts();
             if (timestampEl != null) {
                 WSEncryptionPart timestampPart = convertToEncryptionPart(timestampEl.getElement());
                 sigs.add(timestampPart);        
@@ -457,6 +474,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     || WSConstants.SAML2_NS.equals(tokenType)) {
                     dkEncr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                     dkEncr.setCustomValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                } else if (encrToken instanceof UsernameToken) {
+                    dkEncr.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
                 } else {
                     dkEncr.setCustomValueType(tokenType);
                 }
@@ -557,6 +576,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                             encr.setCustomReferenceValue(tokenType);
                             encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                         }
+                    } else if (encrToken instanceof UsernameToken) {
+                        encr.setCustomReferenceValue(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
                     } else if (!isRequestor()) {
                         if (encrTok.getSHA1() != null) {
                             encr.setCustomReferenceValue(encrTok.getSHA1());
@@ -657,6 +678,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 || WSConstants.SAML2_NS.equals(tokenType)) {
                 dkSign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                 dkSign.setCustomValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            } else if (policyToken instanceof UsernameToken) {
+                dkSign.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
             } else {
                 dkSign.setCustomValueType(tokenType);
             }
@@ -727,6 +750,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     sig.setEncrKeySha1value(tok.getSHA1());
                     sig.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
                 }
+            } else if (policyToken instanceof UsernameToken) {
+                sig.setCustomTokenValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+                sig.setKeyIdentifierType(type);
             } else {
                 //Setting the AttachedReference or the UnattachedReference according to the flag
                 Element ref;
@@ -838,6 +864,24 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         return id;
     }
     
+    private String setupUTDerivedKey(UsernameToken sigToken) throws WSSecurityException {
+        boolean useMac = hasSignedPartsOrElements();
+        WSSecUsernameToken usernameToken = addDKUsernameToken(sigToken, useMac);
+        String id = usernameToken.getId();
+        byte[] secret = usernameToken.getDerivedKey();
+
+        Date created = new Date();
+        Date expires = new Date();
+        expires.setTime(created.getTime() + 300000);
+        SecurityToken tempTok = 
+            new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
+        tempTok.setSecret(secret);
+        
+        tokenStore.add(tempTok);
+        
+        return id;
+    }
+    
     private String getEncryptedKey() {
         
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
@@ -868,6 +912,44 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         return null;
     }
     
+    private String getUTDerivedKey() throws WSSecurityException {
+        
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
+            .get(WSHandlerConstants.RECV_RESULTS));
+        
+        for (WSHandlerResult rResult : results) {
+            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
+            
+            for (WSSecurityEngineResult wser : wsSecEngineResults) {
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                String utID = (String)wser.get(WSSecurityEngineResult.TAG_ID);
+                if (actInt.intValue() == WSConstants.UT_NOPASSWORD) {
+                    if (utID == null || utID.length() == 0) {
+                        utID = wssConfig.getIdAllocator().createId("UsernameToken-", null);
+                    }
+                    Date created = new Date();
+                    Date expires = new Date();
+                    expires.setTime(created.getTime() + 300000);
+                    SecurityToken tempTok = new SecurityToken(utID, created, expires);
+                    
+                    org.apache.ws.security.message.token.UsernameToken usernameToken = 
+                        (org.apache.ws.security.message.token.UsernameToken)wser.get(
+                            WSSecurityEngineResult.TAG_USERNAME_TOKEN
+                        );
+                    
+                    RequestData data = new RequestData();
+                    data.setCallbackHandler(getCallbackHandler());
+                    usernameToken.setRawPassword(data);
+                    tempTok.setSecret(usernameToken.getDerivedKey());
+                    tokenStore.add(tempTok);
+
+                    return utID;
+                }
+            }
+        }
+        return null;
+    }
+    
     private String getSHA1(byte[] input) {
         try {
             byte[] digestBytes = WSSecurityUtil.generateDigest(input);
@@ -876,6 +958,18 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             //REVISIT
         }
         return null;
+    }
+    
+    private boolean hasSignedPartsOrElements() {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.SIGNED_PARTS);
+        if (ais != null && ais.size() > 0) {
+            return true;
+        }
+        ais = aim.getAssertionInfo(SP12Constants.SIGNED_ELEMENTS);
+        if (ais != null && ais.size() > 0) {
+            return true;
+        }
+        return false;
     }
 
 }
