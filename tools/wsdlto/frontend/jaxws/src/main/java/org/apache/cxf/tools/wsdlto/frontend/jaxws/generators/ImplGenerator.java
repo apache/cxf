@@ -19,7 +19,6 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -70,7 +69,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         if (passthrough()) {
             return;
         }
-        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
 
     
@@ -89,8 +88,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
                     }
                 }
             } else {
-                for (Iterator iter = interfaces.keySet().iterator(); iter.hasNext();) {
-                    String interfaceName = (String)iter.next();
+                for (String interfaceName: interfaces.keySet()) {
                     JavaInterface intf = interfaces.get(interfaceName);
                     outputImpl(intf, service, "", penv);
                 }

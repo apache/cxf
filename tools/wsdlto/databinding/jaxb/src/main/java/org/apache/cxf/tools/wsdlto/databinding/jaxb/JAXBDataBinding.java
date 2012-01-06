@@ -973,7 +973,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     try {
                         Field f = jdc.getClass().getDeclaredField("enumConstantsByName");
                         f.setAccessible(true);
-                        Map map = (Map)f.get(jdc);
+                        Map<?, ?> map = (Map<?, ?>)f.get(jdc);
                         Set<String> values = CastUtils.cast(map.keySet());
                         String first = defaultValues.chooseEnumValue(path, values);
                         writer.write(tp.fullName());

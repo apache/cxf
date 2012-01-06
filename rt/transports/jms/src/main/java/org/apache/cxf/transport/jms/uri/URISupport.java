@@ -46,7 +46,7 @@ public final class URISupport {
         private String scheme;
         private String path;
         private URI components[];
-        private Map parameters;
+        private Map<String, String> parameters;
         private String fragment;
 
         public URI[] getComponents() {
@@ -57,7 +57,7 @@ public final class URISupport {
             return fragment;
         }
 
-        public Map getParameters() {
+        public Map<String, String> getParameters() {
             return parameters;
         }
 
@@ -109,10 +109,9 @@ public final class URISupport {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static Map parseQuery(String uri) throws URISyntaxException {
+    public static Map<String, String> parseQuery(String uri) throws URISyntaxException {
         try {
-            Map rc = new HashMap();
+            Map<String, String> rc = new HashMap<String, String>();
             if (uri != null) {
                 String[] parameters = uri.split("&");
                 for (String parameter : parameters) {
@@ -134,13 +133,13 @@ public final class URISupport {
         }
     }
 
-    public static Map parseParameters(URI uri) throws URISyntaxException {
+    public static Map<String, String> parseParameters(URI uri) throws URISyntaxException {
         String query = uri.getQuery();
         if (query == null) {
             String schemeSpecificPart = uri.getSchemeSpecificPart();
             int idx = schemeSpecificPart.lastIndexOf('?');
             if (idx < 0) {
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             } else {
                 query = schemeSpecificPart.substring(idx + 1);
             }
@@ -209,7 +208,7 @@ public final class URISupport {
             if (params.length() > 0) {
                 rc.path = stripPrefix(params, "/");
             }
-            rc.parameters = Collections.EMPTY_MAP;
+            rc.parameters = Collections.emptyMap();
         }
     }
 
@@ -224,20 +223,19 @@ public final class URISupport {
         return new URI(stripPrefix(uri.getSchemeSpecificPart().trim(), "//"));
     }
 
-    public static String createQueryString(Map options) throws URISyntaxException {
+    public static String createQueryString(Map<String, String> options) throws URISyntaxException {
         try {
             if (options.size() > 0) {
                 StringBuilder rc = new StringBuilder();
                 boolean first = true;
-                for (Object o : options.keySet()) {
+                for (String key : options.keySet()) {
                     if (first) {
                         first = false;
                     } else {
                         rc.append("&");
                     }
 
-                    String key = (String) o;
-                    String value = (String) options.get(key);
+                    String value = options.get(key);
                     rc.append(URLEncoder.encode(key, "UTF-8"));
                     rc.append("=");
                     rc.append(URLEncoder.encode(value, "UTF-8"));
@@ -256,7 +254,8 @@ public final class URISupport {
     /**
      * Creates a URI from the original URI and the remaining parameters
      */
-    public static URI createRemainingURI(URI originalURI, Map params) throws URISyntaxException {
+    public static URI createRemainingURI(URI originalURI, Map<String, String> params) 
+        throws URISyntaxException {
         String s = createQueryString(params);
         if (s.length() == 0) {
             s = null;

@@ -113,7 +113,7 @@ public class JAXRSUtilsTest extends Assert {
     }
 
     private void doTestFormParamsWithEncoding(String enc, boolean setEnc) throws Exception {
-        Class[] argType = {String.class, List.class};
+        Class<?>[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         String body = "p1=" + URLEncoder.encode("\u00E4\u00F6\u00FC", enc) + "&p2=2&p2=3";
@@ -131,7 +131,7 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("2 form params should've been identified", 2, params.size());
         assertEquals("First Form Parameter not matched correctly",
                      "\u00E4\u00F6\u00FC", params.get(0));
-        List<String> list = CastUtils.cast((List)params.get(1));
+        List<String> list = CastUtils.cast((List<?>)params.get(1));
         assertEquals(2, list.size());
         assertEquals("2", list.get(0));
         assertEquals("3", list.get(1));
@@ -659,7 +659,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testQueryParameters() throws Exception {
-        Class[] argType = {String.class, Integer.TYPE, String.class, String.class};
+        Class<?>[] argType = {String.class, Integer.TYPE, String.class, String.class};
         Method m = Customer.class.getMethod("testQuery", argType);
         MessageImpl messageImpl = new MessageImpl();
         
@@ -677,7 +677,7 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testQueryParamAsListWithDefaultValue() throws Exception {
-        Class[] argType = {List.class, List.class, List.class, Integer[].class, 
+        Class<?>[] argType = {List.class, List.class, List.class, Integer[].class, 
             List.class, List.class};
         Method m = Customer.class.getMethod("testQueryAsList", argType);
         Message messageImpl = createMessage();
@@ -722,7 +722,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testCookieParameters() throws Exception {
-        Class[] argType = {String.class, String.class};
+        Class<?>[] argType = {String.class, String.class};
         Method m = Customer.class.getMethod("testCookieParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
@@ -740,7 +740,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMultipleCookieParameters() throws Exception {
-        Class[] argType = {String.class, String.class, Cookie.class};
+        Class<?>[] argType = {String.class, String.class, Cookie.class};
         Method m = Customer.class.getMethod("testMultipleCookieParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
@@ -758,7 +758,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFromStringParameters() throws Exception {
-        Class[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
+        Class<?>[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
         Method m = Customer.class.getMethod("testFromStringParam", argType);
         UUID u = UUID.randomUUID();
         Message messageImpl = createMessage();
@@ -775,7 +775,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFromValueEnum() throws Exception {
-        Class[] argType = {Timezone.class};
+        Class<?>[] argType = {Timezone.class};
         Method m = Customer.class.getMethod("testFromValueParam", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=Europe%2FLondon");
@@ -792,7 +792,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
-        Class[] argType = {Customer.class, Customer[].class, Customer2.class};
+        Class<?>[] argType = {Customer.class, Customer[].class, Customer2.class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=Fred&p2=Barry&p3=Jack&p4=John");
@@ -822,7 +822,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new LocaleParameterHandler());
-        Class[] argType = {Locale.class};
+        Class<?>[] argType = {Locale.class};
         Method m = Customer.class.getMethod("testLocaleParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=en_us");
@@ -840,7 +840,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
-        Class[] argType = {Customer.class, Customer[].class, Customer2.class};
+        Class<?>[] argType = {Customer.class, Customer[].class, Customer2.class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p3=jack");
@@ -856,7 +856,7 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testArrayParamNoProvider() throws Exception {
         Message messageImpl = createMessage();
-        Class[] argType = {String[].class};
+        Class<?>[] argType = {String[].class};
         Method m = Customer.class.getMethod("testCustomerParam2", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=Fred&p1=Barry");
@@ -871,7 +871,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testWrongType() throws Exception {
-        Class[] argType = {HashMap.class};
+        Class<?>[] argType = {HashMap.class};
         Method m = Customer.class.getMethod("testWrongType", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=1");
@@ -891,7 +891,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testExceptionDuringConstruction() throws Exception {
-        Class[] argType = {CustomerGender.class};
+        Class<?>[] argType = {CustomerGender.class};
         Method m = Customer.class.getMethod("testWrongType2", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.QUERY_STRING, "p1=3");
@@ -909,7 +909,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testQueryParametersBean() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
+        Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testQueryBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.QUERY_STRING, "a=aValue&b=123");
@@ -928,7 +928,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testXmlAdapterBean() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
+        Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testXmlAdapter", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
@@ -943,7 +943,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testXmlAdapterBean2() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
+        Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testXmlAdapter2", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
@@ -958,7 +958,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testXmlAdapterBean3() throws Exception {
-        Class[] argType = {Customer.CustomerBeanInterface.class};
+        Class<?>[] argType = {Customer.CustomerBeanInterface.class};
         Method m = Customer.class.getMethod("testXmlAdapter3", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
@@ -974,7 +974,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testPathParametersBean() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
+        Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testPathBean", argType);
         
         MultivaluedMap<String, String> pathTemplates = new MetadataMap<String, String>();
@@ -1029,7 +1029,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMatrixParametersBean() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
+        Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testMatrixBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar;a=aValue/baz;b=123");
@@ -1048,7 +1048,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFormParametersBean() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
+        Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testFormBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar");
@@ -1075,7 +1075,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFormParametersBeanWithMap() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
+        Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testFormBean", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar");
@@ -1187,8 +1187,8 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMultipleQueryParameters() throws Exception {
-        Class[] argType = {String.class, String.class, Long.class, 
-                           Boolean.TYPE, String.class};
+        Class<?>[] argType = {String.class, String.class, Long.class, 
+                              Boolean.TYPE, String.class};
         Method m = Customer.class.getMethod("testMultipleQuery", argType);
         MessageImpl messageImpl = new MessageImpl();
         
@@ -1211,7 +1211,8 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testMatrixParameters() throws Exception {
-        Class[] argType = {String.class, String.class, String.class, String.class, List.class, String.class};
+        Class<?>[] argType = {String.class, String.class, String.class, String.class, 
+                              List.class, String.class};
         Method m = Customer.class.getMethod("testMatrixParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         
@@ -1239,7 +1240,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMatrixAndPathSegmentParameters() throws Exception {
-        Class[] argType = {PathSegment.class, String.class};
+        Class<?>[] argType = {PathSegment.class, String.class};
         Method m = Customer.class.getMethod("testPathSegment", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar%20foo;p4=0%201");
@@ -1269,7 +1270,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @SuppressWarnings("unchecked")
     private void doTestFormParameters(boolean useMediaType) throws Exception {
-        Class[] argType = {String.class, List.class};
+        Class<?>[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         String body = "p1=1&p2=2&p2=3";
@@ -1295,7 +1296,7 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testFormParametersAndMap() throws Exception {
-        Class[] argType = {MultivaluedMap.class, String.class, List.class};
+        Class<?>[] argType = {MultivaluedMap.class, String.class, List.class};
         Method m = Customer.class.getMethod("testMultivaluedMapAndFormParam", argType);
         final Message messageImpl = createMessage();
         String body = "p1=1&p2=2&p2=3";

@@ -168,7 +168,7 @@ public class JibxToolingDataBinding implements DataBindingProfile {
 
             BindingUtils.getDefinitions(codegen.getRootBinding(), types, elements, null);
             
-            Iterator it = codegen.getBindingOrganizer().iterateBindings();
+            Iterator<?> it = codegen.getBindingOrganizer().iterateBindings();
             while (it.hasNext()) {
                 BindingHolder o = (BindingHolder)it.next();
                 getDefinitions(o, types, elements);
@@ -246,7 +246,7 @@ public class JibxToolingDataBinding implements DataBindingProfile {
 
     private static String itemType(MappingElement mappingElement, QName qName) {
         String localPart = qName.getLocalPart();
-        for (Iterator childIterator = mappingElement.childIterator(); childIterator.hasNext();) {
+        for (Iterator<?> childIterator = mappingElement.childIterator(); childIterator.hasNext();) {
             Object child = childIterator.next();
             if (child instanceof ValueElement) {
                 ValueElement valueElement = (ValueElement)child;
@@ -324,8 +324,8 @@ public class JibxToolingDataBinding implements DataBindingProfile {
         private String usingNamespace;
         private String nonamespacePackage;
         private String bindingName = "binding";
-        private List fileset;
-        private List includePaths = new ArrayList();
+        private List<?> fileset;
+        private List<?> includePaths = new ArrayList<Object>();
         private File modelFile;
         private BindingElement rootBinding;
         private File compilePath;
@@ -368,15 +368,11 @@ public class JibxToolingDataBinding implements DataBindingProfile {
             this.bindingName = bindingName;
         }
 
-        public List getFileset() {
-            return fileset;
-        }
-
-        public void setFileset(List fileset) {
+        public void setFileset(List<?> fileset) {
             this.fileset = fileset;
         }
 
-        public void setIncludePaths(List includePaths) {
+        public void setIncludePaths(List<?> includePaths) {
             this.includePaths = includePaths;
         }
 

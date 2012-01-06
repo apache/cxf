@@ -19,7 +19,6 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -67,7 +66,7 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
         if (passthrough()) {
             return;
         }
-        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
         
             if (javaModel.getServiceClasses().size() == 0) {
@@ -81,12 +80,8 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
             }
     
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-            Iterator it = javaModel.getServiceClasses().values().iterator();
-            while (it.hasNext()) {
-                JavaServiceClass js = (JavaServiceClass)it.next();
-                Iterator i = js.getPorts().iterator();
-                while (i.hasNext()) {
-                    JavaPort jp = (JavaPort)i.next();
+            for (JavaServiceClass js: javaModel.getServiceClasses().values()) {
+                for (JavaPort jp : js.getPorts()) {
                     String interfaceName = jp.getInterfaceClass();
                     JavaInterface intf = interfaces.get(interfaceName);
                     if (intf == null) {

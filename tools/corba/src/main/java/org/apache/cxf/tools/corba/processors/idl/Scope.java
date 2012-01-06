@@ -27,7 +27,7 @@ import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 
-public final class Scope implements Comparable {
+public final class Scope implements Comparable<Object> {
 
     private static final String SEPARATOR = ".";
     private List<String> scope;

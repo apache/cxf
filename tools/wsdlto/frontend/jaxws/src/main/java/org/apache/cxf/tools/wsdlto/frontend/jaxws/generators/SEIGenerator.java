@@ -73,7 +73,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
             return;
         }
 
-        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
         
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
