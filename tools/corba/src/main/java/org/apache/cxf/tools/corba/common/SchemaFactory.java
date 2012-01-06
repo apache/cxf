@@ -74,7 +74,7 @@ public abstract class SchemaFactory {
             try {
                 // get the appropriate class for the loading.
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                Class cl = loader.loadClass(factoryImplName);
+                Class<?> cl = loader.loadClass(factoryImplName);
 
                 return (SchemaFactory)cl.newInstance();
             } catch (Exception e) {

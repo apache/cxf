@@ -131,7 +131,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         generator.setServiceModel(getServiceInfo());
         
         generator.generate(output);
-        Class clz = classLoader.loadClass("org.apache.cxf.SayHi");
+        Class<?> clz = classLoader.loadClass("org.apache.cxf.SayHi");
         assertNotNull(clz);
         Field field = clz.getDeclaredField("arg0");
         assertNotNull(field.getAnnotation(XmlList.class));

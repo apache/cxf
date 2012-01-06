@@ -272,7 +272,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
         return bo;
     }
 
-    private SoapBody getSoapBody(Class parent) throws ToolException {
+    private SoapBody getSoapBody(Class<?> parent) throws ToolException {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }

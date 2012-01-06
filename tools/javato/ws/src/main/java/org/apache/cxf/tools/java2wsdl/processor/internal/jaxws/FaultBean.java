@@ -65,11 +65,11 @@ public final class FaultBean {
         return fault.faultBean();
     }
 
-    private boolean isWebFaultAbsent(final Class exceptionClass) {
+    private boolean isWebFaultAbsent(final Class<?> exceptionClass) {
         return StringUtils.isEmpty(getWebFaultBean(exceptionClass));
     }
     
-    public WrapperBeanClass transform(final Class exceptionClass, final String defaultPackage) {
+    public WrapperBeanClass transform(final Class<?> exceptionClass, final String defaultPackage) {
         WrapperBeanClass jClass = new WrapperBeanClass();
         if (isWebFaultAbsent(exceptionClass)) {
             jClass.setName(exceptionClass.getSimpleName() + "Bean");
@@ -105,7 +105,7 @@ public final class FaultBean {
             && !Arrays.asList(EXCLUDED_GETTER).contains(method.getName());
     }
     
-    private void buildBeanFields(final Class exceptionClass, final JavaClass jClass) {
+    private void buildBeanFields(final Class<?> exceptionClass, final JavaClass jClass) {
         Map<String, JavaField> fields = new TreeMap<String, JavaField>(); 
         
         for (Method method : exceptionClass.getMethods()) {

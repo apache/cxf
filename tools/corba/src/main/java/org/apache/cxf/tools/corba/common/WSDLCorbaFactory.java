@@ -76,7 +76,7 @@ public abstract class WSDLCorbaFactory {
             try {
                 // get the appropriate class for the loading.
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                Class cl = loader.loadClass(factoryImplName);
+                Class<?> cl = loader.loadClass(factoryImplName);
 
                 return (WSDLCorbaFactory)cl.newInstance();
             } catch (Exception e) {

@@ -139,7 +139,7 @@ public class JAXWSFrontEndProcessor implements Processor {
 
     public String getClassName(Type type) {
         if (type instanceof Class) {
-            Class clz = (Class)type;
+            Class<?> clz = (Class<?>)type;
             if (clz.isArray()) {
                 return clz.getComponentType().getName() + "[]";
             } else {
@@ -170,15 +170,15 @@ public class JAXWSFrontEndProcessor implements Processor {
     }
     
     
-    private boolean isImplRmiRemote(Class claz) {
+    private boolean isImplRmiRemote(Class<?> claz) {
         for (Method method : claz.getMethods()) {
             if (Modifier.isPublic(method.getModifiers()) && !Modifier.isStatic(method.getModifiers())
                 && !method.getDeclaringClass().getName().equals("java.lang.Object")) {
-                Class[] paraClasses = method.getParameterTypes();
-                for (Class clz : paraClasses) {
+                Class<?>[] paraClasses = method.getParameterTypes();
+                for (Class<?> clz : paraClasses) {
                     getInfClass(clz);
                 }
-                Class returnClass = method.getReturnType();
+                Class<?> returnClass = method.getReturnType();
                 getInfClass(returnClass);
             }
         }
@@ -189,8 +189,8 @@ public class JAXWSFrontEndProcessor implements Processor {
     }
     
     
-    private void getInfClass(Class claz) {
-        for (Class inf : claz.getInterfaces()) {
+    private void getInfClass(Class<?> claz) {
+        for (Class<?> inf : claz.getInterfaces()) {
             getInfClass(inf);
         }
         if (claz.getSuperclass() != null) {

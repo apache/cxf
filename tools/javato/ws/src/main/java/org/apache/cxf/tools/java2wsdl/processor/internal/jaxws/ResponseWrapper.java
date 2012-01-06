@@ -110,7 +110,7 @@ public final class ResponseWrapper extends Wrapper {
                 jf.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
                 if (t instanceof ParameterizedType) {
                     ParameterizedType pt = (ParameterizedType)t;
-                    Class c = (Class)pt.getRawType();
+                    Class<?> c = (Class<?>)pt.getRawType();
                     if (Holder.class.isAssignableFrom(c)) {
                         Annotation[][] paramAnnotations = method.getParameterAnnotations();
                         WebParam wParam = getWebParamAnnotation(paramAnnotations[idx]);

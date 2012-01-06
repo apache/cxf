@@ -31,7 +31,7 @@ import javax.xml.namespace.QName;
 public class JAXWSBindingSerializer implements ExtensionSerializer, Serializable {
     public static final long serialVersionUID = 1;
 
-    public void marshall(Class parentType,
+    public void marshall(@SuppressWarnings("rawtypes") Class parentType,
                          QName elementType,
                          ExtensibilityElement extension,
                          PrintWriter pw,
