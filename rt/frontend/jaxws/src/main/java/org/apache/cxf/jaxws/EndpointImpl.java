@@ -111,6 +111,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     private List<Interceptor<? extends Message>> inFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    @SuppressWarnings("rawtypes")
     private List<Handler> handlers = new ModCountCopyOnWriteArrayList<Handler>();
     
     /**
@@ -718,10 +719,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         outFault = interceptors;
     }
-    public void setHandlers(List<Handler> h) {
+    public void setHandlers(@SuppressWarnings("rawtypes") List<Handler> h) {
         handlers.clear();
         handlers.addAll(h);
     }
+    @SuppressWarnings("rawtypes")
     public List<Handler> getHandlers() {
         return handlers;
     }

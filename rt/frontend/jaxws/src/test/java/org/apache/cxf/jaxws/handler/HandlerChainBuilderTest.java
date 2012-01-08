@@ -37,6 +37,7 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("rawtypes")
 public class HandlerChainBuilderTest extends Assert {
 
     Handler[] allHandlers = {EasyMock.createMock(LogicalHandler.class), EasyMock.createMock(Handler.class),

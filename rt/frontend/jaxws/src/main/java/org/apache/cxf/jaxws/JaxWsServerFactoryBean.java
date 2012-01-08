@@ -62,6 +62,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  */
 public class JaxWsServerFactoryBean extends ServerFactoryBean {
     protected boolean doInit;
+    @SuppressWarnings("rawtypes")
     protected List<Handler> handlers = new ArrayList<Handler>();
 
     private boolean blockPostConstruct;
@@ -82,13 +83,14 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     public JaxWsServiceFactoryBean getJaxWsServiceFactory() {
         return (JaxWsServiceFactoryBean)getServiceFactory();
     }
-    public void setHandlers(List<Handler> h) {
+    public void setHandlers(@SuppressWarnings("rawtypes") List<Handler> h) {
         handlers.clear();
         handlers.addAll(h);
     }
-    public void addHandlers(List<Handler> h) {
+    public void addHandlers(@SuppressWarnings("rawtypes") List<Handler> h) {
         handlers.addAll(h);
     }
+    @SuppressWarnings("rawtypes")
     public List<Handler> getHandlers() {
         return handlers;
     }
@@ -237,11 +239,12 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     private void buildHandlerChain() {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
         JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory(); 
+        @SuppressWarnings("rawtypes")
         List<Handler> chain = new ArrayList<Handler>(handlers);
         
         chain.addAll(builder.buildHandlerChainFromClass(getServiceBeanClass(), sf.getEndpointInfo()
             .getName(), sf.getServiceQName(), this.getBindingId()));
-        for (Handler h : chain) {
+        for (Handler<?> h : chain) {
             injectResources(h);
         }
         ((JaxWsEndpointImpl)getServer().getEndpoint()).getJaxwsBinding().setHandlerChain(chain);

@@ -73,19 +73,20 @@ public class LogicalHandlerInterceptorTest extends Assert {
 
     @Test
     public void testInterceptSuccess() {
-        List<LogicalHandler> list = new ArrayList<LogicalHandler>();
-        list.add(new LogicalHandler() {
+        List<LogicalHandler<?>> list = new ArrayList<LogicalHandler<?>>();
+        list.add(new LogicalHandler<LogicalMessageContext>() {
             public void close(MessageContext arg0) {
             }
 
-            public boolean handleFault(MessageContext arg0) {
+            public boolean handleFault(LogicalMessageContext arg0) {
                 return true;
             }
 
-            public boolean handleMessage(MessageContext arg0) {
+            public boolean handleMessage(LogicalMessageContext arg0) {
                 return true;
             }
         });
+        @SuppressWarnings("rawtypes")
         List<Handler> hList = CastUtils.cast(list);
         expect(binding.getHandlerChain()).andReturn(hList).anyTimes();
         expect(invoker.getLogicalHandlers()).andReturn(list);
@@ -109,6 +110,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
     //becomes a response message.
     //NOTE: commented out as this has been covered by other tests.
     public void xtestReturnFalseClientSide() throws Exception {
+        @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<Handler>();
         list.add(new LogicalHandler<LogicalMessageContext>() {
             public void close(MessageContext arg0) {
@@ -130,6 +132,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
 
         IMocksControl control1 = createNiceControl();
         Binding binding1 = control1.createMock(Binding.class);
+        @SuppressWarnings("rawtypes")
         List<Handler> hList = CastUtils.cast(list);
         expect(binding1.getHandlerChain()).andReturn(hList).anyTimes();
         Exchange exchange1 = control1.createMock(Exchange.class);

@@ -49,6 +49,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
 
+@SuppressWarnings("rawtypes")
 public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationHandlerChainBuilder.class);

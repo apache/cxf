@@ -28,6 +28,7 @@ import javax.xml.ws.handler.Handler;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 
 public abstract class AbstractBindingImpl implements Binding {
+    @SuppressWarnings("rawtypes")
     private List<Handler> handlerChain = new ArrayList<Handler>();
     private final JaxWsEndpointImpl endpoint;
     
@@ -36,12 +37,13 @@ public abstract class AbstractBindingImpl implements Binding {
     }
     
     
+    @SuppressWarnings("rawtypes")
     public List<Handler> getHandlerChain() {
         //per spec, this should be a copy
         return new ArrayList<Handler>(handlerChain);
     }
 
-    public void setHandlerChain(List<Handler> hc) {
+    public void setHandlerChain(@SuppressWarnings("rawtypes") List<Handler> hc) {
         handlerChain = hc;
         if (handlerChain == null || handlerChain.isEmpty()) {
             endpoint.removeHandlerInterceptors();

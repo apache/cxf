@@ -56,6 +56,7 @@ public class AbstractProtocolHandlerInterceptorTest extends Assert {
         exchange = control.createMock(Exchange.class);
         binding = control.createMock(Binding.class);
         
+        @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<Handler>();
         list.add(null);
         expect(binding.getHandlerChain()).andReturn(list).anyTimes();

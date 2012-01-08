@@ -41,6 +41,7 @@ public class HTTPBindingImpl extends AbstractBindingImpl implements HTTPBinding 
         return "http://cxf.apache.org/bindings/xformat";
     }
     
+    @SuppressWarnings("rawtypes")
     @Override
     public void setHandlerChain(List<Handler> hc) {
         super.setHandlerChain(hc);
@@ -48,7 +49,7 @@ public class HTTPBindingImpl extends AbstractBindingImpl implements HTTPBinding 
     }
 
     private void validate() {
-        for (Handler handler : this.getHandlerChain()) {
+        for (Handler<?> handler : this.getHandlerChain()) {
             if (!(handler instanceof LogicalHandler)) {
                 throw new WebServiceException("Adding an incompatible handler in HTTPBinding: "
                                               + handler.getClass());

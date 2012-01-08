@@ -145,6 +145,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
         setAddress(port, addNumbersAddress);
 
+        @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = ((BindingProvider)port).getBinding().getHandlerChain();
         SmallNumberHandler h = (SmallNumberHandler)handlerChain.get(0);
         
@@ -166,16 +167,18 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
         setAddress(port, addNumbersAddress);
 
+        @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = ((BindingProvider)port).getBinding().getHandlerChain();
         SmallNumberHandler h = (SmallNumberHandler)handlerChain.get(0);
         
         assertEquals("injectedValue", h.getInjectedString());      
     } 
     
-    private void addHandlersProgrammatically(BindingProvider bp, Handler...handlers) {
+    private void addHandlersProgrammatically(BindingProvider bp, Handler<?>...handlers) {
+        @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = bp.getBinding().getHandlerChain();
         assertNotNull(handlerChain);
-        for (Handler h : handlers) {
+        for (Handler<?> h : handlers) {
             handlerChain.add(h);
         }
         bp.getBinding().setHandlerChain(handlerChain);

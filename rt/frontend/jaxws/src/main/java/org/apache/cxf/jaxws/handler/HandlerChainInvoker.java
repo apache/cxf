@@ -58,11 +58,11 @@ public class HandlerChainInvoker {
 
     private static final Logger LOG = LogUtils.getL7dLogger(HandlerChainInvoker.class);
 
-    private final List<Handler> protocolHandlers = new ArrayList<Handler>();
-    private List<LogicalHandler> logicalHandlers = new ArrayList<LogicalHandler>();
+    private final List<Handler<?>> protocolHandlers = new ArrayList<Handler<?>>();
+    private List<LogicalHandler<?>> logicalHandlers = new ArrayList<LogicalHandler<?>>();
 
-    private final List<Handler> invokedHandlers = new ArrayList<Handler>();
-    private final List<Handler> closeHandlers = new ArrayList<Handler>();
+    private final List<Handler<?>> invokedHandlers = new ArrayList<Handler<?>>();
+    private final List<Handler<?>> closeHandlers = new ArrayList<Handler<?>>();
 
     private boolean outbound;
     private boolean isRequestor;
@@ -71,22 +71,22 @@ public class HandlerChainInvoker {
     private boolean closed;
     private boolean messageDirectionReversed;
     private Exception fault;
-    private MessageContext logicalMessageContext;
+    private LogicalMessageContext logicalMessageContext;
     private MessageContext protocolMessageContext;
 
-    public HandlerChainInvoker(List<Handler> hc) {
+    public HandlerChainInvoker(@SuppressWarnings("rawtypes") List<Handler> hc) {
         this(hc, true);
     }
 
-    public HandlerChainInvoker(List<Handler> hc, boolean isOutbound) {
+    public HandlerChainInvoker(@SuppressWarnings("rawtypes") List<Handler> hc, boolean isOutbound) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "invoker for chain size: " + (hc != null ? hc.size() : 0));
         }
 
         if (hc != null) {
-            for (Handler h : hc) {
+            for (Handler<?> h : hc) {
                 if (h instanceof LogicalHandler) {
-                    logicalHandlers.add((LogicalHandler)h);
+                    logicalHandlers.add((LogicalHandler<?>)h);
                 } else {
                     protocolHandlers.add(h);
                 }
@@ -95,19 +95,19 @@ public class HandlerChainInvoker {
         outbound = isOutbound;
     }
 
-    public List<LogicalHandler> getLogicalHandlers() {
+    public List<LogicalHandler<?>> getLogicalHandlers() {
         return logicalHandlers;
     }
 
-    public List<Handler> getProtocolHandlers() {
+    public List<Handler<?>> getProtocolHandlers() {
         return protocolHandlers;
     }
 
-    public MessageContext getLogicalMessageContext() {
+    public LogicalMessageContext getLogicalMessageContext() {
         return logicalMessageContext;
     }
 
-    public void setLogicalMessageContext(MessageContext mc) {
+    public void setLogicalMessageContext(LogicalMessageContext mc) {
         logicalMessageContext = mc;
     }
 
@@ -225,11 +225,11 @@ public class HandlerChainInvoker {
         logicalHandlers = invoker.getLogicalHandlers();
     }
 
-    List getInvokedHandlers() {
+    List<Handler<?>> getInvokedHandlers() {
         return Collections.unmodifiableList(invokedHandlers);
     }
 
-    private boolean invokeHandlerChain(List<? extends Handler> handlerChain, MessageContext ctx) {
+    private boolean invokeHandlerChain(List<? extends Handler<?>> handlerChain, MessageContext ctx) {
         if (handlerChain.isEmpty()) {
             LOG.log(Level.FINEST, "no handlers registered");
             return true;
@@ -264,7 +264,8 @@ public class HandlerChainInvoker {
      * ProtocolException (per spec), if the exception is thrown from other
      * places other than handlers, we always invoke handleFault.
      */
-    private boolean invokeHandlerChainHandleFault(List<? extends Handler> handlerChain, MessageContext ctx) {
+    private boolean invokeHandlerChainHandleFault(List<? extends Handler<?>> handlerChain, 
+        MessageContext ctx) {
         if (handlerChain.isEmpty()) {
             LOG.log(Level.FINEST, "no handlers registered");
             return true;
@@ -301,15 +302,16 @@ public class HandlerChainInvoker {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean invokeHandleFault(List<? extends Handler> handlerChain, MessageContext ctx) {
+    private boolean invokeHandleFault(List<? extends Handler<?>> handlerChain, MessageContext ctx) {
         boolean continueProcessing = true;
 
         try {
-            for (Handler h : handlerChain) {
+            for (Handler<?> h : handlerChain) {
                 if (invokeThisHandler(h)) {
                     closeHandlers.add(h);
                     markHandlerInvoked(h);
-                    continueProcessing = h.handleFault(ctx);
+                    Handler<MessageContext> lh = (Handler<MessageContext>)h;
+                    continueProcessing = lh.handleFault(ctx);
                 }
                 if (!continueProcessing) {
                     break;
@@ -325,14 +327,15 @@ public class HandlerChainInvoker {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean invokeHandleMessage(List<? extends Handler> handlerChain, MessageContext ctx) {
+    private boolean invokeHandleMessage(List<? extends Handler<?>> handlerChain, MessageContext ctx) {
         boolean continueProcessing = true;
         try {
-            for (Handler h : handlerChain) {
+            for (Handler<?> h : handlerChain) {
                 if (invokeThisHandler(h)) {
                     closeHandlers.add(h);
                     markHandlerInvoked(h);
-                    continueProcessing = h.handleMessage(ctx);
+                    Handler<MessageContext> lh = (Handler<MessageContext>)h;
+                    continueProcessing = lh.handleMessage(ctx);
                 }
                 if (!continueProcessing) {
                     if (responseExpected) {
@@ -489,11 +492,13 @@ public class HandlerChainInvoker {
         try {
             int index = invokedHandlers.size() - 2;
             while (index >= 0 && continueProcessing) {
-                Handler h = invokedHandlers.get(index);
+                Handler<? extends MessageContext> h = invokedHandlers.get(index);
                 if (h instanceof LogicalHandler) {
-                    continueProcessing = h.handleFault(logicalMessageContext);
+                    LogicalHandler<LogicalMessageContext> lh = (LogicalHandler<LogicalMessageContext>)h;
+                    continueProcessing = lh.handleFault(logicalMessageContext);
                 } else {
-                    continueProcessing = h.handleFault(protocolMessageContext);
+                    Handler<MessageContext> ph = (Handler<MessageContext>)h; 
+                    continueProcessing = ph.handleFault(protocolMessageContext);
                 }
 
                 if (!continueProcessing) {
@@ -522,7 +527,7 @@ public class HandlerChainInvoker {
     private void invokeReversedClose() {
         int index = invokedHandlers.size() - 1;
         while (index >= 0) {
-            Handler handler = invokedHandlers.get(index);
+            Handler<?> handler = invokedHandlers.get(index);
             if (handler instanceof LogicalHandler) {
                 handler.close(logicalMessageContext);
             } else {
@@ -534,7 +539,7 @@ public class HandlerChainInvoker {
         closed = true;
     }
 
-    private boolean invokeThisHandler(Handler h) {
+    private boolean invokeThisHandler(Handler<?> h) {
         boolean ret = true;
         // when handler processing has been aborted, only invoke on
         // previously invoked handlers
@@ -549,11 +554,11 @@ public class HandlerChainInvoker {
         return ret;
     }
 
-    private boolean isTheLastInvokedHandler(Handler h) {
+    private boolean isTheLastInvokedHandler(Handler<?> h) {
         return invokedHandlers.contains(h) && invokedHandlers.indexOf(h) == (invokedHandlers.size() - 1);
     }
 
-    private void markHandlerInvoked(Handler h) {
+    private void markHandlerInvoked(Handler<?> h) {
         if (!invokedHandlers.contains(h)) {
             invokedHandlers.add(h);
         }
@@ -574,7 +579,7 @@ public class HandlerChainInvoker {
         }
     }
 
-    private <T extends Handler> List<T> reverseHandlerChain(List<T> handlerChain) {
+    private <T extends Handler<?>> List<T> reverseHandlerChain(List<T> handlerChain) {
         List<T> reversedHandlerChain = new ArrayList<T>();
         reversedHandlerChain.addAll(handlerChain);
         Collections.reverse(reversedHandlerChain);

@@ -73,9 +73,9 @@ public class SOAPHandlerFaultOutInterceptor extends
 
     public Set<QName> getUnderstoodHeaders() {
         Set<QName> understood = new HashSet<QName>();
-        for (Handler h : getBinding().getHandlerChain()) {
+        for (Handler<?> h : getBinding().getHandlerChain()) {
             if (h instanceof SOAPHandler) {
-                Set<QName> headers = CastUtils.cast(((SOAPHandler) h).getHeaders());
+                Set<QName> headers = CastUtils.cast(((SOAPHandler<?>) h).getHeaders());
                 if (headers != null) {
                     understood.addAll(headers);
                 }

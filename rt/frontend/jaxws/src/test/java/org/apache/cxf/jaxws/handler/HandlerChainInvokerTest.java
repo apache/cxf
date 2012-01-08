@@ -70,6 +70,7 @@ public class HandlerChainInvokerTest extends Assert {
     public void setUp() {
         AbstractHandlerBase.clear();
 
+        @SuppressWarnings("rawtypes")
         List<Handler> handlers = new ArrayList<Handler>();
         for (int i = 0; i < logicalHandlers.length; i++) {
             logicalHandlers[i] = new TestLogicalHandler();
@@ -93,6 +94,7 @@ public class HandlerChainInvokerTest extends Assert {
         
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeEmptyHandlerChain() {
         invoker = new HandlerChainInvoker(new ArrayList<Handler>());
@@ -104,12 +106,12 @@ public class HandlerChainInvokerTest extends Assert {
     public void testHandlerPartitioning() {
 
         assertEquals(HANDLER_COUNT, invoker.getLogicalHandlers().size());
-        for (Handler h : invoker.getLogicalHandlers()) {
+        for (Handler<?> h : invoker.getLogicalHandlers()) {
             assertTrue(h instanceof LogicalHandler);
         }
 
         assertEquals(HANDLER_COUNT, invoker.getProtocolHandlers().size());
-        for (Handler h : invoker.getProtocolHandlers()) {
+        for (Handler<?> h : invoker.getProtocolHandlers()) {
             assertTrue(!(h instanceof LogicalHandler));
         }
 

@@ -35,8 +35,10 @@ import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
+@SuppressWarnings("rawtypes")
 public class HandlerResolverImpl implements HandlerResolver {
-    private final Map<PortInfo, List<Handler>> handlerMap = new HashMap<PortInfo, List<Handler>>();
+    private final Map<PortInfo, List<Handler>> handlerMap 
+        = new HashMap<PortInfo, List<Handler>>();
     
     //private QName service;   
     private Class<?> annotationClass;
@@ -72,7 +74,7 @@ public class HandlerResolverImpl implements HandlerResolver {
             chain.addAll(getHandlersFromAnnotation(annotationClass, portInfo));         
         }
         
-        for (Handler h : chain) {
+        for (Handler<?> h : chain) {
             configHandler(h);
         }       
         
@@ -102,7 +104,7 @@ public class HandlerResolverImpl implements HandlerResolver {
      * the case where no injections were requested, the runtime MUST invoke the
      * method carrying a javax.annotation .PostConstruct annotation, if present.
      */
-    private void configHandler(Handler handler) {
+    private void configHandler(Handler<?> handler) {
         if (handler != null) {
             ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
             List<ResourceResolver> resolvers = resourceManager.getResourceResolvers();
