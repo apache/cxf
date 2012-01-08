@@ -331,7 +331,7 @@
 
                                         <!-- Add warning flags that we want -->
                                         <propertyfile file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.core.prefs">
-                                            <!-- need to fix a TON (~2K) of these before figuring out if this is needed -->
+                                            <!-- need to fix a bunch (~450) of these before figuring out if this is needed -->
                                             <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore" />
 
                                             <!-- SDO generated code has unused imports. Checkstyle can handle this though. -->
