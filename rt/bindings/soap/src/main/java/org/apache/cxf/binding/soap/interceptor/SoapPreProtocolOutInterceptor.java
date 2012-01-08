@@ -146,7 +146,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
                 if (null != dboi) {
                     boi = dboi;
                 }
-                SoapOperationInfo soi = (SoapOperationInfo) boi.getExtensor(SoapOperationInfo.class);
+                SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
                 action = soi == null ? "\"\"" : soi.getAction() == null ? "\"\"" : soi.getAction();
             }
         }

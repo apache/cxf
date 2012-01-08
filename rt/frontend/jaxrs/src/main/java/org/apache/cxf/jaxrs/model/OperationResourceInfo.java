@@ -164,7 +164,7 @@ public class OperationResourceInfo {
             consumeMimes = JAXRSUtils.sortMediaTypes(consumeMediaTypes);
         } else {
             Consumes cm = 
-                (Consumes)AnnotationUtils.getMethodAnnotation(annotatedMethod, Consumes.class);
+                AnnotationUtils.getMethodAnnotation(annotatedMethod, Consumes.class);
             if (cm != null) {
                 consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()));
             } else if (classResourceInfo != null) {
@@ -175,7 +175,7 @@ public class OperationResourceInfo {
             produceMimes = JAXRSUtils.sortMediaTypes(produceMediaTypes);
         } else {
             Produces pm = 
-                (Produces)AnnotationUtils.getMethodAnnotation(annotatedMethod, Produces.class);
+                AnnotationUtils.getMethodAnnotation(annotatedMethod, Produces.class);
             if (pm != null) {
                 produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()));
             } else if (classResourceInfo != null) {
@@ -202,10 +202,10 @@ public class OperationResourceInfo {
     }
     
     private void checkDefaultParameterValue() {
-        DefaultValue dv = (DefaultValue)AnnotationUtils.getMethodAnnotation(annotatedMethod, 
+        DefaultValue dv = AnnotationUtils.getMethodAnnotation(annotatedMethod, 
                                             DefaultValue.class);
         if (dv == null && classResourceInfo != null) {
-            dv = (DefaultValue)AnnotationUtils.getClassAnnotation(
+            dv = AnnotationUtils.getClassAnnotation(
                                          classResourceInfo.getServiceClass(), 
                                          DefaultValue.class);
         }

@@ -41,7 +41,7 @@ public class Server extends AbstractBusTestServerBase {
         JMSConfiguration jmsConfig = new JMSConfiguration();
 
         ConnectionFactory connectionFactory
-            = (ConnectionFactory)context.getBean("jmsConnectionFactory", ConnectionFactory.class);
+            = context.getBean("jmsConnectionFactory", ConnectionFactory.class);
         jmsConfig.setConnectionFactory(connectionFactory);
         jmsConfig.setTargetDestination("greeter.queue.noaop");
         jmsConfig.setSessionTransacted(true);

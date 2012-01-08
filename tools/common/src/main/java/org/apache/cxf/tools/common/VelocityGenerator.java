@@ -97,7 +97,7 @@ public final class VelocityGenerator {
 
         VelocityContext ctx = new VelocityContext();
 
-        for (String key: attributes.keySet()) {
+        for (String key : attributes.keySet()) {
             ctx.put(key, attributes.get(key));
         }
 

@@ -282,7 +282,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
             rawClass = Array.newInstance(rawClass, 0).getClass();
         } else {
             if (rawType instanceof ParameterizedType) {
-                rawType = (Class<?>)((ParameterizedType)rawType).getRawType();
+                rawType = ((ParameterizedType)rawType).getRawType();
             }
             rawClass = (Class<?>)rawType;
         }

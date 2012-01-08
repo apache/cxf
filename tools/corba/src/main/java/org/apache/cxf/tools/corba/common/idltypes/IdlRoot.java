@@ -58,7 +58,7 @@ public final class IdlRoot extends IdlScopeBase {
         IdlDefn result = null;
 
         if (!undefined && primitiveTypes.containsKey(nm)) {
-            result = (IdlDefn)primitiveTypes.get(nm);
+            result = primitiveTypes.get(nm);
         } else {
             result = super.lookup(nm, undefined);
         }

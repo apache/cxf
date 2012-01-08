@@ -118,7 +118,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             m.put(FORCE_START_DOCUMENT, Boolean.TRUE);
             return (XMLOutputFactory)o;
         } else if (o != null) {
-            XMLOutputFactory xif = (XMLOutputFactory)factories.get(o);
+            XMLOutputFactory xif = factories.get(o);
             if (xif == null) {
                 Class<?> cls;
                 if (o instanceof Class) {

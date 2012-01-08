@@ -60,7 +60,7 @@ public final class CustomizationParser {
     private String wadlPath;
     
     public CustomizationParser(ToolContext env) {
-        bus = (Bus)env.get(Bus.class);
+        bus = env.get(Bus.class);
         wadlPath = (String)env.get(WadlToolConstants.CFG_WADLURL);
     }
 

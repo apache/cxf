@@ -244,7 +244,7 @@ public final class WSDLTypes {
         int caseIndex = 0;
 
         for (int i = 0; i < fields.size(); i++) {
-            MemberType field = (MemberType)fields.get(i);
+            MemberType field = fields.get(i);
             Unionbranch branch = new Unionbranch();
             branch.setName(field.getName());
             branch.setIdltype(field.getIdltype());
@@ -254,7 +254,7 @@ public final class WSDLTypes {
             branch.setDefault(false);
 
             CaseType c = new CaseType();
-            c.setLabel((String)caselist.get(caseIndex));
+            c.setLabel(caselist.get(caseIndex));
             caseIndex++;
             branch.getCase().add(c);
             corbaUnion.getUnionbranch().add(branch);
@@ -384,10 +384,10 @@ public final class WSDLTypes {
 
         if (boundedDecimal || boundedScale) {
             if (anonymous) {
-                corbaTypeImpl = (CorbaTypeImpl)getAnonFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
+                corbaTypeImpl = getAnonFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
                                                                  digits, scale);
             } else {
-                corbaTypeImpl = (CorbaTypeImpl)getFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
+                corbaTypeImpl = getFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
                                           digits, scale);
             }
         }

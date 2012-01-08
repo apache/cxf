@@ -151,7 +151,7 @@ public final class PolicyUtils {
                 buf.append(" (optional)");
             }
             buf.append(" (");
-            buf.append((Assertion)pc);
+            buf.append(pc);
             buf.append(")");
             nl(buf);
             if (pc instanceof PolicyContainingAssertion) {

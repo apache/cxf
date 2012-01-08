@@ -149,7 +149,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
                     }
                     list.add(wsdltoidlOptions[x].getWSDL());            
                     try {
-                        WSDLToIDL.run((String[])list.toArray(new String[list.size()]));
+                        WSDLToIDL.run(list.toArray(new String[list.size()]));
                         doneFile.delete();
                         doneFile.createNewFile();
                     } catch (Throwable e) {

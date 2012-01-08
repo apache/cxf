@@ -373,7 +373,7 @@ public class ScopedNameVisitor extends VisitorBase {
                                                           VisitorTypeHolder holder) {
 
         boolean result = false;                
-        List<Scope> baseScopes = (List<Scope>)wsdlVisitor.getInheritedScopeMap().get(scope);
+        List<Scope> baseScopes = wsdlVisitor.getInheritedScopeMap().get(scope);
         if (baseScopes != null) {
             List<Scope> scopeList = new ArrayList<Scope>();
             for (Scope scopeName : baseScopes) {

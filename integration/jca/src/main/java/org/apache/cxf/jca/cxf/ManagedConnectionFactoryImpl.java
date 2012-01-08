@@ -131,7 +131,7 @@ public class ManagedConnectionFactoryImpl
         throws ResourceException {
         LOG.info("create connection, subject=" + subject + " connReqInfo=" + connReqInfo);
         init(Thread.currentThread().getContextClassLoader());
-        return (ManagedConnection)new ManagedConnectionImpl(this, connReqInfo, subject);
+        return new ManagedConnectionImpl(this, connReqInfo, subject);
     }
 
     public void close() throws javax.resource.spi.ResourceAdapterInternalException {

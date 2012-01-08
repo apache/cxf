@@ -60,7 +60,7 @@ public final class AnnotationUtil {
     }
 
     public static Annotation[][] getPrivParameterAnnotations(final Method method) {
-        return (Annotation[][])AccessController.doPrivileged(new PrivilegedAction<Annotation[][]>() {
+        return AccessController.doPrivileged(new PrivilegedAction<Annotation[][]>() {
             public Annotation[][] run() {
                 return method.getParameterAnnotations();
             }

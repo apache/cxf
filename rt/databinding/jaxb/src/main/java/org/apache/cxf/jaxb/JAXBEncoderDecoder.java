@@ -704,7 +704,7 @@ public final class JAXBEncoderDecoder {
             Type tp2 = ((ParameterizedType)genericType).getRawType();
             if (tp2 instanceof Class) {
                 Class<?> cls = (Class<?>)tp2;
-                if (!cls.isInterface() && List.class.isAssignableFrom((Class<?>)cls)) {
+                if (!cls.isInterface() && List.class.isAssignableFrom(cls)) {
                     try {
                         return CastUtils.cast((List<?>)cls.newInstance());
                     } catch (Exception e) {

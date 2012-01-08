@@ -197,7 +197,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
                 if ("SOAPService_Test1".equals(service.getName())) {
                     continue;
                 }
-                List<JavaPort> ports = (List<JavaPort>) service.getPorts();
+                List<JavaPort> ports = service.getPorts();
                 for (JavaPort port : ports) {
                     if (interfaceName.equals(port.getPortType())) {
                         address = port.getBindingAdress();

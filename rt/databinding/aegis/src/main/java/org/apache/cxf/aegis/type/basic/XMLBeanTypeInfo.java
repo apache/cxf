@@ -179,7 +179,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         for (Element mapping2 : mappings) {
             List<Element> elements = DOMUtils.getChildrenWithName(mapping2, "", "property");
             for (int i = 0; i < elements.size(); i++) {
-                Element e = (Element)elements.get(i);
+                Element e = elements.get(i);
                 String name = DOMUtils.getAttributeValueEmptyNull(e, "name");
 
                 if (name != null && name.equals(name2)) {

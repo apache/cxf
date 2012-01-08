@@ -85,7 +85,7 @@ public class CommandDocument {
         List<Object> result = new ArrayList<Object>();
 
         if (values != null) {
-            for (Element el: values) {
+            for (Element el : values) {
                 if (el.getAttribute("name").equals(name)) {
                     if (el.hasChildNodes()) {
                         result.add(el.getFirstChild().getNodeValue());
@@ -109,7 +109,7 @@ public class CommandDocument {
         List<Object> result = new ArrayList<Object>();
 
         if (values != null) {
-            for (Element el: values) {
+            for (Element el : values) {
                 result.add(el.getAttribute("name"));
             }
         }

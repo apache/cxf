@@ -42,7 +42,7 @@ public class HelloService extends Service {
 
     @WebEndpoint(name = "HelloPort")
     public Hello getHelloPort() {
-        return (Hello)super.getPort(HELLO_PORT, Hello.class);
+        return super.getPort(HELLO_PORT, Hello.class);
     }
 
 }

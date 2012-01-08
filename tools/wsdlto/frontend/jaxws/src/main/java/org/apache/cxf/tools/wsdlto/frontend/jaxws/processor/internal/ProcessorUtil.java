@@ -375,7 +375,7 @@ public final class ProcessorUtil {
     public static List<WrapperElement> getWrappedElement(ToolContext context, QName partElement) {
         List<WrapperElement> qnames = new ArrayList<WrapperElement>();
 
-        ServiceInfo serviceInfo = (ServiceInfo)context.get(ServiceInfo.class);
+        ServiceInfo serviceInfo = context.get(ServiceInfo.class);
         SchemaCollection schema = serviceInfo.getXmlSchemaCollection();
 
         XmlSchemaElement elementByName = schema.getElementByQName(partElement);
@@ -435,7 +435,7 @@ public final class ProcessorUtil {
     }
     
     public static boolean isSchemaFormQualified(ToolContext context, QName partElement) {
-        ServiceInfo serviceInfo = (ServiceInfo)context.get(ServiceInfo.class);
+        ServiceInfo serviceInfo = context.get(ServiceInfo.class);
         SchemaCollection schemaCol = serviceInfo.getXmlSchemaCollection();
         XmlSchema schema = schemaCol.getSchemaForElement(partElement);
         if (schema != null) {

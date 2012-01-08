@@ -480,7 +480,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     }
     
     org.apache.cxf.endpoint.Endpoint getEndpoint() {
-        return ((ServerImpl)getServer(null)).getEndpoint();
+        return getServer(null).getEndpoint();
     }
     
     private void configureObject(Object instance) {

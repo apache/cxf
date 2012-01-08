@@ -48,7 +48,7 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
         Subject sj) throws ResourceException {
         
         this.managedConnectionFactory = managedFactory;
-        this.crinfo = (ConnectionRequestInfo)crInfo;
+        this.crinfo = crInfo;
     }
 
     

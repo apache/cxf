@@ -391,7 +391,7 @@ public class CorbaConduit implements Conduit {
                 inCorbaMsg.setSystemException(corbaMsg.getSystemException());
             }
             LOG.log(Level.FINE, "incoming observer is " + incomingObserver);
-            incomingObserver.onMessage((Message)inCorbaMsg);
+            incomingObserver.onMessage(inCorbaMsg);
             message.setContent(Exception.class, inCorbaMsg.getContent(Exception.class));
         }
 

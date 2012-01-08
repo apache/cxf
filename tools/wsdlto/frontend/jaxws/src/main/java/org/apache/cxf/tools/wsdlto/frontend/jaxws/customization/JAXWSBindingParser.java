@@ -233,7 +233,7 @@ public class JAXWSBindingParser {
         if (!(rnode instanceof Element)) {
             return null;
         }
-        return (Element)rnode;
+        return rnode;
     }
 
     class ContextImpl implements NamespaceContext {

@@ -116,10 +116,10 @@ public class SpringBeanQNameMap<V>
                                             .getGenericArgumentValues();
                                     
                                     ConstructorArgumentValues.ValueHolder v 
-                                        = (ConstructorArgumentValues.ValueHolder)l.get(0);
+                                        = l.get(0);
                                     
                                     TypedStringValue nss = (TypedStringValue)v.getValue();
-                                    v = (ConstructorArgumentValues.ValueHolder)l.get(1);
+                                    v = l.get(1);
                                     TypedStringValue ln = (TypedStringValue)v.getValue();
                                     checked.add(new QName(nss.getValue(), ln.getValue()));
                                 } catch (Exception ex) {

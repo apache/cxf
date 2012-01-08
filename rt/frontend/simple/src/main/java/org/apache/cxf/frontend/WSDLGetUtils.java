@@ -411,7 +411,7 @@ public class WSDLGetUtils {
         Types types = def.getTypes();
         if (types != null) {
             for (ExtensibilityElement el 
-                : CastUtils.cast((List<?>)types.getExtensibilityElements(), ExtensibilityElement.class)) {
+                : CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
                     Schema see = (Schema)el;
                     updateSchemaImports(bus, see, doneSchemas, base);

@@ -998,7 +998,7 @@ public class WSDLToCorbaHelper {
             }
             List<MemberType> attlist2 = processAttributesAsMembers(complex.getAttributes(), uri);
             for (int i = 0; i < attlist2.size(); i++) {
-                MemberType member = (MemberType)attlist2.get(i);
+                MemberType member = attlist2.get(i);
                 corbaStruct.getMember().add(member);
             }
         }
@@ -1084,7 +1084,7 @@ public class WSDLToCorbaHelper {
 
         //Deal with Attributes defined in Extension
         for (int i = 0; i < attrMembers.size(); i++) {
-            MemberType member = (MemberType)attrMembers.get(i);
+            MemberType member = attrMembers.get(i);
             corbaStruct.getMember().add(member);
         }
 
@@ -1141,7 +1141,7 @@ public class WSDLToCorbaHelper {
         // process attributes at complexContent level
         List<MemberType> attlist1 = processAttributesAsMembers(list, uri);
         for (int i = 0; i < attlist1.size(); i++) {
-            MemberType member = (MemberType)attlist1.get(i);
+            MemberType member = attlist1.get(i);
             corbaStruct.getMember().add(member);
         }
 
@@ -1394,7 +1394,7 @@ public class WSDLToCorbaHelper {
             Iterator<Enumerator> iterator = corbaenum.getEnumerator().iterator();
 
             while (iterator.hasNext()) {
-                Enumerator enumerator = (Enumerator)iterator.next();
+                Enumerator enumerator = iterator.next();
                 caselist.add(enumerator.getValue());
             }
         } else if (SUPPORTEDDISTYPES.contains(disctype.getQName().getLocalPart())) {

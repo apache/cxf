@@ -89,7 +89,7 @@ public class OperationProcessor  extends AbstractProcessor {
         ParameterProcessor paramProcessor = new ParameterProcessor(context);
         method.clear();
         
-        JAXWSBinding opBinding = (JAXWSBinding)operation.getExtensor(JAXWSBinding.class);
+        JAXWSBinding opBinding = operation.getExtensor(JAXWSBinding.class);
         JAXWSBinding ptBinding = operation.getInterface().getExtensor(JAXWSBinding.class);
         JAXWSBinding defBinding = operation.getInterface().getService()
             .getDescription().getExtensor(JAXWSBinding.class);

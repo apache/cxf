@@ -76,7 +76,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
             Map<String, JavaServiceClass> serviceClasses = javaModel.getServiceClasses();
             
             if (serviceClasses.size() == 0) {
-                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
+                ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SERVICE", LOG, wsdl);
                 if (penv.isVerbose()) {

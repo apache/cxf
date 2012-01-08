@@ -101,7 +101,7 @@ public class DataBindingProviderTest extends Assert {
         binding.initialize(s);
         DataBindingProvider p = new DataBindingProvider(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Book book = (Book)p.readFrom((Class)Book.class, Book.class,
+        Book book = (Book)p.readFrom(Book.class, Book.class,
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("CXF", book.getName());
@@ -173,7 +173,7 @@ public class DataBindingProviderTest extends Assert {
         binding.initialize(s);
         DataBindingProvider p = new DataBindingProvider(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Structure struct = (Structure)p.readFrom((Class)Structure.class, Structure.class,
+        Structure struct = (Structure)p.readFrom(Structure.class, Structure.class,
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("sdo", struct.getText());
@@ -209,7 +209,7 @@ public class DataBindingProviderTest extends Assert {
         binding.initialize(s);
         DataBindingProvider p = new DataBindingProvider(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Address address = (Address)p.readFrom((Class)Address.class, Address.class,
+        Address address = (Address)p.readFrom(Address.class, Address.class,
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("Street 1", address.getAddressLine1());

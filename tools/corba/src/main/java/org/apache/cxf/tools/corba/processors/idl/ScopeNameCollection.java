@@ -35,11 +35,11 @@ public final class ScopeNameCollection  {
     }
     
     public Scope getScope(Scope scope) {
-        return (Scope)scopedNames.get(scope.toString());
+        return scopedNames.get(scope.toString());
     }
     
     public Scope getScope(String scopename) {
-        return (Scope)scopedNames.get(scopename);
+        return scopedNames.get(scopename);
     }
     
 }

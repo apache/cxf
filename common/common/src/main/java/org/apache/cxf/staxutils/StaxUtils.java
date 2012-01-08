@@ -1400,12 +1400,12 @@ public final class StaxUtils {
         }
         Iterator<XMLEvent> it = CastUtils.cast(start.getNamespaces());
         while (it != null && it.hasNext()) {
-            writeEvent((XMLEvent)it.next(), writer);
+            writeEvent(it.next(), writer);
         }
         
         it = CastUtils.cast(start.getAttributes());
         while (it != null && it.hasNext()) {
-            writeAttributeEvent((Attribute)it.next(), writer);            
+            writeAttributeEvent(it.next(), writer);            
         }
     }
     private static void writeAttributeEvent(XMLEvent event, XMLStreamWriter writer) 

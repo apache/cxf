@@ -62,7 +62,7 @@ public class TestUtils {
                                                      "/wsdl_corbabinding/exceptions.wsdl", 
                                                      "ExceptionTestCORBAService",
                                                      "ExceptionTestCORBAPort");
-        CorbaBindingFactory corbaBF = (CorbaBindingFactory)factory;
+        CorbaBindingFactory corbaBF = factory;
         return (CorbaDestination)corbaBF.getDestination(endpointInfo);        
     }
     
@@ -71,7 +71,7 @@ public class TestUtils {
                                                      "/wsdl_corbabinding/ComplexTypes.wsdl",
                                                      "ComplexTypesCORBAService",
                                                      "ComplexTypesCORBAPort");
-        CorbaBindingFactory corbaBF = (CorbaBindingFactory)factory;        
+        CorbaBindingFactory corbaBF = factory;        
         return (CorbaDestination)corbaBF.getDestination(endpointInfo);
     }
     public CorbaDestination getComplexTypesTestDestinationYoko() throws Exception {
@@ -79,7 +79,7 @@ public class TestUtils {
                                                      "/wsdl_corbabinding/ComplexTypesYoko.wsdl",
                                                      "ComplexTypesCORBAService",
                                                      "ComplexTypesCORBAPort");
-        CorbaBindingFactory corbaBF = (CorbaBindingFactory)factory;        
+        CorbaBindingFactory corbaBF = factory;        
         return (CorbaDestination)corbaBF.getDestination(endpointInfo);
     }
 

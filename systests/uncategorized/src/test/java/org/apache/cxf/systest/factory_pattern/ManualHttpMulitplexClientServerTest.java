@@ -96,7 +96,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         String portString = EndpointReferenceUtils.getPortName(epr);
         QName portName = new QName(serviceName.getNamespaceURI(), portString);                
         numService.addPort(portName, SoapBindingFactory.SOAP_11_BINDING, "http://foo");
-        Number num = (Number)numService.getPort(portName, Number.class);
+        Number num = numService.getPort(portName, Number.class);
 
         setupContextWithEprAddress(epr, num);
         
@@ -134,11 +134,11 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
         
-        Number num =  (Number)serviceImpl.getPort(numberTwoRef, Number.class);
+        Number num =  serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
         w3cEpr = factory.create("23");
         EndpointReferenceType numberTwentyThreeRef = VersionTransformer.convertToInternal(w3cEpr); 
-        num =  (Number)serviceImpl.getPort(numberTwentyThreeRef, Number.class);
+        num =  serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
     }
     

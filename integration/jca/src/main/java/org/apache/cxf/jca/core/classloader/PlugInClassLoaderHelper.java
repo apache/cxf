@@ -51,7 +51,7 @@ public final class PlugInClassLoaderHelper {
     public static byte[] getResourceAsBytes(String name) throws IOException {
         // check nonClassCache for properties etc..
         if (!name.endsWith(".class") && nonClassesMap.containsKey(name)) {
-            return (byte[])(nonClassesMap.get(name));            
+            return nonClassesMap.get(name);            
         }
 
         // first check file path directorys, then check jars

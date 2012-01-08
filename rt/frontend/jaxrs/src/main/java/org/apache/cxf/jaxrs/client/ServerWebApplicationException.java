@@ -86,7 +86,7 @@ public class ServerWebApplicationException extends WebApplicationException {
     
     @SuppressWarnings("unchecked")
     public MultivaluedMap<String, String> getHeaders() {
-        return (MultivaluedMap<String, String>)((MultivaluedMap)super.getResponse().getMetadata());
+        return (MultivaluedMap)super.getResponse().getMetadata();
     }
     
     @Override
@@ -179,7 +179,7 @@ public class ServerWebApplicationException extends WebApplicationException {
             }
             
             return (T)reader.readFrom(entityCls, entityCls, annotations, mt, 
-                                      (MultivaluedMap<String, String>)headers, 
+                                      headers, 
                                       inputStream);
         } catch (Exception ex) {
             throw new ClientWebApplicationException(ex);

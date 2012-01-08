@@ -1122,7 +1122,7 @@ public class JAXRSUtilsTest extends Assert {
 
         assertEquals("A", cb1.getA());
         assertEquals(new Long(123), cb1.getB());
-        List<String> list1 = (List<String>)cb1.getC();
+        List<String> list1 = cb1.getC();
         assertEquals(3, list1.size());
         assertEquals("1", list1.get(0));
         assertEquals("2", list1.get(1));
@@ -1133,7 +1133,7 @@ public class JAXRSUtilsTest extends Assert {
 
         assertEquals("B", cb2.getA());
         assertEquals(new Long(456), cb2.getB());
-        List<String> list2 = (List<String>)cb2.getC();
+        List<String> list2 = cb2.getC();
         assertEquals(3, list2.size());
         assertEquals("4", list2.get(0));
         assertEquals("5", list2.get(1));
@@ -1161,7 +1161,7 @@ public class JAXRSUtilsTest extends Assert {
 
         assertEquals("C", cb3.getA());
         assertEquals(new Long(789), cb3.getB());
-        List<String> list3 = (List<String>)cb3.getC();
+        List<String> list3 = cb3.getC();
         assertEquals(3, list3.size());
         assertEquals("7", list3.get(0));
         assertEquals("8", list3.get(1));

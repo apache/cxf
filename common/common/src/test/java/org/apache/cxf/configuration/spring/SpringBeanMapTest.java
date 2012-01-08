@@ -41,12 +41,12 @@ public class SpringBeanMapTest extends Assert {
 
         assertEquals(2, beans.size());
 
-        Person p = (Person)beans.get("dan");
+        Person p = beans.get("dan");
         assertNotNull(p);
  
         assertEquals(1, PersonImpl.getLoadCount());
         
-        Person jane = (Person)beans.get("jane");
+        Person jane = beans.get("jane");
         assertNotNull(jane);
         assertEquals(2, PersonImpl.getLoadCount());
         

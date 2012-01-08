@@ -22,7 +22,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
-import org.apache.cxf.jca.cxf.CXFManagedConnection;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +41,7 @@ public class  ProxyInvocationHandlerTest extends AbstractInvocationHandlerTest {
         super.setUp(); 
         data = new CXFInvocationHandlerDataImpl();
         testObject = new ProxyInvocationHandler(data);
-        testObject.getData().setManagedConnection((CXFManagedConnection)mci);
-        assertTrue(testObject instanceof CXFInvocationHandlerBase); 
+        testObject.getData().setManagedConnection(mci);
     } 
 
 

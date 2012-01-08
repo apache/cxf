@@ -146,7 +146,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (null != bmi) {
             policy = policy.merge(engine.getAggregatedMessagePolicy(bmi));
         }
-        policy = (Policy)policy.normalize(engine.getRegistry(), true);
+        policy = policy.normalize(engine.getRegistry(), true);
         return assertor;
     }
     
@@ -157,7 +157,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (bfi != null) {
             policy = policy.merge(engine.getAggregatedFaultPolicy(bfi));
         }
-        policy = (Policy)policy.normalize(engine.getRegistry(), true);
+        policy = policy.normalize(engine.getRegistry(), true);
     }
 
     void chooseAlternative(PolicyEngineImpl engine, Assertor assertor) {

@@ -59,14 +59,14 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
 
     public IdlDefn promoteHeldToScope() {
-        IdlDefn result = (IdlDefn)hold.pop();
+        IdlDefn result = hold.pop();
         defns.add(result);
         return result;
     }
 
 
     public IdlDefn parkHeld() {
-        IdlDefn result = (IdlDefn)hold.pop();
+        IdlDefn result = hold.pop();
         park.add(result);
         return result;
     }

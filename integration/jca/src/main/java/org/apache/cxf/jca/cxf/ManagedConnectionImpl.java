@@ -61,7 +61,7 @@ public class ManagedConnectionImpl
     public void associateConnection(Object connection) throws ResourceException {
         try {           
             CXFInvocationHandler handler = 
-                    (CXFInvocationHandler)Proxy.getInvocationHandler((Proxy)connection);
+                    (CXFInvocationHandler)Proxy.getInvocationHandler(connection);
             Object managedConnection = handler.getData().getManagedConnection();
 
             if (managedConnection != this) {

@@ -383,8 +383,8 @@ public class ServiceProcessor extends AbstractProcessor {
 
                 OperationInfo opinfo = bop.getOperationInfo();
 
-                JAXWSBinding opBinding = (JAXWSBinding)opinfo.getExtensor(JAXWSBinding.class);
-                JAXWSBinding infBinding = (JAXWSBinding)opinfo.getInterface().getExtensor(JAXWSBinding.class);
+                JAXWSBinding opBinding = opinfo.getExtensor(JAXWSBinding.class);
+                JAXWSBinding infBinding = opinfo.getInterface().getExtensor(JAXWSBinding.class);
                 boolean enableMime = enableOpMime;
                 boolean enableWrapperStyle = true;
                 
@@ -654,7 +654,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 return BindingType.SOAPBinding;
             }
             if (ext instanceof HTTPBinding) {
-                bindingObj = (HTTPBinding)ext;
+                bindingObj = ext;
                 return BindingType.HTTPBinding;
             }
         }

@@ -262,7 +262,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
                 }
             }
         }
-        return (Binding[]) result.toArray(new Binding[result.size()]);
+        return result.toArray(new Binding[result.size()]);
     }
 
     public boolean writeDefinition(Writer writer) throws Exception {

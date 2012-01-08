@@ -678,7 +678,7 @@ public class MAPCodecTest extends Assert {
     }
 
     private void verifyAction() {
-        List<?> soapAction = (List<?>)mimeHeaders.get("SOAPAction");
+        List<?> soapAction = mimeHeaders.get("SOAPAction");
         assertNotNull("expected propogated action", soapAction);
         assertEquals("expected single action", 1, soapAction.size());
         String expectedAction = "\"" + ((AttributedURIType)expectedValues[0]).getValue() + "\"";

@@ -506,9 +506,7 @@ public class ClientImpl
             
             message.put(Message.INVOCATION_CONTEXT, context);
             setContext(reqContext, message);
-            if (null != reqContext) {
-                exchange.putAll(reqContext);
-            }
+            exchange.putAll(reqContext);
             
             setParameters(params, message);
 

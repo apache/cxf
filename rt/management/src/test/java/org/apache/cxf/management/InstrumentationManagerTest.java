@@ -83,7 +83,7 @@ public class InstrumentationManagerTest extends Assert {
         assertEquals(2, s.size());
         Iterator<ObjectName> it = s.iterator();
         while (it.hasNext()) {
-            ObjectName n = (ObjectName)it.next();
+            ObjectName n = it.next();
             Long result = 
                 (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
             assertEquals(result, Long.valueOf(256));

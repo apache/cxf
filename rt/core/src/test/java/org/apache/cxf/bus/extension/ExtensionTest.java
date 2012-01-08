@@ -89,7 +89,7 @@ public class ExtensionTest extends Assert {
         
         e.setInterfaceName(Assert.class.getName());
         Class<?> cls = e.loadInterface(cl);
-        assertTrue("Object is not type Class", cls instanceof Class); 
+        assertNotNull(cls);
     }
     
     class MyServiceConstructorThrowsException {

@@ -41,7 +41,7 @@ public class BookSoapService extends Service {
 
     @WebEndpoint(name = "BookPort")
     public BookStoreJaxrsJaxws getBookPort() {
-        return (BookStoreJaxrsJaxws)super.getPort(BOOK_PORT, 
+        return super.getPort(BOOK_PORT, 
                                                   BookStoreJaxrsJaxws.class);
     }
 

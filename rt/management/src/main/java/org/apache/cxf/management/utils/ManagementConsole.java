@@ -120,7 +120,7 @@ public final class ManagementConsole {
         
             if (it.hasNext()) {
                 // only deal with the first endpoint object which retrun from the list.
-                endpointName = (ObjectName)it.next();
+                endpointName = it.next();
                 mbsc.invoke(endpointName, operation, new Object[0], new String[0]);
                 System.out.println("invoke endpoint " + endpointName 
                                    + " operation " + operation + " succeed!");

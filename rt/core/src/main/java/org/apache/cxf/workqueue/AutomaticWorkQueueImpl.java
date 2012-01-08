@@ -557,23 +557,23 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         return executor.getActiveCount();
     }
     public void update(Dictionary<String, String> config) {
-        String s = (String)config.get("highWaterMark");
+        String s = config.get("highWaterMark");
         if (s != null) {
             this.highWaterMark = Integer.parseInt(s);
         }
-        s = (String)config.get("lowWaterMark");
+        s = config.get("lowWaterMark");
         if (s != null) {
             this.lowWaterMark = Integer.parseInt(s);
         }
-        s = (String)config.get("initialSize");
+        s = config.get("initialSize");
         if (s != null) {
             this.initialThreads = Integer.parseInt(s);
         }
-        s = (String)config.get("dequeueTimeout");
+        s = config.get("dequeueTimeout");
         if (s != null) {
             this.dequeueTimeout = Long.parseLong(s);
         }
-        s = (String)config.get("queueSize");
+        s = config.get("queueSize");
         if (s != null) {
             this.maxQueueSize = Integer.parseInt(s);
         } 

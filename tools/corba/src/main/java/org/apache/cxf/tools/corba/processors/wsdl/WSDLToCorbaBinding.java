@@ -171,8 +171,8 @@ public class WSDLToCorbaBinding {
 
         Binding[] bindings = new Binding[intfs.size()];
         for (int i = 0; i < intfs.size(); i++) {
-            bindings[i] = generateCORBABinding(def, (PortType) intfs.get(i));
-            generateCORBAServiceForBinding(def, (PortType) intfs.get(i), bindings[i]);
+            bindings[i] = generateCORBABinding(def, intfs.get(i));
+            generateCORBAServiceForBinding(def, intfs.get(i), bindings[i]);
         }
         return bindings;
     }
@@ -189,7 +189,7 @@ public class WSDLToCorbaBinding {
             PortType portType = null;
             intfs = new ArrayList<PortType>();
             if (portTypes.size() == 1) {
-                portType = (PortType) portTypes.values().iterator().next();
+                portType = portTypes.values().iterator().next();
                 interfaceNames.add(portType.getQName().getLocalPart());
                 intfs.add(portType);
             } else if (portTypes.size() > 1) {
@@ -657,7 +657,7 @@ public class WSDLToCorbaBinding {
                 + corbaex.getName().replace('.', '/')
                 + WSDLToCorbaHelper.IDL_VERSION;
             corbaex.setRepositoryID(repoId);
-            CorbaTypeImpl corbaTypeImpl = (CorbaTypeImpl)corbaex;
+            CorbaTypeImpl corbaTypeImpl = corbaex;
             if (!helper.isDuplicate(corbaTypeImpl)) {
                 CorbaTypeImpl dup = helper.isDuplicateException(corbaTypeImpl);
                 if (dup != null) {

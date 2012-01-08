@@ -159,7 +159,6 @@ public class ASMHelper {
                     // newConstInt was removed in 2.x, if we get this far, we're
                     // using 1.5.x,
                     // set to null so we don't attempt to use it.
-                    newCw = null;    
                     oldASM = true;
                 } catch (Throwable t) {
                     newCw = cons.newInstance(new Object[] {Boolean.TRUE});

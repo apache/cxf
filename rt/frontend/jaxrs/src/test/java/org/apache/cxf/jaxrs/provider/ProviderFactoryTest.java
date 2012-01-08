@@ -574,7 +574,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testRegisterCustomEntityProvider() throws Exception {
-        ProviderFactory pf = (ProviderFactory)ProviderFactory.getInstance();
+        ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new CustomWidgetProvider());
         
         verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class, 

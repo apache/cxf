@@ -587,7 +587,7 @@ public class BeanType extends AegisType {
             AegisType superType = tm.getType(c);
             if (superType == null) {
                 // if we call createType, we know that we'll get a BeanType. */
-                superType = (BeanType)getTypeMapping().getTypeCreator().createType(c);
+                superType = getTypeMapping().getTypeCreator().createType(c);
                 if (superType != null) {
                     tm.register(superType);
                     this.info.setExtension(true);

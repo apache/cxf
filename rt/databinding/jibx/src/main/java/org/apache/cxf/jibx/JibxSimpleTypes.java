@@ -177,9 +177,9 @@ public final class JibxSimpleTypes {
 
     public static QName schemaType(final Class<?> type) {
         String jtype = type.getName();
-        QName stype = (QName)simplePrimitiveTypeMap.get(jtype);
+        QName stype = simplePrimitiveTypeMap.get(jtype);
         if (stype == null) {
-            stype = (QName)simpleObjectTypeMap.get(jtype);
+            stype = simpleObjectTypeMap.get(jtype);
         }
         return stype;
     }

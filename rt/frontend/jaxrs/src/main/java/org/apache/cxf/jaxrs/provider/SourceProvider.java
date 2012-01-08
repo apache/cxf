@@ -143,7 +143,7 @@ public class SourceProvider extends AbstractConfigurableProvider implements
     protected XMLStreamReader getReaderFromMessage() {
         MessageContext mc = getContext();
         if (mc != null) {
-            return (XMLStreamReader)mc.getContent(XMLStreamReader.class);
+            return mc.getContent(XMLStreamReader.class);
         } else {
             return null;
         }

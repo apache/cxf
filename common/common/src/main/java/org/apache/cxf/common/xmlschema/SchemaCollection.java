@@ -251,7 +251,7 @@ public class SchemaCollection {
     }
 
     private void addElementCrossImportsElement(XmlSchema schema, XmlSchemaElement item) {
-        XmlSchemaElement element = (XmlSchemaElement)item;
+        XmlSchemaElement element = item;
         XmlSchemaUtils.addImportIfNeeded(schema, element.getRef().getTargetQName());
         XmlSchemaUtils.addImportIfNeeded(schema, element.getSchemaTypeName());
         // if there's an anonymous type, it might have element refs in it.

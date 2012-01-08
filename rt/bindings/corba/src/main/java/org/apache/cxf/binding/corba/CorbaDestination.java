@@ -414,7 +414,7 @@ public class CorbaDestination implements MultiplexDestination {
         
         orbConfig.addPOAPolicies(orb, name, parentPOA, poaManager, policies);
         
-        Policy[] policyList = (Policy[])policies.toArray(new Policy[policies.size()]);
+        Policy[] policyList = policies.toArray(new Policy[policies.size()]);
 
         try {
             return parentPOA.create_POA(name, poaManager, policyList);

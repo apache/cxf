@@ -74,7 +74,7 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
     
             if (javaModel.getServiceClasses().size() == 0) {
-                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
+                ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SRV", LOG, wsdl);
                 if (penv.isVerbose()) {
@@ -99,7 +99,7 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
                     setAttributes("serverClassName", serverClassName);
                     setAttributes("intf", intf);
                     if (penv.optionSet(ToolConstants.CFG_IMPL_CLASS)) {
-                        setAttributes("impl", (String)penv.get(ToolConstants.CFG_IMPL_CLASS));
+                        setAttributes("impl", penv.get(ToolConstants.CFG_IMPL_CLASS));
                         penv.remove(ToolConstants.CFG_IMPL_CLASS);
                     } else {
                         setAttributes("impl", intf.getName() + "Impl");

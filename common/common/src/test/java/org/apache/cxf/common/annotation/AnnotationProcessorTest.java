@@ -55,8 +55,8 @@ public class AnnotationProcessorTest extends Assert {
         expectedAnnotations.add(WebService.class);
 
         prepareCommonExpectations(visitor);
-        visitor.visitClass((Class<?>)EasyMock.eq(AnnotatedGreeterImpl.class), 
-                           (Annotation)EasyMock.isA(WebService.class));
+        visitor.visitClass(EasyMock.eq(AnnotatedGreeterImpl.class), 
+                           EasyMock.isA(WebService.class));
 
         runProcessor(visitor);
     } 
@@ -69,7 +69,7 @@ public class AnnotationProcessorTest extends Assert {
         expectedAnnotations.add(Resource.class);
         prepareCommonExpectations(visitor);
         visitor.visitField(EasyMock.eq(expectedField), 
-                           (Annotation)EasyMock.isA(Resource.class));
+                           EasyMock.isA(Resource.class));
         visitor.visitMethod((Method)EasyMock.anyObject(), (Annotation)EasyMock.anyObject());
 
         runProcessor(visitor);
@@ -92,17 +92,17 @@ public class AnnotationProcessorTest extends Assert {
 
         prepareCommonExpectations(visitor);
         visitor.visitField(EasyMock.eq(expectedField), 
-                           (Annotation)EasyMock.isA(Resource.class));
+                           EasyMock.isA(Resource.class));
         visitor.visitMethod(EasyMock.eq(expectedMethod1), 
-                           (Annotation)EasyMock.isA(WebMethod.class));
+                           EasyMock.isA(WebMethod.class));
         visitor.visitMethod(EasyMock.eq(expectedMethod2), 
-                           (Annotation)EasyMock.isA(WebMethod.class));
+                           EasyMock.isA(WebMethod.class));
         visitor.visitMethod(EasyMock.eq(expectedMethod3), 
-                           (Annotation)EasyMock.isA(WebMethod.class));
+                           EasyMock.isA(WebMethod.class));
         visitor.visitMethod(EasyMock.eq(expectedMethod4), 
-                           (Annotation)EasyMock.isA(Resource.class));
+                           EasyMock.isA(Resource.class));
         visitor.visitMethod(EasyMock.eq(expectedMethod5), 
-                            (Annotation)EasyMock.isA(WebMethod.class));
+                            EasyMock.isA(WebMethod.class));
         runProcessor(visitor);
     }
 

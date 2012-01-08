@@ -222,7 +222,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         if (bindingExtensors != null) {
             Iterator<ExtensibilityElement> extensionElements = bindingExtensors.iterator();
             while (extensionElements.hasNext()) {
-                ExtensibilityElement ext = (ExtensibilityElement)extensionElements.next();
+                ExtensibilityElement ext = extensionElements.next();
                 if (ext instanceof UnknownExtensibilityElement && Boolean.TRUE.equals(ext.getRequired())) {
                     for (WebServiceFeature feature : this.wsFeatures) {
                         if (feature instanceof RespectBindingFeature && feature.isEnabled()) {
@@ -246,7 +246,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             Iterator<ExtensibilityElement> extensionElements = portExtensors.iterator();
             QName wsaEpr = new QName(Names.WSA_NAMESPACE_NAME, "EndpointReference");
             while (extensionElements.hasNext()) {
-                ExtensibilityElement ext = (ExtensibilityElement)extensionElements.next();
+                ExtensibilityElement ext = extensionElements.next();
                 if (ext instanceof UnknownExtensibilityElement && wsaEpr.equals(ext.getElementType())) {
                     DOMSource domSource = new DOMSource(((UnknownExtensibilityElement)ext).getElement());
                     W3CEndpointReference w3cEPR = new W3CEndpointReference(domSource);
@@ -266,7 +266,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             Iterator<ExtensibilityElement> extensionElements = exts.iterator();
             while (extensionElements.hasNext() && !found) {
                 ExtensibilityElement ext = 
-                    (ExtensibilityElement)extensionElements.next();
+                    extensionElements.next();
                 found = JAXWSAConstants.WSAW_USINGADDRESSING_QNAME.equals(ext.getElementType());
             }
         }
@@ -278,7 +278,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             Iterator<ExtensibilityElement> extensionElements = exts.iterator();
             while (extensionElements.hasNext() && !found) {
                 ExtensibilityElement ext = 
-                    (ExtensibilityElement)extensionElements.next();
+                    extensionElements.next();
                 if (JAXWSAConstants.WSAW_USINGADDRESSING_QNAME.equals(ext.getElementType())
                     && ext.getRequired() != null) {
                     return ext.getRequired();

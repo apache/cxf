@@ -121,7 +121,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (o instanceof XMLInputFactory) {
             return (XMLInputFactory)o;
         } else if (o != null) {
-            XMLInputFactory xif = (XMLInputFactory)factories.get(o);
+            XMLInputFactory xif = factories.get(o);
             if (xif == null) {
                 Class<?> cls;
                 if (o instanceof Class) {

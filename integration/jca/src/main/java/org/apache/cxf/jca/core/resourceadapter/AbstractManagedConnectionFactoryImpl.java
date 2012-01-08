@@ -78,10 +78,10 @@ public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
             AbstractManagedConnectionImpl conn = (AbstractManagedConnectionImpl)iterator.next();
 
             LOG.log(Level.FINE, "MATCH_CONNECTION_AGAINST", 
-                       new Object[] {((AbstractManagedConnectionImpl)conn).getConnectionRequestInfo(),
+                       new Object[] {conn.getConnectionRequestInfo(),
                                      crInfo});
 
-            if (!((AbstractManagedConnectionImpl)conn).isBound()) {
+            if (!conn.isBound()) {
                 LOG.fine("Match against unbounded, con= " + conn + ", info=" + crInfo);
                 return conn;
             } else {

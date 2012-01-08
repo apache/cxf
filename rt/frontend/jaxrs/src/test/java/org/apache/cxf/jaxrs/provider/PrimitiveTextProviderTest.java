@@ -127,7 +127,7 @@ public class PrimitiveTextProviderTest extends Assert {
         
         MessageBodyReader p = new PrimitiveTextProvider();
         
-        String value = (String)p.readFrom((Class)String.class, null,
+        String value = (String)p.readFrom(String.class, null,
                 new Annotation[]{}, 
                 MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null, 
                 new ByteArrayInputStream(s.getBytes("UTF-8")));

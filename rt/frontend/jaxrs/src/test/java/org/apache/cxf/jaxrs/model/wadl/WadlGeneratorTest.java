@@ -89,7 +89,7 @@ public class WadlGeneratorTest extends Assert {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
         new JSONProvider().writeTo(
-                (Document)r.getEntity(), Document.class, Document.class, 
+                r.getEntity(), Document.class, Document.class, 
                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                   new MetadataMap<String, Object>(), os);
         String s = os.toString();

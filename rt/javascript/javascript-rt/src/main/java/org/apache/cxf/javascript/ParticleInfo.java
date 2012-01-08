@@ -131,7 +131,7 @@ public final class ParticleInfo implements ItemInfo {
                                             SchemaCollection schemaCollection,
                                             NamespacePrefixAccumulator prefixAccumulator, QName contextName) {
         XmlSchemaParticle sequenceParticle =
-            XmlSchemaUtils.getObjectParticle((XmlSchemaObject)sequenceObject, contextName);
+            XmlSchemaUtils.getObjectParticle(sequenceObject, contextName);
         ParticleInfo elementInfo = new ParticleInfo();
         XmlSchemaParticle realParticle = sequenceParticle;
 

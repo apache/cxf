@@ -134,7 +134,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         final String beanName = bn;
         setBeanWiringInfoResolver(new BeanWiringInfoResolver() {
             public BeanWiringInfo resolveWiringInfo(Object instance) {
-                if (null != beanName && !"".equals(beanName)) {
+                if (!"".equals(beanName)) {
                     return new BeanWiringInfo(beanName);
                 }
                 return null;

@@ -138,9 +138,8 @@ public class FormEncodingProvider implements
         return (MultivaluedMap<String, String>)clazz.newInstance();
     }
     
-    @SuppressWarnings("unchecked")
     private Object getFormObject(Class<?> clazz, MultivaluedMap<String, String> params) {
-        return Form.class.isAssignableFrom(clazz) ? new Form((MultivaluedMap)params) : params;
+        return Form.class.isAssignableFrom(clazz) ? new Form(params) : params;
     }
     
     /**

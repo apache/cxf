@@ -200,7 +200,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
                 Enumeration<JarEntry> entry = jarFile.entries();
                 
                 while (entry.hasMoreElements()) {
-                    JarEntry ele = (JarEntry)entry.nextElement();
+                    JarEntry ele = entry.nextElement();
                     if (ele.getName().endsWith(".xsd")
                         && ele.getName().indexOf(ToolConstants.CXF_SCHEMAS_DIR_INJAR) > -1) {
                         

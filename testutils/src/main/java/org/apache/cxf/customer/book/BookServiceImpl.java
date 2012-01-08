@@ -41,17 +41,17 @@ public class BookServiceImpl implements BookService {
             System.out.println("getBooks -> " + me.getKey() + " : " + me.getValue());
         }
         Books b = new Books();
-        b.setBooks((Book[])books.values().toArray(new Book[books.size()]));
+        b.setBooks(books.values().toArray(new Book[books.size()]));
         return b;
     }
 
     public Book getBook(GetBook getBook) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
             System.out.println("getBook -> " + me.getKey() + " : " 
-                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
+                               + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getBook.getId());
-        Book b = (Book)books.get(((Long)getBook.getId()).longValue());
+        Book b = books.get(((Long)getBook.getId()).longValue());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
@@ -64,10 +64,10 @@ public class BookServiceImpl implements BookService {
     public Book getAnotherBook(GetAnotherBook getAnotherBook) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
             System.out.println("getBook -> " + me.getKey() + " : " 
-                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
+                               + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getAnotherBook.getId());
-        Book b = (Book)books.get(((Long)getAnotherBook.getId()).longValue());
+        Book b = books.get(((Long)getAnotherBook.getId()).longValue());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
@@ -91,7 +91,7 @@ public class BookServiceImpl implements BookService {
         books.put(id, b);
         for (Map.Entry<Long, Book> me : books.entrySet()) {
             System.out.println("addBook -> " + me.getKey() + " : " 
-                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
+                               + me.getValue().getName() + ", " + me.getValue().getId());
         }
 
         return b.getId();

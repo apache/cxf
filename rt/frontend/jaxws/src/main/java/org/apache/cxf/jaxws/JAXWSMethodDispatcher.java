@@ -86,7 +86,7 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
         if (!endpointClass.isAssignableFrom(method.getDeclaringClass())) {
             try {
                 Method m2 = endpointClass.getMethod(method.getName(), 
-                                                 (Class[])method.getParameterTypes());
+                                                 method.getParameterTypes());
                 if (Modifier.isVolatile(m2.getModifiers())) {
                     //bridge method, need to map the generics
                     Class<?> params[] = method.getParameterTypes();

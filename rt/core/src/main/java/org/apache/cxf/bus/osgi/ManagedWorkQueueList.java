@@ -56,7 +56,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
             return;
         }
         Dictionary<String, String> properties = CastUtils.cast(props);
-        String queueName = (String)properties.get(AutomaticWorkQueueImpl.PROPERTY_NAME);
+        String queueName = properties.get(AutomaticWorkQueueImpl.PROPERTY_NAME);
         if (queues.containsKey(queueName)) {
             queues.get(queueName).update(properties);
         } else {

@@ -427,7 +427,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
         List<String> list = option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
                                                            .isDebugEnabled());
-        String[] args = (String[])list.toArray(new String[list.size()]);
+        String[] args = list.toArray(new String[list.size()]);
         getLog().debug("Calling wadl2java with args: " + Arrays.toString(args));
         
         if (!"false".equals(fork)) {

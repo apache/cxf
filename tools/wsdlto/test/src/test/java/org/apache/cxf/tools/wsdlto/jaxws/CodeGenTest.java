@@ -1056,7 +1056,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method method = clz.getMethod("sayHello", new Class[] {java.lang.String.class});
         assertNotNull("sayHello is not be generated", method);
 
-        SOAPBinding soapBindingAnn = (SOAPBinding)clz.getAnnotation(SOAPBinding.class);
+        SOAPBinding soapBindingAnn = clz.getAnnotation(SOAPBinding.class);
         assertEquals(soapBindingAnn.parameterStyle(), SOAPBinding.ParameterStyle.BARE);
 
     }

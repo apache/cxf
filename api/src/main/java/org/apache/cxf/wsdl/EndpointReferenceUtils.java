@@ -1064,7 +1064,7 @@ public final class EndpointReferenceUtils {
     private static MultiplexDestination getMatchingMultiplexDestination(QName serviceQName, String portName,
                                                                         Bus bus) {
         MultiplexDestination destination = null;
-        ServerRegistry serverRegistry = (ServerRegistry)bus.getExtension(ServerRegistry.class);
+        ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
         if (null != serverRegistry) {
             List<Server> servers = serverRegistry.getServers();
             for (Server s : servers) {

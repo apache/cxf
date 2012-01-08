@@ -74,9 +74,9 @@ public class JaxbAssertionTest extends Assert {
         
         PolicyComponent pc = new Policy();
         assertTrue(!assertion.equal(pc));
-        pc = (PolicyComponent)new All();
+        pc = new All();
         assertTrue(!assertion.equal(pc));
-        pc = (PolicyComponent)new ExactlyOne();
+        pc = new ExactlyOne();
         assertTrue(!assertion.equal(pc));
         
         IMocksControl ctrl = EasyMock.createNiceControl();

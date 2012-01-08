@@ -39,10 +39,10 @@ public class BookServiceWrappedImpl implements BookServiceWrapped {
     public Book getBook(long bookid) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
             System.out.println("getBook -> " + me.getKey() + " : " 
-                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
+                               + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("The Book's id " + bookid);
-        Book b = (Book)books.get(bookid);
+        Book b = books.get(bookid);
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();

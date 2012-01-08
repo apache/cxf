@@ -143,8 +143,6 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         default:
             if (l.toInt() == TRACE.toInt()) {
                 l2 = Level.FINEST;
-            } else {
-                l2 = null;
             }
         } 
         return l2;

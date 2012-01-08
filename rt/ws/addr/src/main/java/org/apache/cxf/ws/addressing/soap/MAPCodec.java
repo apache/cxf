@@ -327,7 +327,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     header.add(holder);
                     childNode = childNode.getNextSibling();
                 }
-                ((AddressingPropertiesImpl)maps).setDuplicate(null);
+                maps.setDuplicate(null);
                 
                 propogateAction(maps.getAction(), message);
                 applyMAPValidation(message);

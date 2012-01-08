@@ -166,7 +166,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                             // ignore
                         }
                     } else {
-                        mbs = (MBeanServer)servers.get(0);
+                        mbs = servers.get(0);
                     }
                 }
             }
@@ -287,7 +287,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         //Using the array to hold the busMBeans to avoid the CurrentModificationException
         Object[] mBeans = busMBeans.toArray();
         for (Object name : mBeans) {
-            busMBeans.remove((ObjectName)name);
+            busMBeans.remove(name);
             try {
                 unregister((ObjectName)name);
             } catch (JMException jmex) {

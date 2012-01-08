@@ -1687,7 +1687,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     private static Class<?> createArrayClass(GenericArrayType atp) {
-        Type tp = ((GenericArrayType)atp).getGenericComponentType();
+        Type tp = atp.getGenericComponentType();
         Class<?> rawClass = null;
         if (tp instanceof Class) {
             rawClass = (Class<?>)tp;
@@ -1696,7 +1696,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         } else if (tp instanceof ParameterizedType) {
             rawClass = (Class<?>)((ParameterizedType)tp).getRawType();
             if (List.class.isAssignableFrom(rawClass)) {
-                rawClass = getClass((ParameterizedType)tp);
+                rawClass = getClass(tp);
                 rawClass = Array.newInstance(rawClass, 0).getClass();
             }
         }
@@ -2280,7 +2280,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     protected void processTypes(Class<?> sc, Type tp) {
         if (tp instanceof ParameterizedType) {
             ParameterizedType ptp = (ParameterizedType)tp;
-            Type c = (Class<?>)ptp.getRawType();
+            Type c = ptp.getRawType();
             Map<String, Class<?>> m = new HashMap<String, Class<?>>();
             parameterizedTypes.put(c, m);
             for (int x = 0; x < ptp.getActualTypeArguments().length; x++) {

@@ -21,7 +21,6 @@ package org.apache.cxf.wsdl11;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -428,10 +427,10 @@ public class WSDLServiceBuilder {
             if (null != elements && elements.size() > 0) {
                 for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
                     if (el instanceof SOAPBinding) {
-                        ns = (String)((SOAPBinding)el).getTransportURI();
+                        ns = ((SOAPBinding)el).getTransportURI();
                         break;
                     } else if (el instanceof SOAP12Binding) {
-                        ns = (String)((SOAP12Binding)el).getTransportURI();
+                        ns = ((SOAP12Binding)el).getTransportURI();
                         break;
                         // TODO: this is really ugly, but how to link between
                         // this binding and this transport ?
@@ -457,8 +456,7 @@ public class WSDLServiceBuilder {
         if (factory instanceof WSDLEndpointFactory) {
             WSDLEndpointFactory wFactory = (WSDLEndpointFactory)factory;
             ei = wFactory.createEndpointInfo(service, bi, 
-                                    port == null ? Collections.emptyList() 
-                                                 : port.getExtensibilityElements());
+                                             port.getExtensibilityElements());
         }
 
         if (ei == null) {

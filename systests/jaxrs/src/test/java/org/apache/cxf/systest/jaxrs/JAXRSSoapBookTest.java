@@ -581,7 +581,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         map.add("name", "CXF in Action - ");
         map.add("name", "679");
         Book b = readBook((InputStream)wc.accept("application/xml")
-                          .form((Map<String, List<Object>>)map).getEntity());
+                          .form(map).getEntity());
         assertEquals(679, b.getId());
         assertEquals("CXF in Action - 679", b.getName());
     }
@@ -791,7 +791,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         final boolean addBadOutInterceptor = true;
         TestFeature testFeature = new TestFeature(addBadOutInterceptor);
         List<AbstractFeature> features = new ArrayList<AbstractFeature>();
-        features.add((AbstractFeature)testFeature);
+        features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
         try {
@@ -815,7 +815,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setResourceClass(BookStoreJaxrsJaxws.class);
         TestFeature testFeature = new TestFeature();
         List<AbstractFeature> features = new ArrayList<AbstractFeature>();
-        features.add((AbstractFeature)testFeature);
+        features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
         WebClient.getConfig(proxy).getRequestContext().put("org.apache.cxf.http.no_io_exceptions", false);

@@ -235,7 +235,7 @@ public final class WSDLParameter {
                 boolean isObjectRef = isObjectReference(xmlSchemaList, part.getElementName());
                 for (int x = 0; x < inputs.size(); x++) {
                     paramtype = null;
-                    ParamType d2 = (ParamType)inputs.get(x);
+                    ParamType d2 = inputs.get(x);
                     if (part.getElementName() != null && !isObjectRef) {
                         XmlSchemaElement el = getElement(part, xmlSchemaList);
                         if (el != null && el.getSchemaType() != null) {
@@ -293,7 +293,7 @@ public final class WSDLParameter {
     private void processReturnParams(List<ParamType> outputs, List<ArgType> returns) {
 
         if (outputs.size() > 0) {
-            ParamType d2 = (ParamType)outputs.get(0);
+            ParamType d2 = outputs.get(0);
 
             if (d2.getMode().value().equals("out")) {
                 ArgType argType = new ArgType();
@@ -309,7 +309,7 @@ public final class WSDLParameter {
         ListIterator<ParamType> inputit = inputs.listIterator();
 
         while (inputit.hasNext()) {
-            ParamType d2 = (ParamType)inputit.next();
+            ParamType d2 = inputit.next();
             if (d2.getMode().value().equals("inout")) {
                 ListIterator<ParamType> it = outputs.listIterator();
 

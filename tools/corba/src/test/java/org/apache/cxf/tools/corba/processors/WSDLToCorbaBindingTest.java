@@ -551,7 +551,7 @@ public class WSDLToCorbaBindingTest extends Assert {
         assertEquals(32, binding.getBindingOperations().size());
         
         List<ExtensibilityElement> extElements = getExtensibilityElements(binding);             
-        ExtensibilityElement extElement = (ExtensibilityElement)extElements.get(0);
+        ExtensibilityElement extElement = extElements.get(0);
         if (extElement.getElementType().getLocalPart().equals("binding")) {
             BindingType bindingType = (BindingType)extElement;
             assertEquals(bindingType.getRepositoryID(), "IDL:Test/MultiPart:1.0");

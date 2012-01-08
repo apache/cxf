@@ -68,7 +68,7 @@ public class ReceivedToken {
             token = ((JAXBElement<?>)receivedToken).getValue();
         } else if (receivedToken instanceof Element) {
             LOG.fine("Found ValidateTarget element: " + ((Element)receivedToken).getLocalName());
-            this.token = (Element)receivedToken;
+            this.token = receivedToken;
             isDOMElement = true;
         } else {
             LOG.fine("Found ValidateTarget object of unknown type");

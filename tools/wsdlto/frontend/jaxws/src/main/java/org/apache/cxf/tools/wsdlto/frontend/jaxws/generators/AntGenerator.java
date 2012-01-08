@@ -64,7 +64,7 @@ public class AntGenerator extends AbstractJAXWSGenerator {
         for (JavaModel javaModel : map.values()) {
 
             if (javaModel.getServiceClasses().size() == 0) {
-                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
+                ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_ANT", LOG, wsdl);
                 if (penv.isVerbose()) {

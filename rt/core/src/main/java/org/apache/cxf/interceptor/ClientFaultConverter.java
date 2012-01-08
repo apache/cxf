@@ -184,7 +184,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             } catch (Exception e1) {
                 LogUtils.log(LOG, Level.INFO, "EXCEPTION_WHILE_CREATING_EXCEPTION", e1, e1.getMessage());
             }
-        } else if (e != null) {
+        } else {
             if (fault.getMessage() != null) {
                 Field f;
                 try {
@@ -268,7 +268,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
         }
         try {
             Field field = cls.getField("TYPE");
-            Object obj = (Object)cls;
+            Object obj = cls;
             Object type = field.get(obj);
             if (type instanceof Class) {
                 return (Class<?>)type;

@@ -617,7 +617,7 @@ public final class DOMUtils {
 
         Node parent = el.getParentNode();
         if (parent instanceof Element) {
-            return getNamespace((Element)parent, searchPrefix);
+            return getNamespace(parent, searchPrefix);
         }
 
         return null;

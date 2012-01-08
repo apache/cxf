@@ -113,7 +113,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             return;
         }
         for (BindingOperationInfo boi : bops) {
-            SoapOperationInfo soi = (SoapOperationInfo) boi.getExtensor(SoapOperationInfo.class);
+            SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
             if (soi != null && action.equals(soi.getAction())) {
                 if (bindingOp != null) {
                     //more than one op with the same action, will need to parse normally

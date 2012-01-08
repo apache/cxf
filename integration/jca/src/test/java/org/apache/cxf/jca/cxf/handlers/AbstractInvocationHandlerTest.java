@@ -71,13 +71,13 @@ public abstract class AbstractInvocationHandlerTest
     }
 
     protected CXFInvocationHandler getNextHandler() {
-        return (CXFInvocationHandler)mockHandler;
+        return mockHandler;
     }
 
     protected abstract CXFInvocationHandler getHandler();
 
     protected CXFManagedConnectionFactory getTestManagedConnectionFactory() {
-        return (CXFManagedConnectionFactory)mcf;
+        return mcf;
     }
 
     

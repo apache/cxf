@@ -45,11 +45,11 @@ public class WSDLHelper {
         }
         Iterator<Binding> ite = CastUtils.cast(def.getBindings().values().iterator());
         while (ite.hasNext()) {
-            Binding binding = (Binding)ite.next();
+            Binding binding = ite.next();
             Iterator<BindingOperation> ite1 
                 = CastUtils.cast(binding.getBindingOperations().iterator());
             while (ite1.hasNext()) {
-                BindingOperation bop = (BindingOperation)ite1.next();
+                BindingOperation bop = ite1.next();
                 if (bop.getName().equals(operationName)) {
                     return bop;
                 }

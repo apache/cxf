@@ -100,7 +100,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
                 }
 
             }
-        } else if (msgInfo == null) {
+        } else {
             // XXX - Is the call to
             // AbstractInDatabindingInterceptor.getMessageInfo()
             // necessary?  Should we put the BindingMessageInfo on

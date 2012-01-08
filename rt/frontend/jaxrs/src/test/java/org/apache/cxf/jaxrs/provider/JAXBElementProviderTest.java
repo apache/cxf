@@ -1262,7 +1262,7 @@ public class JAXBElementProviderTest extends Assert {
         };
         
         provider.setMarshallerProperties(props);
-        provider.writeTo("123", String.class, (Type)String.class, new Annotation[]{}, 
+        provider.writeTo("123", String.class, String.class, new Annotation[]{}, 
                          MediaType.APPLICATION_XML_TYPE, new MetadataMap<String, Object>(), 
                          new ByteArrayOutputStream());
         

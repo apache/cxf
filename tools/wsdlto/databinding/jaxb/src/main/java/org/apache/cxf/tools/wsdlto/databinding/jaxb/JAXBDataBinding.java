@@ -715,7 +715,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             TypesCodeWriter fileCodeWriter = new TypesCodeWriter(new File(dir), context.getExcludePkgList());
 
             if (rawJaxbModelGenCode instanceof S2JJAXBModel) {
-                S2JJAXBModel schem2JavaJaxbModel = (S2JJAXBModel)rawJaxbModelGenCode;
+                S2JJAXBModel schem2JavaJaxbModel = rawJaxbModelGenCode;
 
                 ClassCollector classCollector = context.get(ClassCollector.class);
                 for (JClass cls : schem2JavaJaxbModel.getAllObjectFactories()) {

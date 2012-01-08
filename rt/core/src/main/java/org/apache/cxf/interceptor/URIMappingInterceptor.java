@@ -151,7 +151,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             if (rest != null && rest.size() > 0) {
                 LOG.fine("Set the following parameters to null: " + rest);
                 for (Iterator<String> iter = rest.iterator(); iter.hasNext();) {
-                    String key = (String)iter.next();
+                    String key = iter.next();
                     orderedParameters.put(key, null);
                 }
             }
@@ -221,7 +221,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             // TODO check the parameter name here
             Object param = null;
                         
-            if (type != null && type.isPrimitive() && queries.get(key) != null) {
+            if (type.isPrimitive() && queries.get(key) != null) {
                 param = PrimitiveUtils.read(queries.get(key), type);
             } else {
                 param = readType(queries.get(key), type);

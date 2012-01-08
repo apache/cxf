@@ -243,7 +243,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                             return true;
                         }
                     } else {
-                        if (searchValue.equals((String)o)) {
+                        if (searchValue.equals(o)) {
                             return true;
                         }
                     }

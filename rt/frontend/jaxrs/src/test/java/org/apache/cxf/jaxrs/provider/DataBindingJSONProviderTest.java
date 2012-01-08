@@ -96,7 +96,7 @@ public class DataBindingJSONProviderTest extends Assert {
         p.setDataBinding(binding);
         p.setNamespaceMap(Collections.singletonMap("http://apache.org/structure/types", "p0"));
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Structure struct = (Structure)p.readFrom((Class)Structure.class, Structure.class,
+        Structure struct = (Structure)p.readFrom(Structure.class, Structure.class,
                                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("sdo", struct.getText());
@@ -129,7 +129,7 @@ public class DataBindingJSONProviderTest extends Assert {
         DataBindingJSONProvider p = new DataBindingJSONProvider();
         p.setDataBinding(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Book book = (Book)p.readFrom((Class)Book.class, Book.class,
+        Book book = (Book)p.readFrom(Book.class, Book.class,
                                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("CXF", book.getName());
@@ -187,7 +187,7 @@ public class DataBindingJSONProviderTest extends Assert {
         DataBindingJSONProvider p = new DataBindingJSONProvider();
         p.setDataBinding(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Book book = (Book)p.readFrom((Class)Book.class, Book.class,
+        Book book = (Book)p.readFrom(Book.class, Book.class,
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("CXF", book.getName());

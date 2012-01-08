@@ -495,7 +495,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             Iterator<ExtensibilityElement> extensionElements = exts.iterator();
             while (extensionElements.hasNext() && !found) {
                 ExtensibilityElement ext = 
-                    (ExtensibilityElement)extensionElements.next();
+                    extensionElements.next();
                 found = Names.WSAW_USING_ADDRESSING_QNAME.equals(ext.getElementType());    
             }
         }

@@ -193,7 +193,7 @@ public class JsSimpleDomNode extends ScriptableObject {
                 while (node != null) {
                     JsSimpleDomNode prev = null;
                     if (x > 0) {
-                        prev = (JsSimpleDomNode)children.get(x - 1);
+                        prev = children.get(x - 1);
                     }
                     children.add(x, newObject(node, prev));
                     if (x > 0) {

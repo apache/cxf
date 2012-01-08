@@ -187,7 +187,7 @@ public class ParamReader extends ClassReader {
 
     protected String[] getParameterNames(Member member, Class<?>[] pTypes) {
         // look up the names for this method
-        MethodInfo info = (MethodInfo)methods.get(getSignature(member, pTypes));
+        MethodInfo info = methods.get(getSignature(member, pTypes));
 
         // we know all the local variable names, but we only need to return
         // the names of the parameters.
@@ -230,7 +230,7 @@ public class ParamReader extends ClassReader {
     private MethodInfo getMethodInfo() {
         MethodInfo info = null;
         if (methods != null && methodName != null) {
-            info = (MethodInfo)methods.get(methodName);
+            info = methods.get(methodName);
         }
         return info;
     }

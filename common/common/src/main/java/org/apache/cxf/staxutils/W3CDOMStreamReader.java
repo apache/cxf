@@ -149,7 +149,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     }
 
     public final Node getCurrentNode() {
-        return (Node)getCurrentFrame().element;
+        return getCurrentFrame().element;
     }
     public final Element getCurrentElement() {
         return (Element)getCurrentFrame().element;
@@ -166,7 +166,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         if (getCurrentFrame().currentChild == null) {
             return getCurrentNode().getFirstChild() != null;            
         }
-        return ((Node)getCurrentFrame().currentChild).getNextSibling() != null;
+        return getCurrentFrame().currentChild.getNextSibling() != null;
     }
 
     @Override
@@ -175,7 +175,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         if (frame.currentChild == null) {
             content = getCurrentNode().getFirstChild();            
         } else {
-            content = ((Node)frame.currentChild).getNextSibling();
+            content = frame.currentChild.getNextSibling();
         }
         
         frame.currentChild = content;

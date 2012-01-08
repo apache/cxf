@@ -67,7 +67,7 @@ public class AddNumbersServiceWithAnnotation extends Service {
      */
     @WebEndpoint(name = "AddNumbersPort")
     public AddNumbers getAddNumbersPort() {
-        return (AddNumbers)super.getPort(ADDNUMBERS_PORT, AddNumbers.class);
+        return super.getPort(ADDNUMBERS_PORT, AddNumbers.class);
     }
 
 }

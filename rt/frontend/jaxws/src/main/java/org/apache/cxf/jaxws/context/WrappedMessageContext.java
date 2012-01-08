@@ -240,7 +240,7 @@ public class WrappedMessageContext implements MessageContext {
                     //may have to create the out message and add the headers
                     Message tmp = createResponseMessage();
                     if (tmp != null) {
-                        ret = (Map<?, ?>)tmp.get(Message.PROTOCOL_HEADERS);
+                        ret = tmp.get(Message.PROTOCOL_HEADERS);
                     }
                 }
                 ret = mp;
