@@ -96,7 +96,6 @@ public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements Aeg
         ElementWriter writer = new ElementWriter(output);
         MessageWriter w2 = writer.getElementWriter(elementName);
         if (getContext().isWriteXsiTypes()
-            && aegisType != null 
             && aegisType.getSchemaType() != null) {
             // if we know the type, write it. We are standalone, and the reader needs it.
             w2.writeXsiType(aegisType.getSchemaType());

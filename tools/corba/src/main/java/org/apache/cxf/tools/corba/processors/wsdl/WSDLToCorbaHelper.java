@@ -333,8 +333,7 @@ public class WSDLToCorbaHelper {
                                           elementQualified);
             memName = createQNameCorbaNamespace(memtype.getQName().getLocalPart());
 
-            if (memtype != null
-                && !isDuplicate(memtype)) {
+            if (!isDuplicate(memtype)) {
                 typeMappingType.getStructOrExceptionOrUnion().add(memtype);
             }
             membertype.setQName(memName);

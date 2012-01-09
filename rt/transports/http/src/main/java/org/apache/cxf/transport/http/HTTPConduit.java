@@ -1511,9 +1511,7 @@ public class HTTPConduit
                         WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
                             .getExtension(WorkQueueManager.class);
                         AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
-                        if (ex == null) {
-                            qu = mgr.getAutomaticWorkQueue();
-                        }
+                        qu = mgr.getAutomaticWorkQueue();
                         qu.execute(runnable, 5000);
                     } else {
                         outMessage.getExchange().put(Executor.class.getName() 

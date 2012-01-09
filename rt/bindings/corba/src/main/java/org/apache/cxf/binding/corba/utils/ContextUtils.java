@@ -52,8 +52,7 @@ public final class ContextUtils {
      */
     public static boolean isOutbound(Message message) {
         Exchange exchange = message.getExchange();
-        return message != null
-               && exchange != null
+        return exchange != null
                && message == exchange.getOutMessage();
     }
         

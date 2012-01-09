@@ -70,7 +70,7 @@ public class XPathProvider implements MessageBodyReader<Object> {
         globalNamespaces = nsMap;
     }
     
-    public boolean isReadable(Class cls, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public boolean isReadable(Class<?> cls, Type genericType, Annotation[] annotations, MediaType mediaType) {
         
         return globalExpression != null && (className == null 
             || className != null && className.equals(cls.getName()))  

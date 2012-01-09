@@ -348,10 +348,8 @@ public final class IriDecoderHelper {
                 }
             }
 
-            if (param != null) {
-                params.remove(param);
-                ec.appendChild(doc.createTextNode(param.getValue()));
-            }
+            params.remove(param);
+            ec.appendChild(doc.createTextNode(param.getValue()));
         }
         return doc;
     }
