@@ -210,12 +210,16 @@
                                 <id>setup.eclipse.project.sdo</id>
                                 <phase>process-test-sources</phase>
                                 <configuration>
-                                     <tasks>
-                                         <echo file="${basedir}/.settings/org.eclipse.jdt.core.prefs" append="true">
-org.eclipse.jdt.core.compiler.problem.unusedLocal=ignore
-org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation=ignore
-                                         </echo>
-                                     </tasks>
+                                     <target>
+                                         <!-- SDO generated code is Java1.4 based and thus uses raw List types -->
+                                         <!-- It also generates code with unused imports -->
+                                         <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
+                                             <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore"/>
+                                             <entry key="org.eclipse.jdt.core.compiler.problem.unusedImport" value="ignore"/>
+                                             <entry key="org.eclipse.jdt.core.compiler.problem.unusedLocal" value="ignore"/>
+                                             <entry key="org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation" value="ignore"/>
+                                         </propertyfile>
+                                     </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
