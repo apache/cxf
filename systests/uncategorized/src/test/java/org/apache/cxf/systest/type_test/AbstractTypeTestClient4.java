@@ -840,6 +840,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
     //org.apache.type_test.types3.StructWithOccuringStruct;
 
+    @SuppressWarnings("rawtypes")
     protected boolean equals(StructWithOccuringStruct x, StructWithOccuringStruct y) {
         if (x.getVarInteger() != y.getVarInteger()) {
             return false;
