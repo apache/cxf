@@ -54,33 +54,32 @@ public final class PrimitiveUtils {
         return clz;
     }
 
-    public static Object read(String value, Class<?> type) {
+    public static <T> Object read(String value, Class<T> type) {
         Object ret = value;
-        if (Integer.TYPE.equals(type)) {
+        if (Integer.TYPE.equals(type) || Integer.class.equals(type)) {
             ret = Integer.valueOf(value);
         }
-        if (Byte.TYPE.equals(type)) {
+        if (Byte.TYPE.equals(type) || Byte.class.equals(type)) {
             ret = Byte.valueOf(value);
         }
-        if (Short.TYPE.equals(type)) {
+        if (Short.TYPE.equals(type) || Short.class.equals(type)) {
             ret = Short.valueOf(value);
         }
-        if (Long.TYPE.equals(type)) {
+        if (Long.TYPE.equals(type) || Long.class.equals(type)) {
             ret = Long.valueOf(value);
         }
-        if (Float.TYPE.equals(type)) {
+        if (Float.TYPE.equals(type) || Float.class.equals(type)) {
             ret = Float.valueOf(value);
         }
-        if (Double.TYPE.equals(type)) {
+        if (Double.TYPE.equals(type) || Double.class.equals(type)) {
             ret = Double.valueOf(value);
         }
-        if (Boolean.TYPE.equals(type)) {
+        if (Boolean.TYPE.equals(type) || Boolean.class.equals(type)) {
             ret = Boolean.valueOf(value);
         }
-        if (Character.TYPE.equals(type)) {
+        if (Character.TYPE.equals(type) || Character.class.equals(type)) {
             ret = value.charAt(0);
         }
-        // TODO others.
         return ret;
     }
 }

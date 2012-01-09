@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -39,6 +40,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -75,8 +77,8 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
-public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
-    implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
+public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvider
+    implements MessageBodyReader<T>, MessageBodyWriter<T> {
     
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
 
@@ -182,7 +184,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
     }
     
-    protected <T> T getStaxHandlerFromCurrentMessage(Class<T> staxCls) {
+    protected <X> X getStaxHandlerFromCurrentMessage(Class<X> staxCls) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (m != null) {
             return staxCls.cast(m.getContent(staxCls));
@@ -194,7 +196,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return cls.getAnnotation(XmlRootElement.class) != null;
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
         throws Exception {
         
@@ -210,7 +212,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         } else if (marshalAsJaxbElement || asJaxbElement) {
             name = getJaxbQName(cls, genericType, obj, false);
         }
-        return name != null ? new JAXBElement(name, cls, null, obj) : obj;
+        return name != null ? new JAXBElement<Object>(name, (Class)cls, null, obj) : obj;
     }
     
     public void setCollectionWrapperName(String wName) {
@@ -236,7 +238,15 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         
         return marshalAsJaxbElement || isSupported(type, genericType, anns);
     }
-    
+    public void writeTo(T t, Type genericType, Annotation annotations[], 
+                 MediaType mediaType, 
+                 MultivaluedMap<String, Object> httpHeaders,
+                 OutputStream entityStream) throws IOException, WebApplicationException {
+        @SuppressWarnings("unchecked")
+        Class<T> type = (Class<T>)t.getClass();
+        writeTo(t, type, genericType, annotations, mediaType, httpHeaders, entityStream);
+    }
+
     protected JAXBContext getCollectionContext(Class<?> type) throws JAXBException {
         synchronized (collectionContextClasses) {
             if (!collectionContextClasses.contains(type)) {
@@ -345,7 +355,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         schema = s;    
     }
     
-    public long getSize(Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(T o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 

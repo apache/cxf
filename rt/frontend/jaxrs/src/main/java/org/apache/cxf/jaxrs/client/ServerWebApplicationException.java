@@ -86,7 +86,9 @@ public class ServerWebApplicationException extends WebApplicationException {
     
     @SuppressWarnings("unchecked")
     public MultivaluedMap<String, String> getHeaders() {
-        return (MultivaluedMap)super.getResponse().getMetadata();
+        MultivaluedMap<?, ?> mp = super.getResponse().getMetadata();
+        //need to bounce through the temp so the cast will work
+        return (MultivaluedMap<String, String>)mp;
     }
     
     @Override
@@ -141,11 +143,10 @@ public class ServerWebApplicationException extends WebApplicationException {
      * @param cls the entity class
      * @return the typed entity
      */
-    @SuppressWarnings("unchecked")
     public <T> T toErrorObject(Client client, Class<T> entityCls) {
         Response response = getResponse();
         try {
-            MultivaluedMap headers = response.getMetadata();
+            MultivaluedMap<String, String> headers = getHeaders();
             Object contentType = headers.getFirst("Content-Type");
             InputStream inputStream = (InputStream)response.getEntity();
             if (contentType == null || inputStream == null) {
@@ -166,7 +167,7 @@ public class ServerWebApplicationException extends WebApplicationException {
             
             ProviderFactory pf = (ProviderFactory)ep.get(ProviderFactory.class.getName());
             
-            MessageBodyReader reader = pf.createMessageBodyReader(entityCls, 
+            MessageBodyReader<T> reader = pf.createMessageBodyReader(entityCls, 
                                                              entityCls, 
                                                              annotations, 
                                                              mt, 

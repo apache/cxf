@@ -644,10 +644,9 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         return (Book)u.unmarshal(is);
     }
     
-    @SuppressWarnings("unchecked")
     private Book readJSONBookFromInputStream(InputStream is) throws Exception {
-        JSONProvider provider = new JSONProvider();
-        return (Book)provider.readFrom((Class)Book.class, Book.class, new Annotation[]{}, 
+        JSONProvider<Book> provider = new JSONProvider<Book>();
+        return provider.readFrom(Book.class, Book.class, new Annotation[]{}, 
                                  MediaType.APPLICATION_JSON_TYPE, null, is);
         
     }

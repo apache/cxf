@@ -46,8 +46,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
-public class BinaryDataProvider extends AbstractConfigurableProvider 
-    implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
+public class BinaryDataProvider<T> extends AbstractConfigurableProvider 
+    implements MessageBodyReader<T>, MessageBodyWriter<T> {
     
     private static final String HTTP_RANGE_PROPERTY = "http.range.support";
     
@@ -59,22 +59,22 @@ public class BinaryDataProvider extends AbstractConfigurableProvider
                || Reader.class.isAssignableFrom(type);
     }
 
-    public Object readFrom(Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType type, 
+    public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
                            MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         if (InputStream.class.isAssignableFrom(clazz)) {
-            return is;
+            return clazz.cast(is);
         }
         if (Reader.class.isAssignableFrom(clazz)) {
-            return new InputStreamReader(is, getEncoding(type));
+            return clazz.cast(new InputStreamReader(is, getEncoding(type)));
         }
         if (byte[].class.isAssignableFrom(clazz)) {
-            return IOUtils.readBytesFromStream(is);
+            return clazz.cast(IOUtils.readBytesFromStream(is));
         }
         throw new IOException("Unrecognized class");
     }
 
-    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         // TODO: if it's a range request, then we should probably always return -1 and set 
         // Content-Length and Content-Range in handleRangeRequest
         if (byte[].class.isAssignableFrom(t.getClass())) {
@@ -91,7 +91,7 @@ public class BinaryDataProvider extends AbstractConfigurableProvider
             || StreamingOutput.class.isAssignableFrom(type);
     }
 
-    public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
+    public void writeTo(T o, Class<?> clazz, Type genericType, Annotation[] annotations, 
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         

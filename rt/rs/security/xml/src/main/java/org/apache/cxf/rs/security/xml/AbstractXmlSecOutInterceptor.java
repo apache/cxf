@@ -110,13 +110,13 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
         if (!(providerObject instanceof JAXBElementProvider)) {
             return null;
         }
-        JAXBElementProvider provider = (JAXBElementProvider)providerObject;
+        JAXBElementProvider<Object> provider = (JAXBElementProvider<Object>)providerObject;
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         m.setContent(XMLStreamWriter.class, writer);
-        provider.writeTo(body, body.getClass(), 
+        provider.writeTo(body, 
                          body.getClass(), new Annotation[]{},
                          MediaType.APPLICATION_XML_TYPE,
-                         (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS), null);
+                         (MultivaluedMap<String, Object>)m.get(Message.PROTOCOL_HEADERS), null);
         return writer.getDocument();
     }
     

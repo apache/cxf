@@ -42,7 +42,7 @@ public class BinaryDataProviderTest extends Assert {
     
     @Test
     public void testIsWriteable() {
-        MessageBodyWriter<Object> p = new BinaryDataProvider();
+        MessageBodyWriter<Object> p = new BinaryDataProvider<Object>();
         assertTrue(p.isWriteable(byte[].class, null, null, null)
                    && p.isWriteable(InputStream.class, null, null, null)
                    && p.isWriteable(File.class, null, null, null)
@@ -51,14 +51,14 @@ public class BinaryDataProviderTest extends Assert {
     
     @Test
     public void testIsReadable() {
-        MessageBodyReader<Object> p = new BinaryDataProvider();
+        MessageBodyReader<Object> p = new BinaryDataProvider<Object>();
         assertTrue(p.isReadable(byte[].class, null, null, null)
                    && p.isReadable(InputStream.class, null, null, null)
                    && !p.isReadable(File.class, null, null, null)
                    && !p.isReadable(int[].class, null, null, null));
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void testReadFrom() throws Exception {
         MessageBodyReader p = new BinaryDataProvider();
@@ -76,7 +76,7 @@ public class BinaryDataProviderTest extends Assert {
         assertEquals(IOUtils.toString(r), "hi");
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void testWriteTo() throws Exception {
         MessageBodyWriter p = new BinaryDataProvider();

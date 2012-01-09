@@ -77,7 +77,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookSAMLTokenInForm() throws Exception {
         String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
-        FormEncodingProvider formProvider = new FormEncodingProvider();
+        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
         formProvider.setExpectedEncoded(true);
         WebClient wc = createWebClient(address, new SamlFormOutInterceptor(),
                                        formProvider, true);

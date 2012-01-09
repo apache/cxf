@@ -179,11 +179,11 @@ public class ProviderFactoryTest extends Assert {
     private void doTestDefaultJaxbProviderCloned(ProviderFactory pf, String property) {
         Message message = new MessageImpl();
         message.put(Message.QUERY_STRING, "uri=" + property);
-        MessageBodyReader customJaxbReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, message);
         assertTrue(customJaxbReader instanceof JAXBElementProvider);
         
-        JAXBElementProvider provider = (JAXBElementProvider)customJaxbReader;
+        JAXBElementProvider<Book> provider = (JAXBElementProvider<Book>)customJaxbReader;
         MessageContext mc = provider.getContext();
         assertNotNull(mc);
         UriInfo ui = mc.getUriInfo();
@@ -193,15 +193,15 @@ public class ProviderFactoryTest extends Assert {
         assertEquals(1, uriQuery.size());
         assertEquals(property, uriQuery.get(0));
         
-        MessageBodyReader customJaxbReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<?> customJaxbReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, message);
         assertSame(customJaxbReader, customJaxbReader2);
          
-        MessageBodyWriter customJaxbWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+        MessageBodyWriter<?> customJaxbWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, message);
         assertSame(customJaxbReader, customJaxbWriter);
         
-        MessageBodyReader jaxbReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+        MessageBodyReader<?> jaxbReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
             (Class<?>)Book.class, null, null, MediaType.TEXT_XML_TYPE, message);
         assertTrue(jaxbReader instanceof JAXBElementProvider);
         assertNotSame(jaxbReader, customJaxbReader);
@@ -210,7 +210,7 @@ public class ProviderFactoryTest extends Assert {
     private void checkJaxbProvider(ProviderFactory pf) {
         int count = 0;
         for (Object provider : pf.getReadersWriters()) {
-            if (((ProviderInfo)provider).getProvider() instanceof JAXBElementProvider) {
+            if (((ProviderInfo<?>)provider).getProvider() instanceof JAXBElementProvider) {
                 count++;
             }
         }
@@ -220,13 +220,13 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testCustomJaxbProvider() {
         ProviderFactory pf = ProviderFactory.getInstance();
-        JAXBElementProvider provider = new JAXBElementProvider();
+        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
         pf.registerUserProvider(provider);
-        MessageBodyReader customJaxbReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertSame(customJaxbReader, provider);
         
-        MessageBodyWriter customJaxbWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+        MessageBodyWriter<Book> customJaxbWriter = pf.createMessageBodyWriter(Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertSame(customJaxbWriter, provider);
     }
@@ -234,13 +234,13 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testCustomJsonProvider() {
         ProviderFactory pf = ProviderFactory.getInstance();
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<Book> provider = new JSONProvider<Book>();
         pf.registerUserProvider(provider);
-        MessageBodyReader customJsonReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertSame(customJsonReader, provider);
         
-        MessageBodyWriter customJsonWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+        MessageBodyWriter<?> customJsonWriter = pf.createMessageBodyWriter(Book.class, null, null, 
                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertSame(customJsonWriter, provider);
     }
@@ -248,20 +248,20 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testDefaultJsonProviderCloned() {
         ProviderFactory pf = ProviderFactory.getInstance();
-        MessageBodyReader customJsonReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
                                                 MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertTrue(customJsonReader instanceof JSONProvider);
         
-        MessageBodyReader customJsonReader2 = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<?> customJsonReader2 = pf.createMessageBodyReader(Book.class, null, null, 
                                                 MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertSame(customJsonReader, customJsonReader2);
         
-        MessageBodyWriter customJsonWriter = pf.createMessageBodyWriter((Class<?>)Book.class, null, null, 
+        MessageBodyWriter<?> customJsonWriter = pf.createMessageBodyWriter(Book.class, null, null, 
                                                 MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertSame(customJsonReader, customJsonWriter);
         
-        MessageBodyReader jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
-            (Class<?>)Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        MessageBodyReader<?> jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+            Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertTrue(jsonReader instanceof JSONProvider);
         assertNotSame(jsonReader, customJsonReader);
     }
@@ -269,13 +269,13 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testDataSourceReader() {
         ProviderFactory pf = ProviderFactory.getInstance();
-        pf.registerUserProvider(new DataSourceProvider());
-        MessageBodyReader reader = pf.createMessageBodyReader(
-              (Class<?>)DataSource.class, null, null, 
+        pf.registerUserProvider(new DataSourceProvider<Object>());
+        MessageBodyReader<DataSource> reader = pf.createMessageBodyReader(
+              DataSource.class, null, null, 
               MediaType.valueOf("image/png"), new MessageImpl());
         assertTrue(reader instanceof DataSourceProvider);
-        MessageBodyReader reader2 = pf.createMessageBodyReader(
-                          (Class<?>)DataHandler.class, null, null, 
+        MessageBodyReader<DataHandler> reader2 = pf.createMessageBodyReader(
+                          DataHandler.class, null, null, 
                           MediaType.valueOf("image/png"), new MessageImpl());
         assertSame(reader, reader2);
     }
@@ -283,13 +283,13 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testDataSourceWriter() {
         ProviderFactory pf = ProviderFactory.getInstance();
-        pf.registerUserProvider(new DataSourceProvider());
-        MessageBodyWriter writer = pf.createMessageBodyWriter(
-              (Class<?>)DataSource.class, null, null, 
+        pf.registerUserProvider(new DataSourceProvider<Object>());
+        MessageBodyWriter<DataSource> writer = pf.createMessageBodyWriter(
+              DataSource.class, null, null, 
               MediaType.valueOf("image/png"), new MessageImpl());
         assertTrue(writer instanceof DataSourceProvider);
-        MessageBodyWriter writer2 = pf.createMessageBodyWriter(
-                          (Class<?>)DataHandler.class, null, null, 
+        MessageBodyWriter<DataHandler> writer2 = pf.createMessageBodyWriter(
+                          DataHandler.class, null, null, 
                           MediaType.valueOf("image/png"), new MessageImpl());
         assertSame(writer, writer2);
     }
@@ -297,9 +297,9 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testNoDataSourceWriter() {
         ProviderFactory pf = ProviderFactory.getInstance();
-        pf.registerUserProvider(new DataSourceProvider());
-        MessageBodyWriter writer = pf.createMessageBodyWriter(
-              (Class<?>)DataSource.class, null, null, 
+        pf.registerUserProvider(new DataSourceProvider<Object>());
+        MessageBodyWriter<DataSource> writer = pf.createMessageBodyWriter(
+              DataSource.class, null, null, 
               MediaType.valueOf("multipart/form-data"), new MessageImpl());
         assertFalse(writer instanceof DataSourceProvider);
     }
@@ -309,26 +309,26 @@ public class ProviderFactoryTest extends Assert {
     public void testSchemaLocations() {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.setSchemaLocations(Collections.singletonList("classpath:/test.xsd"));
-        MessageBodyReader customJaxbReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null, 
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertTrue(customJaxbReader instanceof JAXBElementProvider);
-        MessageBodyReader jaxbReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
-            (Class<?>)Book.class, null, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
+        MessageBodyReader<Book> jaxbReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+            Book.class, null, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertTrue(jaxbReader instanceof JAXBElementProvider);
         assertNotSame(jaxbReader, customJaxbReader);
         
-        assertNull(((JAXBElementProvider)jaxbReader).getSchema());
-        assertNotNull(((JAXBElementProvider)customJaxbReader).getSchema());
+        assertNull(((JAXBElementProvider<Book>)jaxbReader).getSchema());
+        assertNotNull(((JAXBElementProvider<Book>)customJaxbReader).getSchema());
         
-        MessageBodyReader customJsonReader = pf.createMessageBodyReader((Class<?>)Book.class, null, null, 
+        MessageBodyReader<Book> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
                                                  MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertTrue(customJsonReader instanceof JSONProvider);
-        MessageBodyReader jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
-            (Class<?>)Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
+        MessageBodyReader<Book> jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
+            Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertTrue(jsonReader instanceof JSONProvider);
         assertNotSame(jsonReader, customJsonReader);
-        assertNull(((JSONProvider)jsonReader).getSchema());
-        assertNotNull(((JSONProvider)customJsonReader).getSchema());
+        assertNull(((JSONProvider<Book>)jsonReader).getSchema());
+        assertNotNull(((JSONProvider<Book>)customJsonReader).getSchema());
     }
     
     @Test
@@ -426,7 +426,7 @@ public class ProviderFactoryTest extends Assert {
     public void testMessageBodyWriterNoTypes() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         List<Object> providers = new ArrayList<Object>();
-        SuperBookReaderWriter2 superBookHandler = new SuperBookReaderWriter2();
+        SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<SuperBook>();
         providers.add(superBookHandler);
         pf.setUserProviders(providers);
         assertSame(superBookHandler, 
@@ -441,14 +441,14 @@ public class ProviderFactoryTest extends Assert {
     public void testSortEntityProviders() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new TestStringProvider());
-        pf.registerUserProvider(new PrimitiveTextProvider());
+        pf.registerUserProvider(new PrimitiveTextProvider<Object>());
         
-        List<ProviderInfo<MessageBodyReader>> readers = pf.getMessageReaders();
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
 
         assertTrue(indexOf(readers, TestStringProvider.class) 
                    < indexOf(readers, PrimitiveTextProvider.class));
         
-        List<ProviderInfo<MessageBodyWriter>> writers = pf.getMessageWriters();
+        List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
 
         assertTrue(indexOf(writers, TestStringProvider.class) 
                    < indexOf(writers, PrimitiveTextProvider.class));
@@ -458,29 +458,29 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testParameterHandlerProvider() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
-        ParameterHandler h = new CustomerParameterHandler();
+        ParameterHandler<Customer> h = new CustomerParameterHandler();
         pf.registerUserProvider(h);
-        ParameterHandler h2 = pf.createParameterHandler(Customer.class);
+        ParameterHandler<Customer> h2 = pf.createParameterHandler(Customer.class);
         assertSame(h2, h);
     }
     
     @Test
     public void testSortEntityProvidersWithConfig() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
-        JSONProvider json1 = new JSONProvider();
+        JSONProvider<?> json1 = new JSONProvider<Object>();
         json1.setConsumeMediaTypes(Collections.singletonList("application/json;q=0.9"));
         pf.registerUserProvider(json1);
-        JSONProvider json2 = new JSONProvider();
+        JSONProvider<?> json2 = new JSONProvider<Object>();
         json2.setConsumeMediaTypes(Collections.singletonList("application/json"));
         json2.setProduceMediaTypes(Collections.singletonList("application/sbc;q=0.9"));
         pf.registerUserProvider(json2);
         
-        List<ProviderInfo<MessageBodyReader>> readers = pf.getMessageReaders();
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
 
         assertTrue(indexOf(readers, json2) 
                    < indexOf(readers, json1));
         
-        List<ProviderInfo<MessageBodyWriter>> writers = pf.getMessageWriters();
+        List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
 
         assertTrue(indexOf(writers, json1) 
                    < indexOf(writers, json2));
@@ -496,7 +496,7 @@ public class ProviderFactoryTest extends Assert {
     public void testGetBinaryProvider() throws Exception {
         verifyProvider(byte[].class, BinaryDataProvider.class, "*/*");
         verifyProvider(InputStream.class, BinaryDataProvider.class, "image/png");
-        MessageBodyWriter writer = ProviderFactory.getInstance()
+        MessageBodyWriter<File> writer = ProviderFactory.getInstance()
             .createMessageBodyWriter(File.class, null, null, MediaType.APPLICATION_OCTET_STREAM_TYPE, 
                                      new MessageImpl());
         assertTrue(BinaryDataProvider.class == writer.getClass());
@@ -511,10 +511,10 @@ public class ProviderFactoryTest extends Assert {
         
         MediaType mType = MediaType.valueOf(mediaType);
         
-        MessageBodyReader reader = pf.createMessageBodyReader(type, type, null, mType, new MessageImpl());
+        MessageBodyReader<?> reader = pf.createMessageBodyReader(type, type, null, mType, new MessageImpl());
         assertSame("Unexpected provider found", provider, reader.getClass());
     
-        MessageBodyWriter writer = pf.createMessageBodyWriter(type, type, null, mType, new MessageImpl());
+        MessageBodyWriter<?> writer = pf.createMessageBodyWriter(type, type, null, mType, new MessageImpl());
         assertTrue("Unexpected provider found", provider == writer.getClass());
     }
     
@@ -581,10 +581,10 @@ public class ProviderFactoryTest extends Assert {
                        "application/widget");
     }
     
-    private int indexOf(List<? extends Object> providerInfos, Class providerType) {
+    private int indexOf(List<? extends Object> providerInfos, Class<?> providerType) {
         int index = 0;
         for (Object pi : providerInfos) {
-            Object p = ((ProviderInfo)pi).getProvider();
+            Object p = ((ProviderInfo<?>)pi).getProvider();
             if (p.getClass().isAssignableFrom(providerType)) {
                 break;
             }
@@ -596,7 +596,7 @@ public class ProviderFactoryTest extends Assert {
     private int indexOf(List<? extends Object> providerInfos, Object provider) {
         int index = 0;
         for (Object pi : providerInfos) {
-            if (((ProviderInfo)pi).getProvider() == provider) {
+            if (((ProviderInfo<?>)pi).getProvider() == provider) {
                 break;
             }
             index++;
@@ -714,7 +714,7 @@ public class ProviderFactoryTest extends Assert {
     
     @Test
     public void testSetSchemasFromClasspath() {
-        JAXBElementProvider provider = new JAXBElementProvider();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(provider);
         
@@ -809,37 +809,38 @@ public class ProviderFactoryTest extends Assert {
     
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class SuperBookReaderWriter2 implements MessageBodyReader, MessageBodyWriter {
+    private static class SuperBookReaderWriter2<T> 
+        implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
-        public boolean isReadable(Class type, Type genericType, Annotation[] annotations, 
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
                                   MediaType mediaType) {
             return true;
         }
 
-        public Object readFrom(Class arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
-                                  MultivaluedMap arg4, InputStream arg5) 
+        public T readFrom(Class<T> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
+                          MultivaluedMap<String, String> arg4, InputStream arg5) 
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public long getSize(Object t, Class type, Type genericType, 
+        public long getSize(T t, Class<?> type, Type genericType, 
                             Annotation[] annotations, MediaType mediaType) {
             // TODO Auto-generated method stub
             return 0;
         }
 
-        public boolean isWriteable(Class type, Type genericType, 
+        public boolean isWriteable(Class<?> type, Type genericType, 
                                    Annotation[] annotations, MediaType mediaType) {
             return true;
         }
 
         
-        public void writeTo(Object arg0, Class arg1, Type arg2, 
-                            Annotation[] arg3, MediaType arg4, MultivaluedMap arg5, 
-                            OutputStream arg6) throws IOException, WebApplicationException {
+        public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations,
+                            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
+                            OutputStream entityStream)
+            throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
-            
         }
         
     }

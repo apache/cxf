@@ -477,7 +477,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test 
     public void testGetBookCollection2() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         provider.setMarshallAsJaxbElement(true);
         provider.setUnmarshallAsJaxbElement(true);
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
@@ -541,7 +541,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testWebClientUnwrapBookWithXslt() throws Exception {
-        XSLTJaxbProvider provider = new XSLTJaxbProvider();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook.xsl");
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/wrapper",
                              Collections.singletonList(provider));
@@ -557,7 +557,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     // uncomment once I can figure out how to set for this test only
     // com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize - JAXB is a pain
     public void testProxyUnwrapBookWithXslt() throws Exception {
-        XSLTJaxbProvider provider = new XSLTJaxbProvider();
+        XSLTJaxbProvider<?> provider = new XSLTJaxbProvider<Object>();
         provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook2.xsl");
         BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                              Collections.singletonList(provider));
@@ -1152,7 +1152,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testPostGetBookAdapterList() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         Map<String, String> outMap = new HashMap<String, String>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");
@@ -1167,7 +1167,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testPostGetBookAdapterListJSON() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         Map<String, String> outMap = new HashMap<String, String>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");

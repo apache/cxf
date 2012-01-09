@@ -323,7 +323,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public UriBuilder path(Class resource) throws IllegalArgumentException {
+    public UriBuilder path(@SuppressWarnings("rawtypes") Class resource) throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
         }
@@ -338,7 +338,8 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public UriBuilder path(Class resource, String method) throws IllegalArgumentException {
+    public UriBuilder path(@SuppressWarnings("rawtypes") Class resource, String method) 
+        throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
         }

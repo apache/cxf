@@ -51,8 +51,8 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 @Produces({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Consumes({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Provider
-public class FormEncodingProvider implements 
-    MessageBodyReader<Object>, MessageBodyWriter<Object> {
+public class FormEncodingProvider<T> implements 
+    MessageBodyReader<T>, MessageBodyWriter<T> {
         
     private FormValidator validator;
     @Context private MessageContext mc;
@@ -87,8 +87,8 @@ public class FormEncodingProvider implements
         return isSupported(type, genericType, annotations, mt);
     }
 
-    public Object readFrom(
-        Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType mt, 
+    public T readFrom(
+        Class<T> clazz, Type genericType, Annotation[] annotations, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         if (is == null) {
@@ -98,9 +98,9 @@ public class FormEncodingProvider implements
             if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
                 MultipartBody body = AttachmentUtils.getMultipartBody(mc);
                 if (MultipartBody.class.isAssignableFrom(clazz)) {
-                    return body;
+                    return clazz.cast(body);
                 } else if (Attachment.class.isAssignableFrom(clazz)) {
-                    return body.getRootAttachment();
+                    return clazz.cast(body.getRootAttachment());
                 }  
             }
             
@@ -138,8 +138,8 @@ public class FormEncodingProvider implements
         return (MultivaluedMap<String, String>)clazz.newInstance();
     }
     
-    private Object getFormObject(Class<?> clazz, MultivaluedMap<String, String> params) {
-        return Form.class.isAssignableFrom(clazz) ? new Form(params) : params;
+    private T getFormObject(Class<T> clazz, MultivaluedMap<String, String> params) {
+        return clazz.cast(Form.class.isAssignableFrom(clazz) ? new Form(params) : params);
     }
     
     /**
@@ -173,7 +173,7 @@ public class FormEncodingProvider implements
         }
     }
 
-    public long getSize(Object t, Class<?> type, 
+    public long getSize(T t, Class<?> type, 
                         Type genericType, Annotation[] annotations, 
                         MediaType mediaType) {
         return -1;
@@ -193,7 +193,7 @@ public class FormEncodingProvider implements
     }
     
     @SuppressWarnings("unchecked")
-    public void writeTo(Object obj, Class<?> c, Type t, Annotation[] anns, 
+    public void writeTo(T obj, Class<?> c, Type t, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException, WebApplicationException {
         

@@ -505,7 +505,7 @@ public final class ResourceUtils {
     }
     
     private static void checkJaxbType(Class<?> type, Map<Class<?>, Type> types) {
-        JAXBElementProvider provider = new JAXBElementProvider();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         if (!InjectionUtils.isPrimitive(type) 
             && !JAXBElement.class.isAssignableFrom(type)
             && provider.isReadable(type, type, new Annotation[0], MediaType.APPLICATION_XML_TYPE)) {
@@ -553,13 +553,13 @@ public final class ResourceUtils {
         return op;
     }
     
-    @SuppressWarnings("unchecked")
     public static Object[] createConstructorArguments(Constructor<?> c, Message m) {
         Class<?>[] params = c.getParameterTypes();
         Annotation[][] anns = c.getParameterAnnotations();
         Type[] genericTypes = c.getGenericParameterTypes();
+        @SuppressWarnings("unchecked")
         MultivaluedMap<String, String> templateValues = m == null ? null
-            : (MultivaluedMap)m.get(URITemplate.TEMPLATE_PARAMETERS);
+            : (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
         Object[] values = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             if (AnnotationUtils.isContextClass(params[i])) {
@@ -578,7 +578,7 @@ public final class ResourceUtils {
         Set<Object> singletons = app.getSingletons();
         verifySingletons(singletons);
         
-        List<Class> resourceClasses = new ArrayList<Class>();
+        List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
         List<Object> providers = new ArrayList<Object>();
         Map<Class<?>, ResourceProvider> map = new HashMap<Class<?>, ResourceProvider>();
         

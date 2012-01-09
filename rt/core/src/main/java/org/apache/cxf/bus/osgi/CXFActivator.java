@@ -50,6 +50,7 @@ public class CXFActivator implements BundleActivator {
     private ServiceRegistration wqSingleConfigRegistratin;
 
     /** {@inheritDoc}*/
+    @SuppressWarnings("deprecation")
     public void start(BundleContext context) throws Exception {
         cxfBundleListener = new CXFExtensionBundleListener(context.getBundle().getBundleId());
         context.addBundleListener(cxfBundleListener);
@@ -74,7 +75,7 @@ public class CXFActivator implements BundleActivator {
     }
 
     private ServiceRegistration registerManagedServiceFactory(BundleContext context,
-                                                              Class serviceClass,
+                                                              Class<?> serviceClass,
                                                               Object service, 
                                                               String servicePid) {
         Properties props = new Properties();

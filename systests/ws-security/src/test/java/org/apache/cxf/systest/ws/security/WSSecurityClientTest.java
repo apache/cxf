@@ -160,6 +160,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         // verify that the SoapHandlerInterceptor can peacefully co-exist
         // with the explicitly configured SAAJOutInterceptor
         //
+        @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = new ArrayList<Handler>();
         Binding binding = ((BindingProvider)greeter).getBinding();
         TestOutHandler handler = new TestOutHandler();

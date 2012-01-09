@@ -37,7 +37,7 @@ import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 
 @Provider
 @Consumes({"text/xml", "application/xml", "application/*+xml" })
-public class XPathProvider implements MessageBodyReader<Object> {
+public class XPathProvider<T> implements MessageBodyReader<T> {
 
     private List<String> consumeMediaTypes;
     private Map<String, String> classExpressions;
@@ -77,7 +77,7 @@ public class XPathProvider implements MessageBodyReader<Object> {
             || classExpressions != null && classExpressions.containsKey(cls.getName());
     }
 
-    public Object readFrom(Class<Object> cls, Type type, Annotation[] anns, MediaType mt, 
+    public T readFrom(Class<T> cls, Type type, Annotation[] anns, MediaType mt, 
         MultivaluedMap<String, String> hrs, InputStream is) throws IOException, WebApplicationException {
         String expression = globalExpression != null ? globalExpression
             : classExpressions.get(cls.getName());

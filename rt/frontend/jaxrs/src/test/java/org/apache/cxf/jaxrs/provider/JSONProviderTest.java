@@ -74,7 +74,6 @@ import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadEmbeddedArray() throws Exception {
         String input = 
@@ -92,7 +91,7 @@ public class JSONProviderTest extends Assert {
                + " }                   "
                + "}                    ";
         
-        Object storeObject = new JSONProvider().readFrom((Class)Store.class, null, null, 
+        Object storeObject = new JSONProvider<Store>().readFrom(Store.class, null, null, 
                                        null, null, new ByteArrayInputStream(input.getBytes()));
         Store store = (Store)storeObject;
         List<Book> books = store.getBooks();
@@ -101,7 +100,6 @@ public class JSONProviderTest extends Assert {
         assertEquals("CXF 2", books.get(1).getName());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadEmbeddedArrayWithNamespaces() throws Exception {
         String input = 
@@ -119,12 +117,12 @@ public class JSONProviderTest extends Assert {
                + " }                   "
                + "}                    ";
         
-        JSONProvider p = new JSONProvider();
+        JSONProvider<QualifiedStore> p = new JSONProvider<QualifiedStore>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://superbooks", "ns1");
         p.setNamespaceMap(namespaceMap);
         
-        Object storeObject = p.readFrom((Class)QualifiedStore.class, null, null, 
+        Object storeObject = p.readFrom(QualifiedStore.class, null, null, 
                                        null, null, new ByteArrayInputStream(input.getBytes()));
         QualifiedStore store = (QualifiedStore)storeObject;
         List<Book2> books = store.getBooks();
@@ -137,7 +135,8 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteCollectionWithoutXmlRootElement() 
         throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>> provider 
+            = new JSONProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>>();
         provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
         provider.setJaxbElementClassMap(Collections.singletonMap(
                 org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
@@ -156,14 +155,13 @@ public class JSONProviderTest extends Assert {
         assertEquals(expected, bos.toString());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadFromTags() throws Exception {
-        MessageBodyReader<Object> p = new JSONProvider();
+        MessageBodyReader<Tags> p = new JSONProvider<Tags>();
         byte[] bytes = 
             "{\"Tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"},{\"group\":\"d\",\"name\":\"c\"}]}}"
             .getBytes();
-        Object tagsObject = p.readFrom((Class)Tags.class, null, null, 
+        Object tagsObject = p.readFrom(Tags.class, null, null, 
                                           null, null, new ByteArrayInputStream(bytes));
         Tags tags = (Tags)tagsObject;
         List<TagVO> list = tags.getTags();
@@ -174,30 +172,28 @@ public class JSONProviderTest extends Assert {
         assertEquals("d", list.get(1).getGroup());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadFromTag() throws Exception {
-        MessageBodyReader<Object> p = new JSONProvider();
+        MessageBodyReader<TagVO> p = new JSONProvider<TagVO>();
         byte[] bytes = "{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}"
             .getBytes();
-        Object tagsObject = p.readFrom((Class)TagVO.class, null, null, 
+        Object tagsObject = p.readFrom(TagVO.class, null, null, 
                                           null, null, new ByteArrayInputStream(bytes));
         TagVO tag = (TagVO)tagsObject;
         assertEquals("a", tag.getName());
         assertEquals("b", tag.getGroup());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadFromQualifiedTag() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
         byte[] bytes = "{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}"
             .getBytes();
-        Object tagsObject = p.readFrom((Class)TagVO2.class, null, null, 
-                                          null, null, new ByteArrayInputStream(bytes));
+        Object tagsObject = p.readFrom(TagVO2.class, null, null, 
+                                       null, null, new ByteArrayInputStream(bytes));
         TagVO2 tag = (TagVO2)tagsObject;
         assertEquals("a", tag.getName());
         assertEquals("b", tag.getGroup());
@@ -205,7 +201,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testReadFromUnwrappedTagWrapperName() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO> p = new JSONProvider<TagVO>();
         p.setSupportUnwrapped(true);
         p.setWrapperName("tagVO");
         readUnwrapped(p);
@@ -213,7 +209,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testReadFromUnwrappedTagMap() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO> p = new JSONProvider<TagVO>();
         p.setSupportUnwrapped(true);
         
         Map<String, String> map = new HashMap<String, String>();
@@ -224,15 +220,14 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testReadFromUnwrappedTagRoot() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO> p = new JSONProvider<TagVO>();
         p.setSupportUnwrapped(true);
         readUnwrapped(p);
     }
     
     @Test
-    @SuppressWarnings("unchecked")
     public void testReadFromUnwrappedQualifiedTagRoot() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         p.setSupportUnwrapped(true);
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
@@ -240,18 +235,17 @@ public class JSONProviderTest extends Assert {
         
         byte[] bytes = "{\"group\":\"b\",\"name\":\"a\"}"
             .getBytes();
-        Object tagsObject = p.readFrom((Class)TagVO2.class, null, null, 
+        Object tagsObject = p.readFrom(TagVO2.class, null, null, 
                                           null, null, new ByteArrayInputStream(bytes));
         TagVO2 tag = (TagVO2)tagsObject;
         assertEquals("a", tag.getName());
         assertEquals("b", tag.getGroup());
     }
     
-    @SuppressWarnings("unchecked")
-    private void readUnwrapped(JSONProvider p) throws Exception {
+    private void readUnwrapped(JSONProvider<TagVO> p) throws Exception {
         byte[] bytes = "{\"group\":\"b\",\"name\":\"a\"}"
             .getBytes();
-        Object tagsObject = p.readFrom((Class)TagVO.class, null, null, 
+        Object tagsObject = p.readFrom(TagVO.class, null, null, 
                                           null, null, new ByteArrayInputStream(bytes));
         TagVO tag = (TagVO)tagsObject;
         assertEquals("a", tag.getName());
@@ -260,7 +254,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToSingleTag() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO> p = new JSONProvider<TagVO>();
         TagVO tag = createTag("a", "b");
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -273,14 +267,13 @@ public class JSONProviderTest extends Assert {
         
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testCopyReaderToDocument() throws Exception {
         String s = "{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}";
         
         ByteArrayInputStream is = new ByteArrayInputStream(s.getBytes());
         
-        Document doc = (Document)new JSONProvider().readFrom((Class)Document.class, Document.class, 
+        Document doc = new JSONProvider<Document>().readFrom(Document.class, Document.class, 
                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                   new MetadataMap<String, String>(), is);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -297,7 +290,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        new JAXBElementProvider().writeTo(tag, TagVO.class, TagVO.class, 
+        new JAXBElementProvider<TagVO>().writeTo(tag, TagVO.class, TagVO.class, 
                   TagVO.class.getAnnotations(), MediaType.APPLICATION_XML_TYPE, 
                   new MetadataMap<String, Object>(), os);
         Document doc = DOMUtils.readXml(new StringReader(os.toString()));
@@ -305,7 +298,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayOutputStream os2 = new ByteArrayOutputStream();
         
-        new JSONProvider().writeTo(
+        new JSONProvider<Document>().writeTo(
                   doc, Document.class, Document.class, 
                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                   new MetadataMap<String, Object>(), os2);
@@ -315,7 +308,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteBookWithStringConverter() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<Book> p = new JSONProvider<Book>();
         p.setConvertTypesToStrings(true);
         Book book = new Book("CXF", 125);
         
@@ -331,7 +324,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToSingleTagBadgerFish() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO> p = new JSONProvider<TagVO>();
         p.setConvention("badgerfish");
         TagVO tag = createTag("a", "b");
         
@@ -347,7 +340,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToSingleQualifiedTag() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
@@ -364,7 +357,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToSingleQualifiedTagBadgerFish() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         p.setConvention("badgerfish");
         TagVO2 tag = createTag2("a", "b");
         
@@ -380,7 +373,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testDropRootElement() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         p.setDropRootElement(true);
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
@@ -420,7 +413,7 @@ public class JSONProviderTest extends Assert {
     
     public void doWriteQualifiedCollection(boolean drop, boolean serializeAsArray, String data) 
         throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<List<?>> p = new JSONProvider<List<?>>();
         p.setCollectionWrapperName("{http://tags}tag");
         p.setDropCollectionWrapperElement(drop);
         p.setSerializeAsArray(serializeAsArray);
@@ -441,7 +434,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteUnqualifiedCollection() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<List<Book>> p = new JSONProvider<List<Book>>();
         List<Book> books = new ArrayList<Book>();
         books.add(new Book("CXF", 123L));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -461,13 +454,13 @@ public class JSONProviderTest extends Assert {
     }
     
     @SuppressWarnings("unchecked")
-    private void doReadUnqualifiedCollection(String data, String mName, Class<?> type) throws Exception {
-        JSONProvider provider = new JSONProvider();
+    private <T> void doReadUnqualifiedCollection(String data, String mName, Class<T> type) throws Exception {
+        JSONProvider<T> provider = new JSONProvider<T>();
         Method m = CollectionsResource.class.getMethod(mName, 
                                                        new Class[]{type});
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
         Object o = provider.readFrom(
-                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
+                       type, m.getGenericParameterTypes()[0],
                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                        new MetadataMap<String, String>(), is);
         assertNotNull(o);
@@ -509,7 +502,7 @@ public class JSONProviderTest extends Assert {
         doReadQualifiedCollection(data, true);
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void doReadQualifiedCollection(String data, boolean isArray) throws Exception {
         
         JSONProvider provider = new JSONProvider();
@@ -526,7 +519,7 @@ public class JSONProviderTest extends Assert {
         
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
         Object o = provider.readFrom(
-                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
+                       m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                        new MetadataMap<String, String>(), is);
         assertNotNull(o);
@@ -550,7 +543,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToSingleQualifiedTag2() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         TagVO2 tag = createTag2("a", "b");
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -586,7 +579,7 @@ public class JSONProviderTest extends Assert {
         JAXBContext context = JAXBContext.newInstance(new Class[]{Books.class, Book.class});
         Unmarshaller um = context.createUnmarshaller();
         JAXBElement<?> jaxbEl = um.unmarshal(new StreamSource(is), Books.class);
-        JSONProvider p = new JSONProvider();
+        JSONProvider<JAXBElement<?>> p = new JSONProvider<JAXBElement<?>>();
         p.setIgnoreMixedContent(ignore);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
@@ -598,7 +591,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteListOfDerivedTypes() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<Books2> p = new JSONProvider<Books2>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
         p.setNamespaceMap(namespaceMap);
@@ -615,17 +608,16 @@ public class JSONProviderTest extends Assert {
         assertEquals(data, s);
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadListOfDerivedTypes() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<Books2> p = new JSONProvider<Books2>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
         p.setNamespaceMap(namespaceMap);
         String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
             + "\"name\":\"CXF Rocks\",\"superId\":124}}}";
         byte[] bytes = data.getBytes();
-        Object books2Object = p.readFrom((Class)Books2.class, null, null, 
+        Object books2Object = p.readFrom(Books2.class, null, null, 
                                           null, null, new ByteArrayInputStream(bytes));
         Books2 books = (Books2)books2Object;
         List<? extends Book> list = books.getBooks();
@@ -636,17 +628,16 @@ public class JSONProviderTest extends Assert {
         assertEquals("CXF Rocks", book.getName());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadListOfDerivedTypesWithNullField() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<Books2> p = new JSONProvider<Books2>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
         p.setNamespaceMap(namespaceMap);
         String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
             + "\"name\":null,\"superId\":124}}}";
         byte[] bytes = data.getBytes();
-        Object books2Object = p.readFrom((Class)Books2.class, null, null, 
+        Object books2Object = p.readFrom(Books2.class, null, null, 
                                           null, null, new ByteArrayInputStream(bytes));
         Books2 books = (Books2)books2Object;
         List<? extends Book> list = books.getBooks();
@@ -658,7 +649,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToListWithManyValues() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<Tags> p = new JSONProvider<Tags>();
         Tags tags = new Tags();
         tags.addTag(createTag("a", "b"));
         tags.addTag(createTag("c", "d"));
@@ -676,7 +667,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteToListWithSingleValue() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<Tags> p = new JSONProvider<Tags>();
         p.setSerializeAsArray(true);
         p.setArrayKeys(Collections.singletonList("list"));
         Tags tags = new Tags();
@@ -695,7 +686,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteUsingNaturalNotation() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<Post> p = new JSONProvider<Post>();
         p.setSerializeAsArray(true);
         p.setArrayKeys(Collections.singletonList("comments"));
         Post post = new Post();
@@ -721,7 +712,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testManyTags() throws Exception {
-        JSONProvider p = new JSONProvider();
+        JSONProvider<ManyTags> p = new JSONProvider<ManyTags>();
         p.setSerializeAsArray(true);
         p.setArrayKeys(Collections.singletonList("list"));
         
@@ -742,13 +733,12 @@ public class JSONProviderTest extends Assert {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testInDropElement() throws Exception {
         String data = "{\"Extra\":{\"ManyTags\":{\"tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}}}";
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
         provider.setInDropElements(Collections.singletonList("Extra"));
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
+        Object o = provider.readFrom(ManyTags.class, ManyTags.class,
                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                       new MetadataMap<String, String>(), is);
         ManyTags holder = (ManyTags)o;
@@ -770,12 +760,11 @@ public class JSONProviderTest extends Assert {
         readAppendElementsNoNs(data, Collections.singletonMap("list", "tags"));
     }
     
-    @SuppressWarnings("unchecked")
     private void readAppendElementsNoNs(String data, Map<String, String> appendMap) throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
         provider.setInAppendElements(appendMap);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
+        Object o = provider.readFrom(ManyTags.class, ManyTags.class,
                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                       new MetadataMap<String, String>(), is);
         ManyTags holder = (ManyTags)o;
@@ -809,9 +798,8 @@ public class JSONProviderTest extends Assert {
         readTagVOAfterTransform(data, "{http://bar}thetag2");
     }
     
-    @SuppressWarnings("unchecked")
     private void readTagVO2AfterTransform(String data, String keyValue) throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
         Map<String, String> map = new HashMap<String, String>();
         map.put(keyValue, "{http://tags}thetag");
         Map<String, String> nsmap = new HashMap<String, String>();
@@ -819,7 +807,7 @@ public class JSONProviderTest extends Assert {
         provider.setNamespaceMap(nsmap);
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom((Class)TagVO2.class, TagVO2.class,
+        Object o = provider.readFrom(TagVO2.class, TagVO2.class,
                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, String>(),
                       is);
         TagVO2 tag2 = (TagVO2)o;
@@ -827,17 +815,16 @@ public class JSONProviderTest extends Assert {
         assertEquals("B", tag2.getGroup());    
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testInNsElementsFromLocals() throws Exception {
         String data = "{tagholder:{thetag:{\"group\":\"B\",\"name\":\"A\"}}}";
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2Holder> provider = new JSONProvider<TagVO2Holder>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagholder", "{http://tags}tagholder");
         map.put("thetag", "{http://tags}thetag");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
+        Object o = provider.readFrom(TagVO2Holder.class, TagVO2Holder.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         TagVO2Holder holder = (TagVO2Holder)o;
         TagVO2 tag2 = holder.getTagValue();
@@ -847,7 +834,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutAttributesAsElements() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2Holder> provider = new JSONProvider<TagVO2Holder>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "thetag");
         map.put("{http://tags}tagholder", "tagholder");
@@ -869,7 +856,7 @@ public class JSONProviderTest extends Assert {
     public void testOutAttributesAsElementsForList() throws Exception {
 
         //Provider
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<List<?>> provider = new JSONProvider<List<?>>();
         provider.setCollectionWrapperName("tagholders");
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}*", "*");
@@ -902,9 +889,8 @@ public class JSONProviderTest extends Assert {
         assertEquals(expected, bos.toString());
     }
     
-    @SuppressWarnings("unchecked")
     private void readTagVOAfterTransform(String data, String keyValue) throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
         Map<String, String> map = new HashMap<String, String>();
         map.put(keyValue, "tagVO");
         provider.setInTransformElements(map);
@@ -912,7 +898,7 @@ public class JSONProviderTest extends Assert {
         nsmap.put("http://bar", "t");
         provider.setNamespaceMap(nsmap);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom((Class)TagVO.class, TagVO.class,
+        Object o = provider.readFrom(TagVO.class, TagVO.class,
                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, String>(),
                       is);
         TagVO tag2 = (TagVO)o;
@@ -925,7 +911,7 @@ public class JSONProviderTest extends Assert {
     @Ignore
     // name:A is lost
     public void testDropElementsIgnored() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
         List<String> list = new ArrayList<String>();
         list.add("ManyTags");
         list.add("list");
@@ -944,7 +930,7 @@ public class JSONProviderTest extends Assert {
  
     @Test
     public void testDropElements() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
         List<String> list = new ArrayList<String>();
         list.add("ManyTags");
         list.add("tags");
@@ -965,7 +951,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testDropQualifiedElements() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
         List<String> list = new ArrayList<String>();
         list.add("{http://tags}thetag");
         provider.setOutDropElements(list);
@@ -982,7 +968,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutAppendNsElementBeforeLocal() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
@@ -996,7 +982,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutAppendLocalBeforeLocal() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "supertag");
         provider.setOutAppendElements(map);
@@ -1010,7 +996,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutAppendElementsSameNs() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tags}t");
         provider.setOutAppendElements(map);
@@ -1024,7 +1010,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutAppendElementsDiffNs() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
@@ -1038,7 +1024,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalNsToLocalNs() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutTransformElements(map);
@@ -1053,7 +1039,7 @@ public class JSONProviderTest extends Assert {
 
     @Test
     public void testOutElementsMapLocalNsToLocal() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "t");
         provider.setOutTransformElements(map);
@@ -1067,7 +1053,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalToLocalNs() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         Map<String, String> map = new HashMap<String, String>();
@@ -1083,7 +1069,7 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalToLocal() throws Exception {
-        JSONProvider provider = new JSONProvider();
+        JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "supertag");
         map.put("group", "group2");

@@ -32,7 +32,7 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class GenericHandlerWriter implements MessageBodyWriter<GenericHandler<Book>> {
-    JAXBElementProvider jaxb = new JAXBElementProvider();
+    JAXBElementProvider<Object> jaxb = new JAXBElementProvider<Object>();
     
     public GenericHandlerWriter() {
         

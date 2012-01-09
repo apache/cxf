@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -39,18 +40,19 @@ public class WorkQueueSingleConfig implements ManagedService {
         this.workQueueList = workQueueList;
     }
 
-    public void updated(Dictionary properties) throws ConfigurationException {
+    public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+        Dictionary<String, String> p = CastUtils.cast(properties);
         String names = (String)properties.get(PROPERTY_PREFIX + ".names");
         String[] nameAr = names.split(",");
         for (String name : nameAr) {
-            updateQueue(name.trim(), properties);
+            updateQueue(name.trim(), p);
         }
     }
 
-    private void updateQueue(String name, Dictionary properties) 
+    private void updateQueue(String name, Dictionary<String, String> properties) 
         throws ConfigurationException {
         Dictionary<String, String> queueProperties = new Hashtable<String, String>();
-        Enumeration it = properties.keys();
+        Enumeration<?> it = properties.keys();
         while (it.hasMoreElements()) {
             String key = (String)it.nextElement();
             String prefix = PROPERTY_PREFIX + "." + name + ".";

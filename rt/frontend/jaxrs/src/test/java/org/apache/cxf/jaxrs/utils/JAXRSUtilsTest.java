@@ -168,7 +168,8 @@ public class JAXRSUtilsTest extends Assert {
         Server server = sf.create();  
         assertSame(app, customer.getApplication1());
         assertSame(app, customer.getApplication2());
-        ThreadLocalProxy proxy = (ThreadLocalProxy)app.getUriInfo();
+        @SuppressWarnings("unchecked")
+        ThreadLocalProxy<UriInfo> proxy = (ThreadLocalProxy<UriInfo>)app.getUriInfo();
         assertNotNull(proxy);
         invokeCustomerMethod(sf.getServiceFactory().getClassResourceInfo().get(0),
                              customer, server);
@@ -185,7 +186,8 @@ public class JAXRSUtilsTest extends Assert {
         sf.setStart(false);
         Server server = sf.create();  
         
-        ThreadLocalProxy proxy = (ThreadLocalProxy)app.getUriInfo();
+        @SuppressWarnings("unchecked")
+        ThreadLocalProxy<UriInfo> proxy = (ThreadLocalProxy<UriInfo>)app.getUriInfo();
         assertNotNull(proxy);
         
         ClassResourceInfo cri = sf.getServiceFactory().getClassResourceInfo().get(0);
@@ -1305,7 +1307,7 @@ public class JAXRSUtilsTest extends Assert {
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
         
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
-            new FormEncodingProvider() {
+            new FormEncodingProvider<Object>() {
                 @Override
                 protected void persistParamsOnMessage(MultivaluedMap<String, String> params) {
                     messageImpl.put(FormUtils.FORM_PARAM_MAP, params);    
@@ -1496,6 +1498,7 @@ public class JAXRSUtilsTest extends Assert {
         
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testSingletonHttpContextFields() throws Exception {
         
@@ -1517,31 +1520,30 @@ public class JAXRSUtilsTest extends Assert {
         InjectionUtils.injectContextMethods(c, cri, m);
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo2().getClass());
         assertSame(UriInfoImpl.class, 
-                   ((ThreadLocalProxy)c.getUriInfo2()).get().getClass());
+                   ((ThreadLocalProxy<UriInfo>)c.getUriInfo2()).get().getClass());
         assertSame(HttpHeadersImpl.class, 
-                   ((ThreadLocalProxy)c.getHeaders()).get().getClass());
+                   ((ThreadLocalProxy<HttpHeaders>)c.getHeaders()).get().getClass());
         assertSame(RequestImpl.class, 
-                   ((ThreadLocalProxy)c.getRequest()).get().getClass());
+                   ((ThreadLocalProxy<Request>)c.getRequest()).get().getClass());
         assertSame(SecurityContextImpl.class, 
-                   ((ThreadLocalProxy)c.getSecurityContext()).get().getClass());
+                   ((ThreadLocalProxy<SecurityContext>)c.getSecurityContext()).get().getClass());
         assertSame(ProvidersImpl.class, 
-                   ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
-        assertSame(ProvidersImpl.class, 
-                   ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
+                   ((ThreadLocalProxy<Providers>)c.getBodyWorkers()).get().getClass());
   
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy)c.getThreadLocalServletContext()).get());
+                   ((ThreadLocalProxy<ServletContext>)c.getThreadLocalServletContext()).get());
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy)c.getServletContext()).get());
+                   ((ThreadLocalProxy<ServletContext>)c.getServletContext()).get());
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy)c.getSuperServletContext()).get());
+                   ((ThreadLocalProxy<ServletContext>)c.getSuperServletContext()).get());
         assertSame(httpRequest, 
-                   ((ThreadLocalProxy)c.getServletRequest()).get());
+                   ((ThreadLocalProxy<HttpServletRequest>)c.getServletRequest()).get());
         HttpServletResponseFilter filter = (
-            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponse()).get();
+            HttpServletResponseFilter)((ThreadLocalProxy<HttpServletResponse>)c.getServletResponse()).get();
         assertSame(httpResponse, filter.getResponse());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testSingletonHttpResourceFields() throws Exception {
         
@@ -1559,14 +1561,16 @@ public class JAXRSUtilsTest extends Assert {
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
         InjectionUtils.injectResourceFields(c, cri, m);
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy)c.getServletContextResource()).get());
+                   ((ThreadLocalProxy<ServletContext>)c.getServletContextResource()).get());
         assertSame(httpRequest, 
-                   ((ThreadLocalProxy)c.getServletRequestResource()).get());
+                   ((ThreadLocalProxy<HttpServletRequest>)c.getServletRequestResource()).get());
         HttpServletResponseFilter filter = (
-            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponseResource()).get();
+            HttpServletResponseFilter)((ThreadLocalProxy<HttpServletResponse>)c.getServletResponseResource())
+                .get();
         assertSame(httpResponse, filter.getResponse());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testContextAnnotationOnMethod() throws Exception {
         
@@ -1582,7 +1586,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(c.getUriInfo());
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo().getClass());
         assertSame(UriInfoImpl.class, 
-                   ((ThreadLocalProxy)c.getUriInfo()).get().getClass());
+                   ((ThreadLocalProxy<UriInfo>)c.getUriInfo()).get().getClass());
         assertSame(ThreadLocalServletConfig.class, c.getSuperServletConfig().getClass());
         assertSame(ThreadLocalHttpServletRequest.class, c.getHttpServletRequest().getClass());
     }

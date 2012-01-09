@@ -158,7 +158,7 @@ public final class JAXRSUtils {
         return values;
     }
     
-    public static List<MediaType> getProviderConsumeTypes(MessageBodyReader provider) {
+    public static List<MediaType> getProviderConsumeTypes(MessageBodyReader<?> provider) {
         String[] values = getUserMediaTypes(provider, "getConsumeMediaTypes");
         
         if (values == null) {
@@ -168,7 +168,7 @@ public final class JAXRSUtils {
         return JAXRSUtils.getMediaTypes(values);
     }
     
-    public static List<MediaType> getProviderProduceTypes(MessageBodyWriter provider) {
+    public static List<MediaType> getProviderProduceTypes(MessageBodyWriter<?> provider) {
         String[] values = getUserMediaTypes(provider, "getProduceMediaTypes");
         
         if (values == null) {
@@ -851,7 +851,7 @@ public final class JAXRSUtils {
             o = new SearchContextImpl(m);
         } else if (Application.class.isAssignableFrom(clazz)) {
             ProviderInfo<?> providerInfo = 
-                (ProviderInfo)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
+                (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
             o = providerInfo == null ? providerInfo : providerInfo.getProvider();
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
@@ -1011,8 +1011,7 @@ public final class JAXRSUtils {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> Object readFromMessageBody(Class<T> targetTypeClass,
+    private static <T> T readFromMessageBody(Class<T> targetTypeClass,
                                                   Type parameterType,
                                                   Annotation[] parameterAnnotations,
                                                   InputStream is, 
@@ -1022,7 +1021,7 @@ public final class JAXRSUtils {
         
         List<MediaType> types = JAXRSUtils.intersectMimeTypes(consumeTypes, contentType);
         
-        MessageBodyReader provider = null;
+        MessageBodyReader<T> provider = null;
         for (MediaType type : types) { 
             provider = ProviderFactory.getInstance(m)
                 .createMessageBodyReader(targetTypeClass,

@@ -112,13 +112,14 @@ public class XMLSource {
      * @param cls class of the node
      * @return the instance representing the matching node
      */
+    @SuppressWarnings("unchecked")
     public <T> T getNode(String expression, Map<String, String> namespaces, Class<T> cls) {
         Node node = (Node)evaluate(expression, namespaces, XPathConstants.NODE);
         if (node == null) {
             return null;
         }
         if (cls.isPrimitive() || cls == String.class) {
-            return readPrimitiveValue(node, cls);    
+            return (T)readPrimitiveValue(node, cls);    
         } else {
             return readNode(node, cls);
         }
@@ -160,7 +161,7 @@ public class XMLSource {
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
             if (InjectionUtils.isPrimitive(cls)) {
-                values[i] = readPrimitiveValue(node, cls);
+                values[i] = (T)readPrimitiveValue(node, cls);
             } else {
                 values[i] = readNode(node, cls);
             }
@@ -278,9 +279,10 @@ public class XMLSource {
      * @param cls the class of the response
      * @return the value
      */
+    @SuppressWarnings("unchecked")
     public <T> T getValue(String expression, Map<String, String> namespaces, Class<T> cls) {
         Object result = evaluate(expression, namespaces, XPathConstants.STRING);
-        return result == null ? null : InjectionUtils.convertStringToPrimitive(result.toString(), cls); 
+        return result == null ? null : (T)InjectionUtils.convertStringToPrimitive(result.toString(), cls); 
     }
     
     
@@ -325,7 +327,7 @@ public class XMLSource {
         }
     }
     
-    private <T> T readPrimitiveValue(Node node, Class<T> cls) {
+    private <T> Object readPrimitiveValue(Node node, Class<T> cls) {
         if (String.class == cls) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -357,7 +359,7 @@ public class XMLSource {
         
         try {
             
-            JAXBElementProvider provider = new JAXBElementProvider();
+            JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
             JAXBContext c = provider.getPackageContext(cls);
             if (c == null) {
                 c = provider.getClassContext(cls);

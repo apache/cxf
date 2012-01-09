@@ -762,6 +762,13 @@ public class WebClient extends AbstractClient {
             
             Object entity = readBody(currentResponse, outMessage, responseClass, genericType,
                                      new Annotation[]{});
+            
+            if (entity == null) {
+                int status = currentResponse.getStatus();
+                if (status >= 400) {
+                    entity = currentResponse.getEntity();
+                }
+            }
             rb.entity(entity instanceof Response 
                       ? ((Response)entity).getEntity() : entity);
             
@@ -791,8 +798,8 @@ public class WebClient extends AbstractClient {
             if (objs == null || objs.size() == 0) {
                 return;
             }
-            MultivaluedMap<String, String> headers = 
-                (MultivaluedMap<String, String>)outMessage.get(Message.PROTOCOL_HEADERS);
+            MultivaluedMap<String, Object> headers = 
+                (MultivaluedMap<String, Object>)outMessage.get(Message.PROTOCOL_HEADERS);
             Object body = objs.get(0);
             
             Map<String, Object> requestContext = WebClient.this.getRequestContext(outMessage);
@@ -801,7 +808,7 @@ public class WebClient extends AbstractClient {
                 type = (Type)requestContext.get(REQUEST_TYPE);
             }
             try {
-                writeBody(body, outMessage, body.getClass(), type == null ? body.getClass() : type, 
+                writeBody(body, outMessage, type == null ? body.getClass() : type, 
                           new Annotation[]{}, headers, os);
                 if (os != null) {
                     os.flush();

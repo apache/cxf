@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -216,7 +217,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         Annotation[] annotations = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
         
-        MessageBodyWriter writer = null;
+        MessageBodyWriter<?> writer = null;
         MediaType responseType = null;
         for (MediaType type : availableContentTypes) { 
             writer = ProviderFactory.getInstance(message)
@@ -244,7 +245,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             message.put(Message.CONTENT_TYPE, responseType.toString());
             
-            long size = writer.getSize(entity, targetType, genericType, annotations, responseType);
+            long size = getSize(writer, entity, targetType, genericType, annotations, responseType);
             if (size > 0) {
                 LOG.fine("Setting ContentLength to " + size + " as requested by " 
                          + writer.getClass().getName());
@@ -254,11 +255,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
             }
             try {
-                writer.writeTo(entity, targetType, genericType, 
-                               annotations, 
-                               responseType, 
-                               responseHeaders, 
-                               message.getContent(OutputStream.class));
+                writeTo(writer, entity, targetType, genericType, 
+                        annotations, 
+                        responseType, 
+                        responseHeaders, 
+                        message.getContent(OutputStream.class));
                 
                 if (isResponseRedirected(message)) {
                     return;
@@ -283,6 +284,31 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
     
+    //CHECKSTYLE:OFF
+    private static <T> void writeTo(MessageBodyWriter<?> mwriter, 
+                                    T entity,
+                                    Class<?> type, Type genericType,
+                                    Annotation[] annotations, 
+                                    MediaType mediaType,
+                                    MultivaluedMap<String, Object> httpHeaders, 
+                                    OutputStream entityStream) 
+        throws WebApplicationException, IOException {
+        @SuppressWarnings("unchecked")
+        MessageBodyWriter<T> writer = (MessageBodyWriter<T>)mwriter;
+        writer.writeTo(entity, type, genericType, annotations, mediaType,
+                           httpHeaders, entityStream);
+    }
+
+    private static <T> long getSize(MessageBodyWriter<?> mwriter, T entity, 
+                                    Class<?> targetType, 
+                                    Type genericType,
+                                    Annotation[] annotations, MediaType responseType) {
+        @SuppressWarnings("unchecked")
+        MessageBodyWriter<T> writer = (MessageBodyWriter<T>)mwriter;
+        return writer.getSize(entity, targetType, genericType, annotations, responseType);
+    }
+    //CHECKSTYLE:ON
+
     private boolean isResponseNull(Object o) {
         return o == null || GenericEntity.class.isAssignableFrom(o.getClass()) 
                             && ((GenericEntity<?>)o).getEntity() == null; 
@@ -292,7 +318,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         return GenericEntity.class.isAssignableFrom(o.getClass()) ? ((GenericEntity<?>)o).getEntity() : o; 
     }
     
-    private boolean checkBufferingMode(Message m, MessageBodyWriter w, boolean firstTry) {
+    private boolean checkBufferingMode(Message m, MessageBodyWriter<?> w, boolean firstTry) {
         if (!firstTry) {
             return false;
         }

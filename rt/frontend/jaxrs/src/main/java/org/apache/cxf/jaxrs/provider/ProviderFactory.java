@@ -45,6 +45,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -66,38 +67,38 @@ public final class ProviderFactory {
     private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JSONProvider";
     
     static {
-        SHARED_FACTORY.setProviders(new BinaryDataProvider(),
-                                    new SourceProvider(),
-                                    new FormEncodingProvider(),
-                                    new PrimitiveTextProvider(),
+        SHARED_FACTORY.setProviders(new BinaryDataProvider<Object>(),
+                                    new SourceProvider<Object>(),
+                                    new FormEncodingProvider<Object>(),
+                                    new PrimitiveTextProvider<Object>(),
                                     new MultipartProvider(),
                                     new WebApplicationExceptionMapper(),
                                     new WadlGenerator());
     }
     
-    private List<ProviderInfo<MessageBodyReader>> messageReaders = 
-        new ArrayList<ProviderInfo<MessageBodyReader>>();
-    private List<ProviderInfo<MessageBodyWriter>> messageWriters = 
-        new ArrayList<ProviderInfo<MessageBodyWriter>>();
-    private List<ProviderInfo<ContextResolver>> contextResolvers = 
-        new ArrayList<ProviderInfo<ContextResolver>>(1);
-    private List<ProviderInfo<ExceptionMapper>> exceptionMappers = 
-        new ArrayList<ProviderInfo<ExceptionMapper>>(1);
+    private List<ProviderInfo<MessageBodyReader<?>>> messageReaders = 
+        new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
+    private List<ProviderInfo<MessageBodyWriter<?>>> messageWriters = 
+        new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
+    private List<ProviderInfo<ContextResolver<?>>> contextResolvers = 
+        new ArrayList<ProviderInfo<ContextResolver<?>>>(1);
+    private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
+        new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
     private List<ProviderInfo<RequestHandler>> requestHandlers = 
         new ArrayList<ProviderInfo<RequestHandler>>(1);
     private List<ProviderInfo<ResponseHandler>> responseHandlers = 
         new ArrayList<ProviderInfo<ResponseHandler>>(1);
-    private List<ProviderInfo<ParameterHandler>> paramHandlers = 
-        new ArrayList<ProviderInfo<ParameterHandler>>(1);
-    private List<ProviderInfo<ResponseExceptionMapper>> responseExceptionMappers = 
-        new ArrayList<ProviderInfo<ResponseExceptionMapper>>(1);
+    private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
+        new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
+    private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
+        new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
     
-    private List<ProviderInfo<MessageBodyReader>> jaxbReaders = 
-        new ArrayList<ProviderInfo<MessageBodyReader>>();
-    private List<ProviderInfo<MessageBodyWriter>> jaxbWriters = 
-        new ArrayList<ProviderInfo<MessageBodyWriter>>();
+    private List<ProviderInfo<MessageBodyReader<?>>> jaxbReaders = 
+        new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
+    private List<ProviderInfo<MessageBodyWriter<?>>> jaxbWriters = 
+        new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
     
     private ProviderFactory() {
         initJaxbProviders();
@@ -110,13 +111,13 @@ public final class ProviderFactory {
     private void initJaxbProviders() {
         Object jaxbProvider = createProvider(JAXB_PROVIDER_NAME);
         if (jaxbProvider != null) {
-            jaxbReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)jaxbProvider));
-            jaxbWriters.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)jaxbProvider));
+            jaxbReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)jaxbProvider));
+            jaxbWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)jaxbProvider));
         }
         Object jsonProvider = createProvider(JSON_PROVIDER_NAME);
         if (jsonProvider != null) {
-            jaxbReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)jsonProvider));
-            jaxbWriters.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)jsonProvider));
+            jaxbReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)jsonProvider));
+            jaxbWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)jsonProvider));
         }
         injectContextProxies(jaxbReaders, jaxbWriters);
     }
@@ -164,7 +165,7 @@ public final class ProviderFactory {
     public <T> ContextResolver<T> createContextResolver(Type contextType, 
                                                         Message m,
                                                         MediaType type) {
-        for (ProviderInfo<ContextResolver> cr : contextResolvers) {
+        for (ProviderInfo<ContextResolver<?>> cr : contextResolvers) {
             Type[] types = cr.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
                 if (t instanceof ParameterizedType) {
@@ -173,7 +174,7 @@ public final class ProviderFactory {
                     for (int i = 0; i < args.length; i++) {
                         if (contextType == args[i]) {
                             injectContextValues(cr, m);
-                            return cr.getProvider();
+                            return (ContextResolver<T>) cr.getProvider();
                         }
                     }
                 }
@@ -197,51 +198,51 @@ public final class ProviderFactory {
     private <T extends Throwable> ExceptionMapper<T> doCreateExceptionMapper(
         Class<?> exceptionType, Message m) {
         
-        List<ExceptionMapper<T>> candidates = new LinkedList<ExceptionMapper<T>>();
+        List<ExceptionMapper<?>> candidates = new LinkedList<ExceptionMapper<?>>();
         
-        for (ProviderInfo<ExceptionMapper> em : exceptionMappers) {
-            handleMapper((List)candidates, em, exceptionType, m, ExceptionMapper.class, true);
+        for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
+            handleMapper(candidates, em, exceptionType, m, ExceptionMapper.class, true);
         }
         if (candidates.size() == 0) {
             return null;
         }
         Collections.sort(candidates, new ExceptionMapperComparator());
-        return candidates.get(0);
+        return (ExceptionMapper<T>) candidates.get(0);
     }
     
     @SuppressWarnings("unchecked")
     public <T> ParameterHandler<T> createParameterHandler(Class<?> paramType) {
         
-        List<ParameterHandler<T>> candidates = new LinkedList<ParameterHandler<T>>();
+        List<ParameterHandler<?>> candidates = new LinkedList<ParameterHandler<?>>();
         
-        for (ProviderInfo<ParameterHandler> em : paramHandlers) {
-            handleMapper((List)candidates, em, paramType, null, ParameterHandler.class, true);
+        for (ProviderInfo<ParameterHandler<?>> em : paramHandlers) {
+            handleMapper(candidates, em, paramType, null, ParameterHandler.class, true);
         }
         if (candidates.size() == 0) {
             return null;
         }
         Collections.sort(candidates, new ClassComparator());
-        return candidates.get(0);
+        return (ParameterHandler<T>) candidates.get(0);
     }
     
     @SuppressWarnings("unchecked")
     public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
                                  Class<?> paramType) {
         
-        List<ResponseExceptionMapper<T>> candidates = new LinkedList<ResponseExceptionMapper<T>>();
+        List<ResponseExceptionMapper<?>> candidates = new LinkedList<ResponseExceptionMapper<?>>();
         
-        for (ProviderInfo<ResponseExceptionMapper> em : responseExceptionMappers) {
-            handleMapper((List)candidates, em, paramType, null, ResponseExceptionMapper.class, true);
+        for (ProviderInfo<ResponseExceptionMapper<?>> em : responseExceptionMappers) {
+            handleMapper(candidates, em, paramType, null, ResponseExceptionMapper.class, true);
         }
         if (candidates.size() == 0) {
             return null;
         }
         Collections.sort(candidates, new ClassComparator());
-        return candidates.get(0);
+        return (ResponseExceptionMapper<T>) candidates.get(0);
     }
     
-    private static <T> void handleMapper(List<Object> candidates, 
-                                     ProviderInfo em, 
+    private static <T> void handleMapper(List<T> candidates, 
+                                     ProviderInfo<T> em, 
                                      Class<?> expectedType, 
                                      Message m, 
                                      Class<?> providerClass,
@@ -406,15 +407,15 @@ public final class ProviderFactory {
             Class<?> oClass = ClassHelper.getRealClass(o);
             
             if (MessageBodyReader.class.isAssignableFrom(oClass)) {
-                messageReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)o)); 
+                messageReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)o)); 
             }
             
             if (MessageBodyWriter.class.isAssignableFrom(oClass)) {
-                messageWriters.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)o)); 
+                messageWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)o)); 
             }
             
             if (ContextResolver.class.isAssignableFrom(oClass)) {
-                contextResolvers.add(new ProviderInfo<ContextResolver>((ContextResolver)o)); 
+                contextResolvers.add(new ProviderInfo<ContextResolver<?>>((ContextResolver<?>)o)); 
             }
             
             if (RequestHandler.class.isAssignableFrom(oClass)) {
@@ -426,26 +427,27 @@ public final class ProviderFactory {
             }
             
             if (ExceptionMapper.class.isAssignableFrom(oClass)) {
-                exceptionMappers.add(new ProviderInfo<ExceptionMapper>((ExceptionMapper)o)); 
+                exceptionMappers.add(new ProviderInfo<ExceptionMapper<?>>((ExceptionMapper<?>)o)); 
             }
             
             if (ResponseExceptionMapper.class.isAssignableFrom(oClass)) {
-                responseExceptionMappers.add(new ProviderInfo<ResponseExceptionMapper>((ResponseExceptionMapper)o)); 
+                responseExceptionMappers.add(new ProviderInfo<ResponseExceptionMapper<?>>((ResponseExceptionMapper<?>)o)); 
             }
             
             if (ParameterHandler.class.isAssignableFrom(oClass)) {
-                paramHandlers.add(new ProviderInfo<ParameterHandler>((ParameterHandler)o)); 
+                paramHandlers.add(new ProviderInfo<ParameterHandler<?>>((ParameterHandler<?>)o)); 
             }
         }
         sortReaders();
         sortWriters();
         
-        injectContextProxies(messageReaders, messageWriters, contextResolvers, requestHandlers, responseHandlers,
+        injectContextProxies(messageReaders, messageWriters, contextResolvers, 
+        			requestHandlers, responseHandlers,
                        exceptionMappers);
     }
 //CHECKSTYLE:ON
     
-    static void injectContextValues(ProviderInfo pi, Message m) {
+    static void injectContextValues(ProviderInfo<?> pi, Message m) {
         if (m != null) {
             InjectionUtils.injectContextFields(pi.getProvider(), pi, m);
             InjectionUtils.injectContextMethods(pi.getProvider(), pi, m);
@@ -454,8 +456,8 @@ public final class ProviderFactory {
     
     void injectContextProxies(List<?> ... providerLists) {
         for (List<?> list : providerLists) {
-            for (Object p : list) {
-                ProviderInfo pi = (ProviderInfo)p;
+            List<ProviderInfo<?>> l2 = CastUtils.cast(list);
+            for (ProviderInfo<?> pi : l2) {
                 if (ProviderFactory.SHARED_FACTORY == this && isJaxbBasedProvider(pi.getProvider())) {
                     continue;
                 }
@@ -492,19 +494,19 @@ public final class ProviderFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> MessageBodyReader<T> chooseMessageReader(List<ProviderInfo<MessageBodyReader>> readers,
+    private <T> MessageBodyReader<T> chooseMessageReader(List<ProviderInfo<MessageBodyReader<?>>> readers,
                                                          Class<T> type,
                                                          Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
-        List<MessageBodyReader<T>> candidates = new LinkedList<MessageBodyReader<T>>();
-        for (ProviderInfo<MessageBodyReader> ep : readers) {
+        List<MessageBodyReader<?>> candidates = new LinkedList<MessageBodyReader<?>>();
+        for (ProviderInfo<MessageBodyReader<?>> ep : readers) {
             if (matchesReaderCriterias(ep, type, genericType, annotations, mediaType, m)) {
                 if (this == SHARED_FACTORY) {
-                    return ep.getProvider();
+                    return (MessageBodyReader<T>) ep.getProvider();
                 }
-                handleMapper((List)candidates, ep, type, m, MessageBodyReader.class, false);
+                handleMapper(candidates, ep, type, m, MessageBodyReader.class, false);
             }
         }     
         
@@ -512,11 +514,11 @@ public final class ProviderFactory {
             return null;
         }
         Collections.sort(candidates, new ClassComparator());
-        return candidates.get(0);
+        return (MessageBodyReader<T>) candidates.get(0);
         
     }
     
-    private <T> boolean matchesReaderCriterias(ProviderInfo<MessageBodyReader> pi,
+    private <T> boolean matchesReaderCriterias(ProviderInfo<MessageBodyReader<?>> pi,
                                                Class<T> type,
                                                Type genericType,
                                                Annotation[] annotations,
@@ -554,29 +556,29 @@ public final class ProviderFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> MessageBodyWriter<T> chooseMessageWriter(List<ProviderInfo<MessageBodyWriter>> writers,
+    private <T> MessageBodyWriter<T> chooseMessageWriter(List<ProviderInfo<MessageBodyWriter<?>>> writers,
                                                          Class<T> type,
                                                          Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
-        List<MessageBodyWriter<T>> candidates = new LinkedList<MessageBodyWriter<T>>();
-        for (ProviderInfo<MessageBodyWriter> ep : writers) {
+        List<MessageBodyWriter<?>> candidates = new LinkedList<MessageBodyWriter<?>>();
+        for (ProviderInfo<MessageBodyWriter<?>> ep : writers) {
             if (matchesWriterCriterias(ep, type, genericType, annotations, mediaType, m)) {
                 if (this == SHARED_FACTORY) {
-                    return ep.getProvider();
+                    return (MessageBodyWriter<T>) ep.getProvider();
                 }
-                handleMapper((List)candidates, ep, type, m, MessageBodyWriter.class, false);
+                handleMapper(candidates, ep, type, m, MessageBodyWriter.class, false);
             }
         }     
         if (candidates.size() == 0) {
             return null;
         }
         Collections.sort(candidates, new ClassComparator());
-        return candidates.get(0);
+        return (MessageBodyWriter<T>) candidates.get(0);
     }
     
-    private <T> boolean matchesWriterCriterias(ProviderInfo<MessageBodyWriter> pi,
+    private <T> boolean matchesWriterCriterias(ProviderInfo<MessageBodyWriter<?>> pi,
                                                Class<T> type,
                                                Type genericType,
                                                Annotation[] annotations,
@@ -604,15 +606,15 @@ public final class ProviderFactory {
         return matches;
     }
     
-    List<ProviderInfo<MessageBodyReader>> getMessageReaders() {
+    List<ProviderInfo<MessageBodyReader<?>>> getMessageReaders() {
         return Collections.unmodifiableList(messageReaders);
     }
 
-    List<ProviderInfo<MessageBodyWriter>> getMessageWriters() {
+    List<ProviderInfo<MessageBodyWriter<?>>> getMessageWriters() {
         return Collections.unmodifiableList(messageWriters);
     }
     
-    List<ProviderInfo<ContextResolver>> getContextResolvers() {
+    List<ProviderInfo<ContextResolver<?>>> getContextResolvers() {
         return Collections.unmodifiableList(contextResolvers);
     }
     
@@ -629,12 +631,12 @@ public final class ProviderFactory {
     }
 
     private static class MessageBodyReaderComparator 
-        implements Comparator<ProviderInfo<MessageBodyReader>> {
+        implements Comparator<ProviderInfo<MessageBodyReader<?>>> {
         
-        public int compare(ProviderInfo<MessageBodyReader> p1, 
-                           ProviderInfo<MessageBodyReader> p2) {
-            MessageBodyReader e1 = p1.getProvider();
-            MessageBodyReader e2 = p2.getProvider();
+        public int compare(ProviderInfo<MessageBodyReader<?>> p1, 
+                           ProviderInfo<MessageBodyReader<?>> p2) {
+            MessageBodyReader<?> e1 = p1.getProvider();
+            MessageBodyReader<?> e2 = p2.getProvider();
             List<MediaType> types1 = JAXRSUtils.getProviderConsumeTypes(e1);
             types1 = JAXRSUtils.sortMediaTypes(types1);
             List<MediaType> types2 = JAXRSUtils.getProviderConsumeTypes(e2);
@@ -645,12 +647,12 @@ public final class ProviderFactory {
     }
     
     private static class MessageBodyWriterComparator 
-        implements Comparator<ProviderInfo<MessageBodyWriter>> {
+        implements Comparator<ProviderInfo<MessageBodyWriter<?>>> {
         
-        public int compare(ProviderInfo<MessageBodyWriter> p1, 
-                           ProviderInfo<MessageBodyWriter> p2) {
-            MessageBodyWriter e1 = p1.getProvider();
-            MessageBodyWriter e2 = p2.getProvider();
+        public int compare(ProviderInfo<MessageBodyWriter<?>> p1, 
+                           ProviderInfo<MessageBodyWriter<?>> p2) {
+            MessageBodyWriter<?> e1 = p1.getProvider();
+            MessageBodyWriter<?> e2 = p2.getProvider();
             
             List<MediaType> types1 =
                 JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e1));
@@ -690,8 +692,8 @@ public final class ProviderFactory {
     
     void clearProxies(List<?> ...lists) {
         for (List<?> list : lists) {
-            for (Object p : list) {
-                ProviderInfo pi = (ProviderInfo)p;
+            List<ProviderInfo<?>> l2 = CastUtils.cast(list);
+            for (ProviderInfo<?> pi : l2) {
                 pi.clearThreadLocalProxies();
             }
         }
@@ -712,7 +714,7 @@ public final class ProviderFactory {
         if (bus == null) {
             return;
         }
-        for (ProviderInfo<MessageBodyReader> r : messageReaders) {
+        for (ProviderInfo<MessageBodyReader<?>> r : messageReaders) {
             injectProviderProperty(r.getProvider(), "setBus", Bus.class, bus);
         }
     }
@@ -731,12 +733,12 @@ public final class ProviderFactory {
     
     public void setSchemaLocations(List<String> schemas) {
         boolean schemasMethodAvailable = false;
-        for (ProviderInfo<MessageBodyReader> r : messageReaders) {
+        for (ProviderInfo<MessageBodyReader<?>> r : messageReaders) {
             schemasMethodAvailable = injectProviderProperty(r.getProvider(), "setSchemas", 
                                                             List.class, schemas);
         }
         if (!schemasMethodAvailable) {
-            for (ProviderInfo<MessageBodyReader> r : jaxbReaders) {
+            for (ProviderInfo<MessageBodyReader<?>> r : jaxbReaders) {
                 schemasMethodAvailable = injectProviderProperty(r.getProvider(), "setSchemas", 
                                                                 List.class, schemas);
             }
@@ -746,7 +748,7 @@ public final class ProviderFactory {
     public void initProviders(List<ClassResourceInfo> cris) {
         Set<Object> set = getReadersWriters();
         for (Object o : set) {
-            Object provider = ((ProviderInfo)o).getProvider();
+            Object provider = ((ProviderInfo<?>)o).getProvider();
             if (provider instanceof AbstractConfigurableProvider) {
                 ((AbstractConfigurableProvider)provider).init(cris);
             }

@@ -68,7 +68,7 @@ public class DataBindingJSONProviderTest extends Assert {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c2), true);
         DataBinding binding = new SDODataBinding();
         binding.initialize(s);
-        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        DataBindingJSONProvider<Structure> p = new DataBindingJSONProvider<Structure>();
         p.setDataBinding(binding);
         p.setNamespaceMap(Collections.singletonMap("http://apache.org/structure/types", "p0"));
         Structure struct = new StructureImpl();
@@ -84,7 +84,6 @@ public class DataBindingJSONProviderTest extends Assert {
         assertEquals(bos.toString(), data);
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testSDORead() throws Exception {
         String data = "{\"p0.Structure\":{\"@xsi.type\":\"p0:Structure\",\"p0.text\":\"sdo\",\"p0.int\":3"
@@ -92,11 +91,11 @@ public class DataBindingJSONProviderTest extends Assert {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c2), true);
         DataBinding binding = new SDODataBinding();
         binding.initialize(s);
-        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        DataBindingJSONProvider<Structure> p = new DataBindingJSONProvider<Structure>();
         p.setDataBinding(binding);
         p.setNamespaceMap(Collections.singletonMap("http://apache.org/structure/types", "p0"));
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Structure struct = (Structure)p.readFrom(Structure.class, Structure.class,
+        Structure struct = p.readFrom(Structure.class, Structure.class,
                                       new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("sdo", struct.getText());
@@ -119,14 +118,13 @@ public class DataBindingJSONProviderTest extends Assert {
         assertEquals(bos.toString(), data);
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testJAXBRead() throws Exception {
         String data = "{\"Book\":{\"id\":127,\"name\":\"CXF\",\"state\":\"\"}}";
         Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
-        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        DataBindingJSONProvider<Book> p = new DataBindingJSONProvider<Book>();
         p.setDataBinding(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
         Book book = (Book)p.readFrom(Book.class, Book.class,
@@ -178,13 +176,12 @@ public class DataBindingJSONProviderTest extends Assert {
         doTestAegisRead(data);
     }
     
-    @SuppressWarnings("unchecked")
     public void doTestAegisRead(String data) throws Exception {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("readXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
-        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        DataBindingJSONProvider<Book> p = new DataBindingJSONProvider<Book>();
         p.setDataBinding(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
         Book book = (Book)p.readFrom(Book.class, Book.class,

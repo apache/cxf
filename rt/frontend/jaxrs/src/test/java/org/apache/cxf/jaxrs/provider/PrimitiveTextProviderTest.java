@@ -38,7 +38,7 @@ public class PrimitiveTextProviderTest extends Assert {
     
     @Test
     public void testIsWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertTrue(p.isWriteable(byte.class, null, null, null)
                    && p.isWriteable(Byte.class, null, null, null)
                    && p.isWriteable(boolean.class, null, null, null)
@@ -47,7 +47,7 @@ public class PrimitiveTextProviderTest extends Assert {
     
     @Test
     public void testIsReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
         assertTrue(p.isReadable(byte.class, null, null, null)
                    && p.isReadable(Byte.class, null, null, null)
                    && p.isReadable(boolean.class, null, null, null)
@@ -57,9 +57,10 @@ public class PrimitiveTextProviderTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testReadByte() throws Exception {
-        MessageBodyReader p = new PrimitiveTextProvider();
+        MessageBodyReader<?> p = new PrimitiveTextProvider<Object>();
         
-        Byte valueRead = (Byte)p.readFrom(byte.class, 
+        @SuppressWarnings("rawtypes")
+        Byte valueRead = (Byte)p.readFrom((Class)byte.class, 
                                           null, 
                                           null, 
                                           null, 
@@ -69,7 +70,7 @@ public class PrimitiveTextProviderTest extends Assert {
         
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void testReadBoolean() throws Exception {
         MessageBodyReader p = new PrimitiveTextProvider();
@@ -84,7 +85,7 @@ public class PrimitiveTextProviderTest extends Assert {
         
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void testWriteBoolean() throws Exception {
         MessageBodyWriter p = new PrimitiveTextProvider();
@@ -100,10 +101,9 @@ public class PrimitiveTextProviderTest extends Assert {
     }
     
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testWriteStringISO() throws Exception {
-        MessageBodyWriter p = new PrimitiveTextProvider();
+        MessageBodyWriter<String> p = new PrimitiveTextProvider<String>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
         
@@ -120,12 +120,11 @@ public class PrimitiveTextProviderTest extends Assert {
         assertEquals(helloStringISO88591, os.toString("ISO-8859-1")); 
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testReadChineeseChars() throws Exception {
         String s = "中文";
         
-        MessageBodyReader p = new PrimitiveTextProvider();
+        MessageBodyReader<String> p = new PrimitiveTextProvider<String>();
         
         String value = (String)p.readFrom(String.class, null,
                 new Annotation[]{}, 

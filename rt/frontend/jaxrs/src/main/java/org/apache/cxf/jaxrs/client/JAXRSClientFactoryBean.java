@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -49,7 +50,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     private MultivaluedMap<String, String> headers;
     private ClientState initialState;
     private boolean threadSafe; 
-    private Class serviceClass;
+    private Class<?> serviceClass;
     
     public JAXRSClientFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -168,7 +169,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
      * Gets the initial headers
      * @return the headers
      */
-    public Map getHeaders() {
+    public Map<String, List<String>> getHeaders() {
         return headers;
     }
     
