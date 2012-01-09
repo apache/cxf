@@ -31,7 +31,6 @@ import org.apache.cxf.endpoint.ClientLifeCycleListener;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
-import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -81,7 +80,9 @@ public class OSGIBusListener implements BusLifeCycleListener {
     public void initComplete() {
         WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
         ManagedWorkQueueList wqList = bus.getExtension(ManagedWorkQueueList.class);
-        addManagedWorkqueuesToManager(manager, wqList);
+        if (wqList != null) {
+            wqList.addAllToWorkQueueManager(manager);
+        }
         registerBusAsService();
     }
     
@@ -170,16 +171,6 @@ public class OSGIBusListener implements BusLifeCycleListener {
             props.put(CONTEXT_NAME_PROPERTY, bus.getId());
 
             service = context.registerService(Bus.class.getName(), bus, props);
-        }
-    }
-
-    private void addManagedWorkqueuesToManager(WorkQueueManager manager, ManagedWorkQueueList wqList) {
-        if (wqList != null && manager != null) {
-            for (AutomaticWorkQueueImpl wq : wqList.queues.values()) {
-                if (manager.getNamedWorkQueue(wq.getName()) == null) {
-                    manager.addNamedWorkQueue(wq.getName(), wq);
-                }
-            }
         }
     }
 

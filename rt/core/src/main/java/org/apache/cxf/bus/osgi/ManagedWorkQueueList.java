@@ -30,6 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
@@ -43,7 +44,8 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
     public static final String FACTORY_PID = "org.apache.cxf.workqueues";    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractServiceFactoryBean.class);
     
-    Map<String, AutomaticWorkQueueImpl> queues = new ConcurrentHashMap<String, AutomaticWorkQueueImpl>();
+    private Map<String, AutomaticWorkQueueImpl> queues = 
+        new ConcurrentHashMap<String, AutomaticWorkQueueImpl>();
     private ServiceTracker configAdminTracker;
     
     public String getName() {
@@ -72,6 +74,9 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         queues.remove(pid);
     }
 
+    /*
+     * On property changes of queue settings we update the config admin service pid of the queue
+     */
     public void propertyChange(PropertyChangeEvent evt) {
         try {
             AutomaticWorkQueueImpl queue = (AutomaticWorkQueueImpl)evt.getSource();
@@ -103,8 +108,26 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         }
         return selectedConfig;
     }
+    
+    public void addAllToWorkQueueManager(WorkQueueManager manager) {
+        if (manager != null) {
+            for (AutomaticWorkQueueImpl wq : queues.values()) {
+                if (manager.getNamedWorkQueue(wq.getName()) == null) {
+                    manager.addNamedWorkQueue(wq.getName(), wq);
+                }
+            }
+        }
+    }
 
     public void setConfigAdminTracker(ServiceTracker configAdminTracker) {
         this.configAdminTracker = configAdminTracker;
+    }
+
+    public void shutDown() {
+        for (AutomaticWorkQueueImpl wq : queues.values()) {
+            wq.setShared(false);
+            wq.shutdown(true);
+        }
+        queues.clear();
     }
 }

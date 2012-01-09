@@ -25,7 +25,6 @@ import java.util.Properties;
 
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
-import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -95,11 +94,7 @@ public class CXFActivator implements BundleActivator {
     public void stop(BundleContext context) throws Exception {
         context.removeBundleListener(cxfBundleListener);
         cxfBundleListener.shutdown();
-        for (AutomaticWorkQueueImpl wq : workQueues.queues.values()) {
-            wq.setShared(false);
-            wq.shutdown(true);
-        }
-        workQueues.queues.clear();
+        workQueues.shutDown();
         workQueueServiceRegistration.unregister();
         configAdminTracker.close();
         ExtensionRegistry.removeExtensions(extensions);
