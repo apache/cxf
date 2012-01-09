@@ -498,6 +498,10 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         int lwm = executor == null ? lowWaterMark : executor.getCorePoolSize();
         return lwm == Integer.MAX_VALUE ? -1 : lwm;
     }
+    
+    public int getInitialSize() {
+        return this.initialThreads;
+    }
 
     public void setHighWaterMark(int hwm) {
         highWaterMark = hwm < 0 ? Integer.MAX_VALUE : hwm;
