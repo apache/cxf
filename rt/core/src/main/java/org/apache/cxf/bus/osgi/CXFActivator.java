@@ -79,7 +79,7 @@ public class CXFActivator implements BundleActivator {
                                                               String servicePid) {
         Properties props = new Properties();
         props.put(Constants.SERVICE_PID, servicePid);  
-        return context.registerService(serviceClass.getName(), workQueues, props);
+        return context.registerService(serviceClass.getName(), service, props);
     }
 
     private Extension createOsgiBusListenerExtension(BundleContext context) {
