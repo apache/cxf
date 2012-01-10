@@ -94,6 +94,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/instrumentation.xsd</xsd>
                                     <extension>true</extension>
+                                    <bindingFile>${basedir}/src/main/build-resources/instrumentation.xjb</bindingFile>
                                     <extensionArgs>
                                         <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>

@@ -51,10 +51,10 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.management.InstrumentationManager;
-import org.apache.cxf.management.JMXConnectorPolicyType;
 import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
+import org.apache.cxf.management.jmx.type.JMXConnectorPolicyType;
 
 /**
  * The manager class for the JMXManagedComponent which hosts the JMXManagedComponents.
