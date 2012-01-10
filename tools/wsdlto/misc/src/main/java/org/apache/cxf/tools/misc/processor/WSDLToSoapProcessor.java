@@ -90,7 +90,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
                 Input input = op.getInput();
                 if (input != null && input.getMessage() != null) {
                     Collection<Part> parts = CastUtils.cast(input.getMessage().getParts().values());
-                    for (Part part: parts) {
+                    for (Part part : parts) {
                         if (part.getTypeName() == null || "".equals(part.getTypeName().toString())) {
                             Message msg = new Message("RPC_PART_ILLEGAL", LOG, new Object[] {part.getName()});
                             throw new ToolException(msg);
@@ -100,7 +100,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
                 Output output = op.getOutput();
                 if (output != null && output.getMessage() != null) {
                     Collection<Part> parts = CastUtils.cast(output.getMessage().getParts().values());
-                    for (Part part: parts) {
+                    for (Part part : parts) {
                         if (part.getTypeName() == null || "".equals(part.getTypeName().toString())) {
                             Message msg = new Message("RPC_PART_ILLEGAL", LOG, new Object[] {part.getName()});
                             throw new ToolException(msg);

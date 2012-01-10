@@ -80,7 +80,7 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
             }
     
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-            for (JavaServiceClass js: javaModel.getServiceClasses().values()) {
+            for (JavaServiceClass js : javaModel.getServiceClasses().values()) {
                 for (JavaPort jp : js.getPorts()) {
                     String interfaceName = jp.getInterfaceClass();
                     JavaInterface intf = interfaces.get(interfaceName);

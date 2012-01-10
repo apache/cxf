@@ -294,7 +294,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
     public boolean checkR2203And2204() {
 
         Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
-        for (Binding binding: bindings) {
+        for (Binding binding : bindings) {
 
             String style = SOAPBindingUtil.getCanonicalBindingStyle(binding);
             
@@ -365,7 +365,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
     // TODO: Should also check SoapHeader/SoapHeaderFault
     public boolean checkR2205() {
         Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
-        for (Binding binding: bindings) {
+        for (Binding binding : bindings) {
 
             if (!SOAPBindingUtil.isSOAPBinding(binding)) {
                 System.err.println("WSIBP Validator found <"
@@ -399,7 +399,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
     public boolean checkR2705() {
         Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
-        for (Binding binding: bindings) {
+        for (Binding binding : bindings) {
             if (SOAPBindingUtil.isMixedStyle(binding)) {
                 addErrorMessage("Mixed style, invalid WSDL");
                 return false;

@@ -144,7 +144,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         if (wsdlBinding == null && bindingName.getNamespaceURI().equals("")
             && !bindingName.getLocalPart().equals("")) {
             Collection<Binding> bindingsCollection = CastUtils.cast(wsdlDef.getBindings().values());
-            for (Binding b: bindingsCollection) {
+            for (Binding b : bindingsCollection) {
                 if (b.getQName().getLocalPart().equals(bindingName.getLocalPart())) {
                     wsdlBinding = b;
                     break;

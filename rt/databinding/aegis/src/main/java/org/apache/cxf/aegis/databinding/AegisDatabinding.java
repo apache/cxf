@@ -377,7 +377,7 @@ public class AegisDatabinding extends AbstractDataBinding {
             return;
         }
         SchemaCollection col = s.getXmlSchemaCollection();
-        for (MessagePartInfo part: container.getMessageParts()) {
+        for (MessagePartInfo part : container.getMessageParts()) {
             if (part.getXmlSchema() == null) {
                 if (part.isElement()) {
                     XmlSchemaAnnotated tp = col.getElementByQName(part.getElementQName());

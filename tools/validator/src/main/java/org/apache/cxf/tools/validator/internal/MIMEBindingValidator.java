@@ -43,7 +43,7 @@ public class MIMEBindingValidator
 
     public boolean isValid() {
         Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
-        for (Binding binding: bindings) {
+        for (Binding binding : bindings) {
             Collection<BindingOperation> bindingOps = CastUtils.cast(binding.getBindingOperations());
             for (BindingOperation bindingOperation : bindingOps) {
                 if (bindingOperation.getBindingInput() == null) {
@@ -102,7 +102,7 @@ public class MIMEBindingValidator
                                                    String operationName) {
         // validate mime:content(s) in the mime:part as per R2909
         String partName = null;
-        for (MIMEContent mimeContent: mimeContents) {
+        for (MIMEContent mimeContent : mimeContents) {
             String mimeContnetPart = mimeContent.getPart();
             if (mimeContnetPart == null) {
                 addErrorMessage("Operation("

@@ -377,7 +377,7 @@ public class ObjectReferenceVisitor extends VisitorBase {
 
         for (Binding b : bindings) {
             List<?> extElements = b.getExtensibilityElements();
-            for (java.lang.Object element: extElements) {
+            for (java.lang.Object element : extElements) {
                 if (element instanceof BindingType) {
                     BindingType bt = (BindingType)element;
                     if (bt.getRepositoryID().equals(repositoryID)) {

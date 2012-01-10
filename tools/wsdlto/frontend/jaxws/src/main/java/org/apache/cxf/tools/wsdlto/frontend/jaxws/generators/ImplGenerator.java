@@ -88,7 +88,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
                     }
                 }
             } else {
-                for (String interfaceName: interfaces.keySet()) {
+                for (String interfaceName : interfaces.keySet()) {
                     JavaInterface intf = interfaces.get(interfaceName);
                     outputImpl(intf, service, "", penv);
                 }
