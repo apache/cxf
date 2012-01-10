@@ -64,6 +64,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JAXWSMethodDispatcher;
+import org.apache.cxf.jaxws.JAXWSMethodInvoker;
 import org.apache.cxf.jaxws.JAXWSProviderMethodDispatcher;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.interceptors.WebFaultOutInterceptor;
@@ -73,6 +74,8 @@ import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.FactoryBeanListener.Event;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
+import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.invoker.SingletonFactory;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -690,5 +693,14 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             return;
         }
         super.initializeParameter(part, rawClass, type);
+    }
+
+    @Override
+    protected Invoker createInvoker() {
+        Class<?> cls = getServiceClass();
+        if (cls.isInterface()) {
+            return null;
+        }
+        return new JAXWSMethodInvoker(new SingletonFactory(getServiceClass()));
     }
 }
