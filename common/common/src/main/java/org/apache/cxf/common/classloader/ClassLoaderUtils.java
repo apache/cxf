@@ -244,7 +244,19 @@ public final class ClassLoaderUtils {
         }
         return loadClass2(className, callingClass);
     }
+    public static <T> Class<? extends T> loadClass(String className, Class<?> callingClass, Class<T> type)
+        throws ClassNotFoundException {
+        try {
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
+            if (cl != null) {
+                return cl.loadClass(className).asSubclass(type);
+            }            
+        } catch (ClassNotFoundException e) {
+            //ignore
+        }
+        return loadClass2(className, callingClass).asSubclass(type);
+    }
     private static Class<?> loadClass2(String className, Class<?> callingClass)
         throws ClassNotFoundException {
         try {

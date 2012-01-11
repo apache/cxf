@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package org.apache.cxf.frontend;
+package org.apache.cxf.service.factory;
 
-public class FaultInfoException extends org.apache.cxf.service.factory.FaultInfoException {
+public class FaultInfoException extends Exception {
 
     private static final long serialVersionUID = 1392427062502667841L;
 

@@ -35,6 +35,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.FaultInfoException;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.FaultInfo;
@@ -131,17 +132,8 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return supportsDOM;
     }
 
-    private boolean hasFaultInfo(Class<?> c) {
-        if ("org.apache.cxf.frontend.FaultInfoException".equals(c.getName())) {
-            return true;
-        } 
-        if (c == Throwable.class) {
-            return false;
-        }
-        return hasFaultInfo(c.getSuperclass());
-    }
     protected Object getFaultBean(Throwable cause, FaultInfo faultPart, Message message) {
-        if (hasFaultInfo(cause.getClass())) {
+        if (cause instanceof FaultInfoException) {
             try {
                 Method method = cause.getClass().getMethod("getFaultInfo", new Class[0]);
                 return method.invoke(cause, new Object[0]);

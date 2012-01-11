@@ -78,9 +78,11 @@ import org.apache.cxf.jaxb.io.DataWriterImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.ObjectFactory;
+
 @NoJSR250Annotations
 public class JAXBDataBinding extends AbstractDataBinding
     implements WrapperCapableDatabinding, InterceptorProvider {
@@ -198,6 +200,18 @@ public class JAXBDataBinding extends AbstractDataBinding
         contextClasses = new LinkedHashSet<Class<?>>();
         contextClasses.addAll(Arrays.asList(classes));
         setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
+    }
+    public JAXBDataBinding(ReflectionServiceFactoryBean b) throws JAXBException {
+        this(b.isQualifyWrapperSchema());
+        Map<String, Object> props = b.getProperties();
+        if (props != null && props.get("jaxb.additionalContextClasses") != null) {
+            Object o = b.getProperties().get("jaxb.additionalContextClasses");
+            if (o instanceof Class) {
+                o = new Class[] {(Class<?>)o};
+            }
+            extraClass = (Class[])o;
+        }
+
     }
 
     public JAXBDataBinding(JAXBContext context) {

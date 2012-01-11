@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.frontend;
+package org.apache.cxf.service.factory;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -27,9 +27,8 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-@SuppressWarnings("deprecation")
 public class SimpleMethodDispatcher 
-    implements  org.apache.cxf.service.invoker.MethodDispatcher, MethodDispatcher  {
+    implements  org.apache.cxf.service.invoker.MethodDispatcher  {
 
     private Map<Method, Map<BindingInfo, BindingOperationInfo>> infoMap = 
         new ConcurrentHashMap<Method, Map<BindingInfo, BindingOperationInfo>>();

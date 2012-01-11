@@ -61,8 +61,10 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -76,13 +78,10 @@ import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.frontend.FaultInfoException;
-import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.MethodComparator;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
-import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
@@ -143,8 +142,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     public static final String METHOD_PARAM_ANNOTATIONS = "method.parameters.annotations";
     public static final String METHOD_ANNOTATIONS = "method.return.annotations";
     public static final String PARAM_ANNOTATION = "parameter.annotations";
-    private static final Logger LOG = LogUtils.getL7dLogger(ReflectionServiceFactoryBean.class,
-                                                            "SimpleMessages");
+    private static final Logger LOG = LogUtils.getL7dLogger(ReflectionServiceFactoryBean.class);
 
     protected String wsdlURL;
 
@@ -192,7 +190,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     protected DataBinding createDefaultDataBinding() {
 
-        DataBinding retVal = null;
+        Object obj = null;
+        Class<? extends DataBinding> cls = null;
 
         if (getServiceClass() != null) {
             org.apache.cxf.annotations.DataBinding db
@@ -203,27 +202,35 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                         return getBus().getExtension(ResourceManager.class).resolveResource(db.ref(),
                                                                                             db.value());
                     }
-                    retVal = db.value().newInstance();
+                    cls = db.value();
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Could not create databinding "
                             + db.value().getName(), e);
                 }
             }
         }
-        if (retVal == null) {
-            JAXBDataBinding db = new JAXBDataBinding(getQualifyWrapperSchema());
-            Map<String, Object> props = this.getProperties();
-            if (props != null && props.get("jaxb.additionalContextClasses") != null) {
-                Object o = this.getProperties().get("jaxb.additionalContextClasses");
-                if (o instanceof Class) {
-                    o = new Class[] {(Class<?>)o};
-                }
-                Class<?>[] extraClass = (Class[])o;
-                db.setExtraClass(extraClass);
-            }
-            retVal = db;
+        if (cls == null && getBus() != null) {
+            obj = getBus().getProperty(DataBinding.class.getName());
         }
-        return retVal;
+        if (obj == null) {
+            obj = "org.apache.cxf.jaxb.JAXBDataBinding";
+        }
+        try {
+            if (obj instanceof String) {
+                cls = ClassLoaderUtils.loadClass(obj.toString(), getClass(), DataBinding.class);
+            } else if (obj instanceof Class) {
+                cls = ((Class<?>)obj).asSubclass(DataBinding.class);
+            }
+            try {
+                return cls.getConstructor(ReflectionServiceFactoryBean.class)
+                    .newInstance(this);
+            } catch (NoSuchMethodException nsme) {
+                //ignore, use the no-arg constructor
+            }
+            return cls.newInstance();
+        } catch (Exception e) {
+            throw new ServiceConstructionException(e);
+        }
     }
     public void reset() {
         if (!dataBindingSet) {
@@ -232,7 +239,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         setService(null);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public synchronized Service create() {
         reset();
@@ -258,10 +264,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         MethodDispatcher m = getMethodDispatcher();
         getService().put(MethodDispatcher.class.getName(), m);
-        if (m instanceof org.apache.cxf.frontend.MethodDispatcher) {
-            getService().put(org.apache.cxf.frontend.MethodDispatcher.class.getName(), m);
-        }
-
         createEndpoints();
 
         fillInSchemaCrossreferences();
@@ -357,11 +359,33 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected void setServiceProperties() {
-        getService().put(MethodDispatcher.class.getName(), getMethodDispatcher());
+        MethodDispatcher md = getMethodDispatcher();
+        getService().put(MethodDispatcher.class.getName(), md);
+        for (Class<?> c : md.getClass().getInterfaces()) {
+            getService().put(c.getName(), md);
+        }
         if (properties != null) {
             getService().putAll(properties);
         }
-
+        setOldMethodDispatcherProperty();
+    }
+    
+    @Deprecated
+    protected void setOldMethodDispatcherProperty() {
+        //Try adding the MethodDispatcher using the old interface
+        MethodDispatcher md = getMethodDispatcher();
+        if (getService().get("org.apache.cxf.frontend.MethodDispatcher") == null) {
+            try {
+                Class<?> cls = ClassLoaderUtils.loadClass("org.apache.cxf.frontend.MethodDispatcher",
+                                                          getClass());
+                Object o = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                                                  new Class[] {cls},
+                                                  new ReflectionInvokationHandler(md));
+                getService().put("org.apache.cxf.frontend.MethodDispatcher", o);
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
     }
 
     protected void buildServiceFromWSDL(String url) {

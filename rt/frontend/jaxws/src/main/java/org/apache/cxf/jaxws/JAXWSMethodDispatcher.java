@@ -31,13 +31,15 @@ import javax.xml.ws.Response;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.service.factory.ServiceConstructionException;
+import org.apache.cxf.service.factory.SimpleMethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
+@SuppressWarnings("deprecation")
+public class JAXWSMethodDispatcher extends SimpleMethodDispatcher
+    implements org.apache.cxf.frontend.MethodDispatcher {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXWSMethodDispatcher.class);
 
