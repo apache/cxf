@@ -49,13 +49,9 @@ public class MAPTest extends MAPTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        // special case handling for WS-Addressing system test to avoid
-        // UUID related issue when server is run as separate process
-        // via maven on Win2k
-        boolean inProcess = "Windows 2000".equals(System.getProperty("os.name"));
         assertTrue("server did not launch correctly", 
                    launchServer(Server.class, null,
-                                new String[] {ADDRESS, GreeterImpl.class.getName()},  inProcess));
+                                new String[] {ADDRESS, GreeterImpl.class.getName()},  true));
     }
     @WebService(serviceName = "SOAPServiceAddressing", 
                 portName = "SoapPort", 
@@ -63,6 +59,10 @@ public class MAPTest extends MAPTestBase {
                 targetNamespace = "http://apache.org/hello_world_soap_http",
                 wsdlLocation = "testutils/hello_world.wsdl")
     public static class GreeterImpl extends org.apache.cxf.systest.ws.addressing.AbstractGreeterImpl {
+        
+        public GreeterImpl() {
+            super(true);
+        }
         
     }
 }
