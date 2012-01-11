@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.service.cm.Configuration;
@@ -42,7 +41,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChangeListener {
     public static final String FACTORY_PID = "org.apache.cxf.workqueues";    
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractServiceFactoryBean.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(ManagedWorkQueueList.class);
     
     private Map<String, AutomaticWorkQueueImpl> queues = 
         new ConcurrentHashMap<String, AutomaticWorkQueueImpl>();
