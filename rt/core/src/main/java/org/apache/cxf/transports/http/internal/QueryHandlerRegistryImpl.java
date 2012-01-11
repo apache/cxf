@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.http;
+package org.apache.cxf.transports.http.internal;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

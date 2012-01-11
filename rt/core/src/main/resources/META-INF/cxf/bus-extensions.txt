@@ -3,7 +3,7 @@ org.apache.cxf.phase.PhaseManagerImpl:org.apache.cxf.phase.PhaseManager:true
 org.apache.cxf.workqueue.WorkQueueManagerImpl:org.apache.cxf.workqueue.WorkQueueManager:true
 org.apache.cxf.buslifecycle.CXFBusLifeCycleManager:org.apache.cxf.buslifecycle.BusLifeCycleManager:true   	   
 org.apache.cxf.endpoint.ServerRegistryImpl:org.apache.cxf.endpoint.ServerRegistry:true
-org.apache.cxf.transport.http.QueryHandlerRegistryImpl:org.apache.cxf.transports.http.QueryHandlerRegistry:true 
+org.apache.cxf.transports.http.internal.QueryHandlerRegistryImpl:org.apache.cxf.transports.http.QueryHandlerRegistry:true 
 org.apache.cxf.endpoint.EndpointResolverRegistryImpl:org.apache.cxf.endpoint.EndpointResolverRegistry:true
 org.apache.cxf.headers.HeaderManagerImpl:org.apache.cxf.headers.HeaderManager:true
 org.apache.cxf.catalog.OASISCatalogManager:org.apache.cxf.catalog.OASISCatalogManager:true
