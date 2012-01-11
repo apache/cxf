@@ -49,14 +49,17 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
                     providerParameters.getRealm()
                 );
         }
-
-        List<AttributeBean> attributeList = new ArrayList<AttributeBean>();
-        String tokenType = providerParameters.getTokenRequirements().getTokenType();
-
+        if (retrievedClaims == null) {
+            return null;
+        }
+        
         Iterator<Claim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
             return null;
         }
+
+        List<AttributeBean> attributeList = new ArrayList<AttributeBean>();
+        String tokenType = providerParameters.getTokenRequirements().getTokenType();
 
         AttributeStatementBean attrBean = new AttributeStatementBean();
         while (claimIterator.hasNext()) {
