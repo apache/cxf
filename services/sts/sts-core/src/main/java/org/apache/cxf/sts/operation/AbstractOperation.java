@@ -19,6 +19,7 @@
 
 package org.apache.cxf.sts.operation;
 
+import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +43,8 @@ import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.cache.STSTokenStore;
+import org.apache.cxf.sts.claims.ClaimsManager;
+import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -95,6 +98,7 @@ public abstract class AbstractOperation {
     protected List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
     protected boolean returnReferences = true;
     protected STSTokenStore tokenStore;
+    protected ClaimsManager claimsManager;
     
     public boolean isReturnReferences() {
         return returnReferences;
@@ -138,7 +142,15 @@ public abstract class AbstractOperation {
 
     public List<TokenValidator> getTokenValidators() {
         return tokenValidators;
-    }  
+    }
+    
+    public ClaimsManager getClaimsManager() {
+        return claimsManager;
+    }
+
+    public void setClaimsManager(ClaimsManager claimsManager) {
+        this.claimsManager = claimsManager;
+    }
     
     /**
      * Check the arguments from the STSProvider and parse the request.
@@ -548,5 +560,25 @@ public abstract class AbstractOperation {
         return tokenResponse;
     }
     
+    protected void checkClaimsSupport(RequestClaimCollection requestedClaims) {
+        if (requestedClaims != null) {
+            List<URI> unhandledClaimTypes = new ArrayList<URI>();
+            for (RequestClaim requestedClaim : requestedClaims) {
+                if (!claimsManager.getSupportedClaimTypes().contains(requestedClaim.getClaimType()) 
+                        && !requestedClaim.isOptional()) {
+                    unhandledClaimTypes.add(requestedClaim.getClaimType());
+                }
+            }
+
+            if (unhandledClaimTypes.size() > 0) {
+                LOG.log(Level.WARNING, "The requested claim " + unhandledClaimTypes.toString() 
+                        + " cannot be fulfilled by the STS.");
+                throw new STSException(
+                        "The requested claim " + unhandledClaimTypes.toString() 
+                        + " cannot be fulfilled by the STS."
+                );
+            }
+        }
+    }
     
 }

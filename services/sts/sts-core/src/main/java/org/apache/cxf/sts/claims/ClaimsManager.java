@@ -55,7 +55,7 @@ public class ClaimsManager {
 
     public ClaimCollection retrieveClaimValues(
             Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
-        if (claimHandlers != null && claimHandlers.size() > 0) {
+        if (claimHandlers != null && claimHandlers.size() > 0 && claims != null && claims.size() > 0) {
             ClaimCollection returnCollection = new ClaimCollection();
             for (ClaimsHandler handler : claimHandlers) {
                 ClaimCollection claimCollection = handler.retrieveClaimValues(

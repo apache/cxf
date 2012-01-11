@@ -20,6 +20,7 @@ package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +29,10 @@ import java.util.Properties;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -38,13 +41,20 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.claims.ClaimTypes;
+import org.apache.cxf.sts.claims.ClaimsHandler;
+import org.apache.cxf.sts.claims.ClaimsManager; 
+import org.apache.cxf.sts.common.CustomAttributeProvider;
+import org.apache.cxf.sts.common.CustomClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
@@ -243,6 +253,120 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("ALICE"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
     }
+
+    /**
+     * Test to successfully validate a UsernameToken and transform it into a SAML Assertion.
+     * Required claims are a child of RST element
+     */
+    @org.junit.Test
+    public void testUsernameTokenTransformationClaims() throws Exception {
+        runUsernameTokenTransformationClaims(false);
+    }
+    
+    /**
+     * Test to successfully validate a UsernameToken and transform it into a SAML Assertion.
+     * Required claims are a child of SecondaryParameters element
+     */
+    @org.junit.Test
+    public void testUsernameTokenTransformationClaimsSecondaryParameters() throws Exception {
+        runUsernameTokenTransformationClaims(true);
+    }
+    
+    /**
+     * Test to successfully validate a UsernameToken and transform it into a SAML Assertion with claims.
+     */
+    private void runUsernameTokenTransformationClaims(boolean useSecondaryParameters) throws Exception {
+        TokenValidateOperation validateOperation = new TokenValidateOperation();
+        
+        // Add Token Validator
+        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        validatorList.add(new UsernameTokenValidator());
+        validateOperation.setTokenValidators(validatorList);
+
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+       
+        List<AttributeStatementProvider> customProviderList = 
+            new ArrayList<AttributeStatementProvider>();
+        customProviderList.add(new CustomAttributeProvider());
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        samlTokenProvider.setAttributeStatementProviders(customProviderList);
+        providerList.add(samlTokenProvider);
+        validateOperation.setTokenProviders(providerList);
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        validateOperation.setStsProperties(stsProperties);
+        
+        // Set the ClaimsManager
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        validateOperation.setClaimsManager(claimsManager);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        Object claims = 
+            useSecondaryParameters ? createClaimsElementInSecondaryParameters() : createClaimsElement();
+            
+        request.getAny().add(claims);
+        
+        // Create a UsernameToken
+        JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
+        ValidateTargetType validateTarget = new ValidateTargetType();
+        validateTarget.setAny(usernameTokenType);
+        
+        JAXBElement<ValidateTargetType> validateTargetType = 
+            new JAXBElement<ValidateTargetType>(
+                QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
+            );
+        request.getAny().add(validateTargetType);
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Validate a token
+        RequestSecurityTokenResponseType response = 
+            validateOperation.validate(request, webServiceContext);
+        assertTrue(validateResponse(response));
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : response.getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
+    }
     
     /*
      * Create a security context object
@@ -323,6 +447,55 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
             );
         
         return tokenType;
+    }
+    
+    /*
+     * Mock up a DOM Element containing some claims
+     */
+    private JAXBElement<ClaimsType> createClaimsElement() {
+        Document doc = DOMUtils.createDocument();
+        
+        Element claimType = createClaimsType(doc);        
+       
+        ClaimsType claims = new ClaimsType();
+        claims.setDialect(STSConstants.IDT_NS_05_05);
+        claims.getAny().add(claimType);
+        
+        JAXBElement<ClaimsType> claimsType =
+            new JAXBElement<ClaimsType>(
+                    QNameConstants.CLAIMS, ClaimsType.class, claims
+            );
+        
+        return claimsType;
+    }
+    
+    /*
+     * Mock up a SecondaryParameters DOM Element containing some claims
+     */
+    private Element createClaimsElementInSecondaryParameters() {
+        Document doc = DOMUtils.createDocument();
+        Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
+        secondary.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
+        
+        Element claims = doc.createElementNS(STSConstants.WST_NS_05_12, "Claims");
+        claims.setAttributeNS(null, "Dialect", STSConstants.IDT_NS_05_05);
+        
+        Element claimType = createClaimsType(doc);
+        
+        claims.appendChild(claimType);
+        secondary.appendChild(claims);
+
+        return secondary;
+    }
+    
+    private Element createClaimsType(Document doc) {
+        Element claimType = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimType");
+        claimType.setAttributeNS(
+            null, "Uri", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
+        );
+        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        
+        return claimType;
     }
     
 }
