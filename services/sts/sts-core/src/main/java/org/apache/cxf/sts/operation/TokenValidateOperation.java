@@ -32,6 +32,7 @@ import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.RequestParser;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -117,6 +118,11 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
                     providerParameters.setPrincipal(responsePrincipal);
                 }
             }
+            
+            // Check if the requested claims can be handled by the configured claim handlers
+            RequestClaimCollection requestedClaims = providerParameters.getRequestedClaims();
+            checkClaimsSupport(requestedClaims);
+            providerParameters.setClaimsManager(claimsManager);
             
             Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
             if (additionalProperties != null) {

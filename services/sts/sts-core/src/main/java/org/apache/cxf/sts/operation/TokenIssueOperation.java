@@ -19,10 +19,7 @@
 
 package org.apache.cxf.sts.operation;
 
-import java.net.URI;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,8 +30,6 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
-import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -68,16 +63,6 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenIssueOperation.class);
 
-    private ClaimsManager claimsManager; 
-
-    public ClaimsManager getClaimsManager() {
-        return claimsManager;
-    }
-
-    public void setClaimsManager(ClaimsManager claimsManager) {
-        this.claimsManager = claimsManager;
-    }
-
 
     public RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenType request,
@@ -100,26 +85,9 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
 
         // Check if the requested claims can be handled by the configured claim handlers
         RequestClaimCollection requestedClaims = providerParameters.getRequestedClaims();
-        if (requestedClaims != null) {
-            List<URI> unhandledClaimTypes = new ArrayList<URI>();
-            for (RequestClaim requestedClaim : requestedClaims) {
-                if (!claimsManager.getSupportedClaimTypes().contains(requestedClaim.getClaimType()) 
-                        && !requestedClaim.isOptional()) {
-                    unhandledClaimTypes.add(requestedClaim.getClaimType());
-                }
-            }
-
-            if (unhandledClaimTypes.size() > 0) {
-                LOG.log(Level.WARNING, "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS.");
-                throw new STSException(
-                        "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS."
-                );
-            }
-        }
-
+        checkClaimsSupport(requestedClaims);
         providerParameters.setClaimsManager(claimsManager);
+        
         String realm = providerParameters.getRealm();
 
         TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
