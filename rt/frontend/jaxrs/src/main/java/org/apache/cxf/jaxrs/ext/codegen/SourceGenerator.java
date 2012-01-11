@@ -111,6 +111,7 @@ public class SourceGenerator {
     private static final Map<String, Class<?>> PARAM_ANNOTATIONS;
     private static final Set<String> RESOURCE_LEVEL_PARAMS;
     private static final Map<String, String> AUTOBOXED_PRIMITIVES_MAP;
+    private static final Map<String, String> XSD_SPECIFIC_TYPE_MAP;
     
     static {
         HTTP_METHOD_ANNOTATIONS = new HashMap<String, Class<?>>();
@@ -139,6 +140,11 @@ public class SourceGenerator {
         AUTOBOXED_PRIMITIVES_MAP.put(float.class.getSimpleName(), Float.class.getSimpleName());
         AUTOBOXED_PRIMITIVES_MAP.put(double.class.getSimpleName(), Double.class.getSimpleName());
         AUTOBOXED_PRIMITIVES_MAP.put(boolean.class.getSimpleName(), Boolean.class.getSimpleName());
+        
+        XSD_SPECIFIC_TYPE_MAP = new HashMap<String, String>();
+        XSD_SPECIFIC_TYPE_MAP.put("string", "String");
+        XSD_SPECIFIC_TYPE_MAP.put("decimal", "java.math.BigInteger");
+        XSD_SPECIFIC_TYPE_MAP.put("integer", "long");
     }
 
     private Comparator<String> importsComparator;
@@ -940,7 +946,11 @@ public class SourceGenerator {
         }
         String[] pair = type.split(":");
         String value = pair.length == 2 ? pair[1] : type;
-        return "string".equals(value) ? "String" : value;
+        if (XSD_SPECIFIC_TYPE_MAP.containsKey(value)) {
+            return XSD_SPECIFIC_TYPE_MAP.get(value);
+        } else {
+            return value;
+        }
     }
     
     private String getElementRefName(Element repElement,
