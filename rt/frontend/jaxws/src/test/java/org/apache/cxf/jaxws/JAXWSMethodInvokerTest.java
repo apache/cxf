@@ -26,7 +26,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Provider;
 
 import org.apache.cxf.continuations.SuspendedInvocationException;
-import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -35,6 +34,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Factory;
+import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.easymock.EasyMock;
 import org.junit.Assert;

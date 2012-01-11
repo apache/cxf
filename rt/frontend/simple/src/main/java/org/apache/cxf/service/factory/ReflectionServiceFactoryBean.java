@@ -77,7 +77,6 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.FaultInfoException;
-import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.MethodComparator;
@@ -92,6 +91,7 @@ import org.apache.cxf.service.ServiceModelSchemaValidator;
 import org.apache.cxf.service.factory.FactoryBeanListener.Event;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.invoker.SingletonFactory;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.BindingInfo;
@@ -232,6 +232,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         setService(null);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public synchronized Service create() {
         reset();
@@ -255,7 +256,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             getService().setDataBinding(getDataBinding());
         }
 
-        getService().put(MethodDispatcher.class.getName(), getMethodDispatcher());
+        MethodDispatcher m = getMethodDispatcher();
+        getService().put(MethodDispatcher.class.getName(), m);
+        if (m instanceof org.apache.cxf.frontend.MethodDispatcher) {
+            getService().put(org.apache.cxf.frontend.MethodDispatcher.class.getName(), m);
+        }
 
         createEndpoints();
 

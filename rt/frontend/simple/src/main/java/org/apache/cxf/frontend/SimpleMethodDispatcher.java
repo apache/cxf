@@ -27,7 +27,9 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-public class SimpleMethodDispatcher implements MethodDispatcher {
+@SuppressWarnings("deprecation")
+public class SimpleMethodDispatcher 
+    implements  org.apache.cxf.service.invoker.MethodDispatcher, MethodDispatcher  {
 
     private Map<Method, Map<BindingInfo, BindingOperationInfo>> infoMap = 
         new ConcurrentHashMap<Method, Map<BindingInfo, BindingOperationInfo>>();

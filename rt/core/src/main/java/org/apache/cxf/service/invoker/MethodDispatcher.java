@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.frontend;
+package org.apache.cxf.service.invoker;
 
 import java.lang.reflect.Method;
 
