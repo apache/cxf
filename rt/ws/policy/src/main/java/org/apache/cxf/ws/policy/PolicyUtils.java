@@ -48,12 +48,10 @@ public final class PolicyUtils {
             obj = o;
         }
 
-        @Override
         public void assertMessage(Message message) {
             obj.assertMessage(message);
         }
 
-        @Override
         public boolean canAssert(QName type) {
             return obj.canAssert(type);
         }
