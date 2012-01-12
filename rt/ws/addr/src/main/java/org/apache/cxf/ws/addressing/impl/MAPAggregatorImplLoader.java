@@ -28,7 +28,6 @@ import org.apache.cxf.ws.addressing.MAPAggregator.MAPAggregatorLoader;
 public class MAPAggregatorImplLoader implements MAPAggregatorLoader {
 
     /** {@inheritDoc}*/
-    @Override
     public MAPAggregator createImplementation(MAPAggregator mag) {
         return new MAPAggregatorImpl(mag);
     }

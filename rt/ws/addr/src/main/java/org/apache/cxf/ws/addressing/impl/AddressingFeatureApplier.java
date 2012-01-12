@@ -32,7 +32,6 @@ import org.apache.cxf.ws.addressing.soap.MAPCodec;
 @NoJSR250Annotations
 public class AddressingFeatureApplier implements WSAddressingFeature.WSAddressingFeatureApplier {
 
-    @Override
     public void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider, Bus bus) {
         MAPCodec mapCodec = new MAPCodec();
         MAPAggregatorImpl mapAggregator = new MAPAggregatorImpl();
