@@ -52,7 +52,10 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
         throwException = false;
     }
     
-    
+    public boolean hasExtensionByName(String name) {
+        return false;
+    }
+
     public static Bus init(String[] args) throws BusException {
         
         initializeCount++;

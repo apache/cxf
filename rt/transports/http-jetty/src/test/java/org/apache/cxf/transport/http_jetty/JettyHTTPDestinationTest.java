@@ -69,7 +69,6 @@ import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.easymock.EasyMock;
 import org.eclipse.jetty.http.HttpFields;
@@ -571,8 +570,8 @@ public class JettyHTTPDestinationTest extends Assert {
             bus = EasyMock.createMock(Bus.class);
             bus.getExtension(EndpointResolverRegistry.class);
             EasyMock.expectLastCall().andReturn(null);
-            bus.getExtension(PolicyEngine.class);          
-            EasyMock.expectLastCall().andReturn(null);
+            bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine");
+            EasyMock.expectLastCall().andReturn(false);
             bus.getExtension(ClassLoader.class);
             EasyMock.expectLastCall().andReturn(this.getClass().getClassLoader());
             EasyMock.replay(bus);

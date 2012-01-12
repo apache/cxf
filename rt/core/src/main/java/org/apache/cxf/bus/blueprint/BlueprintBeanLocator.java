@@ -185,4 +185,13 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         return orig.hasConfiguredPropertyValue(beanName, propertyName, value);
     }
 
+    @Override
+    public boolean hasBeanOfName(String name) {
+        ComponentMetadata cmd = getComponentMetadata(name);
+        if (cmd instanceof BeanMetadata) {
+            return true;
+        }        
+        return orig.hasBeanOfName(name);
+    }
+
 }

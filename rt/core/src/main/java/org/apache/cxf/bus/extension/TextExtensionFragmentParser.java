@@ -56,7 +56,7 @@ public class TextExtensionFragmentParser {
     /**
      * Reads extension definitions from a Text file and instantiates them
      * The text file has the following syntax
-     * classname:interfacename:deferred(true|false)
+     * classname:interfacename:deferred(true|false):optional(true|false)
      * 
      * @param is stream to read the extension from
      * @return list of Extensions
@@ -96,6 +96,9 @@ public class TextExtensionFragmentParser {
         }
         if (parts.length >= 3) {
             ext.setDeferred(Boolean.parseBoolean(parts[2]));
+        }
+        if (parts.length >= 4) {
+            ext.setOptional(Boolean.parseBoolean(parts[3]));
         }
         return ext;
     }

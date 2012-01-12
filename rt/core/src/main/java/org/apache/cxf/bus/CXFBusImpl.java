@@ -111,6 +111,22 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         return null;
     }
     
+    public boolean hasExtensionByName(String name) {
+        for (Class<?> c : extensions.keySet()) {
+            if (name.equals(c.getName())) {
+                return true;
+            }
+        }
+        ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
+        if (loc == null) {
+            loc = createConfiguredBeanLocator();
+        }
+        if (loc != null) {
+            return loc.hasBeanOfName(name);
+        }
+        return false;
+    }
+    
     protected synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
         ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
         if (loc == null) {
@@ -131,6 +147,9 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
                 }
                 public <T> T getBeanOfType(String name, Class<T> type) {
                     return null;
+                }
+                public boolean hasBeanOfName(String name) {
+                    return false;
                 }
             };
             this.setExtension(loc, ConfiguredBeanLocator.class);

@@ -72,7 +72,6 @@ import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLLibrary;
 
@@ -420,11 +419,8 @@ public abstract class AbstractHTTPDestination
     }
 
     private void initConfig() {
-        PolicyEngine engine = bus.getExtension(PolicyEngine.class);
-        // for a decoupled endpoint there is no service info
-        if (null != engine && engine.isEnabled() 
-            && null != endpointInfo.getService()) {
-            server = PolicyUtils.getServer(engine, endpointInfo, this);
+        if (bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine")) {
+            server = PolicyUtils.getServer(bus, endpointInfo, this);
         }
         if (null == server && WSDLLibrary.isAvailable()) {
             server = endpointInfo.getTraversedExtensor(

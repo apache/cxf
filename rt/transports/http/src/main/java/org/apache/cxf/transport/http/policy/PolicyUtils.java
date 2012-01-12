@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -136,17 +137,18 @@ public final class PolicyUtils {
         }
         return compatible;
     }
-  
+
     /**
      * Returns a HTTPClientPolicy that is compatible with the assertions included in the
      * service and endpoint policy subjects, or null if there are no such assertions.
-     * @param pe the policy engine
+     * @param bus the bus
      * @param ei the endpoint info
      * @param c the conduit
      * @return the compatible policy
      * @throws PolicyException if no compatible HTTPClientPolicy can be determined
      */
-    public static HTTPClientPolicy getClient(PolicyEngine pe, EndpointInfo ei, Conduit c) {
+    public static HTTPClientPolicy getClient(Bus bus, EndpointInfo ei, Conduit c) {
+        PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         Collection<Assertion> alternative = pe.getClientEndpointPolicy(ei, c).getChosenAlternative();
         HTTPClientPolicy compatible = null;
         for (Assertion a : alternative) {
@@ -166,17 +168,18 @@ public final class PolicyUtils {
         }
         return compatible;
     }
-    
+
     /**
      * Returns a HTTPServerPolicy that is compatible with the assertions included in the
      * service and endpoint policy subjects, or null if there are no such assertions.
-     * @param pe the policy engine
+     * @param bus the bus
      * @param ei the endpoint info
      * @param d the destination
      * @return the compatible policy
      * @throws PolicyException if no compatible HTTPServerPolicy can be determined
      */
-    public static HTTPServerPolicy getServer(PolicyEngine pe, EndpointInfo ei, Destination d) {
+    public static HTTPServerPolicy getServer(Bus b, EndpointInfo ei, Destination d) {
+        PolicyEngine pe = b.getExtension(PolicyEngine.class);
         Collection<Assertion> alternative = pe.getServerEndpointPolicy(ei, d).getChosenAlternative();
         HTTPServerPolicy compatible = null;
         for (Assertion a : alternative) {
@@ -633,6 +636,10 @@ public final class PolicyUtils {
     private static boolean compatible(String s1, String s2) {
         return s1 == null || s2 == null || s1.equals(s2);
     }
+    
+    
+    
+    
     
     private static HTTPClientPolicy getClient(Collection<Assertion> alternative) {      
         HTTPClientPolicy compatible = null;

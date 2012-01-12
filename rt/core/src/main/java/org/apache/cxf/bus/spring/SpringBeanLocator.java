@@ -288,4 +288,12 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         return lst;
     }
 
+    @Override
+    public boolean hasBeanOfName(String name) {
+        if (context.containsBean(name)) {
+            return true;
+        }
+        return orig.hasBeanOfName(name);
+    }
+
 }

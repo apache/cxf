@@ -39,6 +39,9 @@ public interface Bus extends InterceptorProvider {
     
     <T> void setExtension(T extension, Class<T> extensionType);
     
+    boolean hasExtensionByName(String name);
+    
+    
     String getId();
     
     void shutdown(boolean wait);

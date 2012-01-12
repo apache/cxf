@@ -37,6 +37,8 @@ public class Extension {
     protected Collection<String> namespaces = new ArrayList<String>();
     protected Object args[];
     protected Object obj;
+    protected boolean optional;
+    protected boolean notFound;
     
     public Extension() {
     }
@@ -64,6 +66,14 @@ public class Extension {
         intf = ext.intf;
         classloader = ext.classloader;
         args = ext.args;
+        optional = ext.optional;
+    }
+    
+    public void setOptional(boolean b) {
+        optional = b;
+    }
+    public boolean isOptional() {
+        return optional;
     }
     
     public String getName() {
@@ -108,6 +118,7 @@ public class Extension {
     
     public void setClassname(String i) {
         clazz = null;
+        notFound = false;
         className = i;
     }
        
@@ -117,6 +128,7 @@ public class Extension {
 
     public void setInterfaceName(String i) {
         interfaceName = i;
+        notFound = false;
     }
 
     public boolean isDeferred() {
@@ -135,32 +147,45 @@ public class Extension {
         args = a;
     }
     
-    public Class<?> getClassObject(ClassLoader cl) {
-        if (clazz == null) {
-            if (classloader != null) {
-                try {
-                    clazz = classloader.loadClass(className);
-                    return clazz;
-                } catch (ClassNotFoundException nex) {
-                    //ignore, fall into the stuff below
-                }
-            }                
+    private  Class<?> tryClass(String name, ClassLoader cl) {
+        if (classloader != null) {
             try {
-                clazz = cl.loadClass(className);
-            } catch (ClassNotFoundException ex) {
-                try {
-                    // using the extension classloader as a fallback
-                    clazz = this.getClass().getClassLoader().loadClass(className);
-                } catch (ClassNotFoundException nex) {
+                return classloader.loadClass(name);
+            } catch (Throwable nex) {
+                //ignore, fall into the stuff below
+            }
+        }                
+        try {
+            return cl.loadClass(name);
+        } catch (Throwable ex) {
+            try {
+                // using the extension classloader as a fallback
+                return this.getClass().getClassLoader().loadClass(name);
+            } catch (Throwable nex) {
+                notFound = true;
+                if (!optional) {
                     throw new ExtensionException(nex);
                 }
             }
+        }
+        return null;
+    }
+    
+    public Class<?> getClassObject(ClassLoader cl) {
+        if (notFound) {
+            return null;
+        }
+        if (clazz == null) {
+            clazz = tryClass(className, cl);
         }
         return clazz;
     }
     public Object load(ClassLoader cl, Bus b) {
         try {
             Class<?> cls = getClassObject(cl);
+            if (notFound) {
+                return null;
+            }
             try {
                 //if there is a Bus constructor, use it.
                 if (b != null && args == null) {
@@ -200,30 +225,10 @@ public class Extension {
     }
     
     public Class<?> loadInterface(ClassLoader cl) {
-        if (intf != null) {
+        if (intf != null || notFound) {
             return intf;
         }
-        if (classloader != null) {
-            try {
-                intf = classloader.loadClass(interfaceName);
-                if (intf != null) {
-                    return intf;
-                }
-            } catch (ClassNotFoundException nex) {
-                //ignore, fall into the stuff below
-            }
-        }                
-
-        try {
-            intf = cl.loadClass(interfaceName);
-        } catch (ClassNotFoundException ex) {
-            try {
-                // using the extension classloader as a fallback
-                intf = this.getClass().getClassLoader().loadClass(interfaceName);
-            } catch (ClassNotFoundException nex) {
-                throw new ExtensionException(nex);
-            }
-        }
+        intf = tryClass(interfaceName, cl);
         return intf;
     }
     

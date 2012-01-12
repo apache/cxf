@@ -7,7 +7,7 @@ org.apache.cxf.ws.policy.PolicyAnnotationListener::true
 org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider::true
 org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry::true
 org.apache.cxf.ws.policy.attachment.external.EndpointReferenceDomainExpressionBuilder::true
-org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider::true
+org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider::true:true
 # MTOM Policy Support
 org.apache.cxf.ws.policy.mtom.MTOMAssertionBuilder::true
 org.apache.cxf.ws.policy.mtom.MTOMPolicyInterceptorProvider::true

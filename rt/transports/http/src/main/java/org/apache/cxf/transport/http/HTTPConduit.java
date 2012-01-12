@@ -85,7 +85,6 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.policy.PolicyEngine;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
@@ -304,10 +303,10 @@ public class HTTPConduit
         
         // wsdl extensors are superseded by policies which in        
         // turn are superseded by injection                          
-        PolicyEngine pe = bus.getExtension(PolicyEngine.class);      
-        if (null != pe && pe.isEnabled() && endpointInfo.getService() != null) {                          
+        if (bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine")
+            && endpointInfo.getService() != null) {                         
             clientSidePolicy =                                       
-                PolicyUtils.getClient(pe, endpointInfo, this);              
+                PolicyUtils.getClient(bus, endpointInfo, this);              
         }
         CXFAuthenticator.addAuthenticator();
     }
