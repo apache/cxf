@@ -166,12 +166,15 @@ public class JibxToolingDataBinding implements DataBindingProfile {
                 codegen.compile();
             }
 
-            BindingUtils.getDefinitions(codegen.getRootBinding(), types, elements, null);
+            Map<QName, Object> formats = new HashMap<QName, Object>();
+            BindingUtils.getDefinitions(codegen.getRootBinding(), types, elements, formats);
             
             Iterator it = codegen.getBindingOrganizer().iterateBindings();
             while (it.hasNext()) {
                 BindingHolder o = (BindingHolder)it.next();
-                getDefinitions(o, types, elements);
+                if (o != null) {
+                    getDefinitions(o, types, elements);
+                }
             }
 
         } catch (Exception e) {
