@@ -17,7 +17,12 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
+
+import org.apache.cxf.ws.addressing.AddressingBuilder;
+import org.apache.cxf.ws.addressing.AddressingConstants;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.Names;
 
 
 /**

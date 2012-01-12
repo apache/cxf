@@ -28,7 +28,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
@@ -55,7 +55,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return;
         }
        
-        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(msg, false, true);
+        AddressingProperties maps = RMContextUtils.retrieveMAPs(msg, false, true);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;

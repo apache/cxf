@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
 
 
 import java.util.ResourceBundle;
@@ -26,6 +26,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.ws.addressing.AddressingConstants;
+import org.apache.cxf.ws.addressing.Names;
 
 /**
  * Encapsulation of version-specific WS-Addressing constants.

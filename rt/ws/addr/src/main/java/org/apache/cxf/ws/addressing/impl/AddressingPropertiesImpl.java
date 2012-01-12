@@ -17,13 +17,19 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 import javax.xml.namespace.QName;
+
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.Names;
+import org.apache.cxf.ws.addressing.RelatesToType;
 
 /**
  * Abstraction of Message Addressing Properties. 
@@ -271,5 +277,10 @@ public class AddressingPropertiesImpl implements AddressingProperties {
         buf.append("]");
         return buf.toString();
         
+    } 
+    
+    public AddressingProperties createCompatibleResponseProperties() {
+        return new AddressingPropertiesImpl(getNamespaceURI());
     }
+
 }

@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.DEFAULT_ADDRESSING_BUILDER;
 
@@ -39,7 +40,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.DEFAULT_ADDRESSING_BU
 public abstract class AddressingBuilder implements AddressingType {
 
     private static final Logger LOG = 
-        LogUtils.getL7dLogger(AddressingBuilder.class, "APIMessages");
+        LogUtils.getL7dLogger(AddressingBuilder.class);
     private static AddressingBuilder builder;
 
     /**
@@ -58,7 +59,7 @@ public abstract class AddressingBuilder implements AddressingType {
             if (builder == null) {
                 String className = DEFAULT_ADDRESSING_BUILDER;
                 try {
-                    Class<?> cls = Class.forName(className);
+                    Class<?> cls = ClassLoaderUtils.loadClass(className, AddressingBuilder.class);
                     builder = (AddressingBuilder)cls.newInstance();
                 } catch (ClassNotFoundException cnfe) {
                     cnfe.printStackTrace();

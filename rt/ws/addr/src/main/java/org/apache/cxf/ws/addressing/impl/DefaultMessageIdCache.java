@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.cxf.ws.addressing.MessageIdCache;
 
 /**
  * An implementation that uses a simple set to store received message IDs.

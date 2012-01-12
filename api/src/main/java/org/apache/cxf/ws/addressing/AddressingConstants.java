@@ -115,11 +115,6 @@ public interface AddressingConstants {
     QName getAddressQName();
     
     /**
-     * @return package name of the implementation
-     */
-    String getPackageName();
-    
-    /**
      * @return QName of the reference parameter marker
      */
     QName getIsReferenceParameterQName();

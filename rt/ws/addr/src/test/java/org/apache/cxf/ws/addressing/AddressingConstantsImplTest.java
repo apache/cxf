@@ -22,6 +22,8 @@ package org.apache.cxf.ws.addressing;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.ws.addressing.impl.AddressingConstantsImpl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -164,13 +166,6 @@ public class AddressingConstantsImplTest extends Assert {
                      new QName("http://www.w3.org/2005/08/addressing",
                                "Address"),
                      constants.getAddressQName());
-    }
-
-    @Test
-    public void testGetPackageName() throws Exception {
-        assertEquals("unexpected constant",
-                     "org.apache.cxf.ws.addressing",
-                     constants.getPackageName());
     }
 
     @Test

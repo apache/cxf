@@ -22,50 +22,52 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.ws.addressing.soap.MAPCodec;
 
 @NoJSR250Annotations
 public class WSAddressingFeature extends AbstractFeature {
-    private MAPAggregator mapAggregator = new MAPAggregator();
-    private MAPCodec mapCodec = new MAPCodec();
+    public static enum AddressingResponses {
+        ALL,
+        NON_ANONYMOUS,
+        ANONYMOUS,
+    }
+    
+    public interface WSAddressingFeatureApplier {
+        void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider, Bus bus);
+    }
+    
+    boolean allowDuplicates = true;
+    boolean usingAddressingAdvisory = true;
+    boolean required;
+    MessageIdCache cache;
+    AddressingResponses responses = AddressingResponses.ALL;
     
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(mapAggregator);
-        provider.getInInterceptors().add(mapCodec);
-        
-        provider.getOutInterceptors().add(mapAggregator);
-        provider.getOutInterceptors().add(mapCodec);
-        
-        provider.getInFaultInterceptors().add(mapAggregator);
-        provider.getInFaultInterceptors().add(mapCodec);
-        
-        provider.getOutFaultInterceptors().add(mapAggregator);
-        provider.getOutFaultInterceptors().add(mapCodec);
+        bus.getExtension(WSAddressingFeatureApplier.class).initializeProvider(this, provider, bus);
     }
 
     public void setAllowDuplicates(boolean allow) {
-        mapAggregator.setAllowDuplicates(allow);
+        allowDuplicates = allow;
     }
     
     public boolean isAllowDuplicates() {
-        return mapAggregator.allowDuplicates();
+        return allowDuplicates;
     }
 
     public void setUsingAddressingAdvisory(boolean advisory) {
-        mapAggregator.setUsingAddressingAdvisory(advisory);
+        usingAddressingAdvisory = advisory;
     }
     
     public boolean isUsingAddressingAdvisory() {
-        return mapAggregator.isUsingAddressingAdvisory();
+        return usingAddressingAdvisory;
     }
     
 
     public boolean isAddressingRequired() {
-        return mapAggregator.isAddressingRequired();
+        return required;
     }
-    public void setAddressingRequired(boolean required) {
-        mapAggregator.setAddressingRequired(required);
+    public void setAddressingRequired(boolean r) {
+        required = r; 
     }
     
     /**
@@ -75,7 +77,7 @@ public class WSAddressingFeature extends AbstractFeature {
      * @return the cache used to enforce duplicate message IDs
      */
     public MessageIdCache getMessageIdCache() {
-        return mapAggregator.getMessageIdCache();
+        return cache;
     }
 
     /**
@@ -87,10 +89,17 @@ public class WSAddressingFeature extends AbstractFeature {
      * @throws NullPointerException if {@code messageIdCache} is {@code null}
      */
     public void setMessageIdCache(MessageIdCache messageIdCache) {
-        mapAggregator.setMessageIdCache(messageIdCache);
+        cache = messageIdCache;
+    }
+
+    public void setResponses(AddressingResponses r) {
+        responses = r;
+    }
+    public void setResponses(String r) {
+        responses = AddressingResponses.valueOf(r);
+    }
+    public AddressingResponses getResponses() {
+        return responses;
     }
     
-    public void setResponses(String responses) {
-        mapAggregator.setAddressingResponses(responses);
-    }
 }

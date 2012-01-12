@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
 
 
 import java.lang.reflect.Method;
@@ -59,6 +59,12 @@ import org.apache.cxf.service.model.ServiceInfo;
 
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.Names;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -77,7 +83,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PRO
 
 public class MAPAggregatorTest extends Assert {
 
-    private MAPAggregator aggregator;
+    private MAPAggregatorImpl aggregator;
     private IMocksControl control;
     private AddressingPropertiesImpl expectedMAPs;
     private String expectedTo;
@@ -87,7 +93,7 @@ public class MAPAggregatorTest extends Assert {
     
     @Before
     public void setUp() {
-        aggregator = new MAPAggregator();
+        aggregator = new MAPAggregatorImpl();
         control = EasyMock.createNiceControl();
     }
 

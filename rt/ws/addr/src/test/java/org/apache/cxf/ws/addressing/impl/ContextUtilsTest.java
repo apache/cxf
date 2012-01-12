@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +27,8 @@ import javax.xml.namespace.QName;
 import junit.framework.Assert;
 
 import org.apache.cxf.service.model.Extensible;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.Names;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -60,7 +62,7 @@ public class ContextUtilsTest extends Assert {
             andReturn("urn:foo:test:1");
         control.replay();
         
-        String action = ContextUtils.getAction(ext);
+        String action = InternalContextUtils.getAction(ext);
         assertEquals("urn:foo:test:1", action);
         
         control.reset();
@@ -71,7 +73,7 @@ public class ContextUtilsTest extends Assert {
         attributes.put(WSA_ACTION_QNAME, "urn:foo:test:2");
         control.replay();
         
-        action = ContextUtils.getAction(ext);
+        action = InternalContextUtils.getAction(ext);
         assertEquals("urn:foo:test:2", action);
         
         control.reset();
@@ -82,7 +84,7 @@ public class ContextUtilsTest extends Assert {
         attributes.put(OLD_WSDL_WSA_ACTION_QNAME, "urn:foo:test:3");
         control.replay();
         
-        action = ContextUtils.getAction(ext);
+        action = InternalContextUtils.getAction(ext);
         assertEquals("urn:foo:test:3", action);
         
         control.reset();
@@ -92,7 +94,7 @@ public class ContextUtilsTest extends Assert {
             andReturn(null);
         control.replay();
         
-        action = ContextUtils.getAction(ext);
+        action = InternalContextUtils.getAction(ext);
         assertEquals(null, action);
     }
 }

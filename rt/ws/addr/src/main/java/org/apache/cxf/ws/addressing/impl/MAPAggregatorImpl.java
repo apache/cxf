@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,15 +50,12 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
@@ -71,7 +68,15 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.Observable;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.MAPAggregator;
+import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
+import org.apache.cxf.ws.addressing.WSAContextUtils;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -82,12 +87,7 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
  * Logical Handler responsible for aggregating the Message Addressing 
  * Properties for outgoing messages.
  */
-public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
-    public static final String USING_ADDRESSING = MAPAggregator.class.getName() + ".usingAddressing";
-    public static final String ADDRESSING_DISABLED = MAPAggregator.class.getName() + ".addressingDisabled";
-    public static final String DECOUPLED_DESTINATION = MAPAggregator.class.getName() 
-        + ".decoupledDestination";
-    public static final String ACTION_VERIFIED = MAPAggregator.class.getName() + ".actionVerified";
+public class MAPAggregatorImpl extends MAPAggregator {
     
     private static final Logger LOG = 
         LogUtils.getL7dLogger(MAPAggregator.class);
@@ -109,114 +109,28 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         
     };
 
-    /**
-     * The cache to use for enforcing uniqueness.  Defaults to {@link DefaultMessageIdCache}.
-     */
-    private MessageIdCache messageIdCache = new DefaultMessageIdCache();
-    
-    private boolean usingAddressingAdvisory = true;
-    private boolean addressingRequired;
-
-    private boolean allowDuplicates = true;
-    
-    private String addressingResponses = "ALL";
     
     /**
      * Constructor.
      */
-    public MAPAggregator() {
-        super(Phase.PRE_LOGICAL);
-        addBefore(OneWayProcessorInterceptor.class.getName());
+    public MAPAggregatorImpl() {
+        messageIdCache = new DefaultMessageIdCache();
     }
     
-    /**
-     * Indicates if duplicate messageIDs are allowed.
-     * @return true if duplicate messageIDs are allowed
-     */
-    public boolean allowDuplicates() {
-        return allowDuplicates;
-    }
 
-    /**
-     * Allows/disallows duplicate messageIdDs.  
-     * @param ad whether duplicate messageIDs are allowed
-     */
-    public void setAllowDuplicates(boolean ad) {
-        allowDuplicates = ad;
-    }
-
-    /**
-     * Whether the presence of the <wsaw:UsingAddressing> element
-     * in the WSDL is purely advisory, i.e. its absence doesn't prevent
-     * the encoding of WS-A headers.
-     *
-     * @return true if the presence of the <wsaw:UsingAddressing> element is 
-     * advisory
-     */
-    public boolean isUsingAddressingAdvisory() {
-        return usingAddressingAdvisory;
-    }
-
-    /**
-     * Controls whether the presence of the <wsaw:UsingAddressing> element
-     * in the WSDL is purely advisory, i.e. its absence doesn't prevent
-     * the encoding of WS-A headers.
-     *
-     * @param advisory true if the presence of the <wsaw:UsingAddressing>
-     * element is to be advisory
-     */
-    public void setUsingAddressingAdvisory(boolean advisory) {
-        usingAddressingAdvisory = advisory;
-    }
     
-    /**
-     * Whether the use of addressing is completely required for this endpoint
-     *
-     * @return true if addressing is required
-     */
-    public boolean isAddressingRequired() {
-        return addressingRequired;
-    }
-    /**
-     * Sets whether the use of addressing is completely required for this endpoint
-     *
-     */
-    public void setAddressingRequired(boolean required) {
-        addressingRequired = required;
-    }
-    
-    /**
-     * Sets Addresing Response 
-     *
-     */
-    public void setAddressingResponses(String responses) {
-        addressingResponses = responses;
-    }
-    
-    /**
-     * Returns the cache used to enforce duplicate message IDs when
-     * {@link #allowDuplicates()} returns {@code false}.
-     *
-     * @return the cache used to enforce duplicate message IDs
-     */
-    public MessageIdCache getMessageIdCache() {
-        return messageIdCache;
-    }
-
-    /**
-     * Sets the cache used to enforce duplicate message IDs when
-     * {@link #allowDuplicates()} returns {@code false}.
-     *
-     * @param messageIdCache the cache to use
-     *
-     * @throws NullPointerException if {@code messageIdCache} is {@code null}
-     */
-    public void setMessageIdCache(MessageIdCache messageIdCache) {
+    public MAPAggregatorImpl(MAPAggregator mag) {
+        this.addressingRequired = mag.isAddressingRequired();
+        this.messageIdCache = mag.getMessageIdCache();
         if (messageIdCache == null) {
-            throw new NullPointerException("messageIdCache cannot be null.");
+            messageIdCache = new DefaultMessageIdCache();
         }
-        this.messageIdCache = messageIdCache;
+        this.usingAddressingAdvisory = mag.isUsingAddressingAdvisory();
+        this.allowDuplicates = mag.allowDuplicates();
+        this.addressingResponses = mag.getAddressingResponses();
     }
+
+
 
     /**
      * Invoked for normal processing of inbound and outbound messages.
@@ -516,7 +430,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 // request/response MAPs must be aggregated
                 aggregate(message, isFault);
             }
-            AddressingPropertiesImpl theMaps = 
+            AddressingProperties theMaps = 
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
             if (null != theMaps && ContextUtils.isRequestor(message)) {            
                 assertAddressing(message, 
@@ -525,7 +439,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             }
         } else if (!ContextUtils.isRequestor(message)) {
             //responder validates incoming MAPs
-            AddressingPropertiesImpl maps = getMAPs(message, false, false);
+            AddressingProperties maps = getMAPs(message, false, false);
             //check responses          
             if (maps != null) {
                 checkAddressingResponses(maps.getReplyTo(), maps.getFaultTo());
@@ -539,7 +453,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             }
             continueProcessing = validateIncomingMAPs(maps, message);
             if (maps != null) {
-                AddressingPropertiesImpl theMaps = 
+                AddressingProperties theMaps = 
                     ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
                 if (null != theMaps) {            
                     assertAddressing(message, theMaps.getReplyTo(), theMaps.getFaultTo());
@@ -547,7 +461,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
 
                 if (isOneway
                     || !ContextUtils.isGenericAddress(maps.getReplyTo())) {
-                    ContextUtils.rebaseResponse(maps.getReplyTo(),
+                    InternalContextUtils.rebaseResponse(maps.getReplyTo(),
                                                 maps,
                                                 message);
                 } 
@@ -577,7 +491,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                                               ContextUtils.retrieveMAPFaultName(message)));
             }
         } else {
-            AddressingPropertiesImpl theMaps = 
+            AddressingProperties theMaps = 
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
             if (null != theMaps) {            
                 assertAddressing(message, theMaps.getReplyTo(), theMaps.getFaultTo());
@@ -628,23 +542,24 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     }
 
     private void checkAddressingResponses(EndpointReferenceType replyTo, EndpointReferenceType faultTo) {
-        if (this.addressingResponses.equals("ALL")) {
+        if (this.addressingResponses == WSAddressingFeature.AddressingResponses.ALL) {
             return;
         }
         boolean passed = false;
         boolean anonReply = ContextUtils.isGenericAddress(replyTo);
         boolean anonFault = ContextUtils.isGenericAddress(faultTo);
         boolean isAnonymous = anonReply && anonFault;
-        if ("ANONYMOUS".equals(addressingResponses) && isAnonymous) {
+        if (WSAddressingFeature.AddressingResponses.ANONYMOUS == addressingResponses
+            && isAnonymous) {
             passed = true;
-        } else if ("NON_ANONYMOUS".equals(addressingResponses)
+        } else if (WSAddressingFeature.AddressingResponses.NON_ANONYMOUS == addressingResponses
                    && (!anonReply && (faultTo.getAddress() != null && !anonFault) 
                        || !anonReply && faultTo.getAddress() == null)) {
             passed = true;
         }
         if (!passed) {
             String reason = BUNDLE.getString("INVALID_ADDRESSING_PROPERTY_MESSAGE");
-            QName detail = "ANONYMOUS".equals(addressingResponses)
+            QName detail = WSAddressingFeature.AddressingResponses.ANONYMOUS == addressingResponses
                 ? Names.ONLY_ANONYMOUS_ADDRESS_SUPPORTED_QNAME
                 : Names.ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_QNAME;
             throw new SoapFault(reason, detail);
@@ -659,7 +574,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     private void aggregate(Message message, boolean isFault) {
         boolean isRequestor = ContextUtils.isRequestor(message);
 
-        AddressingPropertiesImpl maps = assembleGeneric(message);
+        AddressingProperties maps = assembleGeneric(message);
         addRoleSpecific(maps, message, isRequestor, isFault);
         // outbound property always used to store MAPs, as this handler 
         // aggregates only when either:
@@ -676,8 +591,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      * @param message the current message
      * @return AddressingProperties containing the generic MAPs
      */
-    private AddressingPropertiesImpl assembleGeneric(Message message) {
-        AddressingPropertiesImpl maps = getMAPs(message, true, true);
+    private AddressingProperties assembleGeneric(Message message) {
+        AddressingProperties maps = getMAPs(message, true, true);
         // MessageID
         if (maps.getMessageID() == null) {
             String messageID = ContextUtils.generateUUID();
@@ -686,7 +601,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
 
         // Action
         if (ContextUtils.hasEmptyAction(maps)) {
-            maps.setAction(ContextUtils.getAction(message));
+            maps.setAction(InternalContextUtils.getAction(message));
 
             if (ContextUtils.hasEmptyAction(maps)
                 && ContextUtils.isOutbound(message)) {
@@ -701,7 +616,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         MessageInfo inputMessage = operation.getInput();
 
         if (inputMessage.getExtensionAttributes() != null) {
-            String inputAction = ContextUtils.getAction(inputMessage);
+            String inputAction = InternalContextUtils.getAction(inputMessage);
             if (!StringUtils.isEmpty(inputAction)) {
                 return inputAction;
             }
@@ -712,7 +627,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     private String getActionFromOutputMessage(final OperationInfo operation) {
         MessageInfo outputMessage = operation.getOutput();
         if (outputMessage != null && outputMessage.getExtensionAttributes() != null) {
-            String outputAction = ContextUtils.getAction(outputMessage);
+            String outputAction = InternalContextUtils.getAction(outputMessage);
             if (!StringUtils.isEmpty(outputAction)) {
                 return outputAction;
             }
@@ -739,7 +654,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             for (FaultInfo faultInfo : operation.getFaults()) {
                 if (isSameFault(faultInfo, faultName)) {
                     if (faultInfo.getExtensionAttributes() != null) {
-                        String faultAction = ContextUtils.getAction(faultInfo);
+                        String faultAction = InternalContextUtils.getAction(faultInfo);
                         if (!StringUtils.isEmpty(faultAction)) {
                             return faultAction;
                         }
@@ -809,7 +724,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         } else if (inMsg) {
             String explicitAction = getActionFromInputMessage(op);
             if (StringUtils.isEmpty(explicitAction)) {
-                SoapOperationInfo soi = ContextUtils.getSoapOperationInfo(bop);
+                SoapOperationInfo soi = InternalContextUtils.getSoapOperationInfo(bop);
                 explicitAction = soi == null ? null : soi.getAction();
             }            
             
@@ -861,7 +776,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      * requestor 
      * @param isFault true if a fault is being mediated
      */
-    private void addRoleSpecific(AddressingPropertiesImpl maps, 
+    private void addRoleSpecific(AddressingProperties maps, 
                                  Message message,
                                  boolean isRequestor,
                                  boolean isFault) {
@@ -926,7 +841,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             }
         } else {
             // add response-specific MAPs
-            AddressingPropertiesImpl inMAPs = getMAPs(message, false, false);
+            AddressingProperties inMAPs = getMAPs(message, false, false);
             maps.exposeAs(inMAPs.getNamespaceURI());
             // To taken from ReplyTo or FaultTo in incoming MAPs (depending
             // on the fault status of the response)
@@ -954,7 +869,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
  
             if (isFault
                 && !ContextUtils.isGenericAddress(inMAPs.getFaultTo())) {
-                ContextUtils.rebaseResponse(inMAPs.getFaultTo(),
+                InternalContextUtils.rebaseResponse(inMAPs.getFaultTo(),
                                             inMAPs,
                                             message);
             }
@@ -1108,11 +1023,11 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      * @param isOutbound true iff the message is outbound
      * @return AddressingProperties retrieved MAPs
      */
-    private AddressingPropertiesImpl getMAPs(Message message,
+    private AddressingProperties getMAPs(Message message,
                                              boolean isProviderContext,
                                              boolean isOutbound) {
 
-        AddressingPropertiesImpl maps = null;
+        AddressingProperties maps = null;
         maps = ContextUtils.retrieveMAPs(message, 
                                          isProviderContext,
                                          isOutbound);
@@ -1125,7 +1040,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         return maps;
     }
 
-    private void setupNamespace(AddressingPropertiesImpl maps, Message message) {
+    private void setupNamespace(AddressingProperties maps, Message message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
             return;

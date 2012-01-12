@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.ws.addressing.impl;
 
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.bind.JAXBException;

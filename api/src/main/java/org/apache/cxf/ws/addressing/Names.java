@@ -25,8 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.binding.soap.SoapBindingConstants;
-
 
 /**
  * Holder for WS-Addressing names (of headers, namespaces etc.).
@@ -180,7 +178,7 @@ public final class Names {
     public static final String SOAP12HTTP_ADDRESSING_BINDING = 
         "http://www.w3.org/2003/05/soap-envelope?addressing=ms";
     
-    public static final String SOAP_ACTION_HEADER = SoapBindingConstants.SOAP_ACTION;
+    public static final String SOAP_ACTION_HEADER = "SOAPAction";
     
     /**
      * The set of headers understood by the protocol binding.

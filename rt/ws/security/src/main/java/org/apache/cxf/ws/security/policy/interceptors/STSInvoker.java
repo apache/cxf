@@ -39,7 +39,6 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -67,7 +66,7 @@ abstract class STSInvoker implements Invoker {
         AddressingProperties inProps = (AddressingProperties)exchange.getInMessage()
                 .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
         if (inProps != null) {
-            AddressingProperties props = new AddressingPropertiesImpl(inProps.getNamespaceURI());
+            AddressingProperties props = inProps.createCompatibleResponseProperties();
             AttributedURIType action = new AttributedURIType();
             action.setValue(inProps.getAction().getValue().replace("/RST/", "/RSTR/"));
             props.setAction(action);
