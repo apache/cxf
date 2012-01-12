@@ -63,9 +63,9 @@ import javax.xml.validation.Schema;
 import org.xml.sax.helpers.DefaultHandler;
 
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;

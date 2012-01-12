@@ -27,12 +27,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+//import javax.xml.ws.EndpointReference;
+//import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 // importation convention: if the same class name is used for 
@@ -40,8 +37,6 @@ import org.w3c.dom.Element;
 // and the latter is fully qualified when used
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
-import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.addressing.v200408.AttributedQName;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.addressing.v200408.ObjectFactory;
@@ -290,44 +285,6 @@ public class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return internal;
     }    
-/**
-     * Convert from EndpointReference to CXF internal 2005/08 EndpointReferenceType
-     * 
-     * @param external the javax.xml.ws.EndpointReference
-     * @return CXF internal 2005/08 EndpointReferenceType
-     */
-    public static EndpointReferenceType convertToInternal(EndpointReference external) {
-        if (external instanceof W3CEndpointReference) {
-            
-            
-            try {
-                Document doc = XMLUtils.newDocument();
-                DOMResult result = new DOMResult(doc);
-                external.writeTo(result);
-                W3CDOMStreamReader reader = new W3CDOMStreamReader(doc.getDocumentElement());
-                
-                // CXF internal 2005/08 EndpointReferenceType should be
-                // compatible with W3CEndpointReference
-                //jaxContext = ContextUtils.getJAXBContext();
-                JAXBContext jaxbContext = JAXBContext
-                    .newInstance(new Class[] {org.apache.cxf.ws.addressing.ObjectFactory.class});
-                EndpointReferenceType internal = jaxbContext.createUnmarshaller()
-                    .unmarshal(reader, EndpointReferenceType.class)
-                    .getValue();
-                return internal;
-            } catch (JAXBException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (ParserConfigurationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return null;
-        } else {
-            //TODO: 200408
-        }
-        return null;
-    }
     
     /**
      * Convert from 2005/08 ReferenceParametersType to 2004/08

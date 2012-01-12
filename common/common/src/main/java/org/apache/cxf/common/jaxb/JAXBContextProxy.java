@@ -17,27 +17,13 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxb;
+package org.apache.cxf.common.jaxb;
 
-import java.util.Map;
+/**
+ * 
+ */
+public interface JAXBContextProxy {
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+    Object getBeanInfo(Class<?> cls);
 
-
-public final class NamespaceMapper extends NamespacePrefixMapper {
-    private final Map<String, String> nspref;
-
-    public NamespaceMapper(Map<String, String> nspref) {
-        this.nspref = nspref;
-    }
-
-    public String getPreferredPrefix(String namespaceUri, 
-                                     String suggestion, 
-                                     boolean requirePrefix) {
-        String prefix = nspref.get(namespaceUri);
-        if (prefix != null) {
-            return prefix;
-        }
-        return suggestion;
-    }
 }

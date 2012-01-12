@@ -20,6 +20,8 @@
 package org.apache.cxf.jaxb;
 
 
+import org.apache.cxf.common.jaxb.JAXBUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 

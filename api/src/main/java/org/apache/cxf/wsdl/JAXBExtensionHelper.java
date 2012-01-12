@@ -50,12 +50,12 @@ import javax.xml.stream.util.StreamReaderDelegate;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxb.JAXBContextCache;
-import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.staxutils.StaxUtils;
 
 

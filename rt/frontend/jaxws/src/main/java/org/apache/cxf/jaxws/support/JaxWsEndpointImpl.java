@@ -84,7 +84,6 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
-import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.neethi.Constants;
@@ -249,7 +248,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 if (ext instanceof UnknownExtensibilityElement && wsaEpr.equals(ext.getElementType())) {
                     DOMSource domSource = new DOMSource(((UnknownExtensibilityElement)ext).getElement());
                     W3CEndpointReference w3cEPR = new W3CEndpointReference(domSource);
-                    EndpointReferenceType ref = VersionTransformer.convertToInternal(w3cEPR);
+                    EndpointReferenceType ref = ProviderImpl.convertToInternal(w3cEPR);
                     endpoint.getTarget().setMetadata(ref.getMetadata());
                     endpoint.getTarget().setReferenceParameters(ref.getReferenceParameters());
                     endpoint.getTarget().getOtherAttributes().putAll(ref.getOtherAttributes());

@@ -41,6 +41,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.jaxb.JAXBBeanInfo;
+import org.apache.cxf.common.jaxb.JAXBContextProxy;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;

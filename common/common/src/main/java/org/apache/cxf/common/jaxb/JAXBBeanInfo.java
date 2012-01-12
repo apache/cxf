@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxb;
+package org.apache.cxf.common.jaxb;
 
 import java.util.Collection;
 

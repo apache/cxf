@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.databinding.AbstractDataBinding;
@@ -41,7 +42,6 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
-import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.ServiceInfo;
 

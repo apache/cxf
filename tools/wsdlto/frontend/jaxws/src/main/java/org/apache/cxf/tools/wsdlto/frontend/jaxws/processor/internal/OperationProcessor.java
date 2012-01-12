@@ -25,7 +25,7 @@ import java.util.logging.Level;
 
 import javax.jws.WebParam;
 
-import org.apache.cxf.jaxb.JAXBUtils;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;

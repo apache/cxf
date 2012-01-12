@@ -30,7 +30,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.WebServiceException;
@@ -38,6 +40,7 @@ import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.spi.ServiceDelegate;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -46,13 +49,16 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 
@@ -163,6 +169,50 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                           metadata, wsdlDocumentLocation, referenceParameters,
                                           null, null);
     }
+    
+    /**
+     * Convert from EndpointReference to CXF internal 2005/08 EndpointReferenceType
+     * 
+     * @param external the javax.xml.ws.EndpointReference
+     * @return CXF internal 2005/08 EndpointReferenceType
+     */
+    public static EndpointReferenceType convertToInternal(EndpointReference external) {
+        if (external instanceof W3CEndpointReference) {
+            
+            
+            try {
+                Document doc = XMLUtils.newDocument();
+                DOMResult result = new DOMResult(doc);
+                external.writeTo(result);
+                W3CDOMStreamReader reader = new W3CDOMStreamReader(doc.getDocumentElement());
+                
+                // CXF internal 2005/08 EndpointReferenceType should be
+                // compatible with W3CEndpointReference
+                //jaxContext = ContextUtils.getJAXBContext();
+                JAXBContext context = JAXBContext
+                    .newInstance(new Class[] {org.apache.cxf.ws.addressing.ObjectFactory.class});
+                EndpointReferenceType internal = context.createUnmarshaller()
+                    .unmarshal(reader, EndpointReferenceType.class)
+                    .getValue();
+                return internal;
+            } catch (JAXBException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null;
+        } else {
+            //TODO: 200408
+        }
+        return null;
+    }
+
+    
+    
+    
+    
     //CHECKSTYLE:OFF - spec requires a bunch of params
     public W3CEndpointReference createW3CEndpointReference(String address,
                                                            QName interfaceName, 

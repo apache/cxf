@@ -685,8 +685,8 @@
                         <chmod>true</chmod>
                         <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                         <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-			<stagingRepositoryId>apache.cxf.site</stagingRepositoryId>
-			<stagingSiteURL>scp://people.apache.org/www/cxf.apache.org/maven-site-${project.version}</stagingSiteURL>
+                        <stagingRepositoryId>apache.cxf.site</stagingRepositoryId>
+                        <stagingSiteURL>scp://people.apache.org/www/cxf.apache.org/maven-site-${project.version}</stagingSiteURL>
                     </configuration>
 		    <dependencies>
 		      <dependency>

@@ -34,7 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 public final class DatatypeFactory {
     
     public static final Duration PT0S;
-    private static final Logger LOG = LogUtils.getL7dLogger(DatatypeFactory.class, "CommonUtilityMessages");
+    private static final Logger LOG = LogUtils.getL7dLogger(DatatypeFactory.class);
    
 
     static {

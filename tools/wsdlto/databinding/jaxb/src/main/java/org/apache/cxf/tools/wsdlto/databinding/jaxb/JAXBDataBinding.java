@@ -416,7 +416,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private boolean isJAXB22() {
-        return org.apache.cxf.jaxb.JAXBUtils.isJAXB22();
+        return org.apache.cxf.common.jaxb.JAXBUtils.isJAXB22();
     }
 
     private static final class ReferenceFinder extends AbstractReferenceFinderImpl {

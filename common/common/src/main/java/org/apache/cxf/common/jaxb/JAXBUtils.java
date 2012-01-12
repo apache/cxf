@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxb;
+package org.apache.cxf.common.jaxb;
 
 
 import java.io.BufferedReader;
@@ -113,7 +113,7 @@ public final class JAXBUtils {
     
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class, "CommonUtilityMessages");
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
     private static ClassLoader jaxbXjcLoader;
 
     static {
@@ -590,7 +590,7 @@ public final class JAXBUtils {
             }
         } else {
             try {
-                Class<?> cls = Class.forName("org.apache.cxf.jaxb.NamespaceMapper");
+                Class<?> cls = Class.forName("org.apache.cxf.common.jaxb.NamespaceMapper");
                 mapper = cls.getConstructor(Map.class).newInstance(nspref);
             } catch (Exception ex) {
                 LOG.log(Level.INFO, "Could not create NamespaceMapper", ex);
@@ -756,13 +756,6 @@ public final class JAXBUtils {
         return null;
     }
     
-    public static JAXBBeanInfo getBeanInfo(JAXBContextProxy context, Class<?> cls) {
-        Object o = context.getBeanInfo(cls);
-        if (o == null) {
-            return null;
-        }
-        return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
-    }
     
     public static List<DOMResult> generateJaxbSchemas(
         JAXBContext context, final Map<String, DOMResult> builtIns) throws IOException {
@@ -1154,4 +1147,13 @@ public final class JAXBUtils {
         return helper.loadClass(className,
                                 cls, bts);
     }
+    
+    public static JAXBBeanInfo getBeanInfo(JAXBContextProxy context, Class<?> cls) {
+        Object o = context.getBeanInfo(cls);
+        if (o == null) {
+            return null;
+        }
+        return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
+    }
+
 }
