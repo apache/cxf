@@ -30,7 +30,14 @@
         <version>2.6.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
+    <properties>
+        <cxf.osgi.import>
+            javax.activation;version="${cxf.osgi.javax.activation.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
+            org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
+        </cxf.osgi.import>
+    </properties>
     <build>
         <plugins>
             <plugin>

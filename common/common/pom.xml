@@ -33,6 +33,21 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <cxf.osgi.import>
+            com.sun*;resolution:=optional,
+            javax.annotation;version="${cxf.osgi.javax.annotation.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
+            org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
+            org.apache.log4j*;resolution:=optional,
+            net.sf.cglib*;resolution:=optional;version="[2.1.3, 2.2.0)",
+            org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
+        </cxf.osgi.import>
+        <cxf.fragment.host>org.apache.cxf.cxf-api</cxf.fragment.host>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

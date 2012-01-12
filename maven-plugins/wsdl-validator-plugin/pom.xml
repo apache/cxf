@@ -32,6 +32,9 @@
       <artifactId>cxf-maven-plugins</artifactId>
       <version>2.6.0-SNAPSHOT</version>
     </parent>
+    <properties>
+        <cxf.manifest.location/>
+    </properties>
 
     <dependencies>
         <dependency>
