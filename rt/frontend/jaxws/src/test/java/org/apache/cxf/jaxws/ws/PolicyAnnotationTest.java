@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.policy;
+package org.apache.cxf.jaxws.ws;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -219,7 +219,7 @@ public class PolicyAnnotationTest extends Assert {
         @Policy(uri = "annotationpolicies/TestImplPolicy.xml")
     }
     )
-    @WebService(endpointInterface = "org.apache.cxf.ws.policy.PolicyAnnotationTest$TestInterface")
+    @WebService(endpointInterface = "org.apache.cxf.jaxws.ws.PolicyAnnotationTest$TestInterface")
     public static class TestImpl implements TestInterface {
         public int echoInt(int i) {
             return i;

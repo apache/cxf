@@ -86,7 +86,6 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.neethi.Constants;
 
@@ -315,8 +314,8 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 
                 writer = new W3CDOMStreamWriter();
                 writer.writeStartElement("wsp", "Policy", Constants.URI_POLICY_NS);
-                writer.writeAttribute("wsu", PolicyConstants.WSU_NAMESPACE_URI,
-                                      PolicyConstants.WSU_ID_ATTR_NAME, polRefId.toString());
+                writer.writeAttribute("wsu", Constants.URI_WSU_NS,
+                                      Constants.ATTR_ID, polRefId.toString());
                 writer.writeStartElement("wsam", "Addressing", JAXWSAConstants.NS_WSAM);
                 if (!addressing.required()) {
                     writer.writeAttribute("wsp", Constants.URI_POLICY_NS,

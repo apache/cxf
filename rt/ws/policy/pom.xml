@@ -75,35 +75,7 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- Test stuff -->
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-local</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
 
-
-
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-testutils</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -153,6 +125,22 @@
                             <goal>xsdtojava</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>generate-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>xsdtojava-tests</goal>
+                        </goals>
+                        <configuration>
+                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
+                            <xsdOptions>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/test/resources/schemas/foo.xsd</xsd>
+                                </xsdOption>
+                            </xsdOptions>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
             <plugin>

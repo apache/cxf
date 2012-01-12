@@ -69,6 +69,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
+import org.apache.cxf.transport.Assertor;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
@@ -84,7 +85,6 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyEngine;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.policy.spring;
+package org.apache.cxf.jaxws.ws;
 
 import java.util.List;
 
@@ -77,7 +77,7 @@ public class PolicyFeatureTest extends Assert {
 
     @Test
     public void testServerFactoryWith2007Xml() {
-        bus = new SpringBusFactory().createBus("/org/apache/cxf/ws/policy/spring/server.xml");
+        bus = new SpringBusFactory().createBus("/org/apache/cxf/jaxws/ws/server.xml");
         
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new GreeterImpl());
@@ -107,7 +107,7 @@ public class PolicyFeatureTest extends Assert {
     @Test
     public void testServerFactoryWith2004Xml() {
         bus = 
-            new SpringBusFactory().createBus("/org/apache/cxf/ws/policy/spring/server.xml");
+            new SpringBusFactory().createBus("/org/apache/cxf/jaxws/ws/server.xml");
         
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new GreeterImpl());
@@ -136,7 +136,7 @@ public class PolicyFeatureTest extends Assert {
     @Test
     public void testPolicyReference() {
         bus = 
-            new SpringBusFactory().createBus("/org/apache/cxf/ws/policy/spring/server.xml");
+            new SpringBusFactory().createBus("/org/apache/cxf/jaxws/ws/server.xml");
         
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new GreeterImpl());

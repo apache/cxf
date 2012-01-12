@@ -155,9 +155,6 @@
                                         <deleteDir>${basedir}/target/generated/src/test/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
                                 </xsdOption>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/test/resources/schemas/foo.xsd</xsd>
-                                </xsdOption>
                             </xsdOptions>
                         </configuration>
                     </execution>
