@@ -2124,6 +2124,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
     //org.apache.type_test.types3.OccuringChoice1;
     
+    @SuppressWarnings("rawtypes")
     protected boolean equals(OccuringChoice1 x, OccuringChoice1 y) {
         List<Comparable> xList = x.getVarFloatOrVarInt();
         List<Comparable> yList = y.getVarFloatOrVarInt();
@@ -2155,6 +2156,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         OccuringChoice1 x = new OccuringChoice1();
+        @SuppressWarnings("rawtypes")
         List<Comparable> theList = x.getVarFloatOrVarInt();
         theList.add(0);
         theList.add(new Float(1.14f));
