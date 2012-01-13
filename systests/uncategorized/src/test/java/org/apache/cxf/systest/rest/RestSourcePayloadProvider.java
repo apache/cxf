@@ -64,7 +64,7 @@ public class RestSourcePayloadProvider implements Provider<DOMSource> {
             (Map<String, List<String>>)mc.get(MessageContext.HTTP_REQUEST_HEADERS);*/
         
         Map<String, List<String>> responseHeader =
-            CastUtils.cast((Map)mc.get(MessageContext.HTTP_RESPONSE_HEADERS));
+            CastUtils.cast((Map<?, ?>)mc.get(MessageContext.HTTP_RESPONSE_HEADERS));
         if (responseHeader == null) {
             responseHeader = new HashMap<String, List<String>>();
             mc.put(MessageContext.HTTP_RESPONSE_HEADERS, responseHeader);

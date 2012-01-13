@@ -55,7 +55,7 @@ public class JavaToWSDLProcessor implements Processor {
     private static final String DEFAULT_ADDRESS = "http://localhost:9090/hello";
     private static final String JAVA_CLASS_PATH = "java.class.path";
     private ToolContext context;
-    private final List<AbstractGenerator> generators = new ArrayList<AbstractGenerator>();
+    private final List<AbstractGenerator<?>> generators = new ArrayList<AbstractGenerator<?>>();
     
     private void customize(ServiceInfo service) {
         if (context.containsKey(ToolConstants.CFG_TNS)) {
@@ -123,32 +123,32 @@ public class JavaToWSDLProcessor implements Processor {
         LOG.log(Level.FINE, "RESUME_CP", oldClassPath);
     }
 
-    private AbstractGenerator getWrapperBeanGenerator() {
+    private AbstractGenerator<?> getWrapperBeanGenerator() {
         WrapperBeanGenerator generator = new WrapperBeanGenerator();
         generator.setOutputBase(getSourceDir());
         generator.setCompileToDir(getClassesDir());
         return generator;
     }
 
-    private AbstractGenerator getFaultBeanGenerator() {
+    private AbstractGenerator<?> getFaultBeanGenerator() {
         FaultBeanGenerator generator = new FaultBeanGenerator();
         generator.setOutputBase(getSourceDir());
         generator.setCompileToDir(getClassesDir());
         return generator;
     }
 
-    private AbstractGenerator getWSDLGenerator(final File wsdlFile) {
+    private AbstractGenerator<?> getWSDLGenerator(final File wsdlFile) {
         WSDLGeneratorFactory factory = new WSDLGeneratorFactory();
         factory.setWSDLVersion(getWSDLVersion());
 
-        AbstractGenerator generator = factory.newGenerator();
+        AbstractGenerator<?> generator = factory.newGenerator();
         generator.setAllowImports(context.containsKey(ToolConstants.CFG_CREATE_XSD_IMPORTS));
         generator.setOutputBase(wsdlFile);
         return generator;
     }
 
     public void generate(ServiceInfo service, File output) throws ToolException {
-        for (AbstractGenerator generator : generators) {
+        for (AbstractGenerator<?> generator : generators) {
             generator.setServiceModel(service);
             generator.setBus(getBus());
             generator.generate(output);

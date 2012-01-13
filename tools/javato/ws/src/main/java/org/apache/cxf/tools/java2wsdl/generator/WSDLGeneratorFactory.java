@@ -40,10 +40,10 @@ public final class WSDLGeneratorFactory {
     }
 
     public AbstractGenerator newGenerator() {
-        AbstractGenerator generator = null;
+        AbstractGenerator<?> generator = null;
         String clzName = getGeneratorClassName();
         try {
-            generator = (AbstractGenerator) Class.forName(clzName).newInstance();
+            generator = (AbstractGenerator<?>) Class.forName(clzName).newInstance();
         } catch (Exception e) {
             throw new ToolException("Can not find the Generator for: " + clzName, e);
         }

@@ -24,7 +24,7 @@ import javax.jws.WebService;
             endpointInterface = "org.apache.cxf.tools.fortest.cxf774.ListTest",
             targetNamespace = "http://cxf.apache/")
 public class ListTestImpl implements ListTest {
-    public List sayHi(String hi) {
+    public List<?> sayHi(String hi) {
         return null;
     }
 

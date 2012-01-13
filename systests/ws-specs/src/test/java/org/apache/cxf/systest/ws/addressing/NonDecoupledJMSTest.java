@@ -88,6 +88,7 @@ public class NonDecoupledJMSTest extends MAPTestBase {
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
                 targetNamespace = "http://apache.org/hello_world_soap_http")
     public static class GreeterImpl extends org.apache.cxf.systest.ws.addressing.AbstractGreeterImpl {
+
         
     }
 }

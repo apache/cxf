@@ -120,7 +120,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
             bp = (BindingProvider)handler;
             Map<String, Object> responseContext = bp.getResponseContext();
             OutofBandHeader hdrToTest = null;
-            List oobHdr = (List) responseContext.get(Header.HEADER_LIST);
+            List<?> oobHdr = (List<?>) responseContext.get(Header.HEADER_LIST);
             if (oobHdr == null) {
                 fail("Should have got List of out-of-band headers ..");
             }
@@ -129,7 +129,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
                     oobHdr.size() == 1);
          
             if (oobHdr != null & oobHdr instanceof List) {
-                Iterator iter = oobHdr.iterator();
+                Iterator<?> iter = oobHdr.iterator();
                 while (iter.hasNext()) {
                     Object hdr = iter.next();
                     if (hdr instanceof Header) {
@@ -137,9 +137,10 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
                         if (hdr1.getObject() instanceof Node) {
                             //System.out.println("Node conains : " + hdr1.getObject().toString());
                             try {
-                                JAXBElement job = (JAXBElement) JAXBContext.newInstance(ObjectFactory.class)
-                                    .createUnmarshaller()
-                                    .unmarshal((Node) hdr1.getObject());
+                                JAXBElement<?> job 
+                                    = (JAXBElement<?>)JAXBContext.newInstance(ObjectFactory.class)
+                                        .createUnmarshaller()
+                                        .unmarshal((Node) hdr1.getObject());
                                 hdrToTest = (OutofBandHeader) job.getValue();
 //                                 System.out.println("oob-hdr contains : \nname = " 
 //                                       + hdrToTest.getName() 

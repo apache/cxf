@@ -22,7 +22,6 @@ package org.apache.cxf.tools.misc.processor;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.wsdl.Binding;
@@ -42,6 +41,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.misc.processor.address.Address;
@@ -52,12 +52,12 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
 
     private static final String NEW_FILE_NAME_MODIFIER = "-xmlbinding";
 
-    private Map services;
+    private Map<QName, Service> services;
     private Service service;
-    private Map ports;
+    private Map<String, Port> ports;
     private Port port;
 
-    private Map portTypes;
+    private Map<QName, PortType> portTypes;
     private PortType portType;
     private Binding binding;
 
@@ -85,16 +85,14 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isServiceExisted() {
-        services = wsdlDefinition.getServices();
+        services = CastUtils.cast(wsdlDefinition.getServices());
         if (services == null) {
             return false;
         }
-        Iterator it = services.keySet().iterator();
-        while (it.hasNext()) {
-            QName serviceQName = (QName)it.next();
+        for (QName serviceQName : services.keySet()) {
             String serviceName = serviceQName.getLocalPart();
             if (serviceName.equals(env.get(ToolConstants.CFG_SERVICE))) {
-                service = (Service)services.get(serviceQName);
+                service = services.get(serviceQName);
                 break;
             }
         }
@@ -102,15 +100,13 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isPortExisted() {
-        ports = service.getPorts();
+        ports = CastUtils.cast(service.getPorts());
         if (ports == null) {
             return false;
         }
-        Iterator it = ports.keySet().iterator();
-        while (it.hasNext()) {
-            String portName = (String)it.next();
+        for (String portName : ports.keySet()) {
             if (portName.equals(env.get(ToolConstants.CFG_PORT))) {
-                port = (Port)ports.get(portName);
+                port = ports.get(portName);
                 break;
             }
         }
@@ -118,16 +114,14 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isPortTypeExisted() {
-        portTypes = wsdlDefinition.getPortTypes();
+        portTypes = CastUtils.cast(wsdlDefinition.getPortTypes());
         if (portTypes == null) {
             return false;
         }
-        Iterator it = portTypes.keySet().iterator();
-        while (it.hasNext()) {
-            QName existPortQName = (QName)it.next();
+        for (QName existPortQName: portTypes.keySet()) {
             String existPortName = existPortQName.getLocalPart();
             if (existPortName.equals(env.get(ToolConstants.CFG_PORTTYPE))) {
-                portType = (PortType)portTypes.get(existPortQName);
+                portType = portTypes.get(existPortQName);
                 break;
             }
         }
@@ -135,17 +129,15 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isBindingExisted() {
-        Map bindings = wsdlDefinition.getBindings();
+        Map<QName, Binding> bindings = CastUtils.cast(wsdlDefinition.getBindings());
         if (bindings == null) {
             return false;
         }
-        Iterator it = bindings.keySet().iterator();
-        while (it.hasNext()) {
-            QName existBindingQName = (QName)it.next();
+        for (QName existBindingQName : bindings.keySet()) {
             String existBindingName = existBindingQName.getLocalPart();
             String bindingName = (String)env.get(ToolConstants.CFG_BINDING);
             if (bindingName.equals(existBindingName)) {
-                binding = (Binding)bindings.get(existBindingQName);
+                binding = bindings.get(existBindingQName);
             }
         }
         return (binding == null) ? false : true;

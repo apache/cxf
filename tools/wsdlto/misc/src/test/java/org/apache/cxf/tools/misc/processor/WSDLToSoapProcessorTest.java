@@ -77,10 +77,8 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (binding == null) {
                 fail("Element wsdl:binding Greeter_Binding Missed!");
             }
-            Iterator it = binding.getExtensibilityElements().iterator();
             boolean found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : binding.getExtensibilityElements()) {
                 SoapBinding soapBinding = SOAPBindingUtil.getSoapBinding(obj);
                 if (soapBinding != null
                     && soapBinding.getStyle().equalsIgnoreCase("document")) {
@@ -95,10 +93,8 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (bo == null) {
                 fail("Element <wsdl:operation name=\"pingMe\"> Missed!");
             }
-            it = bo.getExtensibilityElements().iterator();
             found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bo.getExtensibilityElements()) {
                 SoapOperation soapOperation = SOAPBindingUtil.getSoapOperation(obj);
                 if (soapOperation != null
                     && soapOperation.getStyle().equalsIgnoreCase("document")) {
@@ -113,10 +109,8 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (fault == null) {
                 fail("Element <wsdl:fault name=\"pingMeFault\"> Missed!");
             }
-            it = fault.getExtensibilityElements().iterator();
             found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : fault.getExtensibilityElements()) {
                 if (SOAPBindingUtil.isSOAPFault(obj)) {
                     found = true;
                     break;
@@ -157,10 +151,8 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (binding == null) {
                 fail("Element wsdl:binding Greeter_SOAPBinding_NewBinding Missed!");
             }
-            Iterator it = binding.getExtensibilityElements().iterator();
             boolean found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : binding.getExtensibilityElements()) {
                 SoapBinding soapBinding = SOAPBindingUtil.getSoapBinding(obj);
                 if (soapBinding != null && soapBinding.getStyle().equalsIgnoreCase("rpc")) {
                     found = true;
@@ -175,10 +167,8 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (bo == null) {
                 fail("Element <wsdl:operation name=\"sendReceiveData\"> Missed!");
             }
-            it = bo.getExtensibilityElements().iterator();
             found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bo.getExtensibilityElements()) {
                 SoapOperation soapOperation = SOAPBindingUtil.getSoapOperation(obj);
                 if (soapOperation != null && soapOperation.getStyle().equalsIgnoreCase("rpc")) {
                     found = true;
@@ -189,10 +179,8 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
                 fail("Element soap:operation style=rpc Missed!");
             }
             BindingInput bi = bo.getBindingInput();
-            it = bi.getExtensibilityElements().iterator();
             found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bi.getExtensibilityElements()) {
                 SoapBody soapBody = SOAPBindingUtil.getSoapBody(obj);
                 if (soapBody != null && soapBody.getUse().equalsIgnoreCase("literal")) {
                     found = true;
@@ -233,10 +221,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (binding == null) {
                 fail("Element wsdl:binding Greeter_SOAPBinding_NewBinding Missed!");
             }
-            Iterator it = binding.getExtensibilityElements().iterator();
-
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : binding.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPBinding(obj));
                 assertTrue(obj instanceof SOAP12Binding);
                 SoapBinding soapBinding = SOAPBindingUtil.getSoapBinding(obj);
@@ -250,10 +235,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (bo == null) {
                 fail("Element <wsdl:operation name=\"sayHi\"> Missed!");
             }
-            it = bo.getExtensibilityElements().iterator();
-
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bo.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPOperation(obj));
                 assertTrue(obj instanceof SOAP12Operation);
                 SoapOperation soapOperation = SOAPBindingUtil.getSoapOperation(obj);
@@ -261,9 +243,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
                 assertTrue("document".equalsIgnoreCase(soapOperation.getStyle()));
             }
             BindingInput bi = bo.getBindingInput();
-            it = bi.getExtensibilityElements().iterator();
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bi.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPBody(obj));
                 assertTrue(obj instanceof SOAP12Body);
                 SoapBody soapBody = SOAPBindingUtil.getSoapBody(obj);
@@ -299,10 +279,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (binding == null) {
                 fail("Element wsdl:binding Greeter_SOAPBinding_NewBinding Missed!");
             }
-            Iterator it = binding.getExtensibilityElements().iterator();
-
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : binding.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPBinding(obj));
                 assertTrue(obj instanceof SOAP12Binding);
                 SoapBinding soapBinding = SOAPBindingUtil.getSoapBinding(obj);
@@ -315,10 +292,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (bo == null) {
                 fail("Element <wsdl:operation name=\"sayHi\"> Missed!");
             }
-            it = bo.getExtensibilityElements().iterator();
-
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bo.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPOperation(obj));
                 assertTrue(obj instanceof SOAP12Operation);
                 SoapOperation soapOperation = SOAPBindingUtil.getSoapOperation(obj);
@@ -326,9 +300,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
                 assertTrue("document".equalsIgnoreCase(soapOperation.getStyle()));
             }
             BindingInput bi = bo.getBindingInput();
-            it = bi.getExtensibilityElements().iterator();
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bi.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPBody(obj));
                 assertTrue(obj instanceof SOAP12Body);
                 SoapBody soapBody = SOAPBindingUtil.getSoapBody(obj);
@@ -337,7 +309,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             }
             bo = binding.getBindingOperation("pingMe", null, null);
             assertNotNull(bo);
-            it = bo.getExtensibilityElements().iterator();
+            Iterator<?> it = bo.getExtensibilityElements().iterator();
             assertTrue(it != null && it.hasNext());
             assertTrue(it.next() instanceof SOAP12Operation);
 
@@ -349,7 +321,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             assertTrue(it != null && it.hasNext());
             assertTrue(it.next() instanceof SOAP12Body);
 
-            Map faults = bo.getBindingFaults();
+            Map<?, ?> faults = bo.getBindingFaults();
             assertTrue(faults != null && faults.size() == 1);
             Object bf = faults.get("pingMeFault");
             assertNotNull(bf);
@@ -409,10 +381,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (binding == null) {
                 fail("Element wsdl:binding Greeter_SOAPBinding_NewBinding Missed!");
             }
-            Iterator it = binding.getExtensibilityElements().iterator();
-
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : binding.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPBinding(obj));
                 assertTrue(obj instanceof SOAPBinding);
                 SoapBinding soapBinding = SOAPBindingUtil.getSoapBinding(obj);
@@ -426,10 +395,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
             if (bo == null) {
                 fail("Element <wsdl:operation name=\"sayHi\"> Missed!");
             }
-            it = bo.getExtensibilityElements().iterator();
-
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bo.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPOperation(obj));
                 assertTrue(obj instanceof SOAPOperation);
                 SoapOperation soapOperation = SOAPBindingUtil.getSoapOperation(obj);
@@ -437,9 +403,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
                 assertTrue("document".equalsIgnoreCase(soapOperation.getStyle()));
             }
             BindingInput bi = bo.getBindingInput();
-            it = bi.getExtensibilityElements().iterator();
-            while (it.hasNext()) {
-                Object obj = it.next();
+            for (Object obj : bi.getExtensibilityElements()) {
                 assertTrue(SOAPBindingUtil.isSOAPBody(obj));
                 assertTrue(obj instanceof SOAPBody);
                 SoapBody soapBody = SOAPBindingUtil.getSoapBody(obj);

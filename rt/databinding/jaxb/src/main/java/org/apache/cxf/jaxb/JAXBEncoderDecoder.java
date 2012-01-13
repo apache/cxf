@@ -584,7 +584,6 @@ public final class JAXBEncoderDecoder {
     }
 
 
-    @SuppressWarnings("unchecked")
     public static Object unmarshall(Unmarshaller u, 
                                     Object source, 
                                     MessagePartInfo part,

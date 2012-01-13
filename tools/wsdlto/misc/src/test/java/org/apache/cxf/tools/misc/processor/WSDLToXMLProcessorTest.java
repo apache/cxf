@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.misc.processor;
 
 import java.io.File;
-import java.util.Iterator;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -67,10 +66,8 @@ public class WSDLToXMLProcessorTest extends ProcessorTestBase {
         if (binding == null) {
             fail("Element wsdl:binding Greeter_XMLBinding Missed!");
         }
-        Iterator it = binding.getExtensibilityElements().iterator();
         boolean found = false;
-        while (it.hasNext()) {
-            Object obj = it.next();
+        for (Object obj : binding.getExtensibilityElements()) {
             if (obj instanceof XMLFormatBinding) {
                 found = true;
                 break;
@@ -83,10 +80,8 @@ public class WSDLToXMLProcessorTest extends ProcessorTestBase {
         if (bo == null) {
             fail("Element <wsdl:operation name=\"sayHi\"> Missed!");
         }
-        it = bo.getBindingInput().getExtensibilityElements().iterator();
         found = false;
-        while (it.hasNext()) {
-            Object obj = it.next();
+        for (Object obj :  bo.getBindingInput().getExtensibilityElements()) {
             if (obj instanceof XMLBindingMessageFormat
                 && ((XMLBindingMessageFormat)obj).getRootNode().getLocalPart().equals("sayHi")) {
                 found = true;
@@ -104,10 +99,8 @@ public class WSDLToXMLProcessorTest extends ProcessorTestBase {
         if (service == null) {
             fail("Element wsdl:service Greeter_XMLService Missed!");
         }
-        it = service.getPort("Greeter_XMLPort").getExtensibilityElements().iterator();
         found = false;
-        while (it.hasNext()) {
-            Object obj = it.next();
+        for (Object obj : service.getPort("Greeter_XMLPort").getExtensibilityElements()) {
             if (obj instanceof HTTPAddress) {
                 HTTPAddress xmlHttpAddress = (HTTPAddress)obj;
                 if (xmlHttpAddress.getLocationURI() != null) {

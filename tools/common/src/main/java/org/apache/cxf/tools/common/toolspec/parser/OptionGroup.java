@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.common.toolspec.parser;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +35,7 @@ public class OptionGroup implements TokenConsumer {
     private static final Logger LOG = LogUtils.getL7dLogger(OptionGroup.class);
     private final Element element;
 
-    private final List<Object> options = new ArrayList<Object>();
+    private final List<Option> options = new ArrayList<Option>();
 
     public OptionGroup(Element el) {
         this.element = el;
@@ -59,9 +58,7 @@ public class OptionGroup implements TokenConsumer {
         // string:
         boolean accepted = false;
 
-        for (Iterator it = options.iterator(); it.hasNext();) {
-            Option option = (Option)it.next();
-
+        for (Option option : options) {
             if (option.accept(args, result, errors)) {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Option " + option + " accepted the token");
@@ -82,8 +79,8 @@ public class OptionGroup implements TokenConsumer {
 
     public boolean isSatisfied(ErrorVisitor errors) {
         // Return conjunction of all isSatisfied results from every option
-        for (Iterator it = options.iterator(); it.hasNext();) {
-            if (!((Option)it.next()).isSatisfied(errors)) {
+        for (Option option : options) {
+            if (!option.isSatisfied(errors)) {
                 return false;
             }
         }

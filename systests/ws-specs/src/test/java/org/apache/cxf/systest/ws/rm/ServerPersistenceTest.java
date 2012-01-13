@@ -266,7 +266,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     }
     
     @SuppressWarnings("unchecked")
-    <T> Response<T>[] cast(Response[] val) {
+    <T> Response<T>[] cast(Response<?>[] val) {
         return (Response<T>[])val;
     }
 

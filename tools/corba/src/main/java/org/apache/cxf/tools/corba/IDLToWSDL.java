@@ -50,7 +50,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
         super(TOOL_NAME, toolspec);
     }
 
-    private Set getArrayKeys() {
+    private Set<String> getArrayKeys() {
         Set<String> arrayKeys = new HashSet<String>();
         arrayKeys.add(ToolCorbaConstants.CFG_INCLUDEDIR);
         return arrayKeys;

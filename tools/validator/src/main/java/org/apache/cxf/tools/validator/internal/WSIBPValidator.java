@@ -144,7 +144,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
         int inmessagePartsCount = partsList.size();
         SoapBody soapBody = SOAPBindingUtil.getBindingInputSOAPBody(bop);
         if (soapBody != null) {
-            List parts = soapBody.getParts();
+            List<?> parts = soapBody.getParts();
             int boundPartSize = parts == null ? inmessagePartsCount : parts.size();
             SoapHeader soapHeader = SOAPBindingUtil.getBindingInputSOAPHeader(bop);
             boundPartSize = soapHeader != null
@@ -154,7 +154,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                 ? boundPartSize - 1 : boundPartSize;
 
             if (parts != null) {
-                Iterator partsIte = parts.iterator();
+                Iterator<?> partsIte = parts.iterator();
                 while (partsIte.hasNext()) {
                     String partName = (String)partsIte.next();
                     boolean isDefined = false;
@@ -194,7 +194,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
         int outmessagePartsCount = wsdlHelper.getOutMessageParts(operation).size();
         SoapBody soapBody = SOAPBindingUtil.getBindingOutputSOAPBody(bop);
         if (soapBody != null) {
-            List parts = soapBody.getParts();
+            List<?> parts = soapBody.getParts();
             int boundPartSize = parts == null ? outmessagePartsCount : parts.size();
             SoapHeader soapHeader = SOAPBindingUtil.getBindingOutputSOAPHeader(bop);
             boundPartSize = soapHeader != null
@@ -203,7 +203,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                     .getQName())
                 ? boundPartSize - 1 : boundPartSize;
             if (parts != null) {
-                Iterator partsIte = parts.iterator();
+                Iterator<?> partsIte = parts.iterator();
                 while (partsIte.hasNext()) {
                     String partName = (String)partsIte.next();
                     boolean isDefined = false;
@@ -240,7 +240,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
     public boolean checkBinding() {
         for (PortType portType : wsdlHelper.getPortTypes(def)) {
-            Iterator ite = portType.getOperations().iterator();
+            Iterator<?> ite = portType.getOperations().iterator();
             while (ite.hasNext()) {
                 Operation operation = (Operation)ite.next();
                 if (isOverloading(operation.getName())) {
@@ -293,8 +293,8 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
     public boolean checkR2203And2204() {
 
-        for (Iterator ite = def.getBindings().values().iterator(); ite.hasNext();) {
-            Binding binding = (Binding)ite.next();
+        Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
+        for (Binding binding: bindings) {
 
             String style = SOAPBindingUtil.getCanonicalBindingStyle(binding);
             
@@ -304,13 +304,13 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
             //
 
-            for (Iterator ite2 = binding.getPortType().getOperations().iterator(); ite2.hasNext();) {
+            for (Iterator<?> ite2 = binding.getPortType().getOperations().iterator(); ite2.hasNext();) {
                 Operation operation = (Operation)ite2.next();
                 BindingOperation bop = wsdlHelper.getBindingOperation(def, operation.getName());
                 if (operation.getInput() != null && operation.getInput().getMessage() != null) {
                     Message inMess = operation.getInput().getMessage();
 
-                    for (Iterator ite3 = inMess.getParts().values().iterator(); ite3.hasNext();) {
+                    for (Iterator<?> ite3 = inMess.getParts().values().iterator(); ite3.hasNext();) {
                         Part p = (Part)ite3.next();
                         if (SOAPBinding.Style.RPC.name().equalsIgnoreCase(style) && p.getTypeName() == null
                             && !isHeaderPart(bop, p)) {
@@ -334,7 +334,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                 }
                 if (operation.getOutput() != null && operation.getOutput().getMessage() != null) {
                     Message outMess = operation.getOutput().getMessage();
-                    for (Iterator ite3 = outMess.getParts().values().iterator(); ite3.hasNext();) {
+                    for (Iterator<?> ite3 = outMess.getParts().values().iterator(); ite3.hasNext();) {
                         Part p = (Part)ite3.next();
                         if (style.equalsIgnoreCase(SOAPBinding.Style.RPC.name()) && p.getTypeName() == null
                             &&  !isHeaderPart(bop, p)) {
@@ -364,8 +364,8 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
     // TODO: Should also check SoapHeader/SoapHeaderFault
     public boolean checkR2205() {
-        for (Iterator ite = def.getBindings().values().iterator(); ite.hasNext();) {
-            Binding binding = (Binding)ite.next();
+        Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
+        for (Binding binding: bindings) {
 
             if (!SOAPBindingUtil.isSOAPBinding(binding)) {
                 System.err.println("WSIBP Validator found <"
@@ -373,7 +373,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                 continue;
             }
 
-            for (Iterator ite2 = binding.getPortType().getOperations().iterator(); ite2.hasNext();) {
+            for (Iterator<?> ite2 = binding.getPortType().getOperations().iterator(); ite2.hasNext();) {
                 Operation operation = (Operation)ite2.next();
                 Collection<Fault> faults = CastUtils.cast(operation.getFaults().values());
                 if (CollectionUtils.isEmpty(faults)) {
@@ -398,10 +398,8 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
     }
 
     public boolean checkR2705() {
-        Iterator ite = def.getBindings().values().iterator();
-        while (ite.hasNext()) {
-            Object obj = ite.next();
-            Binding binding = (Binding)obj;
+        Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
+        for (Binding binding: bindings) {
             if (SOAPBindingUtil.isMixedStyle(binding)) {
                 addErrorMessage("Mixed style, invalid WSDL");
                 return false;

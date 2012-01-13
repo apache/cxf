@@ -74,7 +74,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         InterceptorChain chain = message.getInterceptorChain();
         ListIterator<Interceptor<? extends Message>> it = chain.getIterator();
         while (it.hasNext()) {
-            PhaseInterceptor<?> pi = (PhaseInterceptor)it.next();
+            PhaseInterceptor<?> pi = (PhaseInterceptor<? extends Message>)it.next();
             if (MessageSenderInterceptor.class.getName().equals(pi.getId())) {
                 chain.remove(pi);
                 LOG.fine("Removed MessageSenderInterceptor from interceptor chain.");

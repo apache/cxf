@@ -21,7 +21,7 @@ package org.apache.cxf.tools.misc.processor;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +42,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.extensions.soap.SoapBinding;
@@ -55,7 +56,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
 
     private static final String NEW_FILE_NAME_MODIFIER = "-soapbinding";
 
-    private Map portTypes;
+    private Map<QName, PortType> portTypes;
     private PortType portType;
     private Binding binding;
 
@@ -83,14 +84,13 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
             throw new ToolException(msg);
         }
         if (WSDLConstants.RPC.equalsIgnoreCase((String)env.get(ToolConstants.CFG_STYLE))) {
-            Iterator it = portType.getOperations().iterator();
-            while (it.hasNext()) {
-                Operation op = (Operation)it.next();
+            Collection<Operation> ops = CastUtils.cast(portType.getOperations());
+                
+            for (Operation op : ops) {
                 Input input = op.getInput();
                 if (input != null && input.getMessage() != null) {
-                    Iterator itParts = input.getMessage().getParts().values().iterator();
-                    while (itParts.hasNext()) {
-                        Part part = (Part)itParts.next();
+                    Collection<Part> parts = CastUtils.cast(input.getMessage().getParts().values());
+                    for (Part part: parts) {
                         if (part.getTypeName() == null || "".equals(part.getTypeName().toString())) {
                             Message msg = new Message("RPC_PART_ILLEGAL", LOG, new Object[] {part.getName()});
                             throw new ToolException(msg);
@@ -99,9 +99,8 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
                 }
                 Output output = op.getOutput();
                 if (output != null && output.getMessage() != null) {
-                    Iterator itParts = output.getMessage().getParts().values().iterator();
-                    while (itParts.hasNext()) {
-                        Part part = (Part)itParts.next();
+                    Collection<Part> parts = CastUtils.cast(output.getMessage().getParts().values());
+                    for (Part part: parts) {
                         if (part.getTypeName() == null || "".equals(part.getTypeName().toString())) {
                             Message msg = new Message("RPC_PART_ILLEGAL", LOG, new Object[] {part.getName()});
                             throw new ToolException(msg);
@@ -113,16 +112,14 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isPortTypeExisted() {
-        portTypes = wsdlDefinition.getPortTypes();
+        portTypes = CastUtils.cast(wsdlDefinition.getPortTypes());
         if (portTypes == null) {
             return false;
         }
-        Iterator it = portTypes.keySet().iterator();
-        while (it.hasNext()) {
-            QName existPortQName = (QName)it.next();
+        for (QName existPortQName : portTypes.keySet()) {
             String existPortName = existPortQName.getLocalPart();
             if (existPortName.equals(env.get(ToolConstants.CFG_PORTTYPE))) {
-                portType = (PortType)portTypes.get(existPortQName);
+                portType = portTypes.get(existPortQName);
                 break;
             }
         }
@@ -130,17 +127,15 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
     }
 
     private boolean isBindingExisted() {
-        Map bindings = wsdlDefinition.getBindings();
+        Map<QName, Binding> bindings = CastUtils.cast(wsdlDefinition.getBindings());
         if (bindings == null) {
             return false;
         }
-        Iterator it = bindings.keySet().iterator();
-        while (it.hasNext()) {
-            QName existBindingQName = (QName)it.next();
+        for (QName existBindingQName : bindings.keySet()) {
             String existBindingName = existBindingQName.getLocalPart();
             String bindingName = (String)env.get(ToolConstants.CFG_BINDING);
             if (bindingName.equals(existBindingName)) {
-                binding = (Binding)bindings.get(existBindingQName);
+                binding = bindings.get(existBindingQName);
             }
         }
         return (binding == null) ? false : true;
@@ -292,11 +287,8 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
     }
 
     private void addSoapFaults(Operation op, BindingOperation bindingOperation) throws ToolException {
-        Map faults = op.getFaults();
-        Iterator it = faults.keySet().iterator();
-        while (it.hasNext()) {
-            String key = (String)it.next();
-            Fault fault = (Fault)faults.get(key);
+        Map<String, Fault> faults = CastUtils.cast(op.getFaults());
+        for (Fault fault : faults.values()) {
             BindingFault bf = wsdlDefinition.createBindingFault();
             bf.setName(fault.getName());
             setSoapFaultExtElement(bf);

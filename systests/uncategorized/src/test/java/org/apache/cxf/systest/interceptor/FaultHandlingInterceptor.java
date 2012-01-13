@@ -31,7 +31,7 @@ import org.apache.cxf.phase.Phase;
 /**
  * 
  */
-public class FaultHandlingInterceptor extends AbstractPhaseInterceptor {
+public class FaultHandlingInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public FaultHandlingInterceptor() {
         super(Phase.USER_LOGICAL);

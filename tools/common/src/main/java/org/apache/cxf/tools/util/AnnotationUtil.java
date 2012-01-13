@@ -73,7 +73,7 @@ public final class AnnotationUtil {
     }
 
     public static synchronized Class loadClass(String className, ClassLoader parent) {
-        Class clazz = null;
+        Class<?> clazz = null;
         URL[] urls = URIParserUtil.pathToURLs(getClassPath());
         URLClassLoader classLoader = new URLClassLoader(urls, parent);
         try {

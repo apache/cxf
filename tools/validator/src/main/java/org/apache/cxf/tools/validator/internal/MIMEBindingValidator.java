@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.validator.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import javax.wsdl.extensions.mime.MIMEContent;
 import javax.wsdl.extensions.mime.MIMEMultipartRelated;
 import javax.wsdl.extensions.mime.MIMEPart;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.util.SOAPBindingUtil;
 
 public class MIMEBindingValidator
@@ -41,9 +43,8 @@ public class MIMEBindingValidator
     }
 
     public boolean isValid() {
-        Iterator itBinding = def.getBindings().keySet().iterator();
-        while (itBinding.hasNext()) {
-            Binding binding = (Binding)def.getBindings().get(itBinding.next());
+        Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
+        for (Binding binding: bindings) {
             Iterator itOperation = binding.getBindingOperations().iterator();
             while (itOperation.hasNext()) {
                 BindingOperation bindingOperation = (BindingOperation)itOperation.next();

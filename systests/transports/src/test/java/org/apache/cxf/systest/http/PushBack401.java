@@ -47,7 +47,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  *    If the password is not "password" a 401 is issued without 
  *    realm.
  */
-public class PushBack401 extends AbstractPhaseInterceptor {
+public class PushBack401 extends AbstractPhaseInterceptor<Message> {
     
     PushBack401() {
         super(Phase.RECEIVE);

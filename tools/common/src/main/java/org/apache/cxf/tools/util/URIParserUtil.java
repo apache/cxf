@@ -202,8 +202,8 @@ public final class URIParserUtil {
         return newToken.toString();
     }
 
-    private static String combine(List r, char sep) {
-        StringBuilder buf = new StringBuilder(r.get(0).toString());
+    private static String combine(List<String> r, char sep) {
+        StringBuilder buf = new StringBuilder(r.get(0));
 
         for (int i = 1; i < r.size(); i++) {
             buf.append(sep);

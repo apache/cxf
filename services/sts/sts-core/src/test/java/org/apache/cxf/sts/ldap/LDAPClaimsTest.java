@@ -33,6 +33,7 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimTypes;
@@ -186,8 +187,8 @@ public class LDAPClaimsTest {
     @org.junit.Test    
     public void testSupportedClaims() throws Exception {
 
-        @SuppressWarnings("unchecked")
-        Map<String, String> mapping = (Map)appContext.getBean("claimsToLdapAttributeMapping");
+        Map<String, String> mapping 
+            = CastUtils.cast((Map<?, ?>)appContext.getBean("claimsToLdapAttributeMapping"));
 
         LdapClaimsHandler cHandler = new LdapClaimsHandler();
         cHandler.setClaimsLdapAttributeMapping(mapping);

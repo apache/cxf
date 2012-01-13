@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -98,8 +97,7 @@ public final class VelocityGenerator {
 
         VelocityContext ctx = new VelocityContext();
 
-        for (Iterator iter = attributes.keySet().iterator(); iter.hasNext();) {
-            String key = (String)iter.next();
+        for (String key: attributes.keySet()) {
             ctx.put(key, attributes.get(key));
         }
 
