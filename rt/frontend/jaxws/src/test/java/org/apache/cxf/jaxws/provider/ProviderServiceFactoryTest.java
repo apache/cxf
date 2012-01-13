@@ -55,6 +55,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         bean.setServiceClass(HWSoapMessageProvider.class);
 
         Service service = bean.create();
+        assertTrue(service.getInvoker() instanceof JAXWSMethodInvoker);
 
         assertEquals("SOAPService", service.getName().getLocalPart());
         assertEquals("http://apache.org/hello_world_soap_http", service.getName().getNamespaceURI());
@@ -68,6 +69,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         svrFactory.setStart(false);
 
         ServerImpl server = (ServerImpl)svrFactory.create();
+        assertTrue(server.getEndpoint().getService().getInvoker() instanceof JAXWSMethodInvoker);
 
         Endpoint endpoint = server.getEndpoint();
         Binding binding = endpoint.getBinding();
