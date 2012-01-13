@@ -51,22 +51,30 @@ public abstract class AbstractGreeterImpl implements Greeter {
      */
     @Resource
     private WebServiceContext context;
-
+    private boolean quiet = false;
     
     public AbstractGreeterImpl() {
+    }
+    
+    public AbstractGreeterImpl(boolean q) {
+        quiet = q;
     }
 
 
     public String greetMe(String me) {
-        System.out.println("\n\n*** GreetMe called with: " + me + "***\n\n");
+        if (!quiet) {
+            System.out.println("\n\n*** GreetMe called with: " + me + "***\n\n");
+        }
         verifyMAPs();
         return "Hello " + me;
     }
 
     public String greetMeLater(long delay) {
-        System.out.println("\n\n*** GreetMeLater called with: " + delay
+        if (!quiet) {
+            System.out.println("\n\n*** GreetMeLater called with: " + delay
                            + " at: " + new Date().toString()
                            + "***\n\n");
+        }
         if (delay > 0) {
             try {
                 Thread.sleep(delay);
@@ -79,7 +87,9 @@ public abstract class AbstractGreeterImpl implements Greeter {
     }
 
     public void greetMeOneWay(String requestType) {   
-        System.out.println("\n\n*** GreetMeOneWay called with: " + requestType + "***\n\n");
+        if (!quiet) {
+            System.out.println("\n\n*** GreetMeOneWay called with: " + requestType + "***\n\n");
+        }
         verifyMAPs();
     }
 
