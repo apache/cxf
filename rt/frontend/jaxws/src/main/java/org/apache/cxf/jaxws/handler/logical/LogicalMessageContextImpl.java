@@ -41,19 +41,17 @@ public class LogicalMessageContextImpl extends WrappedMessageContext implements 
     
     public Object get(Object key) {
         Object o = super.get(key);
-        if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
-            || MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
-            Map mp = (Map)o;
-            if (mp != null) {
-                if (mp.isEmpty()) {
-                    return null;
-                }
-                if (!isResponse() && MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
-                    return null;
-                }
-                if (isRequestor() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
-                    return null;
-                }
+        if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
+            || MessageContext.HTTP_REQUEST_HEADERS.equals(key))
+            && o != null) {
+            if (((Map<?, ?>)o).isEmpty()) {
+                return null;
+            }
+            if (!isResponse() && MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
+                return null;
+            }
+            if (isRequestor() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+                return null;
             }
         }
         return o;

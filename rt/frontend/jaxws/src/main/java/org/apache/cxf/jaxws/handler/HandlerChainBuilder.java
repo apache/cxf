@@ -42,6 +42,7 @@ import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
+@SuppressWarnings("rawtypes")
 public class HandlerChainBuilder {
     static final Logger LOG = LogUtils.getL7dLogger(HandlerChainBuilder.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
@@ -92,12 +93,12 @@ public class HandlerChainBuilder {
      */
     public List<Handler> sortHandlers(List<Handler> handlers) {
 
-        List<LogicalHandler> logicalHandlers = new ArrayList<LogicalHandler>();
-        List<Handler> protocolHandlers = new ArrayList<Handler>();
+        List<LogicalHandler<?>> logicalHandlers = new ArrayList<LogicalHandler<?>>();
+        List<Handler<?>> protocolHandlers = new ArrayList<Handler<?>>();
 
-        for (Handler handler : handlers) {
+        for (Handler<?> handler : handlers) {
             if (handler instanceof LogicalHandler) {
-                logicalHandlers.add((LogicalHandler)handler);
+                logicalHandlers.add((LogicalHandler<?>)handler);
             } else {
                 protocolHandlers.add(handler);
             }
@@ -123,7 +124,7 @@ public class HandlerChainBuilder {
                                                                       .getValue()), true, classLoader)
                 .asSubclass(Handler.class);
 
-            Handler handler = handlerClass.newInstance();
+            Handler<?> handler = handlerClass.newInstance();
             LOG.fine("adding handler to chain: " + handler);
             configureHandler(handler, ht);
             handlerChain.add(handler);
@@ -155,7 +156,7 @@ public class HandlerChainBuilder {
         return handlerFile;
     } 
     
-    private void configureHandler(Handler handler, PortComponentHandlerType h) {
+    private void configureHandler(Handler<?> handler, PortComponentHandlerType h) {
         if (!handlerInitEnabled) {
             return;
         }
@@ -179,7 +180,7 @@ public class HandlerChainBuilder {
         }
     }
 
-    private void initializeViaInjection(Handler handler, final Map<String, String> params) {
+    private void initializeViaInjection(Handler<?> handler, final Map<String, String> params) {
         if (bus != null) {
             ResourceManager resMgr = bus.getExtension(ResourceManager.class);
             List<ResourceResolver> resolvers = resMgr.getResourceResolvers();
@@ -190,7 +191,7 @@ public class HandlerChainBuilder {
         }
     }
 
-    private void initializeViaInitMethod(Handler handler, Map<String, String> params, Method init) {
+    private void initializeViaInitMethod(Handler<?> handler, Map<String, String> params, Method init) {
         try {
             init.invoke(handler, params);
         } catch (InvocationTargetException ex) {
@@ -201,7 +202,7 @@ public class HandlerChainBuilder {
         }
     }
 
-    private Method getInitMethod(Handler handler) {
+    private Method getInitMethod(Handler<?> handler) {
         Method m = null;
         try {
             m = handler.getClass().getMethod("init", Map.class);

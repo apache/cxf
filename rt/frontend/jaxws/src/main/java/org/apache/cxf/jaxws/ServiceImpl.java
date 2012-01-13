@@ -483,6 +483,7 @@ public class ServiceImpl extends ServiceDelegate {
         client.setExecutor(executor);
         JaxWsEndpointImpl jaxwsEndpoint = (JaxWsEndpointImpl) client.getEndpoint();
         configureObject(jaxwsEndpoint);  
+        @SuppressWarnings("rawtypes")
         List<Handler> hc = jaxwsEndpoint.getJaxwsBinding().getHandlerChain();
         
         hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));
@@ -644,6 +645,7 @@ public class ServiceImpl extends ServiceDelegate {
             && clientFac.getBus() != null) {
             clientBus = clientFac.getBus();
         }
+        @SuppressWarnings("rawtypes")
         List<Handler> hc = clientFac.getHandlers();
         //CXF-3956
         hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));        

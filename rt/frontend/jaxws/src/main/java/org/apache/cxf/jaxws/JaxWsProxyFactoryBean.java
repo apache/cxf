@@ -60,6 +60,7 @@ import org.apache.cxf.service.model.ServiceInfo;
  */
 @NoJSR250Annotations
 public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
+    @SuppressWarnings("rawtypes")
     List<Handler> handlers = new ArrayList<Handler>();
     boolean loadHandlers = true;
     
@@ -84,7 +85,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
      * 
      * @param h a <code>List</code> of <code>Handler</code> objects
      */
-    public void setHandlers(List<Handler> h) {
+    public void setHandlers(@SuppressWarnings("rawtypes") List<Handler> h) {
         handlers.clear();
         handlers.addAll(h);
     }
@@ -93,6 +94,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
      *
      * @return a <code>List</code> of <code>Handler</code> objects
      */
+    @SuppressWarnings("rawtypes")
     public List<Handler> getHandlers() {
         return handlers;
     }
@@ -186,6 +188,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     private void buildHandlerChain(JaxWsClientProxy cp) {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
         JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory(); 
+        @SuppressWarnings("rawtypes")
         List<Handler> chain = new ArrayList<Handler>(handlers);
         if (loadHandlers) {
             chain.addAll(builder.buildHandlerChainFromClass(sf.getServiceClass(),
@@ -200,7 +203,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
             resourceManager = new DefaultResourceManager(resolvers); 
             resourceManager.addResourceResolver(new WebServiceContextResourceResolver());
             ResourceInjector injector = new ResourceInjector(resourceManager);
-            for (Handler h : chain) {
+            for (Handler<?> h : chain) {
                 if (Proxy.isProxyClass(h.getClass()) && getServiceClass() != null) {
                     injector.inject(h, getServiceClass());
                     injector.construct(h, getServiceClass());

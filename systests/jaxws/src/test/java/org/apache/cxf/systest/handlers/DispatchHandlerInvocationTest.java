@@ -390,10 +390,11 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertEquals("Hello tli", value.getResponseType());
     }
 
-    public void addHandlersProgrammatically(BindingProvider bp, Handler...handlers) {
+    public void addHandlersProgrammatically(BindingProvider bp, Handler<?>...handlers) {
+        @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = bp.getBinding().getHandlerChain();
         assertNotNull(handlerChain);
-        for (Handler h : handlers) {
+        for (Handler<?> h : handlers) {
             handlerChain.add(h);
         }
         bp.getBinding().setHandlerChain(handlerChain);

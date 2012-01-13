@@ -95,6 +95,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     // outputStream
     @Test
     public void testChangeSOAPBodyOutBound() throws Exception {
+        @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<Handler>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
@@ -189,6 +190,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
     @Test
     public void testChangeSOAPHeaderInBound() throws Exception {
+        @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<Handler>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
@@ -286,6 +288,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
     @Test
     public void testChangeSOAPHeaderOutBound() throws Exception {
+        @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<Handler>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
@@ -386,6 +389,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
     @Test
     public void testGetSOAPMessageInBound() throws Exception {
+        @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<Handler>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
@@ -444,6 +448,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
     @Test
     public void testGetUnderstoodHeadersReturnsNull() {
+        @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<Handler>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {

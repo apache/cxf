@@ -44,6 +44,7 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
     public void testFindHandlerChainAnnotation() {
         HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
         AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
+        @SuppressWarnings("rawtypes")
         List<Handler> handlers = chainBuilder
             .buildHandlerChainFromClass(handlerTestImpl.getClass(), 
                                         null, 
@@ -69,6 +70,7 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         QName portQName = new QName("namespacedoesntsupportyet", "SoapPort1");
         QName serviceQName = new QName("namespacedoesntsupportyet", "SoapService1");
         String bindingID = "http://schemas.xmlsoap.org/wsdl/soap/http";
+        @SuppressWarnings("rawtypes")
         List<Handler> handlers = chainBuilder
             .buildHandlerChainFromClass(handlerTestImpl.getClass(), portQName, serviceQName, bindingID);
         assertNotNull(handlers);
@@ -82,6 +84,7 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         QName portQName = new QName("namespacedoesntsupportyet", "SoapPortUnknown");
         QName serviceQName = new QName("namespacedoesntsupportyet", "SoapServiceUnknown");
         String bindingID = "BindingUnknow";
+        @SuppressWarnings("rawtypes")
         List<Handler> handlers = chainBuilder
             .buildHandlerChainFromClass(handlerTestImpl.getClass(), portQName, serviceQName, bindingID);
         assertNotNull(handlers);
@@ -95,6 +98,7 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         QName portQName = new QName("http://apache.org/handler_test", "SoapPortWildcard");
         QName serviceQName = new QName("http://apache.org/handler_test", "SoapServiceWildcard");
         String bindingID = "BindingUnknow";
+        @SuppressWarnings("rawtypes")
         List<Handler> handlers = chainBuilder
             .buildHandlerChainFromClass(handlerTestImpl.getClass(), portQName, serviceQName, bindingID);
         assertNotNull(handlers);

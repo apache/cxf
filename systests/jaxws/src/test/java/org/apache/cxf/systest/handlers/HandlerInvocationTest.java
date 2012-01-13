@@ -134,6 +134,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         
         BindingProvider bp1 = (BindingProvider)handlerTest1;
         Binding binding1 = bp1.getBinding();
+        @SuppressWarnings("rawtypes")
         List<Handler> port1HandlerChain = binding1.getHandlerChain();
         assertEquals(1, port1HandlerChain.size());
     }
@@ -1205,10 +1206,11 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
     }
 
-    void addHandlersToChain(BindingProvider bp, Handler... handlers) {
+    void addHandlersToChain(BindingProvider bp, Handler<?>... handlers) {
+        @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = bp.getBinding().getHandlerChain();
         assertNotNull(handlerChain);
-        for (Handler h : handlers) {
+        for (Handler<?> h : handlers) {
             handlerChain.add(h);
         }
         bp.getBinding().setHandlerChain(handlerChain);
@@ -1230,15 +1232,17 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     }
 
     public class MyHandlerResolver implements HandlerResolver {
+        @SuppressWarnings("rawtypes")
         List<Handler> chain = new ArrayList<Handler>();
         String bindingID;
 
-        public MyHandlerResolver(Handler... handlers) {
-            for (Handler h : handlers) {
+        public MyHandlerResolver(Handler<?>... handlers) {
+            for (Handler<?> h : handlers) {
                 chain.add(h);
             }
         }
 
+        @SuppressWarnings("rawtypes")
         public List<Handler> getHandlerChain(PortInfo portInfo) {
             bindingID = portInfo.getBindingID();
             return chain;
