@@ -29,11 +29,13 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaAll;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
 import org.apache.ws.commons.schema.XmlSchemaAnyAttribute;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaAttributeOrGroupRef;
+import org.apache.ws.commons.schema.XmlSchemaChoice;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaContent;
@@ -64,6 +66,8 @@ public final class XmlSchemaUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSchemaUtils.class);
     private static final XmlSchemaSequence EMPTY_SEQUENCE = new XmlSchemaSequence();
+    private static final XmlSchemaChoice EMPTY_CHOICE = new XmlSchemaChoice();
+    private static final XmlSchemaAll EMPTY_ALL = new XmlSchemaAll();
 
     private XmlSchemaUtils() {
     }
@@ -496,7 +500,42 @@ public final class XmlSchemaUtils {
 
         return sequence;
     }
+    public static XmlSchemaChoice getChoice(XmlSchemaComplexType type) {
+        XmlSchemaParticle particle = type.getParticle();
+        XmlSchemaChoice choice = null;
 
+        if (particle == null) {
+            // the code that uses this wants to iterate. An empty one is more useful than
+            // a null pointer, and certainly an exception.
+            return EMPTY_CHOICE;
+        }
+
+        try {
+            choice = (XmlSchemaChoice) particle;
+        } catch (ClassCastException cce) {
+            unsupportedConstruct("NON_CHOICE_PARTICLE", type);
+        }
+
+        return choice;
+    }
+    public static XmlSchemaAll getAll(XmlSchemaComplexType type) {
+        XmlSchemaParticle particle = type.getParticle();
+        XmlSchemaAll all = null;
+
+        if (particle == null) {
+            // the code that uses this wants to iterate. An empty one is more useful than
+            // a null pointer, and certainly an exception.
+            return EMPTY_ALL;
+        }
+
+        try {
+            all = (XmlSchemaAll) particle;
+        } catch (ClassCastException cce) {
+            unsupportedConstruct("NON_CHOICE_PARTICLE", type);
+        }
+
+        return all;
+    }
     public static boolean isAttributeNameQualified(XmlSchemaAttribute attribute, XmlSchema schema) {
         if (attribute.isRef()) {
             throw new RuntimeException("isElementNameQualified on element with ref=");

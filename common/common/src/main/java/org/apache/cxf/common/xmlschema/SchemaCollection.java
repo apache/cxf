@@ -31,9 +31,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaAll;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaAttributeGroupRef;
 import org.apache.ws.commons.schema.XmlSchemaAttributeOrGroupRef;
+import org.apache.ws.commons.schema.XmlSchemaChoice;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentRestriction;
@@ -41,6 +43,7 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaContent;
 import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
@@ -295,12 +298,35 @@ public class SchemaCollection {
             addCrossImports(schema, complexType.getContentModel());
             addCrossImportsAttributeList(schema, complexType.getAttributes());
             // could it be a choice or something else?
-            XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(complexType);
-            addCrossImportsSequence(schema, sequence);
+            
+            if (complexType.getParticle() instanceof XmlSchemaChoice) {
+                XmlSchemaChoice choice = XmlSchemaUtils.getChoice(complexType);
+                addCrossImports(schema, choice);
+            } else if (complexType.getParticle() instanceof XmlSchemaAll) {
+                XmlSchemaAll all = XmlSchemaUtils.getAll(complexType);
+                addCrossImports(schema, all);
+            } else {
+                XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(complexType);
+                addCrossImports(schema, sequence);
+            }
+        }
+    }
+    private void addCrossImports(XmlSchema schema, XmlSchemaAll all) {
+        for (XmlSchemaObject seqMember : all.getItems()) {
+            if (seqMember instanceof XmlSchemaElement) {
+                addElementCrossImportsElement(schema, (XmlSchemaElement)seqMember);
+            }
         }
     }
 
-    private void addCrossImportsSequence(XmlSchema schema, XmlSchemaSequence sequence) {
+    private void addCrossImports(XmlSchema schema, XmlSchemaChoice choice) {
+        for (XmlSchemaObject seqMember : choice.getItems()) {
+            if (seqMember instanceof XmlSchemaElement) {
+                addElementCrossImportsElement(schema, (XmlSchemaElement)seqMember);
+            }
+        }
+    }
+    private void addCrossImports(XmlSchema schema, XmlSchemaSequence sequence) {
         for (XmlSchemaSequenceMember seqMember : sequence.getItems()) {
             if (seqMember instanceof XmlSchemaElement) {
                 addElementCrossImportsElement(schema, (XmlSchemaElement)seqMember);
@@ -338,7 +364,11 @@ public class SchemaCollection {
             addCrossImportsAttributeList(schema, extension.getAttributes());
             XmlSchemaParticle particle = extension.getParticle();
             if (particle instanceof XmlSchemaSequence) {
-                addCrossImportsSequence(schema, (XmlSchemaSequence)particle);
+                addCrossImports(schema, (XmlSchemaSequence)particle);
+            } else if (particle instanceof XmlSchemaChoice) {
+                addCrossImports(schema, (XmlSchemaChoice)particle);
+            } else if (particle instanceof XmlSchemaAll) {
+                addCrossImports(schema, (XmlSchemaAll)particle);
             }
         } else if (content instanceof XmlSchemaComplexContentRestriction) {
             XmlSchemaComplexContentRestriction restriction = (XmlSchemaComplexContentRestriction)content;
