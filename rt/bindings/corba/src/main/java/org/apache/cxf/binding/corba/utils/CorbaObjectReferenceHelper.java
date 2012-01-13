@@ -57,9 +57,9 @@ public final class CorbaObjectReferenceHelper {
     public static QName getServiceName(Binding binding, Definition wsdlDef) {
         LOG.log(Level.FINE, "Getting service name for an object reference");
         Collection<Service> services = CastUtils.cast(wsdlDef.getServices().values());
-        for (Service serv: services) {
+        for (Service serv : services) {
             Collection<Port> ports = CastUtils.cast(serv.getPorts().values());
-            for (Port pt: ports) {
+            for (Port pt : ports) {
                 if (pt.getBinding().equals(binding)) {
                     return serv.getQName();
                 }
@@ -71,9 +71,9 @@ public final class CorbaObjectReferenceHelper {
     public static String getEndpointName(Binding binding, Definition wsdlDef) {
         LOG.log(Level.FINE, "Getting endpoint name for an object reference");
         Collection<Service> services = CastUtils.cast(wsdlDef.getServices().values());
-        for (Service serv: services) {
+        for (Service serv : services) {
             Collection<Port> ports = CastUtils.cast(serv.getPorts().values());
-            for (Port pt: ports) {
+            for (Port pt : ports) {
                 if (pt.getBinding().equals(binding)) {
                     return pt.getName();
                 }
@@ -85,7 +85,7 @@ public final class CorbaObjectReferenceHelper {
     public static Binding getDefaultBinding(Object obj, Definition wsdlDef) {
         LOG.log(Level.FINEST, "Getting binding for a default object reference");
         Collection<Binding> bindings = CastUtils.cast(wsdlDef.getBindings().values());
-        for (Binding b: bindings) {
+        for (Binding b : bindings) {
             List<?> extElements = b.getExtensibilityElements();
             // Get the list of all extensibility elements
             for (Iterator<?> extIter = extElements.iterator(); extIter.hasNext();) {

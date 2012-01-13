@@ -118,7 +118,7 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
         if (portTypes == null) {
             return false;
         }
-        for (QName existPortQName: portTypes.keySet()) {
+        for (QName existPortQName : portTypes.keySet()) {
             String existPortName = existPortQName.getLocalPart();
             if (existPortName.equals(env.get(ToolConstants.CFG_PORTTYPE))) {
                 portType = portTypes.get(existPortQName);

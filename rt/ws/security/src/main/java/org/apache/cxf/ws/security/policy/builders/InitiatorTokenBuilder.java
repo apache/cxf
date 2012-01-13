@@ -71,7 +71,7 @@ public class InitiatorTokenBuilder implements AssertionBuilder<Element> {
     }
 
     private void processAlternative(List<Assertion> assertions, InitiatorToken parent) {
-        for (Assertion token: assertions) {
+        for (Assertion token : assertions) {
             if (token instanceof Token) {
                 parent.setInitiatorToken((Token)token);
             }

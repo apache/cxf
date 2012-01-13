@@ -71,7 +71,7 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         if (services == null) {
             return false;
         }
-        for (QName serviceQName: services.keySet()) {
+        for (QName serviceQName : services.keySet()) {
             String serviceName = serviceQName.getLocalPart();
             if (serviceName.equals(env.get(ToolConstants.CFG_SERVICE))) {
                 service = (Service)services.get(serviceQName);
@@ -86,7 +86,7 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         if (ports == null) {
             return false;
         }
-        for (String portName: ports.keySet()) {
+        for (String portName : ports.keySet()) {
             if (portName.equals(env.get(ToolConstants.CFG_PORT))) {
                 port = ports.get(portName);
                 break;
@@ -100,7 +100,7 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         if (bindings == null) {
             return false;
         }
-        for (QName bindingQName: bindings.keySet()) {
+        for (QName bindingQName : bindings.keySet()) {
             String bindingName = bindingQName.getLocalPart();
             String attrBinding = (String)env.get(ToolConstants.CFG_BINDING_ATTR);
             if (attrBinding.equals(bindingName)) {

@@ -70,7 +70,7 @@ public class InitiatorSignatureTokenBuilder implements AssertionBuilder<Element>
     }
 
     private void processAlternative(List<Assertion> assertions, InitiatorSignatureToken parent) {
-        for (Assertion token: assertions) {
+        for (Assertion token : assertions) {
             if (token instanceof Token) {
                 parent.setInitiatorSignatureToken((Token)token);
             }

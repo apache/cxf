@@ -578,8 +578,7 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             Iterator i = mapType.getStructOrExceptionOrUnion().iterator();
             int strcnt = 0;
             int unioncnt = 0;
-            while (i.hasNext()) {
-                CorbaTypeImpl corbaType = (CorbaTypeImpl)i.next();
+            for (CorbaTypeImpl corbaType : mapType.getStructOrExceptionOrUnion()) {
                 if (corbaType instanceof Struct) {
                     strcnt++;
                 }

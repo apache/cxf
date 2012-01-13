@@ -89,8 +89,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
                     }
                 }
             } else {
-                for (Iterator iter = interfaces.keySet().iterator(); iter.hasNext();) {
-                    String interfaceName = (String)iter.next();
+                for (String interfaceName : interfaces.keySet()) {
                     JavaInterface intf = interfaces.get(interfaceName);
                     outputImpl(intf, service, "", penv);
                 }

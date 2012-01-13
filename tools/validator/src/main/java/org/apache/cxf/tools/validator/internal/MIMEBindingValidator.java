@@ -44,7 +44,7 @@ public class MIMEBindingValidator
 
     public boolean isValid() {
         Collection<Binding> bindings = CastUtils.cast(def.getBindings().values());
-        for (Binding binding: bindings) {
+        for (Binding binding : bindings) {
             Iterator itOperation = binding.getBindingOperations().iterator();
             while (itOperation.hasNext()) {
                 BindingOperation bindingOperation = (BindingOperation)itOperation.next();
@@ -106,6 +106,7 @@ public class MIMEBindingValidator
     private boolean doValidateMimeContentPartNames(Iterator mimeContents, String operationName) {
         // validate mime:content(s) in the mime:part as per R2909
         String partName = null;
+
         while (mimeContents.hasNext()) {
             MIMEContent mimeContent = (MIMEContent)mimeContents.next();
             String mimeContnetPart = mimeContent.getPart();

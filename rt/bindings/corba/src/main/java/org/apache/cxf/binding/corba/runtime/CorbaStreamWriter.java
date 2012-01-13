@@ -343,7 +343,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         }
 
         public String getPrefix(String namespaceURI) {
-            for (Map.Entry<String, String> entry: map.entrySet()) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (namespaceURI.equals(entry.getValue())) {
                     return (String) entry.getKey();
                 }
