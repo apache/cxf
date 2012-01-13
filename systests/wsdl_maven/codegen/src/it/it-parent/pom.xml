@@ -24,7 +24,7 @@
     <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
-      <cxf.version>@project.version@</cxf.version>
+        <cxf.version>@project.version@</cxf.version>
     </properties>
     <build>
         <pluginManagement>
@@ -33,6 +33,15 @@
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-codegen-plugin</artifactId>
                     <version>@project.version@</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <source>1.5</source>
+                        <target>1.5</target>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
