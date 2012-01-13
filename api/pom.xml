@@ -74,8 +74,8 @@
         </dependency>
 
         <dependency>
-	  <groupId>org.apache.ws.xmlschema</groupId>
-	  <artifactId>xmlschema-core</artifactId>
+            <groupId>org.apache.ws.xmlschema</groupId>
+            <artifactId>xmlschema-core</artifactId>
         </dependency>
 
         <dependency>
@@ -92,10 +92,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.neethi</groupId>
-            <artifactId>neethi</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
