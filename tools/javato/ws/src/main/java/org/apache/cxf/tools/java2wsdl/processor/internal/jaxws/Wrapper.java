@@ -168,7 +168,7 @@ public class Wrapper {
         return !isSamePackage;
     }
 
-    public Class getWrapperClass() {
+    public Class<?> getWrapperClass() {
         try {
             return AnnotationUtil.loadClass(getJavaClass().getFullClassName(),
                                             getClass().getClassLoader());
@@ -201,7 +201,7 @@ public class Wrapper {
     protected String getTypeString(Type t) {
         String type = "Object";
         if (t instanceof Class) {
-            Class clz = (Class) t;
+            Class<?> clz = (Class<?>) t;
             if (clz.isArray()) {
                 if (isBuiltInTypes(clz.getComponentType())) {
                     type = clz.getComponentType().getSimpleName() + "[]";
@@ -213,7 +213,7 @@ public class Wrapper {
             }
         } else if (t instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) t;
-            Class c = (Class)pt.getRawType();
+            Class<?> c = (Class<?>)pt.getRawType();
             if (Holder.class.isAssignableFrom(c)
                 && pt.getActualTypeArguments().length == 1
                 && pt.getActualTypeArguments()[0] instanceof Class) {

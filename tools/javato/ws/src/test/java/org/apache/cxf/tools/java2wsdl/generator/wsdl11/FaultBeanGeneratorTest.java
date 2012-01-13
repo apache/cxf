@@ -94,7 +94,7 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
 
     @Test
     public void testGetExceptionClasses() throws Exception {
-        Class seiClass = Class.forName("org.apache.hello_world.Greeter");
+        Class<?> seiClass = Class.forName("org.apache.hello_world.Greeter");
         FaultBeanGenerator generator = new FaultBeanGenerator();
         Set<Class> classes = new HashSet<Class>();
         for (Method method : seiClass.getMethods()) {

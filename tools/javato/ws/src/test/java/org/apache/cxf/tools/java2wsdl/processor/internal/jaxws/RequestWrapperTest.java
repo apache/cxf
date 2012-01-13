@@ -37,7 +37,7 @@ import org.junit.Test;
 public class RequestWrapperTest extends Assert {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 
-    private OperationInfo getOperation(Class clz, String opName) {
+    private OperationInfo getOperation(Class<?> clz, String opName) {
         builder.setServiceClass(clz);
         ServiceInfo serviceInfo = builder.createService();
 
@@ -53,7 +53,7 @@ public class RequestWrapperTest extends Assert {
     @Test
     public void testBuildRequestFields() {
         // Test String[]
-        Class testingClass = GreeterArray.class;
+        Class<?> testingClass = GreeterArray.class;
         OperationInfo opInfo = getOperation(testingClass, "sayStringArray");
         assertNotNull(opInfo);
         
@@ -100,7 +100,7 @@ public class RequestWrapperTest extends Assert {
     @Test
     public void testNoAnnotationNoClass() throws Exception {
         String pkgName = "org.apache.cxf.tools.fortest.classnoanno.docwrapped";
-        Class testingClass = Class.forName(pkgName + ".Stock");        
+        Class<?> testingClass = Class.forName(pkgName + ".Stock");        
 
         OperationInfo opInfo = getOperation(testingClass, "getPrice");
         Wrapper wrapper = new RequestWrapper();
@@ -136,7 +136,7 @@ public class RequestWrapperTest extends Assert {
     @Test
     public void testWithAnnotationNoClass() throws Exception {
         String pkgName = "org.apache.cxf.tools.fortest.withannotation.doc";
-        Class testingClass = Class.forName(pkgName + ".Stock");
+        Class<?> testingClass = Class.forName(pkgName + ".Stock");
 
         OperationInfo opInfo = getOperation(testingClass, "getPrice");
         Wrapper wrapper = new RequestWrapper();
@@ -152,7 +152,7 @@ public class RequestWrapperTest extends Assert {
     @Test
     public void testWithAnnotationWithClass() throws Exception {
         String pkgName = "org.apache.cxf.tools.fortest.withannotation.doc";
-        Class testingClass = Class.forName(pkgName + ".Greeter");
+        Class<?> testingClass = Class.forName(pkgName + ".Greeter");
 
         OperationInfo opInfo = getOperation(testingClass, "sayHi");
 

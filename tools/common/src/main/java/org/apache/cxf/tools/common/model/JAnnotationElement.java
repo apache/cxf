@@ -74,7 +74,7 @@ public final class JAnnotationElement {
                 sb.append(" = ");
             }
             if (value instanceof List) {
-                List list = (List) value;
+                List<?> list = (List<?>) value;
                 sb.append("{");
                 for (int i = 0; i < list.size(); i++) {
                     appendValue(sb, list.get(i));
@@ -107,7 +107,7 @@ public final class JAnnotationElement {
                 getStringValue(sb, obj);
             }
         } else if (obj instanceof Class) {
-            Class clz = (Class) obj;
+            Class<?> clz = (Class<?>) obj;
             if (containsSameClassName(clz) && !imports.contains(clz.getName())) {
                 sb.append(clz.getName());
             } else {
@@ -149,7 +149,7 @@ public final class JAnnotationElement {
         sb.append("\"");
     }
 
-    private boolean containsSameClassName(Class clz) {
+    private boolean containsSameClassName(Class<?> clz) {
         return imports.contains(clz.getName());
     }
 

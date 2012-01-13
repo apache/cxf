@@ -55,7 +55,7 @@ public class DateTypeCustomGeneratorTest extends ProcessorTestBase {
         assertTrue(gen.getJAXBCustFile(new File(".")).toString().endsWith("demo.xjb"));
     }
 
-    private ServiceInfo getServiceInfo(Class clz) {
+    private ServiceInfo getServiceInfo(Class<?> clz) {
         env.put(ToolConstants.CFG_CLASSNAME, clz.getName());
         return processor.getServiceBuilder().createService();
     }

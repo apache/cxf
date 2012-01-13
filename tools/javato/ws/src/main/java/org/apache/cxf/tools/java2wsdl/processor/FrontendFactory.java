@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.java2wsdl.processor;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -35,11 +36,12 @@ import org.apache.cxf.tools.util.AnnotationUtil;
 
 public final class FrontendFactory {
     private static FrontendFactory instance;
-    private Class serviceClass;
+    private Class<?> serviceClass;
     private List<Method> wsMethods;
-    private Class[] annotations = new Class[] {SOAPBinding.class,
-                                               WebService.class,
-                                               WebServiceProvider.class};
+    private Class<? extends Annotation>[] annotations 
+        = new Class[] {SOAPBinding.class,
+                       WebService.class,
+                       WebServiceProvider.class};
 
     public enum Style {
         Jaxws,
@@ -56,13 +58,12 @@ public final class FrontendFactory {
         return instance;
     }
 
-    @SuppressWarnings("unchecked")
     private boolean isJaxws() {
         if (serviceClass == null) {
             return true;
         }
-        for (Class annotation : annotations) {
-            if (serviceClass.getAnnotation(annotation) != null) {
+        for (Class<? extends Annotation> annotation : annotations) {
+            if (serviceClass.isAnnotationPresent(annotation)) {
                 return true;
             }
         }
@@ -117,7 +118,7 @@ public final class FrontendFactory {
         return Style.Simple;
     }
 
-    public void setServiceClass(Class c) {
+    public void setServiceClass(Class<?> c) {
         this.serviceClass = c;
         if (c != null) {
             this.wsMethods = getWSMethods();

@@ -225,7 +225,7 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
         // TODO
     }
 
-    private ExtensibilityElement getXMLBody(Class clz, String operationName) throws ToolException {
+    private ExtensibilityElement getXMLBody(Class<?> clz, String operationName) throws ToolException {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }

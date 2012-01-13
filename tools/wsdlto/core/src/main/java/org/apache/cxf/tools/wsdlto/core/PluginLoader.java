@@ -261,7 +261,7 @@ public final class PluginLoader {
         try {
             for (Generator generator : frontend.getGenerators().getGenerator()) {
                 fullClzName = getGeneratorClass(frontend, generator);
-                Class clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
+                Class<?> clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
                 generators.add((FrontEndGenerator)clz.newInstance());
             }
         } catch (Exception e) {
@@ -276,7 +276,7 @@ public final class PluginLoader {
     private FrontEndProfile loadFrontEndProfile(String fullClzName) {
         FrontEndProfile profile = null;
         try {
-            Class clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
+            Class<?> clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
             profile = (FrontEndProfile)clz.newInstance();
         } catch (Exception e) {
             Message msg = new Message("FRONTEND_PROFILE_LOAD_FAIL", LOG, fullClzName);

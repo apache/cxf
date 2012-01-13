@@ -65,7 +65,7 @@ public final class URLFactory {
             String packagePrefix = packagePrefixIter.nextToken().trim();
             try {
                 String clsName = packagePrefix + "." + protocol + ".Handler";
-                Class cls = null;
+                Class<?> cls = null;
                 try {
                     cls = Class.forName(clsName);
                 } catch (ClassNotFoundException e) {

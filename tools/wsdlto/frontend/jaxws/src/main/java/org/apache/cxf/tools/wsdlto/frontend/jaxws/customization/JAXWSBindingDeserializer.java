@@ -35,7 +35,7 @@ public class JAXWSBindingDeserializer implements ExtensionDeserializer, Serializ
 
     }
 
-    public ExtensibilityElement unmarshall(Class parentType,
+    public ExtensibilityElement unmarshall(@SuppressWarnings("rawtypes") Class parentType,
                                            QName elementType,
                                            Element el,
                                            Definition def,

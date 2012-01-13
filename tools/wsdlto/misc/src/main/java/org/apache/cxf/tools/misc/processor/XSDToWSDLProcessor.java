@@ -162,7 +162,7 @@ public class XSDToWSDLProcessor implements Processor {
         }
     }
 
-    private void registerJAXWSBinding(Class clz) {
+    private void registerJAXWSBinding(Class<?> clz) {
         registry.registerSerializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingSerializer());
 
         registry.registerDeserializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingDeserializer());

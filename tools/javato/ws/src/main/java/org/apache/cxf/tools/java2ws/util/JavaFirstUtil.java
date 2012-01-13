@@ -82,7 +82,7 @@ public final class JavaFirstUtil {
 
     public static String getClassName(Type type) {
         if (type instanceof Class) {
-            Class clz = (Class)type;
+            Class<?> clz = (Class<?>)type;
             if (clz.isArray()) {
                 return clz.getComponentType().getName() + "[]";
             } else {

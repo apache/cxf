@@ -30,7 +30,7 @@ public class ExtensionInvocationHandler implements InvocationHandler {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Class[] clzs = null;
+        Class<?>[] clzs = null;
         if (args != null) {
             clzs = new Class[args.length];
             for (int i = 0; i < args.length; i++) {

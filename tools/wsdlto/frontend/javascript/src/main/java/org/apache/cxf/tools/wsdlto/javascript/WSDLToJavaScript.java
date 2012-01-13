@@ -121,7 +121,7 @@ public class WSDLToJavaScript {
         }
     }
 
-    private static InputStream getResourceAsStream(Class clz, String file) {
+    private static InputStream getResourceAsStream(Class<?> clz, String file) {
         return clz.getResourceAsStream(file);
     }
 }
