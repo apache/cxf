@@ -220,7 +220,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
                    instanceof FailoverTargetSelector);
     }
 
-    protected void verifyStrategy(Object proxy, Class clz, int count) {
+    protected void verifyStrategy(Object proxy, Class<?> clz, int count) {
         ConduitSelector conduitSelector =
             ClientProxy.getClient(proxy).getConduitSelector();
         if (conduitSelector instanceof FailoverTargetSelector) {

@@ -407,7 +407,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         updateWsdlExtensors("9053", PORT_C);
     }
         
-    protected void verifyStrategy(Object proxy, Class clz) {
+    protected void verifyStrategy(Object proxy, Class<?> clz) {
         ConduitSelector conduitSelector =
             ClientProxy.getClient(proxy).getConduitSelector();
         if (conduitSelector instanceof FailoverTargetSelector) {

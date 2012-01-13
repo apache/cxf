@@ -67,7 +67,7 @@ public abstract class AbstractTypeTestClient
         return true;
     }
     
-    public static void initClient(Class clz, QName serviceName, 
+    public static void initClient(Class<?> clz, QName serviceName, 
                                   QName portName, String wsdlPath)
         throws Exception {
         URL wsdlLocation = clz.getResource(wsdlPath);

@@ -396,8 +396,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         DOMSource domReqMsg2 = new DOMSource(soapReqMsg2.getSOAPPart());
         assertNotNull(domReqMsg2);
 
-        Response response = disp.invokeAsync(domReqMsg2);
-        DOMSource domRespMsg2 = (DOMSource)response.get();
+        Response<DOMSource> response = disp.invokeAsync(domReqMsg2);
+        DOMSource domRespMsg2 = response.get();
         assertNotNull(domReqMsg2);
         String expected2 = "Hello TestSOAPInputMessage2";
         assertEquals("Response should be : Hello TestSOAPInputMessage2", expected2, domRespMsg2.getNode()
@@ -410,7 +410,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(domReqMsg3);
 
         TestDOMSourceHandler tdsh = new TestDOMSourceHandler();
-        Future fd = disp.invokeAsync(domReqMsg3, tdsh);
+        Future<?> fd = disp.invokeAsync(domReqMsg3, tdsh);
         assertNotNull(fd);
         waitForFuture(fd);
         String expected3 = "Hello TestSOAPInputMessage3";
@@ -466,8 +466,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         DOMSource domReqMsg2 = new DOMSource(soapReqMsg2.getSOAPBody().extractContentAsDocument());
         assertNotNull(domReqMsg2);
         // invokeAsync
-        Response response = disp.invokeAsync(domReqMsg2);
-        DOMSource domRespMsg2 = (DOMSource)response.get();
+        Response<DOMSource> response = disp.invokeAsync(domReqMsg2);
+        DOMSource domRespMsg2 = response.get();
         assertNotNull(domRespMsg2);
         String expected2 = "Hello TestSOAPInputMessage2";
         
@@ -487,7 +487,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(domReqMsg3);
         // invokeAsync with AsyncHandler
         TestDOMSourceHandler tdsh = new TestDOMSourceHandler();
-        Future fd = disp.invokeAsync(domReqMsg3, tdsh);
+        Future<?> fd = disp.invokeAsync(domReqMsg3, tdsh);
         assertNotNull(fd);
         waitForFuture(fd);
         String expected3 = "Hello TestSOAPInputMessage3";
@@ -523,7 +523,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         disp.invokeOneWay(greetMe);
 
         // Test async polling
-        Response response2 = disp.invokeAsync(greetMe);
+        Response<Object> response2 = disp.invokeAsync(greetMe);
         assertNotNull(response2);
         GreetMeResponse greetMeResponse = (GreetMeResponse)response2.get();
         String responseValue2 = greetMeResponse.getResponseType();
@@ -531,7 +531,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         // Test async callback
         TestJAXBHandler tjbh = new TestJAXBHandler();
-        Future fd = disp.invokeAsync(greetMe, tjbh);
+        Future<?> fd = disp.invokeAsync(greetMe, tjbh);
         assertNotNull(fd);
         waitForFuture(fd);
 
@@ -663,8 +663,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SAXSource saxSourceReq2 = new SAXSource(inputSource2);
         assertNotNull(saxSourceReq2);
 
-        Response response = disp.invokeAsync(saxSourceReq2);
-        SAXSource saxSourceResp2 = (SAXSource)response.get();
+        Response<SAXSource> response = disp.invokeAsync(saxSourceReq2);
+        SAXSource saxSourceResp2 = response.get();
         assertNotNull(saxSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
         assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp2).contains(expected2));
@@ -675,7 +675,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SAXSource saxSourceReq3 = new SAXSource(inputSource3);
         assertNotNull(saxSourceReq3);
         TestSAXSourceHandler tssh = new TestSAXSourceHandler();
-        Future fd = disp.invokeAsync(saxSourceReq3, tssh);
+        Future<?> fd = disp.invokeAsync(saxSourceReq3, tssh);
         assertNotNull(fd);
         waitForFuture(fd);
 
@@ -731,8 +731,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         inputSource2.setSystemId(inputSource2.getPublicId());
         SAXSource saxSourceReq2 = new SAXSource(inputSource2);
         assertNotNull(saxSourceReq2);
-        Response response = disp.invokeAsync(saxSourceReq2);
-        SAXSource saxSourceResp2 = (SAXSource)response.get();
+        Response<SAXSource> response = disp.invokeAsync(saxSourceReq2);
+        SAXSource saxSourceResp2 = response.get();
         assertNotNull(saxSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
         assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp2).contains(expected2));
@@ -747,7 +747,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(saxSourceReq3);
 
         TestSAXSourceHandler tssh = new TestSAXSourceHandler();
-        Future fd = disp.invokeAsync(saxSourceReq3, tssh);
+        Future<?> fd = disp.invokeAsync(saxSourceReq3, tssh);
         assertNotNull(fd);
         waitForFuture(fd);
 
@@ -787,8 +787,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         InputStream is2 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq2.xml");
         StreamSource streamSourceReq2 = new StreamSource(is2);
         assertNotNull(streamSourceReq2);
-        Response response = disp.invokeAsync(streamSourceReq2);
-        StreamSource streamSourceResp2 = (StreamSource)response.get();
+        Response<StreamSource> response = disp.invokeAsync(streamSourceReq2);
+        StreamSource streamSourceResp2 = response.get();
         assertNotNull(streamSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
         assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp2).contains(expected2));
@@ -797,7 +797,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         StreamSource streamSourceReq3 = new StreamSource(is3);
         assertNotNull(streamSourceReq3);
         TestStreamSourceHandler tssh = new TestStreamSourceHandler();
-        Future fd = disp.invokeAsync(streamSourceReq3, tssh);
+        Future<?> fd = disp.invokeAsync(streamSourceReq3, tssh);
         assertNotNull(fd);
         waitForFuture(fd);
 
@@ -839,8 +839,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         InputStream is2 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq2.xml");
         StreamSource streamSourceReq2 = new StreamSource(is2);
         assertNotNull(streamSourceReq2);
-        Response response = disp.invokeAsync(streamSourceReq2);
-        StreamSource streamSourceResp2 = (StreamSource)response.get();
+        Response<StreamSource> response = disp.invokeAsync(streamSourceReq2);
+        StreamSource streamSourceResp2 = response.get();
         assertNotNull(streamSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
         assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp2).contains(expected2));
@@ -851,7 +851,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(streamSourceReq3);
 
         TestStreamSourceHandler tssh = new TestStreamSourceHandler();
-        Future fd = disp.invokeAsync(streamSourceReq3, tssh);
+        Future<?> fd = disp.invokeAsync(streamSourceReq3, tssh);
         assertNotNull(fd);
         waitForFuture(fd);
         

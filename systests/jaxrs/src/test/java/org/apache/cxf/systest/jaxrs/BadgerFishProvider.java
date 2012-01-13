@@ -57,7 +57,8 @@ public final class BadgerFishProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object>  {
 
     
-    private static Map<Class, JAXBContext> jaxbContexts = new WeakHashMap<Class, JAXBContext>();
+    private static Map<Class<?>, JAXBContext> jaxbContexts 
+        = new WeakHashMap<Class<?>, JAXBContext>();
     @Context
     private HttpHeaders requestHeaders;  
     
@@ -115,7 +116,7 @@ public final class BadgerFishProvider
         }
     }
 
-    private JAXBContext getJAXBContext(Class type) throws JAXBException {
+    private JAXBContext getJAXBContext(Class<?> type) throws JAXBException {
         synchronized (jaxbContexts) {
             JAXBContext context = jaxbContexts.get(type);
             if (context == null) {
