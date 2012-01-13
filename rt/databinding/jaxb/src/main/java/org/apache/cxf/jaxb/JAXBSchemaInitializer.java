@@ -575,7 +575,6 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                               XmlSchemaSequence seq, JAXBBeanInfo beanInfo,
                               QName name, boolean isArray) {
         XmlSchemaElement el = new XmlSchemaElement(schema, false);
-        el.setName(name.getLocalPart());
 
         if (isArray) {
             el.setMinOccurs(0);
@@ -590,9 +589,9 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             QName ename = new QName(beanInfo.getElementNamespaceURI(null),
                                    beanInfo.getElementLocalName(null));
             XmlSchemaElement el2 = schemas.getElementByQName(ename);
-            el.setName(null);
-            el.getRef().setTargetQName(el2.getRef().getTargetQName());
+            el.getRef().setTargetQName(el2.getQName());
         } else {
+            el.setName(name.getLocalPart());
             Iterator<QName> itr = beanInfo.getTypeNames().iterator();
             if (!itr.hasNext()) {
                 return;
