@@ -37,6 +37,12 @@
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
             org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
         </cxf.osgi.import>
+        <cxf.osgi.dynamic.import>
+            com.sun.xml.bind.api,
+            com.sun.xml.bind.api.*,
+            com.sun.xml.internal.bind.api,
+            com.sun.xml.internal.bind.api.*,
+        </cxf.osgi.dynamic.import>
     </properties>
     <build>
         <plugins>

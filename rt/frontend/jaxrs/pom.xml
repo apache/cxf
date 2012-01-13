@@ -33,6 +33,12 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <cxf.osgi.import>
+            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+        </cxf.osgi.import>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
@@ -120,6 +126,7 @@
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>

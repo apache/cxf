@@ -33,6 +33,10 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <cxf.spi-dir>spi-2.1</cxf.spi-dir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -131,6 +135,7 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>        
     </dependencies>
 

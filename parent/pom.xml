@@ -60,6 +60,7 @@
         <cxf.osgi.export>
             org.apache.cxf.*;-split-package:=first,
         </cxf.osgi.export>
+        <cxf.osgi.dynamic.import />
         <cxf.osgi.spring.version>[2.5,4)</cxf.osgi.spring.version>
         <cxf.osgi.asm.version>[2.0,4)</cxf.osgi.asm.version>
         <cxf.osgi.commons.lang.version>[2.4,3)</cxf.osgi.commons.lang.version>
@@ -69,7 +70,7 @@
         <cxf.osgi.javax.stream.version>[0.0,2)</cxf.osgi.javax.stream.version>
         <cxf.osgi.javax.activation.version>[0.0,2)</cxf.osgi.javax.activation.version>
         <cxf.osgi.javax.mail.version>[0.0,2)</cxf.osgi.javax.mail.version>
-
+        <cxf.osgi.javax.servlet.version>[0.0,4)</cxf.osgi.javax.servlet.version>
 
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.2</cxf.abdera.version>
@@ -497,15 +498,7 @@
                                     *
                                 </Import-Package>
                                 <DynamicImport-Package>
-                                    com.sun.xml.bind.api,
-                                    com.sun.xml.bind.api.*,
-                                    com.sun.xml.internal.bind.api,
-                                    com.sun.xml.internal.bind.api.*,
-                                    com.ctc.wstx.*,
-                                    org.apache.commons.logging.*,
-                                    org.slf4j.*,
-                                    org.slf4j.impl.*,
-                                    org.eclipse.jetty.jmx
+                                    ${cxf.osgi.dynamic.import}
                                 </DynamicImport-Package>
                             </instructions>
                         </configuration>

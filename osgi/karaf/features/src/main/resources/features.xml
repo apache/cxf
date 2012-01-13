@@ -149,10 +149,68 @@
     </feature>
     <feature name="cxf-core" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-alldeps</feature>
+        <bundle>mvn:org.apache.cxf/cxf-common-utilities/${project.version}</bundle>
 
-        <bundle start-level='30'>mvn:org.apache.cxf/cxf-common-utilities/${project.version}</bundle>
-        <bundle start-level='30'>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
-        <bundle start-level='30'>mvn:org.apache.cxf/cxf-rt-core/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-core/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-management/${project.version}</bundle> 
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-policy/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-addr/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-jaxb/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-aegis/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-xmlbeans/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-tools-common/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-common/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-local/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-http-jetty/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-jms/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-xml/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-soap/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-coloc/${project.version}</bundle>
+
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-corba/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-object/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-simple/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-jaxws/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-jaxrs/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-js/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-javascript/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-mex/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-rm/${project.version}</bundle>
+
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
+
+
+        <bundle>mvn:org.apache.cxf/cxf-tools-java2ws/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-tools-misctools/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-tools-validator/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-tools-wadlto-jaxrs/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-tools-wsdlto-core/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-tools-wsdlto-databinding-jaxb/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-tools-wsdlto-frontend-javascript/${project.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-tools-wsdlto-frontend-jaxws/${project.version}</bundle>
+
+        <!-- needs jra
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-http/${project.version}</bundle-->
+        <!-- need msv
+        <bundle>mvn:org.apache.cxf/cxf-wstx-msv-validation/${project.version}</bundle-->
+        <!-- need sdo deps
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-sdo/${project.version}</bundle-->
+        <!-- need jibx deps
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-jibx/${project.version}</bundle-->
+        <!-- need antlr
+        <bundle>mvn:org.apache.cxf/cxf-tools-corba/${project.version}</bundle-->
     </feature>
 
     <feature name="cxf-sts" version="${project.version}" resolver='(obr)'>

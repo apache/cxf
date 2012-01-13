@@ -45,6 +45,16 @@
             org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
             org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
         </cxf.osgi.import>
+        <cxf.osgi.dynamic.import>
+            com.sun.xml.bind.api,
+            com.sun.xml.bind.api.*,
+            com.sun.xml.internal.bind.api,
+            com.sun.xml.internal.bind.api.*,
+            com.ctc.wstx.*,
+            org.apache.commons.logging.*,
+            org.slf4j.*,
+            org.slf4j.impl.*,
+        </cxf.osgi.dynamic.import>
     </properties>
 
     <dependencies>
