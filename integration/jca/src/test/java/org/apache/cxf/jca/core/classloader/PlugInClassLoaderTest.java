@@ -52,7 +52,7 @@ public class PlugInClassLoaderTest extends Assert {
 
     @Test
     public void testLoadClassWithPlugInClassLoader() throws Exception {
-        Class resultClass = plugInClassLoader.loadClass(
+        Class<?> resultClass = plugInClassLoader.loadClass(
                 "org.apache.cxf.jca.dummy.Dummy");
         assertEquals("wrong class", "org.apache.cxf.jca.dummy.Dummy",
             resultClass.getName());
@@ -63,7 +63,7 @@ public class PlugInClassLoaderTest extends Assert {
     @Test
     public void testInheritsClassLoaderProtectionDomain()
         throws Exception {
-        Class resultClass = plugInClassLoader.loadClass(
+        Class<?> resultClass = plugInClassLoader.loadClass(
                 "org.apache.cxf.jca.dummy.Dummy");
         ProtectionDomain pd1 = plugInClassLoader.getClass().getProtectionDomain();
         ProtectionDomain pd2 = resultClass.getProtectionDomain();
@@ -75,7 +75,7 @@ public class PlugInClassLoaderTest extends Assert {
 
     @Test
     public void testLoadClassWithParentClassLoader() throws Exception {
-        Class resultClass = plugInClassLoader.loadClass("org.omg.CORBA.ORB");
+        Class<?> resultClass = plugInClassLoader.loadClass("org.omg.CORBA.ORB");
         assertEquals("wrong class", "org.omg.CORBA.ORB", resultClass.getName());
         assertTrue("class loader must NOT be the plugInClassLoader",
             !(plugInClassLoader.equals(resultClass.getClassLoader())));
@@ -102,7 +102,7 @@ public class PlugInClassLoaderTest extends Assert {
         // ensure it is available
         getClass().getClassLoader().loadClass(className); 
         try {
-            Class claz = plugInClassLoader.loadClass(className);
+            Class<?> claz = plugInClassLoader.loadClass(className);
             assertEquals("That should be same classloader ", claz.getClassLoader(),
                         getClass().getClassLoader());
             
@@ -114,7 +114,7 @@ public class PlugInClassLoaderTest extends Assert {
     @Test
     public void testLoadResourceWithPluginClassLoader()
         throws Exception {
-        Class resultClass = plugInClassLoader.loadClass(
+        Class<?> resultClass = plugInClassLoader.loadClass(
                 "org.apache.cxf.jca.dummy.Dummy");
         URL url = resultClass.getResource("dummy.txt");
         LOG.info("URL: " + url);
@@ -137,7 +137,7 @@ public class PlugInClassLoaderTest extends Assert {
     @Test
     public void testLoadSlashResourceWithPluginClassLoader()
         throws Exception {
-        Class resultClass = plugInClassLoader.loadClass(
+        Class<?> resultClass = plugInClassLoader.loadClass(
                 "org.apache.cxf.jca.dummy.Dummy");
         URL url = resultClass.getResource("/META-INF/MANIFEST.MF");
         LOG.info("URL: " + url);
@@ -159,7 +159,7 @@ public class PlugInClassLoaderTest extends Assert {
     @Test
     public void testLoadNonExistentResourceWithPluginClassLoader()
         throws Exception {
-        Class resultClass = plugInClassLoader.loadClass(
+        Class<?> resultClass = plugInClassLoader.loadClass(
                 "org.apache.cxf.jca.dummy.Dummy");
         URL url = resultClass.getResource("foo.txt");
         assertNull("url must be null. ", url);

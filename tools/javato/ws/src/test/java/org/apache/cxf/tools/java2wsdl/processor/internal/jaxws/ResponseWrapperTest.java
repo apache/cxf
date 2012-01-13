@@ -33,7 +33,7 @@ import org.junit.Test;
 public class ResponseWrapperTest extends Assert {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 
-    private OperationInfo getOperation(Class clz, String opName) {
+    private OperationInfo getOperation(Class<?> clz, String opName) {
         builder.setServiceClass(clz);
         ServiceInfo serviceInfo = builder.createService();
 
@@ -49,7 +49,7 @@ public class ResponseWrapperTest extends Assert {
     @Test
     public void testBuildFields() {
         // Test String[]
-        Class testingClass = GreeterArray.class;
+        Class<?> testingClass = GreeterArray.class;
         OperationInfo opInfo = getOperation(testingClass, "sayStringArray");
         assertNotNull(opInfo);
         
@@ -90,7 +90,7 @@ public class ResponseWrapperTest extends Assert {
     @Test
     public void testWithAnnotationWithClass() throws Exception {
         String pkgName = "org.apache.cxf.tools.fortest.withannotation.doc";
-        Class testingClass = Class.forName(pkgName + ".Greeter");
+        Class<?> testingClass = Class.forName(pkgName + ".Greeter");
 
         OperationInfo opInfo = getOperation(testingClass, "sayHi");
         

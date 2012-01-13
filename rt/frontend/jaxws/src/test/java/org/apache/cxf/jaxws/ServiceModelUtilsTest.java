@@ -61,7 +61,7 @@ public class ServiceModelUtilsTest extends AbstractJaxWsTest {
         bean.setBus(getBus());
     }
     
-    private Service getService(URL wsdl, Class implClz, QName port) throws EndpointException {
+    private Service getService(URL wsdl, Class<?> implClz, QName port) throws EndpointException {
         assertNotNull(wsdl);
         bean.setWsdlURL(wsdl.toString());
         bean.setServiceClass(implClz);

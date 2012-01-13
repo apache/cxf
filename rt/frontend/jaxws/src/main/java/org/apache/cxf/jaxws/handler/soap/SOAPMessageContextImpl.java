@@ -122,7 +122,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
         Object o = super.get(key);
         if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
             || MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
-            Map mp = (Map)o;
+            Map<?, ?> mp = (Map<?, ?>)o;
             if (mp != null) {
                 if (mp.isEmpty()) {
                     return null;

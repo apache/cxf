@@ -421,7 +421,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
 
     @SuppressWarnings("unchecked")
     public Response<T> invokeAsync(T obj) {
-        return (Response)invokeAsync(obj, null);
+        return (Response<T>)invokeAsync(obj, null);
     }
 
     public void invokeOneWay(T obj) {

@@ -83,10 +83,10 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
     static Class<?> getArrayComponentType(Type cls) {
         if (cls instanceof Class) {
-            if (((Class)cls).isArray()) {
-                return ((Class)cls).getComponentType();
+            if (((Class<?>)cls).isArray()) {
+                return ((Class<?>)cls).getComponentType();
             } else {
-                return (Class)cls;
+                return (Class<?>)cls;
             }
         } else if (cls instanceof ParameterizedType) {
             for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
@@ -94,7 +94,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         } else if (cls instanceof GenericArrayType) {
             GenericArrayType gt = (GenericArrayType)cls;
-            Class ct = (Class) gt.getGenericComponentType();
+            Class<?> ct = (Class<?>) gt.getGenericComponentType();
             return Array.newInstance(ct, 0).getClass();
         }
         return null;
@@ -102,10 +102,10 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
     public JAXBBeanInfo getBeanInfo(Type cls) {
         if (cls instanceof Class) {
-            if (((Class)cls).isArray()) {
-                return getBeanInfo(((Class)cls).getComponentType());
+            if (((Class<?>)cls).isArray()) {
+                return getBeanInfo(((Class<?>)cls).getComponentType());
             } else {
-                return getBeanInfo((Class)cls);
+                return getBeanInfo((Class<?>)cls);
             }
         } else if (cls instanceof ParameterizedType) {
             for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
@@ -113,7 +113,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         } else if (cls instanceof GenericArrayType) {
             GenericArrayType gt = (GenericArrayType)cls;
-            Class ct = (Class) gt.getGenericComponentType();
+            Class<?> ct = (Class<?>) gt.getGenericComponentType();
             ct = Array.newInstance(ct, 0).getClass();
 
             return getBeanInfo(ct);
@@ -365,7 +365,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     public void end(FaultInfo fault) {
         MessagePartInfo part = fault.getMessageParts().get(0);
         Class<?> cls = part.getTypeClass();
-        Class<?> cl2 = (Class)fault.getProperty(Class.class.getName());
+        Class<?> cl2 = (Class<?>)fault.getProperty(Class.class.getName());
         if (cls != cl2) {
             QName name = (QName)fault.getProperty("elementName");
             part.setElementQName(name);
@@ -559,12 +559,12 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
     static boolean isArray(Type cls) {
         if (cls instanceof Class) {
-            return ((Class)cls).isArray();
+            return ((Class<?>)cls).isArray();
         } else if (cls instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)cls;
             return pt.getActualTypeArguments().length == 1
                 && pt.getRawType() instanceof Class
-                && Collection.class.isAssignableFrom((Class)pt.getRawType());
+                && Collection.class.isAssignableFrom((Class<?>)pt.getRawType());
         } else if (cls instanceof GenericArrayType) {
             return true;
         }

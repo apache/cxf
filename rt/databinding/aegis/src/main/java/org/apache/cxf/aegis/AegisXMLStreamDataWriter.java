@@ -112,7 +112,7 @@ public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements Aeg
                       java.lang.reflect.Type objectType) throws Exception {
         AegisType aegisType = null;
         if (objectType instanceof Class) {
-            aegisType = getContext().getTypeMapping().getType((Class)objectType);
+            aegisType = getContext().getTypeMapping().getType((Class<?>)objectType);
         }
         if (aegisType == null) {
             TypeCreator creator = getContext().getTypeMapping().getTypeCreator();

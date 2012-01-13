@@ -204,7 +204,7 @@ public final class CorbaUtils {
             } else if (obj instanceof Enum) {
                 Enum enumType = (Enum)obj;
                 String name = enumType.getName();
-                List enums = enumType.getEnumerator();
+                List<Enumerator> enums = enumType.getEnumerator();
                 String[] members = new String[enums.size()];
 
                 for (int i = 0; i < members.length; ++i) {
@@ -216,7 +216,7 @@ public final class CorbaUtils {
                 Exception exceptType = (Exception)obj;
 
                 // TODO: check to see if this is a recursive type.
-                List list = exceptType.getMember();
+                List<MemberType> list = exceptType.getMember();
                 StructMember[] members = new StructMember[list.size()];
                 for (int i = 0; i < members.length; ++i) {
                     MemberType member = (MemberType) list.get(i);
@@ -250,7 +250,7 @@ public final class CorbaUtils {
                     tc = orb.create_recursive_tc(structType.getRepositoryID());
                 } else {
                     seenTypes.push(new QName(structType.getName()));
-                    List list = structType.getMember();
+                    List<MemberType> list = structType.getMember();
                     StructMember[] members = new StructMember[list.size()];
                     for (int i = 0; i < members.length; ++i) {
                         MemberType member = (MemberType) list.get(i);

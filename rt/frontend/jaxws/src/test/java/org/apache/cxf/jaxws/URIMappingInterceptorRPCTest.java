@@ -93,7 +93,7 @@ public class URIMappingInterceptorRPCTest extends AbstractCXFTest {
         
         Object parameters = message.getContent(List.class);
         assertNotNull(parameters);
-        assertEquals(0, ((List)parameters).size());
+        assertEquals(0, ((List<?>)parameters).size());
         BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
         assertNotNull(boi);
         assertEquals(new QName(ns, "sayHi"), boi.getName());
@@ -110,8 +110,8 @@ public class URIMappingInterceptorRPCTest extends AbstractCXFTest {
         
         Object parameters = message.getContent(List.class);
         assertNotNull(parameters);
-        assertEquals(1, ((List)parameters).size());
-        String value = (String) ((List)parameters).get(0);
+        assertEquals(1, ((List<?>)parameters).size());
+        String value = (String) ((List<?>)parameters).get(0);
         assertEquals("king author", value);
     }
     
@@ -160,8 +160,8 @@ public class URIMappingInterceptorRPCTest extends AbstractCXFTest {
     private void assertion() throws Exception {
         Object parameters = message.getContent(List.class);
         assertNotNull(parameters);
-        assertEquals(1, ((List)parameters).size());
-        String value = (String) ((List)parameters).get(0);
+        assertEquals(1, ((List<?>)parameters).size());
+        String value = (String) ((List<?>)parameters).get(0);
         assertEquals("king", value);        
     }
     
@@ -177,8 +177,8 @@ public class URIMappingInterceptorRPCTest extends AbstractCXFTest {
         
         Object parameters = message.getContent(List.class);
         assertNotNull(parameters);
-        assertEquals(1, ((List)parameters).size());
-        String value = (String) ((List)parameters).get(0);        
+        assertEquals(1, ((List<?>)parameters).size());
+        String value = (String) ((List<?>)parameters).get(0);        
         assertEquals("king author", value);
     }
 }

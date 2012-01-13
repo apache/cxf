@@ -43,7 +43,7 @@ public class JibxDataWriter implements DataWriter<XMLStreamWriter> {
     }
 
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
-        Class jtype = part.getTypeClass();
+        Class<?> jtype = part.getTypeClass();
         QName stype = part.getTypeQName();
         if (JibxSimpleTypes.isSimpleType(jtype)) {
             try {

@@ -72,7 +72,7 @@ public class JaxWsImplementorInfo {
     }
     
     public Class<?> getEndpointClass() {
-        Class endpointInterface = getSEIClass();
+        Class<?> endpointInterface = getSEIClass();
         if (null == endpointInterface) {
             endpointInterface = getImplementorClass();
         }
@@ -228,7 +228,7 @@ public class JaxWsImplementorInfo {
         return new QName(namespace, name);
     }
 
-    private String getDefaultNamespace(Class clazz) {
+    private String getDefaultNamespace(Class<?> clazz) {
         String pkg = PackageUtils.getNamespace(PackageUtils.getPackageName(clazz));
         return StringUtils.isEmpty(pkg) ? "http://unknown.namespace/" : pkg;
     }

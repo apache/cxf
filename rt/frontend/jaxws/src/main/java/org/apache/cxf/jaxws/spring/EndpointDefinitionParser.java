@@ -119,7 +119,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         while (elem != null) {
             String name = elem.getLocalName();
             if ("properties".equals(name)) {
-                Map map = ctx.getDelegate().parseMapElement(elem, bean.getBeanDefinition());
+                Map<?, ?> map = ctx.getDelegate().parseMapElement(elem, bean.getBeanDefinition());
                 bean.addPropertyValue("properties", map);
             } else if ("binding".equals(name)) {
                 setFirstChildAsProperty(elem, ctx, bean, "bindingConfig");
@@ -127,7 +127,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
                 || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
                 || "features".equals(name) || "schemaLocations".equals(name)
                 || "handlers".equals(name)) {
-                List list = ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
+                List<?> list = ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
                 bean.addPropertyValue(name, list);
             } else if (IMPLEMENTOR.equals(name)) {
                 ctx.getDelegate()

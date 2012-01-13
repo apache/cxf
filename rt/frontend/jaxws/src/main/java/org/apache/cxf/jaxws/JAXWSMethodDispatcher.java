@@ -62,7 +62,7 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
                     i++;
                     continue;
                 }
-                Class endpointClass = implInfo.getImplementorClass();
+                Class<?> endpointClass = implInfo.getImplementorClass();
                 Message msg = new Message("SEI_METHOD_NOT_FOUND", LOG, 
                                           m.getName(), endpointClass.getName());
                 throw new ServiceConstructionException(msg, e);
@@ -89,14 +89,14 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
                                                  (Class[])method.getParameterTypes());
                 if (Modifier.isVolatile(m2.getModifiers())) {
                     //bridge method, need to map the generics
-                    Class params[] = method.getParameterTypes();
+                    Class<?> params[] = method.getParameterTypes();
                     for (Type t : method.getGenericParameterTypes()) {
                         if (t instanceof TypeVariable) {
-                            TypeVariable tv = (TypeVariable)t;
+                            TypeVariable<?> tv = (TypeVariable<?>)t;
                             for (int x = 0; x < implInfo.getSEIClass().getTypeParameters().length; x++) {
-                                TypeVariable t2 = implInfo.getSEIClass().getTypeParameters()[x];
+                                TypeVariable<?> t2 = implInfo.getSEIClass().getTypeParameters()[x];
                                 if (t2.getName().equals(tv.getName())) {
-                                    params[x] = (Class)implInfo.getSEIType().getActualTypeArguments()[x];
+                                    params[x] = (Class<?>)implInfo.getSEIType().getActualTypeArguments()[x];
                                 }
                             }
                         }

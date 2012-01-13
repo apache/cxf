@@ -254,13 +254,13 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         
         AsyncHandler<Object> handler;
         if (params.length > 0 && params[params.length - 1] instanceof AsyncHandler) {
-            handler = (AsyncHandler)params[params.length - 1];
+            handler = (AsyncHandler<Object>)params[params.length - 1];
         } else {
             handler = null;
         }
-        ClientCallback callback = new JaxwsClientCallback(handler);
+        ClientCallback callback = new JaxwsClientCallback<Object>(handler);
              
-        Response<Object> ret = new JaxwsResponseCallback(callback);
+        Response<Object> ret = new JaxwsResponseCallback<Object>(callback);
         client.invoke(callback, oi, params);
         return ret;
     }

@@ -96,7 +96,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
                   new Class[] {GreetMe.class, GreetMeOneWay.class});
         svrBean.setProperties(props);
         Server serv = svrBean.create();
-        Class[] extraClass = ((JAXBDataBinding)serv.getEndpoint().getService()
+        Class<?>[] extraClass = ((JAXBDataBinding)serv.getEndpoint().getService()
                 .getDataBinding()).getExtraClass();
         assertEquals(extraClass.length, 2);
         assertEquals(extraClass[0], GreetMe.class);

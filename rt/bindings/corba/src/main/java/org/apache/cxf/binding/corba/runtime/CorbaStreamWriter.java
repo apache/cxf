@@ -343,8 +343,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         }
 
         public String getPrefix(String namespaceURI) {
-            for (Iterator iter = map.entrySet().iterator(); iter.hasNext();) {
-                Map.Entry entry = (Map.Entry) iter.next();
+            for (Map.Entry<String, String> entry: map.entrySet()) {
                 if (namespaceURI.equals(entry.getValue())) {
                     return (String) entry.getKey();
                 }
@@ -355,7 +354,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
             return null;
         }
 
-        public Iterator getPrefixes(String namespaceURI) {
+        public Iterator<String> getPrefixes(String namespaceURI) {
             Set<String> set = new HashSet<String>();
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (namespaceURI.equals(entry.getValue())) {
@@ -363,7 +362,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
                 }
             }
             if (parent != null) {
-                Iterator iter = parent.getPrefixes(namespaceURI);
+                Iterator<?> iter = parent.getPrefixes(namespaceURI);
                 while (iter.hasNext()) {
                     set.add((String)iter.next());
                 }

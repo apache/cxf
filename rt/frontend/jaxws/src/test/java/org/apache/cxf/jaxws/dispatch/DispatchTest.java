@@ -161,7 +161,7 @@ public class DispatchTest extends AbstractJaxWsTest {
         List<Interceptor<? extends Message>> interceptors = ((DispatchImpl)disp).getClient()
             .getInInterceptors();
         boolean exists = false;
-        for (Interceptor interceptor : interceptors) {
+        for (Interceptor<? extends Message> interceptor : interceptors) {
             if (interceptor instanceof LoggingInInterceptor) {
                 exists = true;
             }

@@ -116,7 +116,7 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
     protected void applyProperties(Endpoint ep) {
         //Apply the AuthorizationPolicy to the endpointInfo
-        Map props = this.getProperties();
+        Map<String, Object> props = this.getProperties();
         if (props != null && props.get(AuthorizationPolicy.class.getName()) != null) {
             AuthorizationPolicy ap = (AuthorizationPolicy)props.get(AuthorizationPolicy.class.getName());
             ep.getEndpointInfo().addExtensor(ap);

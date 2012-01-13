@@ -85,14 +85,15 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     }
     
     @Override
-    public ServiceDelegate createServiceDelegate(URL url, QName qname, Class cls) {
+    public ServiceDelegate createServiceDelegate(URL url, QName qname,
+                                                 @SuppressWarnings("rawtypes") Class cls) {
         Bus bus = BusFactory.getThreadDefaultBus();
         return new ServiceImpl(bus, url, qname, cls);
     }
     //new in 2.2
     public ServiceDelegate createServiceDelegate(URL wsdlDocumentLocation,
                                                  QName serviceName,
-                                                 Class serviceClass,
+                                                 @SuppressWarnings("rawtypes") Class serviceClass,
                                                  WebServiceFeature ... features) {
         Bus bus = BusFactory.getThreadDefaultBus();
         for (WebServiceFeature f : features) {

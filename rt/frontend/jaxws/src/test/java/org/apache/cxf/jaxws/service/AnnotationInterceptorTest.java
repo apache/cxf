@@ -174,7 +174,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
     
     private boolean hasTestInterceptor(List<Interceptor<? extends Message>> interceptors) {
         boolean flag = false;
-        for (Interceptor it : interceptors) {
+        for (Interceptor<? extends Message> it : interceptors) {
             if (it instanceof TestInterceptor) {
                 flag = true;
             }
@@ -184,7 +184,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         
     private boolean hasTest2Interceptor(List<Interceptor<? extends Message>> interceptors) {
         boolean flag = false;
-        for (Interceptor it : interceptors) {
+        for (Interceptor<? extends Message> it : interceptors) {
             if (it instanceof Test2Interceptor) {
                 flag = true;
             }
@@ -204,7 +204,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
     
     private boolean hasAnnotationFeatureInterceptor(List<Interceptor<? extends Message>> interceptors) {
         boolean flag = false;
-        for (Interceptor it : interceptors) {
+        for (Interceptor<? extends Message> it : interceptors) {
             if (it instanceof AnnotationFeatureInterceptor) {
                 flag = true;
             }

@@ -62,7 +62,7 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
 
         assertNotNull("handler must not be null", handler);
         int count = 0;
-        Set<Class> allHandlerTypes = new HashSet<Class>();
+        Set<Class<?>> allHandlerTypes = new HashSet<Class<?>>();
 
         while (handler != null) {
 
@@ -85,10 +85,11 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
         assertTrue("last handler must be an InvokingInvocationHandler",
                    last instanceof InvokingInvocationHandler);
 
-        Class[] types = {ProxyInvocationHandler.class, 
-                         ObjectMethodInvocationHandler.class,
-                         InvokingInvocationHandler.class,
-                         SecurityTestHandler.class};
+        Class<?>[] types 
+            = {ProxyInvocationHandler.class, 
+               ObjectMethodInvocationHandler.class,
+               InvokingInvocationHandler.class,
+               SecurityTestHandler.class};
 
         for (int i = 0; i < types.length; i++) {
             assertTrue("handler chain must contain type: " + types[i], allHandlerTypes.contains(types[i]));

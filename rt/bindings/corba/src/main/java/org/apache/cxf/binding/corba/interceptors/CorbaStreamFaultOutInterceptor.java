@@ -138,12 +138,12 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         
         String opName = message.getExchange().get(String.class);
                 
-        Iterator iter = bInfo.getOperations().iterator();
+        Iterator<BindingOperationInfo> iter = bInfo.getOperations().iterator();
 
         BindingOperationInfo bopInfo = null;
         OperationType opType = null;           
         while (iter.hasNext()) {
-            bopInfo = (BindingOperationInfo)iter.next();
+            bopInfo = iter.next();
             if (bopInfo.getName().getLocalPart().equals(opName)) {
                 opType = bopInfo.getExtensor(OperationType.class);
                 break;
@@ -252,7 +252,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         // This creates a default instance of the class representing the exception schema type if
         // one has not been created on the servant side which throws the UserException.
         if (fault == null) {
-            Class faultClass = faultMethod.getReturnType();
+            Class<?> faultClass = faultMethod.getReturnType();
             fault = faultClass.newInstance();
         }
         

@@ -409,9 +409,9 @@ public final class JAXBEncoderDecoder {
             return;
         }
         Object objArray;
-        Class cls = null;
+        Class<?> cls = null;
         if (mObj instanceof List) {
-            List<?> l = (List)mObj;
+            List<?> l = (List<?>)mObj;
             objArray = l.toArray(new Object[l.size()]);
             cls = null;
         } else {
@@ -575,7 +575,7 @@ public final class JAXBEncoderDecoder {
     public static void marshallNullElement(Marshaller marshaller,
                                            Object source,
                                            MessagePartInfo part) {
-        Class<?> clazz = part != null ? (Class)part.getTypeClass() : null;
+        Class<?> clazz = part != null ? (Class<?>)part.getTypeClass() : null;
         try {
             writeObject(marshaller, source, new JAXBElement(part.getElementQName(), clazz, null));
         } catch (JAXBException e) {
@@ -589,7 +589,7 @@ public final class JAXBEncoderDecoder {
                                     Object source, 
                                     MessagePartInfo part,
                                     boolean unwrap) {
-        Class<?> clazz = part != null ? (Class)part.getTypeClass() : null;
+        Class<?> clazz = part != null ? (Class<?>)part.getTypeClass() : null;
         if (clazz != null && Exception.class.isAssignableFrom(clazz) && part != null
             && Boolean.TRUE.equals(part.getProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION"))) {
             return unmarshallException(u, source, part);
@@ -606,8 +606,8 @@ public final class JAXBEncoderDecoder {
 
                 Object obj = unmarshall(u, source, elName, null, unwrap);
                 if (clazz.isArray() && obj instanceof List) {
-                    return ((List)obj).toArray((Object[])Array.newInstance(clazz.getComponentType(),
-                                                                           ((List)obj).size()));
+                    return ((List<?>)obj).toArray((Object[])Array.newInstance(clazz.getComponentType(),
+                                                                           ((List<?>)obj).size()));
                 }
 
                 return obj;
@@ -664,7 +664,7 @@ public final class JAXBEncoderDecoder {
 
     private static Object createSet(MessagePartInfo part, List<Object> ret) {
         Type genericType = (Type)part.getProperty("generic.type");
-        Class tp2 = (Class)((ParameterizedType)genericType).getRawType();
+        Class<?> tp2 = (Class<?>)((ParameterizedType)genericType).getRawType();
         if (tp2.isInterface()) {
             return new HashSet<Object>(ret);
         }
@@ -704,10 +704,10 @@ public final class JAXBEncoderDecoder {
         if (genericType instanceof ParameterizedType) {
             Type tp2 = ((ParameterizedType)genericType).getRawType();
             if (tp2 instanceof Class) {
-                Class<?> cls = (Class)tp2;
+                Class<?> cls = (Class<?>)tp2;
                 if (!cls.isInterface() && List.class.isAssignableFrom((Class<?>)cls)) {
                     try {
-                        return CastUtils.cast((List)cls.newInstance());
+                        return CastUtils.cast((List<?>)cls.newInstance());
                     } catch (Exception e) {
                         // ignore, just return an ArrayList
                     }
@@ -959,7 +959,7 @@ public final class JAXBEncoderDecoder {
 
     public static Class<?> getClassFromType(Type t) {
         if (t instanceof Class) {
-            return (Class)t;
+            return (Class<?>)t;
         } else if (t instanceof GenericArrayType) {
             GenericArrayType g = (GenericArrayType)t;
             return Array.newInstance(getClassFromType(g.getGenericComponentType()), 0).getClass();

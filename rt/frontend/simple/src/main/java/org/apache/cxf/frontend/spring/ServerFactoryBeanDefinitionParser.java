@@ -62,7 +62,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element el, String name) {
         if ("properties".equals(name)) {
-            Map map = ctx.getDelegate().parseMapElement(el, bean.getBeanDefinition());
+            Map<?, ?> map = ctx.getDelegate().parseMapElement(el, bean.getBeanDefinition());
             bean.addPropertyValue("properties", map);
         } else if ("executor".equals(name)) {
             setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");
@@ -73,7 +73,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
             || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
             || "features".equals(name) || "schemaLocations".equals(name)) {
-            List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
+            List<?> list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else {
             setFirstChildAsProperty(el, ctx, bean, name);            

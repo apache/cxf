@@ -35,6 +35,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.omg.CORBA.Object;
 
 public final class CorbaObjectReferenceHelper {
@@ -55,12 +56,10 @@ public final class CorbaObjectReferenceHelper {
     
     public static QName getServiceName(Binding binding, Definition wsdlDef) {
         LOG.log(Level.FINE, "Getting service name for an object reference");
-        Collection services = wsdlDef.getServices().values();
-        for (Iterator iter = services.iterator(); iter.hasNext();) {
-            Service serv = (Service)iter.next();
-            Collection ports = serv.getPorts().values();
-            for (Iterator portIter = ports.iterator(); portIter.hasNext();) {
-                Port pt = (Port)portIter.next();
+        Collection<Service> services = CastUtils.cast(wsdlDef.getServices().values());
+        for (Service serv: services) {
+            Collection<Port> ports = CastUtils.cast(serv.getPorts().values());
+            for (Port pt: ports) {
                 if (pt.getBinding().equals(binding)) {
                     return serv.getQName();
                 }
@@ -71,12 +70,10 @@ public final class CorbaObjectReferenceHelper {
     
     public static String getEndpointName(Binding binding, Definition wsdlDef) {
         LOG.log(Level.FINE, "Getting endpoint name for an object reference");
-        Collection services = wsdlDef.getServices().values();
-        for (Iterator iter = services.iterator(); iter.hasNext();) {
-            Service serv = (Service)iter.next();
-            Collection ports = serv.getPorts().values();
-            for (Iterator portIter = ports.iterator(); portIter.hasNext();) {
-                Port pt = (Port)portIter.next();
+        Collection<Service> services = CastUtils.cast(wsdlDef.getServices().values());
+        for (Service serv: services) {
+            Collection<Port> ports = CastUtils.cast(serv.getPorts().values());
+            for (Port pt: ports) {
                 if (pt.getBinding().equals(binding)) {
                     return pt.getName();
                 }

@@ -135,7 +135,7 @@ public class HttpConduitBeanDefinitionParser
     protected void mapBeanOrClassElement(
         Element               element, 
         BeanDefinitionBuilder bean,
-        Class                 elementClass
+        Class<?>              elementClass
     ) {
         String elementName = element.getLocalName();
     

@@ -139,7 +139,7 @@ public class SDODataBinding extends AbstractDataBinding
                 String pkg = cls.getPackage().getName();
                 if (!pkgs.contains(pkg)) {
                     try {
-                        Class fact = Class.forName(pkg + ".SdoFactory", false, cls.getClassLoader());
+                        Class<?> fact = Class.forName(pkg + ".SdoFactory", false, cls.getClassLoader());
                         registerFactory(fact);
                         pkgs.add(pkg);
                     } catch (Throwable t) {
@@ -166,7 +166,7 @@ public class SDODataBinding extends AbstractDataBinding
         Method method = factory.getClass().getMethod("register", new Class[] {HelperContext.class});
         method.invoke(factory, new Object[] {context});
     }
-    boolean register(Class javaType) {
+    boolean register(Class<?> javaType) {
         if (javaType == null || DataObject.class == javaType) {
             return false;
         }

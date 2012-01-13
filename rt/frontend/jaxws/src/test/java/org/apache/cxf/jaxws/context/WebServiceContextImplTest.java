@@ -81,11 +81,10 @@ public class WebServiceContextImplTest extends Assert {
     
     // CXF-3989
     @Test
-    @SuppressWarnings("unchecked")
     public void testSetHttpRequestHeadersScope() {
         MessageImpl msg = new MessageImpl();
         MessageContext context = new WrappedMessageContext(msg);
-        Map headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<String, List<String>>();
         List<String> values = new ArrayList<String>();
         values.add("Value1");
         headers.put("Header1", values);

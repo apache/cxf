@@ -74,7 +74,6 @@ public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
         assertEquals("document", sop.getStyle());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testJaxbExtraClass() throws Exception {
         
@@ -82,7 +81,7 @@ public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
         cfBean.setAddress("http://localhost/Hello");
         cfBean.setBus(getBus());
         cfBean.setServiceClass(HelloService.class);
-        Map props = cfBean.getProperties();
+        Map<String, Object> props = cfBean.getProperties();
         if (props == null) {
             props = new HashMap<String, Object>();
         }
@@ -91,7 +90,8 @@ public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
         cfBean.setProperties(props);
         Client client = cfBean.create();
         assertNotNull(client);
-        Class[] extraClass = ((JAXBDataBinding)cfBean.getServiceFactory().getDataBinding()).getExtraClass();
+        Class<?>[] extraClass = ((JAXBDataBinding)cfBean.getServiceFactory().getDataBinding())
+            .getExtraClass();
         assertEquals(extraClass.length, 2);
         assertEquals(extraClass[0], GreetMe.class);
         assertEquals(extraClass[1], GreetMeOneWay.class);

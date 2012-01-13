@@ -105,7 +105,7 @@ public class BeanType extends AegisType {
         BeanTypeInfo inf = getTypeInfo();
 
         try {
-            Class clazz = getTypeClass();
+            Class<?> clazz = getTypeClass();
             Object object;
             // the target for properties; either the object or the proxy handler
             Object target;
@@ -293,7 +293,7 @@ public class BeanType extends AegisType {
                 }
             }
 
-            Class propertyType = desc.getPropertyType();
+            Class<?> propertyType = desc.getPropertyType();
             if ((property == null && !propertyType.isPrimitive()) || (property != null)) {
                 m.invoke(object, new Object[] {
                     property
@@ -572,7 +572,7 @@ public class BeanType extends AegisType {
      */
     public AegisType getSuperType() {
         BeanTypeInfo inf = getTypeInfo();
-        Class c = inf.getTypeClass();
+        Class<?> c = inf.getTypeClass();
         if (c.isInterface() && c.getInterfaces().length == 1) {
             c = c.getInterfaces()[0];
         } else {
@@ -634,7 +634,7 @@ public class BeanType extends AegisType {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getName());
         sb.append(": [class=");
-        Class c = getTypeClass();
+        Class<?> c = getTypeClass();
         sb.append((c == null) ? "<null>" : c.getName());
         sb.append(",\nQName=");
         QName q = getSchemaType();

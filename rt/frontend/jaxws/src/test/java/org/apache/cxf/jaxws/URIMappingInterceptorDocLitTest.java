@@ -153,11 +153,11 @@ public class URIMappingInterceptorDocLitTest extends AbstractCXFTest {
     private void assertion() throws Exception {
         Object parameters = message.getContent(List.class);
         assertNotNull(parameters);
-        assertEquals(2, ((List)parameters).size());
+        assertEquals(2, ((List<?>)parameters).size());
                  
-        Integer value = (Integer) ((List)parameters).get(0);       
+        Integer value = (Integer) ((List<?>)parameters).get(0);       
         assertEquals(1, value.intValue());
-        value = (Integer) ((List)parameters).get(1);
+        value = (Integer) ((List<?>)parameters).get(1);
         assertEquals(0, value.intValue());
         BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
         assertNotNull(boi);

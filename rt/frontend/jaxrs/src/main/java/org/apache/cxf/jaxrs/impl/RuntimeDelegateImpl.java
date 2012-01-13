@@ -40,8 +40,8 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 
 public class RuntimeDelegateImpl extends RuntimeDelegate {
-    protected Map<Class, HeaderDelegate> headerProviders 
-        = new HashMap<Class, HeaderDelegate>();    
+    protected Map<Class<?>, HeaderDelegate> headerProviders 
+        = new HashMap<Class<?>, HeaderDelegate>();    
 
     public RuntimeDelegateImpl() {
         headerProviders.put(MediaType.class, new MediaTypeHeaderProvider());

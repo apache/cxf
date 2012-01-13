@@ -23,7 +23,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-public class TestInterceptor extends AbstractPhaseInterceptor {
+public class TestInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public TestInterceptor() {
         super(Phase.SEND);

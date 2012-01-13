@@ -198,7 +198,7 @@ public final class TypeUtil {
      */
     public static Class<?> getTypeClass(Type type, boolean throwForNonClass) {
         if (type instanceof Class) {
-            return (Class) type;
+            return (Class<?>) type;
         } else if (throwForNonClass) {
             throw new RuntimeException("Attempt to derive Class from reflection Type " + type);
         } else {

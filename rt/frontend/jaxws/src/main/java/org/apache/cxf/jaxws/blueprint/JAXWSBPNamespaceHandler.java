@@ -63,6 +63,7 @@ public class JAXWSBPNamespaceHandler implements NamespaceHandler {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     public Set<Class> getManagedClasses() {
         return null;
     }

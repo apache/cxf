@@ -114,8 +114,8 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             boolean isList = Collection.class.isAssignableFrom(clazz);
             if (isFromWrapper) {
                 if (genericType instanceof Class
-                    && ((Class)genericType).isArray()) {
-                    Class cl2 = (Class)genericType;
+                    && ((Class<?>)genericType).isArray()) {
+                    Class<?> cl2 = (Class<?>)genericType;
                     if (cl2.isArray()
                         && !Byte.TYPE.equals(cl2.getComponentType())) {
                         genericType = cl2.getComponentType();
@@ -135,7 +135,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     && pt.getActualTypeArguments()[0] instanceof Class) {
 
                     Class<? extends Object> arrayCls =
-                        Array.newInstance((Class) pt.getActualTypeArguments()[0], 0).getClass();
+                        Array.newInstance((Class<?>) pt.getActualTypeArguments()[0], 0).getClass();
                     clazz = arrayCls;
                     part.setTypeClass(clazz);
                     if (isFromWrapper) {
@@ -146,7 +146,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     GenericArrayType gat = (GenericArrayType)pt.getActualTypeArguments()[0];
                     gat.getGenericComponentType();
                     Class<? extends Object> arrayCls =
-                        Array.newInstance((Class) gat.getGenericComponentType(), 0).getClass();
+                        Array.newInstance((Class<?>) gat.getGenericComponentType(), 0).getClass();
                     clazz = Array.newInstance(arrayCls, 0).getClass();
                     part.setTypeClass(clazz);
                     if (isFromWrapper) {
@@ -213,10 +213,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     }
     private void addType(Type cls, boolean allowArray) {
         if (cls instanceof Class) {
-            if (((Class)cls).isArray() && !allowArray) {
-                addClass(((Class)cls).getComponentType());
+            if (((Class<?>)cls).isArray() && !allowArray) {
+                addClass(((Class<?>)cls).getComponentType());
             } else {
-                addClass((Class)cls);
+                addClass((Class<?>)cls);
             }
         } else if (cls instanceof ParameterizedType) {
             addType(((ParameterizedType)cls).getRawType());
@@ -224,17 +224,17 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 addType(t2);
             }
         } else if (cls instanceof GenericArrayType) {
-            Class ct;
+            Class<?> ct;
             GenericArrayType gt = (GenericArrayType)cls;
             Type componentType = gt.getGenericComponentType();
             if (componentType instanceof Class) {
-                ct = (Class)componentType;
+                ct = (Class<?>)componentType;
             } else {
-                TypeVariable tv = (TypeVariable)componentType;
+                TypeVariable<?> tv = (TypeVariable<?>)componentType;
                 Type[] bounds = tv.getBounds();
                 if (bounds != null && bounds.length == 1) {
                     if (bounds[0] instanceof Class) {
-                        ct = (Class)bounds[0];
+                        ct = (Class<?>)bounds[0];
                     } else {
                         throw new IllegalArgumentException("Unable to determine type for: " + tv);
                     }
@@ -253,7 +253,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 addType(t);
             }
         } else if (cls instanceof TypeVariable) {
-            for (Type t : ((TypeVariable)cls).getBounds()) {
+            for (Type t : ((TypeVariable<?>)cls).getBounds()) {
                 addType(t);
             }
         }
@@ -281,7 +281,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     //may have some interesting annoations we should consider
                     XmlSeeAlso xsa = cls.getAnnotation(XmlSeeAlso.class);
                     if (xsa != null) {
-                        for (Class c : xsa.value()) {
+                        for (Class<?> c : xsa.value()) {
                             addClass(c);
                         }
                     }

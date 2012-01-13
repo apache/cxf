@@ -120,7 +120,7 @@ public class JAXBDataBindingTest extends Assert {
 
     @Test
     public void testCreateReader() {
-        DataReader reader = jaxbDataBinding.createReader(XMLStreamReader.class);
+        DataReader<?> reader = jaxbDataBinding.createReader(XMLStreamReader.class);
         assertTrue(reader instanceof DataReaderImpl);
         
         reader = jaxbDataBinding.createReader(XMLEventReader.class);
@@ -153,7 +153,7 @@ public class JAXBDataBindingTest extends Assert {
 
     @Test
     public void testCreateWriter() {
-        DataWriter writer = jaxbDataBinding.createWriter(XMLStreamWriter.class);
+        DataWriter<?> writer = jaxbDataBinding.createWriter(XMLStreamWriter.class);
         assertTrue(writer instanceof DataWriterImpl);
         
         writer = jaxbDataBinding.createWriter(XMLEventWriter.class);
@@ -168,7 +168,7 @@ public class JAXBDataBindingTest extends Assert {
     
     @Test
     public void testExtraClass() {
-        Class[] extraClass = new Class[] {GreetMe.class, GreetMeOneWay.class};
+        Class<?>[] extraClass = new Class[] {GreetMe.class, GreetMeOneWay.class};
         jaxbDataBinding.setExtraClass(extraClass);
         assertEquals(jaxbDataBinding.getExtraClass().length, 2);
         assertEquals(jaxbDataBinding.getExtraClass()[0], GreetMe.class);

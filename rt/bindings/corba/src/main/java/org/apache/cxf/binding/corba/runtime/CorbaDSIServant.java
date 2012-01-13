@@ -101,7 +101,7 @@ public class CorbaDSIServant extends DynamicImplementation {
         // Build the list of CORBA operations and the WSDL operations they map to.  Note that
         // the WSDL operation name may not always match the CORBA operation name.
         BindingInfo bInfo = destination.getBindingInfo();
-        Iterator i = bInfo.getOperations().iterator();
+        Iterator<BindingOperationInfo> i = bInfo.getOperations().iterator();
         
         operationMap = new HashMap<String, QName>(bInfo.getOperations().size());
 

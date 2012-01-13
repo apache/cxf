@@ -59,8 +59,8 @@ public class WrapperClassGeneratorTest extends Assert {
         
         InterfaceInfo interfaceInfo = serviceInfo.getInterface();
         OperationInfo inf = interfaceInfo.getOperations().iterator().next();
-        Class requestClass = inf.getInput().getMessagePart(0).getTypeClass();
-        Class responseClass = inf.getOutput().getMessagePart(0).getTypeClass();
+        Class<?> requestClass = inf.getInput().getMessagePart(0).getTypeClass();
+        Class<?> responseClass = inf.getOutput().getMessagePart(0).getTypeClass();
                         
         // Create request wrapper Object
         List<String> partNames = Arrays.asList(new String[] {"arg0"});

@@ -123,7 +123,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
             throw new ServiceConstructionException(new Message("NO_JAXB_CLASSMapping", LOG, name));
         }
             
-        Class cls;
+        Class<?> cls;
         
         try {
             int arrayCount = 0;
@@ -166,12 +166,12 @@ public class TypeClassInitializer extends ServiceModelVisitor {
         super.begin(part);
     }
 
-    private Class<?> createFaultClass(Class cls) {
+    private Class<?> createFaultClass(Class<?> cls) {
         return new ExceptionCreator().createExceptionClass(cls);
     }
 
-    private Class getClassByName(JType jType) throws ClassNotFoundException {
-        Class cls;
+    private Class<?> getClassByName(JType jType) throws ClassNotFoundException {
+        Class<?> cls;
         
         if (!jType.isPrimitive()) {
             cls = ClassLoaderUtils.loadClass(jType.binaryName(), getClass());

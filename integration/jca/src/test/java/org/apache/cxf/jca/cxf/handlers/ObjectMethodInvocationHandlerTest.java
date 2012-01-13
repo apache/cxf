@@ -95,7 +95,7 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
     @Test
     public void testEqualsThroughProxies() { 
 
-        Class[] interfaces = {TestInterface.class};
+        Class<?>[] interfaces = {TestInterface.class};
         CXFInvocationHandlerData data1 = new CXFInvocationHandlerDataImpl();
         CXFInvocationHandlerData data2 = new CXFInvocationHandlerDataImpl();
         data1.setTarget(new TestTarget());

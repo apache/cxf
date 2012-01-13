@@ -38,8 +38,9 @@ public class EnumType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
         String value = reader.getValue();
-
-        return Enum.valueOf(getTypeClass(), value.trim());
+        @SuppressWarnings("rawtypes")
+        Class<? extends Enum> cls = (Class<? extends Enum>)getTypeClass();
+        return Enum.valueOf(cls, value.trim());
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 public class ColocBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
     @Override
-    protected Class getBeanClass(Element arg0) {
+    protected Class<?> getBeanClass(Element arg0) {
         return ColocFeature.class;
     }
 

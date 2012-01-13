@@ -59,7 +59,7 @@ public class PolicyExtensionsTest extends Assert {
 
             AssertionBuilderRegistry abr = bus.getExtension(AssertionBuilderRegistry.class);
             assertNotNull(abr);
-            AssertionBuilder ab = abr.getBuilder(KNOWN);
+            AssertionBuilder<?> ab = abr.getBuilder(KNOWN);
             assertNotNull(ab);
             ab = abr.getBuilder(UNKNOWN);
             assertNull(ab);

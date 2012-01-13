@@ -57,7 +57,7 @@ public class XMLMessageInInterceptorTest extends TestBase {
         
         in.handleMessage(xmlMessage);
         docLitIn.handleMessage(xmlMessage);
-        List list = xmlMessage.getContent(List.class);
+        List<?> list = xmlMessage.getContent(List.class);
         assertNotNull(list);
         assertEquals("expect 2 param", 2, list.size());
         assertEquals("method input in2 is MyComplexStructType", true,
@@ -76,7 +76,7 @@ public class XMLMessageInInterceptorTest extends TestBase {
         
         in.handleMessage(xmlMessage);
         docLitIn.handleMessage(xmlMessage);
-        List list = xmlMessage.getContent(List.class);
+        List<?> list = xmlMessage.getContent(List.class);
         assertNotNull(list);
         assertEquals("expect 1 param", 1, list.size());
         assertEquals("method input me is String tli", true, ((String) list.get(0)).indexOf("tli") >= 0);
@@ -94,7 +94,7 @@ public class XMLMessageInInterceptorTest extends TestBase {
         
         in.handleMessage(xmlMessage);
         docLitIn.handleMessage(xmlMessage);
-        List list = xmlMessage.getContent(List.class);
+        List<?> list = xmlMessage.getContent(List.class);
         assertNotNull(list);
         assertEquals("expect 1 param", 1, list.size());
         assertEquals("method input me is String tli", true, list.get(0) instanceof GreetMe);

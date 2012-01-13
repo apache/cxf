@@ -129,11 +129,11 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         // Need to copy header only if the message is going out.
         if (ctx.containsKey(Header.HEADER_LIST) 
                 && ctx.get(Header.HEADER_LIST) instanceof List<?>) {
-            List list = (List) ctx.get(Header.HEADER_LIST);
+            List<?> list = (List<?>) ctx.get(Header.HEADER_LIST);
             if (list != null && !list.isEmpty()) {
                 SoapMessage sm = (SoapMessage) createResponseMessage(exchange);
                 if (sm != null) {
-                    Iterator iter = list.iterator();
+                    Iterator<?> iter = list.iterator();
                     while (iter.hasNext()) {
                         sm.getHeaders().add((Header) iter.next());
                     }
@@ -171,11 +171,11 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
     protected void updateHeader(Exchange exchange, MessageContext ctx) {
         if (ctx.containsKey(Header.HEADER_LIST) 
                 && ctx.get(Header.HEADER_LIST) instanceof List<?>) {
-            List list = (List) ctx.get(Header.HEADER_LIST);
+            List<?> list = (List<?>) ctx.get(Header.HEADER_LIST);
             if (list != null && !list.isEmpty()) {
                 SoapMessage sm = (SoapMessage) createResponseMessage(exchange);
                 if (sm != null) {
-                    Iterator iter = list.iterator();
+                    Iterator<?> iter = list.iterator();
                     while (iter.hasNext()) {
                         Header header = (Header) iter.next();
                         if (!header.getName().getNamespaceURI().

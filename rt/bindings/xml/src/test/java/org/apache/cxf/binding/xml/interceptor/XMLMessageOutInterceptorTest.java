@@ -176,7 +176,7 @@ public class XMLMessageOutInterceptorTest extends TestBase {
         assertEquals(greetMe.getRequestType(), dxr.getText());
     }
 
-    private void prepareMessage(List paramsList) throws Exception {
+    private void prepareMessage(List<?> paramsList) throws Exception {
         outputStream = new ByteArrayOutputStream();
         // all test case here use input message to do test,
         // that means the out interceptor's role is Server-Out
