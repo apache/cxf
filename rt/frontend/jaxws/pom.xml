@@ -157,6 +157,7 @@
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
             <scope>provided</scope>
+	    <optional>true</optional>
         </dependency>
     </dependencies>
 
