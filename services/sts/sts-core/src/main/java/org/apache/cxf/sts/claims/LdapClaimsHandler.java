@@ -40,6 +40,7 @@ import javax.security.auth.x500.X500Principal;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
@@ -191,13 +192,12 @@ public class LdapClaimsHandler implements ClaimsHandler {
             };
         
         
-        @SuppressWarnings("unchecked")
-        List result = ldap.search((this.userBaseDn == null) ? "" : this.userBaseDn, filter.toString(),
+        List<?> result = ldap.search((this.userBaseDn == null) ? "" : this.userBaseDn, filter.toString(),
                 SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
       
         Map<String, Attribute> ldapAttributes = null;
         if (result != null && result.size() > 0) {
-            ldapAttributes = (Map<String, Attribute>)result.get(0);
+            ldapAttributes = CastUtils.cast((Map<?, ?>)result.get(0));
         }
         
         ClaimCollection claimsColl = new ClaimCollection();
