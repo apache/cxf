@@ -22,8 +22,11 @@ import java.util.Collection;
 
 import javax.jws.WebService;
 import javax.wsdl.Definition;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.WebFault;
 
 import org.w3c.dom.Document;
 
@@ -194,6 +197,76 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         
     }
 
+    
+    @Test
+    public void testOnlyRootElementOnFaultBean() throws Exception {
+        //CXF-4016
+        EndpointImpl ep = (EndpointImpl)Endpoint.publish("local://foo4016", new CXF4016Impl());
+        ServiceWSDLBuilder wsdlBuilder = 
+            new ServiceWSDLBuilder(bus, ep.getService().getServiceInfos().get(0));
+        Definition def = wsdlBuilder.build();
+        Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
+        this.addNamespace("http://www.example.org/contract/DoubleIt", "tns");
+        //org.apache.cxf.helpers.XMLUtils.printDOM(d);
+        assertValid("//xsd:element[@ref='tns:CustomMessageBean']", d);
+    }
+
+
+    @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+                serviceName = "DoubleItService",
+                portName = "DoubleItPort")
+    public static class CXF4016Impl {
+        public int doubleIt(int numberToDouble) throws CustomException {
+            return numberToDouble * 2;
+        }
+        
+    } 
+    @WebFault(name = "CustomException", targetNamespace = "http://www.example.org/contract/DoubleIt")
+    public static class CustomException extends Exception {
+        private static final long serialVersionUID = 1L;
+        private CustomMessageBean faultInfo; 
+
+        public CustomException(String msg) {
+            super(msg);
+        }
+        public CustomException(String msg, CustomMessageBean b) {
+            super(msg);
+            faultInfo = b;
+        }
+        public CustomMessageBean getCustomMessage() {
+            return faultInfo;
+        }
+        public void setCustomMessage(CustomMessageBean b) {
+            faultInfo = b;
+        }
+    }
+    
+    @XmlRootElement(name = "CustomMessageBean")
+    @XmlType(name = "", propOrder = { "myId", "msg" })
+    public static class CustomMessageBean {
+        String msg;
+        int myId;
+        
+        public CustomMessageBean() {
+        }
+
+        public int getMyId() {
+            return myId;
+        }
+
+        public void setMyId(int myId) {
+            this.myId = myId;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+    }
+    
     
     @Test
     public void testDocumentationOnImpl() throws Exception {
