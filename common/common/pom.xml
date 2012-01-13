@@ -45,7 +45,6 @@
             org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
             org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
         </cxf.osgi.import>
-        <cxf.fragment.host>org.apache.cxf.cxf-api</cxf.fragment.host>
     </properties>
 
     <dependencies>

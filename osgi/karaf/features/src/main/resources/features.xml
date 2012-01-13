@@ -150,8 +150,8 @@
     <feature name="cxf-core" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-alldeps</feature>
 
-        <bundle start-level='30'>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
         <bundle start-level='30'>mvn:org.apache.cxf/cxf-common-utilities/${project.version}</bundle>
+        <bundle start-level='30'>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
         <bundle start-level='30'>mvn:org.apache.cxf/cxf-rt-core/${project.version}</bundle>
     </feature>
 
