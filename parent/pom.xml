@@ -93,7 +93,7 @@
         <cxf.specs.jaxws.api.version>1.1</cxf.specs.jaxws.api.version>
 
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jetty.version>7.5.3.v20111011</cxf.jetty.version>
+        <cxf.jetty.version>7.5.4.v20111024</cxf.jetty.version>
 	    <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
         <cxf.msv.version>2011.1</cxf.msv.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
