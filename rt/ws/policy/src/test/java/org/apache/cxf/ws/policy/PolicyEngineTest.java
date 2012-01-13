@@ -668,7 +668,7 @@ public class PolicyEngineTest extends Assert {
     private Set<String> getInterceptorIds(List<Interceptor<? extends Message>> interceptors) {
         Set<String> ids = new HashSet<String>();
         for (Interceptor<? extends Message> i : interceptors) {
-            ids.add(((PhaseInterceptor)i).getId());
+            ids.add(((PhaseInterceptor<? extends Message>)i).getId());
         }
         return ids;
     }

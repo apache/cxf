@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -313,9 +312,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         if (container == null) {
             return;
         }
-        for (Iterator itr = container.getMessageParts().iterator(); itr.hasNext();) {
-            MessagePartInfo part = (MessagePartInfo)itr.next();
-
+        for (MessagePartInfo part : container.getMessageParts()) {
             AegisType type = getParameterType(s, serviceTM, part, partType);
 
             if (part.getXmlSchema() == null) {
@@ -380,8 +377,7 @@ public class AegisDatabinding extends AbstractDataBinding {
             return;
         }
         SchemaCollection col = s.getXmlSchemaCollection();
-        for (Iterator itr = container.getMessageParts().iterator(); itr.hasNext();) {
-            MessagePartInfo part = (MessagePartInfo)itr.next();
+        for (MessagePartInfo part: container.getMessageParts()) {
             if (part.getXmlSchema() == null) {
                 if (part.isElement()) {
                     XmlSchemaAnnotated tp = col.getElementByQName(part.getElementQName());

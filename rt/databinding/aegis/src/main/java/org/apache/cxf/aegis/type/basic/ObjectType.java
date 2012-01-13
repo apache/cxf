@@ -210,10 +210,10 @@ public class ObjectType extends AegisType {
             return type;
         }
 
-        Class[] interfaces = clazz.getInterfaces();
+        Class<?>[] interfaces = clazz.getInterfaces();
 
         for (int i = 0; i < interfaces.length; i++) {
-            Class anInterface = interfaces[i];
+            Class<?> anInterface = interfaces[i];
 
             type = tm.getType(anInterface);
 
@@ -222,7 +222,7 @@ public class ObjectType extends AegisType {
             }
         }
 
-        Class superclass = clazz.getSuperclass();
+        Class<?> superclass = clazz.getSuperclass();
 
         if (null == superclass || Object.class.equals(superclass)) {
             return null;

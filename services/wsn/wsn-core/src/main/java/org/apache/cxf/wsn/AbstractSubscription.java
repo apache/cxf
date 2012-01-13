@@ -328,9 +328,9 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         // Check filter
         if (subscribeRequest.getFilter() != null) {
             for (Object f : subscribeRequest.getFilter().getAny()) {
-                JAXBElement e = null;
+                JAXBElement<?> e = null;
                 if (f instanceof JAXBElement) {
-                    e = (JAXBElement) f;
+                    e = (JAXBElement<?>) f;
                     f = e.getValue();
                 }
                 if (f instanceof TopicExpressionType) {
@@ -373,9 +373,9 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         // Check policy
         if (subscribeRequest.getSubscriptionPolicy() != null) {
             for (Object p : subscribeRequest.getSubscriptionPolicy().getAny()) {
-                JAXBElement e = null;
+                JAXBElement<?> e = null;
                 if (p instanceof JAXBElement) {
-                    e = (JAXBElement) p;
+                    e = (JAXBElement<?>) p;
                     p = e.getValue();
                 }
                 if (p instanceof UseRaw) {

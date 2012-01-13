@@ -566,9 +566,9 @@ public interface CertificateHostnameVerifier extends javax.net.ssl.HostnameVerif
                 cpe.printStackTrace();
             }
             if (c != null) {
-                Iterator it = c.iterator();
+                Iterator<List<?>> it = c.iterator();
                 while (it.hasNext()) {
-                    List list = (List) it.next();
+                    List<?> list = it.next();
                     int type = ((Integer) list.get(0)).intValue();
                     // If type is 2, then we've got a dNSName
                     if (type == 2) {

@@ -129,35 +129,37 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         return invoke("local://" + service, LocalTransportFactory.TRANSPORT_ID, message);
     }
 
-    public Server createService(Class serviceClass, QName name) {
+    public Server createService(Class<?> serviceClass, QName name) {
         return createService(serviceClass, null, name);
     }
 
-    public Server createService(Class serviceClass, Object serviceBean, QName name) {
+    public Server createService(Class<?> serviceClass, Object serviceBean, QName name) {
         return createService(serviceClass, serviceBean, serviceClass.getSimpleName(), name);
     }
 
-    protected Server createService(Class serviceClass, QName name, AegisDatabinding binding) {
+    protected Server createService(Class<?> serviceClass, QName name, AegisDatabinding binding) {
         return createService(serviceClass, serviceClass.getSimpleName(), name, binding);
     }
 
-    protected Server createService(Class serviceClass, String address, QName name, AegisDatabinding binding) {
+    protected Server createService(Class<?> serviceClass, String address, QName name,
+                                   AegisDatabinding binding) {
         ServerFactoryBean sf = createServiceFactory(serviceClass, null, address, name, binding);
         return sf.create();
     }
 
-    protected Server createService(Class serviceClass, String address) {
+    protected Server createService(Class<?> serviceClass, String address) {
         ServerFactoryBean sf = createServiceFactory(serviceClass, null, address, null, null);
         return sf.create();
     }
 
-    protected Server createService(Class serviceClass) {
+    protected Server createService(Class<?> serviceClass) {
         ServerFactoryBean sf = createServiceFactory(serviceClass, null, serviceClass.getSimpleName(), null,
                                                     null);
         return sf.create();
     }
 
-    protected Server createJaxwsService(Class serviceClass, Object serviceBean, String address, QName name) {
+    protected Server createJaxwsService(Class<?> serviceClass, 
+                                        Object serviceBean, String address, QName name) {
         if (address == null) {
             address = serviceClass.getSimpleName();
         }
@@ -179,18 +181,19 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         return serverFactoryBean.create();
     }
 
-    public Server createService(Class serviceClass, Object serviceBean, String address, QName name) {
+    public Server createService(Class<?> serviceClass, Object serviceBean, String address, QName name) {
         ServerFactoryBean sf = createServiceFactory(serviceClass, serviceBean, address, name, null);
         return sf.create();
     }
 
-    public Server createService(Class serviceClass, Object serviceBean, String address,
+    public Server createService(Class<?> serviceClass, Object serviceBean, String address,
                                 AegisDatabinding binding) {
         ServerFactoryBean sf = createServiceFactory(serviceClass, serviceBean, address, null, binding);
         return sf.create();
     }
 
-    protected ServerFactoryBean createServiceFactory(Class serviceClass, Object serviceBean, String address,
+    protected ServerFactoryBean createServiceFactory(Class<?> serviceClass, 
+                                                     Object serviceBean, String address,
                                                      QName name, AegisDatabinding binding) {
         ServerFactoryBean sf = new ServerFactoryBean();
         sf.setServiceClass(serviceClass);

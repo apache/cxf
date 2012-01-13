@@ -80,8 +80,8 @@ public class X509TokenBuilder implements AssertionBuilder<Element> {
             Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
             policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-            for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-                processAlternative((List)iterator.next(), x509Token, consts);
+            for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+                processAlternative(iterator.next(), x509Token, consts);
 
                 /*
                  * since there should be only one alternative
@@ -92,12 +92,10 @@ public class X509TokenBuilder implements AssertionBuilder<Element> {
         return x509Token;
     }
 
-    private void processAlternative(List assertions, X509Token parent, SPConstants consts) {
-        Assertion assertion;
+    private void processAlternative(List<Assertion> assertions, X509Token parent, SPConstants consts) {
         QName name;
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-            assertion = (Assertion)iterator.next();
+        for (Assertion assertion : assertions) {
             name = assertion.getName();
             
             if (!consts.getNamespace().equals(name.getNamespaceURI())) {

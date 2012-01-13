@@ -64,21 +64,16 @@ public class RecipientEncryptionTokenBuilder implements AssertionBuilder<Element
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative((List)iterator.next(), recipientEncryptionToken);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternative(iterator.next(), recipientEncryptionToken);
             break; // TODO process all the token that must be set ..
         }
 
         return recipientEncryptionToken;
     }
 
-    private void processAlternative(List assertions, RecipientEncryptionToken parent) {
-
-        Assertion assertion;
-
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-            assertion = (Assertion)iterator.next();
-
+    private void processAlternative(List<Assertion> assertions, RecipientEncryptionToken parent) {
+        for (Assertion assertion : assertions) {
             if (assertion instanceof Token) {
                 parent.setRecipientEncryptionToken((Token)assertion);
             }

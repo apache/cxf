@@ -201,12 +201,12 @@ public class LocalTransportFactory extends AbstractTransportFactory
 
     
     public void copy(Message message, Message copy) {
-        Set<String> filter = CastUtils.cast((Set)message.get(MESSAGE_FILTER_PROPERTIES));
+        Set<String> filter = CastUtils.cast((Set<?>)message.get(MESSAGE_FILTER_PROPERTIES));
         if (filter == null) {
             filter = messageFilterProperties;
         }
         
-        Set<String> includes =  CastUtils.cast((Set)message.get(MESSAGE_INCLUDE_PROPERTIES));
+        Set<String> includes =  CastUtils.cast((Set<?>)message.get(MESSAGE_INCLUDE_PROPERTIES));
         if (includes == null) {
             includes = messageIncludeProperties;
         }

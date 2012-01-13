@@ -21,14 +21,14 @@ package org.apache.cxf.service.factory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-public class HelloServiceProxyFactory implements FactoryBean {
+public class HelloServiceProxyFactory implements FactoryBean<Object> {
     
     public Object getObject() throws Exception {
 
         return new ProxyFactory(HelloService.class, new HelloServiceInterceptor()).getProxy();
     }
     
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
 
         return HelloServiceInterceptor.class;
     }

@@ -128,7 +128,7 @@ public class HTTPTransportFactory
         List<?>     ees
     ) {
         if (ees != null) {
-            for (Iterator itr = ees.iterator(); itr.hasNext();) {
+            for (Iterator<?> itr = ees.iterator(); itr.hasNext();) {
                 Object extensor = itr.next();
     
                 if (extensor instanceof HTTPAddress) {

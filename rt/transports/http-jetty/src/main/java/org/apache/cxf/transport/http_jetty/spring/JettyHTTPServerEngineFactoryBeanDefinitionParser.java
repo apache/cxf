@@ -95,7 +95,7 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
                                 "createThreadingParametersMap"));
             
             // parser the engine list
-            List list = 
+            List<Object> list = 
                 getRequiredElementsList(element, ctx, new QName(HTTP_JETTY_NS, "engine"), bean);
             if (list.size() > 0) {
                 bean.addPropertyValue("enginesList", list);
@@ -105,14 +105,13 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
         }
     }    
     
-    @SuppressWarnings("unchecked")
-    private List getRequiredElementsList(Element parent, ParserContext ctx, QName name,
+    private List<Object> getRequiredElementsList(Element parent, ParserContext ctx, QName name,
                                          BeanDefinitionBuilder bean) {
        
         List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent, 
                                                                      name.getNamespaceURI(), 
                                                                      name.getLocalPart());
-        ManagedList list = new ManagedList(elemList.size());
+        ManagedList<Object> list = new ManagedList<Object>(elemList.size());
         list.setSource(ctx.extractSource(parent));
         
         for (Element elem : elemList) {

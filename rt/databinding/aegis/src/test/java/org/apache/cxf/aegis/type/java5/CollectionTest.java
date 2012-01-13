@@ -129,9 +129,9 @@ public class CollectionTest extends AbstractAegisTest {
         tm.setTypeCreator(creator);
 
         AegisType dto = creator.createType(CollectionDTO.class);
-        Set deps = dto.getDependencies();
+        Set<AegisType> deps = dto.getDependencies();
 
-        AegisType type = (AegisType)deps.iterator().next();
+        AegisType type = deps.iterator().next();
 
         assertTrue(type instanceof CollectionType);
 
@@ -152,11 +152,11 @@ public class CollectionTest extends AbstractAegisTest {
         tm.setTypeCreator(creator);
 
         AegisType dto = creator.createType(ObjectDTO.class);
-        Set deps = dto.getDependencies();
+        Set<AegisType> deps = dto.getDependencies();
 
         assertFalse(deps.isEmpty());
 
-        AegisType type = (AegisType)deps.iterator().next();
+        AegisType type = deps.iterator().next();
 
         assertTrue(type instanceof CollectionType);
 

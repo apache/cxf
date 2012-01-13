@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.jms.uri;
 
 import java.net.URI;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +48,7 @@ public final class JMSEndpointParser {
         if (idx > 0) {
             path = path.substring(0, idx);
         }
-        Map parameters = URISupport.parseParameters(u);
+        Map<String, String> parameters = URISupport.parseParameters(u);
 
         validateURI(uri, path, parameters);
 
@@ -71,7 +70,7 @@ public final class JMSEndpointParser {
      * @param endpoint
      * @param parameters
      */
-    private static void configureProperties(JMSEndpoint endpoint, Map parameters) {
+    private static void configureProperties(JMSEndpoint endpoint, Map<String, String> parameters) {
         String deliveryMode = getAndRemoveParameter(parameters,
                                                     JMSURIConstants.DELIVERYMODE_PARAMETER_NAME);
         String timeToLive = getAndRemoveParameter(parameters,
@@ -118,10 +117,8 @@ public final class JMSEndpointParser {
             endpoint.setJndiURL(jndiUrl);
         }
 
-        Iterator iter = parameters.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = (String)iter.next();
-            String value = (String)parameters.get(key);
+        for (String key : parameters.keySet()) {
+            String value = parameters.get(key);
             if (value == null || value.equals("")) {
                 continue;
             }
@@ -139,7 +136,8 @@ public final class JMSEndpointParser {
      * @param deliverymodeParameterName
      * @return
      */
-    private static String getAndRemoveParameter(Map parameters, String parameterName) {
+    private static String getAndRemoveParameter(Map<String, String> parameters,
+                                                String parameterName) {
         String value = (String)parameters.get(parameterName);
         parameters.remove(parameterName);
         return value;
@@ -153,7 +151,7 @@ public final class JMSEndpointParser {
      * @param parameters the parameters, an empty map if no parameters given
      * @throws ResolveEndpointFailedException should be thrown if the URI validation failed
      */
-    protected static void validateURI(String uri, String path, Map parameters)
+    protected static void validateURI(String uri, String path, Map<String, String> parameters)
         throws ResolveEndpointFailedException {
         // check for uri containing & but no ? marker
         if (uri.contains("&") && !uri.contains("?")) {

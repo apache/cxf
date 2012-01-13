@@ -461,7 +461,7 @@ public class JettyHTTPDestinationTest extends Assert {
         assertNotNull(refWithId.getReferenceParameters().getAny());
         assertTrue("it is an element", 
                    refWithId.getReferenceParameters().getAny().get(0) instanceof JAXBElement);
-        JAXBElement el = (JAXBElement) refWithId.getReferenceParameters().getAny().get(0);
+        JAXBElement<?> el = (JAXBElement<?>) refWithId.getReferenceParameters().getAny().get(0);
         assertEquals("match our id", el.getValue(), id);
     }
     

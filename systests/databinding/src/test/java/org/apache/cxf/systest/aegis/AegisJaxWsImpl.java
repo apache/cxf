@@ -39,7 +39,7 @@ public class AegisJaxWsImpl implements AegisJaxWs {
         items.put(item.getKey(), item);
     }
 
-    public Map getItemsMap() {
+    public Map<?, ?> getItemsMap() {
         return items;
     }
 

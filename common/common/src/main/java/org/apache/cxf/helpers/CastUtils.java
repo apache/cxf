@@ -20,6 +20,8 @@
 package org.apache.cxf.helpers;
 
 import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,13 @@ public final class CastUtils {
     }
     public static <T, U> Map<T, U> cast(Map<?, ?> p, Class<T> t, Class<U> u) {
         return (Map<T, U>)p;
+    }
+
+    public static <T, U> Dictionary<T, U> cast(Dictionary<?, ?> p) {
+        return (Dictionary<T, U>)p;
+    }
+    public static <T, U> Dictionary<T, U> cast(Dictionary<?, ?> p, Class<T> t, Class<U> u) {
+        return (Dictionary<T, U>)p;
     }
     
     public static <T> Collection<T> cast(Collection<?> p) {
@@ -60,7 +69,15 @@ public final class CastUtils {
     public static <T> Iterator<T> cast(Iterator<?> p, Class<T> cls) {
         return (Iterator<T>)p;
     }
+
+    public static <T> Enumeration<T> cast(Enumeration<?> p) {
+        return (Enumeration<T>)p;
+    }
     
+    public static <T> Enumeration<T> cast(Enumeration<?> p, Class<T> cls) {
+        return (Enumeration<T>)p;
+    }
+
     public static <T> Set<T> cast(Set<?> p) {
         return (Set<T>)p;
     }

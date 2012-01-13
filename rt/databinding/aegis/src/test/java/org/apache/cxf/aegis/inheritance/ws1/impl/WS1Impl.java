@@ -108,7 +108,7 @@ public class WS1Impl implements WS1 {
         return resultBean;
     }
 
-    public Map echoMap(Map beans) {
+    public Map<?, ?> echoMap(Map<?, ?> beans) {
         return beans;
     }
 
@@ -122,7 +122,7 @@ public class WS1Impl implements WS1 {
         }
     }
 
-    public Map echoRawMap(Map rawMap) {
+    public Map<?, ?> echoRawMap(Map<?, ?> rawMap) {
         return rawMap;
     }
 }

@@ -32,7 +32,7 @@ public class ClientProxyFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
     public ClientProxyFactoryBeanDefinitionParser() {
         this(ClientProxyFactoryBean.class);
     }
-    public ClientProxyFactoryBeanDefinitionParser(Class cls) {
+    public ClientProxyFactoryBeanDefinitionParser(Class<?> cls) {
         super(cls);
     }
     @Override

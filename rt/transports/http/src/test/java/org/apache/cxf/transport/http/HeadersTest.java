@@ -78,7 +78,7 @@ public class HeadersTest extends Assert {
         headers.copyFromRequest(req);
         
         Map<String, List<String>> protocolHeaders = 
-            CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
+            CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         
         assertTrue("unexpected size", protocolHeaders.size() == headerNames.length);
         
@@ -99,3 +99,4 @@ public class HeadersTest extends Assert {
         
     }
 }
+

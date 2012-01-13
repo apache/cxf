@@ -62,21 +62,16 @@ public class InitiatorTokenBuilder implements AssertionBuilder<Element> {
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative((List)iterator.next(), initiatorToken);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternative(iterator.next(), initiatorToken);
             break; // TODO process all the token that must be set ..
         }
 
         return initiatorToken;
     }
 
-    private void processAlternative(List assertions, InitiatorToken parent) {
-
-        Object token;
-
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-            token = iterator.next();
-
+    private void processAlternative(List<Assertion> assertions, InitiatorToken parent) {
+        for (Assertion token: assertions) {
             if (token instanceof Token) {
                 parent.setInitiatorToken((Token)token);
             }

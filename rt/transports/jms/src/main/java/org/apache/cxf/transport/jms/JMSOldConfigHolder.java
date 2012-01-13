@@ -452,7 +452,7 @@ public class JMSOldConfigHolder {
             env.put(ent.getKey(), ent.getValue());
         }
         if (LOG.isLoggable(Level.FINE)) {
-            Enumeration props = env.propertyNames();
+            Enumeration<?> props = env.propertyNames();
             while (props.hasMoreElements()) {
                 String name = (String)props.nextElement();
                 String value = env.getProperty(name);

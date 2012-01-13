@@ -104,9 +104,9 @@ public class Publisher implements NotificationProducer, Referencable {
         TopicExpressionType topic = null;
         if (subscribeRequest.getFilter() != null) {
             for (Object f : subscribeRequest.getFilter().getAny()) {
-                JAXBElement e = null;
+                JAXBElement<?> e = null;
                 if (f instanceof JAXBElement) {
-                    e = (JAXBElement) f;
+                    e = (JAXBElement<?>) f;
                     f = e.getValue();
                 }
                 if (f instanceof TopicExpressionType) {

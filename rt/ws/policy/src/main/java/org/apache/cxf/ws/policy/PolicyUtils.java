@@ -70,9 +70,8 @@ public final class PolicyUtils {
             return true;
         }
         
-        List components = p.getPolicyComponents();
         
-        for (Object component : components) {
+        for (PolicyComponent component : p.getPolicyComponents()) {
             if (!(component instanceof PolicyOperator)
                 || !isEmptyPolicyOperator((PolicyOperator)component)) {
                 return false;

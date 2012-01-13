@@ -48,7 +48,7 @@ public class CollectionService implements CollectionServiceInterface {
     }
 
     /** {@inheritDoc}*/
-    public Collection getUnannotatedStrings() {
+    public Collection<?> getUnannotatedStrings() {
         return null;
     }
 

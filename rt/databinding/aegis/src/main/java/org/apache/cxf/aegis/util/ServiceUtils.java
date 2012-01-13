@@ -66,9 +66,9 @@ public final class ServiceUtils {
         sb.append('.');
         sb.append(m.getName());
         sb.append('(');
-        Class[] params = m.getParameterTypes();
+        Class<?>[] params = m.getParameterTypes();
         for (int i = 0; i < params.length; i++) {
-            Class param = params[i];
+            Class<?> param = params[i];
             sb.append(param.getName());
             if (i < params.length - 1) {
                 sb.append(", ");

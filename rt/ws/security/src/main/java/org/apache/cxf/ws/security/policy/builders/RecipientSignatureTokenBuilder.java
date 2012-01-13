@@ -62,20 +62,16 @@ public class RecipientSignatureTokenBuilder implements AssertionBuilder<Element>
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative((List)iterator.next(), recipientSignatureToken);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternative(iterator.next(), recipientSignatureToken);
             break; // TODO process all the token that must be set ..
         }
 
         return recipientSignatureToken;
     }
 
-    private void processAlternative(List assertions, RecipientSignatureToken parent) {
-
-        Assertion assertion;
-
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-            assertion = (Assertion)iterator.next();
+    private void processAlternative(List<Assertion> assertions, RecipientSignatureToken parent) {
+        for (Assertion assertion : assertions) {
 
             if (assertion instanceof Token) {
                 parent.setRecipientSignatureToken((Token)assertion);

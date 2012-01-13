@@ -369,7 +369,7 @@ public class ProxyTest extends Assert {
     @SuppressWarnings("unchecked")
     private void expectInvoke(Proxy proxy, OperationInfo oi, Object expectedReturn) throws RMException {
         EasyMock.expect(proxy.invoke(EasyMock.same(oi), EasyMock.isA(Object[].class), 
-            (Map)EasyMock.isNull())).andReturn(expectedReturn).anyTimes();
+            (Map<String, Object>)EasyMock.isNull())).andReturn(expectedReturn).anyTimes();
     }
     
     @SuppressWarnings("unchecked")

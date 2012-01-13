@@ -19,7 +19,6 @@
 package org.apache.cxf.systest.handlers;
 
 
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -58,8 +57,8 @@ import org.apache.cxf.Bus;
  * @author <a href="mailto:codea@iona.com">codea</a>
  * @version 1.0
  */
-public class  TestSOAPHandler<T extends SOAPMessageContext> extends TestHandlerBase 
-    implements SOAPHandler<T> {
+public class  TestSOAPHandler extends TestHandlerBase 
+    implements SOAPHandler<SOAPMessageContext> {
 
     
     
@@ -176,11 +175,6 @@ public class  TestSOAPHandler<T extends SOAPMessageContext> extends TestHandlerB
         }
         
         return true;
-    }
-
-    public final void init(final Map map) {
-        methodCalled("init"); 
-
     }
 
     public final void destroy() {

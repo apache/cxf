@@ -168,7 +168,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     
             ClientProxy handler = clientClientProxy(c);
     
-            Class classes[] = getImplementingClasses();
+            Class<?> classes[] = getImplementingClasses();
             
             Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(),
                                                 classes,

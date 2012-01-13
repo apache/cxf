@@ -35,7 +35,7 @@ public interface CollectionServiceInterface {
 
     void setLongs(Collection<Long> longs);
 
-    Collection getUnannotatedStrings();
+    Collection<?> getUnannotatedStrings();
 
     Collection<Collection<String>> getStringCollections();
 

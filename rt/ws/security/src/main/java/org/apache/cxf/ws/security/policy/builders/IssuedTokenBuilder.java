@@ -83,8 +83,8 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
                 Policy policy = builder.getPolicy(child);
                 policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-                for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-                    processAlternative((List)iterator.next(), issuedToken);
+                for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+                    processAlternative(iterator.next(), issuedToken);
                     break; // since there should be only one alternative ..
                 }                
             }
@@ -95,12 +95,10 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
     }
 
 
-    private void processAlternative(List assertions, IssuedToken parent) {
-        Assertion assertion;
+    private void processAlternative(List<Assertion> assertions, IssuedToken parent) {
         QName name;
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
-            assertion = (Assertion)iterator.next();
+        for (Assertion assertion : assertions) {
             name = assertion.getName();
 
             if (SPConstants.REQUIRE_DERIVED_KEYS.equals(name.getLocalPart())) {

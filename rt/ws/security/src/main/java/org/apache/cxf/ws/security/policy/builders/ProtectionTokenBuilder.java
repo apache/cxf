@@ -59,8 +59,8 @@ public class ProtectionTokenBuilder implements AssertionBuilder<Element> {
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative((List)iterator.next(), protectionToken);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternative(iterator.next(), protectionToken);
             break; // since there should be only one alternative ..
         }
 
@@ -68,9 +68,8 @@ public class ProtectionTokenBuilder implements AssertionBuilder<Element> {
     }
 
 
-    private void processAlternative(List assertions, ProtectionToken parent) {
+    private void processAlternative(List<Assertion> assertions, ProtectionToken parent) {
         Object token = assertions.get(0);
-
         if (token instanceof Token) {
             parent.setToken((Token)token);
         }

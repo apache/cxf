@@ -120,7 +120,7 @@ public class JMSEndpointTest extends Assert {
                      "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         assertEquals(endpoint.getJndiConnectionFactoryName(), "ConnectionFactory");
         assertEquals(endpoint.getJndiURL(), "tcp://localhost:61616");
-        Map addParas = endpoint.getJndiParameters();
+        Map<String, String> addParas = endpoint.getJndiParameters();
         assertEquals(addParas.size(), 1);
         assertEquals(addParas.get("com.sun.jndi.someParameter"), "someValue");
     }

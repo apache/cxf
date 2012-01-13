@@ -55,7 +55,7 @@ public class JAXBWrapperHelper extends AbstractWrapperHelper {
     protected Object getValue(Method method, Object in) throws IllegalAccessException,
     InvocationTargetException {
         if ("javax.xml.bind.JAXBElement".equals(method.getReturnType().getCanonicalName())) {
-            JAXBElement je = (JAXBElement)method.invoke(in);
+            JAXBElement<?> je = (JAXBElement<?>)method.invoke(in);
             return je == null ? je : je.getValue();
         } else {            
             return method.invoke(in);    

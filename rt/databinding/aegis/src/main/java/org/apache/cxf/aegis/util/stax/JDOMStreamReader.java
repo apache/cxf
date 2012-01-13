@@ -124,7 +124,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
         prefix2decNs = new HashMap<String, Namespace>();
         namespaces.clear();
 
-        for (Iterator itr = element.getAdditionalNamespaces().iterator(); itr.hasNext();) {
+        for (Iterator<?> itr = element.getAdditionalNamespaces().iterator(); itr.hasNext();) {
             declare((Namespace)itr.next());
         }
 
@@ -134,7 +134,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
             declare(ns);
         }
 
-        for (Iterator itr = element.getAttributes().iterator(); itr.hasNext();) {
+        for (Iterator<?> itr = element.getAttributes().iterator(); itr.hasNext();) {
             ns = ((Attribute)itr.next()).getNamespace();
             if (shouldDeclare(ns)) {
                 declare(ns);

@@ -291,7 +291,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     
     private SchemaTypeSystem loadTypeSystem(String wsdlFile, 
                                            String[] configFiles,
-                                           Set mdefNamespaces, 
+                                           Set<?> mdefNamespaces, 
                                            File baseDir, 
                                            File schemasDir,
                                            EntityResolver entResolver) {

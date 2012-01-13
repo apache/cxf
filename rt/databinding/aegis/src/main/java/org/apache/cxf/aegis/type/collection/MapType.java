@@ -145,13 +145,13 @@ public class MapType extends AegisType {
         }
 
         try {
-            Map map = (Map)object;
+            Map<?, ?> map = (Map<?, ?>)object;
 
             AegisType kType = getKeyType();
             AegisType vType = getValueType();
 
-            for (Iterator itr = map.entrySet().iterator(); itr.hasNext();) {
-                Map.Entry entry = (Map.Entry)itr.next();
+            for (Iterator<?> itr = map.entrySet().iterator(); itr.hasNext();) {
+                Map.Entry<?, ?> entry = (Map.Entry<?, ?>)itr.next();
 
                 writeEntry(writer, context, kType, vType, entry);
             }
@@ -162,7 +162,7 @@ public class MapType extends AegisType {
 
     private void writeEntry(MessageWriter writer, Context context,
                             AegisType kType, AegisType vType,
-                            Map.Entry entry) throws DatabindingException {
+                            Map.Entry<?, ?> entry) throws DatabindingException {
         kType = TypeUtil.getWriteType(context.getGlobalContext(), entry.getKey(), kType);
         vType = TypeUtil.getWriteType(context.getGlobalContext(), entry.getValue(), vType);
 

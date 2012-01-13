@@ -184,7 +184,7 @@ public abstract class TestHandlerBase {
     protected List<String> getHandlerInfoList(MessageContext ctx) { 
         List<String> handlerInfoList = null; 
         if (ctx.containsKey("handler.info")) { 
-            handlerInfoList = CastUtils.cast((List)ctx.get("handler.info")); 
+            handlerInfoList = CastUtils.cast((List<?>)ctx.get("handler.info")); 
         } else {
             handlerInfoList = new ArrayList<String>();
             ctx.put("handler.info", handlerInfoList);

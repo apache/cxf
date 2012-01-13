@@ -37,7 +37,7 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
     public ServerFactoryBeanDefinitionParser() {
         this(ServerFactoryBean.class);
     }
-    public ServerFactoryBeanDefinitionParser(Class cls) {
+    public ServerFactoryBeanDefinitionParser(Class<?> cls) {
         super(cls);
     }
     

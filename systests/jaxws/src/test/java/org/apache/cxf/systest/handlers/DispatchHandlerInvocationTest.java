@@ -55,6 +55,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handlers.AddNumbersService;
+import org.apache.handlers.types.AddNumbers;
 import org.apache.handlers.types.AddNumbersResponse;
 import org.apache.handlers.types.ObjectFactory;
 import org.apache.hello_world_xml_http.wrapped.XMLService;
@@ -101,9 +102,9 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         req.setArg0(10);
         req.setArg1(20);
         ObjectFactory factory = new ObjectFactory();
-        JAXBElement e = factory.createAddNumbers(req);
+        JAXBElement<AddNumbers> e = factory.createAddNumbers(req);
 
-        JAXBElement response = (JAXBElement)disp.invoke(e);
+        JAXBElement<?> response = (JAXBElement<?>)disp.invoke(e);
         assertNotNull(response);
         AddNumbersResponse value = (AddNumbersResponse)response.getValue();
         assertEquals(222, value.getReturn());
@@ -408,7 +409,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                         .newInstance(ObjectFactory.class,
                                      org.apache.hello_world_xml_http.wrapped.types.ObjectFactory.class);
 
-                    Object payload = ((JAXBElement)msg.getPayload(jaxbContext)).getValue();
+                    Object payload = ((JAXBElement<?>)msg.getPayload(jaxbContext)).getValue();
                     org.apache.handlers.types.AddNumbers req =
                         (org.apache.handlers.types.AddNumbers)payload;
 
@@ -424,7 +425,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                 } else {
                     LogicalMessage msg = ctx.getMessage();
                     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-                    Object payload = ((JAXBElement)msg.getPayload(jaxbContext)).getValue();
+                    Object payload = ((JAXBElement<?>)msg.getPayload(jaxbContext)).getValue();
                     org.apache.handlers.types.AddNumbersResponse res =
                         (org.apache.handlers.types.AddNumbersResponse)payload;
 
@@ -479,13 +480,13 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
                     SOAPEnvelope env = msg.getSOAPPart().getEnvelope();
                     SOAPBody body = env.getBody();
-                    Iterator it = body.getChildElements();
+                    Iterator<?> it = body.getChildElements();
                     while (it.hasNext()) {
                         
                         Object elem = it.next();
                         if (elem instanceof SOAPElement) {
 
-                            Iterator it2 = ((SOAPElement)elem).getChildElements();
+                            Iterator<?> it2 = ((SOAPElement)elem).getChildElements();
                             while (it2.hasNext()) {
                                 Object elem2 = it2.next();
                                 if (elem2 instanceof SOAPElement) {
@@ -514,13 +515,13 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
                     SOAPEnvelope env = msg.getSOAPPart().getEnvelope();
                     SOAPBody body = env.getBody();
-                    Iterator it = body.getChildElements();
+                    Iterator<?> it = body.getChildElements();
                     while (it.hasNext()) {
                         
                         Object elem = it.next();
                         if (elem instanceof SOAPElement) {
 
-                            Iterator it2 = ((SOAPElement)elem).getChildElements();
+                            Iterator<?> it2 = ((SOAPElement)elem).getChildElements();
                             while (it2.hasNext()) {
                                 Object elem2 = it2.next();
                                 if (elem2 instanceof SOAPElement) {

@@ -62,9 +62,9 @@ public class JDOMNamespaceContext implements NamespaceContext {
             return element.getNamespacePrefix();
         }
 
-        List namespaces = element.getAdditionalNamespaces();
+        List<?> namespaces = element.getAdditionalNamespaces();
 
-        for (Iterator itr = namespaces.iterator(); itr.hasNext();) {
+        for (Iterator<?> itr = namespaces.iterator(); itr.hasNext();) {
             Namespace ns = (Namespace)itr.next();
 
             if (ns.getURI().equals(namespaceURI)) {
@@ -84,9 +84,9 @@ public class JDOMNamespaceContext implements NamespaceContext {
             prefixes.add(element.getNamespacePrefix());
         }
 
-        List namespaces = element.getAdditionalNamespaces();
+        List<?> namespaces = element.getAdditionalNamespaces();
 
-        for (Iterator itr = namespaces.iterator(); itr.hasNext();) {
+        for (Iterator<?> itr = namespaces.iterator(); itr.hasNext();) {
             Namespace ns = (Namespace)itr.next();
 
             if (ns.getURI().equals(namespaceURI)) {

@@ -155,7 +155,7 @@ public final class JMSUtils {
         } else {
             messageType = "unknow";
         }
-        Map<String, List<String>> headers = CastUtils.cast((Map)inMessage
+        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)inMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (headers == null) {
             headers = new TreeMap<String, List<String>>();
@@ -196,9 +196,9 @@ public final class JMSUtils {
             Map<String, List<String>> protHeaders
                 = new TreeMap<String, List<String>>();
             List<JMSPropertyType> props = messageProperties.getProperty();
-            Enumeration enm = message.getPropertyNames();
+            Enumeration<String> enm = CastUtils.cast(message.getPropertyNames());
             while (enm.hasMoreElements()) {
-                String name = (String)enm.nextElement();
+                String name = enm.nextElement();
                 String val = message.getStringProperty(name);
                 JMSPropertyType prop = new JMSPropertyType();
                 prop.setName(name);
@@ -263,7 +263,7 @@ public final class JMSUtils {
                 messageProperties.setSOAPJMSRequestURI(jmsMessage
                     .getStringProperty(JMSSpecConstants.REQUESTURI_FIELD));
                 
-                Map<String, List<String>> headers = CastUtils.cast((Map)inMessage
+                Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)inMessage
                     .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
                 if (headers == null) {
                     headers = new TreeMap<String, List<String>>();

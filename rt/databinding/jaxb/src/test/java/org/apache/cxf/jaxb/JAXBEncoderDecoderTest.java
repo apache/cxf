@@ -282,7 +282,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         Unmarshaller um = context.createUnmarshaller();        
         Object val = um.unmarshal(reader, GreetMe.class);
         assertTrue(val instanceof JAXBElement);
-        val = ((JAXBElement)val).getValue();
+        val = ((JAXBElement<?>)val).getValue();
         assertTrue(val instanceof GreetMe);
         assertEquals(obj.getRequestType(), 
                      ((GreetMe)val).getRequestType());
@@ -455,7 +455,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         Unmarshaller um = context.createUnmarshaller();        
         Object val = um.unmarshal(reader, GreetMe.class);
         assertTrue(val instanceof JAXBElement);
-        val = ((JAXBElement)val).getValue();
+        val = ((JAXBElement<?>)val).getValue();
         assertTrue(val instanceof GreetMe);
         assertEquals(obj.getRequestType(), 
                      ((GreetMe)val).getRequestType());
