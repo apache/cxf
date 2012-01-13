@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -43,7 +42,6 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.processor.ReferenceListProcessor;
 
 
 /**
@@ -128,8 +126,7 @@ public final class CryptoCoverageUtil {
         CoverageType type,
         CoverageScope scope
     ) throws WSSecurityException {
-        String xpath = ReferenceListProcessor.getXPath(soapBody);
-        if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody, xpath)) {
+        if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody)) {
             throw new WSSecurityException("The " + getCoverageTypeString(type)
                     + " does not cover the required elements (soap:Body).");
         }
@@ -176,8 +173,7 @@ public final class CryptoCoverageUtil {
         }
         
         for (Element el : elements) {
-            String xpath = ReferenceListProcessor.getXPath(el);
-            if (!CryptoCoverageUtil.matchElement(refs, type, scope, el, xpath)) {
+            if (!CryptoCoverageUtil.matchElement(refs, type, scope, el)) {
                 throw new WSSecurityException("The " + getCoverageTypeString(type)
                         + " does not cover the required elements ({"
                         + namespace + "}" + name + ").");
@@ -282,8 +278,7 @@ public final class CryptoCoverageUtil {
                     
                     final Element el = (Element)list.item(x);
                     
-                    boolean instanceMatched = CryptoCoverageUtil.
-                            matchElement(refs, type, scope, el, xpathString);
+                    boolean instanceMatched = CryptoCoverageUtil.matchElement(refs, type, scope, el);
                     
                     // We looked through all of the refs, but the element was
                     // not signed.
@@ -345,7 +340,7 @@ public final class CryptoCoverageUtil {
     }
 
     private static boolean matchElement(Collection<WSDataRef> refs,
-            CoverageType type, CoverageScope scope, Element el, String elXPath) {
+            CoverageType type, CoverageScope scope, Element el) {
         final boolean content;
         
         switch (scope) {
@@ -372,24 +367,11 @@ public final class CryptoCoverageUtil {
         }
         
         for (WSDataRef r : refs) {
-            
             // If the element is the same object instance
             // as that in the ref, we found it and can
             // stop looking at this element.
             if (r.getProtectedElement() == el && r.isContent() == content) {
                 return true;
-            }
-            
-            // Only if checking signature coverage do we attempt to
-            // do matches based on ID and element names (and XPath expressions) and not object
-            // equality.
-            if (CoverageType.SIGNED.equals(type)) {
-                QName elQName = new QName(el.getNamespaceURI(), el.getLocalName());
-                if (r.getName().equals(elQName)
-                    && r.getWsuId() != null && (r.getWsuId().equals(id)
-                    && r.getXpath() != null && r.getXpath().equals(elXPath))) {
-                    return true;
-                }
             }
         }
         return false;
