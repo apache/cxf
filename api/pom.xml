@@ -34,6 +34,7 @@
     </parent>
 
     <properties>
+        <cxf.fragment.host>org.apache.cxf.bundle</cxf.fragment.host>
         <cxf.osgi.import>
             javax.activation;version="${cxf.osgi.javax.activation.version}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",

@@ -34,7 +34,9 @@
     </parent>
 
     <properties>
-        <cxf.fragment.host>org.apache.cxf.cxf-api</cxf.fragment.host>
+        <cxf.bundle.activator>org.apache.cxf.bus.osgi.CXFActivator</cxf.bundle.activator>
+        <cxf.osgi.symbolic.name>${project.groupId}.bundle</cxf.osgi.symbolic.name>
+
         <cxf.osgi.import>
             org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
             javax.activation;version="${cxf.osgi.javax.activation.version}",
@@ -43,6 +45,10 @@
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}"
         </cxf.osgi.import>
+        <cxf.osgi.export>
+            '=META-INF.cxf',
+            org.apache.cxf.*;-split-package:=first,
+        </cxf.osgi.export>
     </properties>
 
     <dependencies>

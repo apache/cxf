@@ -55,6 +55,7 @@
 
         <!-- OSGi related properties -->
         <cxf.fragment.host/>
+        <cxf.bundle.activator/>
         <cxf.osgi.import/>
         <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
         <cxf.osgi.export>
@@ -500,6 +501,7 @@
                                 <DynamicImport-Package>
                                     ${cxf.osgi.dynamic.import}
                                 </DynamicImport-Package>
+                                <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
                             </instructions>
                         </configuration>
                     </execution>
