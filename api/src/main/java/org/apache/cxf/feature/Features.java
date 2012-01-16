@@ -26,5 +26,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Features {
-    String[] features();
+    String[] features() default { };
+    
+    Class<? extends Feature>[] classes() default { };
 }
