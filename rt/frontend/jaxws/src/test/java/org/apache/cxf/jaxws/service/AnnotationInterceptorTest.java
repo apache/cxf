@@ -212,10 +212,10 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         return flag;
     }
     
-    @InInterceptors(interceptors = "org.apache.cxf.jaxws.service.TestInterceptor")
-    @OutFaultInterceptors (interceptors = {"org.apache.cxf.jaxws.service.TestInterceptor" , 
-                                           "org.apache.cxf.jaxws.service.Test2Interceptor" })
-    @Features (features = "org.apache.cxf.jaxws.service.AnnotationFeature")
+    @InInterceptors(classes = org.apache.cxf.jaxws.service.TestInterceptor.class)
+    @OutFaultInterceptors (classes = {org.apache.cxf.jaxws.service.TestInterceptor.class , 
+                                      org.apache.cxf.jaxws.service.Test2Interceptor.class })
+    @Features (classes = org.apache.cxf.jaxws.service.AnnotationFeature.class)
     public class HelloServiceImpl implements HelloService {
         public String sayHi() {
             return "HI";
@@ -290,7 +290,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
     }
     
     @WebService(endpointInterface = "org.apache.cxf.jaxws.service.SayHiInterface")
-    @InInterceptors (interceptors = "org.apache.cxf.jaxws.service.Test2Interceptor")
+    @InInterceptors (classes = org.apache.cxf.jaxws.service.Test2Interceptor.class)
     public class SayHiInterfaceImpl2 implements SayHiInterface {
         public String sayHi(String s) {
             return "HI";
