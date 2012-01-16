@@ -79,16 +79,16 @@
         </dependency>
 
         <dependency>
-           <groupId>rhino</groupId>
-           <artifactId>js</artifactId>
-           <version>${cxf.rhino.version}</version>
-           <scope>test</scope>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>${cxf.rhino.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>${cxf.jetty.version}</version>
-           <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -100,29 +100,44 @@
             <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
         </dependency>
-	<dependency>
-	  <groupId>org.apache.cxf</groupId>
-	  <artifactId>cxf-rt-bindings-soap</artifactId>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>${project.version}</version>
-	    <scope>test</scope>
-	</dependency>
-	<dependency>
-	  <groupId>org.apache.cxf</groupId>
-	  <artifactId>cxf-rt-transports-http</artifactId>
-	  <version>${project.version}</version>
-	  <scope>test</scope>
-	</dependency>
-	<dependency>
-	  <groupId>org.apache.cxf</groupId>
-	  <artifactId>cxf-rt-transports-local</artifactId>
-	  <version>${project.version}</version>
-	  <scope>test</scope>
-	</dependency>
-	<dependency>
-	  <groupId>org.apache.cxf</groupId>
-	  <artifactId>cxf-rt-frontend-simple</artifactId>
-	  <version>${project.version}</version>
-	  <scope>test</scope>
-	</dependency>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-local</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-simple</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

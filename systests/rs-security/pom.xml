@@ -32,28 +32,30 @@
     <version>2.6.0-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
     
+
     <properties>
         <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
         <oauth.version>20100527</oauth.version>
     </properties>
     
+
     <dependencies>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
         </dependency>
         <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-server</artifactId>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
-         <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-plus</artifactId>
-       		 <version>${cxf.jetty.version}</version>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-plus</artifactId>
+            <version>${cxf.jetty.version}</version>
         </dependency>
-          <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-webapp</artifactId>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -90,7 +92,7 @@
             <artifactId>cxf-rt-rs-security-oauth-test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>  
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-http</artifactId>
@@ -107,10 +109,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-jdk14</artifactId>
-             <scope>test</scope>
-         </dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
@@ -123,15 +125,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>jsr250-api</artifactId>
-          <version>1.0</version>
-          <scope>test</scope>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.oauth.core</groupId>
             <artifactId>oauth-consumer</artifactId>
             <version>${oauth.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -174,6 +181,17 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>${cxf.spring.mock}</artifactId>
             <version>${cxf.spring.version}</version>
         </dependency>
@@ -196,8 +214,10 @@
             <scope>test</scope>
         </dependency>
         
+
     </dependencies>
     
+
     <build>
         <plugins>
             <plugin>
@@ -214,6 +234,7 @@
         </plugins>
     </build>
     
+
     <profiles>
         <profile>
             <id>jdk15</id>
@@ -246,16 +267,16 @@
                                             <outputDirectory>${basedir}/target/endorsed</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
-                                 </configuration>
-                             </execution>
-                         </executions>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
-                         <groupId>org.apache.maven.plugins</groupId>
-                         <artifactId>maven-surefire-plugin</artifactId>
-                         <configuration>
-                             <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
-                         </configuration>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -269,4 +290,5 @@
         </repository>
     </repositories>
     
+
 </project>
