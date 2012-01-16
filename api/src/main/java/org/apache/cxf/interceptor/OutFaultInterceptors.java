@@ -24,6 +24,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.cxf.message.Message;
+
 /**
  * Specifies a list of classes that are added to the outbound fault 
  * interceptor chain. This annotation effects SEI classes and service 
@@ -33,5 +35,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OutFaultInterceptors {
     
-    String[] interceptors();
+    String[] interceptors() default { };
+    
+    Class<? extends Interceptor<? extends Message>>[] classes() default { };
+
 }

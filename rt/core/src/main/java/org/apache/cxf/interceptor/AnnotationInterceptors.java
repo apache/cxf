@@ -45,12 +45,40 @@ public class AnnotationInterceptors {
         for (Class<?> cls : clazzes) {
             Annotation  annotation = cls.getAnnotation(annotationClazz);
             if (annotation != null) {
-                return initializeAnnotationObjects(getAnnotationObjectNames(annotation), type);
+                return initializeAnnotationObjects(annotation, type);
             }
         }
         return null;
     }
     
+    private <T> List<T> initializeAnnotationObjects(Annotation annotation,
+                                             Class<T> type) {
+        List<T> list = new ArrayList<T>();
+        for (String cn : getAnnotationObjectNames(annotation)) {
+            list.add(initializeAnnotationObject(cn, type));
+        }
+        for (Class<? extends T> cn : getAnnotationObjectClasses(annotation, type)) {
+            list.add(initializeAnnotationObject(cn));
+        }
+        return list;   
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> Class<? extends T>[] getAnnotationObjectClasses(Annotation ann, Class<T> type) {
+        if (ann instanceof InFaultInterceptors) {
+            return (Class<? extends T>[])((InFaultInterceptors)ann).classes();
+        } else if (ann instanceof InInterceptors) {
+            return (Class<? extends T>[])((InInterceptors)ann).classes();
+        } else if (ann instanceof OutFaultInterceptors) {
+            return (Class<? extends T>[])((OutFaultInterceptors)ann).classes();
+        } else if (ann instanceof OutInterceptors) {
+            return (Class<? extends T>[])((OutInterceptors)ann).classes();
+        } else if (ann instanceof Features) {
+            return (Class<? extends T>[])((Features)ann).classes();
+        }
+        throw new UnsupportedOperationException("Doesn't support the annotation: " + ann);
+    }
+
     private String[] getAnnotationObjectNames(Annotation ann) {
         if (ann instanceof InFaultInterceptors) {
             return ((InFaultInterceptors)ann).interceptors();
@@ -67,34 +95,27 @@ public class AnnotationInterceptors {
         throw new UnsupportedOperationException("Doesn't support the annotation: " + ann);
     }
     
-    private <T> List<T> initializeAnnotationObjects(String[] annotationObjects, Class<T> type) {
-        List<T> theAnnotationObjects = new ArrayList<T>();
-        if (annotationObjects != null && annotationObjects.length > 0) {
-            for (String annObjectName : annotationObjects) {
-                Object object = null;
-                try {
-                    object = ClassLoaderUtils.loadClass(annObjectName, this.getClass()).newInstance();
-                    theAnnotationObjects.add(type.cast(object));
-                } catch (ClassNotFoundException e) {
-                    throw new Fault(new org.apache.cxf.common.i18n.Message(
-                                                    "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
-                                                    BUNDLE, annObjectName), e);
-                } catch (InstantiationException ie) {
-                    throw new Fault(new org.apache.cxf.common.i18n.Message(
-                                                    "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
-                                                    BUNDLE, annObjectName), ie);
-                } catch (IllegalAccessException iae) {
-                    throw new Fault(new org.apache.cxf.common.i18n.Message(
-                                                    "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
-                                                    BUNDLE, annObjectName), iae);
-                } catch (ClassCastException ex) {
-                    throw new Fault(new org.apache.cxf.common.i18n.Message(
-                                                "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
-                                                BUNDLE, annObjectName), ex);
-                }
-            }
+    private <T> T initializeAnnotationObject(String annObjectName, Class<T> type) {
+        Object object = null;
+        try {
+            object = ClassLoaderUtils.loadClass(annObjectName, this.getClass()).newInstance();
+            return type.cast(object);
+        } catch (Throwable e) {
+            throw new Fault(new org.apache.cxf.common.i18n.Message(
+                                            "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                                            BUNDLE, annObjectName), e);
         }
-        return theAnnotationObjects;
+    }
+    private <T> T initializeAnnotationObject(Class<T> type) {
+        Object object = null;
+        try {
+            object = type.newInstance();
+            return type.cast(object);
+        } catch (Throwable e) {
+            throw new Fault(new org.apache.cxf.common.i18n.Message(
+                                            "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                                            BUNDLE, type.getName()), e);
+        }
     }
     
     @SuppressWarnings("unchecked")
