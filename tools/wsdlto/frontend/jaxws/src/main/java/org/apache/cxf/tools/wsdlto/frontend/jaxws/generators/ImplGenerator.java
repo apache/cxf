@@ -19,7 +19,6 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
