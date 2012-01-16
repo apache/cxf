@@ -41,6 +41,9 @@ public class WorkQueueSingleConfig implements ManagedService {
     }
 
     public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+        if (properties == null) {
+            return;
+        }
         Dictionary<String, String> p = CastUtils.cast(properties);
         String names = (String)properties.get(PROPERTY_PREFIX + ".names");
         String[] nameAr = names.split(",");
