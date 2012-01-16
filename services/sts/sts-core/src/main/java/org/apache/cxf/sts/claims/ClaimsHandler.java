@@ -32,8 +32,11 @@ public interface ClaimsHandler {
 
     List<URI> getSupportedClaimTypes();
 
+    @Deprecated
     ClaimCollection retrieveClaimValues(
             Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm);
+
+    ClaimCollection retrieveClaimValues(RequestClaimCollection claims, ClaimsParameters parameters);
 
 }
  
