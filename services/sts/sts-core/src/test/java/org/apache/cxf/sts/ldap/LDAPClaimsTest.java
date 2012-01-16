@@ -37,6 +37,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimTypes;
+import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.LdapClaimsHandler;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
@@ -88,9 +89,11 @@ public class LDAPClaimsTest {
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
-
+       
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
         ClaimCollection retrievedClaims = 
-            claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims, null, null);
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 
@@ -124,8 +127,9 @@ public class LDAPClaimsTest {
         claim.setOptional(false);
         requestedClaims.add(claim);
 
-        claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims, null, null);
-
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
+        claimsHandler.retrieveClaimValues(requestedClaims, params);
     }
 
     @org.junit.Test
@@ -148,9 +152,11 @@ public class LDAPClaimsTest {
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
-
+        
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
         ClaimCollection retrievedClaims = 
-            claimsHandler.retrieveClaimValues(new CustomTokenPrincipal(user), requestedClaims, null, null);
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 

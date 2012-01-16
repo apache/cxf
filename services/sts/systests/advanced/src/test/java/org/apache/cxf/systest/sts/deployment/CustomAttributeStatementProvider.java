@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsManager;
+import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.ws.security.WSConstants;
@@ -41,12 +42,21 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
         ClaimsManager claimsManager = providerParameters.getClaimsManager();
         ClaimCollection retrievedClaims = new ClaimCollection();
         if (claimsManager != null) {
+            ClaimsParameters params = new ClaimsParameters();
+            params.setAdditionalProperties(providerParameters.getAdditionalProperties());
+            params.setAppliesToAddress(providerParameters.getAppliesToAddress());
+            params.setEncryptionProperties(providerParameters.getEncryptionProperties());
+            params.setKeyRequirements(providerParameters.getKeyRequirements());
+            params.setPrincipal(providerParameters.getPrincipal());
+            params.setRealm(providerParameters.getRealm());
+            params.setStsProperties(providerParameters.getStsProperties());
+            params.setTokenRequirements(providerParameters.getTokenRequirements());
+            params.setTokenStore(providerParameters.getTokenStore());
+            params.setWebServiceContext(providerParameters.getWebServiceContext());
             retrievedClaims = 
                 claimsManager.retrieveClaimValues(
-                    providerParameters.getPrincipal(),
                     providerParameters.getRequestedClaims(),
-                    providerParameters.getWebServiceContext(),
-                    providerParameters.getRealm()
+                    params
                 );
         }
         if (retrievedClaims == null) {

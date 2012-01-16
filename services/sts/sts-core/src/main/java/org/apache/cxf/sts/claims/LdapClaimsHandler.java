@@ -41,7 +41,6 @@ import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.AndFilter;
@@ -130,9 +129,24 @@ public class LdapClaimsHandler implements ClaimsHandler {
         return uriList;
     }
 
+    @Deprecated
     public ClaimCollection retrieveClaimValues(
             Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
-
+        
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(principal);
+        params.setWebServiceContext(context);
+        params.setRealm(realm);
+        
+        return retrieveClaimValues(claims, params);
+    }
+    
+    
+    public ClaimCollection retrieveClaimValues(
+            RequestClaimCollection claims, ClaimsParameters parameters) {
+      
+        Principal principal = parameters.getPrincipal();
+        
         String user = null;
         if (principal instanceof KerberosPrincipal) {
             KerberosPrincipal kp = (KerberosPrincipal)principal;
@@ -154,8 +168,8 @@ public class LdapClaimsHandler implements ClaimsHandler {
             LOG.warning("User must not be null");
             return new ClaimCollection();
         } else {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Retrieve claims for user " + user);
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.finest("Retrieve claims for user " + user);
             }
         }
         
@@ -171,7 +185,9 @@ public class LdapClaimsHandler implements ClaimsHandler {
                     getClaimsLdapAttributeMapping().get(claim.getClaimType().toString())
                 );
             } else {
-                LOG.warning("Unsupported claim: " + claim.getClaimType());
+                if (LOG.isLoggable(Level.FINER)) {
+                    LOG.finer("Unsupported claim: " + claim.getClaimType());
+                }
             }
         }
 
@@ -207,11 +223,8 @@ public class LdapClaimsHandler implements ClaimsHandler {
             String ldapAttribute = getClaimsLdapAttributeMapping().get(claimType.toString());
             Attribute attr = ldapAttributes.get(ldapAttribute);
             if (attr == null) {
-                if (!claim.isOptional()) {
-                    LOG.warning("Mandatory claim not found in LDAP: " + claim.getClaimType());
-                    throw new STSException("Mandatory claim '" + claim.getClaimType() + "' not found");
-                } else {
-                    LOG.fine("Claim '" + claim.getClaimType() + "' is null");
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.finest("Claim '" + claim.getClaimType() + "' is null");
                 }
             } else {
                 Claim c = new Claim();

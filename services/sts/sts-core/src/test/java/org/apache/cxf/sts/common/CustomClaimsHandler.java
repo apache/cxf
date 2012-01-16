@@ -29,6 +29,7 @@ import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.cxf.sts.claims.ClaimsHandler;
+import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 
@@ -49,8 +50,22 @@ public class CustomClaimsHandler implements ClaimsHandler {
         return knownURIs;
     }
 
+    @Deprecated
     public ClaimCollection retrieveClaimValues(
             Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
+        
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(principal);
+        params.setWebServiceContext(context);
+        params.setRealm(realm);
+        
+        return retrieveClaimValues(claims, params);
+    }
+    
+    
+    public ClaimCollection retrieveClaimValues(
+            RequestClaimCollection claims, ClaimsParameters parameters) {
+      
         if (claims != null && claims.size() > 0) {
             ClaimCollection claimCollection = new ClaimCollection();
             for (RequestClaim requestClaim : claims) {

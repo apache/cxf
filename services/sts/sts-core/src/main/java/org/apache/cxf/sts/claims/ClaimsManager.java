@@ -23,14 +23,20 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.ws.WebServiceContext;
+
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ws.security.sts.provider.STSException;
 
 /**
  * This class holds various ClaimsHandler implementations.
  */
 public class ClaimsManager {
-        
+
+    private static final Logger LOG = LogUtils.getL7dLogger(ClaimsManager.class);
+
     private List<ClaimsHandler> claimHandlers;
     private List<URI> supportedClaimTypes = new ArrayList<URI>();
 
@@ -53,6 +59,7 @@ public class ClaimsManager {
         }
     }
 
+    @Deprecated
     public ClaimCollection retrieveClaimValues(
             Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
         if (claimHandlers != null && claimHandlers.size() > 0 && claims != null && claims.size() > 0) {
@@ -64,9 +71,49 @@ public class ClaimsManager {
                     returnCollection.addAll(claimCollection);
                 }
             }
+            validateClaimValues(claims, returnCollection);
             return returnCollection;
         }
         return null;
     }
+    
+    public ClaimCollection retrieveClaimValues(RequestClaimCollection claims, ClaimsParameters parameters) {
+        if (claimHandlers != null && claimHandlers.size() > 0 && claims != null && claims.size() > 0) {
+            ClaimCollection returnCollection = new ClaimCollection();
+            for (ClaimsHandler handler : claimHandlers) {
+                ClaimCollection claimCollection = handler.retrieveClaimValues(claims, parameters);
+                if (claimCollection != null && claimCollection.size() != 0) {
+                    returnCollection.addAll(claimCollection);
+                }
+            }
+            validateClaimValues(claims, returnCollection);
+            return returnCollection;
+        }
+        return null;
+    }
+    
+    private boolean validateClaimValues(RequestClaimCollection requestedClaims, ClaimCollection claims) {
+        for (RequestClaim claim : requestedClaims) {
+            URI claimType = claim.getClaimType();
+            boolean found = false;
+            if (!claim.isOptional()) {
+                for (Claim c : claims) {
+                    if (c.getClaimType().equals(claimType)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    LOG.warning("Mandatory claim not found: " + claim.getClaimType());
+                    throw new STSException("Mandatory claim '" + claim.getClaimType() + "' not found");
+                }
+            }
+        }
+        return true;
+        
+    }
+    
+    
 
 }
+ 
