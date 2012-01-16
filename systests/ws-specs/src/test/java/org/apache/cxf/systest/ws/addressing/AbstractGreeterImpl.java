@@ -51,7 +51,7 @@ public abstract class AbstractGreeterImpl implements Greeter {
      */
     @Resource
     private WebServiceContext context;
-    private boolean quiet = false;
+    private boolean quiet;
     
     public AbstractGreeterImpl() {
     }
