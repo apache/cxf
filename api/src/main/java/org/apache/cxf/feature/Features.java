@@ -28,5 +28,5 @@ import java.lang.annotation.Target;
 public @interface Features {
     String[] features() default { };
     
-    Class<? extends Feature>[] classes() default { };
+    Class<? extends AbstractFeature>[] classes() default { };
 }
