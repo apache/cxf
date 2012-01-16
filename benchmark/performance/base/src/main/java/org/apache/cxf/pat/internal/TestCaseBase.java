@@ -299,6 +299,24 @@ public abstract class TestCaseBase<T> {
                 e.printStackTrace();
             }
         }
+        printResult();
+    }
+    private void printResult() {
+        double totalDuration = 0;
+        double totalInvocations = 0;
+        for (TestResult testResult : results) {
+            totalDuration = totalDuration + testResult.getDuration();
+            totalInvocations = totalInvocations + testResult.getNumOfInvocations();
+        }
+        double totalThroughput = totalInvocations/totalDuration;
+        double totalAvgResponseTime = totalDuration/totalInvocations;
+        System.out.println();
+        System.out.println("=============Overall Test Result============");
+        System.out.println("Overall Throughput: " + this.getOperationName() + " " + totalThroughput + TestResult.THROUGHPUT_UNIT);
+        System.out.println("Overall AVG. response time: " + totalAvgResponseTime * 1000 + TestResult.AVG_UNIT);
+        System.out.println(totalInvocations + " (invocations), running " + totalDuration  + " (sec) ");
+        System.out.println("============================================");
+        
     }
 
     public void run() {
