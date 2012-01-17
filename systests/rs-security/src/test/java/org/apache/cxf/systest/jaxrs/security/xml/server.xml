@@ -67,6 +67,7 @@ under the License.
     
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
     <bean id="xmlSigHandler" class="org.apache.cxf.rs.security.xml.XmlSigInHandler"/>
+    <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor"/>
     <bean id="xmlEncHandler" class="org.apache.cxf.rs.security.xml.XmlEncInHandler"/>
     <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
         <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
@@ -80,7 +81,12 @@ under the License.
        <jaxrs:providers>
           <ref bean="xmlSigHandler"/>
        </jaxrs:providers> 
+       <jaxrs:outInterceptors>
+          <ref bean="xmlSigOutHandler"/>
+       </jaxrs:outInterceptors>
        <jaxrs:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
        </jaxrs:properties> 

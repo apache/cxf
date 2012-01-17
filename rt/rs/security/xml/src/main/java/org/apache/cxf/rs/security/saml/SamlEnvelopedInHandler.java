@@ -40,6 +40,9 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
     private static final String SAML2_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
     private static final String SAML1_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     private static final String SAML_ASSERTION = "Assertion";
+    
+    private boolean bodyIsRoot;
+    
     public SamlEnvelopedInHandler() {
     }
     
@@ -78,13 +81,19 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
         validateToken(message, samlElement);
         
         doc.getDocumentElement().removeChild(samlElement);
-        Element actualBody = getActualBody(doc.getDocumentElement());
-        if (actualBody != null) {
-            Document newDoc = DOMUtils.createDocument();
-            newDoc.adoptNode(actualBody);
+        if (bodyIsRoot) {
             message.setContent(XMLStreamReader.class, 
-                    new W3CDOMStreamReader(actualBody));
+                               new W3CDOMStreamReader(doc));
             message.setContent(InputStream.class, null);
+        } else {
+            Element actualBody = getActualBody(doc.getDocumentElement());
+            if (actualBody != null) {
+                Document newDoc = DOMUtils.createDocument();
+                newDoc.adoptNode(actualBody);
+                message.setContent(XMLStreamReader.class, 
+                        new W3CDOMStreamReader(actualBody));
+                message.setContent(InputStream.class, null);
+            }
         }
         
         return null;
@@ -104,5 +113,9 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
             return (Element)list.item(0);
         } 
         return null;
+    }
+
+    public void setBodyIsRoot(boolean bodyIsRoot) {
+        this.bodyIsRoot = bodyIsRoot;
     }
 }

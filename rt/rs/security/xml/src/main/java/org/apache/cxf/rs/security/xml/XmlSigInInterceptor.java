@@ -16,21 +16,48 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.rs.security.xml;
 
-import javax.ws.rs.core.Response;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
 
-public class XmlSigInHandler extends AbstractXmlSigInHandler implements RequestHandler {
+public class XmlSigInInterceptor extends AbstractXmlSigInHandler implements PhaseInterceptor<Message> {
+
+    public XmlSigInInterceptor() {
+    }
     
-    public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
-        
+    public void handleFault(Message message) {
+    }
+
+    public void handleMessage(Message message) throws Fault {
         checkSignature(message);
-        
+    }
+
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
+
+    public Set<String> getAfter() {
+        return Collections.singleton(XmlEncInInterceptor.class.getName());
+    }
+
+    public Set<String> getBefore() {
+        return Collections.emptySet();
+    }
+
+    public String getId() {
+        return getClass().getName();
+    }
+
+    public String getPhase() {
+        return Phase.UNMARSHAL;
+    }
+
+    
 }

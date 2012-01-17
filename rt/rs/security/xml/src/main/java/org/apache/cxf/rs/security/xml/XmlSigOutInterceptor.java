@@ -31,7 +31,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -48,7 +47,9 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 import org.opensaml.xml.signature.SignatureConstants;
 
-
+//TODO: Make sure that enveloped signatures can be applied to individual
+//      child nodes of an envelope root element, a new property such as 
+//      targetElementQName will be needed
 public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     public static final String ENVELOPED_SIG = "enveloped";
     public static final String ENVELOPING_SIG = "enveloping";
@@ -63,7 +64,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     private static final Set<String> SUPPORTED_STYLES = 
         new HashSet<String>(Arrays.asList(ENVELOPED_SIG, ENVELOPING_SIG, DETACHED_SIG));
     
-    private QName envelopeQName;
+    private QName envelopeQName = DEFAULT_ENV_QNAME;
     private String sigStyle = ENVELOPED_SIG;
     private String defaultSigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
     private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
@@ -74,9 +75,6 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     public void setStyle(String style) {
         if (!SUPPORTED_STYLES.contains(style)) {
             throw new IllegalArgumentException("Unsupported XML Signature style");
-        }
-        if (DETACHED_SIG.equals(style)) {
-            envelopeQName = DEFAULT_ENV_QNAME;
         }
         sigStyle = style;    
     }
@@ -98,11 +96,6 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     // enveloping & detached sigs will be supported too
     private Document createSignature(Message message, Document doc) 
         throws Exception {
-        
-        boolean enveloping = ENVELOPING_SIG.equals(sigStyle);
-        if (enveloping && envelopeQName != null) {
-            throw new IllegalStateException("Enveloping XMLSignature can not have custom envelope names");
-        }
         
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         
@@ -145,9 +138,9 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         String referenceId = "#" + id;
         
         XMLSignature sig = null;
-        if (enveloping) {
+        if (ENVELOPING_SIG.equals(sigStyle)) {
             sig = prepareEnvelopingSignature(doc, id, referenceId, sigAlgo);
-        } else if (envelopeQName != null) {
+        } else if (DETACHED_SIG.equals(sigStyle)) {
             sig = prepareDetachedSignature(doc, id, referenceId, sigAlgo);
         } else {
             sig = prepareEnvelopedSignature(doc, id, referenceId, sigAlgo);
