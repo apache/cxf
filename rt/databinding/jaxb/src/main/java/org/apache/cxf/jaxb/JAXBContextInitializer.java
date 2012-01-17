@@ -269,30 +269,38 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         } else {
             cls = JAXBUtils.getValidClass(cls);
             if (null != cls) {
+                if (classes.contains(cls)) {
+                    return;
+                }
+
+                if (!cls.isInterface()) {
+                    classes.add(cls);
+                }
+
+                XmlSeeAlso xsa = cls.getAnnotation(XmlSeeAlso.class);
+                if (xsa != null) {
+                    for (Class<?> c : xsa.value()) {
+                        addClass(c);
+                    }
+                }
+                XmlJavaTypeAdapter xjta = cls.getAnnotation(XmlJavaTypeAdapter.class);
+                if (xjta != null) {
+                    //has an adapter.   We need to inspect the adapter and then
+                    //return as the adapter will handle the superclass
+                    //and interfaces and such
+                    @SuppressWarnings("rawtypes")
+                    Class<? extends XmlAdapter> c2 = xjta.value();
+                    inspectTypeAdapter(c2);
+                    return;
+                }
+                
                 if (cls.getSuperclass() != null) {
                     //JAXB should do this, but it doesn't always.
                     //in particular, older versions of jaxb don't
                     addClass(cls.getSuperclass());
                 }
-                
-                if (cls.isInterface()) {
-                    //interfaces cannot be added directly, however, they
-                    //may have some interesting annoations we should consider
-                    XmlSeeAlso xsa = cls.getAnnotation(XmlSeeAlso.class);
-                    if (xsa != null) {
-                        for (Class c : xsa.value()) {
-                            addClass(c);
-                        }
-                    }
-                    XmlJavaTypeAdapter xjta = cls.getAnnotation(XmlJavaTypeAdapter.class);
-                    if (xjta != null) {
-                        Class<? extends XmlAdapter> c2 = xjta.value();
-                        inspectTypeAdapter(c2);
-                    }
-                } else if (classes.contains(cls)) {
-                    return;
-                } else {
-                    classes.add(cls);
+
+                if (!cls.isInterface()) {
                     walkReferences(cls);
                 }
             }
@@ -407,11 +415,17 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (method.getName().startsWith("is")) {
             beginIndex = 2;
         }
+        Method setter = null;
         try {
-            method.getDeclaringClass().getMethod("set" + method.getName().substring(beginIndex),
-                                                 new Class[] {method.getReturnType()});
+            setter = method.getDeclaringClass()
+                .getMethod("set" + method.getName().substring(beginIndex),
+                           new Class[] {method.getReturnType()});
         } catch (Exception e) {
             //getter, but no setter
+        }
+        if (setter == null 
+            || setter.isAnnotationPresent(XmlTransient.class)
+            || !Modifier.isPublic(setter.getModifiers())) {
             return false;
         }
 
