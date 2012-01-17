@@ -19,6 +19,8 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
 import javax.jws.HandlerChain;
@@ -129,8 +131,17 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 }
                 clearAttributes();
                 
+                boolean useGetResource = false;
+                try {
+                    new URL(location);
+                } catch (MalformedURLException e) {
+                    useGetResource = true;
+                }
+                
+                
                 setAttributes("service", js);
                 setAttributes("wsdlLocation", location);
+                setAttributes("useGetResource", useGetResource);
                 setAttributes("serviceSuperclass", serviceSuperclass);
                 if ("Service".equals(serviceSuperclass)) {
                     js.addImport("javax.xml.ws.Service");
