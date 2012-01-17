@@ -32,11 +32,13 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.xml.XmlEncInInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
+import org.apache.cxf.rs.security.xml.XmlSigInInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.xml.security.encryption.XMLCipher;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -126,7 +128,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
         }
         bean.getOutInterceptors().add(sigInterceptor);
-        
+        bean.getInInterceptors().add(new XmlSigInInterceptor());
         
         WebClient wc = bean.createWebClient();
         try {
