@@ -20,10 +20,7 @@
 package org.apache.cxf.sts.claims;
 
 import java.net.URI;
-import java.security.Principal;
 import java.util.List;
-
-import javax.xml.ws.WebServiceContext;
 
 /**
  * This interface provides a pluggable way to handle Claims.
@@ -31,10 +28,6 @@ import javax.xml.ws.WebServiceContext;
 public interface ClaimsHandler {
 
     List<URI> getSupportedClaimTypes();
-
-    @Deprecated
-    ClaimCollection retrieveClaimValues(
-            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm);
 
     ClaimCollection retrieveClaimValues(RequestClaimCollection claims, ClaimsParameters parameters);
 
