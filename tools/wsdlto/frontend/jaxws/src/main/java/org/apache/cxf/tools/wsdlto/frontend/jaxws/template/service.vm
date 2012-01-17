@@ -83,7 +83,15 @@ public class ${service.Name} extends ${serviceSuperclass} {
         if (url == null) {
             url = ${service.Name}.class.getClassLoader().getResource("$wsdlLocation.substring(11)");
         }
-#end        
+#end     
+        if (url == null) {
+            java.util.logging.Logger.getLogger(${service.Name}.class.getName())
+                .log(java.util.logging.Level.INFO, 
+                     "Can not initialize the default wsdl from {0}", "$wsdlLocation");
+        }       
+        WSDL_LOCATION = url;   
+#elseif ($useGetResource)
+        URL url = ${service.Name}.class.getResource("$wsdlLocation");
         if (url == null) {
             java.util.logging.Logger.getLogger(${service.Name}.class.getName())
                 .log(java.util.logging.Level.INFO, 

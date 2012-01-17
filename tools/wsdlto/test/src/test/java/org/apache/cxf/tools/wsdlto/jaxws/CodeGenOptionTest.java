@@ -290,4 +290,31 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         }
         return count;
     }
+    
+    
+    @Test
+    public void testResourceURLForWsdlLocation() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_WSDLLOCATION, "/wsdl2java_wsdl/hello_world.wsdl");
+        env.put(ToolConstants.CFG_COMPILE, null);
+        env.put(ToolConstants.CFG_CLASSDIR, null);
+        processor.setContext(env);
+        processor.execute();
+
+        File dir = new File(output, "org");
+        assertTrue("org directory is not found", dir.exists());
+        dir = new File(dir, "apache");
+        assertTrue("apache directory is not found", dir.exists());
+        dir = new File(dir, "cxf");
+        assertTrue("cxf directory is not found", dir.exists());
+        dir = new File(dir, "w2j");
+        assertTrue("w2j directory is not found", dir.exists());
+        dir = new File(dir, "hello_world_soap_http");
+        assertTrue("hello_world_soap_http directory is not found", dir.exists());
+
+        String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir,
+                                                                               "SOAPService.java")));
+        assertTrue(str, str.contains("getResource"));
+    }
+
 }
