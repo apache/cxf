@@ -19,6 +19,7 @@
 package org.apache.cxf.aegis.type.basic;
 
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -581,7 +582,8 @@ public class BeanType extends AegisType {
         /*
          * Don't dig any deeper than Object or Exception
          */
-        if (c != null && c != Object.class && c != Exception.class && c != RuntimeException.class) {
+        if (c != null && c != Object.class && c != Exception.class && c != RuntimeException.class 
+            && c != Enum.class && c != Serializable.class && c != Cloneable.class) {
             TypeMapping tm = inf.getTypeMapping();
             AegisType superType = tm.getType(c);
             if (superType == null) {
