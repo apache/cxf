@@ -115,6 +115,8 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
                 if (!duplicate) {
                     newList.add(o);
                 }
+            } else {
+                newList.add(o);
             }
         }
         effectiveWsdlOptions.clear();
