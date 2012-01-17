@@ -954,6 +954,7 @@ public final class JAXBUtils {
         void parseSchema(InputSource source);
 
         void parseSchema(String key, Element el);
+        void parseSchema(String key, XMLStreamReader el);
 
         @WrapReturn(Options.class)
         Options getOptions();

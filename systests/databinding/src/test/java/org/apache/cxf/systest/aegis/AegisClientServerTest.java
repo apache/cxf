@@ -259,7 +259,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testDynamicClient() throws Exception {
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
-        Client client = dcf.createClient("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl");
+        Client client = dcf.createClient("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl&dynamic");
 
         Object r = client.invoke("getAttributeBean")[0];
         Method getAddrPlainString = r.getClass().getMethod("getAttrPlainString");

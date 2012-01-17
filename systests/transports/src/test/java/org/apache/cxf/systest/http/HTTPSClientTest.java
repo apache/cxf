@@ -25,6 +25,7 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
@@ -89,11 +90,28 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     public final void testSuccessfulCall(String configuration,
                                          String address,
                                          URL url) throws Exception {
+        testSuccessfulCall(configuration, address, url, false);
+    }
+    public final void testSuccessfulCall(String configuration,
+                                         String address,
+                                         URL url, 
+                                         boolean dynamicClient) throws Exception {
         setTheConfiguration(configuration);
         startServers();
         if (url == null) {
             url = SOAPService.WSDL_LOCATION;
         }
+        
+        //CXF-4037 - dynamic client isn't using the conduit settings to resolve schemas
+        if (dynamicClient) {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            JaxWsDynamicClientFactory.newInstance(BusFactory.getDefaultBus())
+                .createClient(url.toExternalForm());
+            Thread.currentThread().setContextClassLoader(loader);
+        }
+
+        
+        
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
         assertNotNull("Service is null", service);   
         final Greeter port = service.getHttpsPort();
@@ -105,6 +123,8 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
               address);
         
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        
         stopServers();
     }
     
@@ -139,6 +159,8 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     public final void testResourceKeySpecEndpointURL() throws Exception {
         testSuccessfulCall("resources/resource-key-spec-url.xml",
                            "https://localhost:" + PORT5 + "/SoapContext/HttpsPort",
-                           new URL("https://localhost:" + PORT5 + "/SoapContext/HttpsPort?wsdl"));
+                           new URL("https://localhost:" + PORT5 + "/SoapContext/HttpsPort?wsdl"),
+                           true);
+        
     }
 }
