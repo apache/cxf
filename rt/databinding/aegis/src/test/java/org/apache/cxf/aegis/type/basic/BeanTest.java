@@ -21,7 +21,9 @@ package org.apache.cxf.aegis.type.basic;
 import java.beans.PropertyDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
@@ -608,6 +610,55 @@ public class BeanTest extends AbstractAegisTest {
         assertFalse(type.getTypeInfo().getElements().iterator().hasNext());
     }
 
+    @Test
+    public void testInterfaceBeans() throws Exception {
+        defaultContext();
+        BeanType type = new BeanType();
+        type.setTypeClass(SerializableBean.class);
+        type.setTypeMapping(mapping);
+        type.setSchemaType(new QName("urn:foo", "SerializableBean"));
+
+        AegisType stringType = mapping.getType(String.class);
+        assertTrue(type.getDependencies().contains(stringType));
+
+        type = new BeanType();
+        type.setTypeClass(CloneableBean.class);
+        type.setTypeMapping(mapping);
+        type.setSchemaType(new QName("urn:foo", "CloneableBean"));
+
+        assertEquals(1, type.getDependencies().size());
+        assertTrue(type.getDependencies().contains(stringType));
+
+        type = new BeanType();
+        type.setTypeClass(SimpleInterface.class);
+        type.setTypeMapping(mapping);
+        type.setSchemaType(new QName("urn:foo", "SimpleInterface"));
+
+        assertEquals(1, type.getDependencies().size());
+        assertTrue(type.getDependencies().contains(stringType));
+
+        type = new BeanType();
+        type.setTypeClass(ExtendingInterface.class);
+        type.setTypeMapping(mapping);
+        type.setSchemaType(new QName("urn:foo", "ExtendingInterface"));
+
+        Set<AegisType> dependencies = type.getDependencies();
+        assertEquals(2, dependencies.size());
+        dependencies.remove(stringType);
+        assertEquals(SimpleInterface.class, dependencies.iterator().next().getTypeClass());
+    }
+
+    @Test
+    public void testEnumBean() throws Exception {
+        defaultContext();
+        BeanType type = new BeanType();
+        type.setTypeClass(EnumBean.class);
+        type.setTypeMapping(mapping);
+        type.setSchemaType(new QName("urn:foo", "EnumBean"));
+
+        assertTrue(type.getDependencies().isEmpty());
+    }
+
     public static class DateBean {
         private Date date;
 
@@ -707,5 +758,25 @@ public class BeanTest extends AbstractAegisTest {
         public void setHowdy(String howdy) {
             this.howdy = howdy;
         }
+    }
+    
+    public interface SerializableBean extends Serializable {
+        String getString();
+    }
+    
+    public interface CloneableBean extends Cloneable {
+        String getString();
+    }
+    
+    public interface SimpleInterface {
+        String getString();
+    }
+    
+    public interface ExtendingInterface extends SimpleInterface {
+        String getAnotherString();
+    }
+    
+    public enum EnumBean {
+        VALUE1, VALUE2;
     }
 }
