@@ -27,48 +27,8 @@
     targetNamespace="http://apache.org/hello_world/messages">
     <wsdl:types>
         <schema
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:x1="http://apache.org/hello_world/types"
-            targetNamespace="http://apache.org/hello_world/types"
-            elementFormDefault="qualified">
-            <element name="sayHi">
-                <complexType/>
-            </element>
-            <element name="sayHiResponse">
-                <complexType>
-                    <sequence>
-                        <element name="responseType" type="string"/>
-                    </sequence>
-                </complexType>
-            </element>
-            <element name="greetMe">
-                <complexType>
-                    <sequence>
-                        <element name="requestType" type="string"/>
-                    </sequence>
-                </complexType>
-            </element>
-            <element name="greetMeResponse">
-                <complexType>
-                    <sequence>
-                        <element name="responseType" type="string"/>
-                    </sequence>
-                </complexType>
-            </element>
-            <element name="pingMe">
-                <complexType/>
-            </element>
-            <element name="pingMeResponse">
-                <complexType/>
-            </element>
-            <element name="faultDetail">
-                <complexType>
-                    <sequence>
-                        <element name="minor" type="short" form="qualified" minOccurs="0"/>
-                        <element name="major" type="short" form="qualified" minOccurs="0"/>
-                    </sequence>
-                </complexType>
-            </element>
+            xmlns="http://www.w3.org/2001/XMLSchema">
+            <import namespace="http://apache.org/hello_world/types" schemaLocation="hello_world_types.xsd"/>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
