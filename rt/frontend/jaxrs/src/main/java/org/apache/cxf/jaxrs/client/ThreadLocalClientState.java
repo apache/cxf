@@ -41,14 +41,20 @@ public class ThreadLocalClientState implements ClientState {
     private LocalClientState initialState;
     
     private Map<Thread, Long> checkpointMap;
-    private long secondsToKeepState;
+    private long timeToKeepState;
     
     public ThreadLocalClientState(String baseURI) {
         this.initialState = new LocalClientState(URI.create(baseURI));
     }
     
-    public ThreadLocalClientState(LocalClientState initialState) {
+    public ThreadLocalClientState(String baseURI, long timeToKeepState) {
+        this.initialState = new LocalClientState(URI.create(baseURI));
+        this.timeToKeepState = timeToKeepState;
+    }
+    
+    public ThreadLocalClientState(LocalClientState initialState, long timeToKeepState) {
         this.initialState = initialState;
+        this.timeToKeepState = timeToKeepState;
     }
     
     public void setCurrentBuilder(UriBuilder currentBuilder) {
@@ -101,7 +107,7 @@ public class ThreadLocalClientState implements ClientState {
         LocalClientState ls = new LocalClientState(baseURI);
         ls.setRequestHeaders(headers);
         ls.setTemplates(templates);
-        return new ThreadLocalClientState(ls);
+        return new ThreadLocalClientState(ls, timeToKeepState);
     }
     
     private void removeThreadLocalState(Thread t) {
@@ -116,7 +122,7 @@ public class ThreadLocalClientState implements ClientState {
         if (cs == null) {
             cs = new LocalClientState(initialState);
             state.put(Thread.currentThread(), cs);
-            if (secondsToKeepState > 0) {
+            if (timeToKeepState > 0) {
                 long currentTime = System.currentTimeMillis();
                 checkpointMap.put(Thread.currentThread(), currentTime);
                 new CleanupThread(Thread.currentThread(), currentTime).start();
@@ -125,9 +131,9 @@ public class ThreadLocalClientState implements ClientState {
         return cs;
     }
 
-    public void setSecondsToKeepState(long secondsToKeepState) {
-        this.secondsToKeepState = secondsToKeepState;
-        if (secondsToKeepState > 0) {
+    public void setTimeToKeepState(long timeToKeepState) {
+        this.timeToKeepState = timeToKeepState;
+        if (timeToKeepState > 0) {
             checkpointMap = new ConcurrentHashMap<Thread, Long>();
         }
     }
@@ -144,7 +150,7 @@ public class ThreadLocalClientState implements ClientState {
         @Override
         public void run() {
             try {
-                Thread.sleep(secondsToKeepState);
+                Thread.sleep(timeToKeepState);
                 long actualTime = checkpointMap.get(thread);
                 // if times do not match then the original worker thread
                 // has called reset() but came back again to create new local state

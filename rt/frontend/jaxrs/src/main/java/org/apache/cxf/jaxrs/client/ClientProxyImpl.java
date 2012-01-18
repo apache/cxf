@@ -475,20 +475,24 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     
     protected Object handleResponse(HttpURLConnection connect, Message outMessage, OperationResourceInfo ori) 
         throws Throwable {
-        Response r = setResponseBuilder(connect, outMessage.getExchange()).build();
-        Method method = ori.getMethodToInvoke();
-        checkResponse(method, r, outMessage);
-        if (method.getReturnType() == Void.class) { 
-            return null;
-        }
-        if (method.getReturnType() == Response.class
-            && (r.getEntity() == null || InputStream.class.isAssignableFrom(r.getEntity().getClass())
-                && ((InputStream)r.getEntity()).available() == 0)) {
-            return r;
-        }
+        try {
+            Response r = setResponseBuilder(connect, outMessage.getExchange()).build();
+            Method method = ori.getMethodToInvoke();
+            checkResponse(method, r, outMessage);
+            if (method.getReturnType() == Void.class) { 
+                return null;
+            }
+            if (method.getReturnType() == Response.class
+                && (r.getEntity() == null || InputStream.class.isAssignableFrom(r.getEntity().getClass())
+                    && ((InputStream)r.getEntity()).available() == 0)) {
+                return r;
+            }
         
-        return readBody(r, outMessage, method.getReturnType(), 
+            return readBody(r, outMessage, method.getReturnType(), 
                         method.getGenericReturnType(), method.getDeclaredAnnotations());
+        } finally {
+            ProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
+        }
     }
 
     public Object getInvocationHandler() {

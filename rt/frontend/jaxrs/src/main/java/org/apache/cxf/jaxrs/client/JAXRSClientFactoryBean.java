@@ -47,7 +47,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     private boolean inheritHeaders; 
     private MultivaluedMap<String, String> headers;
     private ClientState initialState;
-    private boolean threadSafe; 
+    private boolean threadSafe;
+    private long timeToKeepState;
     
     public JAXRSClientFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -69,7 +70,16 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     public void setThreadSafe(boolean threadSafe) {
         this.threadSafe = threadSafe;
     }
-    
+
+    /**
+     * Sets the time a thread-local client state will be kept.
+     * This property is ignored for thread-unsafe clients
+     * @param secondsToKeepState
+     */
+    public void setSecondsToKeepState(long time) {
+        this.timeToKeepState = time;
+    }
+
     /**
      * Gets the user name
      * @return the name
@@ -183,10 +193,12 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             throw new RuntimeException(ex);
         }
     }
+
+    
     
     private ClientState getActualState() {
         if (threadSafe) {
-            initialState = new ThreadLocalClientState(getAddress());
+            initialState = new ThreadLocalClientState(getAddress(), timeToKeepState);
         }
         if (initialState != null) {
             return headers != null
