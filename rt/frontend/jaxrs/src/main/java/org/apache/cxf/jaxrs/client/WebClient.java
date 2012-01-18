@@ -49,6 +49,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
@@ -769,6 +770,8 @@ public class WebClient extends AbstractClient {
         } catch (Throwable ex) {
             throw (ex instanceof ClientWebApplicationException) ? (ClientWebApplicationException)ex
                                                               : new ClientWebApplicationException(ex);
+        } finally {
+            ProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
     }
     
