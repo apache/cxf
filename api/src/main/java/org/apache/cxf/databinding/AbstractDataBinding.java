@@ -90,6 +90,13 @@ public abstract class AbstractDataBinding implements DataBinding {
 
     public XmlSchema addSchemaDocument(ServiceInfo serviceInfo, SchemaCollection col, Document d,
                                        String systemId) {
+        return addSchemaDocument(serviceInfo, col, d, systemId, null);
+    }
+    public XmlSchema addSchemaDocument(ServiceInfo serviceInfo, 
+                                       SchemaCollection col, 
+                                       Document d,
+                                       String systemId,
+                                       Collection<String> ids) {
 
 
         /*
@@ -161,7 +168,10 @@ public abstract class AbstractDataBinding implements DataBinding {
                     Element e = (Element)n;
                     if (e.getLocalName().equals("import")) {
                         e = (Element)n;
-                        e.removeAttribute("schemaLocation");
+                        String loc = e.getAttribute("schemaLocation");
+                        if (ids == null || ids.contains(loc)) {
+                            e.removeAttribute("schemaLocation");
+                        }
                         updateSchemaLocation(e);
                         if (StringUtils.isEmpty(e.getAttribute("namespace"))) {
                             e.setAttribute("namespace", serviceInfo.getInterface().getName()
