@@ -114,4 +114,11 @@ For schema validation with the Aegis data binding.
  - isorelax.jar (version 20030108)
  - relaxngDatatype.jar (version 20020414)
 
+For the WS-Notification Service:
+ - cxf-services-wsn-api.jar
+ - cxf-services-wsn-core.jar  
+
+For the CXF Security Token Service:
+ - cxf-services-sts-core.jar
+
 
