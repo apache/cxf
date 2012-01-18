@@ -43,6 +43,10 @@ public class RetryStrategy extends SequentialStrategy {
     public List<Endpoint> getAlternateEndpoints(Exchange exchange) {
         return getEndpoints(exchange, stillTheSameAddress());
     }
+    
+    protected <T> T getNextAlternate(List<T> alternates) {
+        return stillTheSameAddress() ? alternates.get(0) : alternates.remove(0);
+    }
 
     protected boolean stillTheSameAddress() {
         if (maxNumberOfRetries == 0) {
@@ -50,15 +54,12 @@ public class RetryStrategy extends SequentialStrategy {
         }
         // let the target selector move to the next address
         // and then stay on the same address for maxNumberOfRetries
-        synchronized (this) {
-            if (++counter <= maxNumberOfRetries) {
-                return true;    
-            } else {
-                counter = 0;
-                return false;
-            }
+        if (++counter <= maxNumberOfRetries) {
+            return true;    
+        } else {
+            counter = 0;
+            return false;
         }
-        
     }
     
 
