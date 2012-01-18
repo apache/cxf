@@ -400,24 +400,32 @@ public class JSONProviderTest extends Assert {
     public void testWriteQualifiedCollection() throws Exception {
         String data = "{\"ns1.tag\":[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]}";
-        doWriteQualifiedCollection(false, false, data);
+        doWriteQualifiedCollection(false, false, false, data);
+    }
+    
+    @Test
+    public void testWriteQualifiedCollectionDropNs() throws Exception {
+        String data = "{\"tag\":[{\"group\":\"b\",\"name\":\"a\"}"
+            + ",{\"group\":\"d\",\"name\":\"c\"}]}";
+        doWriteQualifiedCollection(false, false, true, data);
     }
     
     @Test
     public void testWriteQualifiedCollection2() throws Exception {
         String data = "{{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}}";
-        doWriteQualifiedCollection(true, false, data);
+        doWriteQualifiedCollection(true, false, false, data);
     }
     
     @Test
     public void testWriteQualifiedCollection3() throws Exception {
         String data = "[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]";
-        doWriteQualifiedCollection(true, true, data);
+        doWriteQualifiedCollection(true, true, false, data);
     }
     
-    public void doWriteQualifiedCollection(boolean drop, boolean serializeAsArray, String data) 
+    public void doWriteQualifiedCollection(boolean drop, boolean serializeAsArray, 
+                                           boolean ignoreNamespaces, String data) 
         throws Exception {
         JSONProvider p = new JSONProvider();
         p.setCollectionWrapperName("{http://tags}tag");
@@ -426,6 +434,8 @@ public class JSONProviderTest extends Assert {
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
+        p.setIgnoreNamespaces(ignoreNamespaces);
+        
         List<TagVO2> tags = new ArrayList<TagVO2>();
         tags.add(createTag2("a", "b"));
         tags.add(createTag2("c", "d"));
@@ -447,6 +457,7 @@ public class JSONProviderTest extends Assert {
         Method m = CollectionsResource.class.getMethod("getBooks", new Class[0]);
         p.writeTo(books, m.getReturnType(), m.getGenericReturnType(), new Annotation[0], 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        System.out.println(os.toString());
         assertEquals("{\"Book\":[{\"id\":123,\"name\":\"CXF\",\"state\":\"\"}]}",
                      os.toString());
         
