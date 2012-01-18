@@ -20,12 +20,15 @@
 package org.apache.cxf.systest.jaxrs.failover;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.RandomStrategy;
+import org.apache.cxf.clustering.RetryStrategy;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
@@ -153,6 +156,32 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             getFeature(false, false, "http://localhost:8182/non-existent"); 
         strategyTest(Server.ADDRESS1, feature, null, null, false, false, false);
     }
+    
+    @Test
+    public void testSequentialStrategyWithRetries() throws Exception {
+        String address = "http://localhost:8182/non-existent";
+        String address2 = "http://localhost:8182/non-existent2";
+        
+        FailoverFeature feature = new FailoverFeature();
+        List<String> alternateAddresses = new ArrayList<String>();
+        alternateAddresses.add(address);
+        alternateAddresses.add(address2);
+        CustomRetryStrategy strategy = new CustomRetryStrategy();
+        strategy.setMaxNumberOfRetries(5);
+        strategy.setAlternateAddresses(alternateAddresses);
+        feature.setStrategy(strategy);
+            
+        BookStore store = getBookStore(address, feature);
+        try {
+            store.getBook("1");
+            fail("Exception expected");
+        } catch (ClientWebApplicationException ex) {
+            assertEquals(10, strategy.getTotalCount());
+            assertEquals(5, strategy.getAddressCount(address));
+            assertEquals(5, strategy.getAddressCount(address2));
+        }
+    }
+    
 
     private FailoverFeature getFeature(boolean custom, boolean random, String ...address) {
         FailoverFeature feature = new FailoverFeature();
@@ -340,6 +369,32 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         @Override
         protected boolean requiresFailover(Exchange exchange) {
             return false;
+        }
+    }
+    
+    private static class CustomRetryStrategy extends RetryStrategy {
+        private int totalCount;
+        private Map<String, Integer> map = new HashMap<String, Integer>(); 
+        @Override
+        protected <T> T getNextAlternate(List<T> alternates) {
+            totalCount++;
+            T next = super.getNextAlternate(alternates);
+            String address = (String)next;
+            Integer count = map.get(address);
+            if (count == null) {
+                count = 0; 
+            }
+            count++;
+            map.put(address, count);
+            return next;
+        }
+        
+        public int getTotalCount() {
+            return totalCount - 2;
+        }
+        
+        public int getAddressCount(String address) {
+            return map.get(address) - 1;
         }
     }
 }
