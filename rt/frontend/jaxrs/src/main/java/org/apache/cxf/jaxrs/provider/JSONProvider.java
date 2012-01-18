@@ -390,11 +390,18 @@ public class JSONProvider extends AbstractJAXBProvider  {
             } else {
                 qname = getCollectionWrapperQName(actualClass, genericType, firstObj, false);
             }
-            if (qname.getNamespaceURI().length() > 0) {
-                startTag = "{\"ns1." + qname.getLocalPart() + "\":[";
-            } else {
-                startTag = "{\"" + qname.getLocalPart() + "\":[";
+            String prefix = "";
+            if (!ignoreNamespaces) {
+                if (namespaceMap.containsKey(qname.getNamespaceURI())) {
+                    prefix = namespaceMap.get(qname.getNamespaceURI());
+                    if (!prefix.isEmpty()) {
+                        prefix += ".";
+                    }
+                } else if (qname.getNamespaceURI().length() > 0) {
+                    prefix = "ns1.";
+                }
             }
+            startTag = "{\"" + prefix + qname.getLocalPart() + "\":[";
             endTag = "]}";
         } else if (serializeAsArray) {
             startTag = "[";
@@ -475,7 +482,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys,
              isCollection || dropRootElement);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
-        writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
+        writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces && !isCollection);
         return createTransformWriterIfNeeded(writer, os);
     }
     
