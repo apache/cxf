@@ -512,20 +512,24 @@ public class ClientProxyImpl extends AbstractClient implements
     
     protected Object handleResponse(Message outMessage) 
         throws Throwable {
-        Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
-        Method method = outMessage.getExchange().get(Method.class);
-        checkResponse(method, r, outMessage);
-        if (method.getReturnType() == Void.class) { 
-            return null;
+        try {
+            Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
+            Method method = outMessage.getExchange().get(Method.class);
+            checkResponse(method, r, outMessage);
+            if (method.getReturnType() == Void.class) { 
+                return null;
+            }
+            if (method.getReturnType() == Response.class
+                && (r.getEntity() == null || InputStream.class.isAssignableFrom(r.getEntity().getClass())
+                    && ((InputStream)r.getEntity()).available() == 0)) {
+                return r;
+            }
+            
+            return readBody(r, outMessage, method.getReturnType(), 
+                            method.getGenericReturnType(), method.getDeclaredAnnotations());
+        } finally {
+            ProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
-        if (method.getReturnType() == Response.class
-            && (r.getEntity() == null || InputStream.class.isAssignableFrom(r.getEntity().getClass())
-                && ((InputStream)r.getEntity()).available() == 0)) {
-            return r;
-        }
-        
-        return readBody(r, outMessage, method.getReturnType(), 
-                        method.getGenericReturnType(), method.getDeclaredAnnotations());
     }
 
     public Object getInvocationHandler() {
