@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -333,6 +334,10 @@ public class JAXBDataBinding extends AbstractDataBinding
                 } catch (IOException e) {
                     throw new ServiceConstructionException("SCHEMA_GEN_EXC", LOG, e);
                 }
+            }
+            Set<String> ids = new HashSet<String>();
+            for (DOMSource r : schemas) {
+                ids.add(r.getSystemId());
             }
             for (DOMSource r : schemas) {
                 if (bi.contains(r)) {
