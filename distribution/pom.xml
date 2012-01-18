@@ -322,6 +322,24 @@
             <artifactId>cxf-rt-rs-security-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- services jars -->
+        <dependency>
+            <groupId>org.apache.cxf.services.sts</groupId>
+            <artifactId>cxf-services-sts-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.wsn</groupId>
+            <artifactId>cxf-services-wsn-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.wsn</groupId>
+            <artifactId>cxf-services-wsn-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>

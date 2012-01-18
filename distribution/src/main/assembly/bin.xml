@@ -158,6 +158,7 @@
             <includes>
                 <include>org.apache.cxf:*</include>
                 <include>org.apache.cxf.xjcplugins:*</include>
+                <include>org.apache.cxf.services.*:*</include>
             </includes>
             <excludes>
                 <exclude>org.apache.cxf:cxf-bundle*</exclude>
