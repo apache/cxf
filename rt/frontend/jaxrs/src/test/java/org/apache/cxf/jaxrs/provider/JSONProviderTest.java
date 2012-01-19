@@ -391,6 +391,7 @@ public class JSONProviderTest extends Assert {
     public void testDropRootElement() throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         p.setDropRootElement(true);
+        p.setIgnoreNamespaces(true);
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
