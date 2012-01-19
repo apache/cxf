@@ -42,7 +42,6 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.PRE_INVOKE);
     }
 
-    @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault {
         MessageContentsList inObjects = MessageContentsList.getContentsList(message);
 
@@ -64,7 +63,8 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
                 .getOutMessage().get(CLIENT_HOLDERS));
             for (MessagePartInfo part : parts) {
                 if (part.getIndex() != 0 && part.getTypeClass() != null) {
-                    Holder holder = (Holder)outHolders.get(part.getIndex() - 1);
+                    @SuppressWarnings("unchecked")
+                    Holder<Object> holder = (Holder<Object>)outHolders.get(part.getIndex() - 1);
                     if (holder != null) {
                         holder.value = inObjects.get(part);
                         inObjects.put(part, holder);
@@ -75,6 +75,13 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
             for (MessagePartInfo part : parts) {
                 int idx = part.getIndex() - 1;
                 if (idx >= 0 && part.getTypeClass() != null) {
+                    if (inObjects == null) {
+                        //if soap:body is empty, the contents may not exist
+                        //so we need to create a contents list to store
+                        //the holders for the outgoing parts (CXF-4031)
+                        inObjects = new MessageContentsList();
+                        message.setContent(List.class, inObjects);
+                    }
                     if (idx >= inObjects.size()) {
                         inObjects.set(idx, new Holder<Object>());
                     } else {
