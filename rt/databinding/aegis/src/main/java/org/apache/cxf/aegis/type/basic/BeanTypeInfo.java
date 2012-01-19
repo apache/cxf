@@ -271,6 +271,8 @@ public class BeanTypeInfo {
         try {
             if (beanClass.isInterface() || beanClass.isPrimitive()) {
                 descriptors = getInterfacePropertyDescriptors(beanClass);
+            } else if (beanClass.isEnum()) {
+                // do nothing
             } else if (beanClass == Object.class || beanClass == Throwable.class) {
                 // do nothing
             } else if (beanClass == Throwable.class) {
