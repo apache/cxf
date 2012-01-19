@@ -33,10 +33,27 @@ public class OAuthPermission extends Permission {
     public OAuthPermission(String permission, String description, String role) {
         this(permission, description, Collections.singletonList(role));
     }
-
+    
     public OAuthPermission(String permission, String description, List<String> roles) {
         super(permission, description);
         this.roles = roles;
+    }
+    
+    public OAuthPermission(String permission, String description, 
+                           List<String> roles, List<String> httpVerbs) {
+        this(permission, description, roles);
+        this.httpVerbs = httpVerbs;
+    }
+    
+    public OAuthPermission(String permission, 
+                           String description, 
+                           List<String> roles, 
+                           List<String> httpVerbs, 
+                           List<String> uris,
+                           boolean authorizeKeyRequired) {
+        this(permission, description, roles, httpVerbs);
+        this.uri = uris;
+        this.authorizationKeyRequired = authorizeKeyRequired;
     }
     
     /**
@@ -44,15 +61,7 @@ public class OAuthPermission extends Permission {
      * @return the roles
      */
     public List<String> getRoles() {
-        return roles;
-    }
-
-    /**
-     * Sets an optional list of HTTP verbs 
-     * @param httpVerbs the verbs
-     */
-    public void setHttpVerbs(List<String> httpVerbs) {
-        this.httpVerbs = httpVerbs;
+        return Collections.unmodifiableList(roles);
     }
 
     /**
@@ -60,15 +69,7 @@ public class OAuthPermission extends Permission {
      * @return the list of verbs
      */
     public List<String> getHttpVerbs() {
-        return httpVerbs;
-    }
-
-    /**
-     * Sets an optional list of URIs
-     * @param uri the uris
-     */
-    public void setUris(List<String> uris) {
-        this.uri = uris;
+        return Collections.unmodifiableList(httpVerbs);
     }
 
     /**
@@ -76,16 +77,7 @@ public class OAuthPermission extends Permission {
      * @return the uri
      */
     public List<String> getUris() {
-        return uri;
-    }
-
-    /**
-     * Can be used to disable the default requirement for all
-     * consumer requests to contain an access token
-     * @param authorizationKeyRequired the boolean value
-     */
-    public void setAuthorizationKeyRequired(boolean authorizationKeyRequired) {
-        this.authorizationKeyRequired = authorizationKeyRequired;
+        return Collections.unmodifiableList(uri);
     }
 
     /**

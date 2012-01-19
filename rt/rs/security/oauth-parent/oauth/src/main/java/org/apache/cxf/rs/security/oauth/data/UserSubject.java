@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth.data;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,20 +30,17 @@ public class UserSubject {
     private String login;
     private List<String> roles;
     
-    public void setLogin(String login) {
+    public UserSubject(String login, List<String> roles) {
         this.login = login;
+        this.roles = roles;
     }
-
+    
     public String getLogin() {
         return login;
     }
 
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
-
     public List<String> getRoles() {
-        return roles;
+        return Collections.unmodifiableList(roles);
     }
     
 

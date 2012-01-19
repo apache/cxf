@@ -18,23 +18,30 @@
  */
 package org.apache.cxf.rs.security.oauth.data;
 
+import java.util.Collections;
+import java.util.List;
+
 
 /**
  * Captures the information which custom filters may use to further protect the endpoints
  */
 public class OAuthContext {
-    
+
     private UserSubject subject;
-
-    public void setSubject(UserSubject subject) {
+    private List<OAuthPermission> permissions;
+    
+    public OAuthContext(UserSubject subject, List<OAuthPermission> perms) {
         this.subject = subject;
+        this.permissions = perms;
     }
-
+    
     public UserSubject getSubject() {
         return subject;
     }
     
-    
+    public List<OAuthPermission> getPermissions() {
+        return Collections.unmodifiableList(permissions);
+    }
     
 
 }

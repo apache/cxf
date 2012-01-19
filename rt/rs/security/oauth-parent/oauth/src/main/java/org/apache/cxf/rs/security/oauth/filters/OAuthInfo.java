@@ -57,6 +57,10 @@ public class OAuthInfo {
         return authorities;
     }
     
+    public List<OAuthPermission> getPermissions() {
+        return permissions;
+    }
+    
     public boolean useUserSubject() {
         return useUserSubject;
     }
