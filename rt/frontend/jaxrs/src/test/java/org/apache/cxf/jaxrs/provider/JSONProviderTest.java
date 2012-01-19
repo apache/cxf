@@ -275,7 +275,7 @@ public class JSONProviderTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testWriteToSingleTag2NoNs() throws Exception {
-        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
+        JSONProvider p = new JSONProvider();
         p.setIgnoreNamespaces(true);
         TagVO2 tag = createTag2("a", "b");
         
