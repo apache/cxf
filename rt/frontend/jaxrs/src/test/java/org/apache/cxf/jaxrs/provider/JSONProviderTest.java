@@ -274,6 +274,22 @@ public class JSONProviderTest extends Assert {
     
     @SuppressWarnings("unchecked")
     @Test
+    public void testWriteToSingleTag2NoNs() throws Exception {
+        JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
+        p.setIgnoreNamespaces(true);
+        TagVO2 tag = createTag2("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(tag, TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+        
+    }
+    
+    @Test
     public void testCopyReaderToDocument() throws Exception {
         String s = "{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}";
         
@@ -381,6 +397,7 @@ public class JSONProviderTest extends Assert {
     public void testDropRootElement() throws Exception {
         JSONProvider p = new JSONProvider();
         p.setDropRootElement(true);
+        p.setIgnoreNamespaces(true);
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
@@ -457,7 +474,6 @@ public class JSONProviderTest extends Assert {
         Method m = CollectionsResource.class.getMethod("getBooks", new Class[0]);
         p.writeTo(books, m.getReturnType(), m.getGenericReturnType(), new Annotation[0], 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
-        System.out.println(os.toString());
         assertEquals("{\"Book\":[{\"id\":123,\"name\":\"CXF\",\"state\":\"\"}]}",
                      os.toString());
         
@@ -569,6 +585,7 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
+        System.out.println(s);
         assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
         
     }
