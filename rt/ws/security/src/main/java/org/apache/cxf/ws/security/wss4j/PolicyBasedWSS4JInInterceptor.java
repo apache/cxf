@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -45,6 +46,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -99,6 +101,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     public static final String PROPERTIES_CACHE = "ws-security.properties.cache";
     public static final PolicyBasedWSS4JInInterceptor INSTANCE 
         = new PolicyBasedWSS4JInInterceptor();
+    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JInInterceptor.class);
 
     /**
      * 
@@ -445,21 +448,21 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         // Check policies
         //
-        boolean check = checkSignedEncryptedCoverage(aim, msg, soapHeader, soapBody, signed, encrypted);
-        
-        if (check) {
-            check = checkTokenCoverage(aim, msg, soapBody, results, signedResults, utWithCallbacks);
+        if (!checkSignedEncryptedCoverage(aim, msg, soapHeader, soapBody, signed, encrypted)) {
+            LOG.fine("Incoming request failed signed-encrypted policy validation");
         }
         
-        if (check) {
-            check = checkBindingCoverage(aim, msg, soapBody, results, signedResults, encryptResults);
+        if (!checkTokenCoverage(aim, msg, soapBody, results, signedResults)) {
+            LOG.fine("Incoming request failed token policy validation");
+        }
+        
+        if (!checkBindingCoverage(aim, msg, soapBody, results, signedResults, encryptResults)) {
+            LOG.fine("Incoming request failed binding policy validation");
         }
 
-        if (check) {
-            check = 
-                checkSupportingTokenCoverage(
-                    aim, msg, results, signedResults, encryptResults, utWithCallbacks
-                );
+        if (!checkSupportingTokenCoverage(aim, msg, results, signedResults, 
+            encryptResults, utWithCallbacks)) {
+            LOG.fine("Incoming request failed supporting token policy validation");
         }
         
         // The supporting tokens are already validated
@@ -519,14 +522,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         SoapMessage msg,
         Element soapBody,
         List<WSSecurityEngineResult> results, 
-        List<WSSecurityEngineResult> signedResults, 
-        boolean utWithCallbacks
+        List<WSSecurityEngineResult> signedResults
     ) {
         boolean check = true;
         TokenPolicyValidator x509Validator = new X509TokenPolicyValidator();
         check &= x509Validator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
-        TokenPolicyValidator utValidator = new UsernameTokenPolicyValidator(utWithCallbacks);
+        TokenPolicyValidator utValidator = new UsernameTokenPolicyValidator();
         check &= utValidator.validatePolicy(aim, msg, soapBody, results, signedResults);
         
         TokenPolicyValidator samlValidator = new SamlTokenPolicyValidator();

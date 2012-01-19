@@ -42,6 +42,7 @@ public class UTPasswordCallback implements CallbackHandler {
         //for MS clients
         passwords.put("abcd", "dcba");
         passwords.put("alice", "password");
+        passwords.put("bob", "password");
     }
 
     /**

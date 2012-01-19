@@ -434,6 +434,33 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         assertTrue(result == 50);
     }
     
+    @org.junit.Test
+    public void testNoSamlToken() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItInlinePolicyPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT2);
+        
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected on no SamlToken");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error));
+        }
+    }
+    
+    
     private boolean checkUnrestrictedPoliciesInstalled() {
         try {
             byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};

@@ -40,12 +40,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 public class UsernameTokenPolicyValidator 
     extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
     
-    private boolean utWithCallbacks;
-    
-    public UsernameTokenPolicyValidator(boolean utWithCallbacks) {
-        this.utWithCallbacks = utWithCallbacks;
-    }
-    
     public boolean validatePolicy(
         AssertionInfoMap aim,
         Message message,
@@ -67,7 +61,7 @@ public class UsernameTokenPolicyValidator
                 (org.apache.cxf.ws.security.policy.model.UsernameToken)ai.getAssertion();
             ai.setAsserted(true);
 
-            if (utWithCallbacks || !isTokenRequired(usernameTokenPolicy, message)) {
+            if (!isTokenRequired(usernameTokenPolicy, message)) {
                 continue;
             }
 
@@ -81,7 +75,6 @@ public class UsernameTokenPolicyValidator
             if (!checkTokens(usernameTokenPolicy, ai, utResults)) {
                 return false;
             }
-
         }
         return true;
     }
