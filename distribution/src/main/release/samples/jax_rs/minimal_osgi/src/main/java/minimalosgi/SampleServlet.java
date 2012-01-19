@@ -19,16 +19,17 @@
 
 package minimalosgi;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-
 public class SampleServlet extends CXFNonSpringJaxrsServlet {
 
-    protected void createServerFromApplication(String cName, ServletConfig servletConfig) throws ServletException {
+    protected void createServerFromApplication(String cName, ServletConfig servletConfig) 
+        throws ServletException {
         // technically, you should look up the application name from ServletConfig's init parameters
         // but creating the actual application object is slower via reflection than actually
         // instantiating it

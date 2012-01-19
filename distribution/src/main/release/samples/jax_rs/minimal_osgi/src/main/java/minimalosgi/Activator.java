@@ -19,14 +19,14 @@
 
 package minimalosgi;
 
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
-
-import java.util.Hashtable;
 
 public class Activator implements BundleActivator {
 
@@ -51,7 +51,7 @@ public class Activator implements BundleActivator {
                 public Object addingService(ServiceReference serviceReference) {
                     try {
                         HttpService service = (HttpService)_context.getService(serviceReference);
-                        Hashtable<String, String> initParams = new Hashtable<String, String>();
+                        Map<String, String> initParams = new Hashtable<String, String>();
                         initParams.put("javax.ws.rs.Application", SampleApplication.class.getName());
                         service.registerServlet(_path, new SampleServlet(), initParams, null);
                         return service;
@@ -67,8 +67,9 @@ public class Activator implements BundleActivator {
 
                 public void removedService(ServiceReference serviceReference, Object o) {
                     HttpService service = (HttpService)_context.getService(serviceReference);
-                    if (service != null)
+                    if (service != null) {
                         service.unregister(_path);
+                    }
                 }
             }
         );
