@@ -1,5 +1,5 @@
 
-Apache CXF 2.3.8 Release Notes
+Apache CXF 2.3.9 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ New features include:
    for the Stax parser
 
 
-2.3.8 fixes over 32 JIRA issues reported by users and the community.
+2.3.9 fixes over 8 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -105,40 +105,13 @@ for caveats when upgrading from CXF 2.2.x to 2.3.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-
 ** Bug
-    * [CXF-3829] - NPE in wsdl2java if soap:binding tag is omitted
-    * [CXF-3836] - Missing output parameters in wrapped method implementations generate NPE
-    * [CXF-3840] - WS-Addressing and WS-RM: Nested Reference Parameters in request are not supported and become concatenated in the response to client
-    * [CXF-3845] - Incompatibility between Derby 10.8 and WS-RM RMTxStore
-    * [CXF-3846] - NullPointerException when requesting ?wsdl using AegisDatabinding and @SchemaValidation
-    * [CXF-3847] - ResponseBuilderImpl.status - validation against instance var instead of parameter
-    * [CXF-3853] - RMTxStore: Vendor specific condition check
-    * [CXF-3855] - Incorrect character escaping by URIParserUtil
-    * [CXF-3860] - CXF sample "restful_dispatch" Readme.txt need to be updated
-    * [CXF-3867] - Fix for CXF-1816 causes startup performance regression
-    * [CXF-3871] - NPE is thrown when ws-addr is configured using policy and ws-addr Action is absent
-    * [CXF-3878] - org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper does not print the WebApplicationException stack trace even when log level is set to FINEST
-    * [CXF-3884] - [JAXB] DynamicClientFactory#setupClasspath does not handle URL encoded file names correctly
-    * [CXF-3897] - Better handling on invalid JAXRS '_type' parameter
-    * [CXF-3900] - InjectionUtils do not handle correctly collections inside query bean
-    * [CXF-3925] - WebFaultOutInterceptor expects the Fault.
-    * [CXF-3934] - JaxWsClientProxy clears stacktrace of custom exception
-    * [CXF-3938] - JAX-RS Contexts are not available to MessageBodyReader and MessageBodyWriter providers at the selection stage
-    * [CXF-3939] - UriInfo returns the list of matched uris and resources in the wrong order
-    * [CXF-3948] - CXF 2.3.x does not configure the Future TTL value for Timestamp processing
-    * [CXF-3956] - JAX-WS HandlerResolver consulted for ServiceImpl.createPort, but not for createDispatch
-    * [CXF-3961] - SoapTransportFactory: confused exception by unknown transport protocol
-    * [CXF-3966] - When client sends invalid XML, JAX-RS returns 500 instead of 4xx
-
-** Improvement
-    * [CXF-3380] - JAX-RS: Support writing to DataSources
-    * [CXF-3849] - JAXBElementProvider prints Exception on System.err
-    * [CXF-3858] - It will be helpful to add the cause exception message, when throw the fault from XMLStreamDataReader and XMLStreamDataWriter
-    * [CXF-3863] - Warning info since build service from wsdl of JaxWsServiceFactoryBean once I located the wsdl location
-    * [CXF-3872] - Confusing error message "Problem writing SAAJ model to stream" in case if service not avalable (patch)
-    * [CXF-3879] - Add the ability to enforce a maximum attachment size
-    * [CXF-3887] - wsdl2java only shows first error from JAXB/xjc
-    * [CXF-3921] - Making RMTxStore's table exists error state/code configurable
-    * [CXF-3965] - Enhancement of the exception message when configuring the schema location in the jaxws endpoint.
+    * [CXF-3984] - Impossible to handle Locale parameters with country qualifiers 
+    * [CXF-3986] - Update MessageContext.getContextualProperty to check Exchange if the property is of type Class 
+    * [CXF-4007] - Jetty threading parameters doesn't setup threadpool properly
+    * [CXF-4018] - JAX-WS Providers created from class (instead of an actual instance bean) do not get the JAXWSMethodInvoker
+    * [CXF-4027] - Aegis BeanType does not ignore super type of java.lang.Enum
+    * [CXF-4031] - NullPoint Exception Raised when input is nothing  and using Holder to return response
+    * [CXF-4044] - ensure publishedEndpointUrl property could be set to endpoint
+    * [CXF-4045] - BusFactory does not catch NoClassDefFoundError
 
