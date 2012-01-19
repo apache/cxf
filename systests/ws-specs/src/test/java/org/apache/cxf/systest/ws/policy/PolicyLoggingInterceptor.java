@@ -67,7 +67,7 @@ public class PolicyLoggingInterceptor extends AbstractPhaseInterceptor<Message> 
             for (Assertion a : as) {
                 LOG.fine("Assertion: " + a.getClass().getName());
                 HTTPServerPolicy p = (JaxbAssertion.cast(a, HTTPServerPolicy.class)).getData(); 
-                LOG.fine("server policy: " + new ServerPolicyCalculator().toString(p));
+                LOG.fine("server policy: " + ServerPolicyCalculator.toString(p));
             }
         }
 
