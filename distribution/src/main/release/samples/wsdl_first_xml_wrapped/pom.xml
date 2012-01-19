@@ -21,13 +21,13 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wsdl_first_xml_wrapped</artifactId>
     <name>CXF sample using WRAPPED Style in XML Binding (pure XML over HTTP)</name>
-    <version>2.4.6</version>
+    <version>2.4.7-SNAPSHOT</version>
     <description>CXF sample using WRAPPED Style in XML Binding (pure XML over HTTP)</description>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.4.6</version>
+        <version>2.4.7-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -149,18 +149,18 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>2.4.6</version>
+            <version>2.4.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>2.4.6</version>
+            <version>2.4.7-SNAPSHOT</version>
         </dependency>
         <!-- Jetty is needed if you're using the CXFServlet -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>2.4.6</version>
+            <version>2.4.7-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
