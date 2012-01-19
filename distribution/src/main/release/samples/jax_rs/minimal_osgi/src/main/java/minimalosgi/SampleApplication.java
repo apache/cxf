@@ -19,14 +19,14 @@
 
 package minimalosgi;
 
-import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
+import javax.ws.rs.core.Application;
 
 public class SampleApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
-        HashSet<Class<?>> s = new HashSet<Class<?>>();
+        Set<Class<?>> s = new HashSet<Class<?>>();
         s.add(SampleResource.class);
         return s;
     }
