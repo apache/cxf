@@ -279,25 +279,24 @@ public abstract class BusFactory {
                 busFactoryCondition = rd.readLine();
                 rd.close();
             }
-            if (isValidBusFactoryClass(busFactoryClass)) {
-                if (busFactoryCondition != null) {
-                    try {
-                        Class<?> cls =  ClassLoaderUtils.loadClass(busFactoryClass, BusFactory.class)
-                            .asSubclass(BusFactory.class);
-                        int idx = busFactoryCondition.indexOf(',');
-                        while (idx != -1) {
-                            cls.getClassLoader().loadClass(busFactoryCondition.substring(0, idx));
-                            busFactoryCondition = busFactoryCondition.substring(idx + 1);
-                            idx = busFactoryCondition.indexOf(',');
-                        }
-                        cls.getClassLoader().loadClass(busFactoryCondition);
-                        return busFactoryClass;
-                    } catch (ClassNotFoundException e) {
-                        return DEFAULT_BUS_FACTORY;
+            if (isValidBusFactoryClass(busFactoryClass) 
+                && busFactoryCondition != null) {
+                try {
+                    Class<?> cls =  ClassLoaderUtils.loadClass(busFactoryClass, BusFactory.class)
+                        .asSubclass(BusFactory.class);
+                    int idx = busFactoryCondition.indexOf(',');
+                    while (idx != -1) {
+                        cls.getClassLoader().loadClass(busFactoryCondition.substring(0, idx));
+                        busFactoryCondition = busFactoryCondition.substring(idx + 1);
+                        idx = busFactoryCondition.indexOf(',');
                     }
-                } else {
-                    return busFactoryClass;
+                    cls.getClassLoader().loadClass(busFactoryCondition);
+                } catch (ClassNotFoundException e) {
+                    busFactoryClass = DEFAULT_BUS_FACTORY;
+                } catch (NoClassDefFoundError e) {
+                    busFactoryClass = DEFAULT_BUS_FACTORY;
                 }
+                
             }
             return busFactoryClass;
 
