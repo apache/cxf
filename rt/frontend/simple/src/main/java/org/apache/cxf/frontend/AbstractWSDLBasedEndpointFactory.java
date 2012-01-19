@@ -157,6 +157,10 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             ei.setAddress(getAddress()); 
         }
 
+        if (publishedEndpointUrl != null && !"".equals(publishedEndpointUrl)) {
+            ei.setProperty("publishedEndpointUrl", publishedEndpointUrl);
+        }
+        
         if (endpointReference != null) {
             ei.setAddress(endpointReference);
         }
@@ -294,10 +298,6 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         ei.setAddress(getAddress());
         ei.setBinding(bindingInfo);
         
-        if (publishedEndpointUrl != null && !"".equals(publishedEndpointUrl)) {
-            ei.setProperty("publishedEndpointUrl", publishedEndpointUrl);
-        }
-
         if (wsdlEndpointFactory != null) {
             wsdlEndpointFactory.createPortExtensors(ei, service);
         }
