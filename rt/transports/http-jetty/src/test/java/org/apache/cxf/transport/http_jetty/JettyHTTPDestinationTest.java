@@ -51,6 +51,7 @@ import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -570,6 +571,8 @@ public class JettyHTTPDestinationTest extends Assert {
             bus = EasyMock.createMock(Bus.class);
             bus.getExtension(EndpointResolverRegistry.class);
             EasyMock.expectLastCall().andReturn(null);
+            bus.getExtension(PolicyDataEngine.class);
+            EasyMock.expectLastCall().andReturn(null).anyTimes();
             bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine");
             EasyMock.expectLastCall().andReturn(false);
             bus.getExtension(ClassLoader.class);

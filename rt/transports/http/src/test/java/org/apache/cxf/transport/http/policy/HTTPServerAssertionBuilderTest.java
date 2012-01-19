@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http.policy;
 
+import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.neethi.Assertion;
@@ -37,7 +38,7 @@ public class HTTPServerAssertionBuilderTest extends Assert {
         Assertion a = ab.buildAssertion();
         assertTrue(a instanceof JaxbAssertion);
         assertTrue(a instanceof HTTPServerAssertionBuilder.HTTPServerPolicyAssertion);
-        assertEquals(PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME, a.getName());
+        assertEquals(new ServerPolicyCalculator().getDataClassName(), a.getName());
         assertTrue(!a.isOptional());
     }
     

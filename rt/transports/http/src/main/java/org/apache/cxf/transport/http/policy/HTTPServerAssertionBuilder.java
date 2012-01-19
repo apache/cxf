@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
@@ -39,10 +40,10 @@ import org.apache.neethi.PolicyComponent;
 @NoJSR250Annotations
 public class HTTPServerAssertionBuilder extends JaxbAssertionBuilder<HTTPServerPolicy> {
     public static final List<QName> KNOWN_ELEMENTS 
-        = Collections.singletonList(PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME);
+        = Collections.singletonList(new ServerPolicyCalculator().getDataClassName());
 
     public HTTPServerAssertionBuilder() throws JAXBException {
-        super(HTTPServerPolicy.class, PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME);        
+        super(HTTPServerPolicy.class, new ServerPolicyCalculator().getDataClassName());        
     }
     
     @Override
@@ -52,7 +53,7 @@ public class HTTPServerAssertionBuilder extends JaxbAssertionBuilder<HTTPServerP
     
     class HTTPServerPolicyAssertion extends JaxbAssertion<HTTPServerPolicy> {
         HTTPServerPolicyAssertion() {
-            super(PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME, false);            
+            super(new ServerPolicyCalculator().getDataClassName(), false);            
         }
 
         @Override
@@ -65,7 +66,7 @@ public class HTTPServerAssertionBuilder extends JaxbAssertionBuilder<HTTPServerP
                 return false;
             }
             JaxbAssertion<HTTPServerPolicy> other = JaxbAssertion.cast((Assertion)policyComponent);
-            return PolicyUtils.equals(this.getData(), other.getData());  
+            return new ServerPolicyCalculator().equals(this.getData(), other.getData());  
         }
         
         @Override

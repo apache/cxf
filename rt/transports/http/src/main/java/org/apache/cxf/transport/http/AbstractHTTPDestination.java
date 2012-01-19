@@ -60,13 +60,14 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Assertor;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.http.policy.PolicyUtils;
+import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.SSLUtils;
@@ -419,8 +420,9 @@ public abstract class AbstractHTTPDestination
     }
 
     private void initConfig() {
-        if (bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine")) {
-            server = PolicyUtils.getServer(bus, endpointInfo, this);
+        PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
+        if (pde != null) {
+            server = pde.getServerEndpointPolicy(endpointInfo, this, new ServerPolicyCalculator());
         }
         if (null == server && WSDLLibrary.isAvailable()) {
             server = endpointInfo.getTraversedExtensor(
@@ -768,11 +770,12 @@ public abstract class AbstractHTTPDestination
     }
     
     public void assertMessage(Message message) {
-        PolicyUtils.assertServerPolicy(message, server); 
+        PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
+        pde.assertMessage(message, server, new ServerPolicyCalculator());
     }
 
     public boolean canAssert(QName type) {
-        return PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME.equals(type); 
+        return new ServerPolicyCalculator().getDataClassName().equals(type); 
     }
     
     public void releaseRegistry() {

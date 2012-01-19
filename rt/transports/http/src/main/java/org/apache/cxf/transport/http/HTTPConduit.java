@@ -67,6 +67,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Assertor;
@@ -76,7 +77,7 @@ import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
-import org.apache.cxf.transport.http.policy.PolicyUtils;
+import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
@@ -300,15 +301,24 @@ public class HTTPConduit
         proxyFactory = new ProxyFactory();
         connectionFactory = new HttpsURLConnectionFactory();
         cookies = new Cookies();
-        
-        // wsdl extensors are superseded by policies which in        
-        // turn are superseded by injection                          
-        if (bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine")
-            && endpointInfo.getService() != null) {                         
-            clientSidePolicy =                                       
-                PolicyUtils.getClient(bus, endpointInfo, this);              
-        }
+        updateClientPolicy();
         CXFAuthenticator.addAuthenticator();
+    }
+
+    /**
+     * updates the HTTPClientPolicy that is compatible with the assertions
+     * included in the service, endpoint, operation and message policy subjects
+     * if a PolicyDataEngine is installed
+     * 
+     * wsdl extensors are superseded by policies which in 
+     * turn are superseded by injection
+     */
+    private void updateClientPolicy() {
+        PolicyDataEngine policyEngine = bus.getExtension(PolicyDataEngine.class);
+        if (policyEngine != null && endpointInfo.getService() != null) {
+            clientSidePolicy = policyEngine.getClientEndpointPolicy(endpointInfo, 
+                                                                    this, new ClientPolicyCalculator());
+        }
     }
 
     /**
@@ -838,7 +848,17 @@ public class HTTPConduit
     }
     
     public HTTPClientPolicy getClient(Message message) {
-        return PolicyUtils.getClient(message, clientSidePolicy);
+        ClientPolicyCalculator cpc = new ClientPolicyCalculator();
+        HTTPClientPolicy messagePol = message.get(HTTPClientPolicy.class);
+        if (messagePol != null) {
+            return cpc.intersect(messagePol, clientSidePolicy);
+        }
+
+        PolicyDataEngine policyDataEngine = bus.getExtension(PolicyDataEngine.class);
+        if (policyDataEngine == null) {
+            return clientSidePolicy;
+        }
+        return policyDataEngine.getPolicy(message, clientSidePolicy, cpc);
     }
 
     /**
@@ -1688,11 +1708,12 @@ public class HTTPConduit
     }
     
     public void assertMessage(Message message) {
-        PolicyUtils.assertClientPolicy(message, clientSidePolicy);
+        PolicyDataEngine policyDataEngine = bus.getExtension(PolicyDataEngine.class);
+        policyDataEngine.assertMessage(message, getClient(), new ClientPolicyCalculator());
     }
     
     public boolean canAssert(QName type) {
-        return PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME.equals(type);  
+        return new ClientPolicyCalculator().equals(type);  
     }
 
     public void propertyChange(PropertyChangeEvent evt) {

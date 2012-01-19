@@ -1,4 +1,5 @@
 org.apache.cxf.ws.policy.PolicyEngineImpl:org.apache.cxf.ws.policy.PolicyEngine:false
+org.apache.cxf.ws.policy.PolicyDataEngineImpl:org.apache.cxf.policy.PolicyDataEngine:false
 org.apache.cxf.ws.policy.AssertionBuilderRegistryImpl:org.apache.cxf.ws.policy.AssertionBuilderRegistry:true 
 org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistryImpl:org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry:true
 org.apache.cxf.ws.policy.PolicyBuilderImpl:org.apache.cxf.ws.policy.PolicyBuilder:true
