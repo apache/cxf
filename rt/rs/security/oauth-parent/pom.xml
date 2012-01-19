@@ -21,7 +21,7 @@
 
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
-    <version>2.5.3-SNAPSHOT</version>
+    <version>2.5.2</version>
     <packaging>pom</packaging>
     <name>Apache CXF Runtime RS Security OAuth Parent</name>
     <description>Apache CXF Runtime RS Security OAuth Parent</description>
@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.5.3-SNAPSHOT</version>
+        <version>2.5.2</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
