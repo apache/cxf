@@ -53,6 +53,7 @@ public class MapTest extends AbstractAegisTest {
         tm.setTypeCreator(creator);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testType() throws Exception {
         Method m = MapService.class.getMethod("getMap", new Class[0]);
@@ -97,6 +98,7 @@ public class MapTest extends AbstractAegisTest {
         assertEquals(Double.class, ((CollectionType)type).getComponentType().getTypeClass());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testPDType() throws Exception {
         PropertyDescriptor pd = Introspector.getBeanInfo(MapDTO.class,
@@ -118,6 +120,7 @@ public class MapTest extends AbstractAegisTest {
         assertTrue(type.getTypeClass().isAssignableFrom(Integer.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testMapDTO() {
         tm = new DefaultTypeMapping();

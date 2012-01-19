@@ -84,7 +84,8 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         }
         proxyFac.setProperties(props);
 
-        client = proxyFac.create(MtomTestService.class);
+        client = (org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService)
+            proxyFac.create(MtomTestService.class);
         jaxwsClient = jaxwsFac.create(MtomTestService.class);
         impl = (MtomTestImpl)applicationContext.getBean("mtomImpl");
     }

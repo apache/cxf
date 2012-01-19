@@ -1,4 +1,4 @@
 org.apache.cxf.ws.rm.RMManager::true
-org.apache.cxf.ws.rm.policy.RMPolicyInterceptorProvider::true:true
-org.apache.cxf.ws.rm.policy.RMAssertionBuilder::true:true
+org.apache.cxf.ws.rm.policy.RMPolicyInterceptorProvider::true
+org.apache.cxf.ws.rm.policy.RMAssertionBuilder::true
 

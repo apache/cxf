@@ -32,7 +32,6 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
  * 
  */
 public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    private static final long serialVersionUID = 2092269997296804632L;
     private static final Collection<QName> ASSERTION_TYPES;
     static {
         ASSERTION_TYPES = new ArrayList<QName>();

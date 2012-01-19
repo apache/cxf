@@ -33,7 +33,7 @@ public class CXFConnectionRequestInfo extends CXFConnectionParam implements Conn
         super();
     }
     
-    public CXFConnectionRequestInfo(Class<?> aIface, URL aWsdlLocation, 
+    public CXFConnectionRequestInfo(Class aIface, URL aWsdlLocation, 
                                        QName aServiceName, QName aPortName) {
         super(aIface, aWsdlLocation, aServiceName, aPortName);
     }

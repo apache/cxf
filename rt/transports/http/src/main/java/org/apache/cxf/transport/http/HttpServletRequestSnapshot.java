@@ -72,7 +72,7 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
         contextPath = request.getContextPath();
         cookies = request.getCookies();
         requestHeaderNames = request.getHeaderNames();
-        Enumeration<String> tmp = request.getHeaderNames();
+        Enumeration<String> tmp = (Enumeration<String>)request.getHeaderNames();
         while (tmp.hasMoreElements()) {
             String key = tmp.nextElement();
             headersMap.put(key, request.getHeaders(key));

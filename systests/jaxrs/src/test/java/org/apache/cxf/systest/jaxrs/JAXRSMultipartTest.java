@@ -380,7 +380,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Book json2 = readJSONBookFromInputStream(result.get(1).getDataHandler().getInputStream());
         assertEquals("json", json2.getName());
         assertEquals(2L, json2.getId());
-        InputStream is2 = result.get(2).getDataHandler().getInputStream();
+        InputStream is2 = (InputStream)result.get(2).getDataHandler().getInputStream();
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
@@ -437,7 +437,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Book json2 = readJSONBookFromInputStream(result.get(1).getDataHandler().getInputStream());
         assertEquals("json", json2.getName());
         assertEquals(2L, json2.getId());
-        InputStream is2 = result.get(2).getDataHandler().getInputStream();
+        InputStream is2 = (InputStream)result.get(2).getDataHandler().getInputStream();
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
@@ -644,9 +644,10 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         return (Book)u.unmarshal(is);
     }
     
+    @SuppressWarnings("unchecked")
     private Book readJSONBookFromInputStream(InputStream is) throws Exception {
-        JSONProvider<Book> provider = new JSONProvider<Book>();
-        return provider.readFrom(Book.class, Book.class, new Annotation[]{}, 
+        JSONProvider provider = new JSONProvider();
+        return (Book)provider.readFrom((Class)Book.class, Book.class, new Annotation[]{}, 
                                  MediaType.APPLICATION_JSON_TYPE, null, is);
         
     }

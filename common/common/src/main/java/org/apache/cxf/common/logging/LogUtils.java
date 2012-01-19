@@ -213,7 +213,7 @@ public final class LogUtils {
                                          String loggerName) {
         if (loggerClass != null) {
             try {
-                Constructor<?> cns = loggerClass.getConstructor(String.class, String.class);
+                Constructor cns = loggerClass.getConstructor(String.class, String.class);
                 if (name == null) {
                     try {
                         return (Logger) cns.newInstance(loggerName, BundleUtils.getBundleName(cls));

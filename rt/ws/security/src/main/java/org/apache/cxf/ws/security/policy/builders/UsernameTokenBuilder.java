@@ -65,6 +65,7 @@ public class UsernameTokenBuilder implements AssertionBuilder<Element> {
                 for (int i = 0; i < children.getLength(); i++) {
                     Node child = children.item(i);
                     if (child instanceof Element) {
+                        child = (Element)child;
                         QName qname = new QName(child.getNamespaceURI(), child.getLocalName());
                         if (SPConstants.USERNAME_TOKEN10.equals(qname.getLocalPart())) {
                             usernameToken.setUseUTProfile10(true);

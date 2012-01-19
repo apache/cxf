@@ -26,13 +26,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.jaxb.JAXBUtils.JType;
-import org.apache.cxf.common.jaxb.JAXBUtils.Mapping;
-import org.apache.cxf.common.jaxb.JAXBUtils.S2JJAXBModel;
-import org.apache.cxf.common.jaxb.JAXBUtils.TypeAndAnnotation;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.jaxb.JAXBUtils.JType;
+import org.apache.cxf.jaxb.JAXBUtils.Mapping;
+import org.apache.cxf.jaxb.JAXBUtils.S2JJAXBModel;
+import org.apache.cxf.jaxb.JAXBUtils.TypeAndAnnotation;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.FaultInfo;

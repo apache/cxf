@@ -62,7 +62,7 @@ public class JMSConduitBeanDefinitionParser extends AbstractBeanDefinitionParser
     }
 
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return JMSConduit.class;
     }
 }

@@ -76,7 +76,7 @@ public class SubscriptionDialogImpl extends DialogBox implements SubscriptionDia
         setWidget(form);
     } 
 
-    public void setValidationErrors(@Nullable Map<HasValue<String>, String> errors) {
+    public void setValidationErrors(@Nullable Map<HasValue, String> errors) {
         form.nameErrorLabel.setVisible(false);
         form.urlErrorLabel.setVisible(false);
         

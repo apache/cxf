@@ -39,13 +39,13 @@ import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultInInterceptor;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
-import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -110,7 +110,7 @@ public class HttpBindingFactory extends AbstractBindingFactory {
             Method m = md.getMethod(bop);
             
             try {
-                Class<?> c = (Class<?>) service.get(ReflectionServiceFactoryBean.ENDPOINT_CLASS);
+                Class<?> c = (Class) service.get(ReflectionServiceFactoryBean.ENDPOINT_CLASS);
                 if (c != null) {
                     m = c.getMethod(m.getName(), m.getParameterTypes());
                 }

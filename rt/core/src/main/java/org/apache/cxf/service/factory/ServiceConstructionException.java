@@ -26,7 +26,6 @@ import org.apache.cxf.common.i18n.UncheckedException;
 
 public class ServiceConstructionException extends UncheckedException {
 
-    private static final long serialVersionUID = -4242545895784708313L;
     public ServiceConstructionException(Message msg, Throwable t) {
         super(msg, t);
     }

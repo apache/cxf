@@ -108,7 +108,7 @@ public final class WSDLTypes {
                             obj.setBinding(bName);
                             // get the repository id of the binding.
                             String repId = null;
-                            Iterator<?> bindIter = binding.getExtensibilityElements().iterator();
+                            Iterator bindIter = binding.getExtensibilityElements().iterator();
                             while (bindIter.hasNext()) {
                                 BindingType type = (BindingType)bindIter.next();
                                 repId = type.getRepositoryID();
@@ -239,12 +239,11 @@ public final class WSDLTypes {
         return corbaTypeImpl;
     }
 
-    public static Union processUnionBranches(Union corbaUnion, List<MemberType> fields,
-                                             List<String> caselist) {
+    public static Union processUnionBranches(Union corbaUnion, List fields, List<String> caselist) {
         int caseIndex = 0;
 
         for (int i = 0; i < fields.size(); i++) {
-            MemberType field = fields.get(i);
+            MemberType field = (MemberType)fields.get(i);
             Unionbranch branch = new Unionbranch();
             branch.setName(field.getName());
             branch.setIdltype(field.getIdltype());
@@ -254,7 +253,7 @@ public final class WSDLTypes {
             branch.setDefault(false);
 
             CaseType c = new CaseType();
-            c.setLabel(caselist.get(caseIndex));
+            c.setLabel((String)caselist.get(caseIndex));
             caseIndex++;
             branch.getCase().add(c);
             corbaUnion.getUnionbranch().add(branch);
@@ -384,10 +383,10 @@ public final class WSDLTypes {
 
         if (boundedDecimal || boundedScale) {
             if (anonymous) {
-                corbaTypeImpl = getAnonFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
+                corbaTypeImpl = (CorbaTypeImpl)getAnonFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
                                                                  digits, scale);
             } else {
-                corbaTypeImpl = getFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
+                corbaTypeImpl = (CorbaTypeImpl)getFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
                                           digits, scale);
             }
         }

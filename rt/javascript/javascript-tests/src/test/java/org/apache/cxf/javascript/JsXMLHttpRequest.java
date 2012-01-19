@@ -72,7 +72,6 @@ import org.mozilla.javascript.ScriptableObject;
  * CXF 'local' URLs if the author is feeling frisky.
  */
 public class JsXMLHttpRequest extends ScriptableObject {
-    private static final long serialVersionUID = 6993486986900120981L;
     private static final Logger LOG = LogUtils.getL7dLogger(JsXMLHttpRequest.class);
     private static Charset utf8 = Charset.forName("utf-8");
     private static Set<String> validMethods;

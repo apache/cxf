@@ -39,13 +39,13 @@ class CglibProxyHelper extends ProxyHelper {
     }
     
     @Override
-    protected Object getProxyInternal(ClassLoader loader, Class<?>[] interfaces, 
+    protected Object getProxyInternal(ClassLoader loader, Class[] interfaces, 
                                       final java.lang.reflect.InvocationHandler h) {
         
-        Class<?> superClass = null;
-        List<Class<?>> theInterfaces = new ArrayList<Class<?>>();
+        Class superClass = null;
+        List<Class> theInterfaces = new ArrayList<Class>();
         
-        for (Class<?> c : interfaces) {
+        for (Class c : interfaces) {
             if (!c.isInterface()) {
                 if (superClass != null) {
                     throw new IllegalArgumentException("Only a single superclass is supported");

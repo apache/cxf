@@ -236,14 +236,14 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             } 
             
             if (ids != null) {
-                for (Iterator<?> itr = ids.iterator(); itr.hasNext();) {
+                for (Iterator itr = ids.iterator(); itr.hasNext();) {
                     Object o = itr.next();
                     if (o instanceof TypedStringValue) {
                         if (searchValue.equals(((TypedStringValue) o).getValue())) {
                             return true;
                         }
                     } else {
-                        if (searchValue.equals(o)) {
+                        if (searchValue.equals((String)o)) {
                             return true;
                         }
                     }
@@ -286,13 +286,6 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             LOG.log(Level.FINE, "Could not get services for " + type.getName(), e);
         }
         return lst;
-    }
-
-    public boolean hasBeanOfName(String name) {
-        if (context.containsBean(name)) {
-            return true;
-        }
-        return orig.hasBeanOfName(name);
     }
 
 }

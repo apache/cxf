@@ -171,15 +171,15 @@ public final class CorbaObjectReferenceHelper {
 
     public static int readIntFromAlignedCDREncaps(byte[] data, int index, boolean bigEndian) {
         if (bigEndian) {
-            int partial = ((data[index] << 24) & 0xff000000)
-                | ((data[index + 1] << 16) & 0x00ff0000);
-            return partial | ((data[index + 2] << 8) & 0x0000ff00) 
-                | ((data[index + 3]) & 0x000000ff);
+            int partial = ((((int)data[index]) << 24) & 0xff000000)
+                | ((((int)data[index + 1]) << 16) & 0x00ff0000);
+            return partial | ((((int)data[index + 2]) << 8) & 0x0000ff00) 
+                | ((((int)data[index + 3])) & 0x000000ff);
         } else {
-            int partial = ((data[index]) & 0x000000ff)
-                | ((data[index + 1] << 8) & 0x0000ff00);
-            return partial | ((data[index + 2] << 16) & 0x00ff0000) 
-                | ((data[index + 3] << 24) & 0xff000000);
+            int partial = ((((int)data[index])) & 0x000000ff)
+                | ((((int)data[index + 1]) << 8) & 0x0000ff00);
+            return partial | ((((int)data[index + 2]) << 16) & 0x00ff0000) 
+                | ((((int)data[index + 3]) << 24) & 0xff000000);
         }
     }
 

@@ -33,6 +33,7 @@ import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
 import org.apache.cxf.systest.jaxws.types.Bar;
 import org.apache.cxf.systest.jaxws.types.BarImpl;
 

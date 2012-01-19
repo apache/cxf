@@ -28,8 +28,6 @@ import org.apache.cxf.common.i18n.Message;
  */
 public class UnsupportedConstruct extends RuntimeException {
 
-    private static final long serialVersionUID = -5854990568839716895L;
-
     public UnsupportedConstruct() {
     }
 

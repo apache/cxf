@@ -184,7 +184,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
         List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, getLog()
                                                            .isDebugEnabled());
-        String[] args = list.toArray(new String[list.size()]);
+        String[] args = (String[])list.toArray(new String[list.size()]);
         getLog().debug("Calling wsdl2java with args: " + Arrays.toString(args));
         
         if (!"false".equals(fork)) {

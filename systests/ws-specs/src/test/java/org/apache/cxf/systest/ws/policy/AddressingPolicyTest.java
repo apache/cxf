@@ -138,8 +138,8 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
         } catch (PingMeFault ex) {
-            assertEquals(2, ex.getFaultInfo().getMajor());
-            assertEquals(1, ex.getFaultInfo().getMinor());
+            assertEquals(2, (int)ex.getFaultInfo().getMajor());
+            assertEquals(1, (int)ex.getFaultInfo().getMinor());
         } 
     }
 }

@@ -130,10 +130,10 @@ public class ReadHeaderInterceptorTest extends TestBase {
                 }
                 assertEquals(2, reservationChilds.size());
                 assertEquals("reference", reservationChilds.get(0).getLocalName());
-                assertEquals("uuid:093a2da1-q345-739r-ba5d-pqff98fe8j7d", reservationChilds.get(0)
+                assertEquals("uuid:093a2da1-q345-739r-ba5d-pqff98fe8j7d", ((Element)reservationChilds.get(0))
                     .getTextContent());
-                assertEquals("dateAndTime", reservationChilds.get(1).getLocalName());
-                assertEquals("2001-11-29T13:20:00.000-05:00", reservationChilds.get(1)
+                assertEquals("dateAndTime", ((Element)reservationChilds.get(1)).getLocalName());
+                assertEquals("2001-11-29T13:20:00.000-05:00", ((Element)reservationChilds.get(1))
                     .getTextContent());
 
             }

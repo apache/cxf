@@ -26,7 +26,8 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 public class ThreadLocalSearchContext extends AbstractThreadLocalProxy<SearchContext> 
     implements SearchContext {
 
-    public <T> SearchCondition<T> getCondition(Class<T> cls) {
+    @SuppressWarnings("unchecked")
+    public SearchCondition getCondition(Class cls) {
         return get().getCondition(cls);
     }
 

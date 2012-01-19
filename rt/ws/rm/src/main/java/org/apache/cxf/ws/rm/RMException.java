@@ -28,8 +28,6 @@ import org.apache.cxf.common.i18n.Message;
  */
 public class RMException extends Exception {
     
-    private static final long serialVersionUID = 7216414721524238682L;
-
     public RMException(Message msg, Throwable t) {
         super(msg, t);
     }

@@ -27,7 +27,6 @@ import javax.xml.ws.WebFault;
          propOrder = { "message" }
 )
 public class UserException extends Exception {
-    private static final long serialVersionUID = -6334864208013570102L;
     private String message;
 
     public String getMessage() {

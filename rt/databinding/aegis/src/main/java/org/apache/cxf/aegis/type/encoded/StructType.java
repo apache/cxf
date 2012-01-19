@@ -95,7 +95,7 @@ public class StructType extends BeanType {
     protected void writeProperty(QName name,
             Object object,
             Object property,
-            Class<?> impl,
+            Class impl,
             BeanTypeInfo inf) throws DatabindingException {
 
         // nested elements use unqualified names
@@ -174,12 +174,12 @@ public class StructType extends BeanType {
     private final class WritePropertyAction implements SoapRef.Action {
         private final QName name;
         private final Object targetObject;
-        private final Class<?> targetClass;
+        private final Class targetClass;
         private final BeanTypeInfo beanTypeInfo;
 
         private WritePropertyAction(QName name,
                 Object targetObject,
-                Class<?> targetClass,
+                Class targetClass,
                 BeanTypeInfo beanTypeInfo) {
             this.name = name;
             this.targetObject = targetObject;

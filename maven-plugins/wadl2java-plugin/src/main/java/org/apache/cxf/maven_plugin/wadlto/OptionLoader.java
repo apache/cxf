@@ -138,7 +138,7 @@ public final class OptionLoader {
         String ex = joinWithComma(exList.toArray(new String[exList.size()]));
 
         try {
-            List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
+            List newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
             return CastUtils.cast(newfiles);
         } catch (IOException exc) {
             throw new MojoExecutionException(exc.getMessage(), exc);

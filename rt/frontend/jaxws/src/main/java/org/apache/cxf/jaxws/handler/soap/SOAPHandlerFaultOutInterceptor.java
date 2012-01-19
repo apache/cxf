@@ -151,7 +151,7 @@ public class SOAPHandlerFaultOutInterceptor extends
                         soapFault.addDetail().appendChild(nd);
                     }
                 } else if (exception instanceof Fault) {
-                    SoapFault sf = SoapFault.createFault((Fault)exception, message
+                    SoapFault sf = SoapFault.createFault((Fault)exception, ((SoapMessage)message)
                         .getVersion());
                     soapFault.setFaultString(sf.getReason());
                     soapFault.setFaultCode(sf.getFaultCode());

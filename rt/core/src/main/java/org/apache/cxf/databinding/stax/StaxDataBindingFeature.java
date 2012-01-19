@@ -55,9 +55,9 @@ public class StaxDataBindingFeature extends AbstractFeature {
 
     private void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
 
-        for (Interceptor<? extends Message> i : inInterceptors) {
+        for (Interceptor i : inInterceptors) {
             if (i instanceof PhaseInterceptor) {
-                PhaseInterceptor<? extends Message> p = (PhaseInterceptor<? extends Message>)i;
+                PhaseInterceptor p = (PhaseInterceptor)i;
 
                 if (p.getId().equals(name)) {
                     inInterceptors.remove(p);

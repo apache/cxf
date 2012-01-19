@@ -27,7 +27,7 @@ import org.apache.cxf.jca.cxf.CXFConnectionRequestInfo;
 
 
 public class CXFConnectionParam {
-    private Class<?> iface;
+    private Class iface;
     private URL wsdlLocation;
     private QName serviceName;
     private QName portName;
@@ -36,7 +36,7 @@ public class CXFConnectionParam {
     public CXFConnectionParam() {
     }
 
-    public CXFConnectionParam(Class<?> aIface, URL aWsdlLocation, 
+    public CXFConnectionParam(Class aIface, URL aWsdlLocation, 
                                        QName aServiceName, QName aPortName) {
         this.iface = aIface;
         this.wsdlLocation = aWsdlLocation;

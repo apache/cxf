@@ -89,7 +89,7 @@ public class MultipartStore {
             throw new RuntimeException("Wrong image property");
         }
         context.put(org.apache.cxf.message.Message.MTOM_ENABLED, 
-                    "true");
+                    (Object)"true");
         
         XopType xop = new XopType();
         xop.setName("xopName");

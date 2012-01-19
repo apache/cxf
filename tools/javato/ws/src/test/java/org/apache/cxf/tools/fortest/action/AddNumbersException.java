@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.fortest.action;
 
 public class AddNumbersException extends Exception {
-    private static final long serialVersionUID = -4139447662348493476L;
     String detail;
 
     public AddNumbersException(String message, String detail) {

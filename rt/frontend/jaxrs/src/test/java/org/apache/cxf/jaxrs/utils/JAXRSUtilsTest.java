@@ -113,7 +113,7 @@ public class JAXRSUtilsTest extends Assert {
     }
 
     private void doTestFormParamsWithEncoding(String enc, boolean setEnc) throws Exception {
-        Class<?>[] argType = {String.class, List.class};
+        Class[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         String body = "p1=" + URLEncoder.encode("\u00E4\u00F6\u00FC", enc) + "&p2=2&p2=3";
@@ -131,7 +131,7 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("2 form params should've been identified", 2, params.size());
         assertEquals("First Form Parameter not matched correctly",
                      "\u00E4\u00F6\u00FC", params.get(0));
-        List<String> list = CastUtils.cast((List<?>)params.get(1));
+        List<String> list = CastUtils.cast((List)params.get(1));
         assertEquals(2, list.size());
         assertEquals("2", list.get(0));
         assertEquals("3", list.get(1));
@@ -168,8 +168,7 @@ public class JAXRSUtilsTest extends Assert {
         Server server = sf.create();  
         assertSame(app, customer.getApplication1());
         assertSame(app, customer.getApplication2());
-        @SuppressWarnings("unchecked")
-        ThreadLocalProxy<UriInfo> proxy = (ThreadLocalProxy<UriInfo>)app.getUriInfo();
+        ThreadLocalProxy proxy = (ThreadLocalProxy)app.getUriInfo();
         assertNotNull(proxy);
         invokeCustomerMethod(sf.getServiceFactory().getClassResourceInfo().get(0),
                              customer, server);
@@ -186,8 +185,7 @@ public class JAXRSUtilsTest extends Assert {
         sf.setStart(false);
         Server server = sf.create();  
         
-        @SuppressWarnings("unchecked")
-        ThreadLocalProxy<UriInfo> proxy = (ThreadLocalProxy<UriInfo>)app.getUriInfo();
+        ThreadLocalProxy proxy = (ThreadLocalProxy)app.getUriInfo();
         assertNotNull(proxy);
         
         ClassResourceInfo cri = sf.getServiceFactory().getClassResourceInfo().get(0);
@@ -661,7 +659,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testQueryParameters() throws Exception {
-        Class<?>[] argType = {String.class, Integer.TYPE, String.class, String.class};
+        Class[] argType = {String.class, Integer.TYPE, String.class, String.class};
         Method m = Customer.class.getMethod("testQuery", argType);
         MessageImpl messageImpl = new MessageImpl();
         
@@ -679,7 +677,7 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testQueryParamAsListWithDefaultValue() throws Exception {
-        Class<?>[] argType = {List.class, List.class, List.class, Integer[].class, 
+        Class[] argType = {List.class, List.class, List.class, Integer[].class, 
             List.class, List.class};
         Method m = Customer.class.getMethod("testQueryAsList", argType);
         Message messageImpl = createMessage();
@@ -724,7 +722,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testCookieParameters() throws Exception {
-        Class<?>[] argType = {String.class, String.class};
+        Class[] argType = {String.class, String.class};
         Method m = Customer.class.getMethod("testCookieParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
@@ -742,7 +740,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMultipleCookieParameters() throws Exception {
-        Class<?>[] argType = {String.class, String.class, Cookie.class};
+        Class[] argType = {String.class, String.class, Cookie.class};
         Method m = Customer.class.getMethod("testMultipleCookieParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
@@ -760,7 +758,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFromStringParameters() throws Exception {
-        Class<?>[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
+        Class[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
         Method m = Customer.class.getMethod("testFromStringParam", argType);
         UUID u = UUID.randomUUID();
         Message messageImpl = createMessage();
@@ -777,7 +775,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFromValueEnum() throws Exception {
-        Class<?>[] argType = {Timezone.class};
+        Class[] argType = {Timezone.class};
         Method m = Customer.class.getMethod("testFromValueParam", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=Europe%2FLondon");
@@ -794,7 +792,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
-        Class<?>[] argType = {Customer.class, Customer[].class, Customer2.class};
+        Class[] argType = {Customer.class, Customer[].class, Customer2.class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=Fred&p2=Barry&p3=Jack&p4=John");
@@ -824,7 +822,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new LocaleParameterHandler());
-        Class<?>[] argType = {Locale.class};
+        Class[] argType = {Locale.class};
         Method m = Customer.class.getMethod("testLocaleParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=en_us");
@@ -842,7 +840,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
-        Class<?>[] argType = {Customer.class, Customer[].class, Customer2.class};
+        Class[] argType = {Customer.class, Customer[].class, Customer2.class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p3=jack");
@@ -858,7 +856,7 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testArrayParamNoProvider() throws Exception {
         Message messageImpl = createMessage();
-        Class<?>[] argType = {String[].class};
+        Class[] argType = {String[].class};
         Method m = Customer.class.getMethod("testCustomerParam2", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=Fred&p1=Barry");
@@ -873,7 +871,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testWrongType() throws Exception {
-        Class<?>[] argType = {HashMap.class};
+        Class[] argType = {HashMap.class};
         Method m = Customer.class.getMethod("testWrongType", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=1");
@@ -893,7 +891,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testExceptionDuringConstruction() throws Exception {
-        Class<?>[] argType = {CustomerGender.class};
+        Class[] argType = {CustomerGender.class};
         Method m = Customer.class.getMethod("testWrongType2", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.QUERY_STRING, "p1=3");
@@ -911,7 +909,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testQueryParametersBean() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBean.class};
+        Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testQueryBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.QUERY_STRING, "a=aValue&b=123");
@@ -930,7 +928,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testXmlAdapterBean() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBean.class};
+        Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testXmlAdapter", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
@@ -945,7 +943,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testXmlAdapterBean2() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBean.class};
+        Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testXmlAdapter2", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
@@ -960,7 +958,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testXmlAdapterBean3() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBeanInterface.class};
+        Class[] argType = {Customer.CustomerBeanInterface.class};
         Method m = Customer.class.getMethod("testXmlAdapter3", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
@@ -976,7 +974,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testPathParametersBean() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBean.class};
+        Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testPathBean", argType);
         
         MultivaluedMap<String, String> pathTemplates = new MetadataMap<String, String>();
@@ -1031,7 +1029,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMatrixParametersBean() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBean.class};
+        Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testMatrixBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar;a=aValue/baz;b=123");
@@ -1050,7 +1048,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFormParametersBean() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBean.class};
+        Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testFormBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar");
@@ -1077,7 +1075,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFormParametersBeanWithMap() throws Exception {
-        Class<?>[] argType = {Customer.CustomerBean.class};
+        Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testFormBean", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar");
@@ -1124,7 +1122,7 @@ public class JAXRSUtilsTest extends Assert {
 
         assertEquals("A", cb1.getA());
         assertEquals(new Long(123), cb1.getB());
-        List<String> list1 = cb1.getC();
+        List<String> list1 = (List<String>)cb1.getC();
         assertEquals(3, list1.size());
         assertEquals("1", list1.get(0));
         assertEquals("2", list1.get(1));
@@ -1135,7 +1133,7 @@ public class JAXRSUtilsTest extends Assert {
 
         assertEquals("B", cb2.getA());
         assertEquals(new Long(456), cb2.getB());
-        List<String> list2 = cb2.getC();
+        List<String> list2 = (List<String>)cb2.getC();
         assertEquals(3, list2.size());
         assertEquals("4", list2.get(0));
         assertEquals("5", list2.get(1));
@@ -1163,7 +1161,7 @@ public class JAXRSUtilsTest extends Assert {
 
         assertEquals("C", cb3.getA());
         assertEquals(new Long(789), cb3.getB());
-        List<String> list3 = cb3.getC();
+        List<String> list3 = (List<String>)cb3.getC();
         assertEquals(3, list3.size());
         assertEquals("7", list3.get(0));
         assertEquals("8", list3.get(1));
@@ -1189,8 +1187,8 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMultipleQueryParameters() throws Exception {
-        Class<?>[] argType = {String.class, String.class, Long.class, 
-                              Boolean.TYPE, String.class};
+        Class[] argType = {String.class, String.class, Long.class, 
+                           Boolean.TYPE, String.class};
         Method m = Customer.class.getMethod("testMultipleQuery", argType);
         MessageImpl messageImpl = new MessageImpl();
         
@@ -1213,8 +1211,7 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testMatrixParameters() throws Exception {
-        Class<?>[] argType = {String.class, String.class, String.class, String.class, 
-                              List.class, String.class};
+        Class[] argType = {String.class, String.class, String.class, String.class, List.class, String.class};
         Method m = Customer.class.getMethod("testMatrixParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         
@@ -1242,7 +1239,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMatrixAndPathSegmentParameters() throws Exception {
-        Class<?>[] argType = {PathSegment.class, String.class};
+        Class[] argType = {PathSegment.class, String.class};
         Method m = Customer.class.getMethod("testPathSegment", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar%20foo;p4=0%201");
@@ -1272,7 +1269,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @SuppressWarnings("unchecked")
     private void doTestFormParameters(boolean useMediaType) throws Exception {
-        Class<?>[] argType = {String.class, List.class};
+        Class[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         String body = "p1=1&p2=2&p2=3";
@@ -1298,7 +1295,7 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testFormParametersAndMap() throws Exception {
-        Class<?>[] argType = {MultivaluedMap.class, String.class, List.class};
+        Class[] argType = {MultivaluedMap.class, String.class, List.class};
         Method m = Customer.class.getMethod("testMultivaluedMapAndFormParam", argType);
         final Message messageImpl = createMessage();
         String body = "p1=1&p2=2&p2=3";
@@ -1307,7 +1304,7 @@ public class JAXRSUtilsTest extends Assert {
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
         
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
-            new FormEncodingProvider<Object>() {
+            new FormEncodingProvider() {
                 @Override
                 protected void persistParamsOnMessage(MultivaluedMap<String, String> params) {
                     messageImpl.put(FormUtils.FORM_PARAM_MAP, params);    
@@ -1498,7 +1495,6 @@ public class JAXRSUtilsTest extends Assert {
         
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testSingletonHttpContextFields() throws Exception {
         
@@ -1520,30 +1516,31 @@ public class JAXRSUtilsTest extends Assert {
         InjectionUtils.injectContextMethods(c, cri, m);
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo2().getClass());
         assertSame(UriInfoImpl.class, 
-                   ((ThreadLocalProxy<UriInfo>)c.getUriInfo2()).get().getClass());
+                   ((ThreadLocalProxy)c.getUriInfo2()).get().getClass());
         assertSame(HttpHeadersImpl.class, 
-                   ((ThreadLocalProxy<HttpHeaders>)c.getHeaders()).get().getClass());
+                   ((ThreadLocalProxy)c.getHeaders()).get().getClass());
         assertSame(RequestImpl.class, 
-                   ((ThreadLocalProxy<Request>)c.getRequest()).get().getClass());
+                   ((ThreadLocalProxy)c.getRequest()).get().getClass());
         assertSame(SecurityContextImpl.class, 
-                   ((ThreadLocalProxy<SecurityContext>)c.getSecurityContext()).get().getClass());
+                   ((ThreadLocalProxy)c.getSecurityContext()).get().getClass());
         assertSame(ProvidersImpl.class, 
-                   ((ThreadLocalProxy<Providers>)c.getBodyWorkers()).get().getClass());
+                   ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
+        assertSame(ProvidersImpl.class, 
+                   ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
   
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy<ServletContext>)c.getThreadLocalServletContext()).get());
+                   ((ThreadLocalProxy)c.getThreadLocalServletContext()).get());
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy<ServletContext>)c.getServletContext()).get());
+                   ((ThreadLocalProxy)c.getServletContext()).get());
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy<ServletContext>)c.getSuperServletContext()).get());
+                   ((ThreadLocalProxy)c.getSuperServletContext()).get());
         assertSame(httpRequest, 
-                   ((ThreadLocalProxy<HttpServletRequest>)c.getServletRequest()).get());
+                   ((ThreadLocalProxy)c.getServletRequest()).get());
         HttpServletResponseFilter filter = (
-            HttpServletResponseFilter)((ThreadLocalProxy<HttpServletResponse>)c.getServletResponse()).get();
+            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponse()).get();
         assertSame(httpResponse, filter.getResponse());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testSingletonHttpResourceFields() throws Exception {
         
@@ -1561,16 +1558,14 @@ public class JAXRSUtilsTest extends Assert {
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
         InjectionUtils.injectResourceFields(c, cri, m);
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy<ServletContext>)c.getServletContextResource()).get());
+                   ((ThreadLocalProxy)c.getServletContextResource()).get());
         assertSame(httpRequest, 
-                   ((ThreadLocalProxy<HttpServletRequest>)c.getServletRequestResource()).get());
+                   ((ThreadLocalProxy)c.getServletRequestResource()).get());
         HttpServletResponseFilter filter = (
-            HttpServletResponseFilter)((ThreadLocalProxy<HttpServletResponse>)c.getServletResponseResource())
-                .get();
+            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponseResource()).get();
         assertSame(httpResponse, filter.getResponse());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testContextAnnotationOnMethod() throws Exception {
         
@@ -1586,7 +1581,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(c.getUriInfo());
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo().getClass());
         assertSame(UriInfoImpl.class, 
-                   ((ThreadLocalProxy<UriInfo>)c.getUriInfo()).get().getClass());
+                   ((ThreadLocalProxy)c.getUriInfo()).get().getClass());
         assertSame(ThreadLocalServletConfig.class, c.getSuperServletConfig().getClass());
         assertSame(ThreadLocalHttpServletRequest.class, c.getHttpServletRequest().getClass());
     }

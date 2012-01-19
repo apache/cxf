@@ -23,8 +23,6 @@ package org.apache.cxf.tools.java2ws.fortest;
  * 
  */
 public class AddException extends Exception {
-    private static final long serialVersionUID = 2865532025595433778L;
-
     public AddException(String message) {
         super(message);
     }

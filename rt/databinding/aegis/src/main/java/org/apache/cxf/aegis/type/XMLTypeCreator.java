@@ -101,7 +101,7 @@ import org.apache.cxf.helpers.XPathUtils;
  */
 public class XMLTypeCreator extends AbstractTypeCreator {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLTypeCreator.class);
-    private static List<Class<?>> stopClasses = new ArrayList<Class<?>>();
+    private static List<Class> stopClasses = new ArrayList<Class>();
     static {
         stopClasses.add(Object.class);
         stopClasses.add(Exception.class);
@@ -191,7 +191,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         return doc;
     }
 
-    protected Document getDocument(Class<?> clazz) {
+    protected Document getDocument(Class clazz) {
         if (clazz == null) {
             return null;
         }
@@ -217,7 +217,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    protected boolean isEnum(Class<?> javaType) {
+    protected boolean isEnum(Class javaType) {
         Element mapping = findMapping(javaType);
         if (mapping != null) {
             return super.isEnum(javaType);
@@ -293,7 +293,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     protected List<Element> findMappings(Type type) {
-        Class<?> clazz = TypeUtil.getTypeClass(type, false);
+        Class clazz = TypeUtil.getTypeClass(type, false);
         List<Element> mappings = new ArrayList<Element>();
         if (clazz == null) {
             return mappings;
@@ -304,18 +304,18 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             mappings.add(top);
         }
 
-        Class<?> parent = clazz;
+        Class parent = clazz;
         while (true) {
 
             // Read mappings for interfaces as well
-            Class<?>[] interfaces = parent.getInterfaces();
+            Class[] interfaces = parent.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
-                Class<?> interfaze = interfaces[i];
+                Class interfaze = interfaces[i];
                 List<Element> interfaceMappings = findMappings(interfaze);
                 mappings.addAll(interfaceMappings);
             }
 
-            Class<?> sup = parent.getSuperclass();
+            Class sup = parent.getSuperclass();
 
             if (sup == null || stopClasses.contains(sup)) {
                 break;
@@ -552,7 +552,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         if (cType instanceof TypeClassInfo) {
             return createTypeForClass((TypeClassInfo)cType);
         } else if (cType instanceof Class) {
-            return createType((Class<?>)cType);
+            return createType((Class)cType);
         } else {
             return null;
         }
@@ -633,7 +633,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         }
     }
 
-    private Class<?> loadComponentClass(String componentType) {
+    private Class loadComponentClass(String componentType) {
         try {
             return ClassLoaderUtils.loadClass(componentType, getClass());
         } catch (ClassNotFoundException e) {
@@ -645,7 +645,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         String type = DOMUtils.getAttributeValueEmptyNull(parameter, "type");
         if (type != null) {
             try {
-                Class<?> aegisTypeClass = ClassLoaderUtils.loadClass(type, getClass()); 
+                Class aegisTypeClass = ClassLoaderUtils.loadClass(type, getClass()); 
                 info.setAegisTypeClass(Java5TypeCreator.castToAegisTypeClass(aegisTypeClass));
             } catch (ClassNotFoundException e) {
                 throw new DatabindingException("Unable to load type class " + type, e);
@@ -668,16 +668,16 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             return null;
         }
         // if the method has no params, then more than one mapping is pointless
-        Class<?>[] parameterTypes = method.getParameterTypes();
+        Class[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 0) {
             return nodes.get(0);
         }
         // here's the fun part.
         // we go through the method parameters, ruling out matches
         for (int i = 0; i < parameterTypes.length; i++) {
-            Class<?> parameterType = parameterTypes[i];
-            for (Iterator<Element> iterator = nodes.iterator(); iterator.hasNext();) {
-                Element element = iterator.next();
+            Class parameterType = parameterTypes[i];
+            for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
+                Element element = (Element)iterator.next();
                 // first we check if the parameter index is specified
                 Element match = getMatch(element, "parameter[@index='" + i + "']");
                 if (match != null
@@ -700,8 +700,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         // the best one is the one with the most parameters specified
         Element bestCandidate = null;
         int highestSpecified = 0;
-        for (Iterator<Element> iterator = nodes.iterator(); iterator.hasNext();) {
-            Element element = iterator.next();
+        for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
+            Element element = (Element)iterator.next();
 
             List<Element> params = DOMUtils.getChildrenWithName(element, "", "parameter");
             int availableParameters = params.size();

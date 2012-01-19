@@ -45,8 +45,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public abstract class AbstractHTTPServlet extends HttpServlet {
     
-    private static final long serialVersionUID = -8357252743467075117L;
-
     /**
      * List of well-known HTTP 1.1 verbs, with POST and GET being the most used verbs at the top 
      */

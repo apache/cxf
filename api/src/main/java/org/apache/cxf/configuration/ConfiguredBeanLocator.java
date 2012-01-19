@@ -93,6 +93,4 @@ public interface ConfiguredBeanLocator {
          */
         boolean beanLoaded(String name, T bean);
     }
-
-    boolean hasBeanOfName(String name);
 }

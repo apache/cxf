@@ -34,8 +34,8 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
-public class PrimitiveTextProvider<T> 
-    implements MessageBodyReader<T>, MessageBodyWriter<T> {
+public class PrimitiveTextProvider 
+    implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
 
     private static boolean isSupported(Class<?> type) { 
         return InjectionUtils.isPrimitive(type);
@@ -45,8 +45,8 @@ public class PrimitiveTextProvider<T>
         return isSupported(type);
     }
 
-    public T readFrom(Class<T> type, Type genType, Annotation[] anns, MediaType mt, 
-                      MultivaluedMap<String, String> headers, InputStream is) throws IOException {
+    public Object readFrom(Class<Object> type, Type genType, Annotation[] anns, MediaType mt, 
+                           MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         
         return InjectionUtils.handleParameter(
                     IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8")), 
@@ -57,7 +57,7 @@ public class PrimitiveTextProvider<T>
         
     }
 
-    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
@@ -65,7 +65,7 @@ public class PrimitiveTextProvider<T>
         return isSupported(type);
     }
 
-    public void writeTo(T obj, Class<?> type, Type genType, Annotation[] anns, 
+    public void writeTo(Object obj, Class<?> type, Type genType, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
         String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");

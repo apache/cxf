@@ -32,7 +32,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 public interface FormInterface {
     @Path("/form1")
     @POST
-    void form1(MultivaluedMap<String, String> map);
+    void form1(MultivaluedMap map);
     
     @Path("/form2")
     @POST

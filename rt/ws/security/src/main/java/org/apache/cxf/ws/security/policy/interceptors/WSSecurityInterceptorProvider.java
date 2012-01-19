@@ -33,7 +33,6 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
  * 
  */
 public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    private static final long serialVersionUID = -6222118542914666817L;
     private static final Collection<QName> ASSERTION_TYPES;
     static {
         ASSERTION_TYPES = new ArrayList<QName>();

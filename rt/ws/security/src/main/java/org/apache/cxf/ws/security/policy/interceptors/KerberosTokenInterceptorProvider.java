@@ -58,8 +58,6 @@ import org.apache.ws.security.message.token.KerberosSecurity;
  */
 public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
-    private static final long serialVersionUID = 5922028830873137490L;
-
     public KerberosTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.KERBEROS_TOKEN, SP12Constants.KERBEROS_TOKEN));
         

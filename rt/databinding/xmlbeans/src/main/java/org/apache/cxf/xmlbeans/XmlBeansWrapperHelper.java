@@ -44,7 +44,7 @@ public class XmlBeansWrapperHelper extends AbstractWrapperHelper {
     }
 
     @Override
-    protected Object createWrapperObject(Class<?> typeClass) throws Exception {
+    protected Object createWrapperObject(Class typeClass) throws Exception {
         Class<?> cls[] = typeClass.getDeclaredClasses();
         Method newType = null;
         for (Method method : typeClass.getMethods()) {

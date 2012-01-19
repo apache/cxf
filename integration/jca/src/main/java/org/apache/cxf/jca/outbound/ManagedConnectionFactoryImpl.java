@@ -137,7 +137,7 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         LoggerHelper.initializeLoggingOnWriter(printWriter);
     }
     
-    public ManagedConnection matchManagedConnections(@SuppressWarnings("rawtypes") Set mcs, Subject subject, 
+    public ManagedConnection matchManagedConnections(Set mcs, Subject subject, 
             ConnectionRequestInfo reqInfo) throws ResourceException {
 
         if (LOG.isLoggable(Level.FINER)) {
@@ -146,7 +146,6 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         }
 
         // find the first managed connection that matches the bus and request info
-        @SuppressWarnings("rawtypes")
         Iterator iter = mcs.iterator();
         while (iter.hasNext()) {
             Object obj = iter.next();

@@ -76,13 +76,13 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
      * It would also be good to cache across creations,
      * but Method.equals isn't good enough.
      */
-    private Map<Object, Class<?>> responseMethodClassCache;
-    private Map<Object, Class<?>> requestMethodClassCache;
+    private Map<Object, Class> responseMethodClassCache;
+    private Map<Object, Class> requestMethodClassCache;
     private Map<Method, Annotation[][]> methodAnnotationCache;
     
     public JaxWsServiceConfiguration() {
-        responseMethodClassCache = new HashMap<Object, Class<?>>();
-        requestMethodClassCache = new HashMap<Object, Class<?>>();
+        responseMethodClassCache = new HashMap<Object, Class>();
+        requestMethodClassCache = new HashMap<Object, Class>();
         methodAnnotationCache = new HashMap<Method, Annotation[][]>();
     }
 
@@ -194,7 +194,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
 
         
-        Class<?> implClz = implInfo.getImplementorClass();
+        Class implClz = implInfo.getImplementorClass();
         Method m = getDeclaredMethod(implClz, method);
         if (m != null) {
             WebMethod wm = m.getAnnotation(WebMethod.class);
@@ -219,7 +219,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     private Method getDeclaredMethod(Class<?> endpointClass, Method method) {
         if (!method.getDeclaringClass().equals(endpointClass)) {
             try {
-                method = endpointClass.getMethod(method.getName(), method.getParameterTypes());
+                method = endpointClass.getMethod(method.getName(), (Class[])method.getParameterTypes());
             } catch (SecurityException e) {
                 throw new ServiceConstructionException(e);
             } catch (NoSuchMethodException e) {
@@ -597,8 +597,8 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     
     
     @Override
-    public Class<?> getResponseWrapper(Method selected) {
-        Class<?> cachedClass = responseMethodClassCache.get(selected);
+    public Class getResponseWrapper(Method selected) {
+        Class cachedClass = responseMethodClassCache.get(selected);
         if (cachedClass != null) {
             return cachedClass;
         }
@@ -621,7 +621,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 return cachedClass;
             }
             try {
-                Class<?> r = ClassLoaderUtils.loadClass(clsName, implInfo.getEndpointClass());
+                Class r = ClassLoaderUtils.loadClass(clsName, implInfo.getEndpointClass());
                 responseMethodClassCache.put(clsName, r);
                 responseMethodClassCache.put(selected, r);
                 
@@ -668,8 +668,8 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     }
     
     @Override
-    public Class<?> getRequestWrapper(Method selected) {
-        Class<?> cachedClass = requestMethodClassCache.get(selected);
+    public Class getRequestWrapper(Method selected) {
+        Class cachedClass = requestMethodClassCache.get(selected);
         if (cachedClass != null) {
             return cachedClass;
         }
@@ -691,7 +691,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 return cachedClass;
             }
             try {
-                Class<?> r = ClassLoaderUtils.loadClass(clsName, implInfo.getEndpointClass());
+                Class r = ClassLoaderUtils.loadClass(clsName, implInfo.getEndpointClass());
                 requestMethodClassCache.put(clsName, r);
                 requestMethodClassCache.put(selected, r);
                 if (m.getParameterTypes().length == 1 && r.equals(m.getParameterTypes()[0])) {

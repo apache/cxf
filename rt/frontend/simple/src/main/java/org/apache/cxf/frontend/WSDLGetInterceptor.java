@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.interceptor.EndpointSelectionInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -43,6 +42,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.http.UrlUtilities;
 
 /**
  * 
@@ -95,7 +95,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         //cannot have two wsdl's being written for the same endpoint at the same
         //time as the addresses may get mixed up
         synchronized (message.getExchange().getEndpoint()) {
-            Map<String, String> map = UrlUtils.parseQueryString(query);
+            Map<String, String> map = UrlUtilities.parseQueryString(query);
             if (isRecognizedQuery(map, baseUri, ctx, 
                                   message.getExchange().getEndpoint().getEndpointInfo())) {
                 

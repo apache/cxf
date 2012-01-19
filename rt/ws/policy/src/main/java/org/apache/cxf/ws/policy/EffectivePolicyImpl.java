@@ -119,18 +119,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         chooseAlternative(engine, assertor);
         initialiseInterceptors(engine, false);  
     }
-    
-    private <T> T getAssertorAs(Assertor as, Class<T> t) {
-        if (t.isInstance(as)) {
-            return t.cast(as);
-        } else if (as instanceof PolicyUtils.WrappedAssertor) {
-            Object o = ((PolicyUtils.WrappedAssertor)as).getWrappedAssertor();
-            if (t.isInstance(o)) {
-                return t.cast(o);
-            }
-        }
-        return null;
-    }
+     
     Assertor initialisePolicy(EndpointInfo ei,
                           BindingOperationInfo boi,  
                           PolicyEngineImpl engine, 
@@ -144,9 +133,9 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         BindingMessageInfo bmi = request ? boi.getInput() : boi.getOutput();
         EndpointPolicy ep;
         if (requestor) {
-            ep = engine.getClientEndpointPolicy(ei, getAssertorAs(assertor, Conduit.class));
+            ep = engine.getClientEndpointPolicy(ei, (Conduit)assertor);
         } else {
-            ep = engine.getServerEndpointPolicy(ei, getAssertorAs(assertor, Destination.class));
+            ep = engine.getServerEndpointPolicy(ei, (Destination)assertor);
         }
         policy = ep.getPolicy();
         if (ep instanceof EndpointPolicyImpl) {
@@ -157,7 +146,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (null != bmi) {
             policy = policy.merge(engine.getAggregatedMessagePolicy(bmi));
         }
-        policy = policy.normalize(engine.getRegistry(), true);
+        policy = (Policy)policy.normalize(engine.getRegistry(), true);
         return assertor;
     }
     
@@ -168,7 +157,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (bfi != null) {
             policy = policy.merge(engine.getAggregatedFaultPolicy(bfi));
         }
-        policy = policy.normalize(engine.getRegistry(), true);
+        policy = (Policy)policy.normalize(engine.getRegistry(), true);
     }
 
     void chooseAlternative(PolicyEngineImpl engine, Assertor assertor) {

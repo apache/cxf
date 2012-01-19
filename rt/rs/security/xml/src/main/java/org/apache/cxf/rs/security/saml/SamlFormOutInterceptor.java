@@ -69,7 +69,7 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
             if (obj instanceof Form) {
                 return (Form)obj;
             } else if (obj instanceof MultivaluedMap) {
-                return new Form((MultivaluedMap<String, String>)obj);
+                return new Form((MultivaluedMap)obj);
             }
         }
         return null;

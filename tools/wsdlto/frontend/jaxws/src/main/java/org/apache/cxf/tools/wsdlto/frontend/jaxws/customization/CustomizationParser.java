@@ -243,7 +243,7 @@ public final class CustomizationParser {
     }
 
     protected void copyAllJaxbDeclarations(final Node schemaNode, final Element jaxwsBindingNode) {
-        if (isSchemaElement(schemaNode)) {
+        if (isSchemaElement((Element)schemaNode)) {
             appendJaxbVersion((Element)schemaNode);
         }
 
@@ -255,7 +255,7 @@ public final class CustomizationParser {
             childNode != null;
             childNode = childNode.getNextSibling()) {
 
-            if (isSchemaElement(schemaNode)) {
+            if (isSchemaElement((Element)schemaNode)) {
                 copyJaxbAttributes(childNode, (Element)schemaNode);
             }
 
@@ -457,7 +457,7 @@ public final class CustomizationParser {
                 a.add((Element)item);
             }
         }
-        return a.toArray(new Element[a.size()]);
+        return (Element[])a.toArray(new Element[a.size()]);
     }
 
     private void addBinding(String bindingFile) throws XMLStreamException {
@@ -549,7 +549,7 @@ public final class CustomizationParser {
         if (StringUtils.isEmpty(url)) {
             return null;
         }
-        Bus bus = env.get(Bus.class);
+        Bus bus = (Bus)env.get(Bus.class);
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
         
         try {

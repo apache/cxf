@@ -44,7 +44,7 @@ import org.springframework.context.support.AbstractApplicationContext;
  * 
  */
 public class SpringBus extends ExtensionManagerBus 
-    implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
+    implements ApplicationContextAware, ApplicationListener {
 
     AbstractApplicationContext ctx;
 

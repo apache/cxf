@@ -117,7 +117,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
                 = CastUtils.cast((Map<?, ?>)mc.get(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS));
             byte[] data = new byte[50];
             for (int x = 0; x < data.length; x++) {
-                data[x] = (byte)(x + '0');
+                data[x] = (byte)(x + (int)'0');
             }
             DataHandler foo = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
             outDataHandlers.put("foo", foo);

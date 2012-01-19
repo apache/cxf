@@ -84,6 +84,6 @@ public class CorbaEnumHandlerTest extends Assert {
         obj.setValue(members[1]);
         assertTrue(obj.getValue().equals(enumerator1.getValue()));
         
-        assertTrue(obj.getIndex() == 1);
+        assertTrue(obj.getIndex() == (long)1);
     }
 }

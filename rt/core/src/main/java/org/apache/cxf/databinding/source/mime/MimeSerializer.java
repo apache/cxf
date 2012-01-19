@@ -30,9 +30,8 @@ import org.apache.ws.commons.schema.extensions.ExtensionSerializer;
 
 public class MimeSerializer implements ExtensionSerializer {
     
-    public void serialize(XmlSchemaObject schemaObject, 
-                          @SuppressWarnings("rawtypes") Class classOfType, Node domNode) {
-        Map<Object, Object> metaInfoMap = schemaObject.getMetaInfoMap();
+    public void serialize(XmlSchemaObject schemaObject, Class classOfType, Node domNode) {
+        Map metaInfoMap = schemaObject.getMetaInfoMap();
         MimeAttribute mimeType = (MimeAttribute)metaInfoMap.get(MimeAttribute.MIME_QNAME);
 
         Element elt = (Element)domNode;

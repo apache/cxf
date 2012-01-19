@@ -70,7 +70,7 @@ import org.apache.cxf.service.invoker.Invoker;
  */
 public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     
-    protected Map<Class<?>, ResourceProvider> resourceProviders = new HashMap<Class<?>, ResourceProvider>();
+    protected Map<Class, ResourceProvider> resourceProviders = new HashMap<Class, ResourceProvider>();
     
     private Server server;
     private boolean start = true;
@@ -243,7 +243,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * setResourceClasses method accepting the array of Class parameters.
      * @param clazz the service/resource class
      */
-    public void setServiceClass(Class<?> clazz) {
+    public void setServiceClass(Class clazz) {
         serviceFactory.setResourceClasses(clazz);
     }
 
@@ -251,7 +251,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * Sets one or more root resource classes 
      * @param classes the list of resource classes
      */
-    public void setResourceClasses(List<Class<?>> classes) {
+    public void setResourceClasses(List<Class> classes) {
         serviceFactory.setResourceClasses(classes);
     }
 
@@ -259,7 +259,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * Sets one or more root resource classes 
      * @param classes the array of resource classes
      */
-    public void setResourceClasses(Class<?>... classes) {
+    public void setResourceClasses(Class... classes) {
         serviceFactory.setResourceClasses(classes);
     }
     
@@ -304,7 +304,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param c resource class
      * @param rp resource provider
      */
-    public void setResourceProvider(Class<?> c, ResourceProvider rp) {
+    public void setResourceProvider(Class c, ResourceProvider rp) {
         resourceProviders.put(c, rp);
     }
     

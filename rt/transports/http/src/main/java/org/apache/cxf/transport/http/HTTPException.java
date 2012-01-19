@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.URL;
 
 public class HTTPException extends IOException {
-    private static final long serialVersionUID = -6186825695409511895L;
     private int responseCode;
     private String responseMessage;
     private URL url;

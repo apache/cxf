@@ -129,7 +129,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         BusFactory.getDefaultBus().getInInterceptors().add(new LoggingInInterceptor());
     }
     
-    private void waitForFuture(Future<?> fd) throws Exception {
+    private void waitForFuture(Future fd) throws Exception {
         int count = 0;
         while (!fd.isDone()) {
             ++count;
@@ -162,7 +162,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                                      + TestUtil.getPortNumber("fake-port")
                                      + "/SOAPDispatchService/SoapDispatchPort");
         
-        DispatchImpl<?> dispImpl = (DispatchImpl<?>)disp;
+        DispatchImpl dispImpl = (DispatchImpl)disp;
         HTTPConduit cond = (HTTPConduit)dispImpl.getClient().getConduit();
         cond.getClient().setConnectionTimeout(500);
         
@@ -297,7 +297,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SOAPMessage soapReqMsg2 = MessageFactory.newInstance().createMessage(null, is2);
         assertNotNull(soapReqMsg2);
 
-        Response<?> response = disp.invokeAsync(soapReqMsg2);
+        Response response = disp.invokeAsync(soapReqMsg2);
         SOAPMessage soapResMsg2 = (SOAPMessage)response.get();
         assertNotNull(soapResMsg2);
         String expected2 = "Hello TestSOAPInputMessage2";
@@ -309,7 +309,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SOAPMessage soapReqMsg3 = MessageFactory.newInstance().createMessage(null, is3);
         assertNotNull(soapReqMsg3);
         TestSOAPMessageHandler tsmh = new TestSOAPMessageHandler();
-        Future<?> f = disp.invokeAsync(soapReqMsg3, tsmh);
+        Future f = disp.invokeAsync(soapReqMsg3, tsmh);
         assertNotNull(f);
         waitForFuture(f);
         

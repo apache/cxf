@@ -208,7 +208,7 @@ public final class CorbaUtils {
                 String[] members = new String[enums.size()];
 
                 for (int i = 0; i < members.length; ++i) {
-                    members[i] = enums.get(i).getValue();
+                    members[i] = ((Enumerator) enums.get(i)).getValue();
                 }
                 name = getTypeCodeName(name);
                 tc = orb.create_enum_tc(enumType.getRepositoryID(), name, members);
@@ -219,7 +219,7 @@ public final class CorbaUtils {
                 List<MemberType> list = exceptType.getMember();
                 StructMember[] members = new StructMember[list.size()];
                 for (int i = 0; i < members.length; ++i) {
-                    MemberType member = list.get(i);
+                    MemberType member = (MemberType) list.get(i);
                     members[i] = new StructMember(member.getName(),
                                                   getTypeCode(orb, member.getIdltype(), typeMap, seenTypes),
                                                   null);
@@ -253,7 +253,7 @@ public final class CorbaUtils {
                     List<MemberType> list = structType.getMember();
                     StructMember[] members = new StructMember[list.size()];
                     for (int i = 0; i < members.length; ++i) {
-                        MemberType member = list.get(i);
+                        MemberType member = (MemberType) list.get(i);
                         members[i] = new StructMember(member.getName(),
                                                  getTypeCode(orb, member.getIdltype(), typeMap, seenTypes),
                                                  null);
@@ -381,7 +381,7 @@ public final class CorbaUtils {
             return orb.create_union_tc(unionType.getRepositoryID(),
                                        getTypeCodeName(unionType.getName()),
                                        discTC,
-                                       members.values().toArray(
+                                       (UnionMember[])members.values().toArray(
                                            new UnionMember[members.size()]));
         }
     }
@@ -420,7 +420,7 @@ public final class CorbaUtils {
 
     public static CorbaTypeImpl getCorbaType(QName idlType, CorbaTypeMap typeMap) {
         if (!isPrimitiveIdlType(idlType) && (typeMap != null)) {
-            return typeMap.getType(idlType.getLocalPart());
+            return (CorbaTypeImpl) typeMap.getType(idlType.getLocalPart());
         }
         return null;
     }

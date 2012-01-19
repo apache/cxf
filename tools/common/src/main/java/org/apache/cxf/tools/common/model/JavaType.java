@@ -142,8 +142,8 @@ public class JavaType {
         return "null";
     }
 
-    private boolean hasDefaultConstructor(Class<?> clz) {
-        Constructor<?>[] cons = clz.getConstructors();
+    private boolean hasDefaultConstructor(Class clz) {
+        Constructor[] cons = clz.getConstructors();
         if (cons.length == 0) {
             return false;
         } else {

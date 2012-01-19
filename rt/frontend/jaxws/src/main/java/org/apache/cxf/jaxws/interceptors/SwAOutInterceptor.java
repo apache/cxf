@@ -244,7 +244,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             ByteArrayOutputStream bwriter = new ByteArrayOutputStream();
             XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(bwriter);
             try {
-                StaxUtils.copy(o, writer);
+                StaxUtils.copy((Source)o, writer);
                 writer.flush();
                 ds = new ByteDataSource(bwriter.toByteArray(), ct);
             } catch (XMLStreamException e1) {
@@ -260,9 +260,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         }
         
         // Wait until the image is completely loaded
-        MediaTracker tracker = new MediaTracker(new Component() {
-            private static final long serialVersionUID = 6412221228374321325L; 
-        });
+        MediaTracker tracker = new MediaTracker(new Component() { });
         tracker.addImage(image, 0);
         try {
             tracker.waitForAll();

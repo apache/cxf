@@ -28,7 +28,6 @@ import org.apache.cxf.service.model.MessagePartInfo;
 
 public class MessageContentsList extends ArrayList<Object> {
     public static final Object REMOVED_MARKER = new Object();
-    private static final long serialVersionUID = -5780720048950696258L;
 
     public MessageContentsList() {
         super(6);

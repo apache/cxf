@@ -99,7 +99,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
 
             // Build the ServiceModel from the WSDLModel
             if (version == WSDLConstants.WSDLVersion.WSDL11) {
-                AbstractWSDLBuilder builder = frontend.getWSDLBuilder();
+                AbstractWSDLBuilder<Definition> builder = frontend.getWSDLBuilder();
                 builder.setContext(context);
                 builder.setBus(getBus());
                 context.put(Bus.class, getBus());

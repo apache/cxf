@@ -134,7 +134,7 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
     }
 
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return SpringJettyHTTPServerEngineFactory.class;
     }
     

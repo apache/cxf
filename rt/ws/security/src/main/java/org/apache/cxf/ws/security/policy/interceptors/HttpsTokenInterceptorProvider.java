@@ -54,8 +54,6 @@ import org.apache.cxf.ws.security.policy.model.HttpsToken;
  */
 public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
     
-    private static final long serialVersionUID = -13951002554477036L;
-
     public HttpsTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN));
         this.getOutInterceptors().add(new HttpsTokenOutInterceptor());

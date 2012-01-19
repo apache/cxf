@@ -46,7 +46,7 @@ public class SOAPBindingTest extends AbstractJaxWsTest {
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
+        CalculatorPortType cal = (CalculatorPortType)service.getPort(PORT_1, CalculatorPortType.class);
         
         BindingProvider bindingProvider = (BindingProvider)cal;
         
@@ -87,7 +87,7 @@ public class SOAPBindingTest extends AbstractJaxWsTest {
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
+        CalculatorPortType cal = (CalculatorPortType)service.getPort(PORT_1, CalculatorPortType.class);
         
         BindingProvider bindingProvider = (BindingProvider)cal;
         

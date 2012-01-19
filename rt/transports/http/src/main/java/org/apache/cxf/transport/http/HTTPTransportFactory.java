@@ -210,8 +210,6 @@ public class HTTPTransportFactory
     
     private static class HttpAddressType extends AddressType 
         implements HTTPAddress, SOAPAddress {
-        private static final long serialVersionUID = 7048265985129995746L;
-
         public HttpAddressType() {
             super();
             setElementType(new QName("http://schemas.xmlsoap.org/wsdl/soap/", "address"));

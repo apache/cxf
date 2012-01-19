@@ -157,7 +157,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                                              unwrapJAXBElement);
     }
 
-    public Object read(QName name, T input, Class<?> type) {
+    public Object read(QName name, T input, Class type) {
         return JAXBEncoderDecoder.unmarshall(createUnmarshaller(), input,
                                              name, type, 
                                              unwrapJAXBElement);

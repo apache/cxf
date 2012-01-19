@@ -46,7 +46,7 @@ public class ResourceUtilsTest extends Assert {
     
     @Test
     public void testFindResourceConstructor() {
-        Constructor<?> c = ResourceUtils.findResourceConstructor(Customer.class, true); 
+        Constructor c = ResourceUtils.findResourceConstructor(Customer.class, true); 
         assertNotNull(c);
         assertEquals(2, c.getParameterTypes().length);
         assertEquals(UriInfo.class, c.getParameterTypes()[0]);

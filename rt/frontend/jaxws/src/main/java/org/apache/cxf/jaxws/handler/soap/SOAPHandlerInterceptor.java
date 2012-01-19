@@ -185,7 +185,7 @@ public class SOAPHandlerInterceptor extends
             if (getInvoker(message).isOutbound()) {
                 message.getInterceptorChain().abort();
                 
-                MessageObserver observer = message.getExchange().get(MessageObserver.class);
+                MessageObserver observer = (MessageObserver)message.getExchange().get(MessageObserver.class);
                 if (!message.getExchange().isOneWay()
                     && observer != null) {
                     Endpoint e = message.getExchange().get(Endpoint.class);

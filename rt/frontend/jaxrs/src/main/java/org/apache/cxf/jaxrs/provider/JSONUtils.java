@@ -177,7 +177,7 @@ public final class JSONUtils {
                     return namespaceMap.get(ns);
                 }
 
-                public Iterator<?> getPrefixes(String ns) {
+                public Iterator getPrefixes(String ns) {
                     String prefix = getPrefix(ns);
                     return prefix == null ? null : Collections.singletonList(prefix).iterator();
                 }

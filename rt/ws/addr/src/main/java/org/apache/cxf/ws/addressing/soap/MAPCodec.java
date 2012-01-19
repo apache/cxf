@@ -56,6 +56,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -65,7 +66,6 @@ import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 
@@ -183,7 +183,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param maps the MAPs to encode
      */
     private void encode(SoapMessage message, 
-                        AddressingProperties maps) {
+                        AddressingPropertiesImpl maps) {
         if (maps != null) { 
             cacheExchange(message, maps);
             LOG.log(Level.FINE, "Outbound WS-Addressing headers");
@@ -327,7 +327,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     header.add(holder);
                     childNode = childNode.getNextSibling();
                 }
-                maps.setDuplicate(null);
+                ((AddressingPropertiesImpl)maps).setDuplicate(null);
                 
                 propogateAction(maps.getAction(), message);
                 applyMAPValidation(message);
@@ -416,7 +416,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
     private void addMustUnderstandAttribute(Element header,
                                             QName name,
                                             SoapMessage msg,
-                                            AddressingProperties maps) {
+                                            AddressingPropertiesImpl maps) {
         if (maps.getMustUnderstand().contains(name)) {
             Element lastAdded = (Element)header.getLastChild();
             String pfx = lastAdded.lookupPrefix(msg.getVersion().getNamespace());
@@ -453,7 +453,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param header the SOAP header element
      * @param marshaller the JAXB marshaller to use
      */
-    private <T> void encodeAsExposed(AddressingProperties maps,
+    private <T> void encodeAsExposed(AddressingPropertiesImpl maps,
                                      SoapMessage message,
                                      T value,
                                      QName name,

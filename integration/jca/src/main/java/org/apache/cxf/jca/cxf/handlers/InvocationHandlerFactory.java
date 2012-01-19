@@ -82,7 +82,7 @@ public class InvocationHandlerFactory {
         for (int i = 0; i < handlerChainTypes.length; i++) {
             CXFInvocationHandler newHandler;
             try {
-                Constructor<?> newHandlerConstructor = handlerChainTypes[i]
+                Constructor newHandlerConstructor = handlerChainTypes[i]
                     .getDeclaredConstructor(new Class[] {CXFInvocationHandlerData.class});
                 newHandler = (CXFInvocationHandler)newHandlerConstructor.newInstance(new Object[] {data});
             } catch (Exception ex) {
@@ -115,7 +115,7 @@ public class InvocationHandlerFactory {
             loadProperties(handlersMap, url);            
         }
         
-        Class<?>[] handlers = new Class[handlersMap.size()];
+        Class[] handlers = new Class[handlersMap.size()];
         String[] handlerClasses = new String[handlersMap.size()];
         handlersMap.values().toArray(handlerClasses);
         for (int i = 0; i < handlerClasses.length; i++) {

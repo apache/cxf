@@ -157,12 +157,17 @@ public class BaseGreeterImpl implements Greeter {
         /*not called */
     }
 
-    public Future<?> testDocLitFaultAsync(String faultType, 
-        AsyncHandler<org.apache.hello_world_soap_http.types.TestDocLitFaultResponse> ah) {
+    public Future<?> testDocLitFaultAsync(String faultType, AsyncHandler ah) {
         invocationCount++;
         System.err.println("In testDocLitFaultAsync 2");
         return null;
         /*not called */
+    }
+
+    public Future<?> testDocLitBareAsync(String bare, AsyncHandler ah) {
+        invocationCount++;
+        return null;
+        /* not called */
     }
 
     public Response<BareDocumentResponse> testDocLitBareAsync(String bare) {

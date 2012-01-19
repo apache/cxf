@@ -137,7 +137,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         assertNotNull(wsdl1);
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
-        Iterator<QName> iter = service.getPorts();
+        Iterator iter = service.getPorts();
         assertNotNull(iter);
         assertTrue(iter.hasNext());
         assertEquals(PORT_1, iter.next());
@@ -183,7 +183,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
+        CalculatorPortType cal = (CalculatorPortType)service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal);
     }
 
@@ -198,7 +198,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        CalculatorPortType cal1 = service.getPort(PORT_1, CalculatorPortType.class);
+        CalculatorPortType cal1 = (CalculatorPortType)service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal1);
         
         ClientProxy cp = (ClientProxy)Proxy.getInvocationHandler(cal1);
@@ -210,7 +210,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         System.gc();
         System.gc();
         
-        CalculatorPortType cal2 = service.getPort(PORT_1, CalculatorPortType.class);
+        CalculatorPortType cal2 = (CalculatorPortType)service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal2);
 
         cp = (ClientProxy)Proxy.getInvocationHandler(cal2);
@@ -227,7 +227,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        Dispatch<Source> dispatch = service.createDispatch(PORT_1, Source.class, Service.Mode.PAYLOAD);
+        Dispatch dispatch = service.createDispatch(PORT_1, Source.class, Service.Mode.PAYLOAD);
         assertNotNull(dispatch);
     }
 
@@ -259,7 +259,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
 
         service.setHandlerResolver(resolver);
         
-        CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
+        CalculatorPortType cal = (CalculatorPortType)service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal);
 
         PortInfo info = resolver.getPortInfo();

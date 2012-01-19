@@ -159,7 +159,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             assertEquals(0, output.list().length);
 
             // Now you can get the JavaModel from the context.
-            Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)context.get(WSDLToJavaProcessor.MODEL_MAP));
+            Map<QName, JavaModel> map = CastUtils.cast((Map)context.get(WSDLToJavaProcessor.MODEL_MAP));
             JavaModel javaModel = map.get(new QName("http://cxf.apache.org/w2j/hello_world_soap_http",
                                                     "SOAPService"));
             assertNotNull(javaModel);
@@ -197,7 +197,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
                 if ("SOAPService_Test1".equals(service.getName())) {
                     continue;
                 }
-                List<JavaPort> ports = service.getPorts();
+                List<JavaPort> ports = (List<JavaPort>) service.getPorts();
                 for (JavaPort port : ports) {
                     if (interfaceName.equals(port.getPortType())) {
                         address = port.getBindingAdress();

@@ -51,7 +51,7 @@ public class CollectionsResource {
     }
     
     @GET
-    public List<JAXBElement<?>> getBookElements2() {
+    public List<JAXBElement> getBookElements2() {
         return null;
     }
     

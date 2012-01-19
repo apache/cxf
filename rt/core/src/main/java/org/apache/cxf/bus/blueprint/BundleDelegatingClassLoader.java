@@ -83,7 +83,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
             urls =  AccessController.doPrivileged(new PrivilegedExceptionAction<Enumeration<URL>>() {
                 @SuppressWarnings("unchecked")
                 public Enumeration<URL> run() throws IOException {
-                    return bundle.getResources(name);
+                    return (Enumeration<URL>)bundle.getResources(name);
                 }
           
             });
@@ -105,7 +105,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class<?> clazz;
+        Class clazz;
         try {
             clazz = findClass(name);
         } catch (ClassNotFoundException cnfe) {

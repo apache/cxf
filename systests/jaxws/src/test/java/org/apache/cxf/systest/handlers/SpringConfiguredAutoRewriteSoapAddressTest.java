@@ -43,7 +43,7 @@ public class SpringConfiguredAutoRewriteSoapAddressTest
         System.err.println(getApplicationContext().getBean("cxfHandlerTestEndpoint").
                                                                    getClass().toString());
 
-        AddNumbers addNumbers = getApplicationContext().getBean("cxfHandlerTestClientEndpoint",
+        AddNumbers addNumbers = (AddNumbers)getApplicationContext().getBean("cxfHandlerTestClientEndpoint",
                                                                    AddNumbers.class);
 
         int r = addNumbers.addNumbers(10, 15);

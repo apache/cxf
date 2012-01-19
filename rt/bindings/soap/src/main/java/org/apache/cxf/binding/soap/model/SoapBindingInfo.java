@@ -101,7 +101,7 @@ public class SoapBindingInfo extends BindingInfo {
      * @return
      */
     public String getSoapAction(OperationInfo operation) {
-        BindingOperationInfo b = getOperation(operation.getName());
+        BindingOperationInfo b = (BindingOperationInfo) getOperation(operation.getName());
         SoapOperationInfo opInfo = b.getExtensor(SoapOperationInfo.class);
 
         if (opInfo != null && opInfo.getAction() != null) {

@@ -42,12 +42,12 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
     }
     
     
-    protected Class<?> getRawFactoryClass() {
+    protected Class getRawFactoryClass() {
         return JaxWsProxyFactoryBean.class;
     }
 
     @Override
-    protected Class<?> getFactoryClass() {
+    protected Class getFactoryClass() {
         return JAXWSSpringClientProxyFactoryBean.class;
     }
 
@@ -58,7 +58,7 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
 
     @NoJSR250Annotations
     public static class JAXWSSpringClientProxyFactoryBean extends JaxWsProxyFactoryBean
-        implements ApplicationContextAware, FactoryBean<Object>, DisposableBean {
+        implements ApplicationContextAware, FactoryBean, DisposableBean {
 
         private Object obj;
 
@@ -84,7 +84,7 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
             }
             return obj;
         }
-        public Class<?> getObjectType() {
+        public Class getObjectType() {
             return this.getServiceClass();
         }
         public boolean isSingleton() {

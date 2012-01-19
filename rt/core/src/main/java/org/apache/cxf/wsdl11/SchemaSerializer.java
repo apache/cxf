@@ -43,8 +43,7 @@ import org.apache.cxf.helpers.XMLUtils;
  */
 public class SchemaSerializer implements ExtensionSerializer {
 
-    public void marshall(@SuppressWarnings("rawtypes") Class parentType, 
-                         QName elementType, ExtensibilityElement extension, PrintWriter pw,
+    public void marshall(Class parentType, QName elementType, ExtensibilityElement extension, PrintWriter pw,
                          Definition def, ExtensionRegistry extReg) throws WSDLException {
         try {
             writeXml(((Schema)extension).getElement(), pw);

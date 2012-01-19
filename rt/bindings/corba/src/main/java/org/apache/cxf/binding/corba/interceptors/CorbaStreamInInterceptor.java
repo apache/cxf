@@ -103,7 +103,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
         }
 
         CorbaMessage outMessage = (CorbaMessage)message.getExchange().getOutMessage();
-        orb = message.getExchange().get(ORB.class);
+        orb = (ORB)message.getExchange().get(ORB.class);
         HandlerIterator paramIterator = new HandlerIterator(outMessage, false);
 
         CorbaTypeEventProducer eventProducer = null;
@@ -170,7 +170,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
             throw new RuntimeException("Couldn't find the binding operation for " + opName);
         }
 
-        orb = exchange.get(ORB.class);
+        orb = (ORB)exchange.get(ORB.class);
 
         ServerRequest request = exchange.get(ServerRequest.class);
         NVList list = prepareArguments(message, info, opType, 

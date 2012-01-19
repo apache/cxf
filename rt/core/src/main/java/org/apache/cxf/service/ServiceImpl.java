@@ -39,7 +39,6 @@ import org.apache.cxf.workqueue.SynchronousExecutor;
 
 @NoJSR250Annotations
 public class ServiceImpl extends AbstractAttributedInterceptorProvider implements Service, Configurable {
-    private static final long serialVersionUID = -3920605127948701230L;
     private List<ServiceInfo> serviceInfos;
     private DataBinding dataBinding;
     private Executor executor;

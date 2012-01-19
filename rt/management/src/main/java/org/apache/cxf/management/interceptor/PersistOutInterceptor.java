@@ -129,7 +129,7 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
             } else if (entry.getKey().equals(org.apache.cxf.message.Message.PROTOCOL_HEADERS)) {
 
                 if (entry.getValue() instanceof Map) {
-                    List<?> userAgents = (List<?>)((Map<?, ?>)entry.getValue()).get("user-agent");
+                    List userAgents = (List)((Map)entry.getValue()).get("user-agent");
                     if (userAgents != null && !userAgents.isEmpty()) {
                         exchange.setUserAgent(userAgents.get(0).toString());
                     }

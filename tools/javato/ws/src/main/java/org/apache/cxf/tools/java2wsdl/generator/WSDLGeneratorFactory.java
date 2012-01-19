@@ -39,7 +39,7 @@ public final class WSDLGeneratorFactory {
         return pkgName + "." + wsdlVersion.toString().toLowerCase() + "." + wsdlVersion + "Generator";
     }
 
-    public AbstractGenerator<?> newGenerator() {
+    public AbstractGenerator newGenerator() {
         AbstractGenerator<?> generator = null;
         String clzName = getGeneratorClassName();
         try {

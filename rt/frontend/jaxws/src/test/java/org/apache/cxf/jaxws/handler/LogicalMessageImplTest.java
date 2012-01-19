@@ -66,7 +66,7 @@ public class LogicalMessageImplTest extends Assert {
         
         Object obj = lmi.getPayload(ctx);
         assertTrue(obj instanceof JAXBElement);
-        JAXBElement<?> el2 = (JAXBElement<?>)obj;
+        JAXBElement<?> el2 = (JAXBElement)obj;
         assertTrue(el2.getValue() instanceof AddNumbers);
         AddNumbers resp = (AddNumbers)el2.getValue();
         assertEquals(req.getArg0(), resp.getArg0());        

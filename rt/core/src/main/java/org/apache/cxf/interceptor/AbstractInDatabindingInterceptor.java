@@ -161,13 +161,13 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
                 continue;
             }
             
-            Collection<MessagePartInfo> bodyParts = msgInfo.getMessageParts();
+            Collection bodyParts = msgInfo.getMessageParts();
             if (bodyParts.size() == 0 || bodyParts.size() <= index) {
                 itr.remove();
                 continue;
             }
 
-            MessagePartInfo p = msgInfo.getMessageParts().get(index);
+            MessagePartInfo p = (MessagePartInfo)msgInfo.getMessageParts().get(index);
             if (name.getNamespaceURI() == null || name.getNamespaceURI().length() == 0) {
                 // message part has same namespace with the message
                 name = new QName(p.getMessageInfo().getName().getNamespaceURI(), name.getLocalPart());

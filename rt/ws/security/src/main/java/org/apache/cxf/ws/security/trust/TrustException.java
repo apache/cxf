@@ -29,7 +29,6 @@ import org.apache.cxf.common.i18n.UncheckedException;
  */
 public class TrustException extends UncheckedException {
 
-    private static final long serialVersionUID = -2957463932630164766L;
     /**
      * @param msg
      */

@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 
 public class JAXWSBinding implements ExtensibilityElement, Serializable {
 
-    private static final long serialVersionUID = -7918008370548583809L;
     private Boolean enableAsyncMapping;
     private Boolean enableWrapperStyle;
     private Boolean enableMime;

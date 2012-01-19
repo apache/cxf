@@ -57,11 +57,13 @@ public final class WsdlUtilities {
         }
         StringBuilder str = new StringBuilder();
 
-        for (String s : arr) {
-            if (str.length() > 0) {
-                str.append(',');
+        if (arr != null) {
+            for (String s : arr) {
+                if (str.length() > 0) {
+                    str.append(',');
+                }
+                str.append(s);
             }
-            str.append(s);
         }
         return str.toString();
     }
@@ -79,7 +81,7 @@ public final class WsdlUtilities {
         String ex = joinWithComma(exList.toArray(new String[exList.size()]));
 
         try {
-            List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
+            List newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
             return CastUtils.cast(newfiles);
         } catch (IOException exc) {
             throw new MojoExecutionException(exc.getMessage(), exc);

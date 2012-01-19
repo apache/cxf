@@ -68,8 +68,8 @@ public class SpringResourceFactoryTest extends Assert {
         assertNotNull(bean);
         SpringResourceFactory sf = (SpringResourceFactory)bean;
         assertNotNull(sf.getApplicationContext());
-        Constructor<?> c = sf.getBeanConstructor();
-        Constructor<BookStore> c2 = BookStore.class.getConstructor(new Class[]{});
+        Constructor c = sf.getBeanConstructor();
+        Constructor c2 = BookStore.class.getConstructor(new Class[]{});
                 
         assertEquals(c.getParameterTypes().length, c2.getParameterTypes().length);
         assertEquals(isSingleton, sf.isSingleton());

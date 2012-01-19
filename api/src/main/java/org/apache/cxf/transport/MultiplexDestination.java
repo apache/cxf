@@ -47,5 +47,5 @@ public interface MultiplexDestination extends Destination {
      * the current invocation
      * @return the id associated with the current invocation
      */
-    String getId(Map<String, Object> contextMap);
+    String getId(Map contextMap);
 }

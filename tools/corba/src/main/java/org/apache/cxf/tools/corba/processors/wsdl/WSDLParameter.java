@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.corba.processors.wsdl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -36,7 +37,6 @@ import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
 import org.apache.cxf.binding.corba.wsdl.ModeType;
 import org.apache.cxf.binding.corba.wsdl.ParamType;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
 import org.apache.ws.commons.schema.XmlSchemaAnnotationItem;
@@ -127,8 +127,9 @@ public final class WSDLParameter {
 
         if (input != null) {
             Message msg = input.getMessage();
-            List<Part> parts = CastUtils.cast(msg.getOrderedParts(null));
-            for (Part part : parts) {
+            Iterator i = msg.getOrderedParts(null).iterator();
+            while (i.hasNext()) {
+                Part part = (Part)i.next();
                 XmlSchemaType schemaType = null;
                 boolean isObjectRef = isObjectReference(xmlSchemaList, part.getElementName());
                 if (part.getElementName() != null && !isObjectRef) {
@@ -226,8 +227,9 @@ public final class WSDLParameter {
 
         if (output != null) {
             Message msg = output.getMessage();
-            List<Part> parts = CastUtils.cast(msg.getOrderedParts(null));
-            for (Part part : parts) {
+            Iterator i = msg.getOrderedParts(null).iterator();
+            while (i.hasNext()) {
+                Part part = (Part)i.next();
                 XmlSchemaType schemaType = null;
                 // check if in input list
                 String mode = "out";
@@ -235,7 +237,7 @@ public final class WSDLParameter {
                 boolean isObjectRef = isObjectReference(xmlSchemaList, part.getElementName());
                 for (int x = 0; x < inputs.size(); x++) {
                     paramtype = null;
-                    ParamType d2 = inputs.get(x);
+                    ParamType d2 = (ParamType)inputs.get(x);
                     if (part.getElementName() != null && !isObjectRef) {
                         XmlSchemaElement el = getElement(part, xmlSchemaList);
                         if (el != null && el.getSchemaType() != null) {
@@ -293,7 +295,7 @@ public final class WSDLParameter {
     private void processReturnParams(List<ParamType> outputs, List<ArgType> returns) {
 
         if (outputs.size() > 0) {
-            ParamType d2 = outputs.get(0);
+            ParamType d2 = (ParamType)outputs.get(0);
 
             if (d2.getMode().value().equals("out")) {
                 ArgType argType = new ArgType();
@@ -309,12 +311,12 @@ public final class WSDLParameter {
         ListIterator<ParamType> inputit = inputs.listIterator();
 
         while (inputit.hasNext()) {
-            ParamType d2 = inputit.next();
+            ParamType d2 = (ParamType)inputit.next();
             if (d2.getMode().value().equals("inout")) {
-                ListIterator<ParamType> it = outputs.listIterator();
+                ListIterator it = outputs.listIterator();
 
                 while (it.hasNext()) {
-                    ParamType d3 = it.next();
+                    ParamType d3 = (ParamType)it.next();
                     if (!d3.getName().equals(d2.getName()) && (!simpleOrdering)
                         && (!d3.getMode().value().equals("inout"))) {
                         // the in/outs are in a different order in the

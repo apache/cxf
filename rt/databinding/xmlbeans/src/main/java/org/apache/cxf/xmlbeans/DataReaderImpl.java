@@ -67,7 +67,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
                       unwrap);
     }
 
-    public Object read(QName name, XMLStreamReader reader, Class<?> typeClass) {
+    public Object read(QName name, XMLStreamReader reader, Class typeClass) {
         SchemaType st = null;
         try {
             Field f = typeClass.getField("type");

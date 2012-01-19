@@ -92,7 +92,7 @@ public class WSDLGetUtils {
                                        params, ctxUri, 
                                        endpointInfo);
         
-        Map<String, Definition> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+        Map<String, Definition> mp = CastUtils.cast((Map)endpointInfo.getService()
                                                     .getProperty(WSDLS_KEY));
         return mp.keySet();
     }
@@ -109,7 +109,7 @@ public class WSDLGetUtils {
                                        params, ctxUri, 
                                        endpointInfo);
       
-        Map<String, SchemaReference> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+        Map<String, SchemaReference> mp = CastUtils.cast((Map)endpointInfo.getService()
                                                          .getProperty(SCHEMAS_KEY));
         
         Map<String, String> schemas = new HashMap<String, String>();
@@ -152,21 +152,21 @@ public class WSDLGetUtils {
                 xsd = URLDecoder.decode(xsd, "utf-8");
             }
             
-            Map<String, Definition> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+            Map<String, Definition> mp = CastUtils.cast((Map)endpointInfo.getService()
                                                         .getProperty(WSDLS_KEY));
-            Map<String, SchemaReference> smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+            Map<String, SchemaReference> smp = CastUtils.cast((Map)endpointInfo.getService()
                                                         .getProperty(SCHEMAS_KEY));
 
             if (mp == null) {
                 endpointInfo.getService().setProperty(WSDLS_KEY,
-                                                      new ConcurrentHashMap<String, Definition>());
-                mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+                                                      new ConcurrentHashMap());
+                mp = CastUtils.cast((Map)endpointInfo.getService()
                                     .getProperty(WSDLS_KEY));
             }
             if (smp == null) {
                 endpointInfo.getService().setProperty(SCHEMAS_KEY,
-                                                      new ConcurrentHashMap<String, SchemaReference>());
-                smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
+                                                      new ConcurrentHashMap());
+                smp = CastUtils.cast((Map)endpointInfo.getService()
                                     .getProperty(SCHEMAS_KEY));
             }
             
@@ -411,7 +411,7 @@ public class WSDLGetUtils {
         Types types = def.getTypes();
         if (types != null) {
             for (ExtensibilityElement el 
-                : CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class)) {
+                : CastUtils.cast((List)types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
                     Schema see = (Schema)el;
                     updateSchemaImports(bus, see, doneSchemas, base);

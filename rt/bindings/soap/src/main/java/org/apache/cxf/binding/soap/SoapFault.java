@@ -30,10 +30,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 
 public class SoapFault extends Fault {
+
     public static final QName ATTACHMENT_IO = new QName(Soap12.SOAP_NAMESPACE, "AttachmentIOError");
-
-    private static final long serialVersionUID = 5775857720028582429L;
-
 
     /**
      * "The message was incorrectly formed or did not contain the appropriate

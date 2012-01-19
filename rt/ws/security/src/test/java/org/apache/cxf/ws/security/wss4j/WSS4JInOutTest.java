@@ -175,7 +175,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         // This should contain exactly 1 protection result
         //
         final java.util.List<WSSecurityEngineResult> protectionResults =
-            handlerResults.get(0).getResults();
+            (java.util.List<WSSecurityEngineResult>) handlerResults.get(0).getResults();
         assertNotNull(protectionResults);
         assertSame(protectionResults.size(), 1);
         //
@@ -183,7 +183,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         // which should contain the soap:Body Qname
         //
         final java.util.Map<String, Object> result =
-            protectionResults.get(0);
+            (java.util.Map<String, Object>) protectionResults.get(0);
         final java.util.List<WSDataRef> protectedElements =
             CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
         assertNotNull(protectedElements);
@@ -237,7 +237,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         // This should contain exactly 2 protection results
         //
         final java.util.List<WSSecurityEngineResult> protectionResults =
-            handlerResults.get(0).getResults();
+            (java.util.List<WSSecurityEngineResult>) handlerResults.get(0).getResults();
         assertNotNull(protectionResults);
         assertSame(protectionResults.size(), 2);
         

@@ -21,7 +21,7 @@ package org.apache.cxf.tools.corba.processors.idl;
 
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,14 +36,12 @@ import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
 
 import antlr.ASTVisitor;
 import antlr.collections.AST;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 import org.apache.cxf.tools.corba.common.WSDLUtils;
@@ -250,19 +248,20 @@ public final class WSDLASTVisitor implements ASTVisitor {
 
     public Binding[] getCorbaBindings() {
         List<Binding> result = new ArrayList<Binding>();
-        Map<QName, Binding> bindings = CastUtils.cast(definition.getBindings());
-        for (Binding binding : bindings.values()) {
-            List<ExtensibilityElement> extElements 
-                = CastUtils.cast(binding.getExtensibilityElements());
+        Map bindings = definition.getBindings();
+        Iterator it = bindings.values().iterator();
+        while (it.hasNext()) {
+            Binding binding = (Binding) it.next();
+            List extElements = binding.getExtensibilityElements();
             for (int i = 0; i < extElements.size(); i++) {
-                ExtensibilityElement el = extElements.get(i);
+                ExtensibilityElement el = (ExtensibilityElement) extElements.get(i);
                 if (el.getElementType().equals(CorbaConstants.NE_CORBA_BINDING)) {
                     result.add(binding);
                     break;
                 }
             }
         }
-        return result.toArray(new Binding[result.size()]);
+        return (Binding[]) result.toArray(new Binding[result.size()]);
     }
 
     public boolean writeDefinition(Writer writer) throws Exception {
@@ -368,18 +367,21 @@ public final class WSDLASTVisitor implements ASTVisitor {
             }
         }
 
-        Collection<PortType> portTypes = CastUtils.cast(definition.getAllPortTypes().values());
-        for (PortType port : portTypes) {
+        Iterator iter = definition.getAllPortTypes().values().iterator();
+        while (iter.hasNext()) {
+            PortType port = (PortType)iter.next();
             def.addPortType(port);
         }
 
-        Collection<Message> messages = CastUtils.cast(definition.getMessages().values());
-        for (Message msg : messages) {
+        iter = definition.getMessages().values().iterator();
+        while (iter.hasNext()) {
+            Message msg = (Message)iter.next();
             def.addMessage(msg);
         }
 
-        Collection<String> namespaces = CastUtils.cast(definition.getNamespaces().values());
-        for (String namespace : namespaces) {
+        iter = definition.getNamespaces().values().iterator();
+        while (iter.hasNext()) {
+            String namespace = (String)iter.next();
             String prefix = definition.getPrefix(namespace);
             if (!"corba".equals(prefix)) {
                 def.addNamespace(prefix, namespace);
@@ -388,8 +390,9 @@ public final class WSDLASTVisitor implements ASTVisitor {
             }
         }
 
-        Collection<Import> imports = CastUtils.cast(definition.getImports().values());
-        for (Import importType : imports) {
+        iter = definition.getImports().values().iterator();
+        while (iter.hasNext()) {
+            Import importType = (Import)iter.next();
             def.addImport(importType);
         }
 
@@ -410,21 +413,26 @@ public final class WSDLASTVisitor implements ASTVisitor {
             def = manager.createWSDLDefinition(targetNamespace);
         }
 
-        Collection<String> namespaces = CastUtils.cast(definition.getNamespaces().values());
-        for (String namespace : namespaces) {
+        Iterator iter = definition.getNamespaces().values().iterator();
+        while (iter.hasNext()) {
+            String namespace = (String)iter.next();
             String prefix = definition.getPrefix(namespace);
             def.addNamespace(prefix, namespace);
         }
-        Collection<Binding> bindings = CastUtils.cast(definition.getAllBindings().values());
-        for (Binding binding : bindings) {
+
+        iter = definition.getAllBindings().values().iterator();
+        while (iter.hasNext()) {
+            Binding binding = (Binding)iter.next();
             def.addBinding(binding);
         }
-        Collection<Service> services = CastUtils.cast(definition.getAllServices().values());
-        for (Service service : services) {
+        iter = definition.getAllServices().values().iterator();
+        while (iter.hasNext()) {
+            Service service = (Service)iter.next();
             def.addService(service);
         }
-        Collection<ExtensibilityElement> extns = CastUtils.cast(definition.getExtensibilityElements());
-        for (ExtensibilityElement ext : extns) {
+        iter = definition.getExtensibilityElements().iterator();
+        while (iter.hasNext()) {
+            ExtensibilityElement ext = (ExtensibilityElement)iter.next();
             def.addExtensibilityElement(ext);
         }
 
@@ -450,7 +458,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
         return moduleToNSMapper;
     }
 
-    public void setExcludedModules(Map<String, List<String>> modules) {
+    public void setExcludedModules(Map<String, List> modules) {
         moduleToNSMapper.setExcludedModuleMap(modules);
     }
 

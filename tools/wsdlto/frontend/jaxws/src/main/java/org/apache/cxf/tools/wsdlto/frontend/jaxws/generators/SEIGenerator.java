@@ -73,13 +73,13 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
             return;
         }
 
-        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
         
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
     
             if (interfaces.size() == 0) {
-                ServiceInfo serviceInfo = env.get(ServiceInfo.class);
+                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SEI", LOG, wsdl);
                 if (penv.isVerbose()) {

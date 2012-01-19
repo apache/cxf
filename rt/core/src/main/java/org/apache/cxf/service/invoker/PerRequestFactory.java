@@ -36,9 +36,9 @@ import org.apache.cxf.resource.ResourceManager;
 public class PerRequestFactory implements Factory {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(PerRequestFactory.class);
 
-    private final Class<?> svcClass;
+    private final Class svcClass;
 
-    public PerRequestFactory(final Class<?> svcClass) {
+    public PerRequestFactory(final Class svcClass) {
         super();
         this.svcClass = svcClass;
     }

@@ -74,7 +74,7 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         for (QName serviceQName : services.keySet()) {
             String serviceName = serviceQName.getLocalPart();
             if (serviceName.equals(env.get(ToolConstants.CFG_SERVICE))) {
-                service = services.get(serviceQName);
+                service = (Service)services.get(serviceQName);
                 break;
             }
         }

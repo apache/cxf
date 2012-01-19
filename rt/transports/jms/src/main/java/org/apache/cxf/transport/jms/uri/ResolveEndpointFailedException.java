@@ -24,7 +24,6 @@ package org.apache.cxf.transport.jms.uri;
  * 
  */
 public class ResolveEndpointFailedException extends RuntimeException {
-    private static final long serialVersionUID = -6624403816682681106L;
     private final String uri;
 
     public ResolveEndpointFailedException(String uri, Throwable cause) {

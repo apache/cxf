@@ -343,7 +343,7 @@ tryAgain:
 					}
 				else {
 					if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-				else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+				else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				}
 				if ( _returnToken==null ) continue tryAgain; // found SKIP token
@@ -748,7 +748,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}
@@ -840,7 +840,7 @@ tryAgain:
 						match('*');
 					}
 					else {
-						if ( _cnt332>=1 ) { break _loop332; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+						if ( _cnt332>=1 ) { break _loop332; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 					}
 					
 					_cnt332++;
@@ -857,7 +857,7 @@ tryAgain:
 					}
 				}
 				else {
-					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				
 				}
@@ -904,7 +904,7 @@ tryAgain:
 			matchNot('\'');
 		}
 		else {
-			throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		
 		}
@@ -1008,7 +1008,7 @@ tryAgain:
 				else if (((LA(1) >= '\u0000' && LA(1) <= '\ufffe')) && (true) && (true) && (true)) {
 				}
 				else {
-					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				
 				}
@@ -1016,7 +1016,7 @@ tryAgain:
 			else if (((LA(1) >= '\u0000' && LA(1) <= '\ufffe')) && (true) && (true) && (true)) {
 			}
 			else {
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			
 			}
@@ -1036,7 +1036,7 @@ tryAgain:
 			else if (((LA(1) >= '\u0000' && LA(1) <= '\ufffe')) && (true) && (true) && (true)) {
 			}
 			else {
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			
 			}
@@ -1062,7 +1062,7 @@ tryAgain:
 					else if (((LA(1) >= '\u0000' && LA(1) <= '\ufffe')) && (true) && (true) && (true)) {
 					}
 					else {
-						throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+						throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 					}
 					
 					}
@@ -1070,7 +1070,7 @@ tryAgain:
 				else if (((LA(1) >= '\u0000' && LA(1) <= '\ufffe')) && (true) && (true) && (true)) {
 				}
 				else {
-					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				
 				}
@@ -1078,7 +1078,7 @@ tryAgain:
 			else if (((LA(1) >= '\u0000' && LA(1) <= '\ufffe')) && (true) && (true) && (true)) {
 			}
 			else {
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			
 			}
@@ -1087,7 +1087,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}
@@ -1204,7 +1204,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}
@@ -1267,7 +1267,7 @@ tryAgain:
 			match("0X");
 		}
 		else {
-			throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		
 		}
@@ -1279,7 +1279,7 @@ tryAgain:
 				mHEXDIGIT(false);
 			}
 			else {
-				if ( _cnt361>=1 ) { break _loop361; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt361>=1 ) { break _loop361; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
 			_cnt361++;
@@ -1346,7 +1346,7 @@ tryAgain:
 				}
 				default:
 				{
-					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				}
 				}
@@ -1370,7 +1370,7 @@ tryAgain:
 				}
 				default:
 				{
-					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				}
 				}
@@ -1382,7 +1382,7 @@ tryAgain:
 						mDIGIT(false);
 					}
 					else {
-						if ( _cnt373>=1 ) { break _loop373; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+						if ( _cnt373>=1 ) { break _loop373; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 					}
 					
 					_cnt373++;
@@ -1408,7 +1408,7 @@ tryAgain:
 				}
 				default:
 				{
-					throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				}
 				}
@@ -1439,7 +1439,7 @@ tryAgain:
 			}
 			default:
 			{
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			}
 			}
@@ -1463,7 +1463,7 @@ tryAgain:
 			}
 			default:
 			{
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			}
 			}
@@ -1475,7 +1475,7 @@ tryAgain:
 					mDIGIT(false);
 				}
 				else {
-					if ( _cnt378>=1 ) { break _loop378; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt378>=1 ) { break _loop378; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
 				_cnt378++;
@@ -1500,7 +1500,7 @@ tryAgain:
 			}
 			default:
 			{
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			}
 			}
@@ -1539,7 +1539,7 @@ tryAgain:
 					mDIGIT(false);
 				}
 				else {
-					if ( _cnt383>=1 ) { break _loop383; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt383>=1 ) { break _loop383; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
 				_cnt383++;
@@ -1569,7 +1569,7 @@ tryAgain:
 			}
 			default:
 			{
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			}
 			}
@@ -1603,7 +1603,7 @@ tryAgain:
 				mDIGIT(false);
 			}
 			else {
-				if ( _cnt387>=1 ) { break _loop387; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt387>=1 ) { break _loop387; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
 			_cnt387++;
@@ -1627,7 +1627,7 @@ tryAgain:
 			}
 			default:
 			{
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			}
 			}
@@ -1651,7 +1651,7 @@ tryAgain:
 			}
 			default:
 			{
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			}
 			}
@@ -1663,7 +1663,7 @@ tryAgain:
 					mDIGIT(false);
 				}
 				else {
-					if ( _cnt392>=1 ) { break _loop392; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt392>=1 ) { break _loop392; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
 				_cnt392++;
@@ -1687,7 +1687,7 @@ tryAgain:
 			}
 			default:
 			{
-				throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			}
 			}
@@ -1737,7 +1737,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}
@@ -1826,7 +1826,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}

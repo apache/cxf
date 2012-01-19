@@ -54,13 +54,12 @@ public final class JarLoader {
         return getBytesFromInputStream(is, -1);
     }
 
-    public static synchronized Map<?, ?> getJarContents(String path) 
-        throws MalformedURLException, IOException {
+    public static synchronized Map getJarContents(String path) throws MalformedURLException, IOException {
         if (!archives.containsKey(path)) {
             loadArchive(path);
         }
 
-        return (Map<?, ?>)archives.get(path);
+        return (Map)archives.get(path);
     }
 
     private static void loadArchive(String path) throws MalformedURLException, IOException {
@@ -77,9 +76,9 @@ public final class JarLoader {
                     // no longer needed, replace the entry with the exploded Map
                     //
                     Map<String, Object> parentMap = 
-                        CastUtils.cast((Map<?, ?>)archives.get(buildPartialName(nameComponents, i)));
-                    Map<?, ?> archiveMap = 
-                        (Map<?, ?>)archives.get(buildPartialName(nameComponents, i + 1));
+                        CastUtils.cast((Map)archives.get(buildPartialName(nameComponents, i)));
+                    Map archiveMap = 
+                        (Map)archives.get(buildPartialName(nameComponents, i + 1));
 
                     parentMap.put(nameComponents.get(i), archiveMap);
                 }
@@ -136,8 +135,7 @@ public final class JarLoader {
         if (nameComponents.size() == 1) {            
             map = readZipStream((new URL(getRootArchiveName(name))).openStream());
         } else {
-            Map<?, ?> parentMap 
-                = (Map<?, ?>)archives.get(buildPartialName(nameComponents, nameComponents.size() - 1));
+            Map parentMap = (Map)archives.get(buildPartialName(nameComponents, nameComponents.size() - 1));
             byte bytes[] = (byte[])(parentMap.get(nameComponents.get(nameComponents.size() - 1)));
             
             if (null == bytes) {

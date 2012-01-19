@@ -98,7 +98,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
     }
     public synchronized Handler[] getHandlers() {
         List<Handler> ret = new ArrayList<Handler>();
-        Enumeration<?> en = log.getAllAppenders();
+        Enumeration en = log.getAllAppenders();
         while (en.hasMoreElements()) {
             Appender ap = (Appender)en.nextElement();
             if (ap instanceof HandlerWrapper) {
@@ -143,6 +143,8 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         default:
             if (l.toInt() == TRACE.toInt()) {
                 l2 = Level.FINEST;
+            } else {
+                l2 = null;
             }
         } 
         return l2;

@@ -91,11 +91,11 @@ public class SoapRefType extends AegisType {
         baseType.setTypeMapping(typeMapping);
     }
 
-    public Class<?> getTypeClass() {
+    public Class getTypeClass() {
         return baseType.getTypeClass();
     }
 
-    public void setTypeClass(Class<?> typeClass) {
+    public void setTypeClass(Class typeClass) {
         baseType.setTypeClass(typeClass);
     }
 

@@ -18,13 +18,11 @@
  */
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -37,12 +35,12 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 
@@ -54,19 +52,18 @@ public class JAXRSDataBinding extends AbstractDataBinding {
     private static final Class<?> SUPPORTED_READER_FORMATS[] = new Class<?>[] {XMLStreamReader.class};
     private static final Class<?> SUPPORTED_WRITER_FORMATS[] = new Class<?>[] {XMLStreamWriter.class};
     
-    private MessageBodyReader<?> xmlReader;
-    private MessageBodyWriter<Object> xmlWriter;
+    private MessageBodyReader xmlReader;
+    private MessageBodyWriter xmlWriter;
     
-    @SuppressWarnings("unchecked")
     public void setProvider(Object provider) {
         if (!(provider instanceof MessageBodyWriter)) {
             throw new IllegalArgumentException(
                 "The provider must implement javax.ws.rs.ext.MessageBodyWriter");
         }
-        xmlWriter = (MessageBodyWriter<Object>)provider;
+        xmlWriter = (MessageBodyWriter)provider;
         
         if (provider instanceof MessageBodyReader) {
-            xmlReader = (MessageBodyReader<?>)provider;
+            xmlReader = (MessageBodyReader)provider;
         }
     }
     
@@ -110,23 +107,19 @@ public class JAXRSDataBinding extends AbstractDataBinding {
         return new MetadataMap<String, String>(
             (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS), true, true);
     }
-    @SuppressWarnings("unchecked")
-    private MultivaluedMap<String, Object> getWriteHeaders(Message message) {
-        return new MetadataMap<String, Object>(
-            (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS), true, true);
-    }
     
     private class MessageBodyDataWriter implements DataWriter<XMLStreamWriter> {
         
         public void write(Object obj, XMLStreamWriter output) {
             write(obj, null, output);
         }
-        
+
+        @SuppressWarnings("unchecked")
         public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
             try {
                 Message message = PhaseInterceptorChain.getCurrentMessage();
                 Method method = getTargetMethod(message);
-                MultivaluedMap<String, Object> headers = getWriteHeaders(message);
+                MultivaluedMap<String, String> headers = getHeaders(message);        
                 xmlWriter.writeTo(obj, 
                                  method.getReturnType(), 
                                  method.getGenericReturnType(), 
@@ -163,27 +156,22 @@ public class JAXRSDataBinding extends AbstractDataBinding {
             return doRead(part.getTypeClass(), input);
         }
 
-        public Object read(QName elementQName, XMLStreamReader input, Class<?> type) {
+        public Object read(QName elementQName, XMLStreamReader input, Class type) {
             return doRead(type, input);
         }
 
         
         @SuppressWarnings("unchecked")
-        private <T> T read(Class<T> cls) throws WebApplicationException, IOException {
-            Message message = PhaseInterceptorChain.getCurrentMessage();
-            Method method = getTargetMethod(message);
-            MessageBodyReader<T> reader = (MessageBodyReader<T>)xmlReader;
-
-            return reader.readFrom(cls, 
-                                      method.getGenericParameterTypes()[0], 
-                                      method.getParameterTypes()[0].getAnnotations(), 
-                                      MediaType.APPLICATION_ATOM_XML_TYPE,
-                                      getHeaders(message),             
-                                      null);
-        }
-        private Object doRead(Class<?> cls, XMLStreamReader input) {
+        private Object doRead(Class cls, XMLStreamReader input) {
             try {
-                return read(cls);
+                Message message = PhaseInterceptorChain.getCurrentMessage();
+                Method method = getTargetMethod(message);
+                return xmlReader.readFrom(cls, 
+                                          method.getGenericParameterTypes()[0], 
+                                          method.getParameterTypes()[0].getAnnotations(), 
+                                          MediaType.APPLICATION_ATOM_XML_TYPE,
+                                          getHeaders(message),             
+                                          null);
             } catch (Exception ex) {
                 return null;
             }

@@ -51,7 +51,7 @@ import org.junit.Test;
 public class CodeFirstWSDLTest extends AbstractJaxWsTest {
     String address = "local://localhost:9000/Hello";
     
-    private Definition createService(Class<?> clazz) throws Exception {
+    private Definition createService(Class clazz) throws Exception {
         
         JaxWsImplementorInfo info = new JaxWsImplementorInfo(clazz);
         ReflectionServiceFactoryBean bean = new JaxWsServiceFactoryBean(info);

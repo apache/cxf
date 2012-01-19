@@ -55,8 +55,8 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         builder.customize();
 
         Definition customizedDef = builder.getWSDLModel();
-        List<?> defExtensionList = customizedDef.getExtensibilityElements();
-        Iterator<?> ite = defExtensionList.iterator();
+        List defExtensionList = customizedDef.getExtensibilityElements();
+        Iterator ite = defExtensionList.iterator();
 
         while (ite.hasNext()) {
             ExtensibilityElement extElement = (ExtensibilityElement)ite.next();
@@ -68,15 +68,15 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         PortType portType = customizedDef.getPortType(new QName("http://apache.org/hello_world_soap_http",
                                                                 "Greeter"));
 
-        List<?> portTypeList = portType.getExtensibilityElements();
+        List portTypeList = portType.getExtensibilityElements();
         JAXWSBinding binding = (JAXWSBinding)portTypeList.get(0);
 
         assertEquals("Customized enable EnableWrapperStyle name does not been parsered", true, binding
             .isEnableWrapperStyle());
 
-        List<?> opList = portType.getOperations();
+        List opList = portType.getOperations();
         Operation operation = (Operation)opList.get(0);
-        List<?> extList = operation.getExtensibilityElements();
+        List extList = operation.getExtensibilityElements();
         binding = (JAXWSBinding)extList.get(0);
 
         assertEquals("Customized method name does not parsered", "echoMeOneWay", binding.getMethodName());
@@ -103,8 +103,8 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         builder.customize();
 
         Definition customizedDef = builder.getWSDLModel();
-        List<?> defExtensionList = customizedDef.getExtensibilityElements();
-        Iterator<?> ite = defExtensionList.iterator();
+        List defExtensionList = customizedDef.getExtensibilityElements();
+        Iterator ite = defExtensionList.iterator();
 
         while (ite.hasNext()) {
             ExtensibilityElement extElement = (ExtensibilityElement)ite.next();
@@ -116,15 +116,15 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         PortType portType = customizedDef.getPortType(new QName("http://apache.org/hello_world_soap_http",
                                                                 "Greeter"));
 
-        List<?> portTypeList = portType.getExtensibilityElements();
+        List portTypeList = portType.getExtensibilityElements();
         JAXWSBinding binding = (JAXWSBinding)portTypeList.get(0);
 
         assertEquals("Customized enable EnableWrapperStyle name does not been parsered", true, binding
             .isEnableWrapperStyle());
 
-        List<?> opList = portType.getOperations();
+        List opList = portType.getOperations();
         Operation operation = (Operation)opList.get(0);
-        List<?> extList = operation.getExtensibilityElements();
+        List extList = operation.getExtensibilityElements();
         binding = (JAXWSBinding)extList.get(0);
 
         assertEquals("Customized method name does not parsered", "echoMeOneWay", binding.getMethodName());

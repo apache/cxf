@@ -32,7 +32,7 @@ import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.AbstractConduit;
-import org.apache.cxf.transport.Assertor;
+import org.apache.cxf.ws.policy.Assertor;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 

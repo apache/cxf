@@ -20,8 +20,6 @@
 package org.apache.cxf.io;
 
 public class CacheSizeExceededException extends RuntimeException {
-    private static final long serialVersionUID = -8976580055837650080L;
-
     public CacheSizeExceededException() {
         super();
     }

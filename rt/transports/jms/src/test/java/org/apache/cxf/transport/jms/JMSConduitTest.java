@@ -163,12 +163,13 @@ public class JMSConduitTest extends AbstractJMSTester {
         JMSConfiguration jmsConfig = conduit.getJmsConfig();
         JmsTemplate jmsTemplate = new JmsTemplate();
         jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
-        SessionCallback<javax.jms.Message> sc = new SessionCallback<javax.jms.Message>() {
-            public javax.jms.Message doInJms(Session session) throws JMSException {
+        SessionCallback sc = new SessionCallback() {
+            public Object doInJms(Session session) throws JMSException {
                 return JMSUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             }
         };
-        javax.jms.Message message = jmsTemplate.execute(sc);
+        @SuppressWarnings("unchecked")
+        javax.jms.Message message = (javax.jms.Message)jmsTemplate.execute(sc);
         
         // The ibm jdk finalizes conduit (during most runs of this test) and
         // causes it to fail unless we reference the conduit here after the

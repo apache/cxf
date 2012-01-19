@@ -203,7 +203,7 @@ public final class XPathAssert {
             return null;
         }
 
-        public Iterator<String> getPrefixes(String namespaceURI) {
+        public Iterator getPrefixes(String namespaceURI) {
             return null;
         }
 

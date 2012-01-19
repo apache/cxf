@@ -96,7 +96,7 @@ public  final class MapNamespaceContext implements NamespaceContext {
         return null;
     }
 
-    public Iterator<String> getPrefixes(String namespaceURI) {
+    public Iterator getPrefixes(String namespaceURI) {
         return null;
     }
 

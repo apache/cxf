@@ -108,7 +108,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
         return ac;    
     }
     
-    Constructor<?> getBeanConstructor() {
+    Constructor getBeanConstructor() {
         return c;
     }
 

@@ -90,7 +90,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         
         if (!PolicyUtils.isEmptyPolicy(p)) {
             Policy normalizedPolicy 
-                = p.normalize(engine == null ? null : engine.getRegistry(), true);
+                = (Policy)p.normalize(engine == null ? null : engine.getRegistry(), true);
             epi.setPolicy(getPolicy().merge(normalizedPolicy));
         } else {
             Policy clonedPolicy = new Policy();
@@ -149,7 +149,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         policy = engine.getAggregatedServicePolicy(ei.getService());
         policy = policy.merge(engine.getAggregatedEndpointPolicy(ei));
         if (!policy.isEmpty()) {
-            policy = policy.normalize(engine == null ? null : engine.getRegistry(),
+            policy = (Policy)policy.normalize(engine == null ? null : engine.getRegistry(),
                                               true);
         }
     }

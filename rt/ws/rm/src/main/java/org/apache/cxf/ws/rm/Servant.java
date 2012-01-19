@@ -246,7 +246,7 @@ public class Servant implements Invoker {
     }
 
     Object getParameter(Message message) {
-        List<?> resList = null;
+        List resList = null;
         // assert message == message.getExchange().getInMessage();
         
         if (message != null) {

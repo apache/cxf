@@ -30,10 +30,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
@@ -60,9 +60,9 @@ public final class ReflectionUtil {
         });
     }
 
-    public static <T> Constructor<T> getDeclaredConstructor(final Class<T> cls, final Class<?> ... args) {
-        return AccessController.doPrivileged(new PrivilegedAction<Constructor<T>>() {
-            public Constructor<T> run() {
+    public static Constructor getDeclaredConstructor(final Class<?> cls, final Class<?> ... args) {
+        return AccessController.doPrivileged(new PrivilegedAction<Constructor>() {
+            public Constructor run() {
                 try {
                     return cls.getDeclaredConstructor(args);
                 } catch (SecurityException e) {
@@ -74,9 +74,9 @@ public final class ReflectionUtil {
         });
         
     }
-    public static <T> Constructor<T> getConstructor(final Class<T> cls, final Class<?> ... args) {
-        return AccessController.doPrivileged(new PrivilegedAction<Constructor<T>>() {
-            public Constructor<T> run() {
+    public static Constructor getConstructor(final Class<?> cls, final Class<?> ... args) {
+        return AccessController.doPrivileged(new PrivilegedAction<Constructor>() {
+            public Constructor run() {
                 try {
                     return cls.getConstructor(args);
                 } catch (SecurityException e) {

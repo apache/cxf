@@ -41,7 +41,7 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
         if (!(obj instanceof ProviderInfo)) {
             return false;
         }
-        return provider.equals(((ProviderInfo<?>)obj).getProvider());
+        return provider.equals(((ProviderInfo)obj).getProvider());
     }
 
     public int hashCode() {

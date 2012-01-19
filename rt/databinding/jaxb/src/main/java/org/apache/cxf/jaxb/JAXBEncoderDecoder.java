@@ -74,7 +74,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.SOAPConstants;
@@ -179,6 +178,7 @@ public final class JAXBEncoderDecoder {
     private JAXBEncoderDecoder() {
     }
 
+    @SuppressWarnings("unchecked")
     public static void marshall(Marshaller marshaller, 
                                 Object elValue, 
                                 MessagePartInfo part,
@@ -224,7 +224,7 @@ public final class JAXBEncoderDecoder {
                         && ((XmlSchemaSimpleType)el.getSchemaType()).
                         getContent() instanceof XmlSchemaSimpleTypeList) {
                         mObj = Arrays.asList((Object[])mObj);
-                        writeObject(marshaller, source, newJAXBElement(elName, cls, mObj));
+                        writeObject(marshaller, source, new JAXBElement(elName, cls, mObj));
                     } else if (part.getMessageInfo().getOperation().isUnwrapped()
                                && (mObj.getClass().isArray() || mObj instanceof List)
                                && el.getMaxOccurs() != 1) {
@@ -233,20 +233,20 @@ public final class JAXBEncoderDecoder {
                                          elName,
                                          mObj);
                     } else {
-                        writeObject(marshaller, source, newJAXBElement(elName, cls, mObj));
+                        writeObject(marshaller, source, new JAXBElement(elName, cls, mObj));
                     }
                 } else if (byte[].class == cls && part.getTypeQName() != null
                            && part.getTypeQName().getLocalPart().equals("hexBinary")) {
                     mObj = new HexBinaryAdapter().marshal((byte[])mObj);
-                    writeObject(marshaller, source, newJAXBElement(elName, String.class, mObj));
+                    writeObject(marshaller, source, new JAXBElement(elName, String.class, mObj));
                 } else if (mObj instanceof JAXBElement) {
                     writeObject(marshaller, source, mObj);
                 } else if (marshaller.getSchema() != null) {
                     //force xsi:type so types can be validated instead of trying to 
                     //use the RPC/lit element names that aren't in the schema 
-                    writeObject(marshaller, source, newJAXBElement(elName, Object.class, mObj));
+                    writeObject(marshaller, source, new JAXBElement(elName, Object.class, mObj));
                 } else {
-                    writeObject(marshaller, source, newJAXBElement(elName, cls, mObj));
+                    writeObject(marshaller, source, new JAXBElement(elName, cls, mObj));
                 }
             } else {
                 writeObject(marshaller, source, mObj);
@@ -264,11 +264,6 @@ public final class JAXBEncoderDecoder {
             }
         }
     }
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static JAXBElement<?> newJAXBElement(QName elName, Class<?> cls, Object mObj) {
-        return new JAXBElement(elName, cls, mObj);
-    }
-
     //TODO: cache the JAXBRIContext
     public static void marshalWithBridge(QName qname,
                                          Class<?> cls,
@@ -339,7 +334,9 @@ public final class JAXBEncoderDecoder {
         }
 
     }    
+    
 
+    @SuppressWarnings("unchecked")
     public static void marshallException(Marshaller marshaller, Exception elValue,
                                          MessagePartInfo part, Object source) {
         XMLStreamWriter writer = getStreamWriter(source);
@@ -373,7 +370,7 @@ public final class JAXBEncoderDecoder {
                         if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
                             writeArrayObject(marshaller, writer, fname, f.get(elValue));
                         } else {
-                            writeObject(marshaller, writer, newJAXBElement(fname, String.class, 
+                            writeObject(marshaller, writer, new JAXBElement(fname, String.class, 
                                                                             f.get(elValue)));
                         }
                     }
@@ -388,7 +385,7 @@ public final class JAXBEncoderDecoder {
                     if (JAXBSchemaInitializer.isArray(m.getGenericReturnType())) {
                         writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
                     } else {
-                        writeObject(marshaller, writer, newJAXBElement(mname, String.class, 
+                        writeObject(marshaller, writer, new JAXBElement(mname, String.class, 
                                                                         m.invoke(elValue)));
                     }
                 }
@@ -401,6 +398,7 @@ public final class JAXBEncoderDecoder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void writeArrayObject(Marshaller marshaller, 
                                          Object source,
                                          QName mname,
@@ -424,7 +422,7 @@ public final class JAXBEncoderDecoder {
         for (int x = 0; x < len; x++) {
             Object o = Array.get(objArray, x);
             writeObject(marshaller, source, 
-                        newJAXBElement(mname, cls == null ? o.getClass() : cls, o));
+                        new JAXBElement(mname, cls == null ? o.getClass() : cls, o));
         }        
     }
 
@@ -454,10 +452,10 @@ public final class JAXBEncoderDecoder {
             Class<?> cls = part.getTypeClass();
             Object obj = null;
             try {
-                Constructor<?> cons = cls.getConstructor();
+                Constructor cons = cls.getConstructor();
                 obj = cons.newInstance();
             } catch (NoSuchMethodException nse) {
-                Constructor<?> cons = cls.getConstructor(new Class[] {String.class});
+                Constructor cons = cls.getConstructor(new Class[] {String.class});
                 obj = cons.newInstance(new Object[1]);
             }
 
@@ -573,12 +571,13 @@ public final class JAXBEncoderDecoder {
     }
 
 
+    @SuppressWarnings("unchecked")
     public static void marshallNullElement(Marshaller marshaller,
                                            Object source,
                                            MessagePartInfo part) {
         Class<?> clazz = part != null ? (Class<?>)part.getTypeClass() : null;
         try {
-            writeObject(marshaller, source, newJAXBElement(part.getElementQName(), clazz, null));
+            writeObject(marshaller, source, new JAXBElement(part.getElementQName(), clazz, null));
         } catch (JAXBException e) {
             throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
         }
@@ -705,7 +704,7 @@ public final class JAXBEncoderDecoder {
             Type tp2 = ((ParameterizedType)genericType).getRawType();
             if (tp2 instanceof Class) {
                 Class<?> cls = (Class<?>)tp2;
-                if (!cls.isInterface() && List.class.isAssignableFrom(cls)) {
+                if (!cls.isInterface() && List.class.isAssignableFrom((Class<?>)cls)) {
                     try {
                         return CastUtils.cast((List<?>)cls.newInstance());
                     } catch (Exception e) {
@@ -881,7 +880,7 @@ public final class JAXBEncoderDecoder {
                 Field f =  ReflectionUtil.getDeclaredField(c.getClass(), "fNamespaceContext");
                 f.setAccessible(true);
                 Object c2 = f.get(c);
-                Enumeration<?> enm = (Enumeration<?>)c2.getClass().getMethod("getAllPrefixes").invoke(c2);
+                Enumeration enm = (Enumeration)c2.getClass().getMethod("getAllPrefixes").invoke(c2);
                 while (enm.hasMoreElements()) {
                     String s = (String)enm.nextElement();
                     if (s == null) {
@@ -989,7 +988,7 @@ public final class JAXBEncoderDecoder {
             while (reader.getName().equals(elName)) {
                 Object obj = u.unmarshal(reader, clazz);
                 if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement<?>)obj).getValue();
+                    obj = ((JAXBElement)obj).getValue();
                 }
                 ret.add(obj);
                 while (reader.getEventType() != XMLStreamConstants.START_ELEMENT 

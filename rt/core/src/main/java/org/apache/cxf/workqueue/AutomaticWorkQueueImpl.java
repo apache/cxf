@@ -498,10 +498,6 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         int lwm = executor == null ? lowWaterMark : executor.getCorePoolSize();
         return lwm == Integer.MAX_VALUE ? -1 : lwm;
     }
-    
-    public int getInitialSize() {
-        return this.initialThreads;
-    }
 
     public void setHighWaterMark(int hwm) {
         highWaterMark = hwm < 0 ? Integer.MAX_VALUE : hwm;
@@ -560,29 +556,29 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
         return executor.getActiveCount();
     }
-    public void update(Dictionary<String, String> config) {
-        String s = config.get("highWaterMark");
+    public void update(Dictionary config) {
+        String s = (String)config.get("highWaterMark");
         if (s != null) {
             this.highWaterMark = Integer.parseInt(s);
         }
-        s = config.get("lowWaterMark");
+        s = (String)config.get("lowWaterMark");
         if (s != null) {
             this.lowWaterMark = Integer.parseInt(s);
         }
-        s = config.get("initialSize");
+        s = (String)config.get("initialSize");
         if (s != null) {
             this.initialThreads = Integer.parseInt(s);
         }
-        s = config.get("dequeueTimeout");
+        s = (String)config.get("dequeueTimeout");
         if (s != null) {
             this.dequeueTimeout = Long.parseLong(s);
         }
-        s = config.get("queueSize");
+        s = (String)config.get("queueSize");
         if (s != null) {
             this.maxQueueSize = Integer.parseInt(s);
         } 
     }
-    public Dictionary<String, String> getProperties() {
+    public Dictionary getProperties() {
         Dictionary<String, String> properties = new Hashtable<String, String>();
         NumberFormat nf = NumberFormat.getIntegerInstance();
         properties.put("name", nf.format(getName()));

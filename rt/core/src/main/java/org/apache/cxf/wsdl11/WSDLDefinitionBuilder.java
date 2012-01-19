@@ -100,10 +100,10 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
 
     public static Collection<Import> getImports(final Definition wsdlDef) {
         Collection<Import> importList = new ArrayList<Import>();
-        Map<?, ?> imports = wsdlDef.getImports();
-        for (Iterator<?> iter = imports.keySet().iterator(); iter.hasNext();) {
+        Map imports = wsdlDef.getImports();
+        for (Iterator iter = imports.keySet().iterator(); iter.hasNext();) {
             String uri = (String)iter.next();
-            List<Import> lst = CastUtils.cast((List<?>)imports.get(uri));
+            List<Import> lst = CastUtils.cast((List)imports.get(uri));
             importList.addAll(lst);
         }
         return importList;
@@ -136,7 +136,7 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
             throw new RuntimeException(ex);
         }
 
-        for (Iterator<?> it = initialExtensions.keySet().iterator(); it.hasNext();) {
+        for (Iterator it = initialExtensions.keySet().iterator(); it.hasNext();) {
             String key = (String) it.next();
             String pluginClz = initialExtensions.getProperty(key);
             try {

@@ -153,7 +153,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     }
 
 
-    protected boolean isHolder(Class<?> javaType) {
+    protected boolean isHolder(Class javaType) {
         return "javax.xml.ws.Holder".equals(javaType.getName());
     }
 
@@ -169,7 +169,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     }
 
 
-    protected boolean isArray(Class<?> javaType) {
+    protected boolean isArray(Class javaType) {
         return javaType.isArray() && !javaType.equals(byte[].class);
     }
 
@@ -229,7 +229,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return type;
     }
 
-    protected QName createQName(Class<?> javaType) {
+    protected QName createQName(Class javaType) {
         String clsName = javaType.getName();
 
         String ns = NamespaceHelper.makeNamespaceFromClassName(clsName, "http");
@@ -238,7 +238,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return new QName(ns, localName);
     }
 
-    protected boolean isCollection(Class<?> javaType) {
+    protected boolean isCollection(Class javaType) {
         return Collection.class.isAssignableFrom(javaType);
     }
 
@@ -313,13 +313,13 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return new QName(tm.getMappingIdentifierURI(), name);
     }
 
-    protected boolean isMap(Class<?> javaType) {
+    protected boolean isMap(Class javaType) {
         return Map.class.isAssignableFrom(javaType);
     }
 
     public abstract TypeClassInfo createClassInfo(PropertyDescriptor pd);
 
-    protected boolean isEnum(Class<?> javaType) {
+    protected boolean isEnum(Class javaType) {
         return false;
     }
 
@@ -422,7 +422,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         
     }
 
-    public AegisType createType(Class<?> clazz) {
+    public AegisType createType(Class clazz) {
         TypeClassInfo info = createBasicClassInfo(clazz);
         info.setDescription(clazz.toString());
         return createTypeForClass(info);

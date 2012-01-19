@@ -21,6 +21,8 @@ package org.apache.cxf.systest.coloc;
 
 import javax.xml.namespace.QName;
 
+import static junit.framework.Assert.assertEquals;
+
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;

@@ -31,11 +31,11 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.frontend.FaultInfoException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.FaultInfoException;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.FaultInfo;
@@ -124,7 +124,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private boolean isDOMSupported(DataBinding db) {
         boolean supportsDOM = false;
-        for (Class<?> c : db.getSupportedWriterFormats()) {
+        for (Class c : db.getSupportedWriterFormats()) {
             if (c.equals(Node.class)) {
                 supportsDOM = true;
             }
@@ -133,7 +133,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     protected Object getFaultBean(Throwable cause, FaultInfo faultPart, Message message) {
-        if (cause instanceof FaultInfoException) {
+        if (FaultInfoException.class.isAssignableFrom(cause.getClass())) {
             try {
                 Method method = cause.getClass().getMethod("getFaultInfo", new Class[0]);
                 return method.invoke(cause, new Object[0]);
@@ -155,11 +155,11 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @param class1
      * @return
      */
-    public FaultInfo getFaultForClass(BindingOperationInfo op, Class<?> class1) {
+    public FaultInfo getFaultForClass(BindingOperationInfo op, Class class1) {
         for (BindingFaultInfo bfi : op.getFaults()) {
 
             FaultInfo faultInfo = bfi.getFaultInfo();
-            Class<?> c = (Class<?>)faultInfo.getProperty(Class.class.getName());
+            Class<?> c = (Class)faultInfo.getProperty(Class.class.getName());
             if (c.isAssignableFrom(class1)) {
                 return faultInfo;
             }

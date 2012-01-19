@@ -62,7 +62,7 @@ public class CXFBusImplTest extends Assert {
         
         control = EasyMock.createNiceControl();
         
-        Map<Class<?>, Object> extensions = new HashMap<Class<?>, Object>();
+        Map<Class, Object> extensions = new HashMap<Class, Object>();
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         wsdlManager = control.createMock(WSDLManager.class);
         instrumentationManager = control.createMock(InstrumentationManager.class);

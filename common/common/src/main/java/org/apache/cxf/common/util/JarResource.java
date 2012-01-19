@@ -49,8 +49,8 @@ public final class JarResource {
         List<String> jarContents = new ArrayList<String>();
         try {
             ZipFile zf = new ZipFile(jarFile);
-            for (Enumeration<? extends ZipEntry> e = zf.entries(); e.hasMoreElements();) {
-                ZipEntry ze = e.nextElement();
+            for (Enumeration e = zf.entries(); e.hasMoreElements();) {
+                ZipEntry ze = (ZipEntry) e.nextElement();
                 if (ze.isDirectory()) {
                     continue;
                 }

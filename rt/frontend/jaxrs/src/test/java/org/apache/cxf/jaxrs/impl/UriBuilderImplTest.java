@@ -514,7 +514,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddPathClassNull() throws Exception {
-        new UriBuilderImpl().path((Class<?>)null).build();
+        new UriBuilderImpl().path((Class)null).build();
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -60,7 +60,7 @@ public final class WSAContextUtils {
      */   
     public static boolean retrieveUsingAddressing(Message message) {
         Boolean override = (Boolean)message.get(USING_PROPERTY);
-        return override == null || override.booleanValue();
+        return override == null || (override != null && override.booleanValue());
     }
 
     /**

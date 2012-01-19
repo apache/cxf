@@ -72,7 +72,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             if (cls == null) {
                 try {
                     Method m = ReflectionUtil.findMethod(container.getClass(), "loadClass", String.class);
-                    cls = (Class<?>)ReflectionUtil.setAccessible(m).invoke(container, bm.getClassName());
+                    cls = (Class)ReflectionUtil.setAccessible(m).invoke(container, bm.getClassName());
                 } catch (Exception e) {
                     //ignore
                 }
@@ -183,14 +183,6 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             return false;
         }
         return orig.hasConfiguredPropertyValue(beanName, propertyName, value);
-    }
-
-    public boolean hasBeanOfName(String name) {
-        ComponentMetadata cmd = getComponentMetadata(name);
-        if (cmd instanceof BeanMetadata) {
-            return true;
-        }        
-        return orig.hasBeanOfName(name);
     }
 
 }

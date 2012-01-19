@@ -74,7 +74,7 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
                 if (!(ex instanceof Fault)) {
                     ex = new Fault(ex);
                 }
-                FaultMode mode = message.get(FaultMode.class);
+                FaultMode mode = (FaultMode)message.get(FaultMode.class);
                 
                 faultMessage = exchange.getOutMessage();
                 if (null == faultMessage) {

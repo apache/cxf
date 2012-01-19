@@ -36,8 +36,6 @@ import org.apache.cxf.phase.Phase;
  * This policy interceptor provider can be used to implicitly handle unknown policy assertions.
  */
 public class IgnorablePolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    private static final long serialVersionUID = 8411915832046532494L;
-
     private static final Logger LOG = LogUtils.getL7dLogger(IgnorablePolicyInterceptorProvider.class); 
 
     private IgnorableAssertionsInterceptor interceptor = new IgnorableAssertionsInterceptor();

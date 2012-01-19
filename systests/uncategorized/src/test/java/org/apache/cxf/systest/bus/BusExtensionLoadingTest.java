@@ -51,7 +51,7 @@ public class BusExtensionLoadingTest extends Assert {
         try {
             Thread.currentThread().setContextClassLoader(new TestClassLoader());
             BusFactory factory = new CXFBusFactory() {
-                public Bus createBus(Map<Class<?>, Object> e, Map<String, Object> properties) {
+                public Bus createBus(Map<Class, Object> e, Map<String, Object> properties) {
                     return new ExtensionManagerBus(e, properties, this.getClass().getClassLoader());
                 }
             };

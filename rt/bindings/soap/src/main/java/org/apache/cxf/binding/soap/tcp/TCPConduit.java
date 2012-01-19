@@ -38,8 +38,8 @@ import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
-import org.apache.cxf.transport.Assertor;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.policy.Assertor;
 
 public class TCPConduit
     extends AbstractConduit

@@ -37,7 +37,7 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
     public JaxWsClientFactoryBean() {
         super(new JaxWsServiceFactoryBean());
     }
-    public void setServiceClass(Class<?> serviceClass) {
+    public void setServiceClass(Class serviceClass) {
         super.setServiceClass(serviceClass);
         if (((JaxWsServiceFactoryBean)getServiceFactory()).getJaxWsImplementorInfo() == null) {
             JaxWsImplementorInfo implInfo = new JaxWsImplementorInfo(serviceClass);

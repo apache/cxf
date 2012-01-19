@@ -41,7 +41,6 @@ import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 
 public class ServiceListGeneratorServlet extends HttpServlet {
-    private static final long serialVersionUID = -113918058557537996L;
     private DestinationRegistry destinationRegistry;
     private Bus bus;
     private String serviceListStyleSheet;

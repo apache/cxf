@@ -74,7 +74,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
         GetBook getBook = new GetBook();
         getBook.setId(123);
         Book book = bs.getBook(getBook);
-        assertEquals(book.getId(), 123);
+        assertEquals(book.getId(), (long)123);
         assertEquals(book.getName(), "CXF in Action");
     }
     
@@ -93,7 +93,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
         GetAnotherBook getAnotherBook = new GetAnotherBook();
         getAnotherBook.setId(123);
         Book book = bs.getAnotherBook(getAnotherBook);
-        assertEquals(book.getId(), 123);
+        assertEquals(book.getId(), (long)123);
         assertEquals(book.getName(), "CXF in Action");
     }
     
@@ -108,7 +108,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
         sf.setAddress("http://localhost:" + PORT + "/xmlwrapped/");
         BookServiceWrapped bs = (BookServiceWrapped)sf.create();
         Book book = bs.getBook(123);
-        assertEquals(book.getId(), 123);
+        assertEquals(book.getId(), (long)123);
         assertEquals(book.getName(), "CXF in Action");
     }
     

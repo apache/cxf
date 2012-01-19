@@ -171,7 +171,7 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
             } else {
                 String enumLabel = null;
                 for (Iterator<Enumerator> enumIter = enumerators.iterator(); enumIter.hasNext();) {
-                    enumLabel = enumIter.next().getValue();
+                    enumLabel = ((Enumerator)enumIter.next()).getValue();
                     if (!labels.contains(enumLabel)) {
                         label = enumLabel;
                         break;

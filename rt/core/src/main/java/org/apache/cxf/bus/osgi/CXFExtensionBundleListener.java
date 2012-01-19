@@ -19,6 +19,7 @@
 package org.apache.cxf.bus.osgi;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
@@ -28,8 +29,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import org.apache.cxf.bus.extension.Extension;
+import org.apache.cxf.bus.extension.ExtensionFragmentParser;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
-import org.apache.cxf.bus.extension.TextExtensionFragmentParser;
 import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -69,8 +70,15 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
     protected void register(final Bundle bundle) {
         Enumeration<?> e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
         while (e != null && e.hasMoreElements()) {
-            List<Extension> orig = new TextExtensionFragmentParser().getExtensions((URL)e.nextElement());
-            addExtensions(bundle, orig);
+            final URL u = (URL)e.nextElement();
+            try {
+                InputStream ins = u.openStream();
+                List<Extension> orig = new ExtensionFragmentParser().getExtensionsFromText(ins);
+                ins.close();
+                addExtensions(bundle, orig);
+            } catch (IOException ex) {
+                LOG.severe("Error installing extension " + u + " " + ex.getMessage());
+            }
         }
     }
 

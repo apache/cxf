@@ -24,15 +24,13 @@ import java.lang.reflect.Method;
 import javax.xml.ws.Provider;
 
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-@SuppressWarnings("deprecation")
-public class JAXWSProviderMethodDispatcher 
-    implements org.apache.cxf.service.invoker.MethodDispatcher,
-    org.apache.cxf.frontend.MethodDispatcher {
+public class JAXWSProviderMethodDispatcher implements MethodDispatcher {
 
     Method invoke;
     

@@ -38,7 +38,7 @@ public class XmlSeeAlsoAnnotatorTest extends Assert {
         collector.getTypesPackages().add(ObjectFactory.class.getPackage().getName());
         intf.annotate(new XmlSeeAlsoAnnotator(collector));
 
-        Iterator<String> iter = intf.getImports();
+        Iterator iter = intf.getImports();
         assertEquals("javax.xml.bind.annotation.XmlSeeAlso", iter.next());
      
         assertEquals("@XmlSeeAlso({" + ObjectFactory.class.getName() + ".class})", 

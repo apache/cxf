@@ -92,7 +92,7 @@ public class Java2WSMojo extends AbstractMojo {
      * @parameter  expression="${project.compileClasspathElements}"
      * @required
      */
-    private List<?> classpathElements;
+    private List classpathElements;
 
     /**
      * @parameter expression="${project}"

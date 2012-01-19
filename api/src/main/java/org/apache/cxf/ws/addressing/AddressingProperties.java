@@ -19,10 +19,6 @@
 
 package org.apache.cxf.ws.addressing;
 
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 
 /**
  * Abstraction of Message Addressing Properties. 
@@ -124,21 +120,4 @@ public interface AddressingProperties extends AddressingType {
      * @param iri new value for Action property
      */
     void setAction(AttributedURIType iri);
-    
-    /**
-     * Used to specify a different WS-Addressing namespace URI, 
-     * so as to cause MAPs to be exposed (i.e. encoded in externalized
-     * message with a different WS-Addressing version).
-     * 
-     * @return WS-Addressing namespace URI
-     */
-    void exposeAs(String uri);
-    
-    
-    AddressingProperties createCompatibleResponseProperties();
-    
-    QName getDuplicate();
-    void setDuplicate(QName qn);
-    List<QName> getMustUnderstand();
-
 }

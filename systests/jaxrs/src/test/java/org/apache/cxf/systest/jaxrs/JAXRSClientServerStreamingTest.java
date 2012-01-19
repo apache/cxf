@@ -56,11 +56,11 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
                                    new SingletonResourceProvider(new BookStore()));
-            JAXBElementProvider<?> p1 = new JAXBElementProvider<Object>();
+            JAXBElementProvider p1 = new JAXBElementProvider();
             p1.setEnableBuffering(true);
             p1.setEnableStreaming(true);
             
-            JAXBElementProvider<?> p2 = new CustomJaxbProvider();
+            JAXBElementProvider p2 = new CustomJaxbProvider();
             p2.setProduceMediaTypes(Collections.singletonList("text/xml"));
             
             List<Object> providers = new ArrayList<Object>();
@@ -130,7 +130,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     }
     
     @Ignore
-    public static class CustomJaxbProvider extends JAXBElementProvider<Object> {
+    public static class CustomJaxbProvider extends JAXBElementProvider {
         @Override
         protected XMLStreamWriter getStreamWriter(Object obj, OutputStream os, MediaType mt) {
             if (mt.equals(MediaType.TEXT_XML_TYPE)) {

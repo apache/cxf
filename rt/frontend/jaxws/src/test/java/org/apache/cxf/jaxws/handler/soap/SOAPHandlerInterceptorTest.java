@@ -174,10 +174,10 @@ public class SOAPHandlerInterceptorTest extends Assert {
         SOAPMessage resultedMessage = message.getContent(SOAPMessage.class);
         assertNotNull(resultedMessage);
         SOAPBody bodyNew = resultedMessage.getSOAPBody();
-        Iterator<?> itNew = bodyNew.getChildElements(new QName("http://apache.org/hello_world_rpclit",
+        Iterator itNew = bodyNew.getChildElements(new QName("http://apache.org/hello_world_rpclit",
                                                             "sendReceiveDataResponse"));
         SOAPBodyElement bodyElementNew = (SOAPBodyElement)itNew.next();
-        Iterator<?> outIt = bodyElementNew
+        Iterator outIt = bodyElementNew
             .getChildElements(new QName("http://apache.org/hello_world_rpclit/types", "out"));
         Element outElement = (SOAPElement)outIt.next();
         assertNotNull(outElement);        
@@ -299,7 +299,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
                         SOAPMessage message = smc.getMessage();
                          
                         SOAPHeader soapHeader = message.getSOAPHeader();
-                        Iterator<?> it = soapHeader.getChildElements(new QName(
+                        Iterator it = soapHeader.getChildElements(new QName(
                             "http://apache.org/hello_world_rpclit/types", "header1"));
                         SOAPHeaderElement headerElementNew = (SOAPHeaderElement)it.next();
 
@@ -379,9 +379,8 @@ public class SOAPHandlerInterceptorTest extends Assert {
         SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);
 
         SOAPHeader soapHeader = soapMessageNew.getSOAPHeader();
-        Iterator<?> itNew = soapHeader
-            .getChildElements(new QName("http://apache.org/hello_world_rpclit/types",
-                "header1"));
+        Iterator itNew = soapHeader.getChildElements(new QName("http://apache.org/hello_world_rpclit/types",
+            "header1"));
         SOAPHeaderElement headerElementNew = (SOAPHeaderElement)itNew.next();
         SoapVersion soapVersion = Soap11.getInstance();
         assertEquals("false", headerElementNew.getAttributeNS(soapVersion.getNamespace(), "mustUnderstand"));
@@ -437,7 +436,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
         // Verify SOAPMessage
         SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);
         SOAPBody bodyNew = soapMessageNew.getSOAPBody();
-        Iterator<?> itNew = bodyNew.getChildElements();
+        Iterator itNew = bodyNew.getChildElements();
         SOAPBodyElement bodyElementNew = (SOAPBodyElement)itNew.next();
         assertEquals("sendReceiveData", bodyElementNew.getLocalName());
 

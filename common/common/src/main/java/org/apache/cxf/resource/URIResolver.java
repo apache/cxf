@@ -62,7 +62,7 @@ public class URIResolver {
     private URI uri;
     private URL url;
     private InputStream is;
-    private Class<?> calling;
+    private Class calling;
 
     public URIResolver() {
     }
@@ -75,7 +75,7 @@ public class URIResolver {
         this(baseUriStr, uriStr, null);
     }
     
-    public URIResolver(String baseUriStr, String uriStr, Class<?> calling) throws IOException {
+    public URIResolver(String baseUriStr, String uriStr, Class calling) throws IOException {
         this.calling = (calling != null) ? calling : getClass();
         if (uriStr.startsWith("classpath:")) {
             tryClasspath(uriStr);
@@ -99,7 +99,7 @@ public class URIResolver {
         this.is = null;
     }
     
-    public void resolve(String baseUriStr, String uriStr, Class<?> callingCls) throws IOException {
+    public void resolve(String baseUriStr, String uriStr, Class callingCls) throws IOException {
         this.calling = (callingCls != null) ? callingCls : getClass();
         this.file = null;
         this.uri = null;

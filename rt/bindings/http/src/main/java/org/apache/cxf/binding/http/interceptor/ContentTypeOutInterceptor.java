@@ -40,7 +40,7 @@ public class ContentTypeOutInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
     public void handleMessage(Message message) throws Fault {
-        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        Map<String, List<String>> headers = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null) {
             headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
             message.put(Message.PROTOCOL_HEADERS, headers);

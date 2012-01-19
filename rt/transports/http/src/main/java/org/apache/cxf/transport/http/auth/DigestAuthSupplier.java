@@ -46,7 +46,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
         try {
             md = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            //ignore - set to null
+            md = null;
         }
         md5Helper = md;
     }

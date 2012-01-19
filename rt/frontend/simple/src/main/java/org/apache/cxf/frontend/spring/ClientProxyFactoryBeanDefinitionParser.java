@@ -49,10 +49,10 @@ public class ClientProxyFactoryBeanDefinitionParser
         setBeanClass(SpringClientProxyFactoryBean.class);
     }
     @Override
-    protected Class<?> getFactoryClass() {
+    protected Class getFactoryClass() {
         return SpringClientProxyFactoryBean.class;
     }
-    protected Class<?> getRawFactoryClass() {
+    protected Class getRawFactoryClass() {
         return ClientProxyFactoryBean.class;
     }
 
@@ -79,14 +79,14 @@ public class ClientProxyFactoryBeanDefinitionParser
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
         if ("properties".equals(name)) {
-            Map<?, ?> map = ctx.getDelegate().parseMapElement(e, bean.getBeanDefinition());
+            Map map = ctx.getDelegate().parseMapElement(e, bean.getBeanDefinition());
             bean.addPropertyValue("properties", map);
         } else if ("binding".equals(name)) {
             setFirstChildAsProperty(e, ctx, bean, "bindingConfig");
         } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
             || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
             || "features".equals(name) || "handlers".equals(name)) {
-            List<?> list = ctx.getDelegate().parseListElement(e, bean.getBeanDefinition());
+            List list = ctx.getDelegate().parseListElement(e, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else {
             setFirstChildAsProperty(e, ctx, bean, name);
@@ -95,7 +95,7 @@ public class ClientProxyFactoryBeanDefinitionParser
     
     @NoJSR250Annotations
     public static class SpringClientProxyFactoryBean extends ClientProxyFactoryBean
-        implements ApplicationContextAware, FactoryBean<Object>, DisposableBean {
+        implements ApplicationContextAware, FactoryBean, DisposableBean {
 
         private Object obj;
         
@@ -121,7 +121,7 @@ public class ClientProxyFactoryBeanDefinitionParser
             }
             return obj;
         }
-        public Class<?> getObjectType() {
+        public Class getObjectType() {
             return this.getServiceClass();
         }
         public boolean isSingleton() {

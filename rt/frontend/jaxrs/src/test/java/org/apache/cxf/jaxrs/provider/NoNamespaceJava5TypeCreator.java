@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
 public class NoNamespaceJava5TypeCreator extends Java5TypeCreator {
 
     @Override
-    public QName createQName(Class<?> typeClass) {
+    public QName createQName(Class typeClass) {
         QName defName = super.createQName(typeClass);
         return new QName(defName.getLocalPart());
     }

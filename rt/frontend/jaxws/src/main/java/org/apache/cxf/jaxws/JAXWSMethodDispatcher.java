@@ -31,15 +31,13 @@ import javax.xml.ws.Response;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.service.factory.ServiceConstructionException;
-import org.apache.cxf.service.factory.SimpleMethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-@SuppressWarnings("deprecation")
-public class JAXWSMethodDispatcher extends SimpleMethodDispatcher
-    implements org.apache.cxf.frontend.MethodDispatcher {
+public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXWSMethodDispatcher.class);
 
@@ -88,7 +86,7 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher
         if (!endpointClass.isAssignableFrom(method.getDeclaringClass())) {
             try {
                 Method m2 = endpointClass.getMethod(method.getName(), 
-                                                 method.getParameterTypes());
+                                                 (Class[])method.getParameterTypes());
                 if (Modifier.isVolatile(m2.getModifiers())) {
                     //bridge method, need to map the generics
                     Class<?> params[] = method.getParameterTypes();

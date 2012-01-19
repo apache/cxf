@@ -131,7 +131,6 @@ public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectio
 }
 
 class DummyResourceAdapterImpl extends ResourceAdapterImpl {
-    private static final long serialVersionUID = 2416067861013682575L;
     int registeredCount;
 
     DummyResourceAdapterImpl() {
@@ -144,7 +143,5 @@ class DummyResourceAdapterImpl extends ResourceAdapterImpl {
 }
 
 class TestableAssociatedManagedConnectionFactoryImpl extends AssociatedManagedConnectionFactoryImpl {
-
-    private static final long serialVersionUID = -1077391534536084071L;
    
 }

@@ -33,7 +33,6 @@ import org.mozilla.javascript.ScriptableObject;
  */
 public class JsNamedNodeMap extends ScriptableObject {
     
-    private static final long serialVersionUID = -3714155882606691342L;
     private NamedNodeMap wrappedMap;
     
     public JsNamedNodeMap() {

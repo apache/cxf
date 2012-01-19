@@ -118,14 +118,14 @@ public class AnnotationInterceptors {
         }
     }
     
+    @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> getAnnotationInterceptorList(Class<? extends Annotation> t) {
-        @SuppressWarnings("rawtypes")
         List<Interceptor> i = getAnnotationObject(t, Interceptor.class);
         if (i == null) {
             return null;
         }
         List<Interceptor<? extends Message>> m = new ArrayList<Interceptor<? extends Message>>();
-        for (Interceptor<?> i2 : i) {
+        for (Interceptor i2 : i) {
             m.add(i2);
         }
         return m;

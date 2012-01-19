@@ -26,7 +26,7 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 public class AddressingBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return WSAddressingFeature.class;
     }
 }

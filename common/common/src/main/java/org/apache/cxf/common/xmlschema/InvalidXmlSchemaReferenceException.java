@@ -24,8 +24,6 @@ package org.apache.cxf.common.xmlschema;
  */
 public class InvalidXmlSchemaReferenceException extends RuntimeException {
 
-    private static final long serialVersionUID = -2053958361555768873L;
-
     /**
      * 
      */

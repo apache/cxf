@@ -168,12 +168,12 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             try {
                 Class<?> exClass = faultWanted.getProperty(Class.class.getName(), Class.class);
                 if (e == null) { 
-                    Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
+                    Constructor constructor = exClass.getConstructor(new Class[]{String.class});
                     e = constructor.newInstance(new Object[]{fault.getMessage()});
                 } else {
                 
                     try {
-                        Constructor<?> constructor = getConstructor(exClass, e);
+                        Constructor constructor = getConstructor(exClass, e);
                         e = constructor.newInstance(new Object[]{fault.getMessage(), e});
                     } catch (NoSuchMethodException e1) {
                         //Use reflection to convert fault bean to exception
@@ -184,7 +184,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             } catch (Exception e1) {
                 LogUtils.log(LOG, Level.INFO, "EXCEPTION_WHILE_CREATING_EXCEPTION", e1, e1.getMessage());
             }
-        } else {
+        } else if (e != null) {
             if (fault.getMessage() != null) {
                 Field f;
                 try {
@@ -199,10 +199,10 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
         }
     }
     
-    private Constructor<?> getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
+    private Constructor getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
         Class<?> beanClass = e.getClass();
-        Constructor<?> cons[] = faultClass.getConstructors();
-        for (Constructor<?> c : cons) {
+        Constructor cons[] = faultClass.getConstructors();
+        for (Constructor c : cons) {
             if (c.getParameterTypes().length == 2
                 && String.class.equals(c.getParameterTypes()[0])
                 && c.getParameterTypes()[1].isInstance(e)) {
@@ -224,7 +224,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
 
     private boolean isDOMSupported(DataBinding db) {
         boolean supportsDOM = false;
-        for (Class<?> c : db.getSupportedReaderFormats()) {
+        for (Class c : db.getSupportedReaderFormats()) {
             if (c.equals(Node.class)) {
                 supportsDOM = true;
             }
@@ -268,10 +268,10 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
         }
         try {
             Field field = cls.getField("TYPE");
-            Object obj = cls;
+            Object obj = (Object)cls;
             Object type = field.get(obj);
             if (type instanceof Class) {
-                return (Class<?>)type;
+                return (Class)type;
             }
         } catch (Exception e) {
             // do nothing
@@ -280,7 +280,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
     }
     
     private Exception convertFaultBean(Class<?> exClass, Object faultBean, Fault fault) throws Exception {
-        Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
+        Constructor constructor = exClass.getConstructor(new Class[]{String.class});
         Exception e = (Exception)constructor.newInstance(new Object[]{fault.getMessage()});
 
         //Copy fault bean fields to exception

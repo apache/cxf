@@ -50,7 +50,7 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        Class<?> greeterServer = classLoader
+        Class greeterServer = classLoader
             .loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPort_Server");
         assertNotNull("Server should be generated", greeterServer);
 
@@ -65,7 +65,7 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        Class<?> greeterServer = classLoader
+        Class greeterServer = classLoader
             .loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPort_Server");
         assertNotNull("Server should be generated", greeterServer);
     }
@@ -85,11 +85,11 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
 
         doWSDLListOptionTest(null, Arrays.asList(wsdl1, wsdl2));
 
-        Class<?> greeterServer = classLoader
+        Class greeterServer = classLoader
             .loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPort_Server");
         assertNotNull("Server should be generated", greeterServer);
 
-        Class<?> carDealerServer = classLoader
+        Class carDealerServer = classLoader
             .loadClass("type_substitution.server.CarDealer_CarDealerPort_Server");
         assertNotNull("Server should be generated", carDealerServer);
 
@@ -109,7 +109,7 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
 
         doWSDLListOptionTest(null, Arrays.asList(wsdl1));
 
-        Class<?> greeterServer = classLoader
+        Class greeterServer = classLoader
             .loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPort_Server");
         assertNotNull("Server should be generated", greeterServer);
     }
@@ -206,7 +206,7 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         File apache = new File(org, "apache");
         assertTrue(apache.exists());
 
-        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterAsync");
+        Class clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterAsync");
         assertEquals(3, clz.getMethods().length);
 
     }

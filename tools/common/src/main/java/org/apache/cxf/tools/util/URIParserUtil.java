@@ -276,7 +276,9 @@ public final class URIParserUtil {
                 return escapeChars(uri.replace("\\", "/"));
             }
         } catch (URISyntaxException e) {
-            result = escapeChars(url.toString().replace("\\", "/"));
+            if (url != null) {
+                result = escapeChars(url.toString().replace("\\", "/"));
+            }
         }
         return result;
     }

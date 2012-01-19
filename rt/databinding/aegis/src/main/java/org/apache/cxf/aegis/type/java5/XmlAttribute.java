@@ -28,7 +28,7 @@ import org.apache.cxf.aegis.type.AegisType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface XmlAttribute {
-    Class<?> type() default AegisType.class;
+    Class type() default AegisType.class;
 
     String name() default "";
 

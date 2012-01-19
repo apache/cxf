@@ -130,7 +130,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         return classResourceInfos;
     }
     
-    public void setResourceClass(Class<?> cls) {
+    public void setResourceClass(Class cls) {
         if (getCreatedFromModel(cls) == null) {
             classResourceInfos.clear();
             boolean isRoot = AnnotationUtils.getClassAnnotation(cls, Path.class) != null;
@@ -138,8 +138,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
     
-    public void setResourceClasses(List<Class<?>> classes) {
-        for (Class<?> resourceClass : classes) {
+    public void setResourceClasses(List<Class> classes) {
+        for (Class resourceClass : classes) {
             
             ClassResourceInfo cri = getCreatedFromModel(resourceClass);
             if (cri != null) {
@@ -186,7 +186,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         return map;
     }
     
-    protected ClassResourceInfo createResourceInfo(Class<?> cls, boolean isRoot) {
+    protected ClassResourceInfo createResourceInfo(Class cls, boolean isRoot) {
         ClassResourceInfo classResourceInfo = 
             ResourceUtils.createClassResourceInfo(cls, cls, isRoot, enableStatic);
         if (classResourceInfo != null) {
@@ -195,7 +195,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         return classResourceInfo;
     }
 
-    public void setResourceClasses(Class<?>... classes) {
+    public void setResourceClasses(Class... classes) {
         setResourceClasses(Arrays.asList(classes));
     }
     

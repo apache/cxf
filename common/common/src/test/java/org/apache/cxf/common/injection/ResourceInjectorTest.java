@@ -240,7 +240,7 @@ class ProxyClass implements InvocationHandler {
     public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
         Object result = null;
         try {
-            Class<?>[] types = new Class[0];
+            Class[] types = new Class[0];
             if (args != null) {
                 types = new Class[args.length];
                 for (int i = 0; i < args.length; i++) {

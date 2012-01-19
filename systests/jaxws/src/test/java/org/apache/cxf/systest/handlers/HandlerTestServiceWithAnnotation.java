@@ -73,7 +73,7 @@ public class HandlerTestServiceWithAnnotation extends Service {
      */
     @WebEndpoint(name = "SoapPort")
     public HandlerTest getSoapPort() {
-        return super.getPort(SOAPPORT, HandlerTest.class);
+        return (HandlerTest)super.getPort(SOAPPORT, HandlerTest.class);
     }
 
     /**
@@ -85,7 +85,7 @@ public class HandlerTestServiceWithAnnotation extends Service {
      */
     @WebEndpoint(name = "SoapPort")
     public HandlerTest getSoapPort(WebServiceFeature... features) {
-        return super.getPort(SOAPPORT, HandlerTest.class, features);
+        return (HandlerTest)super.getPort(SOAPPORT, HandlerTest.class, features);
     }
 
     /**
@@ -93,7 +93,7 @@ public class HandlerTestServiceWithAnnotation extends Service {
      */
     @WebEndpoint(name = "SoapPort1")
     public HandlerTest1 getSoapPort1() {
-        return super.getPort(SOAPPORT1, HandlerTest1.class);
+        return (HandlerTest1)super.getPort(SOAPPORT1, HandlerTest1.class);
     }
 
     /**
@@ -105,7 +105,7 @@ public class HandlerTestServiceWithAnnotation extends Service {
      */
     @WebEndpoint(name = "SoapPort1")
     public HandlerTest1 getSoapPort1(WebServiceFeature... features) {
-        return super.getPort(SOAPPORT1, HandlerTest1.class, features);
+        return (HandlerTest1)super.getPort(SOAPPORT1, HandlerTest1.class, features);
     }
 
 }

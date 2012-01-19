@@ -25,6 +25,8 @@ import java.util.Vector;
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
+
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.RpcLitCodeFirstService",
             serviceName = "RpcLitCodeFirstService",
             portName = "RpcLitCodeFirstServicePort",

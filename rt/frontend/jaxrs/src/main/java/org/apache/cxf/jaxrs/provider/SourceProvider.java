@@ -54,8 +54,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
-public class SourceProvider<T> extends AbstractConfigurableProvider implements 
-    MessageBodyReader<T>, MessageBodyWriter<T> {
+public class SourceProvider extends AbstractConfigurableProvider implements 
+    MessageBodyReader<Object>, MessageBodyWriter<Object> {
 
     private static final String PREFERRED_FORMAT = "source-preferred-format";
     @Context
@@ -73,7 +73,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
                || Document.class.isAssignableFrom(type);
     }
     
-    public T readFrom(Class<T> source, Type genericType, Annotation[] annotations, MediaType m,  
+    public Object readFrom(Class<Object> source, Type genericType, Annotation[] annotations, MediaType m,  
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         
@@ -91,7 +91,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             XMLStreamReader reader = getReader(is);
             try {
                 Document doc = StaxUtils.read(reader);
-                return source.cast(docRequired ? doc : new DOMSource(doc));
+                return docRequired ? doc : new DOMSource(doc);
             } catch (Exception e) {
                 IOException ioex = new IOException("Problem creating a Source object");
                 ioex.setStackTrace(e.getStackTrace());
@@ -105,12 +105,12 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             }
         } else if (SAXSource.class.isAssignableFrom(theSource)
                   || StaxSource.class.isAssignableFrom(theSource)) {
-            return source.cast(new StaxSource(getReader(is)));
+            return new StaxSource(getReader(is));
         } else if (StreamSource.class.isAssignableFrom(theSource)
                    || Source.class.isAssignableFrom(theSource)) {
-            return source.cast(new StreamSource(getRealStream(is)));
+            return new StreamSource(getRealStream(is));
         } else if (XMLSource.class.isAssignableFrom(theSource)) {
-            return source.cast(new XMLSource(getRealStream(is)));
+            return new XMLSource(getRealStream(is));
         }
         
         throw new IOException("Unrecognized source");
@@ -143,13 +143,13 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
     protected XMLStreamReader getReaderFromMessage() {
         MessageContext mc = getContext();
         if (mc != null) {
-            return mc.getContent(XMLStreamReader.class);
+            return (XMLStreamReader)mc.getContent(XMLStreamReader.class);
         } else {
             return null;
         }
     }
     
-    public void writeTo(T source, Class<?> clazz, Type genericType, Annotation[] annotations,  
+    public void writeTo(Object source, Class<?> clazz, Type genericType, Annotation[] annotations,  
         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         
@@ -177,7 +177,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         }
     }
     
-    public long getSize(T source, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(Object source, Class<?> type, Type genericType, Annotation[] annotations, 
                         MediaType mt) {
         return -1;
     }

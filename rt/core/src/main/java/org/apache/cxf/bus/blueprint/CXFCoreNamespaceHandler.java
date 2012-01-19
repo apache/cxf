@@ -84,7 +84,6 @@ public class CXFCoreNamespaceHandler implements NamespaceHandler {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
     public Set<Class> getManagedClasses() {
         //probably should have the various stuff in cxf-api in here?
         return null;

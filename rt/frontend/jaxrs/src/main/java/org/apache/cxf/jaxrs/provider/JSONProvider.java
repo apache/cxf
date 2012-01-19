@@ -75,7 +75,7 @@ import org.codehaus.jettison.util.StringIndenter;
 @Produces("application/json")
 @Consumes("application/json")
 @Provider
-public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
+public class JSONProvider extends AbstractJAXBProvider  {
     
     private static final String MAPPED_CONVENTION = "mapped";
     private static final String BADGER_FISH_CONVENTION = "badgerfish";
@@ -193,7 +193,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         return super.isReadable(type, genericType, anns, mt) || Document.class.isAssignableFrom(type);    
     }
     
-    public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt, 
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         
@@ -202,7 +202,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             if (Document.class.isAssignableFrom(type)) {
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
                 copyReaderToWriter(createReader(type, realStream, false), writer);
-                return type.cast(writer.getDocument());
+                return writer.getDocument();
             }
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
@@ -220,7 +220,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                 response = unmarshaller.unmarshal(xsr);
             }
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
-                response = ((JAXBElement<?>)response).getValue();    
+                response = ((JAXBElement)response).getValue();    
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(theType, type, 
@@ -228,7 +228,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
-            return type.cast(response);
+            return response;
             
         } catch (JAXBException e) {
             handleJAXBException(e, true);
@@ -259,7 +259,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
     }
     
-    protected InputStream getInputStream(Class<T> cls, Type type, InputStream is) throws Exception {
+    protected InputStream getInputStream(Class<Object> cls, Type type, InputStream is) throws Exception {
         if (unwrapped) {
             String rootName = getRootName(cls, type);
             InputStream isBefore = new ByteArrayInputStream(rootName.getBytes());
@@ -285,7 +285,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                  
     }
     
-    protected String getRootName(Class<T> cls, Type type) throws Exception {
+    protected String getRootName(Class<Object> cls, Type type) throws Exception {
         String name = null;
         if (wrapperName != null) {
             name = wrapperName;
@@ -316,7 +316,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             || Document.class.isAssignableFrom(type);
     }
     
-    public void writeTo(T obj, Class<?> cls, Type genericType, Annotation[] anns,  
+    public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         if (os == null) {
@@ -372,10 +372,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         Class<?> actualClass = InjectionUtils.getActualType(genericType);
         actualClass = getActualType(actualClass, genericType, anns);
         
-        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
-                                             : (Collection<?>) collection;
+        Collection c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
+                                             : (Collection) collection;
 
-        Iterator<?> it = c.iterator();
+        Iterator it = c.iterator();
         
         Object firstObj = it.hasNext() ? it.next() : null;
 
@@ -384,7 +384,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (!dropCollectionWrapperElement) {
             QName qname = null;
             if (firstObj instanceof JAXBElement) {
-                JAXBElement<?> el = (JAXBElement<?>)firstObj;
+                JAXBElement el = (JAXBElement)firstObj;
                 qname = el.getName();
                 actualClass = el.getDeclaredType();
             } else {
@@ -429,7 +429,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     protected void marshalCollectionMember(Object obj, Class<?> cls, Type genericType,
                                            String enc, OutputStream os) throws Exception {
         if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement<?>)obj).getValue();    
+            obj = ((JAXBElement)obj).getValue();    
         } else {
             obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
         }

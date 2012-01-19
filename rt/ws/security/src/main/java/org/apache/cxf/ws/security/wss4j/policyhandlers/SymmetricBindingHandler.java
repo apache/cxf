@@ -371,7 +371,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 encrTok = tokenStore.getToken(encrTokId);
                 
                 if (includeToken(encrToken.getInclusion())) {
-                    Element encrTokElem = encrTok.getToken();
+                    Element encrTokElem = (Element)encrTok.getToken();
                     
                     //Add the encrToken element before the sigToken element
                     secHeader.getSecurityHeader().insertBefore(encrTokElem, sigTokElem);

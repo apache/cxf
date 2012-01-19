@@ -73,7 +73,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 info.setType(genericType);
             }
 
-            Class<?> paramTypeClass = annotationReader.getParamType(m, index);
+            Class paramTypeClass = annotationReader.getParamType(m, index);
             info.setAegisTypeClass(castToAegisTypeClass(paramTypeClass));
             String paramName = annotationReader.getParamTypeName(m, index);
             if (paramName != null) {
@@ -159,7 +159,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         }
         
         /* null arises when the index-th parameter to generic is something list List<T> */
-        Class<?> clazz = TypeUtil.getTypeRelatedClass(paramType);
+        Class clazz = TypeUtil.getTypeRelatedClass(paramType);
         if (clazz == null) {
             return createObjectType();
         }
@@ -240,13 +240,13 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public QName createQName(Class<?> typeClass) {
+    public QName createQName(Class typeClass) {
         String name = annotationReader.getName(typeClass);
         String ns = annotationReader.getNamespace(typeClass);
         return createQName(typeClass, null, name, ns);
     }
 
-    private QName createQName(Class<?> typeClass, Type type, String name, String ns) {
+    private QName createQName(Class typeClass, Type type, String name, String ns) {
         if (typeClass.isArray()) {
             typeClass = typeClass.getComponentType();
         }
@@ -254,7 +254,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             && type instanceof ParameterizedType) {
             type = ((ParameterizedType)type).getActualTypeArguments()[0];
             if (type instanceof Class) {
-                typeClass = (Class<?>)type;
+                typeClass = (Class)type;
             }
         }
         
@@ -277,7 +277,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    protected boolean isEnum(Class<?> javaType) {
+    protected boolean isEnum(Class javaType) {
         return javaType.isEnum();
     }
 }

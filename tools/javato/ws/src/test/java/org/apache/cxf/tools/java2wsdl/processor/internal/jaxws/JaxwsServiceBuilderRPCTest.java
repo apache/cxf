@@ -22,7 +22,7 @@ package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 import java.io.File;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;

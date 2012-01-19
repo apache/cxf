@@ -72,7 +72,7 @@ public final class ClassLoaderUtils {
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
-    public static URL getResource(String resourceName, Class<?> callingClass) {
+    public static URL getResource(String resourceName, Class callingClass) {
         URL url = Thread.currentThread().getContextClassLoader().getResource(resourceName);
         if (url == null && resourceName.startsWith("/")) {
             //certain classloaders need it without the leading /
@@ -123,7 +123,7 @@ public final class ClassLoaderUtils {
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
-    public static List<URL> getResources(String resourceName, Class<?> callingClass) {
+    public static List<URL> getResources(String resourceName, Class callingClass) {
         List<URL> ret = new ArrayList<URL>();
         Enumeration<URL> urls = new Enumeration<URL>() {
             public boolean hasMoreElements() {
@@ -207,7 +207,7 @@ public final class ClassLoaderUtils {
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
-    public static InputStream getResourceAsStream(String resourceName, Class<?> callingClass) {
+    public static InputStream getResourceAsStream(String resourceName, Class callingClass) {
         URL url = getResource(resourceName, callingClass);
 
         try {
@@ -244,19 +244,7 @@ public final class ClassLoaderUtils {
         }
         return loadClass2(className, callingClass);
     }
-    public static <T> Class<? extends T> loadClass(String className, Class<?> callingClass, Class<T> type)
-        throws ClassNotFoundException {
-        try {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-            if (cl != null) {
-                return cl.loadClass(className).asSubclass(type);
-            }            
-        } catch (ClassNotFoundException e) {
-            //ignore
-        }
-        return loadClass2(className, callingClass).asSubclass(type);
-    }
     private static Class<?> loadClass2(String className, Class<?> callingClass)
         throws ClassNotFoundException {
         try {

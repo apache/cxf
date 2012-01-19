@@ -70,10 +70,10 @@ public class AntGenerator extends AbstractGenerator {
         setAttributes("clientClassNamesMap", clientClassNamesMap);
         setAttributes("serverClassNamesMap", serverClassNamesMap);
         
-        setAttributes("srcdir", penv.get(ToolConstants.CFG_SOURCEDIR));
-        setAttributes("clsdir", penv.get(ToolConstants.CFG_CLASSDIR));
-        setAttributes("classpath", penv.get(ToolConstants.CFG_CLASSPATH));
-        setAttributes("classpath", penv.get(ToolConstants.CFG_CLASSPATH));
+        setAttributes("srcdir", (String)penv.get(ToolConstants.CFG_SOURCEDIR));
+        setAttributes("clsdir", (String)penv.get(ToolConstants.CFG_CLASSDIR));
+        setAttributes("classpath", (String)penv.get(ToolConstants.CFG_CLASSPATH));
+        setAttributes("classpath", (String)penv.get(ToolConstants.CFG_CLASSPATH));
         
         setCommonAttributes();
         doWrite(BUILD_TEMPLATE, parseOutputName(null, "build", ".xml"));

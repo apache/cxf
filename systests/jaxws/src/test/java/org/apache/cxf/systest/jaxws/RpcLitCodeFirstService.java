@@ -28,6 +28,8 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
+
 
 @WebService(name = "RpcLitCodeFirstService",
             targetNamespace = "http://cxf.apache.org/systest/jaxws/RpcLitCodeFirstService")

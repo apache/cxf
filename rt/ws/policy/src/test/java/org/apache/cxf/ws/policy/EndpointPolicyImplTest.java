@@ -201,7 +201,7 @@ public class EndpointPolicyImplTest extends Assert {
         p2.addAssertion(mockAssertion(aqn2, 5, true));
         control.replay();
         
-        epi.setPolicy(p1.normalize(null, true));
+        epi.setPolicy((Policy)p1.normalize(null, true));
                 
         Policy ep = epi.updatePolicy(p2).getPolicy();
         
@@ -262,7 +262,7 @@ public class EndpointPolicyImplTest extends Assert {
         EndpointPolicyImpl epi = new TestEndpointPolicy();
         control.replay();
         
-        epi.setPolicy(p1.normalize(true));
+        epi.setPolicy((Policy)p1.normalize(true));
                 
         Policy ep = epi.updatePolicy(emptyPolicy).getPolicy();
         

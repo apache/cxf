@@ -70,7 +70,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
             return;
         }
         
-        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
  
             ClassCollector collector = penv.get(ClassCollector.class);
@@ -78,7 +78,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
             Map<String, JavaServiceClass> serviceClasses = javaModel.getServiceClasses();
             
             if (serviceClasses.size() == 0) {
-                ServiceInfo serviceInfo = env.get(ServiceInfo.class);
+                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SERVICE", LOG, wsdl);
                 if (penv.isVerbose()) {

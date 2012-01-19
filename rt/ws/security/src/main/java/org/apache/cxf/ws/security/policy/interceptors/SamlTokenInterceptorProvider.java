@@ -32,7 +32,6 @@ import org.apache.cxf.ws.security.wss4j.SamlTokenInterceptor;
  * 
  */
 public class SamlTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    private static final long serialVersionUID = -2270910622513357794L;
     private static final Collection<QName> ASSERTION_TYPES;
     static {
         ASSERTION_TYPES = new ArrayList<QName>();

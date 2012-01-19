@@ -41,7 +41,7 @@ public class CorbaPrimitiveMapTest extends TestCase {
         corbaTypeImpl.setName(corbaName.getLocalPart());
 
         map.put(typeName, corbaTypeImpl);
-        Object value = map.get(typeName);
+        Object value = (CorbaTypeImpl)map.get(typeName);
         assertEquals(corbaTypeImpl.getName(), corbaName.getLocalPart());
         assertEquals(corbaTypeImpl.getQName(), corbaName);
         assertEquals(corbaTypeImpl.getType(), typeName);

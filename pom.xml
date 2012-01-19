@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf</artifactId>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.5.2</version>
     <name>Apache CXF</name>
     <description>Apache CXF is an open-source services framework that aids in 
     the development of services using front-end programming APIs, like JAX-WS 
@@ -31,8 +31,8 @@
     <packaging>pom</packaging>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.5.2</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.5.2</developerConnection>
     </scm>
     <issueManagement>
         <system>jira</system>
@@ -325,6 +325,17 @@
                                             <param name="checkstyleconfigcorba" expression="${full.eclipse.workspace}/cxf-checkstyle-corba.xml" />
                                         </xslt>
                                         <copy file="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml.new" tofile="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml" overwrite="yes" />
+
+
+
+
+                                        <!-- Add warning flags that we want -->
+                                        <propertyfile file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.core.prefs">
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.missingSerialVersion" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedImport" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.annotationSuperInterface" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore" />
+                                        </propertyfile>
 
 
                                         <!-- Add code format rules -->
@@ -685,8 +696,8 @@
                         <chmod>true</chmod>
                         <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                         <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                        <stagingRepositoryId>apache.cxf.site</stagingRepositoryId>
-                        <stagingSiteURL>scp://people.apache.org/www/cxf.apache.org/maven-site-${project.version}</stagingSiteURL>
+			<stagingRepositoryId>apache.cxf.site</stagingRepositoryId>
+			<stagingSiteURL>scp://people.apache.org/www/cxf.apache.org/maven-site-${project.version}</stagingSiteURL>
                     </configuration>
 		    <dependencies>
 		      <dependency>

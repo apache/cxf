@@ -155,7 +155,7 @@ public class JibxSchemaHelper {
     private void getSchemaList(Definition def) {
         Types typesElement = def.getTypes();
         if (typesElement != null) {
-            Iterator<?> ite = typesElement.getExtensibilityElements().iterator();
+            Iterator ite = typesElement.getExtensibilityElements().iterator();
             while (ite.hasNext()) {
                 Object obj = ite.next();
                 if (obj instanceof Schema) {
@@ -188,7 +188,7 @@ public class JibxSchemaHelper {
             }
         }
 
-        Map<String, List<?>> imports = CastUtils.cast(schema.getImports());
+        Map<String, List> imports = CastUtils.cast(schema.getImports());
         if (imports != null && imports.size() > 0) {
             Collection<String> importKeys = imports.keySet();
             for (String importNamespace : importKeys) {

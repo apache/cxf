@@ -21,11 +21,11 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 import javax.ws.rs.ext.ContextResolver;
 
-public class ThreadLocalContextResolver<T> 
-    extends AbstractThreadLocalProxy<ContextResolver<T>> 
-    implements ContextResolver<T> {
+public class ThreadLocalContextResolver extends AbstractThreadLocalProxy<ContextResolver> 
+    implements ContextResolver {
 
-    public T getContext(Class<?> type) {
+    @SuppressWarnings("unchecked")
+    public Object getContext(Class type) {
         return get() != null ? get().getContext(type) : null;
     }
 

@@ -40,7 +40,7 @@ public interface SubscriptionDialog {
 
     void hide();
 
-    void setValidationErrors(Map<HasValue<String>, String> errors);
+    void setValidationErrors(Map<HasValue, String> errors);
 
     void setTitle(String title);
 

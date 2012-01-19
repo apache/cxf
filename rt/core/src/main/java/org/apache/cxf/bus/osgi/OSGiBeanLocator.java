@@ -37,6 +37,7 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
         cbl = c;
         context = ctx;
     }
+
     public <T> T getBeanOfType(String name, Class<T> type) {
         return cbl.getBeanOfType(name, type);
     }
@@ -77,7 +78,5 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
     public List<String> getBeanNamesOfType(Class<?> type) {
         return cbl.getBeanNamesOfType(type);
     }
-    public boolean hasBeanOfName(String name) {
-        return cbl.hasBeanOfName(name);
-    }
+
 }

@@ -226,7 +226,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     }
 
     public void unsubscribe(String address) throws UnableToDestroySubscriptionFault {
-        AbstractSubscription subscription = subscriptions.remove(address);
+        AbstractSubscription subscription = (AbstractSubscription) subscriptions.remove(address);
         if (subscription != null) {
             subscription.unsubscribe();
         }

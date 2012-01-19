@@ -52,7 +52,7 @@ public class HttpDestinationBeanDefinitionParser
     }
     
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return AbstractHTTPDestination.class;
     }
 

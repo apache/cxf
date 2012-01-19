@@ -49,7 +49,6 @@ import org.apache.cxf.message.MessageImpl;
  */
 public class ServerWebApplicationException extends WebApplicationException {
 
-    private static final long serialVersionUID = -97862759448606951L;
     private String errorMessage;
     
     public ServerWebApplicationException() {
@@ -86,9 +85,7 @@ public class ServerWebApplicationException extends WebApplicationException {
     
     @SuppressWarnings("unchecked")
     public MultivaluedMap<String, String> getHeaders() {
-        MultivaluedMap<?, ?> mp = super.getResponse().getMetadata();
-        //need to bounce through the temp so the cast will work
-        return (MultivaluedMap<String, String>)mp;
+        return (MultivaluedMap<String, String>)((MultivaluedMap)super.getResponse().getMetadata());
     }
     
     @Override
@@ -143,10 +140,11 @@ public class ServerWebApplicationException extends WebApplicationException {
      * @param cls the entity class
      * @return the typed entity
      */
+    @SuppressWarnings("unchecked")
     public <T> T toErrorObject(Client client, Class<T> entityCls) {
         Response response = getResponse();
         try {
-            MultivaluedMap<String, String> headers = getHeaders();
+            MultivaluedMap headers = response.getMetadata();
             Object contentType = headers.getFirst("Content-Type");
             InputStream inputStream = (InputStream)response.getEntity();
             if (contentType == null || inputStream == null) {
@@ -167,7 +165,7 @@ public class ServerWebApplicationException extends WebApplicationException {
             
             ProviderFactory pf = (ProviderFactory)ep.get(ProviderFactory.class.getName());
             
-            MessageBodyReader<T> reader = pf.createMessageBodyReader(entityCls, 
+            MessageBodyReader reader = pf.createMessageBodyReader(entityCls, 
                                                              entityCls, 
                                                              annotations, 
                                                              mt, 
@@ -180,7 +178,7 @@ public class ServerWebApplicationException extends WebApplicationException {
             }
             
             return (T)reader.readFrom(entityCls, entityCls, annotations, mt, 
-                                      headers, 
+                                      (MultivaluedMap<String, String>)headers, 
                                       inputStream);
         } catch (Exception ex) {
             throw new ClientWebApplicationException(ex);

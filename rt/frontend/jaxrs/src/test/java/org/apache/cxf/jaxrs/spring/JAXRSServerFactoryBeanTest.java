@@ -80,10 +80,10 @@ public class JAXRSServerFactoryBeanTest extends Assert {
     }
     
     private void verifyJaxbProvider(List<?> providers) throws Exception {
-        JAXBElementProvider<?> provider = null;
+        JAXBElementProvider provider = null;
         for (Object o : providers) {
             if (o instanceof JAXBElementProvider) {
-                provider = (JAXBElementProvider<?>)o;
+                provider = (JAXBElementProvider)o;
                 
             }
         }

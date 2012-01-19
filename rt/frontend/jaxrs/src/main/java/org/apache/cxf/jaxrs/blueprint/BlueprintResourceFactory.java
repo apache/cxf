@@ -94,7 +94,7 @@ public class BlueprintResourceFactory implements ResourceProvider {
         this.beanId = serviceBeanId;
     }
 
-    Constructor<?> getBeanConstructor() {
+    Constructor getBeanConstructor() {
         return c;
     }
 

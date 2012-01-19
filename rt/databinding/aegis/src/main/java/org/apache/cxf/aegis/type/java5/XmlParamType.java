@@ -34,7 +34,7 @@ import org.apache.cxf.aegis.type.AegisType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface XmlParamType {
-    Class<?> type() default AegisType.class;
+    Class type() default AegisType.class;
 
     String name() default "";
 

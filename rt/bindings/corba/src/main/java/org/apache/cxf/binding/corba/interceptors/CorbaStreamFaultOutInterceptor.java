@@ -88,7 +88,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
 
         orb = (ORB) message.get(CorbaConstants.ORB);
         if (orb == null) {
-            orb = exchange.get(ORB.class); 
+            orb = (ORB) exchange.get(ORB.class); 
         }
         
         DataWriter<XMLStreamWriter> writer = getDataWriter(message);

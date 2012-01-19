@@ -57,8 +57,8 @@ public class CorbaFixedHandlerTest extends Assert {
     public void testCorbaFixedHandler() {
         Fixed fixedType = new Fixed();
         fixedType.setName("FixedType");
-        fixedType.setDigits(3);
-        fixedType.setScale(2);
+        fixedType.setDigits((long)3);
+        fixedType.setScale((long)2);
         
         QName fixedName = new QName(fixedType.getName());
         QName fixedIdlType = 

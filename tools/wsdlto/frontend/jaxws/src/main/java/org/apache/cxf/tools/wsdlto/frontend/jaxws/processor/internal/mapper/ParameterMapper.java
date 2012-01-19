@@ -21,7 +21,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.mapper;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
-import org.apache.cxf.common.jaxb.JAXBUtils;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.model.JavaMethod;

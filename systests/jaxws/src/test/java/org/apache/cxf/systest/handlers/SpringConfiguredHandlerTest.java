@@ -37,20 +37,20 @@ public class SpringConfiguredHandlerTest extends AbstractCXFSpringTest {
 
     @Test
     public void testSpringConfiguresHandlers() throws Exception {
-        AddNumbers addNumbers = getApplicationContext().getBean("cxfHandlerTestClientEndpoint",
+        AddNumbers addNumbers = (AddNumbers)getApplicationContext().getBean("cxfHandlerTestClientEndpoint",
                                                                    AddNumbers.class);
 
         int r = addNumbers.addNumbers(10, 15);
         assertEquals(1015, r);
 
     
-        addNumbers = getApplicationContext().getBean("cxfHandlerTestClientEndpointNoHandler",
+        addNumbers = (AddNumbers)getApplicationContext().getBean("cxfHandlerTestClientEndpointNoHandler",
                                                                  AddNumbers.class);
 
         r = addNumbers.addNumbers(10, 15);
         assertEquals(115, r);
 
-        addNumbers = getApplicationContext().getBean("cxfHandlerTestClientServer",
+        addNumbers = (AddNumbers)getApplicationContext().getBean("cxfHandlerTestClientServer",
                                                                  AddNumbers.class);
 
         r = addNumbers.addNumbers(10, 15);

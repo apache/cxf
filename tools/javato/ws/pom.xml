@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-tools-java2ws</artifactId>
     <packaging>jar</packaging>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.5.2</version>
     <name>Apache CXF Command Line Tools JavaTo WS</name>
     <description>Apache CXF Command Line Tools JavaTo WS</description>
     <url>http://cxf.apache.org</url>
@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>2.5.2</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -177,10 +177,6 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <testWsdlRoot>${basedir}/src/test/resources/java2wsdl_wsdl</testWsdlRoot>
-                            <defaultOptions>
-                                <markGenerated>true</markGenerated>
-                                <faultSerialVersionUID>1</faultSerialVersionUID>
-                            </defaultOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>

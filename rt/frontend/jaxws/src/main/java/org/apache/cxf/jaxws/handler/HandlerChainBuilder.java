@@ -141,7 +141,7 @@ public class HandlerChainBuilder {
      * @param filename
      * @return A URL object or null if no resource with this name is found
      */    
-    protected URL resolveHandlerChainFile(Class<?> clz, String filename) {
+    protected URL resolveHandlerChainFile(Class clz, String filename) {
         URL handlerFile = clz.getResource(filename);
         if (handlerFile == null) {
             //the file location might be an absolute java.net.URL in externalForm.

@@ -146,7 +146,7 @@ public class LogicalHandlerOutInterceptor
                         responseMsg.setExchange(message.getExchange());
                         responseMsg = e.getBinding().createMessage(responseMsg);            
     
-                        MessageObserver observer = message.getExchange()
+                        MessageObserver observer = (MessageObserver)message.getExchange()
                                     .get(MessageObserver.class);
                         if (observer != null) {
                             //client side outbound, the request message becomes the response message

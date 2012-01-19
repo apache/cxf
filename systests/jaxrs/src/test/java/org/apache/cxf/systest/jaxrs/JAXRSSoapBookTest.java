@@ -209,7 +209,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress("http://localhost:" + PORT + "/test/services/rest3/bookstore/fastinfoset2");
         bean.getInInterceptors().add(new FIStaxInInterceptor());
-        JAXBElementProvider<?> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider p = new JAXBElementProvider();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         bean.setProvider(p);
         
@@ -230,7 +230,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setAddress("http://localhost:" + PORT + "/test/services/rest3/bookstore/fastinfoset");
         bean.getOutInterceptors().add(new FIStaxOutInterceptor());
         bean.getInInterceptors().add(new FIStaxInInterceptor());
-        JAXBElementProvider<?> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider p = new JAXBElementProvider();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
         bean.setProvider(p);
@@ -250,7 +250,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookFastinfosetProxy() throws Exception {
         
-        JAXBElementProvider<Object> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider p = new JAXBElementProvider();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
         
@@ -272,7 +272,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookFastinfosetProxyInterceptors() throws Exception {
         
-        JAXBElementProvider<Object> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider p = new JAXBElementProvider();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
         
@@ -581,7 +581,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         map.add("name", "CXF in Action - ");
         map.add("name", "679");
         Book b = readBook((InputStream)wc.accept("application/xml")
-                          .form(map).getEntity());
+                          .form((Map<String, List<Object>>)map).getEntity());
         assertEquals(679, b.getId());
         assertEquals("CXF in Action - 679", b.getName());
     }
@@ -791,7 +791,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         final boolean addBadOutInterceptor = true;
         TestFeature testFeature = new TestFeature(addBadOutInterceptor);
         List<AbstractFeature> features = new ArrayList<AbstractFeature>();
-        features.add(testFeature);
+        features.add((AbstractFeature)testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
         try {
@@ -815,7 +815,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setResourceClass(BookStoreJaxrsJaxws.class);
         TestFeature testFeature = new TestFeature();
         List<AbstractFeature> features = new ArrayList<AbstractFeature>();
-        features.add(testFeature);
+        features.add((AbstractFeature)testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
         WebClient.getConfig(proxy).getRequestContext().put("org.apache.cxf.http.no_io_exceptions", false);

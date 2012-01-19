@@ -36,7 +36,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 
 public class JaxWsClientEndpointImpl extends JaxWsEndpointImpl {
 
-    private static final long serialVersionUID = 3059035442836604053L;
     private ServiceImpl executorProvider;
     
     public JaxWsClientEndpointImpl(Bus bus, Service s, EndpointInfo ei, ServiceImpl si, 

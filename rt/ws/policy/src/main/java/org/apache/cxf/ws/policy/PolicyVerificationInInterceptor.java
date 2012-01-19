@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -106,9 +106,9 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
             //To check if there is ws addressing policy violation and throw WSA specific 
             //exception to pass jaxws2.2 tests
             if (ex.getMessage().indexOf("Addressing") > -1) {
-                throw new Fault("A required header representing a Message Addressing Property " 
-                                    + "is not present", LOG)
-                    .setFaultCode(new QName("http://www.w3.org/2005/08/addressing", 
+                throw new SoapFault("A required header representing a Message Addressing Property " 
+                                    + "is not present",
+                                    new QName("http://www.w3.org/2005/08/addressing", 
                                               "MessageAddressingHeaderRequired"));
             }
             throw ex;

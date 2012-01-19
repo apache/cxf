@@ -125,7 +125,7 @@ public class LogicalHandlerFaultOutInterceptor
                 
                 Exception ex = new Fault(exception);
 
-                FaultMode mode = message.get(FaultMode.class);                
+                FaultMode mode = (FaultMode)message.get(FaultMode.class);                
                 
                 Message faultMessage = exchange.getOutMessage();
                 if (null == faultMessage) {

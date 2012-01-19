@@ -41,7 +41,7 @@ public class TestPwdCallback implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
 
-            String pass = passwords.get(pc.getIdentifier());
+            String pass = (String)passwords.get(pc.getIdentifier());
             if (pass != null) {
                 pc.setPassword(pass);
             }

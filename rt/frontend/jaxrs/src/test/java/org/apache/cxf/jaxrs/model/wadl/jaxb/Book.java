@@ -69,7 +69,7 @@ public class Book implements FormInterface {
         return chapter;
     }
     
-    public void form1(MultivaluedMap<String, String> map) {
+    public void form1(MultivaluedMap map) {
     }
     
     public String form2(String f1, String f2) {

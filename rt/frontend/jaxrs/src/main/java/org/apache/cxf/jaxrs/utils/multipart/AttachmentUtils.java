@@ -136,17 +136,19 @@ public final class AttachmentUtils {
         return false;
     }
 
-    public static MultivaluedMap<String, String> populateFormMap(MessageContext mc, 
+    @SuppressWarnings("unchecked")
+    public static <T> MultivaluedMap<String, T> populateFormMap(MessageContext mc, 
+                                                                Class<T> cls,
                                                                 boolean errorIfMissing) {
-        MultivaluedMap<String, String> data = new MetadataMap<String, String>();
-        FormUtils.populateMapFromMultipart(data,
+        MultivaluedMap<String, T> data = new MetadataMap<String, T>();
+        FormUtils.populateMapFromMultipart((MultivaluedMap)data,
                                            AttachmentUtils.getMultipartBody(mc), 
                                            true);
         return data;
     }
     
     public static MultivaluedMap<String, String> populateFormMap(MessageContext mc) {
-        return populateFormMap(mc, true);
+        return populateFormMap(mc, String.class, true);
     }
     
     private static Map<String, Attachment> fromListToMap(List<Attachment> atts) {

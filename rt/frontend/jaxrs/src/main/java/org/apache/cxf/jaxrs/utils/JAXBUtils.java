@@ -100,7 +100,6 @@ public final class JAXBUtils {
                 return obj;
             }
             try {
-                @SuppressWarnings("rawtypes")
                 XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
                 if (marshal) {
                     return xmlAdapter.marshal(obj);

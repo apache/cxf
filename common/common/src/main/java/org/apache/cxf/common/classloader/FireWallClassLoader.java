@@ -260,7 +260,7 @@ public class FireWallClassLoader extends SecureClassLoader {
             return null;
         }
 
-        return filters.clone();
+        return (String[])filters.clone();
     }
 
     /**
@@ -274,7 +274,7 @@ public class FireWallClassLoader extends SecureClassLoader {
             return null;
         }
 
-        return negativeFilters.clone();
+        return (String[])negativeFilters.clone();
     }
 
 }

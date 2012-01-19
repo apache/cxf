@@ -48,10 +48,10 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             }
             Definition def = bus.getExtension(WSDLManager.class)
                 .getDefinition(wsdlLocation);
-            Map<?, ?> map = def.getAllServices();
+            Map map = def.getAllServices();
             for (Object o : map.values()) {
                 Service service = (Service)o;
-                Map<?, ?> ports = service.getPorts();
+                Map ports = service.getPorts();
                 for (Object p : ports.values()) {
                     Port port = (Port)p;
                     List<?> l = port.getExtensibilityElements();
@@ -70,7 +70,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                             try {
                                 Field f = e.getClass().getDeclaredField("jmsNamingProperty");
                                 f.setAccessible(true);
-                                List<?> props = (List<?>)f.get(e);
+                                List<?> props = (List)f.get(e);
                                 for (Object prop : props) {
                                     f = prop.getClass().getDeclaredField("name");
                                     f.setAccessible(true);

@@ -100,7 +100,7 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         operationName = ProcessorUtil.mangleNameToVariableName(operationName);
 
         
-        JAXWSBinding binding = operation.getExtensor(JAXWSBinding.class);
+        JAXWSBinding binding = (JAXWSBinding)operation.getExtensor(JAXWSBinding.class);
         if (binding != null) {
             if (!binding.isEnableWrapperStyle()) {
                 valid = true;

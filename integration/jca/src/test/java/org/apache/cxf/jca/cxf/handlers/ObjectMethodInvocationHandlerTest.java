@@ -48,7 +48,7 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
         data = new CXFInvocationHandlerDataImpl();
         data.setTarget(target);
         handler = new ObjectMethodInvocationHandler(data);
-        handler.setNext(dummyHandler); 
+        handler.setNext((CXFInvocationHandler)dummyHandler); 
     } 
 
     @Test
@@ -83,7 +83,7 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
     public void testNonObjecMethod() throws Throwable { 
 
         DummyHandler dummyHandler1 = new DummyHandler(); 
-        handler.setNext(dummyHandler1); 
+        handler.setNext((CXFInvocationHandler)dummyHandler1); 
 
         final Method method = TestTarget.class.getMethod("testMethod", new Class[0]); 
         
@@ -101,9 +101,9 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
         data1.setTarget(new TestTarget());
         data2.setTarget(new TestTarget());
         ObjectMethodInvocationHandler handler1 = new ObjectMethodInvocationHandler(data1); 
-        handler1.setNext(mockHandler); 
+        handler1.setNext((CXFInvocationHandler)mockHandler); 
         ObjectMethodInvocationHandler handler2 = new ObjectMethodInvocationHandler(data2); 
-        handler2.setNext(mockHandler); 
+        handler2.setNext((CXFInvocationHandler)mockHandler); 
 
         TestInterface proxy1 = 
             (TestInterface)Proxy.newProxyInstance(TestInterface.class.getClassLoader(), interfaces, handler1);

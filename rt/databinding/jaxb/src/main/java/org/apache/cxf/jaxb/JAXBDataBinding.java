@@ -58,9 +58,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.common.jaxb.JAXBContextCache;
-import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
@@ -75,17 +72,16 @@ import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentSchemaValidationHack;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.ObjectFactory;
-
 @NoJSR250Annotations
 public class JAXBDataBinding extends AbstractDataBinding
     implements WrapperCapableDatabinding, InterceptorProvider {
@@ -203,18 +199,6 @@ public class JAXBDataBinding extends AbstractDataBinding
         contextClasses = new LinkedHashSet<Class<?>>();
         contextClasses.addAll(Arrays.asList(classes));
         setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
-    }
-    public JAXBDataBinding(ReflectionServiceFactoryBean b) throws JAXBException {
-        this(b.isQualifyWrapperSchema());
-        Map<String, Object> props = b.getProperties();
-        if (props != null && props.get("jaxb.additionalContextClasses") != null) {
-            Object o = b.getProperties().get("jaxb.additionalContextClasses");
-            if (o instanceof Class) {
-                o = new Class[] {(Class<?>)o};
-            }
-            extraClass = (Class[])o;
-        }
-
     }
 
     public JAXBDataBinding(JAXBContext context) {
@@ -404,11 +388,11 @@ public class JAXBDataBinding extends AbstractDataBinding
         return tns;
     }
 
-    public void setExtraClass(Class<?>[] userExtraClass) {
+    public void setExtraClass(Class[] userExtraClass) {
         extraClass = userExtraClass;
     }
 
-    public Class<?>[] getExtraClass() {
+    public Class[] getExtraClass() {
         return extraClass;
     }
 

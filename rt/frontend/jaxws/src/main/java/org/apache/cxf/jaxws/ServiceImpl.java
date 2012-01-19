@@ -75,7 +75,6 @@ import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.binding.soap.JaxWsSoapBindingConfiguration;
 import org.apache.cxf.jaxws.handler.HandlerResolverImpl;
 import org.apache.cxf.jaxws.handler.PortInfoImpl;
-import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.jaxws.support.BindingID;
 import org.apache.cxf.jaxws.support.DummyImpl;
 import org.apache.cxf.jaxws.support.JaxWsClientEndpointImpl;
@@ -96,6 +95,7 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.OneShotAsyncExecutor;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl.http.AddressType;
@@ -683,7 +683,7 @@ public class ServiceImpl extends ServiceDelegate {
                                           Class<T> type,
                                           Mode mode,
                                           WebServiceFeature... features) {
-        EndpointReferenceType ref = ProviderImpl.convertToInternal(endpointReference);
+        EndpointReferenceType ref = VersionTransformer.convertToInternal(endpointReference);
         QName portName = EndpointReferenceUtils.getPortQName(ref, bus);
         updatePortInfoAddress(portName, EndpointReferenceUtils.getAddress(ref));
         return createDispatch(portName, 
@@ -708,7 +708,7 @@ public class ServiceImpl extends ServiceDelegate {
                                            JAXBContext context,
                                            Mode mode,
                                            WebServiceFeature... features) {
-        EndpointReferenceType ref = ProviderImpl.convertToInternal(endpointReference);
+        EndpointReferenceType ref = VersionTransformer.convertToInternal(endpointReference);
         QName portName = EndpointReferenceUtils.getPortQName(ref, bus);
         updatePortInfoAddress(portName, EndpointReferenceUtils.getAddress(ref));
         return createDispatch(portName, context, mode, features);        
@@ -717,7 +717,7 @@ public class ServiceImpl extends ServiceDelegate {
     @Override
     public <T> T getPort(EndpointReference endpointReference, Class<T> serviceEndpointInterface,
                          WebServiceFeature... features) {
-        return getPort(ProviderImpl.convertToInternal(endpointReference), serviceEndpointInterface,
+        return getPort(VersionTransformer.convertToInternal(endpointReference), serviceEndpointInterface,
                        features);
 
     }

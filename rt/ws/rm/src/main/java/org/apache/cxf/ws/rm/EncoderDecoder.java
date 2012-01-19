@@ -65,21 +65,21 @@ public interface EncoderDecoder {
      * 
      * @return class
      */
-    Class<?> getCreateSequenceType();
+    Class getCreateSequenceType();
     
     /**
      * Get the class used for the CreateSequenceResponseType.
      * 
      * @return class
      */
-    Class<?> getCreateSequenceResponseType();
+    Class getCreateSequenceResponseType();
     
     /**
      * Get the class used for the TerminateSequenceType.
      * 
      * @return class
      */
-    Class<?> getTerminateSequenceType();
+    Class getTerminateSequenceType();
     
     /**
      * Builds an element containing WS-RM headers. This adds the appropriate WS-RM and WS-A namespace

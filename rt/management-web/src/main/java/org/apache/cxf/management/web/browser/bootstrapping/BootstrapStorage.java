@@ -199,7 +199,7 @@ public class BootstrapStorage {
     }
 
     @Provider
-    public static class SettingsProvider extends JSONProvider<String> {
+    public static class SettingsProvider extends JSONProvider {
         private static final String LOGGING_NAMESPACE = "http://cxf.apache.org/log";
         private static final String SUBSCRIPTIONS_ARRAY = "subscriptions";
 
@@ -212,8 +212,6 @@ public class BootstrapStorage {
 
             // Removes namespace from output
             setOutTransformElements(new HashMap<String, String>() {
-                private static final long serialVersionUID = -1341932955817405356L;
-
                 {
                     put("{" + LOGGING_NAMESPACE + "}*", "*");
                 }
@@ -221,8 +219,6 @@ public class BootstrapStorage {
 
             // Adds namespace to input
             setInTransformElements(new HashMap<String, String>() {
-                private static final long serialVersionUID = -1509522821399368946L;
-
                 {
                     put("*", "{" + LOGGING_NAMESPACE + "}*");
                 }

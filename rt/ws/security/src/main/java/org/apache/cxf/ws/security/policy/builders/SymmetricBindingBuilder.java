@@ -59,7 +59,7 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
         SymmetricBinding symmetricBinding = new SymmetricBinding(consts, builder);
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = policy.normalize(builder.getPolicyRegistry(), false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternatives(iterator.next(), symmetricBinding, consts);

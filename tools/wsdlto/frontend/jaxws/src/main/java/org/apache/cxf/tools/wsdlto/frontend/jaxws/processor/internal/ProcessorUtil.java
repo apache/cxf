@@ -35,9 +35,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolContext;
@@ -236,7 +236,7 @@ public final class ProcessorUtil {
         }
 
         if (!primitiveType && dataBinding == null) {
-            Class<?> holderClass = JAXBUtils.holderClass(xmlTypeName.getLocalPart());
+            Class holderClass = JAXBUtils.holderClass(xmlTypeName.getLocalPart());
             jtype = holderClass == null ? null : holderClass.getName();
             if (jtype == null) {
                 jtype = JAXBUtils.builtInTypeToJavaType(xmlTypeName.getLocalPart());
@@ -375,7 +375,7 @@ public final class ProcessorUtil {
     public static List<WrapperElement> getWrappedElement(ToolContext context, QName partElement) {
         List<WrapperElement> qnames = new ArrayList<WrapperElement>();
 
-        ServiceInfo serviceInfo = context.get(ServiceInfo.class);
+        ServiceInfo serviceInfo = (ServiceInfo)context.get(ServiceInfo.class);
         SchemaCollection schema = serviceInfo.getXmlSchemaCollection();
 
         XmlSchemaElement elementByName = schema.getElementByQName(partElement);
@@ -435,7 +435,7 @@ public final class ProcessorUtil {
     }
     
     public static boolean isSchemaFormQualified(ToolContext context, QName partElement) {
-        ServiceInfo serviceInfo = context.get(ServiceInfo.class);
+        ServiceInfo serviceInfo = (ServiceInfo)context.get(ServiceInfo.class);
         SchemaCollection schemaCol = serviceInfo.getXmlSchemaCollection();
         XmlSchema schema = schemaCol.getSchemaForElement(partElement);
         if (schema != null) {

@@ -150,7 +150,7 @@ public class BareInInterceptorTest extends Assert {
         message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
             .createXMLStreamReader(getTestStream(getClass(), "resources/bareNoParamDocLitBareReq.xml")));
         
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+        XMLStreamReader reader = (XMLStreamReader)message.getContent(XMLStreamReader.class);
         // skip to the end element of soap body, so that we can serve an empty request to
         // interceptor
         StaxUtils.skipToStartOfElement(reader);

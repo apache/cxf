@@ -46,7 +46,7 @@ public final class CorbaAnyHelper {
     private static final Map<QName, QName> SCHEMA_TO_IDL_TYPES = new HashMap<QName, QName>();
     private static final Map<QName, QName> IDL_TO_SCHEMA_TYPES = new HashMap<QName, QName>();
     
-    private static Constructor<?> fixedAnyConstructor;
+    private static Constructor fixedAnyConstructor;
     
     private CorbaAnyHelper() {
         //utility class
@@ -202,19 +202,19 @@ public final class CorbaAnyHelper {
             primitive.setValue(Short.valueOf(a.extract_short()));
             break;
         case TCKind._tk_ushort:
-            primitive.setValue(Integer.valueOf(a.extract_ushort()));
+            primitive.setValue(Integer.valueOf((int)a.extract_ushort()));
             break;
         case TCKind._tk_long:
             primitive.setValue(Integer.valueOf(a.extract_long()));
             break;
         case TCKind._tk_ulong:
-            primitive.setValue(BigInteger.valueOf(a.extract_ulong()));
+            primitive.setValue(BigInteger.valueOf((long)a.extract_ulong()));
             break;
         case TCKind._tk_longlong:
             primitive.setValue(Long.valueOf(a.extract_longlong()));
             break;
         case TCKind._tk_ulonglong:
-            primitive.setValue(BigInteger.valueOf(a.extract_ulonglong()));
+            primitive.setValue(BigInteger.valueOf((long)a.extract_ulonglong()));
             break;
         case TCKind._tk_float:
             primitive.setValue(Float.valueOf(a.extract_float()));

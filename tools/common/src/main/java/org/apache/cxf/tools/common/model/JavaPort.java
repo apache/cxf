@@ -95,7 +95,7 @@ public class JavaPort {
         operations.add(method);
     }
 
-    public List<JavaMethod> getOperations() {
+    public List getOperations() {
         return operations;
     }
 

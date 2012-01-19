@@ -41,7 +41,6 @@ import org.mozilla.javascript.ScriptableObject;
  */
 public class JsSimpleDomParser extends ScriptableObject {
 
-    private static final long serialVersionUID = 664129507418929844L;
     private DocumentBuilder documentBuilder;
 
     public JsSimpleDomParser() {

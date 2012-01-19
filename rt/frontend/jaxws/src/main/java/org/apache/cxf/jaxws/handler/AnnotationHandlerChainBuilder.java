@@ -285,7 +285,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         return buildHandlerChainFromClass(clz, null, portQName, serviceQName, bindingID);
     }
     
-    protected URL resolveHandlerChainAnnotationFile(Class<?> clazz, String name) {
+    protected URL resolveHandlerChainAnnotationFile(Class clazz, String name) {
         return clazz.getResource(name);
     }
     
@@ -306,7 +306,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                 WebService ws = clz.getAnnotation(WebService.class);
                 if (ws != null && !StringUtils.isEmpty(ws.endpointInterface())) {
                     String seiClassName = ws.endpointInterface().trim();
-                    Class<?> seiClass = null;
+                    Class seiClass = null;
                     try {
                         seiClass = ClassLoaderUtils.loadClass(seiClassName, clz);
                     } catch (ClassNotFoundException e) {

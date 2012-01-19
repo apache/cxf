@@ -55,5 +55,5 @@ public interface DataReader<T> extends BaseDataReader {
      * mapping processing, instead.
      * @return item read.
      */
-    Object read(QName elementQName, T input, Class<?> type);
+    Object read(QName elementQName, T input, Class type);
 }

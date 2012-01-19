@@ -31,7 +31,7 @@ public interface ServiceBuilder {
     void setTransportId(String id);
     void setBus(Bus bus);
     void setAddress(String addr);
-    void setServiceClass(Class<?> clz);
+    void setServiceClass(Class clz);
 
     File getOutputFile();
 

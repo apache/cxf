@@ -57,7 +57,7 @@ public class ProtectionTokenBuilder implements AssertionBuilder<Element> {
         ProtectionToken protectionToken = new ProtectionToken(consts, builder);
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = policy.normalize(builder.getPolicyRegistry(), false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternative(iterator.next(), protectionToken);

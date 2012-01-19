@@ -42,7 +42,7 @@ public final class JAXBUtils {
         List<Element> annoList = DOMUtils.findAllElementsByTagNameNS(schema, schemaNamespace, "annotation");
         Element annotation = null;
         if (annoList.size() > 0) {
-            annotation = annoList.get(0);
+            annotation = (Element)annoList.get(0);
         } else {
             annotation = schema.getOwnerDocument().createElementNS(schemaNamespace, "annotation");
         }
@@ -51,7 +51,7 @@ public final class JAXBUtils {
                                                                     "appinfo");
         Element appInfo = null;
         if (appList.size() > 0) {
-            appInfo = appList.get(0);
+            appInfo = (Element)appList.get(0);
         } else {
             appInfo = schema.getOwnerDocument().createElementNS(schemaNamespace, "appinfo");
             annotation.appendChild(appInfo);
@@ -62,7 +62,7 @@ public final class JAXBUtils {
                                                                      ToolConstants.NS_JAXB_BINDINGS, 
                                                                      "schemaBindings");
         if (jaxbList.size() > 0) {
-            jaxbBindings = jaxbList.get(0);
+            jaxbBindings = (Element)jaxbList.get(0);
         } else {
             jaxbBindings = schema.getOwnerDocument().createElementNS(ToolConstants.NS_JAXB_BINDINGS, 
                                                                      "schemaBindings");
@@ -90,7 +90,7 @@ public final class JAXBUtils {
                                                                     "package");
         Element packagename = null;
         if (pkgList.size() > 0) {
-            packagename = pkgList.get(0);
+            packagename = (Element)pkgList.get(0);
         } else {
             packagename = doc.createElementNS(ToolConstants.NS_JAXB_BINDINGS, "package");
         }

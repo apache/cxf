@@ -47,7 +47,7 @@ public final class NSManager {
         resolveConstants(WSDLConstants.class);
     }
 
-    private void resolveConstants(final Class<?> clz) {
+    private void resolveConstants(final Class clz) {
         for (Field field : clz.getFields()) {
             if (field.getName().endsWith("_PREFIX") && isPulicStaticFinal(field)) {
                 try {

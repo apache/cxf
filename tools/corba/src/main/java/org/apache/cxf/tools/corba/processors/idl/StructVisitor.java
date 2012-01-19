@@ -224,11 +224,11 @@ public class StructVisitor extends VisitorBase {
     private void processForwardStructActions(Scope structScope) {
         if (wsdlVisitor.getDeferredActions() != null) {
             DeferredActionCollection deferredActions = wsdlVisitor.getDeferredActions();
-            List<DeferredAction> list = deferredActions.getActions(structScope);
+            List list = deferredActions.getActions(structScope);
             if ((list != null) && !list.isEmpty()) {
                 XmlSchemaType stype = getSchemaType();
                 CorbaTypeImpl ctype = getCorbaType();
-                Iterator<DeferredAction> iterator = list.iterator();
+                Iterator iterator = list.iterator();
                 while (iterator.hasNext()) {
                     SchemaDeferredAction action = (SchemaDeferredAction)iterator.next();
                     action.execute(stype, ctype);

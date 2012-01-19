@@ -344,7 +344,7 @@ public final class NamespaceHelper {
             throw new DatabindingException("No namespace was found for prefix: " + prefix);
         }
         
-        if (localName == null) {
+        if (jNS == null || localName == null) {
             throw new DatabindingException("Invalid QName in mapping: " + value);
         }
 

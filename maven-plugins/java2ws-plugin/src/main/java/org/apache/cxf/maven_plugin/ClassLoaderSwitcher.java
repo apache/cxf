@@ -58,7 +58,7 @@ public class ClassLoaderSwitcher {
     public String switchClassLoader(MavenProject project,
                                     boolean useCompileClasspath,
                                     String classpath,
-                                    List<?> classpathElements) {
+                                    List classpathElements) {
         List<URL> urlList = new ArrayList<URL>();
         StringBuilder buf = new StringBuilder();
 

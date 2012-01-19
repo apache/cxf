@@ -39,7 +39,6 @@ public class Fault extends UncheckedException {
     public static final String STACKTRACE_NAMESPACE = "http://cxf.apache.org/fault";
     public static final String STACKTRACE = "stackTrace";
     private static final int DEFAULT_HTTP_RESPONSE_CODE = 500;
-    private static final long serialVersionUID = -1583932965031558864L;
 
     private Element detail;
     private String message;

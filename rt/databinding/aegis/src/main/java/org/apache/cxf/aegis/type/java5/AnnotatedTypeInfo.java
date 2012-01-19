@@ -31,12 +31,12 @@ import org.apache.cxf.aegis.util.NamespaceHelper;
 public class AnnotatedTypeInfo extends BeanTypeInfo {
     private final AnnotationReader annotationReader;
 
-    public AnnotatedTypeInfo(TypeMapping tm, Class<?> typeClass, 
+    public AnnotatedTypeInfo(TypeMapping tm, Class typeClass, 
                              String ns, TypeCreationOptions typeCreationOptions) {
         this(tm, typeClass, ns, new AnnotationReader(), typeCreationOptions);
     }
 
-    public AnnotatedTypeInfo(TypeMapping tm, Class<?> typeClass, String ns, AnnotationReader annotationReader,
+    public AnnotatedTypeInfo(TypeMapping tm, Class typeClass, String ns, AnnotationReader annotationReader,
                              TypeCreationOptions typeCreationOptions) {
         super(typeClass, ns);
         this.annotationReader = annotationReader;
@@ -70,7 +70,7 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
     protected boolean registerType(PropertyDescriptor desc) {
         Method readMethod = desc.getReadMethod();
 
-        Class<?> type = annotationReader.getType(readMethod);
+        Class type = annotationReader.getType(readMethod);
         return type == null && super.registerType(desc);
     }
 

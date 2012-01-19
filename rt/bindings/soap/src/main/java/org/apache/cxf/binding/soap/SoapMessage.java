@@ -31,7 +31,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 public class SoapMessage extends MessageImpl {
-    private static final long serialVersionUID = 6310906412722265578L;
     private SoapVersion version;
 
     public SoapMessage(Message message) {

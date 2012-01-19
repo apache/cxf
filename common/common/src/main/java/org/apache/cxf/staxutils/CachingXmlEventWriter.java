@@ -256,7 +256,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
             return null;
         }
 
-        public Iterator<String> getPrefixes(String namespaceURI) {
+        public Iterator getPrefixes(String namespaceURI) {
             List<String> l = new ArrayList<String>();
             for (Map.Entry<String, String> e : map.entrySet()) {
                 if (e.getValue().equals(namespaceURI)) {
@@ -266,8 +266,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
             if (l.isEmpty()) {
                 String pfx = getPrefix(namespaceURI);
                 if (pfx == null) {
-                    l = Collections.emptyList();
-                    return l.iterator();
+                    return Collections.emptyList().iterator();
                 }
                 return Collections.singleton(pfx).iterator();
             }

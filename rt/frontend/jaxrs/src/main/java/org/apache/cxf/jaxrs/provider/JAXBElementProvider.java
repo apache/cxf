@@ -55,8 +55,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 
-import org.apache.cxf.common.jaxb.NamespaceMapper;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
@@ -74,7 +74,7 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml" })
 @Provider
-public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
+public class JAXBElementProvider extends AbstractJAXBProvider  {
     private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
     private static final String NS_MAPPER_PROPERTY = "com.sun.xml.bind.namespacePrefixMapper";
     private static final String NS_MAPPER_PROPERTY_INT = "com.sun.xml.internal.bind.namespacePrefixMapper";
@@ -147,7 +147,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         mProperties.put(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
     }
     
-    public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt, 
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
@@ -172,7 +172,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 response = doUnmarshal(unmarshaller, type, is, mt);
             }
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
-                response = ((JAXBElement<?>)response).getValue();    
+                response = ((JAXBElement)response).getValue();    
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(theType, type, 
@@ -180,7 +180,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
-            return type.cast(response);
+            return response;
             
         } catch (JAXBException e) {
             handleJAXBException(e, true);
@@ -242,7 +242,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         return unmarshaller.unmarshal(reader);
     }
     
-    public void writeTo(T obj, Class<?> cls, Type genericType, Annotation[] anns,  
+    public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         try {
@@ -273,16 +273,16 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         Class<?> actualClass = InjectionUtils.getActualType(genericType);
         actualClass = getActualType(actualClass, genericType, anns);
         
-        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
-                                             : (Collection<?>) collection;
+        Collection c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
+                                             : (Collection) collection;
 
-        Iterator<?> it = c.iterator();
+        Iterator it = c.iterator();
         
         Object firstObj = it.hasNext() ? it.next() : null;
 
         QName qname = null;
         if (firstObj instanceof JAXBElement) {
-            JAXBElement<?> el = (JAXBElement<?>)firstObj;
+            JAXBElement el = (JAXBElement)firstObj;
             qname = el.getName();
             actualClass = el.getDeclaredType();
         } else {
@@ -338,7 +338,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                                            String ns) throws Exception {
         
         if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement<?>)obj).getValue();    
+            obj = ((JAXBElement)obj).getValue();    
         } else {
             obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
         }

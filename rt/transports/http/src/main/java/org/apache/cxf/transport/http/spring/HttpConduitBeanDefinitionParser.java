@@ -186,7 +186,7 @@ public class HttpConduitBeanDefinitionParser
     }
 
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return HTTPConduit.class;
     }
 

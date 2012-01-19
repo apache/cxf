@@ -82,7 +82,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                 exchange.getBindingOperationInfo();
             Object[] params = message.getContent(List.class).toArray();
             Map<String, Object> context =
-                CastUtils.cast((Map<?, ?>)message.get(Message.INVOCATION_CONTEXT));
+                CastUtils.cast((Map)message.get(Message.INVOCATION_CONTEXT));
             InvocationContext invocation = 
                 new InvocationContext(endpoint, 
                                       bindingOperationInfo,
@@ -282,7 +282,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      */
     protected void overrideAddressProperty(Map<String, Object> context) {
         Map<String, Object> requestContext =
-            CastUtils.cast((Map<?, ?>)context.get(Client.REQUEST_CONTEXT));
+            CastUtils.cast((Map)context.get(Client.REQUEST_CONTEXT));
         if (requestContext != null) {
             requestContext.put(Message.ENDPOINT_ADDRESS,
                                getEndpoint().getEndpointInfo().getAddress());

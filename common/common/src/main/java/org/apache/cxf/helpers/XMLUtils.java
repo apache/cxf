@@ -344,7 +344,7 @@ public final class XMLUtils {
 
         String namespceURI = defaultNamespace;
         if (prefix != null) {
-            namespceURI = namespaces.get(prefix);
+            namespceURI = (String)namespaces.get(prefix);
         }
         return new QName(namespceURI, localName);
     }

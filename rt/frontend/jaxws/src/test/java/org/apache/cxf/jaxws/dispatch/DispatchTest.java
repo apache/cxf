@@ -158,7 +158,7 @@ public class DispatchTest extends AbstractJaxWsTest {
                                               serviceName, null);
 
         Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
-        List<Interceptor<? extends Message>> interceptors = ((DispatchImpl<?>)disp).getClient()
+        List<Interceptor<? extends Message>> interceptors = ((DispatchImpl)disp).getClient()
             .getInInterceptors();
         boolean exists = false;
         for (Interceptor<? extends Message> interceptor : interceptors) {
@@ -181,7 +181,7 @@ public class DispatchTest extends AbstractJaxWsTest {
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/sayHiResponse.xml"));
 
         BindingOperationVerifier bov = new BindingOperationVerifier();
-        ((DispatchImpl<?>)disp).getClient().getOutInterceptors().add(bov);
+        ((DispatchImpl)disp).getClient().getOutInterceptors().add(bov);
 
         Document doc = DOMUtils.readXml(getResourceAsStream("/org/apache/cxf/jaxws/sayHi2.xml"));
         DOMSource source = new DOMSource(doc);

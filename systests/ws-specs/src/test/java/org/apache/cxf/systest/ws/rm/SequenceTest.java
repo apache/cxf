@@ -1461,7 +1461,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         dispatch.getRequestContext().put(BindingProvider.SOAPACTION_USE_PROPERTY, Boolean.FALSE);
 
         if (useDecoupledEndpoint) {
-            initDecoupledEndpoint(((DispatchImpl<?>)dispatch).getClient());
+            initDecoupledEndpoint(((DispatchImpl)dispatch).getClient());
         }
     }
 
@@ -1509,7 +1509,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
                 ClientProxy.getClient(greeter).getConduit().close();
             }
             if (dispatch != null) {
-                ((DispatchImpl<?>)dispatch).getClient().getConduit().close();
+                ((DispatchImpl)dispatch).getClient().getConduit().close();
             }
             greeterBus.shutdown(true);
             greeter = null;

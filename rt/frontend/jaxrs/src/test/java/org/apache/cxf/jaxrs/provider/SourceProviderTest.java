@@ -58,7 +58,7 @@ public class SourceProviderTest extends Assert {
        
     @Test
     public void testIsWriteable() {
-        SourceProvider<Source> p = new SourceProvider<Source>();
+        SourceProvider p = new SourceProvider();
         assertTrue(p.isWriteable(StreamSource.class, null, null, null)
                    && p.isWriteable(DOMSource.class, null, null, null)
                    && p.isWriteable(Source.class, null, null, null));
@@ -66,7 +66,7 @@ public class SourceProviderTest extends Assert {
     
     @Test
     public void testIsReadable() {
-        SourceProvider<Source> p = new SourceProvider<Source>();
+        SourceProvider p = new SourceProvider();
         assertTrue(p.isReadable(StreamSource.class, null, null, null)
                    && p.isReadable(DOMSource.class, null, null, null)
                    && p.isReadable(Source.class, null, null, null));
@@ -74,7 +74,7 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testReadFrom() throws Exception {
-        SourceProvider<Object> p = new TestSourceProvider<Object>();
+        SourceProvider p = new TestSourceProvider();
         assertSame(StreamSource.class, verifyRead(p, StreamSource.class).getClass());
         assertSame(StreamSource.class, verifyRead(p, Source.class).getClass());
         assertSame(StaxSource.class, verifyRead(p, SAXSource.class).getClass());
@@ -83,9 +83,10 @@ public class SourceProviderTest extends Assert {
         assertTrue(Document.class.isAssignableFrom(verifyRead(p, Document.class).getClass()));
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadFromStreamReader() throws Exception {
-        TestSourceProvider<Source> p = new TestSourceProvider<Source>();
+        TestSourceProvider p = new TestSourceProvider();
         
         InputStream is = new ByteArrayInputStream("<test xmlns=\"http://bar\"/>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
@@ -98,7 +99,7 @@ public class SourceProviderTest extends Assert {
         
         p.getMessage().setContent(XMLStreamReader.class, reader);
         
-        Source source = p.readFrom(Source.class,
+        Source source = (Source)p.readFrom((Class)Source.class,
                    null, null, null, null, is);
         ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
         TransformerFactory.newInstance().newTransformer()
@@ -108,7 +109,7 @@ public class SourceProviderTest extends Assert {
     
     @Test
     public void testWriteToDocument() throws Exception {
-        SourceProvider<Document> p = new SourceProvider<Document>();
+        SourceProvider p = new SourceProvider();
         
         Document doc = DOMUtils.readXml(new StringReader("<test/>"));
         
@@ -124,14 +125,14 @@ public class SourceProviderTest extends Assert {
     
     @Test
     public void testReadFromWithPreferredFormat() throws Exception {
-        TestSourceProvider<Source> p = new TestSourceProvider<Source>();
+        TestSourceProvider p = new TestSourceProvider();
         p.getMessage().put("source-preferred-format", "sax");        
         assertSame(StaxSource.class, verifyRead(p, Source.class).getClass());
     }
     
     @Test
     public void testWriteTo() throws Exception {
-        SourceProvider<Source> p = new TestSourceProvider<Source>();
+        SourceProvider p = new TestSourceProvider();
         StreamSource s = new StreamSource(new ByteArrayInputStream("<test/>".getBytes()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.writeTo(s, null, null, null, MediaType.APPLICATION_XML_TYPE, 
@@ -143,10 +144,9 @@ public class SourceProviderTest extends Assert {
         assertTrue(os.toString().contains("<test/>"));
     }
     
-    private <T> T verifyRead(MessageBodyReader<T> p, Class<?> type) throws Exception {
-        @SuppressWarnings("unchecked")
-        Class<T> cls = (Class<T>)type;
-        return (T)p.readFrom(cls,
+    @SuppressWarnings("unchecked")
+    private <T> T verifyRead(MessageBodyReader p, Class<T> type) throws Exception {
+        return (T)p.readFrom(type,
                    null, null, null, null,
                    new ByteArrayInputStream("<test/>".getBytes()));
     }
@@ -158,7 +158,7 @@ public class SourceProviderTest extends Assert {
         return new DOMSource(builder.parse(new ByteArrayInputStream("<test/>".getBytes())));
     }
     
-    private static class TestSourceProvider<T> extends SourceProvider<T> {
+    private static class TestSourceProvider extends SourceProvider {
         
         private Message m = new MessageImpl();
         

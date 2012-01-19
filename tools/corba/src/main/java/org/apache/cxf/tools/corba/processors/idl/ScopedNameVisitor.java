@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.corba.processors.idl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.wsdl.Definition;
@@ -373,7 +374,7 @@ public class ScopedNameVisitor extends VisitorBase {
                                                           VisitorTypeHolder holder) {
 
         boolean result = false;                
-        List<Scope> baseScopes = wsdlVisitor.getInheritedScopeMap().get(scope);
+        List<Scope> baseScopes = (List<Scope>)wsdlVisitor.getInheritedScopeMap().get(scope);
         if (baseScopes != null) {
             List<Scope> scopeList = new ArrayList<Scope>();
             for (Scope scopeName : baseScopes) {
@@ -397,7 +398,9 @@ public class ScopedNameVisitor extends VisitorBase {
         }        
         
         if (scopeList != null) {            
-            for (Scope inheritScope : scopeList) {
+            Iterator iterator = scopeList.iterator();
+            while (iterator.hasNext()) {
+                Scope inheritScope = (Scope)iterator.next();
 
                 Scope scopedName = new Scope(inheritScope, node);
                 result = findScopeSchemaType(scopedName, schemaRef, wsdlVisitor, holder);
@@ -494,7 +497,9 @@ public class ScopedNameVisitor extends VisitorBase {
                                                            QName schemaTypeName,
                                                            Scope scopedName) {
         CorbaTypeImpl result = null;
-        for (CorbaTypeImpl type : typeMap.getStructOrExceptionOrUnion()) {         
+        Iterator corbaTypes = typeMap.getStructOrExceptionOrUnion().iterator();
+        while (corbaTypes.hasNext()) {
+            CorbaTypeImpl type = (CorbaTypeImpl) corbaTypes.next();         
             if ((type instanceof Sequence)
                 || (type instanceof Array)
                 || (type.getType() == null)
@@ -524,7 +529,9 @@ public class ScopedNameVisitor extends VisitorBase {
 
     public static CorbaTypeImpl findCorbaType(TypeMappingType typeMap, QName typeName) {
         CorbaTypeImpl result = null;
-        for (CorbaTypeImpl type : typeMap.getStructOrExceptionOrUnion()) {
+        Iterator corbaTypes = typeMap.getStructOrExceptionOrUnion().iterator();
+        while (corbaTypes.hasNext()) {
+            CorbaTypeImpl type = (CorbaTypeImpl) corbaTypes.next();
             if (type.getQName().equals(typeName)) {
                 result = type;
                 break;

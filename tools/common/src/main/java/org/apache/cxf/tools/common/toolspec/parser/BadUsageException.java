@@ -42,7 +42,7 @@ public class BadUsageException extends Exception {
         this.errors = err;
     }
 
-    public Collection<CommandLineError> getErrors() {
+    public Collection getErrors() {
         return errors.getErrors();
     }
 

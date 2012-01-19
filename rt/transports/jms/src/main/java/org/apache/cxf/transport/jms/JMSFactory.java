@@ -330,11 +330,12 @@ public final class JMSFactory {
      * @param pubSubDomain true=pubSub, false=Queues
      * @return resolved destination
      */
+    @SuppressWarnings("unchecked")
     public static Destination resolveOrCreateDestination(final JmsTemplate jmsTemplate,
                                                           final String replyToDestinationName,
                                                           final boolean pubSubDomain) {
-        return jmsTemplate.execute(new SessionCallback<Destination>() {
-            public Destination doInJms(Session session) throws JMSException {
+        return (Destination)jmsTemplate.execute(new SessionCallback() {
+            public Object doInJms(Session session) throws JMSException {
                 if (replyToDestinationName == null) {
                     if (session instanceof QueueSession) {
                         // For JMS 1.0.2

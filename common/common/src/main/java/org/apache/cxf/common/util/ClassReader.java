@@ -86,7 +86,7 @@ public class ClassReader extends ByteArrayInputStream {
      * @return a byte array containing the bytecode
      * @throws IOException
      */
-    protected static byte[] getBytes(Class<?> c) throws IOException {
+    protected static byte[] getBytes(Class c) throws IOException {
         InputStream fin = c.getResourceAsStream('/' + c.getName().replace('.', '/') + ".class");
         if (fin == null) {
             throw new IOException();
@@ -111,7 +111,7 @@ public class ClassReader extends ByteArrayInputStream {
         return desc.replace('/', '.');
     }
 
-    protected static Map<String, Method> findAttributeReaders(Class<?> c) {
+    protected static Map<String, Method> findAttributeReaders(Class c) {
         Map<String, Method> map = new HashMap<String, Method>();
         Method[] methods = c.getMethods();
 
@@ -125,7 +125,7 @@ public class ClassReader extends ByteArrayInputStream {
         return map;
     }
 
-    protected static String getSignature(Member method, Class<?>[] paramTypes) {
+    protected static String getSignature(Member method, Class[] paramTypes) {
         // compute the method descriptor
 
         StringBuilder b = new StringBuilder((method instanceof Method) ? method.getName() : "<init>");
@@ -145,7 +145,7 @@ public class ClassReader extends ByteArrayInputStream {
         return b.toString();
     }
 
-    private static void addDescriptor(StringBuilder b, Class<?> c) {
+    private static void addDescriptor(StringBuilder b, Class c) {
         if (c.isPrimitive()) {
             if (c == void.class) {
                 b.append('V');
@@ -209,11 +209,11 @@ public class ClassReader extends ByteArrayInputStream {
             Member m = (Member)cpool[index];
             if (m == null) {
                 pos = cpoolIndex[index];
-                Class<?> owner = resolveClass(readShort());
+                Class owner = resolveClass(readShort());
                 NameAndType nt = resolveNameAndType(readShort());
                 String signature = nt.name + nt.type;
                 if ("<init>".equals(nt.name)) {
-                    Constructor<?>[] ctors = owner.getConstructors();
+                    Constructor[] ctors = owner.getConstructors();
                     for (int i = 0; i < ctors.length; i++) {
                         String sig = getSignature(ctors[i], ctors[i].getParameterTypes());
                         if (sig.equals(signature)) {
@@ -249,7 +249,7 @@ public class ClassReader extends ByteArrayInputStream {
             Field f = (Field)cpool[i];
             if (f == null) {
                 pos = cpoolIndex[i];
-                Class<?> owner = resolveClass(readShort());
+                Class owner = resolveClass(readShort());
                 NameAndType nt = resolveNameAndType(readShort());
                 cpool[i] = owner.getDeclaredField(nt.name);
                 f = owner.getDeclaredField(nt.name);
@@ -277,10 +277,10 @@ public class ClassReader extends ByteArrayInputStream {
         }
     }
 
-    protected final Class<?> resolveClass(int i) throws IOException, ClassNotFoundException {
+    protected final Class resolveClass(int i) throws IOException, ClassNotFoundException {
         int oldPos = pos;
         try {
-            Class<?> c = (Class<?>)cpool[i];
+            Class c = (Class)cpool[i];
             if (c == null) {
                 pos = cpoolIndex[i];
                 String name = resolveUtf8(readShort());

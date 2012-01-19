@@ -84,15 +84,15 @@ public class AnnotationReader {
     }
 
     @SuppressWarnings("unchecked")
-    public Class<?> getType(AnnotatedElement element) {
-        Class<?> value = (Class<?>) getAnnotationValue("type",
+    public Class getType(AnnotatedElement element) {
+        Class value = (Class) getAnnotationValue("type",
                 element,
                 AegisType.class,
                 XmlAttribute.class,
                 XmlElement.class);
         // jaxb uses a different default value
         if (value == null) {
-            value = (Class<?>) getAnnotationValue("type",
+            value = (Class) getAnnotationValue("type",
                     element,
                     javax.xml.bind.annotation.XmlElement.DEFAULT.class,
                     XML_ELEMENT);
@@ -102,8 +102,8 @@ public class AnnotationReader {
     }
 
     @SuppressWarnings("unchecked")
-    public Class<?> getParamType(Method method, int index) {
-        return (Class<?>) getAnnotationValue("type",
+    public Class getParamType(Method method, int index) {
+        return (Class) getAnnotationValue("type",
                 method,
                 index,
                 AegisType.class,
@@ -111,8 +111,8 @@ public class AnnotationReader {
     }
 
     @SuppressWarnings("unchecked")
-    public Class<?> getReturnType(AnnotatedElement element) {
-        return (Class<?>) getAnnotationValue("type",
+    public Class getReturnType(AnnotatedElement element) {
+        return (Class) getAnnotationValue("type",
                 element,
                 AegisType.class,
                 XmlReturnType.class);

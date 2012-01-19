@@ -243,7 +243,7 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
 
         if (eClassifier instanceof EClass) {
             // complex type
-            GenClass genEClass = genClasses.get(eClassifier);
+            GenClass genEClass = (GenClass)genClasses.get(eClassifier);
             if (genEClass != null) {
                 name = genEClass.getGenPackage().getInterfacePackageName() 
                     + '.' + genEClass.getInterfaceName();

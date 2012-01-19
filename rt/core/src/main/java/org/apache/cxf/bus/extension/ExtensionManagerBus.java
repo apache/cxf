@@ -53,7 +53,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
     private static final String BUS_ID_PROPERTY_NAME = "org.apache.cxf.bus.id";
     private final ExtensionManagerImpl extensionManager;
     
-    public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties,
+    public ExtensionManagerBus(Map<Class, Object> e, Map<String, Object> properties,
           ClassLoader extensionClassLoader) {
         super(e);
 
@@ -135,7 +135,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
     }
     
-    public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties) {
+    public ExtensionManagerBus(Map<Class, Object> e, Map<String, Object> properties) {
        this(e, properties, Thread.currentThread().getContextClassLoader());
     }
 

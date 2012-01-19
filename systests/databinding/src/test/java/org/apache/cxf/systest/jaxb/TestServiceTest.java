@@ -55,7 +55,7 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
     public void testExtraSubClassWithJaxb() throws Throwable {
         Widget expected = new ExtendedWidget(42, "blah", "blah", true, true);
         TestService testClient = getTestClient();
-        Widget widgetFromService = testClient.getWidgetById(42);
+        Widget widgetFromService = testClient.getWidgetById((long)42);
 
         Assert.assertEquals(expected, widgetFromService);
     }
@@ -68,7 +68,7 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
         ((BindingProvider)testClient).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
                  "http://localhost:" + PORT + "/service/TestEndpoint");
-        Widget widgetFromService = testClient.getWidgetById(42);
+        Widget widgetFromService = testClient.getWidgetById((long)42);
 
         Assert.assertEquals(expected, widgetFromService);
     }
@@ -102,6 +102,6 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
      * @return the testClient
      */
     public TestService getTestClient() {
-        return applicationContext.getBean("testClient", TestService.class);
+        return (TestService)applicationContext.getBean("testClient", TestService.class);
     }
 }

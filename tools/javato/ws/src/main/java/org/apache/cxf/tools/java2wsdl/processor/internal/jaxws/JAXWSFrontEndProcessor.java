@@ -156,7 +156,7 @@ public class JAXWSFrontEndProcessor implements Processor {
 
     public void checkJaxwsClass() {
         Class<?> clz = context.get(Class.class);
-        WebService webServiceAnno = clz.getAnnotation(WebService.class);
+        WebService webServiceAnno = (WebService)clz.getAnnotation(WebService.class);
         if (webServiceAnno == null) {
             Message msg = new Message("CLASS_DOESNOT_CARRY_WEBSERVICE_ANNO", LOG, clz.getName());
             LOG.log(Level.WARNING, msg.toString());

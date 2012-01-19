@@ -40,8 +40,6 @@ import org.apache.cxf.jca.core.logging.LoggerHelper;
 public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean 
     implements ManagedConnectionFactory {
 
-    private static final long serialVersionUID = 1886331424891906960L;
-
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractManagedConnectionFactoryImpl.class);
 
     private PrintWriter printWriter;
@@ -68,20 +66,20 @@ public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
         throws ResourceAdapterInternalException;
 
     public ManagedConnection matchManagedConnections(
-        @SuppressWarnings("rawtypes") Set aMCSet, Subject subject, ConnectionRequestInfo crInfo)
+        Set aMCSet, Subject subject, ConnectionRequestInfo crInfo)
         throws ResourceException {
         
         LOG.log(Level.FINE, "MATCHING_CONNECTIONS",
             new Object[] {new Integer(aMCSet.size()), crInfo, subject});
 
-        for (@SuppressWarnings("rawtypes") Iterator iterator = aMCSet.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = aMCSet.iterator(); iterator.hasNext();) {
             AbstractManagedConnectionImpl conn = (AbstractManagedConnectionImpl)iterator.next();
 
             LOG.log(Level.FINE, "MATCH_CONNECTION_AGAINST", 
-                       new Object[] {conn.getConnectionRequestInfo(),
+                       new Object[] {((AbstractManagedConnectionImpl)conn).getConnectionRequestInfo(),
                                      crInfo});
 
-            if (!conn.isBound()) {
+            if (!((AbstractManagedConnectionImpl)conn).isBound()) {
                 LOG.fine("Match against unbounded, con= " + conn + ", info=" + crInfo);
                 return conn;
             } else {

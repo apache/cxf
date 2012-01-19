@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -40,7 +39,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -63,9 +61,9 @@ import javax.xml.validation.Schema;
 import org.xml.sax.helpers.DefaultHandler;
 
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -77,8 +75,8 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
-public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvider
-    implements MessageBodyReader<T>, MessageBodyWriter<T> {
+public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
+    implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
 
@@ -113,7 +111,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     private boolean skipJaxbChecks;
     private boolean singleJaxbContext;
-    private Class<?>[] extraClass;
+    private Class[] extraClass;
     
     private boolean validateOutput;
     private boolean validateBeforeWrite;
@@ -127,7 +125,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         singleJaxbContext = useSingleContext;
     }
     
-    public void setExtraClass(Class<?>[] userExtraClass) {
+    public void setExtraClass(Class[] userExtraClass) {
         extraClass = userExtraClass;
     }
     
@@ -184,7 +182,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
     }
     
-    protected <X> X getStaxHandlerFromCurrentMessage(Class<X> staxCls) {
+    protected <T> T getStaxHandlerFromCurrentMessage(Class<T> staxCls) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (m != null) {
             return staxCls.cast(m.getContent(staxCls));
@@ -196,7 +194,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return cls.getAnnotation(XmlRootElement.class) != null;
     }
     
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
         throws Exception {
         
@@ -212,7 +210,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         } else if (marshalAsJaxbElement || asJaxbElement) {
             name = getJaxbQName(cls, genericType, obj, false);
         }
-        return name != null ? new JAXBElement<Object>(name, (Class)cls, null, obj) : obj;
+        return name != null ? new JAXBElement(name, cls, null, obj) : obj;
     }
     
     public void setCollectionWrapperName(String wName) {
@@ -238,15 +236,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         
         return marshalAsJaxbElement || isSupported(type, genericType, anns);
     }
-    public void writeTo(T t, Type genericType, Annotation annotations[], 
-                 MediaType mediaType, 
-                 MultivaluedMap<String, Object> httpHeaders,
-                 OutputStream entityStream) throws IOException, WebApplicationException {
-        @SuppressWarnings("unchecked")
-        Class<T> type = (Class<T>)t.getClass();
-        writeTo(t, type, genericType, annotations, mediaType, httpHeaders, entityStream);
-    }
-
+    
     protected JAXBContext getCollectionContext(Class<?> type) throws JAXBException {
         synchronized (collectionContextClasses) {
             if (!collectionContextClasses.contains(type)) {
@@ -283,7 +273,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         throws Exception {
         
         if (cls == JAXBElement.class) {
-            return object != null ? ((JAXBElement<?>)object).getName() : null;
+            return object != null ? ((JAXBElement)object).getName() : null;
         }
         
         XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
@@ -355,7 +345,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         schema = s;    
     }
     
-    public long getSize(T o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
@@ -392,7 +382,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
             if (context == null) {
-                Class<?>[] classes = null;
+                Class[] classes = null;
                 if (extraClass != null) {
                     classes = new Class[extraClass.length + 1];
                     classes[0] = type;
@@ -481,7 +471,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         throws JAXBException {
         
         Class<?> objClazz = JAXBElement.class.isAssignableFrom(cls) 
-                            ? ((JAXBElement<?>)obj).getDeclaredType() : cls;
+                            ? ((JAXBElement)obj).getDeclaredType() : cls;
                             
         JAXBContext context = getJAXBContext(objClazz, genericType);
         Marshaller marshaller = context.createMarshaller();
@@ -654,7 +644,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                     List<Object> newList = new ArrayList<Object>(theList.size());
                     for (Object o : theList) {
                         newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(
-                                        ((JAXBElement<?>)o).getValue(), adapter, false));
+                                        ((JAXBElement)o).getValue(), adapter, false));
                     }
                     theList = newList;
                 }
@@ -675,7 +665,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                     theList = newList;
                 }
                 if (origType == Set.class) {
-                    return new HashSet<Object>(theList);
+                    return new HashSet(theList);
                 } else {
                     return theList;
                 }

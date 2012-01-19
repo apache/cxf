@@ -29,12 +29,12 @@ import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 public class ModuleToNSMapper {
 
     Map<String, String> userMap;
-    Map<String, List<String>> exModules;
+    Map<String, List> exModules;
     boolean defaultMapping = true;
 
     public ModuleToNSMapper() {
         userMap = new HashMap<String, String>();
-        exModules = new HashMap<String, List<String>>();
+        exModules = new HashMap<String, List>();
     }
 
     public void setDefaultMapping(boolean flag) {
@@ -53,11 +53,11 @@ public class ModuleToNSMapper {
         return userMap;
     }
 
-    public void setExcludedModuleMap(Map<String, List<String>> map) {
+    public void setExcludedModuleMap(Map<String, List> map) {
         exModules = map;
     }
     
-    public Map<String, List<String>> getExcludedModuleMap() {
+    public Map<String, List> getExcludedModuleMap() {
         return exModules;
     }
 
@@ -65,7 +65,7 @@ public class ModuleToNSMapper {
         return exModules.keySet().iterator();
     }
 
-    public List<String> getExcludedImports(String module) {
+    public List getExcludedImports(String module) {
         return exModules.get(module);
     }
 

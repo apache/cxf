@@ -25,7 +25,6 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.addressing.MAPAggregator;
-import org.apache.cxf.ws.addressing.impl.MAPAggregatorImpl;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 
@@ -36,9 +35,8 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
  */
 public class AddressingPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
-    private static final long serialVersionUID = -1018053541795476992L;
     private static final Collection<QName> ASSERTION_TYPES;
-    private static final MAPAggregator MAP_AGGREGATOR = new MAPAggregatorImpl();
+    private static final MAPAggregator MAP_AGGREGATOR = new MAPAggregator();
     private static final MAPCodec MAP_CODEC = new MAPCodec();
     
     static {

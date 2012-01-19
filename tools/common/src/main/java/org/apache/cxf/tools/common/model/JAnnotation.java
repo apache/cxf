@@ -26,7 +26,7 @@ import java.util.Set;
 
 public final class JAnnotation {
 
-    private Class<?> type;
+    private Class type;
     private List<JAnnotationElement> elements = new ArrayList<JAnnotationElement>();
     private Set<String> imports = new HashSet<String>();
 
@@ -34,7 +34,7 @@ public final class JAnnotation {
         // empty
     }
 
-    public JAnnotation(Class<?> t) {
+    public JAnnotation(Class t) {
         setType(t);
     }
 
@@ -76,11 +76,11 @@ public final class JAnnotation {
         return null;
     }
 
-    public Class<?> getType() {
+    public Class getType() {
         return type;
     }
 
-    public void setType(final Class<?> newType) {
+    public void setType(final Class newType) {
         this.type = newType;
         imports.add(type.getName());
     }

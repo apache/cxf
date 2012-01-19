@@ -24,8 +24,6 @@ package org.apache.cxf.rs.security.oauth.provider;
  */
 public class OAuthServiceException extends RuntimeException {
 
-    private static final long serialVersionUID = 343738539234766320L;
-
     public OAuthServiceException(String message) {
         super(message);
     }

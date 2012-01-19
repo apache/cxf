@@ -223,7 +223,7 @@ public class BeanType extends AegisType {
     protected Object createFromFault(Context context) throws SecurityException, InstantiationException,
         IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Class<?> clazz = getTypeClass();
-        Constructor<?> ctr;
+        Constructor ctr;
         Object o;
 
         Fault fault = context.getFault();
@@ -263,8 +263,7 @@ public class BeanType extends AegisType {
     /**
      * Write the specified property to a field.
      */
-    protected void writeProperty(QName name, Object object, Object property, 
-                                 Class<?> impl, BeanTypeInfo inf)
+    protected void writeProperty(QName name, Object object, Object property, Class impl, BeanTypeInfo inf)
         throws DatabindingException {
 
         if (object instanceof InterfaceInvocationHandler) {
@@ -549,7 +548,7 @@ public class BeanType extends AegisType {
         // search the BeanType superType tree for the first BeanType with a property named 'name'
         BeanType beanType = this;
         AegisType type = null;
-        while (type == null) {
+        while (type == null && beanType != null) {
             type = beanType.getTypeInfo().getType(name);
 
             if (type == null) {
@@ -589,7 +588,7 @@ public class BeanType extends AegisType {
             AegisType superType = tm.getType(c);
             if (superType == null) {
                 // if we call createType, we know that we'll get a BeanType. */
-                superType = getTypeMapping().getTypeCreator().createType(c);
+                superType = (BeanType)getTypeMapping().getTypeCreator().createType(c);
                 if (superType != null) {
                     tm.register(superType);
                     this.info.setExtension(true);

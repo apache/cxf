@@ -82,7 +82,7 @@ public class JCABusFactoryTest extends AbstractCXFTest {
         JCABusFactory jcaBusFactory = new JCABusFactory(mcf);
         Bus mockBus = EasyMock.createMock(Bus.class);
 
-        jcaBusFactory.setBus(mockBus);
+        jcaBusFactory.setBus((Bus)mockBus);
         jcaBusFactory.initializeServants();
         
     }

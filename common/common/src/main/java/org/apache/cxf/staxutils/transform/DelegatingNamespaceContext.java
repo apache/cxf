@@ -24,8 +24,6 @@ import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.apache.cxf.helpers.CastUtils;
-
 class DelegatingNamespaceContext implements NamespaceContext {
 
     private Map<String, String> prefixes = new HashMap<String, String>();
@@ -89,8 +87,8 @@ class DelegatingNamespaceContext implements NamespaceContext {
         return prefix;
     }
 
-    public Iterator<String> getPrefixes(String ns) {
-        return CastUtils.cast(nc.getPrefixes(ns));
+    public Iterator getPrefixes(String ns) {
+        return nc.getPrefixes(ns);
     }
     
 }

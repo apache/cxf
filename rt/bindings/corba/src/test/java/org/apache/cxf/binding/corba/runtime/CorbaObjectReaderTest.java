@@ -493,7 +493,7 @@ public class CorbaObjectReaderTest extends Assert {
         
         // create the following fixed
         // fixed<5,2>
-        oStream.write_fixed(new java.math.BigDecimal("12345.67").movePointRight(2));
+        oStream.write_fixed(new java.math.BigDecimal("12345.67").movePointRight((int)2));
         InputStream iStream = oStream.create_input_stream();
         CorbaObjectReader reader = new CorbaObjectReader(iStream);
         

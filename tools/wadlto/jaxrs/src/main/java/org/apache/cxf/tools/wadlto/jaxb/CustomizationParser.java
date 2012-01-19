@@ -60,7 +60,7 @@ public final class CustomizationParser {
     private String wadlPath;
     
     public CustomizationParser(ToolContext env) {
-        bus = env.get(Bus.class);
+        bus = (Bus)env.get(Bus.class);
         wadlPath = (String)env.get(WadlToolConstants.CFG_WADLURL);
     }
 
@@ -81,7 +81,7 @@ public final class CustomizationParser {
             //hard code to enable jaxb extensions
             compilerArgs.add("-extension");
             String name = "/org/apache/cxf/tools/common/jaxb/W3CEPRJaxbBinding.xml";
-            if (org.apache.cxf.common.jaxb.JAXBUtils.isJAXB22()) {
+            if (org.apache.cxf.jaxb.JAXBUtils.isJAXB22()) {
                 name = "/org/apache/cxf/tools/common/jaxb/W3CEPRJaxbBinding_jaxb22.xml";
             }
             URL bindingFileUrl = getClass().getResource(name);

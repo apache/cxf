@@ -54,7 +54,8 @@ public final class NSDecl {
         if (!(obj instanceof NSDecl)) {
             return false;
         }
-        return uri == ((NSDecl)obj).uri
+        return obj != null
+            && uri == ((NSDecl)obj).uri
             && prefix == ((NSDecl)obj).prefix;
     }
 

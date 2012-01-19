@@ -62,7 +62,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         assertNotNull(output);
 
-        Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
+        Class clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
         Method meths[] = clz.getMethods();
         for (Method m : meths) {
@@ -121,7 +121,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         assertNotNull(output);
 
-        Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
+        Class clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
         Method meths[] = clz.getMethods();
         for (Method m : meths) {
@@ -154,7 +154,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         assertNotNull(output);
 
-        Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
+        Class clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
         Method meths[] = clz.getMethods();
         for (Method m : meths) {
@@ -189,7 +189,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         assertNotNull(output);
 
-        Class<?> clz = classLoader.loadClass("org.apache.cxf.pizza_wrapped.Pizza");
+        Class clz = classLoader.loadClass("org.apache.cxf.pizza_wrapped.Pizza");
 
         Method meths[] = clz.getMethods();
         for (Method m : meths) {
@@ -222,7 +222,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         assertNotNull(output);
 
-        Class<?> clz = classLoader.loadClass("org.apache.cxf.bugs.oobh.LoginInterface");
+        Class clz = classLoader.loadClass("org.apache.cxf.bugs.oobh.LoginInterface");
         Method meths[] = clz.getMethods();
         for (Method m : meths) {
             if ("login".equals(m.getName())) {
@@ -503,7 +503,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             assertEquals(method.getName() + "()" + " Annotation : WebMethod.operationName ", "pingMe",
                      webMethodAnno.operationName());
         }
-        Class<?>[] exceptionCls = method.getExceptionTypes();
+        Class[] exceptionCls = method.getExceptionTypes();
         assertEquals(1, exceptionCls.length);
         assertEquals("org.apache.cxf.w2j.hello_world_soap12_http.PingMeFault",
                      exceptionCls[0].getName());
@@ -791,7 +791,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File serviceCollision = new File(apache, "Greeter_Service.java");
         assertTrue(serviceCollision.exists());
 
-        Class<?> clz = classLoader.loadClass("org.apache.Greeter");
+        Class clz = classLoader.loadClass("org.apache.Greeter");
         assertTrue("SEI class Greeter modifier should be interface", clz.isInterface());
 
         clz = classLoader.loadClass("org.apache.Greeter_Exception");
@@ -819,7 +819,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File serviceCollision = new File(apache, "HelloWorldServiceImpl_Service.java");
         assertTrue(serviceCollision.exists());
 
-        Class<?> clz = classLoader.loadClass("org.apache.HelloWorldServiceImpl");
+        Class clz = classLoader.loadClass("org.apache.HelloWorldServiceImpl");
         assertTrue("SEI class HelloWorldServiceImpl modifier should be interface", clz.isInterface());
 
         clz = classLoader.loadClass("org.apache.HelloWorldServiceImpl_Service");
@@ -1040,7 +1040,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
         Class<?> clz = classLoader.loadClass("org.apache.header2.Header2Test");
-        Class<?> header = classLoader.loadClass("org.apache.header2.Header");
+        Class header = classLoader.loadClass("org.apache.header2.Header");
         Method method = clz.getMethod("headerMethod", new Class[] {Holder.class, header});
         assertNotNull("method should be generated", method);
     }
@@ -1056,7 +1056,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method method = clz.getMethod("sayHello", new Class[] {java.lang.String.class});
         assertNotNull("sayHello is not be generated", method);
 
-        SOAPBinding soapBindingAnn = clz.getAnnotation(SOAPBinding.class);
+        SOAPBinding soapBindingAnn = (SOAPBinding)clz.getAnnotation(SOAPBinding.class);
         assertEquals(soapBindingAnn.parameterStyle(), SOAPBinding.ParameterStyle.BARE);
 
     }
@@ -1129,7 +1129,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_with_enum_type.wsdl"));
         processor.setContext(env);
         processor.execute();
-        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.types.ActionType");
+        Class clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.types.ActionType");
         assertNotNull("Enum class could not be found", clz);
     }
 
@@ -1149,7 +1149,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Type[] types = method1.getGenericParameterTypes();
         ParameterizedType paraType = (ParameterizedType)types[1];
-        Class<?> typeClass = (Class<?>)paraType.getActualTypeArguments()[0];
+        Class typeClass = (Class)paraType.getActualTypeArguments()[0];
         assertEquals("javax.activation.DataHandler", typeClass.getName());
     }
 
@@ -1158,7 +1158,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/soapheader_rpc.wsdl"));
         processor.setContext(env);
         processor.execute();
-        Class<?> cls = classLoader.loadClass("org.apache.header_test.rpc.TestRPCHeader");
+        Class cls = classLoader.loadClass("org.apache.header_test.rpc.TestRPCHeader");
 
         Method meths[] = cls.getMethods();
         for (Method m : meths) {
@@ -1233,7 +1233,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_SERVICENAME, "HelloWorldService");
         processor.setContext(env);
         processor.execute();
-        Class<?> cls = classLoader.loadClass("org.apache.cxf.w2j.hello_world_jms.BadRecordLitFault");
+        Class cls = classLoader.loadClass("org.apache.cxf.w2j.hello_world_jms.BadRecordLitFault");
         WebFault webFault = AnnotationUtil.getPrivClassAnnotation(cls, WebFault.class);
         assertEquals("http://www.w3.org/2001/XMLSchema", webFault.targetNamespace());
 
@@ -1366,7 +1366,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
         
-        Class<?> sei =  classLoader.loadClass("org.apache.stringarray.StringListTest");
+        Class sei =  classLoader.loadClass("org.apache.stringarray.StringListTest");
         Method method = sei.getMethods()[0];
         assertNotNull("@XmlList is not generated for method", method.getAnnotation(XmlList.class));
         boolean xmlListGenerated = false;
@@ -1384,7 +1384,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf-1404/hello_world.wsdl"));
         processor.setContext(env);
         processor.execute();
-        Class<?> sei =  classLoader.loadClass("org.apache.cxf.cxf1404.hello_world_soap_http.Greeter");
+        Class sei =  classLoader.loadClass("org.apache.cxf.cxf1404.hello_world_soap_http.Greeter");
         assertEquals(1, sei.getMethods().length);
         assertFalse(Void.TYPE.equals(sei.getMethods()[0].getReturnType()));
     }
@@ -1397,7 +1397,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         File seif = new File(output, "org/apache/cxf/helloworld/HelloWorldServiceImpl.java");
         assertTrue(seif.exists());
-        Class<?> sei =  classLoader.loadClass("org.apache.cxf.helloworld.HelloWorldServiceImpl");
+        Class sei =  classLoader.loadClass("org.apache.cxf.helloworld.HelloWorldServiceImpl");
         Method m[] = sei.getDeclaredMethods();
         assertEquals(1, m.length);
         assertTrue(m[0].getParameterAnnotations()[1][0] instanceof WebParam);

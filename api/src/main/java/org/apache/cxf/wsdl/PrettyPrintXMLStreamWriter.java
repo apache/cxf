@@ -172,7 +172,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     }
 
     public void writeEndElement() throws XMLStreamException {
-        CurrentElement elem = elems.pop();
+        CurrentElement elem = (CurrentElement) elems.pop();
         unindent();
         if (elem.hasChildElements()) {
             baseWriter.writeCharacters("\n");
@@ -235,7 +235,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
             baseWriter.writeCharacters("");
             baseWriter.writeCharacters("\n");
             indentWithSpaces();
-            CurrentElement elem = elems.peek();
+            CurrentElement elem = (CurrentElement) elems.peek();
             elem.setChildElements(true);
         }
         if (prefix == null && namespaceURI == null) {
@@ -249,7 +249,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     }
 
     private int getIndentLevel(Class<?> parent) {
-        Integer result = WSDL_INDENT_MAP.get(parent);
+        Integer result = (Integer)WSDL_INDENT_MAP.get(parent);
         if (result == null) {
             return DEFAULT_INDENT_LEVEL;
         }

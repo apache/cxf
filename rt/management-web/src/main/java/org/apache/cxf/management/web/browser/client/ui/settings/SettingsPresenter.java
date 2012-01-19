@@ -100,7 +100,7 @@ public class SettingsPresenter extends BasePresenter
     public void onSaveButtonClicked(@Nullable final String id,
                                     @Nonnull final HasValue<String> name,
                                     @Nonnull final HasValue<String> url) {
-        Map<HasValue<String>, String> errors = validate(name, url);
+        Map<HasValue, String> errors = validate(name, url);
 
         if (errors.isEmpty()) {
             String nameValue = name.getValue();
@@ -140,9 +140,9 @@ public class SettingsPresenter extends BasePresenter
         subscriptionDialog.show();
     }
 
-    private Map<HasValue<String>, String> validate(@Nonnull final HasValue<String> name,
+    private Map<HasValue, String> validate(@Nonnull final HasValue<String> name,
                                            @Nonnull final HasValue<String> url) {
-        Map<HasValue<String>, String> errors = new HashMap<HasValue<String>, String>();
+        Map<HasValue, String> errors = new HashMap<HasValue, String>();
 
         String nameValue = name.getValue();
         if (nameValue == null || nameValue.length() == 0) {

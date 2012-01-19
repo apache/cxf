@@ -133,7 +133,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
         Class<?> clazz = ClassHelper.getRealClass(bean);
 
         if (clazz.isAnnotationPresent(WebService.class)) {
-            WebService ws = clazz.getAnnotation(WebService.class);
+            WebService ws = (WebService)clazz.getAnnotation(WebService.class);
             String url = urlPrefix + ws.serviceName();
             Message message = new Message("SELECTED_SERVICE", LOG, beanName,
                                           clazz.getName(),
@@ -161,8 +161,9 @@ public class JaxWsWebServicePublisherBeanPostProcessor
                     new IllegalArgumentException(
                         "prototypeServerFactoryBeanName must indicate a scope='prototype' bean");
             }
-            serverFactory = beanFactory.getBean(prototypeServerFactoryBeanName, 
-                                 ServerFactoryBean.class);
+            serverFactory = (ServerFactoryBean)
+                             beanFactory.getBean(prototypeServerFactoryBeanName, 
+                                                 ServerFactoryBean.class);
             customizedServerFactory = true;
         } else {
             serverFactory = new JaxWsServerFactoryBean();
@@ -180,8 +181,9 @@ public class JaxWsWebServicePublisherBeanPostProcessor
                         "prototypeDataBindingBeanName must indicate a scope='prototype' bean");
             }
             customizedDataBinding = true;
-            dataBinding = beanFactory.getBean(prototypeDataBindingBeanName, 
-                                 DataBinding.class); 
+            dataBinding = (DataBinding)
+                             beanFactory.getBean(prototypeDataBindingBeanName, 
+                                                 DataBinding.class); 
         } else {
             dataBinding = new JAXBDataBinding();
         }

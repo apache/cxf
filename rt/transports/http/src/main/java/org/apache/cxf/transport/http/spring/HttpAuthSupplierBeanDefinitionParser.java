@@ -32,7 +32,7 @@ public class HttpAuthSupplierBeanDefinitionParser extends
         return "org.apache.cxf.transports.http.configuration";
     }
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return HttpAuthSupplier.class;
     }
 

@@ -41,12 +41,12 @@ public class ProxyHelper {
     protected ProxyHelper() {
     }
     
-    protected Object getProxyInternal(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
+    protected Object getProxyInternal(ClassLoader loader, Class[] interfaces, InvocationHandler handler) {
         return Proxy.newProxyInstance(loader, interfaces, handler);
     }
     
     
-    public static Object getProxy(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
+    public static Object getProxy(ClassLoader loader, Class[] interfaces, InvocationHandler handler) {
         return HELPER.getProxyInternal(loader, interfaces, handler);
     }
 }

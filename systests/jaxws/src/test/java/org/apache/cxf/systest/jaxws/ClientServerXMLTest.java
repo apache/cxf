@@ -268,8 +268,8 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
             greeter.pingMe();
             fail("did not catch expected PingMeFault exception");
         } catch (PingMeFault ex) {
-            assertEquals("minor value", 1, ex.getFaultInfo().getMinor());
-            assertEquals("major value", 2, ex.getFaultInfo().getMajor());
+            assertEquals("minor value", 1, (int)ex.getFaultInfo().getMinor());
+            assertEquals("major value", 2, (int)ex.getFaultInfo().getMajor());
 
             BindingProvider bp = (BindingProvider) greeter;
             Map<String, Object> responseContext = bp.getResponseContext();

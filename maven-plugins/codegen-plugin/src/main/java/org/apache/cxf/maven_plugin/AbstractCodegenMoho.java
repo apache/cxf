@@ -482,7 +482,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             throw new MojoExecutionException(msg.toString());
         }
 
-        file.delete();
+        if (file != null) {
+            file.delete();
+        }
         if (StringUtils.isNotEmpty(err.getOutput()) && err.getOutput().contains("WSDL2Java Error")) {
             StringBuffer msg = new StringBuffer();
             msg.append(err.getOutput());

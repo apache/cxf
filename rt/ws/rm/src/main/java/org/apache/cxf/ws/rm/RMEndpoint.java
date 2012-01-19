@@ -288,7 +288,7 @@ public class RMEndpoint {
         service = new WrappedService(applicationEndpoint.getService(), serviceQName, si);
 
         DataBinding dataBinding = null;
-        Class<?> create = protocol.getCodec().getCreateSequenceType();
+        Class create = protocol.getCodec().getCreateSequenceType();
         try {
             JAXBContext ctx =
                 JAXBContext.newInstance(PackageUtils.getPackageName(create), create.getClassLoader());

@@ -48,7 +48,7 @@ import java.util.Map;
 public class ParamReader extends ClassReader {
     private String methodName;
     private Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
-    private Class<?>[] paramTypes;
+    private Class[] paramTypes;
 
     /**
      * process a class file, given it's class. We'll use the defining
@@ -57,7 +57,7 @@ public class ParamReader extends ClassReader {
      * @param c
      * @throws IOException
      */
-    public ParamReader(Class<?> c) throws IOException {
+    public ParamReader(Class c) throws IOException {
         this(getBytes(c));
     }
 
@@ -122,7 +122,7 @@ public class ParamReader extends ClassReader {
         }
         
         // get declaring class
-        Class<?> c = method.getDeclaringClass();
+        Class c = method.getDeclaringClass();
 
         // Don't worry about it if the class is a Java dynamic proxy
         if (Proxy.isProxyClass(c)) {
@@ -166,7 +166,7 @@ public class ParamReader extends ClassReader {
      * @param ctor
      * @return String[] array of names, one per parameter, or null
      */
-    public String[] getParameterNames(Constructor<?> ctor) {
+    public String[] getParameterNames(Constructor ctor) {
         paramTypes = ctor.getParameterTypes();
         return getParameterNames(ctor, paramTypes);
     }
@@ -185,9 +185,9 @@ public class ParamReader extends ClassReader {
         return getParameterNames(method, paramTypes);
     }
 
-    protected String[] getParameterNames(Member member, Class<?>[] pTypes) {
+    protected String[] getParameterNames(Member member, Class[] pTypes) {
         // look up the names for this method
-        MethodInfo info = methods.get(getSignature(member, pTypes));
+        MethodInfo info = (MethodInfo)methods.get(getSignature(member, pTypes));
 
         // we know all the local variable names, but we only need to return
         // the names of the parameters.
@@ -230,7 +230,7 @@ public class ParamReader extends ClassReader {
     private MethodInfo getMethodInfo() {
         MethodInfo info = null;
         if (methods != null && methodName != null) {
-            info = methods.get(methodName);
+            info = (MethodInfo)methods.get(methodName);
         }
         return info;
     }

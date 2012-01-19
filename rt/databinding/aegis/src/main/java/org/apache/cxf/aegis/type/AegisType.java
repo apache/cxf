@@ -104,7 +104,7 @@ public abstract class AegisType {
      * For a generic, return the raw type. For something
      * truly exotic, return null.
      */
-    public Class<?> getTypeClass() {
+    public Class getTypeClass() {
         return TypeUtil.getTypeRelatedClass(typeClass);
     }
     

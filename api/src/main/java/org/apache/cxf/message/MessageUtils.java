@@ -41,7 +41,7 @@ public final class MessageUtils {
      */
     public static boolean isOutbound(Message message) {
         Exchange exchange = message.getExchange();
-        return exchange != null
+        return message != null && exchange != null
                && (message == exchange.getOutMessage() || message == exchange.getOutFaultMessage());
     }
 

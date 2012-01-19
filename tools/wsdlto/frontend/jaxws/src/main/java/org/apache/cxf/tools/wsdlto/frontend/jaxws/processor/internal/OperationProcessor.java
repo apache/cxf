@@ -25,7 +25,7 @@ import java.util.logging.Level;
 
 import javax.jws.WebParam;
 
-import org.apache.cxf.common.jaxb.JAXBUtils;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -89,7 +89,7 @@ public class OperationProcessor  extends AbstractProcessor {
         ParameterProcessor paramProcessor = new ParameterProcessor(context);
         method.clear();
         
-        JAXWSBinding opBinding = operation.getExtensor(JAXWSBinding.class);
+        JAXWSBinding opBinding = (JAXWSBinding)operation.getExtensor(JAXWSBinding.class);
         JAXWSBinding ptBinding = operation.getInterface().getExtensor(JAXWSBinding.class);
         JAXWSBinding defBinding = operation.getInterface().getService()
             .getDescription().getExtensor(JAXWSBinding.class);

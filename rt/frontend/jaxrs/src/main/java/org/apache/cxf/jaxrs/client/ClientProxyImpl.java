@@ -409,7 +409,7 @@ public class ClientProxyImpl extends AbstractClient implements
             if (pValue != null) {
                 if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
                     Collection<?> c = pValue.getClass().isArray() 
-                        ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
+                        ? Arrays.asList((Object[]) pValue) : (Collection) pValue;
                     for (Iterator<?> it = c.iterator(); it.hasNext();) {
                         FormUtils.addPropertyToForm(form, p.getName(), it.next());
                     }
@@ -502,7 +502,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                  Exchange exchange, 
                                  Map<String, Object> invContext) throws Throwable {
         
-        Map<String, Object> reqContext = CastUtils.cast((Map<?, ?>)invContext.get(REQUEST_CONTEXT));
+        Map<String, Object> reqContext = CastUtils.cast((Map)invContext.get(REQUEST_CONTEXT));
         int bodyIndex = body != null ? (Integer)reqContext.get("BODY_INDEX") : -1;
         OperationResourceInfo ori = 
             (OperationResourceInfo)reqContext.get(OperationResourceInfo.class.getName());
@@ -570,8 +570,8 @@ public class ClientProxyImpl extends AbstractClient implements
             if (objs == null || objs.size() == 0) {
                 return;
             }
-            MultivaluedMap<String, Object> headers = 
-                (MultivaluedMap<String, Object>)outMessage.get(Message.PROTOCOL_HEADERS);
+            MultivaluedMap<String, String> headers = 
+                (MultivaluedMap)outMessage.get(Message.PROTOCOL_HEADERS);
             Method method = ori.getMethodToInvoke();
             int bodyIndex = (Integer)outMessage.get("BODY_INDEX");
             Method aMethod = ori.getAnnotatedMethod();
@@ -580,11 +580,11 @@ public class ClientProxyImpl extends AbstractClient implements
             Object body = objs.get(0);
             try {
                 if (bodyIndex != -1) {
-                    writeBody(body, outMessage,
+                    writeBody(body, outMessage, body.getClass(), 
                               method.getGenericParameterTypes()[bodyIndex],
                               anns, headers, os);
                 } else {
-                    writeBody(body, outMessage, body.getClass(), 
+                    writeBody(body, outMessage, body.getClass(), body.getClass(), 
                               anns, headers, os);
                 }
             } catch (Exception ex) {

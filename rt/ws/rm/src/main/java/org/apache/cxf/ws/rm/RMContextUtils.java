@@ -22,6 +22,7 @@ package org.apache.cxf.ws.rm;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 
 /**
  * Holder for utility methods relating to contexts.
@@ -113,9 +114,8 @@ public final class RMContextUtils {
      * @param isOutbound true if the message is outbound
      * @return the current addressing properties
      */
-    public static AddressingProperties retrieveMAPs(Message message, 
-                                                    boolean isProviderContext,
-                                                    boolean isOutbound) {
+    public static AddressingPropertiesImpl retrieveMAPs(Message message, boolean isProviderContext,
+                                                        boolean isOutbound) {
         return org.apache.cxf.ws.addressing.ContextUtils.retrieveMAPs(message, isProviderContext, isOutbound);
     }
 

@@ -36,26 +36,25 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 
-public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
+public class DataSourceProvider implements MessageBodyReader, MessageBodyWriter {
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isReadable(Class type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, mt);
     }
 
-    public T readFrom(Class<T> cls, Type genericType, Annotation[] annotations, 
-                               MediaType type, 
-                               MultivaluedMap<String, String> headers, InputStream is)
+    public Object readFrom(Class cls, Type genericType, Annotation[] annotations, 
+                               MediaType type, MultivaluedMap headers, InputStream is)
         throws IOException {
         DataSource ds = new InputStreamDataSource(is, type.toString());
-        return cls.cast(DataSource.class.isAssignableFrom(cls) ? ds : new DataHandler(ds));
+        return DataSource.class.isAssignableFrom(cls) ? ds : new DataHandler(ds);
     }
 
-    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(Object t, Class type, Type genericType, Annotation[] annotations, 
                         MediaType mt) {
         return -1;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isWriteable(Class type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, mt);
     }
 
@@ -64,8 +63,8 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
             && (DataSource.class.isAssignableFrom(type) || DataHandler.class.isAssignableFrom(type));
     }
     
-    public void writeTo(T src, Class<?> cls, Type genericType, Annotation[] annotations, 
-                        MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
+    public void writeTo(Object src, Class cls, Type genericType, Annotation[] annotations, 
+                        MediaType type, MultivaluedMap headers, OutputStream os)
         throws IOException {
         DataSource ds = DataSource.class.isAssignableFrom(cls) 
             ? (DataSource)src : ((DataHandler)src).getDataSource();
@@ -73,9 +72,8 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
         IOUtils.copy(ds.getInputStream(), os);
     }
     
-    private void setContentTypeIfNeeded(MediaType type, 
-        MultivaluedMap<String, Object> headers, String ct) {
-
+    @SuppressWarnings("unchecked")
+    private void setContentTypeIfNeeded(MediaType type, MultivaluedMap headers, String ct) {
         if (!StringUtils.isEmpty(ct) && !type.equals(MediaType.valueOf(ct))) { 
             headers.putSingle("Content-Type", ct);
         }

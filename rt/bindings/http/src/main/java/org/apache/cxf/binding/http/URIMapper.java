@@ -126,7 +126,7 @@ public class URIMapper {
         }
     }
 
-    public List<Object> getParameters(MessageInfo msgInfo, String path) {
+    public List getParameters(MessageInfo msgInfo, String path) {
         String resource = locations.get(msgInfo.getOperation());
         Map<String, String> paramMap = ResourceUtil.getURIParameters(path, resource);
         

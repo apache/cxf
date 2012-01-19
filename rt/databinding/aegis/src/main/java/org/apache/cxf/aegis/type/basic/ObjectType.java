@@ -199,7 +199,7 @@ public class ObjectType extends AegisType {
         }
     }
 
-    public AegisType determineType(Context context, Class<?> clazz) {
+    public AegisType determineType(Context context, Class clazz) {
         TypeMapping tm = context.getTypeMapping();
         if (tm == null) {
             tm = getTypeMapping();

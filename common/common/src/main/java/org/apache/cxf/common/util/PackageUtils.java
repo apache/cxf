@@ -166,7 +166,7 @@ public final class PackageUtils {
         return newToken.toString();
     }
 
-    private static String combine(List<?> r, char sep) {
+    private static String combine(List r, char sep) {
         StringBuilder buf = new StringBuilder(r.get(0).toString());
 
         for (int i = 1; i < r.size(); i++) {

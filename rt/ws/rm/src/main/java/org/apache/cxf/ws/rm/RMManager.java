@@ -54,12 +54,12 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
@@ -328,7 +328,7 @@ public class RMManager {
             org.apache.cxf.transport.Destination destination = message.getExchange().getDestination();
             EndpointReferenceType replyTo = null;
             if (null != destination) {
-                AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+                AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
                 replyTo = maps.getReplyTo();
             }
             Endpoint ei = message.getExchange().get(Endpoint.class);
@@ -353,7 +353,7 @@ public class RMManager {
     String getAddressingNamespace(Message message) {
         String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
         if (addrUri == null) {
-            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+            AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
             if (maps != null) {
                 addrUri = maps.getNamespaceURI();
             }
@@ -414,7 +414,7 @@ public class RMManager {
             RelatesToType relatesTo = null;
             if (isServer) {
 
-                AddressingProperties inMaps = RMContextUtils.retrieveMAPs(message, false, false);
+                AddressingPropertiesImpl inMaps = RMContextUtils.retrieveMAPs(message, false, false);
                 inMaps.exposeAs(getRMAddressingNamespace());
                 acksTo = RMUtils.createReference(inMaps.getTo().getValue());
                 to = inMaps.getReplyTo();

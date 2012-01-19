@@ -33,7 +33,7 @@ public class CommandDocument {
 
     private final Document doc;
     private final ToolSpec toolspec;
-    private final List<Element> values;
+    private final List<Object> values;
 
     CommandDocument(ToolSpec ts, Document d) {
 
@@ -45,16 +45,16 @@ public class CommandDocument {
         if (d == null) {
             throw new NullPointerException("CommandDocument cannot be created with a null document");
         }
-        values = new ArrayList<Element>();
+        values = new ArrayList<Object>();
         this.doc = d;
         NodeList nl = doc.getDocumentElement().getElementsByTagName("option");
 
         for (int i = 0; i < nl.getLength(); i++) {
-            values.add((Element)nl.item(i));
+            values.add(nl.item(i));
         }
         nl = doc.getDocumentElement().getElementsByTagName("argument");
         for (int i = 0; i < nl.getLength(); i++) {
-            values.add((Element)nl.item(i));
+            values.add(nl.item(i));
         }
     }
 
@@ -85,7 +85,9 @@ public class CommandDocument {
         List<Object> result = new ArrayList<Object>();
 
         if (values != null) {
-            for (Element el : values) {
+            for (Iterator it = values.iterator(); it.hasNext();) {
+                Element el = (Element)it.next();
+
                 if (el.getAttribute("name").equals(name)) {
                     if (el.hasChildNodes()) {
                         result.add(el.getFirstChild().getNodeValue());
@@ -109,7 +111,9 @@ public class CommandDocument {
         List<Object> result = new ArrayList<Object>();
 
         if (values != null) {
-            for (Element el : values) {
+            for (Iterator it = values.iterator(); it.hasNext();) {
+                Element el = (Element)it.next();
+
                 result.add(el.getAttribute("name"));
             }
         }

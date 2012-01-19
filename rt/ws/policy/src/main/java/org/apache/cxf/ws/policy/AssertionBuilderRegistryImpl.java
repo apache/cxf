@@ -100,7 +100,7 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
             }
         }
     }
-    protected AssertionBuilder<?> handleNoRegisteredBuilder(QName qname) {
+    protected AssertionBuilder handleNoRegisteredBuilder(QName qname) {
         if (ignoreUnknownAssertions) {
             boolean alreadyWarned = ignored.contains(qname);
             if (!alreadyWarned) {

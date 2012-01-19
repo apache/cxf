@@ -20,6 +20,7 @@
 package org.apache.cxf.customer.book;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.jws.WebService;
@@ -28,30 +29,34 @@ import javax.jws.WebService;
 @WebService(endpointInterface = "org.apache.cxf.customer.book.BookService")
 public class BookServiceImpl implements BookService {
     long currentId = 1;
-    Map<Long, Book> books = new HashMap<Long, Book>();
+    Map books = new HashMap();
 
+    @SuppressWarnings("unchecked")
     public BookServiceImpl() {
         Book book = createBook();
         System.out.println("Enregistre Book de id " + book.getId());
         books.put(book.getId(), book);
     }
 
+    @SuppressWarnings("unchecked")
     public Books getBooks() {
-        for (Map.Entry<Long, Book> me : books.entrySet()) {
+        for (Iterator iter = books.entrySet().iterator(); iter.hasNext();) { 
+            Map.Entry me = (Map.Entry)iter.next();
             System.out.println("getBooks -> " + me.getKey() + " : " + me.getValue());
         }
         Books b = new Books();
-        b.setBooks(books.values().toArray(new Book[books.size()]));
+        b.setBooks((Book[])books.values().toArray(new Book[books.size()]));
         return b;
     }
 
     public Book getBook(GetBook getBook) throws BookNotFoundFault {
-        for (Map.Entry<Long, Book> me : books.entrySet()) {
+        for (Iterator iter = books.entrySet().iterator(); iter.hasNext();) { 
+            Map.Entry me = (Map.Entry)iter.next();
             System.out.println("getBook -> " + me.getKey() + " : " 
-                               + me.getValue().getName() + ", " + me.getValue().getId());
+                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
         }
         System.out.println("Book de id " + getBook.getId());
-        Book b = books.get(((Long)getBook.getId()).longValue());
+        Book b = (Book)books.get(((Long)getBook.getId()).longValue());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
@@ -62,12 +67,13 @@ public class BookServiceImpl implements BookService {
     }
 
     public Book getAnotherBook(GetAnotherBook getAnotherBook) throws BookNotFoundFault {
-        for (Map.Entry<Long, Book> me : books.entrySet()) {
+        for (Iterator iter = books.entrySet().iterator(); iter.hasNext();) { 
+            Map.Entry me = (Map.Entry)iter.next();
             System.out.println("getBook -> " + me.getKey() + " : " 
-                               + me.getValue().getName() + ", " + me.getValue().getId());
+                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
         }
         System.out.println("Book de id " + getAnotherBook.getId());
-        Book b = books.get(((Long)getAnotherBook.getId()).longValue());
+        Book b = (Book)books.get(((Long)getAnotherBook.getId()).longValue());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
@@ -77,21 +83,25 @@ public class BookServiceImpl implements BookService {
         return b;
     }
 
+    @SuppressWarnings("unchecked")
     public void updateBook(Book b) {
         books.put(b.getId(), b);
-        for (Map.Entry<Long, Book> me : books.entrySet()) {
+        for (Iterator iter = books.entrySet().iterator(); iter.hasNext();) { 
+            Map.Entry me = (Map.Entry)iter.next();
             System.out.println("updateBook -> " + me.getKey() + " : " + me.getValue());
         }
     }
 
+    @SuppressWarnings("unchecked")
     public long addBook(Book b) {
         long id = ++currentId;
         System.out.println("addBook : " + b.getName());
         b.setId(id);
         books.put(id, b);
-        for (Map.Entry<Long, Book> me : books.entrySet()) {
+        for (Iterator iter = books.entrySet().iterator(); iter.hasNext();) { 
+            Map.Entry me = (Map.Entry)iter.next();
             System.out.println("addBook -> " + me.getKey() + " : " 
-                               + me.getValue().getName() + ", " + me.getValue().getId());
+                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
         }
 
         return b.getId();
@@ -99,7 +109,8 @@ public class BookServiceImpl implements BookService {
 
     public void deleteBook(long id) {
         books.remove(id);
-        for (Map.Entry<Long, Book> me : books.entrySet()) {
+        for (Iterator iter = books.entrySet().iterator(); iter.hasNext();) { 
+            Map.Entry me = (Map.Entry)iter.next();
             System.out.println("deleteBook -> " + me.getKey() + " : " + me.getValue());
         }
     }

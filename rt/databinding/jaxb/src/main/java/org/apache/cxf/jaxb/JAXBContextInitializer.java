@@ -44,7 +44,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
@@ -301,7 +300,6 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     //in particular, older versions of jaxb don't
                     addClass(cls.getSuperclass());
                 }
-
                 if (!cls.isInterface()) {
                     walkReferences(cls);
                 }
@@ -309,7 +307,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
     }
 
-    private void inspectTypeAdapter(@SuppressWarnings("rawtypes") Class<? extends XmlAdapter> aclass) {
+    private void inspectTypeAdapter(Class<? extends XmlAdapter> aclass) {
         Class<?> c2 = aclass;
         Type sp = c2.getGenericSuperclass();
         while (!XmlAdapter.class.equals(c2) && c2 != null) {

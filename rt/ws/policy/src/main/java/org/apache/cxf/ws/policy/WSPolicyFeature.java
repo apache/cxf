@@ -29,7 +29,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
@@ -41,6 +40,9 @@ import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyReference;
 import org.apache.neethi.PolicyRegistry;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 
 /**
@@ -53,7 +55,7 @@ import org.apache.neethi.PolicyRegistry;
  * @see AbstractFeature
  */
 @NoJSR250Annotations
-public class WSPolicyFeature extends AbstractFeature {
+public class WSPolicyFeature extends AbstractFeature implements ApplicationContextAware {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WSPolicyFeature.class);
     
@@ -62,6 +64,7 @@ public class WSPolicyFeature extends AbstractFeature {
     private Collection<Element> policyReferenceElements;
     private boolean ignoreUnknownAssertions;
     private AlternativeSelector alternativeSelector; 
+    private ApplicationContext context;
     private boolean enabled = true;
   
        
@@ -82,6 +85,10 @@ public class WSPolicyFeature extends AbstractFeature {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+    
+    public void setApplicationContext(ApplicationContext c) throws BeansException {
+        context = c;  
     }
     
     @Override
@@ -236,8 +243,7 @@ public class WSPolicyFeature extends AbstractFeature {
         }
         ReferenceResolver resolver = new ReferenceResolver() {
             public Policy resolveReference(String uri) {
-                PolicyBean pb = bus.getExtension(ConfiguredBeanLocator.class)
-                        .getBeanOfType(uri, PolicyBean.class);
+                PolicyBean pb = (PolicyBean)context.getBean(uri);
                 if (null != pb) {
                     PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
                     return builder.getPolicy(pb.getElement()); 

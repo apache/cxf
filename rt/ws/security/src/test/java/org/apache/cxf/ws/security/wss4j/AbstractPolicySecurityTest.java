@@ -438,7 +438,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         //
         // This result should contain a reference to the decrypted element
         //
-        final Map<String, Object> result = protectionResults
+        final Map<String, Object> result = (Map<String, Object>) protectionResults
                 .get(0);
         final List<WSDataRef> protectedElements = 
             CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));

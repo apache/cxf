@@ -58,13 +58,13 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
 
-        Map<?, ?> services = def.getServices();
+        Map services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
         Service service = (Service)services.get(new QName(qname, "XMLService"));
         assertNotNull(service);
 
-        Map<?, ?> ports = service.getPorts();
+        Map ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("XMLPort");
@@ -98,13 +98,13 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
 
-        Map<?, ?> services = def.getServices();
+        Map services = def.getServices();
         assertNotNull(services);
         assertEquals(8, services.size());
         Service service = (Service)services.get(new QName(qname, "HelloWorldQueueBinMsgService"));
         assertNotNull(service);
 
-        Map<?, ?> ports = service.getPorts();
+        Map ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("HelloWorldQueueBinMsgPort");

@@ -47,7 +47,7 @@ public class SecurityContextImpl implements SecurityContext {
 
     public Principal getUserPrincipal() {
         org.apache.cxf.security.SecurityContext sc = 
-            m.get(org.apache.cxf.security.SecurityContext.class);
+            (org.apache.cxf.security.SecurityContext)m.get(org.apache.cxf.security.SecurityContext.class);
         return sc == null ? null : sc.getUserPrincipal();
     }
 
@@ -59,7 +59,7 @@ public class SecurityContextImpl implements SecurityContext {
 
     public boolean isUserInRole(String role) {
         org.apache.cxf.security.SecurityContext sc = 
-            m.get(org.apache.cxf.security.SecurityContext.class);
+            (org.apache.cxf.security.SecurityContext)m.get(org.apache.cxf.security.SecurityContext.class);
         return sc == null ? false : sc.isUserInRole(role);
     }
 

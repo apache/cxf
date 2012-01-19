@@ -42,12 +42,12 @@ import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -147,11 +147,11 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             LOG.fine(order.size()
                      + " parameters definded in WSDL but found " 
                      + params.size() + " in request!");            
-            Collection<String> rest = CollectionUtils.diff(order, params.keySet());
+            Collection rest = CollectionUtils.diff(order, params.keySet());
             if (rest != null && rest.size() > 0) {
                 LOG.fine("Set the following parameters to null: " + rest);
-                for (Iterator<String> iter = rest.iterator(); iter.hasNext();) {
-                    String key = iter.next();
+                for (Iterator iter = rest.iterator(); iter.hasNext();) {
+                    String key = (String)iter.next();
                     orderedParameters.put(key, null);
                 }
             }
@@ -186,7 +186,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         
         Method method = getMethod(message, operation);        
         
-        Class<?>[] types = method.getParameterTypes();        
+        Class[] types = method.getParameterTypes();        
         
         for (String key : queries.keySet()) {
             MessagePartInfo inf = null;
@@ -221,7 +221,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             // TODO check the parameter name here
             Object param = null;
                         
-            if (type.isPrimitive() && queries.get(key) != null) {
+            if (type != null && type.isPrimitive() && queries.get(key) != null) {
                 param = PrimitiveUtils.read(queries.get(key), type);
             } else {
                 param = readType(queries.get(key), type);

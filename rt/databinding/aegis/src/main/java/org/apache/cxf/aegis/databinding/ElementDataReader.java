@@ -68,7 +68,7 @@ public class ElementDataReader implements DataReader<Element> {
     }
 
     /** {@inheritDoc}*/
-    public Object read(QName name, Element input, Class<?> typeClass) {
+    public Object read(QName name, Element input, Class typeClass) {
         try {
             // TODO: pay attention to the typeClass parameter.
             return reader.read(input);

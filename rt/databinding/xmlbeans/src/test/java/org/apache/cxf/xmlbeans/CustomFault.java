@@ -22,7 +22,6 @@ import javax.xml.ws.WebFault;
 
 @WebFault
 public class CustomFault extends Exception {
-    private static final long serialVersionUID = 7752898855112831690L;
     private String extraInfo;
 
     public CustomFault() {

@@ -50,7 +50,7 @@ public class JMSEndpoint extends JMSEndpointType {
             if ("targetService".equals(key)) {
                 continue;
             }
-            String value = parameters.get(key);
+            String value = (String)parameters.get(key);
             if (first) {
                 requestUri += "?" + key + "=" + value;
                 first = false;
@@ -78,7 +78,7 @@ public class JMSEndpoint extends JMSEndpointType {
      * @return
      */
     public String getParameter(String key) {
-        return parameters.get(key);
+        return (String)parameters.get(key);
     }
 
     public Map<String, String> getJndiParameters() {

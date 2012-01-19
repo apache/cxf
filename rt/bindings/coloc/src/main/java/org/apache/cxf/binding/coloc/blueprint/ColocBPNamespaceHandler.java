@@ -36,7 +36,6 @@ public class ColocBPNamespaceHandler implements NamespaceHandler {
         return getClass().getClassLoader().getResource("/schemas/coloc-feature.xsd");
     }
 
-    @SuppressWarnings("rawtypes")
     public Set<Class> getManagedClasses() {
         return null;
     }

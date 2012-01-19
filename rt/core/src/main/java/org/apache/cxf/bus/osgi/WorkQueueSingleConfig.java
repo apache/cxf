@@ -54,6 +54,9 @@ public class WorkQueueSingleConfig implements ManagedService {
 
     private void updateQueue(String name, Dictionary<String, String> properties) 
         throws ConfigurationException {
+        if (properties == null) {
+            return;
+        }
         Dictionary<String, String> queueProperties = new Hashtable<String, String>();
         Enumeration<?> it = properties.keys();
         while (it.hasMoreElements()) {

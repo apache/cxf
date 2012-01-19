@@ -28,7 +28,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 public class FailoverBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
     @Override
-    protected Class<?> getBeanClass(Element element) {
+    protected Class getBeanClass(Element element) {
         return FailoverFeature.class;
     }
  

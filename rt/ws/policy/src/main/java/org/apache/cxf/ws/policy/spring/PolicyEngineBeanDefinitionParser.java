@@ -48,7 +48,7 @@ public class PolicyEngineBeanDefinitionParser extends AbstractBeanDefinitionPars
     }
 
     @Override
-    protected Class<?> getBeanClass(Element el) {
+    protected Class getBeanClass(Element el) {
         return PolicyEngineConfig.class;
     }
 

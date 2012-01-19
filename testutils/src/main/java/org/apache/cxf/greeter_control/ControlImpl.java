@@ -115,7 +115,7 @@ public class ControlImpl implements Control {
     public void setFaultLocation(FaultLocation fl) {
         List<Interceptor<? extends Message>> interceptors = greeterBus.getInInterceptors();
         FaultThrowingInterceptor fi = null;
-        for (Interceptor<? extends Message> i : interceptors) {
+        for (Interceptor i : interceptors) {
             if (i instanceof FaultThrowingInterceptor) {
                 interceptors.remove(i);
                 LOG.fine("Removed existing FaultThrowingInterceptor");

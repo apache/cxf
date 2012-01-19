@@ -30,7 +30,7 @@ import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
 import org.apache.cxf.jca.cxf.CXFManagedConnection;
 
-abstract class CXFInvocationHandlerBase implements CXFInvocationHandler {
+abstract class CXFInvocationHandlerBase<T> implements CXFInvocationHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFInvocationHandlerBase.class);
 
@@ -87,7 +87,7 @@ abstract class CXFInvocationHandlerBase implements CXFInvocationHandler {
     private boolean isCheckedException(Method method, Throwable t) {
         boolean isCheckedException = false;
 
-        Class<?> checkExceptionTypes[] = method.getExceptionTypes();
+        Class<?> checkExceptionTypes[] = (Class<?>[])method.getExceptionTypes();
 
         for (int i = 0; i < checkExceptionTypes.length; i++) {
             if (checkExceptionTypes[i].isAssignableFrom(t.getClass())) {

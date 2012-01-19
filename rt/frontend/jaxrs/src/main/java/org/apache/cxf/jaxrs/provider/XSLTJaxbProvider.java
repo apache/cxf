@@ -70,7 +70,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Produces({"application/xml", "application/*+xml", "text/xml", "text/html" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
 @Provider
-public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
+public class XSLTJaxbProvider extends JAXBElementProvider {
     
     private static final Logger LOG = LogUtils.getL7dLogger(XSLTJaxbProvider.class);
     

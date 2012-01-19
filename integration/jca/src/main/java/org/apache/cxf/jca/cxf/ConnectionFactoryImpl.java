@@ -39,7 +39,6 @@ import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 public class ConnectionFactoryImpl implements CXFConnectionFactory, 
                                               Referenceable, 
                                               Serializable {
-    private static final long serialVersionUID = 3664687493256918163L;
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ConnectionFactoryImpl.class);
     private ManagedConnectionFactory managedConnectionFactory;
     private ConnectionManager connectionManager;

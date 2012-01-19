@@ -135,7 +135,7 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
                         if (bean instanceof AbstractBindingFactory) {
                             for (String ns 
                                  : ((AbstractBindingFactory)bean).getActivationNamespaces()) {
-                                registerBindingFactory(ns, bean);
+                                registerBindingFactory(ns, (BindingFactory)bean);
                             }
                         } else {
                             try {

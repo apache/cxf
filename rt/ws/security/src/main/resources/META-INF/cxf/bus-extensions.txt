@@ -1,1 +1,1 @@
-org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader::true:true
+org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader::true

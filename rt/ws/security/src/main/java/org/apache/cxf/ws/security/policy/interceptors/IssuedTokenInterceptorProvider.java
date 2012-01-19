@@ -70,7 +70,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
  */
 public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
     
-    private static final long serialVersionUID = -6936475570762840527L;
     private static final String ASSOCIATED_TOKEN = 
         IssuedTokenInterceptorProvider.class.getName() + "-" + "Associated_Token";
 

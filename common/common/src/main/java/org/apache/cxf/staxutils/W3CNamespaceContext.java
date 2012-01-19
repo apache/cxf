@@ -100,7 +100,7 @@ public class W3CNamespaceContext implements NamespaceContext {
         return null;
     }
 
-    public Iterator<String> getPrefixes(String uri) {
+    public Iterator getPrefixes(String uri) {
         List<String> prefixes = new ArrayList<String>();
 
         String prefix = getPrefix(uri);

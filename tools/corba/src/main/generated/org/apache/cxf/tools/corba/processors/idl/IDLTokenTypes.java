@@ -2,6 +2,9 @@
 
   package org.apache.cxf.tools.corba.processors.idl;
 
+  import java.io.*;
+  import java.util.Vector;
+  import java.util.Hashtable;
  
 public interface IDLTokenTypes {
 	int EOF = 1;

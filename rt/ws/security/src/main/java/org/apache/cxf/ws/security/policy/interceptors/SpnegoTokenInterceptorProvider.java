@@ -45,8 +45,6 @@ import org.apache.ws.security.WSSConfig;
 public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
     static final Logger LOG = LogUtils.getL7dLogger(SpnegoTokenInterceptorProvider.class);
 
-    private static final long serialVersionUID = -3412111025613191505L;
-
     public SpnegoTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.SPNEGO_CONTEXT_TOKEN, SP12Constants.SPNEGO_CONTEXT_TOKEN));
         this.getOutInterceptors().add(new SpnegoContextTokenOutInterceptor());

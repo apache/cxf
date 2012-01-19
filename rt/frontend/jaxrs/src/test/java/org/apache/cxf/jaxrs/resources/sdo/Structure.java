@@ -53,7 +53,6 @@ public interface Structure extends Serializable {
     void setDbl(double value);
     void unsetDbl();
     boolean isSetDbl();
-    @SuppressWarnings("rawtypes")
     List getTexts();
 }
 

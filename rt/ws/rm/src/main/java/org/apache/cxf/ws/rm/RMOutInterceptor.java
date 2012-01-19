@@ -28,7 +28,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
@@ -55,7 +55,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return;
         }
        
-        AddressingProperties maps = RMContextUtils.retrieveMAPs(msg, false, true);
+        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(msg, false, true);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;
@@ -125,7 +125,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             synchronized (source) {
                 SourceSequence seq = null;
                 if (isLastMessage) {
-                    Map<?, ?> invocationContext = (Map<?, ?>)msg.get(Message.INVOCATION_CONTEXT);
+                    Map<?, ?> invocationContext = (Map)msg.get(Message.INVOCATION_CONTEXT);
                     seq = (SourceSequence)invocationContext.get(SourceSequence.class.getName());
                 } else {
                     seq = getManager().getSequence(inSeqId, msg, maps);

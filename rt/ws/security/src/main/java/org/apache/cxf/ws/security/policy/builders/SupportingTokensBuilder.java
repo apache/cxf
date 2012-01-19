@@ -77,7 +77,7 @@ public class SupportingTokensBuilder implements AssertionBuilder<Element> {
         }
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = policy.normalize(builder.getPolicyRegistry(), false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternative(iterator.next(), supportingToken);

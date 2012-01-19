@@ -93,7 +93,7 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             xsw.writeStartDocument();
             if (obj instanceof XmlObject) {
 
-                XmlObject xObj = obj;
+                XmlObject xObj = (XmlObject)obj;
                 XMLBeanStreamSerializer ser = new XMLBeanStreamSerializer();
                 ser.serialize(xObj, xsw);
             }

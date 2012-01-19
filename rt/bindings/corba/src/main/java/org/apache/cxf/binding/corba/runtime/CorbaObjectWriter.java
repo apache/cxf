@@ -183,7 +183,7 @@ public class CorbaObjectWriter {
 
     public void writeLong(Integer l) throws CorbaBindingException {
         if (l == null) {
-            stream.write_long(0);
+            stream.write_long((int)0);
         } else {
             stream.write_long(l.intValue());
         }
@@ -191,7 +191,7 @@ public class CorbaObjectWriter {
 
     public void writeULong(Long l) throws CorbaBindingException {
         if (l == null) {
-            stream.write_ulong(0);
+            stream.write_ulong((int)0);
         } else {
             stream.write_ulong(l.intValue());
         }
@@ -199,7 +199,7 @@ public class CorbaObjectWriter {
 
     public void writeLongLong(Long l) throws CorbaBindingException {
         if (l == null) {
-            stream.write_longlong(0);
+            stream.write_longlong((long)0);
         } else {
             stream.write_longlong(l.longValue());
         }
@@ -207,7 +207,7 @@ public class CorbaObjectWriter {
 
     public void writeULongLong(java.math.BigInteger l) throws CorbaBindingException {
         if (l == null) {
-            stream.write_ulonglong(0);
+            stream.write_ulonglong((long)0);
         } else {
             stream.write_ulonglong(l.longValue());
         }
@@ -223,7 +223,7 @@ public class CorbaObjectWriter {
 
     public void writeDouble(Double d) throws CorbaBindingException {
         if (d == null) {
-            stream.write_double(0.0);
+            stream.write_double((double)0.0);
         } else {
             stream.write_double(d.doubleValue());
         }

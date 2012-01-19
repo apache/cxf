@@ -43,7 +43,7 @@ public class HelloContinuationService extends Service {
 
     @WebEndpoint(name = "HelloContinuationPort")
     public HelloContinuation getHelloContinuationPort() {
-        return super.getPort(HELLO_PORT, HelloContinuation.class);
+        return (HelloContinuation)super.getPort(HELLO_PORT, HelloContinuation.class);
     }
 
 }

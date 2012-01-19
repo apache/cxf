@@ -53,9 +53,9 @@ import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.frontend.MethodDispatcher;
+import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.SimpleMethodDispatcher;
-import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -647,7 +647,7 @@ public class AegisDatabinding extends AbstractDataBinding {
             return null;
         }
         SimpleMethodDispatcher smd = (SimpleMethodDispatcher)md;
-        return smd.getPrimaryMethod(op);
+        return smd != null ? smd.getPrimaryMethod(op) : null;
     }
 
     public AegisType getType(MessagePartInfo part) {

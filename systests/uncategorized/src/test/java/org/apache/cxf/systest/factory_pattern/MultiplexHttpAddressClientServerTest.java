@@ -96,11 +96,11 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
         W3CEndpointReference numberTwoRef = factory.create("20");
         assertNotNull("reference", numberTwoRef);
            
-        Number num =  serviceImpl.getPort(numberTwoRef, Number.class);
+        Number num =  (Number)serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
         
         W3CEndpointReference numberTwentyThreeRef = factory.create("23");
-        num =  serviceImpl.getPort(numberTwentyThreeRef, Number.class);
+        num =  (Number)serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
     }
     
@@ -108,7 +108,7 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
     public void testWithManualMultiplexEprCreation() throws Exception {
     
         Service numService = Service.create(NumberFactoryImpl.NUMBER_SERVICE_QNAME);
-        Number num =  numService.getPort(Number.class);
+        Number num =  (Number)numService.getPort(Number.class);
         
         InvocationHandler handler  = Proxy.getInvocationHandler(num);
         BindingProvider bp = (BindingProvider)handler;    

@@ -44,7 +44,6 @@ public class ResourceBean implements Serializable {
     public static final String MONITOR_POLL_INTERVAL = "monitor.poll.interval"; 
     public static final String EJB_SERVANT_BASE_URL = "ejb.servant.base.url";
     
-    private static final long serialVersionUID = -2373577203597864072L;
 
     static {
         // first use of log, default init if necessary

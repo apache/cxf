@@ -181,7 +181,7 @@ public class SpringBusFactoryTest extends Assert {
     }
 
     
-    static class TestInterceptor implements Interceptor<Message> {
+    static class TestInterceptor implements Interceptor {
 
         private String name;
         

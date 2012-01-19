@@ -21,5 +21,5 @@ package org.apache.cxf.jaxrs.fortest;
 
 
 
-public class AbstractEntity2<T, E> extends AbstractEntity<T, E>  {
+public class AbstractEntity2<T, E> extends AbstractEntity {
 }

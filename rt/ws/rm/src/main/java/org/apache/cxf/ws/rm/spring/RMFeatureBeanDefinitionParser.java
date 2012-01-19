@@ -63,7 +63,7 @@ public class RMFeatureBeanDefinitionParser extends AbstractBeanDefinitionParser 
     }
 
     @Override
-    protected Class<?> getBeanClass(Element element) {
+    protected Class getBeanClass(Element element) {
         return RMFeature.class;
     }
 

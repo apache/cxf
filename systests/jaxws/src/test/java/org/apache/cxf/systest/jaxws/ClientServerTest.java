@@ -469,7 +469,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             }
         }
         
-        Greeter greeter = service.getPort(portName, Greeter.class);
+        Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
         long before = System.currentTimeMillis();
 
@@ -576,7 +576,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
         String expectedString = new String("Hello, finally!");
         try {
-            Greeter greeter = service.getPort(portName, Greeter.class);
+            Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
             updateAddressPort(greeter, PORT);
             long before = System.currentTimeMillis();
             long delay = 3000;

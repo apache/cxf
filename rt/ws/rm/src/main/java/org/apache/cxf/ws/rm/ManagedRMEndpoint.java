@@ -55,7 +55,6 @@ public class ManagedRMEndpoint implements ManagedComponent {
     {"sequenceId", "currentMessageNumber", "expires", "lastMessage", "queuedMessageCount", 
      "target"};
     private static final String[] SOURCE_SEQUENCE_DESCRIPTIONS = SOURCE_SEQUENCE_NAMES;
-    @SuppressWarnings("rawtypes") // needed as OpenType isn't generic on Java5
     private static final OpenType[] SOURCE_SEQUENCE_TYPES =  
     {SimpleType.STRING, SimpleType.LONG, SimpleType.DATE, SimpleType.BOOLEAN, SimpleType.INTEGER, 
      SimpleType.STRING};
@@ -63,7 +62,6 @@ public class ManagedRMEndpoint implements ManagedComponent {
     private static final String[] DESTINATION_SEQUENCE_NAMES = 
     {"sequenceId", "lastMessageNumber", "correlationId", "ackTo"};
     private static final String[] DESTINATION_SEQUENCE_DESCRIPTIONS = DESTINATION_SEQUENCE_NAMES;
-    @SuppressWarnings("rawtypes") // needed as OpenType isn't generic on Java5
     private static final OpenType[] DESTINATION_SEQUENCE_TYPES =  
     {SimpleType.STRING, SimpleType.LONG, SimpleType.STRING, 
      SimpleType.STRING};
@@ -71,7 +69,6 @@ public class ManagedRMEndpoint implements ManagedComponent {
     private static final String[] RETRANSMISSION_STATUS_NAMES = 
     {"messageNumber", "resends", "previous", "next", "nextInterval", "backOff", "pending", "suspended"};
     private static final String[] RETRANSMISSION_STATUS_DESCRIPTIONS = RETRANSMISSION_STATUS_NAMES;
-    @SuppressWarnings("rawtypes") // needed as OpenType isn't generic on Java5
     private static final OpenType[] RETRANSMISSION_STATUS_TYPES =  
     {SimpleType.LONG, SimpleType.INTEGER, SimpleType.DATE, SimpleType.DATE, SimpleType.LONG, SimpleType.LONG, 
      SimpleType.BOOLEAN, SimpleType.BOOLEAN};

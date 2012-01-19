@@ -125,7 +125,7 @@ public class ConfigurerImpl implements Configurer {
                 }
                 if (cm instanceof BeanMetadata) {
                     ReflectionUtil.setAccessible(m);
-                    m.invoke(container, cm, beanInstance);
+                    m.invoke(container, (BeanMetadata)cm, beanInstance);
                 }
             } else {
                 //Aries blueprint 0.3.x

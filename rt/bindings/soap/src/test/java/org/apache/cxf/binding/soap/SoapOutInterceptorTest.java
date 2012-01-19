@@ -69,7 +69,7 @@ public class SoapOutInterceptorTest extends TestBase {
         
         assertNotNull(soapMessage.getHeaders());
 
-        Exception oe = soapMessage.getContent(Exception.class);
+        Exception oe = (Exception)soapMessage.getContent(Exception.class);
         if (oe != null) {
             throw oe;
         }
@@ -91,7 +91,7 @@ public class SoapOutInterceptorTest extends TestBase {
         
         assertNotNull(soapMessage.getHeaders());
 
-        Exception oe = soapMessage.getContent(Exception.class);
+        Exception oe = (Exception)soapMessage.getContent(Exception.class);
         if (oe != null) {
             throw oe;
         }

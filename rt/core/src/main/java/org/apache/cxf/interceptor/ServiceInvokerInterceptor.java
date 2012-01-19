@@ -72,7 +72,7 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                         if (result instanceof MessageContentsList) {
                             resList = (MessageContentsList)result;
                         } else if (result instanceof List) {
-                            resList = new MessageContentsList((List<?>)result);
+                            resList = new MessageContentsList((List)result);
                         } else if (result.getClass().isArray()) {
                             resList = new MessageContentsList((Object[])result);
                         } else {

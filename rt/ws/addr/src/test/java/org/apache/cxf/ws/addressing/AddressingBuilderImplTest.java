@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.addressing;
 
-import org.apache.cxf.ws.addressing.impl.AddressingBuilderImpl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

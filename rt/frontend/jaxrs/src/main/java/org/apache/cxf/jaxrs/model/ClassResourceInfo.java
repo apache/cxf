@@ -229,7 +229,7 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             return JAXRSUtils.parseMediaTypes(producesTypes);
         }
         return JAXRSUtils.getProduceTypes(
-             AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class));
+             (Produces)AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class));
     }
     
     public List<MediaType> getConsumeMime() {
@@ -237,11 +237,11 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             return JAXRSUtils.parseMediaTypes(consumesTypes);
         }
         return JAXRSUtils.getConsumeTypes(
-             AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class));
+             (Consumes)AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class));
     }
     
     public Path getPath() {
-        return AnnotationUtils.getClassAnnotation(getServiceClass(), Path.class);
+        return (Path)AnnotationUtils.getClassAnnotation(getServiceClass(), Path.class);
     }
     
     private void addParamMethod(Method m) {

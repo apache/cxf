@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -60,11 +61,11 @@ public class AntGenerator extends AbstractJAXWSGenerator {
             return;
         }
         
-        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
 
             if (javaModel.getServiceClasses().size() == 0) {
-                ServiceInfo serviceInfo = env.get(ServiceInfo.class);
+                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_ANT", LOG, wsdl);
                 if (penv.isVerbose()) {
@@ -78,8 +79,12 @@ public class AntGenerator extends AbstractJAXWSGenerator {
             
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
             int index = 1;
-            for (JavaServiceClass js : javaModel.getServiceClasses().values()) {
-                for (JavaPort jp : js.getPorts()) {
+            Iterator it = javaModel.getServiceClasses().values().iterator();
+            while (it.hasNext()) {
+                JavaServiceClass js = (JavaServiceClass)it.next();
+                Iterator i = js.getPorts().iterator();
+                while (i.hasNext()) {
+                    JavaPort jp = (JavaPort)i.next();
                     String interfaceName = jp.getInterfaceClass();
                     JavaInterface intf = interfaces.get(interfaceName);
                     if (intf == null) {

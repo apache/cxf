@@ -107,7 +107,7 @@ public class SCTValidator implements TokenValidator {
                     LOG.fine("Identifier: " + identifier + " is not found in the cache");
                     return response;
                 }
-                byte[] secret = token.getSecret();
+                byte[] secret = (byte[])token.getSecret();
                 Map<String, Object> properties = new HashMap<String, Object>();
                 properties.put(SCT_VALIDATOR_SECRET, secret);
                 response.setAdditionalProperties(properties);

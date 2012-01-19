@@ -51,7 +51,7 @@ public final class PlugInClassLoaderHelper {
     public static byte[] getResourceAsBytes(String name) throws IOException {
         // check nonClassCache for properties etc..
         if (!name.endsWith(".class") && nonClassesMap.containsKey(name)) {
-            return nonClassesMap.get(name);            
+            return (byte[])(nonClassesMap.get(name));            
         }
 
         // first check file path directorys, then check jars
@@ -71,7 +71,7 @@ public final class PlugInClassLoaderHelper {
             } else {
                 String enclosingJar = name.substring(0, name.lastIndexOf("!/") + 2);
                 String resourceName = name.substring(name.lastIndexOf("!/") + 2);
-                Map<?, ?> jarMap = JarLoader.getJarContents(enclosingJar);
+                Map jarMap = JarLoader.getJarContents(enclosingJar);
 
                 if (null != jarMap && jarMap.containsKey(resourceName)) {
                     byte bytes[] = (byte[])jarMap.get(resourceName);

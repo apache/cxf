@@ -1157,7 +1157,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);
         TestSOAPHandler soapHandler2 = new TestSOAPHandler(false);
 
-        addHandlersToChain(disp, handler1, handler2, soapHandler1, soapHandler2);
+        addHandlersToChain((BindingProvider)disp, handler1, handler2, soapHandler1, soapHandler2);
 
         InputStream is = getClass().getResourceAsStream("PingReq.xml");
         SOAPMessage outMsg = MessageFactory.newInstance().createMessage(null, is);

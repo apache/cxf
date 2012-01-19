@@ -29,14 +29,14 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 public class CXFBusFactory extends BusFactory {
     
     public Bus createBus() {
-        return createBus(new HashMap<Class<?>, Object>());
+        return createBus(new HashMap<Class, Object>());
     }
     
-    public Bus createBus(Map<Class<?>, Object> e) {
+    public Bus createBus(Map<Class, Object> e) {
         return createBus(e, new HashMap<String, Object>());
     }
     
-    public Bus createBus(Map<Class<?>, Object> e, Map<String, Object> properties) {
+    public Bus createBus(Map<Class, Object> e, Map<String, Object> properties) {
         ExtensionManagerBus bus = new ExtensionManagerBus(e, properties);
         possiblySetDefaultBus(bus);
         initializeBus(bus);

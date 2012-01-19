@@ -23,7 +23,6 @@ import javax.xml.ws.WebFault;
 
 @WebFault
 public class BookNotFoundFault extends Exception {
-    private static final long serialVersionUID = 497738666759033678L;
     private BookNotFoundDetails details;
 
     public BookNotFoundFault(BookNotFoundDetails details) {

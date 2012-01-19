@@ -70,7 +70,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
         return null;
     }
 
-    public Object read(QName name, XMLStreamReader input, Class<?> type) {        
+    public Object read(QName name, XMLStreamReader input, Class type) {        
         return read(null, input);
     }
 

@@ -263,7 +263,7 @@ public class WSDLManagerImpl implements WSDLManager {
             throw new BusException(ex);
         }
 
-        for (Iterator<?> it = initialExtensions.keySet().iterator(); it.hasNext();) {
+        for (Iterator it = initialExtensions.keySet().iterator(); it.hasNext();) {
             StringTokenizer st = new StringTokenizer(initialExtensions.getProperty((String) it.next()), "=");
             String parentType = st.nextToken();
             String elementType = st.nextToken();

@@ -85,7 +85,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
         ServiceBuilder builder = null;
 
         try {
-            builder = applicationContext.getBean(beanName, ServiceBuilder.class);
+            builder = (ServiceBuilder)applicationContext.getBean(beanName, ServiceBuilder.class);
             AbstractServiceFactory serviceFactory = (AbstractServiceFactory)builder;
             serviceFactory.setDataBinding(dataBinding);
         } catch (RuntimeException e) {

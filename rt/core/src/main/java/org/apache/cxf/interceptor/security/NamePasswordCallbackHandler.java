@@ -37,7 +37,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(NamePasswordCallbackHandler.class);
     private static final Logger LOG = LogUtils.getL7dLogger(NamePasswordCallbackHandler.class);
     private static final String PASSWORD_CALLBACK_NAME = "setObject";
-    private static final Class<?>[] PASSWORD_CALLBACK_TYPES = 
+    private static final Class[] PASSWORD_CALLBACK_TYPES = 
         new Class[]{Object.class, char[].class, String.class};
     
     private String username;  

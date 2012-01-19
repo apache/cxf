@@ -97,7 +97,7 @@ public class SourceType extends AegisType {
 
             StaxUtils.writeElement(element, writer, false);
         } else {
-            StaxUtils.copy(object, writer);
+            StaxUtils.copy((Source)object, writer);
         }
     }
 

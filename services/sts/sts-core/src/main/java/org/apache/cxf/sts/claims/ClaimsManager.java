@@ -20,9 +20,12 @@
 package org.apache.cxf.sts.claims;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -54,6 +57,24 @@ public class ClaimsManager {
                 supportedClaimTypes.addAll(handler.getSupportedClaimTypes());
             }
         }
+    }
+
+    @Deprecated
+    public ClaimCollection retrieveClaimValues(
+            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
+        if (claimHandlers != null && claimHandlers.size() > 0 && claims != null && claims.size() > 0) {
+            ClaimCollection returnCollection = new ClaimCollection();
+            for (ClaimsHandler handler : claimHandlers) {
+                ClaimCollection claimCollection = handler.retrieveClaimValues(
+                        principal, claims, context, realm);
+                if (claimCollection != null && claimCollection.size() != 0) {
+                    returnCollection.addAll(claimCollection);
+                }
+            }
+            validateClaimValues(claims, returnCollection);
+            return returnCollection;
+        }
+        return null;
     }
     
     public ClaimCollection retrieveClaimValues(RequestClaimCollection claims, ClaimsParameters parameters) {

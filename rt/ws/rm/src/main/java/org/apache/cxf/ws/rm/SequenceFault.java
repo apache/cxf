@@ -31,7 +31,6 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
  */
 public class SequenceFault extends Exception {
     
-    private static final long serialVersionUID = 1144842362378723203L;
     private boolean sender;
     private QName faultCode;
     private Object detail;

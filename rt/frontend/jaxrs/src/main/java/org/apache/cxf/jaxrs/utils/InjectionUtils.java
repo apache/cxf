@@ -107,7 +107,7 @@ public final class InjectionUtils {
         return !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers());
     }
     
-    public static Type getSuperType(Class<?> serviceClass, TypeVariable<?> var) {
+    public static Type getSuperType(Class<?> serviceClass, TypeVariable var) {
         
         int pos = 0;
         TypeVariable<?>[] vars = var.getGenericDeclaration().getTypeParameters();
@@ -277,19 +277,20 @@ public final class InjectionUtils {
         return null;
     }
     
-    public static <T> T handleParameter(String value, 
-                                        boolean decoded,
-                                        Class<T> pClass,
-                                        Annotation[] paramAnns,
-                                        ParameterType pType,
-                                        Message message) {
+    public static Object handleParameter(String value, 
+                                         boolean decoded,
+                                         Class<?> pClass,
+                                         Annotation[] paramAnns,
+                                         ParameterType pType,
+                                         Message message) {
+        
         if (value == null) {
             return null;
         }
         
         if (pType == ParameterType.PATH) {
             if (PathSegment.class.isAssignableFrom(pClass)) {
-                return pClass.cast(new PathSegmentImpl(value, decoded));   
+                return new PathSegmentImpl(value, decoded);   
             } else {
                 value = new PathSegmentImpl(value, false).getPath();                 
             }
@@ -297,14 +298,10 @@ public final class InjectionUtils {
         
         value = decodeValue(value, decoded, pType);
         
+        
         if (pClass.isPrimitive()) {
             try {
-                @SuppressWarnings("unchecked")
-                T ret = (T)PrimitiveUtils.read(value, pClass);
-                // cannot us pClass.cast as the pClass is something like
-                // Boolean.TYPE (representing the boolean primitive) and
-                // the object is a Boolean object
-                return ret;
+                return PrimitiveUtils.read(value, pClass);
             } catch (NumberFormatException nfe) {
                 //
                 //  For path, query & matrix parameters this is 404,
@@ -319,27 +316,26 @@ public final class InjectionUtils {
         }
         
         boolean adapterHasToBeUsed = false;
-        Class<?> cls = pClass;        
         Class<?> valueType = JAXBUtils.getValueTypeFromAdapter(pClass, pClass, paramAnns);
-        if (valueType != cls) {
-            cls = valueType;
+        if (valueType != pClass) {
+            pClass = valueType;
             adapterHasToBeUsed = true;
         }
         
-        Object result = instantiateFromParameterHandler(value, cls, message);
+        Object result = instantiateFromParameterHandler(value, pClass, message);
         if (result != null) {
-            return pClass.cast(result);
+            return result;
         }
         // check constructors accepting a single String value
         try {
-            Constructor<?> c = cls.getConstructor(new Class<?>[]{String.class});
+            Constructor<?> c = pClass.getConstructor(new Class<?>[]{String.class});
             result = c.newInstance(new Object[]{value});
         } catch (NoSuchMethodException ex) {
             // try valueOf
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (Exception ex) {
-            result = createFromParameterHandler(value, cls, message);
+            result = createFromParameterHandler(value, pClass, message);
             if (result == null) {
                 LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                    BUNDLE, 
@@ -349,11 +345,11 @@ public final class InjectionUtils {
         }
         if (result == null) {
             // check for valueOf(String) static methods
-            String[] methodNames = cls.isEnum() 
+            String[] methodNames = pClass.isEnum() 
                 ? new String[] {"fromString", "fromValue", "valueOf"} 
                 : new String[] {"valueOf", "fromString"};
             for (String mName : methodNames) {   
-                result = evaluateFactoryMethod(value, cls, pType, mName);
+                result = evaluateFactoryMethod(value, pClass, pType, mName);
                 if (result != null) {
                     break;
                 }
@@ -361,7 +357,7 @@ public final class InjectionUtils {
         }
         
         if (result == null) {
-            result = createFromParameterHandler(value, cls, message);
+            result = createFromParameterHandler(value, pClass, message);
         }
         
         if (result != null && adapterHasToBeUsed) {
@@ -377,11 +373,11 @@ public final class InjectionUtils {
             reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
         }
         
-        return pClass.cast(result);
+        return result;
     }
 
-    private static <T> T instantiateFromParameterHandler(String value, 
-                                                     Class<T> pClass,
+    private static Object instantiateFromParameterHandler(String value, 
+                                                     Class<?> pClass,
                                                      Message message) {
         // TODO: Consider always checking custom parameter handlers first.
         // Right now, Locale and Date are two special cases so it's very cheap
@@ -393,12 +389,12 @@ public final class InjectionUtils {
         }
     }
     
-    private static <T> T createFromParameterHandler(String value, 
-                                                    Class<T> pClass,
-                                                    Message message) {
-        T result = null;
+    private static Object createFromParameterHandler(String value, 
+                                                     Class<?> pClass,
+                                                     Message message) {
+        Object result = null;
         if (message != null) {
-            ParameterHandler<T> pm = ProviderFactory.getInstance(message)
+            ParameterHandler<?> pm = ProviderFactory.getInstance(message)
                 .createParameterHandler(pClass);
             if (pm != null) {
                 result = pm.fromString(value);
@@ -419,14 +415,14 @@ public final class InjectionUtils {
         throw new WebApplicationException(r);
     }
     
-    private static <T> T evaluateFactoryMethod(String value,
-                                                Class<T> pClass, 
+    private static Object evaluateFactoryMethod(String value,
+                                                Class<?> pClass, 
                                                 ParameterType pType, 
                                                 String methodName) {
         try {
             Method m = pClass.getMethod(methodName, new Class<?>[]{String.class});
             if (Modifier.isStatic(m.getModifiers())) {
-                return pClass.cast(m.invoke(null, new Object[]{value}));
+                return m.invoke(null, new Object[]{value});
             }
         } catch (NoSuchMethodException ex) {
             // no luck
@@ -843,9 +839,8 @@ public final class InjectionUtils {
     }
     
     // TODO : investigate the possibility of using generic proxies only
-    @SuppressWarnings("unchecked")
-    public static <T> ThreadLocalProxy<T> createThreadLocalProxy(Class<T> type) {
-        ThreadLocalProxy<?> proxy = null;
+    public static ThreadLocalProxy createThreadLocalProxy(Class<?> type) {
+        ThreadLocalProxy proxy = null;
         if (UriInfo.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalUriInfo();
         } else if (HttpHeaders.class.isAssignableFrom(type)) {
@@ -855,7 +850,7 @@ public final class InjectionUtils {
         } else if (SecurityContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalSecurityContext();
         } else if (ContextResolver.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalContextResolver<Object>();
+            proxy = new ThreadLocalContextResolver();
         } else if (Request.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalRequest();
         }  else if (Providers.class.isAssignableFrom(type)) {
@@ -870,7 +865,7 @@ public final class InjectionUtils {
             proxy = createThreadLocalServletApiContext(type.getName());  
         }
         
-        return (ThreadLocalProxy<T>)proxy;
+        return proxy;
     }
     
     private static boolean isServletApiContext(String name) { 
@@ -932,9 +927,8 @@ public final class InjectionUtils {
         if (!cri.isSingleton()) {
             InjectionUtils.injectFieldValue(f, o, value);
         } else {
-            ThreadLocalProxy<Object> proxy =  (ThreadLocalProxy<Object>)(
-                    resource ? cri.getResourceFieldProxy(f)
-                        : cri.getContextFieldProxy(f));
+            ThreadLocalProxy proxy = resource ? cri.getResourceFieldProxy(f)
+                                              : cri.getContextFieldProxy(f);
             if (proxy != null) {
                 proxy.set(value);
             }
@@ -967,8 +961,7 @@ public final class InjectionUtils {
                 if (!cri.isSingleton()) {
                     InjectionUtils.injectThroughMethod(requestObject, method, o);
                 } else {
-                    ThreadLocalProxy<Object> proxy 
-                        = (ThreadLocalProxy<Object>)cri.getContextSetterProxy(method);
+                    ThreadLocalProxy proxy = cri.getContextSetterProxy(method);
                     if (proxy != null) {
                         proxy.set(o);
                     }
@@ -1117,12 +1110,13 @@ public final class InjectionUtils {
         }
     }
     
-    public static <T> Object convertStringToPrimitive(String value, Class<?> cls) {
+    @SuppressWarnings("unchecked")
+    public static <T> T convertStringToPrimitive(String value, Class<T> cls) {
         if (String.class == cls) {
-            return value;
+            return cls.cast(value);
         }
         if (cls.isPrimitive()) {
-            return PrimitiveUtils.read(value, cls);
+            return (T)PrimitiveUtils.read(value, cls);
         } else {
             try {
                 Method m = cls.getMethod("valueOf", new Class[]{String.class});

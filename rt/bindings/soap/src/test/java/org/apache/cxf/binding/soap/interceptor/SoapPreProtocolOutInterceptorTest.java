@@ -64,8 +64,7 @@ public class SoapPreProtocolOutInterceptorTest extends Assert {
         interceptor.handleMessage(message);
         control.verify();
 
-        Map<String, List<String>> reqHeaders 
-            = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        Map<String, List<String>> reqHeaders = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
         assertNotNull(reqHeaders);
         List<String> soapaction = reqHeaders.get("soapaction");
         assertTrue(null != soapaction && soapaction.size() == 1);
@@ -89,8 +88,7 @@ public class SoapPreProtocolOutInterceptorTest extends Assert {
         interceptor.handleMessage(message);
         control.verify();
 
-        Map<String, List<String>> reqHeaders 
-            = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        Map<String, List<String>> reqHeaders = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
         assertNotNull(reqHeaders);
         List<String> soapaction = reqHeaders.get("soapaction");
         assertTrue(null != soapaction && soapaction.size() == 1);

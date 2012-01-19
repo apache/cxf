@@ -138,7 +138,7 @@ public final class JMSEndpointParser {
      */
     private static String getAndRemoveParameter(Map<String, String> parameters,
                                                 String parameterName) {
-        String value = parameters.get(parameterName);
+        String value = (String)parameters.get(parameterName);
         parameters.remove(parameterName);
         return value;
     }

@@ -20,6 +20,7 @@
 package org.apache.cxf.customer.book;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.jws.WebService;
@@ -28,8 +29,9 @@ import javax.jws.WebService;
 @WebService(endpointInterface = "org.apache.cxf.customer.book.BookService")
 public class BookServiceWrappedImpl implements BookServiceWrapped {
     long currentId = 1;
-    Map<Long, Book> books = new HashMap<Long, Book>();
+    Map books = new HashMap();
     
+    @SuppressWarnings("unchecked")
     public BookServiceWrappedImpl() {
         Book book = createBook();
         System.out.println("Register the Book's id " + book.getId());
@@ -37,12 +39,13 @@ public class BookServiceWrappedImpl implements BookServiceWrapped {
     }
 
     public Book getBook(long bookid) throws BookNotFoundFault {
-        for (Map.Entry<Long, Book> me : books.entrySet()) {
+        for (Iterator iter = books.entrySet().iterator(); iter.hasNext();) { 
+            Map.Entry me = (Map.Entry)iter.next();
             System.out.println("getBook -> " + me.getKey() + " : " 
-                               + me.getValue().getName() + ", " + me.getValue().getId());
+                               + ((Book)me.getValue()).getName() + ", " + ((Book)me.getValue()).getId());
         }
         System.out.println("The Book's id " + bookid);
-        Book b = books.get(bookid);
+        Book b = (Book)books.get(bookid);
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();

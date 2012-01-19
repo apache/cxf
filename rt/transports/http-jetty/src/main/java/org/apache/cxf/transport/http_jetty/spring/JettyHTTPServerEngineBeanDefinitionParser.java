@@ -159,7 +159,7 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
     }
 
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return SpringJettyHTTPServerEngine.class;
     }
     

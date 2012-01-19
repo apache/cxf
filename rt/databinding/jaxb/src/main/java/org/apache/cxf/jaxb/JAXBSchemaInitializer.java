@@ -41,9 +41,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.jaxb.JAXBBeanInfo;
-import org.apache.cxf.common.jaxb.JAXBContextProxy;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
@@ -264,8 +261,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         return null;
     }
 
-    private JAXBBeanInfo findFromTypeAdapter(@SuppressWarnings("rawtypes") 
-                                             Class<? extends XmlAdapter> aclass) {
+    private JAXBBeanInfo findFromTypeAdapter(Class<? extends XmlAdapter> aclass) {
         Class<?> c2 = aclass;
         Type sp = c2.getGenericSuperclass();
         while (!XmlAdapter.class.equals(c2) && c2 != null) {

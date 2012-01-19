@@ -310,7 +310,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         return servletContext;
     }
     
-    public ContextResolver<JAXBContext> getContextResolver() {
+    public ContextResolver getContextResolver() {
         return cr;
     }
 
@@ -395,7 +395,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
 //  CHECKSTYLE:OFF
-    public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) {
+    public void testWrongType(@QueryParam("p1") HashMap map) {
         // complete
     }
 //  CHECKSTYLE:ON    

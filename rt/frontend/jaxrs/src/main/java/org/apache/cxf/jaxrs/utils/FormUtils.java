@@ -102,8 +102,8 @@ public final class FormUtils {
                 }
             }
         } else if (request != null) {
-            for (Enumeration<String> en = request.getParameterNames(); en.hasMoreElements();) {
-                String paramName = en.nextElement();
+            for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
+                String paramName = en.nextElement().toString();
                 String[] values = request.getParameterValues(paramName);
                 params.put(HttpUtils.urlDecode(paramName), Arrays.asList(values));
             }

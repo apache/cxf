@@ -91,7 +91,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
         buf.append(File.pathSeparatorChar);
 
 
-        List<?> artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
+        List artifacts = useCompileClasspath ? project.getCompileArtifacts() : project.getTestArtifacts();
         for (Artifact a : CastUtils.cast(artifacts, Artifact.class)) {
             try {
                 if (a.getFile() != null
@@ -149,7 +149,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
                     }
                     list.add(wsdltoidlOptions[x].getWSDL());            
                     try {
-                        WSDLToIDL.run(list.toArray(new String[list.size()]));
+                        WSDLToIDL.run((String[])list.toArray(new String[list.size()]));
                         doneFile.delete();
                         doneFile.createNewFile();
                     } catch (Throwable e) {

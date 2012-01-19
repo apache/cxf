@@ -111,7 +111,7 @@ public class JCABusFactory {
         LOG.info("Initializing EJB endpoints from properties file...");
         
         try {           
-            Enumeration<?> keys = ejbServants.keys();
+            Enumeration keys = ejbServants.keys();
             while (keys.hasMoreElements()) {
                 String theJNDIName = (String)keys.nextElement();
                 String value = (String)ejbServants.get(theJNDIName);
@@ -208,7 +208,7 @@ public class JCABusFactory {
     }
     
 
-    protected List<Server> getRegisteredServants() {
+    protected List getRegisteredServants() {
         return servantsCache;
     }
 

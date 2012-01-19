@@ -24,7 +24,6 @@ package org.apache.cxf.aegis.inheritance.ws1;
  * @author xfournet
  */
 public class BeanA implements java.io.Serializable {
-    private static final long serialVersionUID = 5809923229162815069L;
     private String propA;
 
     public String getPropA() {

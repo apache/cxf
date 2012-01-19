@@ -56,10 +56,10 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     private final ClassLoader loader;
     private ResourceManager resourceManager;
     private Map<String, Extension> all = new LinkedHashMap<String, Extension>();
-    private final Map<Class<?>, Object> activated;
+    private final Map<Class, Object> activated;
     private final Bus bus;
 
-    public ExtensionManagerImpl(ClassLoader cl, Map<Class<?>, Object> initialExtensions, 
+    public ExtensionManagerImpl(ClassLoader cl, Map<Class, Object> initialExtensions, 
                                 ResourceManager rm, Bus b) {
         this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_XML,
                            BUS_EXTENSION_RESOURCE_OLD_XML},
@@ -67,14 +67,14 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
     public ExtensionManagerImpl(String resource, 
                                 ClassLoader cl, 
-                                Map<Class<?>, Object> initialExtensions, 
+                                Map<Class, Object> initialExtensions, 
                                 ResourceManager rm,
                                 Bus b) {
         this(new String[] {resource}, cl, initialExtensions, rm, b);
     }    
     public ExtensionManagerImpl(String resources[], 
                                 ClassLoader cl, 
-                                Map<Class<?>, Object> initialExtensions, 
+                                Map<Class, Object> initialExtensions, 
                                 ResourceManager rm,
                                 Bus b) {
 
@@ -134,26 +134,18 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
     public synchronized <T> void activateAllByType(Class<T> type) {
         for (Extension e : all.values()) {
-            if (e.getLoadedObject() == null) {
-                Class<?> cls = e.getClassObject(loader);
-                if (cls != null && type.isAssignableFrom(cls)) {
-                    loadAndRegister(e);
-                }
+            if (e.getLoadedObject() == null
+                && type.isAssignableFrom(e.getClassObject(loader))) {
+                loadAndRegister(e);
             }
         }        
     }
-    
-    public boolean hasBeanOfName(String name) {
-        return all.containsKey(name);
-    }
-
     final void load(String resource) throws IOException {
         if (loader != getClass().getClassLoader()) {
             load(resource, getClass().getClassLoader());
         }
         load(resource, loader);
     }
-    @SuppressWarnings("deprecation")
     final void load(String resource, ClassLoader l) throws IOException {
         
         Enumeration<URL> urls = l.getResources(resource);
@@ -166,9 +158,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                 if (resource.endsWith("xml")) {
                     LOG.log(Level.WARNING, "DEPRECATED_EXTENSIONS", 
                             new Object[] {resource, url, BUS_EXTENSION_RESOURCE});
-                    exts = new XmlExtensionFragmentParser().getExtensions(is);
+                    exts = new ExtensionFragmentParser().getExtensionsFromXML(is);
                 } else {
-                    exts = new TextExtensionFragmentParser().getExtensions(is);
+                    exts = new ExtensionFragmentParser().getExtensionsFromText(is);
                 }
                 for (Extension e : exts) {
                     if (loader != l) {
@@ -238,29 +230,26 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
     public synchronized <T> T getExtension(String name, Class<T> type) {
         Extension e = all.get(name);
-        if (e != null) {
-            Class<?> cls = e.getClassObject(loader);
-        
-            if (cls != null && type.isAssignableFrom(e.getClassObject(loader))) {
-                if (e.getLoadedObject() == null) {
-                    loadAndRegister(e);
-                }
-                return type.cast(e.getLoadedObject());
+        if (e != null
+            && type.isAssignableFrom(e.getClassObject(loader))) {
+            if (e.getLoadedObject() == null) {
+                loadAndRegister(e);
             }
+            return type.cast(e.getLoadedObject());
         }
         return null;
     }
     
     private void invokeSetterActivationNSMethod(Object target, Object value) {
-        Class<?> clazz = target.getClass();
+        Class clazz = target.getClass();
         String methodName = ACTIVATION_NAMESPACES_SETTER_METHOD_NAME;
         while (clazz != Object.class) {
             Method[] methods = clazz.getMethods();
             for (int i = 0; i < methods.length; i++) {
                 Method method = methods[i];
-                Class<?> params[] = method.getParameterTypes();
+                Class params[] = method.getParameterTypes();
                 if (method.getName().equals(methodName) && params.length == 1) {
-                    Class<?> paramType = params[0];
+                    Class paramType = params[0];
                     if (paramType.isInstance(value)) {
                         try {
                             method.invoke(target, new Object[] {value});
@@ -277,8 +266,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     public List<String> getBeanNamesOfType(Class<?> type) {
         List<String> ret = new LinkedList<String>();
         for (Extension ex : all.values()) {
-            Class<?> cls = ex.getClassObject(loader);
-            if (cls != null && type.isAssignableFrom(cls)) {
+            if (type.isAssignableFrom(ex.getClassObject(loader))) {
                 ret.add(ex.getName());
             }            
         }
@@ -297,8 +285,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     public synchronized <T> Collection<? extends T> getBeansOfType(Class<T> type) {
         List<T> ret = new LinkedList<T>();
         for (Extension ex : all.values()) {
-            Class<?> cls = ex.getClassObject(loader);
-            if (cls != null && type.isAssignableFrom(cls)) {
+            if (type.isAssignableFrom(ex.getClassObject(loader))) {
                 if (ex.getLoadedObject() == null) {
                     loadAndRegister(ex);
                 }
@@ -311,8 +298,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         boolean loaded = false;
         for (Extension ex : all.values()) {
             Class<?> cls = ex.getClassObject(loader);
-            if (cls != null 
-                && ex.getLoadedObject() == null 
+            if (ex.getLoadedObject() == null 
                 && type.isAssignableFrom(cls)
                 && listener.loadBean(ex.getName(), cls.asSubclass(type))) {
                 loadAndRegister(ex);

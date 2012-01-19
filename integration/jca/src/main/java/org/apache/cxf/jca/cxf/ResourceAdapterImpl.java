@@ -19,6 +19,7 @@
 package org.apache.cxf.jca.cxf;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -46,10 +47,9 @@ import org.apache.cxf.jca.inbound.MDBActivationWork;
 
 public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter {
 
-    private static final long serialVersionUID = 5318740621610762307L;
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceAdapterImpl.class);
     private BootstrapContext ctx;
-    private Set<Bus> busCache = new HashSet<Bus>();
+    private Set <Bus> busCache = new HashSet<Bus>();
     private Map<String, InboundEndpoint> endpoints = new ConcurrentHashMap<String, InboundEndpoint>();
     
     public ResourceAdapterImpl() {
@@ -65,7 +65,7 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
         busCache.add(bus);
     }
 
-    protected Set<Bus> getBusCache() {
+    protected Set getBusCache() {
         return busCache;
     }
 
@@ -84,7 +84,10 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
     public void stop() {
         LOG.fine("Resource Adapter is being stopped by appserver...");
         if (!busCache.isEmpty()) {
-            for (Bus bus : busCache) {
+            Iterator busIterator = busCache.iterator();
+            Bus bus = null;
+            while (busIterator.hasNext()) {
+                bus = (Bus)busIterator.next();
                 bus.shutdown(true);
             }
         }   

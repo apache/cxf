@@ -138,7 +138,7 @@ public class AegisJSONProviderTest extends Assert {
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
         bean.setStrValue("hovercraft");
-        p.writeTo(bean, AegisTestBean.class, AegisTestBean.class, 
+        p.writeTo(bean, (Class)AegisTestBean.class, AegisTestBean.class, 
                   AegisTestBean.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();

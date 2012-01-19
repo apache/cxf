@@ -61,7 +61,7 @@ public class PolicyFeatureBeanDefinitionParser extends AbstractBeanDefinitionPar
     }
 
     @Override
-    protected Class<?> getBeanClass(Element el) {
+    protected Class getBeanClass(Element el) {
         return WSPolicyFeature.class;
     }
 

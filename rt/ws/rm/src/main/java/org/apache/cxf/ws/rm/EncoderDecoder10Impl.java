@@ -74,22 +74,22 @@ public final class EncoderDecoder10Impl implements EncoderDecoder {
         return RM10Constants.INSTANCE;
     }
 
-    public Class<?> getCreateSequenceType() {
+    public Class getCreateSequenceType() {
         return org.apache.cxf.ws.rm.v200502.CreateSequenceType.class;
     }
 
-    public Class<?> getCreateSequenceResponseType() {
+    public Class getCreateSequenceResponseType() {
         return org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType.class;
     }
 
-    public Class<?> getTerminateSequenceType() {
+    public Class getTerminateSequenceType() {
         return org.apache.cxf.ws.rm.v200502.TerminateSequenceType.class;
     }
 
     private static JAXBContext getContext() throws JAXBException {
         synchronized (EncoderDecoder10Impl.class) {
             if (jaxbContext == null) {
-                Class<?> clas = RMUtils.getWSRM200502Factory().getClass();
+                Class clas = RMUtils.getWSRM200502Factory().getClass();
                 jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(clas),
                     clas.getClassLoader());
             }
@@ -118,8 +118,7 @@ public final class EncoderDecoder10Impl implements EncoderDecoder {
             if (rmps.isLastMessage()) {
                 toseq.setLastMessage(new org.apache.cxf.ws.rm.v200502.SequenceType.LastMessage());
             }
-            JAXBElement<org.apache.cxf.ws.rm.v200502.SequenceType> element 
-                = RMUtils.getWSRM200502Factory().createSequence(toseq);
+            JAXBElement element = RMUtils.getWSRM200502Factory().createSequence(toseq);
             marshaller.marshal(element, header);
         } 
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();

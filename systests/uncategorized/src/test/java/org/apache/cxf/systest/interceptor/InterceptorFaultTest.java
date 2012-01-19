@@ -183,8 +183,8 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
         } catch (PingMeFault f) {
-            assertEquals(20, f.getFaultInfo().getMajor());
-            assertEquals(10, f.getFaultInfo().getMinor());
+            assertEquals(20, (int)f.getFaultInfo().getMajor());
+            assertEquals(10, (int)f.getFaultInfo().getMinor());
         }
         
         // test failure in phases before Phase.PRE_LOGICAL

@@ -23,8 +23,6 @@ import org.apache.cxf.common.i18n.Message;
 
 public class EndpointException extends Exception {
 
-    private static final long serialVersionUID = 2718396758999944442L;
-
     public EndpointException(Message msg) {
         super(msg);
     }

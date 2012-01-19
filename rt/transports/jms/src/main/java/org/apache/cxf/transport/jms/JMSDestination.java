@@ -73,8 +73,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 public class JMSDestination extends AbstractMultiplexDestination 
-    implements SessionAwareMessageListener<javax.jms.Message>,
-        MessageListener, JMSExchangeSender {
+    implements SessionAwareMessageListener, MessageListener, JMSExchangeSender {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JMSDestination.class);
 
@@ -137,14 +136,15 @@ public class JMSDestination extends AbstractMultiplexDestination
         this.deactivate();
     }
 
+    @SuppressWarnings("unchecked")
     private Destination resolveDestinationName(final JmsTemplate jmsTemplate, final String name) {
-        SessionCallback<Destination> sc = new SessionCallback<Destination>() {
-            public Destination doInJms(Session session) throws JMSException {
+        SessionCallback sc = new SessionCallback() {
+            public Object doInJms(Session session) throws JMSException {
                 DestinationResolver resolv = jmsTemplate.getDestinationResolver();
                 return resolv.resolveDestinationName(session, name, jmsConfig.isPubSubDomain());
             }
         };
-        return jmsTemplate.execute(sc);
+        return (Destination)jmsTemplate.execute(sc);
     }
 
     public Destination getReplyToDestination(JmsTemplate jmsTemplate, Message inMessage) throws JMSException {

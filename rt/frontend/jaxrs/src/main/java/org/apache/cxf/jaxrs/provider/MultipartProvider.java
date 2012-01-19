@@ -55,7 +55,6 @@ import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -189,7 +188,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
         return actual != null && actual != Object.class ? actual : Attachment.class;
     }
     
-    private <T> Object fromAttachment(Attachment multipart, Class<T> c, Type t, Annotation anns[]) 
+    @SuppressWarnings("unchecked")
+    private Object fromAttachment(Attachment multipart, Class<?> c, Type t, Annotation anns[]) 
         throws IOException {
         if (DataHandler.class.isAssignableFrom(c)) {
             return multipart.getDataHandler();
@@ -205,12 +205,12 @@ public class MultipartProvider extends AbstractConfigurableProvider
                        multipart.getDataHandler().getInputStream());
                 anns = new Annotation[]{};
             }
-            MessageBodyReader<T> r = 
-                mc.getProviders().getMessageBodyReader(c, t, anns, multipart.getContentType());
+            MessageBodyReader<Object> r = 
+                mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
             if (r != null) {
                 InputStream is = multipart.getDataHandler().getInputStream();
                 is = decodeIfNeeded(multipart, is);
-                return r.readFrom(c, t, anns, multipart.getContentType(), multipart.getHeaders(), 
+                return r.readFrom((Class)c, t, anns, multipart.getContentType(), multipart.getHeaders(), 
                                   is);
             }
         }
@@ -254,18 +254,19 @@ public class MultipartProvider extends AbstractConfigurableProvider
         handlers.get(0).getDataHandler().writeTo(os);
     }
     
+    @SuppressWarnings("unchecked")
     private List<Attachment> convertToDataHandlers(Object obj,
                                                    Class<?> type, Type genericType,                          
                                                    Annotation[] anns, MediaType mt) {
         if (Map.class.isAssignableFrom(obj.getClass())) {
-            Map<Object, Object> objects = CastUtils.cast((Map<?, ?>)obj);
+            Map<Object, Object> objects = (Map)obj;
             List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
             int i = 0;
             for (Iterator<Map.Entry<Object, Object>> iter = objects.entrySet().iterator(); 
                 iter.hasNext();) {
-                Map.Entry<Object, Object> entry = iter.next();
+                Map.Entry entry = iter.next();
                 Object value = entry.getValue();
-                Attachment handler = createDataHandler(value, value.getClass(), 
+                Attachment handler = createDataHandler(value, value.getClass(), value.getClass(), 
                                                        new Annotation[]{},
                                                        entry.getKey().toString(),
                                                        mt.toString(),
@@ -276,7 +277,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         } else {
             String rootMediaType = getRootMediaType(anns, mt); 
             if (List.class.isAssignableFrom(obj.getClass())) {
-                return getAttachments((List<?>)obj, rootMediaType);
+                return getAttachments((List)obj, rootMediaType);
             } else {
                 if (MultipartBody.class.isAssignableFrom(type)) {
                     List<Attachment> atts = ((MultipartBody)obj).getAllAttachments();
@@ -284,7 +285,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                     return getAttachments(atts, rootMediaType);
                 }
                 Attachment handler = createDataHandler(obj,
-                                                       genericType, anns,
+                                                       type, genericType, anns,
                                                        rootMediaType, mt.toString(), 1);
                 return Collections.singletonList(handler);
             }
@@ -296,26 +297,15 @@ public class MultipartProvider extends AbstractConfigurableProvider
         for (int i = 0; i < objects.size(); i++) {
             Object value = objects.get(i);
             Attachment handler = createDataHandler(value,
-                                           value.getClass(), new Annotation[]{},
+                                           value.getClass(), value.getClass(), new Annotation[]{},
                                            rootMediaType, rootMediaType, i);
             handlers.add(handler);
         }
         return handlers;
     }
     
-    private <T> Attachment createDataHandler(T obj, 
-                                             Type genericType,
-                                             Annotation[] anns,
-                                             String mimeType,
-                                             String mainMediaType,
-                                             int id) {
-        @SuppressWarnings("unchecked")
-        Class<T> cls = (Class<T>)obj.getClass();
-        return createDataHandler(obj, cls, genericType, anns, mimeType, mainMediaType, id);
-    }
-    private <T> Attachment createDataHandler(T obj, 
-                                         Class<T> cls, 
-                                         Type genericType,
+    private Attachment createDataHandler(Object obj, 
+                                         Class<?> cls, Type genericType,
                                          Annotation[] anns,
                                          String mimeType,
                                          String mainMediaType,
@@ -341,7 +331,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             if (att.getObject() == null) {
                 return att;
             }
-            dh = getHandlerForObject(att.getObject(), 
+            dh = getHandlerForObject(att.getObject(), att.getObject().getClass(), 
                                      att.getObject().getClass(), new Annotation[]{}, 
                                      att.getContentType().toString(), id);
             return new Attachment(att.getContentId(), dh, att.getHeaders());
@@ -365,13 +355,14 @@ public class MultipartProvider extends AbstractConfigurableProvider
         return id == 0 ? AttachmentUtil.BODY_ATTACHMENT_ID : Integer.toString(id);
     }
     
-    private <T> DataHandler getHandlerForObject(T obj, 
-                                            Class<T> cls, Type genericType,
+    @SuppressWarnings("unchecked")
+    private DataHandler getHandlerForObject(Object obj, 
+                                            Class<?> cls, Type genericType,
                                             Annotation[] anns,
                                             String mimeType, int id) {
         MediaType mt = MediaType.valueOf(mimeType);
-        MessageBodyWriter<T> r = 
-            mc.getProviders().getMessageBodyWriter(cls, genericType, anns, mt);
+        MessageBodyWriter<Object> r = 
+            (MessageBodyWriter)mc.getProviders().getMessageBodyWriter(cls, genericType, anns, mt);
         if (r == null) {
             org.apache.cxf.common.i18n.Message message = 
                 new org.apache.cxf.common.i18n.Message("NO_MSG_WRITER",
@@ -380,15 +371,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             LOG.severe(message.toString());
             throw new WebApplicationException(500);
         }
-        return new MessageBodyWriterDataHandler<T>(r, obj, cls, genericType, anns, mt);
-    }
-    private <T> DataHandler getHandlerForObject(T obj, 
-                                            Type genericType,
-                                            Annotation[] anns,
-                                            String mimeType, int id) {
-        @SuppressWarnings("unchecked")
-        Class<T> cls = (Class<T>)obj.getClass();
-        return getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
+        return new MessageBodyWriterDataHandler(r, obj, cls, genericType, anns, mt);
     }
     
     private DataHandler createInputStreamDH(InputStream is, String mimeType) {
@@ -414,16 +397,16 @@ public class MultipartProvider extends AbstractConfigurableProvider
         return mimeType;
     }
     
-    private static class MessageBodyWriterDataHandler<T> extends DataHandler {
-        private MessageBodyWriter<T> writer;
-        private T obj;
-        private Class<T> cls;
+    private static class MessageBodyWriterDataHandler extends DataHandler {
+        private MessageBodyWriter<Object> writer;
+        private Object obj;
+        private Class<?> cls;
         private Type genericType;
         private Annotation[] anns;
         private MediaType contentType;
-        public MessageBodyWriterDataHandler(MessageBodyWriter<T> writer,
-                                            T obj,
-                                            Class<T> cls,
+        public MessageBodyWriterDataHandler(MessageBodyWriter<Object> writer,
+                                            Object obj,
+                                            Class<?> cls,
                                             Type genericType,
                                             Annotation[] anns,
                                             MediaType contentType) {

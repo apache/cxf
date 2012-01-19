@@ -60,19 +60,19 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
-import org.apache.cxf.transport.Assertor;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
+import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.policy.Assertor;
+import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLLibrary;
 
@@ -420,9 +420,11 @@ public abstract class AbstractHTTPDestination
     }
 
     private void initConfig() {
-        PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
-        if (pde != null) {
-            server = pde.getServerEndpointPolicy(endpointInfo, this, new ServerPolicyCalculator());
+        PolicyEngine engine = bus.getExtension(PolicyEngine.class);
+        // for a decoupled endpoint there is no service info
+        if (null != engine && engine.isEnabled() 
+            && null != endpointInfo.getService()) {
+            server = PolicyUtils.getServer(engine, endpointInfo, this);
         }
         if (null == server && WSDLLibrary.isAvailable()) {
             server = endpointInfo.getTraversedExtensor(
@@ -714,8 +716,8 @@ public abstract class AbstractHTTPDestination
      * 
      * @see org.apache.cxf.transport.AbstractMultiplexDestination#getId(java.util.Map)
      */
-    @Override
-    public String getId(Map<String, Object> context) {
+    @SuppressWarnings("rawtypes")
+    public String getId(Map context) {
         String id = null;
 
         if (isMultiplexWithAddress()) {
@@ -770,12 +772,11 @@ public abstract class AbstractHTTPDestination
     }
     
     public void assertMessage(Message message) {
-        PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
-        pde.assertMessage(message, server, new ServerPolicyCalculator());
+        PolicyUtils.assertServerPolicy(message, server); 
     }
 
     public boolean canAssert(QName type) {
-        return new ServerPolicyCalculator().getDataClassName().equals(type); 
+        return PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME.equals(type); 
     }
     
     public void releaseRegistry() {

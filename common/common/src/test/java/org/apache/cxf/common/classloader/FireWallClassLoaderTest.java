@@ -38,7 +38,7 @@ public class FireWallClassLoaderTest extends Assert {
     @Test
     public void testJavaLangStringAlt() throws Exception {
         ClassLoader c = new FireWallClassLoader(ClassLoader.getSystemClassLoader(), new String[] {"java.*"});
-        Class<?> c1 = c.loadClass("java.lang.String");
+        Class c1 = c.loadClass("java.lang.String");
         assertNotNull("Should have returned a class here", c1);
     }
     

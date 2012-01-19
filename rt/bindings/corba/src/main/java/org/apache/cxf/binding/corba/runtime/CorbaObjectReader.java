@@ -563,7 +563,7 @@ public class CorbaObjectReader {
     }
 
     private CorbaObjectHandler initializeCorbaObjectHandler(CorbaObjectHandler template) {
-        Constructor<?> templateConstructor = template.getClass().getDeclaredConstructors()[0];
+        Constructor templateConstructor = template.getClass().getDeclaredConstructors()[0];
         Object[] params = new Object[4];
         
         // Check to see if the template type is a recursive type.  If so, it means that it is part

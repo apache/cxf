@@ -46,7 +46,7 @@ public class MissingQualification1226Test extends AbstractCXFSpringTest {
     
     @Test
     public void lookForMissingNamespace() throws Exception {
-        EndpointImpl endpoint = getBean(EndpointImpl.class, "helloWorld");
+        EndpointImpl endpoint = (EndpointImpl) getBean(EndpointImpl.class, "helloWorld");
         Document d = getWSDLDocument(endpoint.getServer());
         NodeList schemas = assertValid("//xsd:schema[@targetNamespace='http://nstest.helloworld']", d);
         Element schemaElement = (Element)schemas.item(0);

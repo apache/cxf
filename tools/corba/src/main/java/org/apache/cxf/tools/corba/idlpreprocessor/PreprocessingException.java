@@ -23,8 +23,6 @@ import java.net.URL;
 
 public final class PreprocessingException extends RuntimeException {
 
-    private static final long serialVersionUID = -3241939562830460198L;
-
     private final int line;
 
     private final URL url;

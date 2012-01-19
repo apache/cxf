@@ -212,7 +212,7 @@ public class HttpsURLConnectionFactory {
                     //need to see if we can create one - mostly the weblogic case.   The 
                     //weblogic SSLSocketFactory has a protected constructor that can take
                     //a JSSE SSLSocketFactory so we'll try and use that
-                    Constructor<?> c = getSSLSocketFactory.getReturnType()
+                    Constructor c = getSSLSocketFactory.getReturnType()
                         .getDeclaredConstructor(SSLSocketFactory.class);
                     c.setAccessible(true);
                     setSSLSocketFactory.invoke(connection, c.newInstance(socketFactory));

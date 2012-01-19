@@ -79,11 +79,11 @@ public class InstrumentationManagerTest extends Assert {
         assertNotNull("MBeanServer should be available.", mbs);
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
                                          + ":type=WorkQueues,*");
-        Set<ObjectName> s = mbs.queryNames(name, null);
+        Set s = mbs.queryNames(name, null);
         assertEquals(2, s.size());
-        Iterator<ObjectName> it = s.iterator();
+        Iterator it = s.iterator();
         while (it.hasNext()) {
-            ObjectName n = it.next();
+            ObjectName n = (ObjectName)it.next();
             Long result = 
                 (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
             assertEquals(result, Long.valueOf(256));

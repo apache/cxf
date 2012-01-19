@@ -76,7 +76,7 @@ public class JAXBWrapperHelperTest extends Assert {
         assertTrue(lst.get(2) instanceof boolean[]);
         assertTrue(((boolean[])lst.get(2))[0]);
         assertFalse(((boolean[])lst.get(2))[1]);
-        assertEquals("hello", lst.get(3));
+        assertEquals("hello", (String)lst.get(3));
 
         lst.set(0, Boolean.TRUE);
         Object o = wh.createWrapperObject(lst);

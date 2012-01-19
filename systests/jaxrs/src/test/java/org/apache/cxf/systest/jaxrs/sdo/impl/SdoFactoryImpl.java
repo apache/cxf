@@ -108,7 +108,7 @@ public class SdoFactoryImpl extends FactoryBase implements SdoFactory {
             }
             isInitialized = true;
         
-            ModelFactoryImpl theModelPackageImpl = ModelFactoryImpl.init();
+            ModelFactoryImpl theModelPackageImpl = (ModelFactoryImpl)ModelFactoryImpl.init();
                 Property property = null;
         
                 // Add supertypes to types

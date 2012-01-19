@@ -43,12 +43,12 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.addressing.v200408.Relationship;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
@@ -678,7 +678,7 @@ public class MAPCodecTest extends Assert {
     }
 
     private void verifyAction() {
-        List<?> soapAction = mimeHeaders.get("SOAPAction");
+        List<?> soapAction = (List<?>)mimeHeaders.get("SOAPAction");
         assertNotNull("expected propogated action", soapAction);
         assertEquals("expected single action", 1, soapAction.size());
         String expectedAction = "\"" + ((AttributedURIType)expectedValues[0]).getValue() + "\"";

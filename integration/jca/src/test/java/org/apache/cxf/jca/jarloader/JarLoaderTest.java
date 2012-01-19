@@ -55,7 +55,7 @@ public class JarLoaderTest extends Assert {
         
         LOG.info("URLPath: " + urlPath);
 
-        Map<?, ?> map = JarLoader.getJarContents(urlPath + "!/blackbox-notx.jar!/");
+        Map map = JarLoader.getJarContents(urlPath + "!/blackbox-notx.jar!/");
         assertNotNull("map must not be null", map);
         assertNotNull("class must be included in map "
             + map.get("com/sun/connector/blackbox/JdbcDataSource.class"));

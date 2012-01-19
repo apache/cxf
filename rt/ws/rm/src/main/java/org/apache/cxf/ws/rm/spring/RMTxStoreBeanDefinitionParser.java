@@ -26,7 +26,7 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 public class RMTxStoreBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
     @Override
-    protected Class<?> getBeanClass(Element element) {
+    protected Class getBeanClass(Element element) {
         return RMTxStore.class;
     }
 

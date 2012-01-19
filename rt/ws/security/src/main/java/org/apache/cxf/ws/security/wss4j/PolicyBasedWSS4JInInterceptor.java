@@ -141,10 +141,12 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 if (url == null) {
                     url = new URL((String)o);
                 }
-                properties = new Properties();
-                InputStream ins = url.openStream();
-                properties.load(ins);
-                ins.close();
+                if (url != null) {
+                    properties = new Properties();
+                    InputStream ins = url.openStream();
+                    properties.load(ins);
+                    ins.close();
+                }
             } catch (IOException e) {
                 properties = null;
             }

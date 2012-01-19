@@ -508,7 +508,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             }
         }
         for (BindingOperationInfo bop : bindingInfo.getOperations()) {
-            SoapOperationInfo soi = bop.getExtensor(SoapOperationInfo.class);
+            SoapOperationInfo soi = (SoapOperationInfo)bop.getExtensor(SoapOperationInfo.class);
             if (soi != null) {
                 // operation style overrides binding style, if present
                 String operationStyle = soi.getStyle() != null ? soi.getStyle() : bindingStyle;  

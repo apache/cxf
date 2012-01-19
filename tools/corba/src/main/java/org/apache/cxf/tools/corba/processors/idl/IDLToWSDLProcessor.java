@@ -538,7 +538,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         List<CorbaTypeImpl> types = visitor.getTypeMap().getStructOrExceptionOrUnion();
         ModuleToNSMapper mapper = visitor.getModuleToNSMapper();
         WSDLSchemaManager manager = visitor.getManager();
-        Collection<String> namespaces = CastUtils.cast(def.getNamespaces().values());
+        Collection namespaces = def.getNamespaces().values();
         Set<Map.Entry<String, String>> userModuleMappings = mapper.getUserMapping().entrySet();
         
         if (types != null) {
@@ -658,8 +658,8 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         return map;
     }
 
-    private Map<String, List<String>> getExcludedModules(String modules) {
-        Map<String, List<String>> exModules = new HashMap<String, List<String>>();
+    private Map<String, List> getExcludedModules(String modules) {
+        Map<String, List> exModules = new HashMap<String, List>();
         if ((modules != null) && (modules.length() > 0)) {
             if ((modules.startsWith("[")) && (modules.endsWith("]"))) {
                 modules = modules.substring(1, modules.length() - 1);
@@ -667,7 +667,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 while (tokens.hasMoreTokens()) {
                     String token = tokens.nextToken();
                     //Revisit, Do we also take in the imports of the wsdl/schema?
-                    exModules.put(token, new ArrayList<String>());
+                    exModules.put(token, new ArrayList());
                 }               
             } else if (modules.startsWith(":")) {
                 //TO DO

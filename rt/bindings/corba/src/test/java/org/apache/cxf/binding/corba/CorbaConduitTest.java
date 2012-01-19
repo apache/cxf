@@ -264,7 +264,7 @@ public class CorbaConduitTest extends Assert {
         assertNotNull("list should not be null", list != null);
         
         message.setStreamableArguments(arguments);
-        NVList listArgs = conduit.getArguments(message);
+        NVList listArgs = (NVList)conduit.getArguments(message);
         assertNotNull("listArgs should not be null", listArgs != null);
         assertNotNull("listArgs Item should not be null", listArgs.item(0) != null);
         assertEquals("Name should be equal", listArgs.item(0).name(), "object");
@@ -284,12 +284,12 @@ public class CorbaConduitTest extends Assert {
         CorbaStreamable arg = message.createStreamableObject(obj1, objName);        
         
         CorbaConduit conduit = setupCorbaConduit(false);
-        NamedValue ret = conduit.getReturn(message);
+        NamedValue ret = (NamedValue)conduit.getReturn(message);
         assertNotNull("Return should not be null", ret != null);
         assertEquals("name should be equal", ret.name(), "return");
         
         message.setStreamableReturn(arg);
-        NamedValue ret2  = conduit.getReturn(message);
+        NamedValue ret2  = (NamedValue)conduit.getReturn(message);
         assertNotNull("Return2 should not be null", ret2 != null);
         assertEquals("name should be equal", ret2.name(), "returnName");               
     }
@@ -356,7 +356,7 @@ public class CorbaConduitTest extends Assert {
         
         //msg.put(CorbaConstants.CORBA_ENDPOINT_OBJECT, obj);        
         Request r = control.createMock(Request.class);        
-        NVList nvList = orb.create_list(0);
+        NVList nvList = (NVList)orb.create_list(0);
         NamedValue ret = control.createMock(NamedValue.class);
         ExceptionList exList = control.createMock(ExceptionList.class);        
         

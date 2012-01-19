@@ -50,7 +50,7 @@ public class JAXWSBindingParser {
         extReg = ext;
     }
 
-    public JAXWSBinding parse(Class<?> parentType, Element element, String namespace) throws WSDLException {
+    public JAXWSBinding parse(Class parentType, Element element, String namespace) throws WSDLException {
         JAXWSBinding jaxwsBinding = (JAXWSBinding)extReg.createExtension(parentType,
                                                                          ToolConstants.JAXWS_BINDINGS);
 
@@ -233,7 +233,7 @@ public class JAXWSBindingParser {
         if (!(rnode instanceof Element)) {
             return null;
         }
-        return rnode;
+        return (Element)rnode;
     }
 
     class ContextImpl implements NamespaceContext {

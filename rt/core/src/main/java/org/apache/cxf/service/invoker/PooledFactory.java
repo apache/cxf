@@ -42,7 +42,7 @@ public class PooledFactory implements Factory {
      * @param svcClass the class to create
      * @param max the absolute maximum number to create and pool
      */
-    public PooledFactory(final Class<?> svcClass, int max) {
+    public PooledFactory(final Class svcClass, int max) {
         this(new PerRequestFactory(svcClass), max, false);
     }
     /**

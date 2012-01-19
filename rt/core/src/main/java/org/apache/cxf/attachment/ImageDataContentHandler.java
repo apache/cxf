@@ -92,9 +92,7 @@ public class ImageDataContentHandler implements DataContentHandler {
         }
         
         // Wait until the image is completely loaded
-        MediaTracker tracker = new MediaTracker(new Component() {
-            private static final long serialVersionUID = 977142547536262901L; 
-        });
+        MediaTracker tracker = new MediaTracker(new Component() { });
         tracker.addImage(image, 0);
         try {
             tracker.waitForAll();

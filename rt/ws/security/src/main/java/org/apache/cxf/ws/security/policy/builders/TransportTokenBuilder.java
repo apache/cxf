@@ -55,7 +55,7 @@ public class TransportTokenBuilder implements AssertionBuilder<Element> {
         TransportToken transportToken = new TransportToken(consts, builder);
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = policy.normalize(builder.getPolicyRegistry(), false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
             transportToken.setToken((Token)((iterator.next()).get(0)));

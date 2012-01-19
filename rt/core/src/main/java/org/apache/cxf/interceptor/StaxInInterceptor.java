@@ -121,11 +121,11 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (o instanceof XMLInputFactory) {
             return (XMLInputFactory)o;
         } else if (o != null) {
-            XMLInputFactory xif = factories.get(o);
+            XMLInputFactory xif = (XMLInputFactory)factories.get(o);
             if (xif == null) {
-                Class<?> cls;
+                Class cls;
                 if (o instanceof Class) {
-                    cls = (Class<?>)o;
+                    cls = (Class)o;
                 } else if (o instanceof String) {
                     try {
                         cls = ClassLoaderUtils.loadClass((String)o, StaxInInterceptor.class);

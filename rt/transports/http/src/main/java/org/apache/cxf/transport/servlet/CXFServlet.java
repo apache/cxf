@@ -31,7 +31,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 public class CXFServlet extends CXFNonSpringServlet {
-    private static final long serialVersionUID = -5922443981969455305L;
     private boolean busCreated;
     private XmlWebApplicationContext createdContext; 
     

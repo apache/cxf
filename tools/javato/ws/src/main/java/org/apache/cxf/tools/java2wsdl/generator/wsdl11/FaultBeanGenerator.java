@@ -46,7 +46,7 @@ public final class FaultBeanGenerator extends BeanGenerator {
     }
     
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo serviceInfo) {
-        Set<Class<?>> exceptionClasses = new HashSet<Class<?>>();
+        Set<Class> exceptionClasses = new HashSet<Class>();
         String seiPackageName = null;
         for (OperationInfo op : serviceInfo.getInterface().getOperations()) {
             Method method = (Method) op.getProperty("operation.method");
@@ -66,8 +66,8 @@ public final class FaultBeanGenerator extends BeanGenerator {
         return faultBeanClasses;
     }
 
-    protected Set<Class<?>> getExceptionClasses(final Method method) {
-        Set<Class<?>> exps = new HashSet<Class<?>>();
+    protected Set<Class> getExceptionClasses(final Method method) {
+        Set<Class> exps = new HashSet<Class>();
         final Class<?>[] exceptionClasses = method.getExceptionTypes();
         for (int i = 0; i < exceptionClasses.length; i++) {
             boolean exclude = false;

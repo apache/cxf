@@ -77,7 +77,7 @@ public class RMManagerBeanDefinitionParser extends AbstractBeanDefinitionParser 
     }
 
     @Override
-    protected Class<?> getBeanClass(Element element) {
+    protected Class getBeanClass(Element element) {
         return RMManager.class;
     }
 

@@ -158,7 +158,7 @@ public final class JAXRSUtils {
         return values;
     }
     
-    public static List<MediaType> getProviderConsumeTypes(MessageBodyReader<?> provider) {
+    public static List<MediaType> getProviderConsumeTypes(MessageBodyReader provider) {
         String[] values = getUserMediaTypes(provider, "getConsumeMediaTypes");
         
         if (values == null) {
@@ -168,7 +168,7 @@ public final class JAXRSUtils {
         return JAXRSUtils.getMediaTypes(values);
     }
     
-    public static List<MediaType> getProviderProduceTypes(MessageBodyWriter<?> provider) {
+    public static List<MediaType> getProviderProduceTypes(MessageBodyWriter provider) {
         String[] values = getUserMediaTypes(provider, "getProduceMediaTypes");
         
         if (values == null) {
@@ -555,7 +555,7 @@ public final class JAXRSUtils {
         
         
         Method method = ori.getMethodToInvoke();
-        Class<?>[] parameterTypes = method.getParameterTypes();
+        Class[] parameterTypes = method.getParameterTypes();
         Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[]{});  
         Method annotatedMethod = ori.getAnnotatedMethod();
         Type[] genericParameterTypes = annotatedMethod == null ? method.getGenericParameterTypes() 
@@ -568,10 +568,10 @@ public final class JAXRSUtils {
             Type genericParam = genericParameterTypes[i];
             if (genericParam instanceof TypeVariable) {
                 genericParam = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
-                                                           (TypeVariable<?>)genericParam);
+                                                           (TypeVariable)genericParam);
             }
             if (param == Object.class) {
-                param = (Class<?>)genericParam; 
+                param = (Class)genericParam; 
             } else if (genericParam == Object.class) {
                 genericParam = param;
             }
@@ -740,7 +740,7 @@ public final class JAXRSUtils {
                 String enc = HttpUtils.getEncoding(mt, "UTF-8");
                 String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
-                FormUtils.populateMapFromString(params, body, enc, decode, request);
+                FormUtils.populateMapFromString(params, (String)body, enc, decode, request);
             } else {
                 if (mt != null && "multipart".equalsIgnoreCase(mt.getType()) 
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
@@ -851,7 +851,7 @@ public final class JAXRSUtils {
             o = new SearchContextImpl(m);
         } else if (Application.class.isAssignableFrom(clazz)) {
             ProviderInfo<?> providerInfo = 
-                (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
+                (ProviderInfo)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
             o = providerInfo == null ? providerInfo : providerInfo.getProvider();
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
@@ -1011,7 +1011,8 @@ public final class JAXRSUtils {
         }
     }
 
-    private static <T> T readFromMessageBody(Class<T> targetTypeClass,
+    @SuppressWarnings("unchecked")
+    private static <T> Object readFromMessageBody(Class<T> targetTypeClass,
                                                   Type parameterType,
                                                   Annotation[] parameterAnnotations,
                                                   InputStream is, 
@@ -1021,7 +1022,7 @@ public final class JAXRSUtils {
         
         List<MediaType> types = JAXRSUtils.intersectMimeTypes(consumeTypes, contentType);
         
-        MessageBodyReader<T> provider = null;
+        MessageBodyReader provider = null;
         for (MediaType type : types) { 
             provider = ProviderFactory.getInstance(m)
                 .createMessageBodyReader(targetTypeClass,
@@ -1201,9 +1202,10 @@ public final class JAXRSUtils {
         return types;
     }
     
-    public static <T extends Throwable> Response convertFaultToResponse(T ex, Message inMessage) {
+    @SuppressWarnings("unchecked")
+    public static Response convertFaultToResponse(Throwable ex, Message inMessage) {
         
-        ExceptionMapper<T> mapper = 
+        ExceptionMapper mapper = 
             ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
             try {

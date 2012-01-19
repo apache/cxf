@@ -75,7 +75,7 @@ public abstract class AbstractMultiplexDestination extends AbstractDestination i
      * @return the id from the reference parameters of the  ws-a-to address or null if not found
      * @see org.apache.cxf.transport.MultiplexDestination#getId(java.util.Map)
      */
-    public String getId(Map<String, Object> contextMap) {
+    public String getId(Map contextMap) {
         String markedParam = null;
         AddressingProperties maps = (AddressingProperties)contextMap
             .get(SERVER_ADDRESSING_PROPERTIES_INBOUND);
@@ -93,7 +93,7 @@ public abstract class AbstractMultiplexDestination extends AbstractDestination i
         if (null != epr.getReferenceParameters()) {
             for (Object o : epr.getReferenceParameters().getAny()) {
                 if (o instanceof JAXBElement) {
-                    JAXBElement<?> el = (JAXBElement<?>)o;
+                    JAXBElement el = (JAXBElement)o;
                     if (el.getName().equals(elementQName)) {
                         elementStringValue = (String)el.getValue();
                     }

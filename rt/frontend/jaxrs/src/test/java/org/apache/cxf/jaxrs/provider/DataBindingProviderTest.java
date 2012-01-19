@@ -93,14 +93,15 @@ public class DataBindingProviderTest extends Assert {
         doTestAegisRead(data);
     }
     
+    @SuppressWarnings("unchecked")
     public void doTestAegisRead(String data) throws Exception { 
         Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("readXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
-        DataBindingProvider<Book> p = new DataBindingProvider<Book>(binding);
+        DataBindingProvider p = new DataBindingProvider(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Book book = p.readFrom(Book.class, Book.class,
+        Book book = (Book)p.readFrom((Class)Book.class, Book.class,
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("CXF", book.getName());
@@ -142,7 +143,7 @@ public class DataBindingProviderTest extends Assert {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c2), true);
         DataBinding binding = new SDODataBinding();
         binding.initialize(s);
-        DataBindingProvider<Structure> p = new DataBindingProvider<Structure>(binding);
+        DataBindingProvider p = new DataBindingProvider(binding);
         Structure struct = new StructureImpl();
         struct.getTexts().add("text1");
         struct.setText("sdo");
@@ -159,6 +160,7 @@ public class DataBindingProviderTest extends Assert {
         assertEquals(bos.toString(), data);
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testSDORead() throws Exception {
         String data = "<p0:Structure xmlns:p0=\"http://apache.org/structure/types\" " 
@@ -169,9 +171,9 @@ public class DataBindingProviderTest extends Assert {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c2), true);
         DataBinding binding = new SDODataBinding();
         binding.initialize(s);
-        DataBindingProvider<Structure> p = new DataBindingProvider<Structure>(binding);
+        DataBindingProvider p = new DataBindingProvider(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Structure struct = (Structure)p.readFrom(Structure.class, Structure.class,
+        Structure struct = (Structure)p.readFrom((Class)Structure.class, Structure.class,
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("sdo", struct.getText());
@@ -179,12 +181,13 @@ public class DataBindingProviderTest extends Assert {
         assertEquals(3, struct.getInt());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testXmlBeansWrite() throws Exception {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c3), true);
         DataBinding binding = new XmlBeansDataBinding();
         binding.initialize(s);
-        DataBindingProvider<Address> p = new DataBindingProvider<Address>(binding);
+        DataBindingProvider p = new DataBindingProvider(binding);
         Address address = Address.Factory.newInstance();
         address.setAddressLine1("Street 1");
         
@@ -196,6 +199,7 @@ public class DataBindingProviderTest extends Assert {
         assertEquals(bos.toString(), data);
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testXmlBeansRead() throws Exception {
         String data = "<tns:Address xmlns:tns=\"http://cxf.apache.org/jaxrs/providers/xmlbeans/types\">"
@@ -203,9 +207,9 @@ public class DataBindingProviderTest extends Assert {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c3), true);
         DataBinding binding = new XmlBeansDataBinding();
         binding.initialize(s);
-        DataBindingProvider<Address> p = new DataBindingProvider<Address>(binding);
+        DataBindingProvider p = new DataBindingProvider(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Address address = (Address)p.readFrom(Address.class, Address.class,
+        Address address = (Address)p.readFrom((Class)Address.class, Address.class,
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("Street 1", address.getAddressLine1());

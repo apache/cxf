@@ -107,7 +107,7 @@ public class SpnegoAuthSupplier implements HttpAuthSupplier {
         }
 
         try {
-            return (byte[])Subject.doAs(lc.getSubject(), new CreateServiceTicketAction(context, token));
+            return (byte[]) Subject.doAs(lc.getSubject(), new CreateServiceTicketAction(context, token));
         } catch (PrivilegedActionException e) {
             if (e.getCause() instanceof GSSException) {
                 throw (GSSException) e.getCause();

@@ -43,7 +43,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
-        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message
+        Map<String, List<String>> headers = CastUtils.cast((Map)message
             .get(Message.PROTOCOL_HEADERS));
         if (headers != null) {
             checkContentType(message, headers);

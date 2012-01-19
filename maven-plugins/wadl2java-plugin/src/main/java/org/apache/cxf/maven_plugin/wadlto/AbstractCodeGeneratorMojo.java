@@ -181,7 +181,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      * @readonly
      * @required
      */
-    private List<?> repositories;
+    private List repositories;
 
     /**
      * Artifact repository factory component.
@@ -242,7 +242,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      */
     
     @SuppressWarnings("unchecked")
-    private Artifact resolveRemoteWsdlArtifact(List<?> remoteRepos, Artifact artifact)
+    private Artifact resolveRemoteWsdlArtifact(List remoteRepos, Artifact artifact)
         throws MojoExecutionException {
         
         /**
@@ -278,7 +278,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     }
 
     protected void downloadRemoteDocs(List<WadlOption> effectiveOptions) throws MojoExecutionException {
-        List<?> remoteRepos;
+        List remoteRepos;
         try {
             remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, artifactRepositoryFactory,
                                                                  mavenSession.getContainer());
@@ -427,7 +427,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
         List<String> list = option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
                                                            .isDebugEnabled());
-        String[] args = list.toArray(new String[list.size()]);
+        String[] args = (String[])list.toArray(new String[list.size()]);
         getLog().debug("Calling wadl2java with args: " + Arrays.toString(args));
         
         if (!"false".equals(fork)) {
@@ -480,7 +480,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         return javaExe;
     }
 
-    private void runForked(Set<URI> classPath, Class<?> cls, String[] args) throws MojoExecutionException {
+    private void runForked(Set<URI> classPath, Class cls, String[] args) throws MojoExecutionException {
         getLog().info("Running wsdl2java in fork mode...");
 
         Commandline cmd = new Commandline();

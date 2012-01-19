@@ -67,17 +67,15 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
-import org.apache.cxf.transport.Assertor;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
-import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
+import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
@@ -86,6 +84,8 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.policy.Assertor;
+import org.apache.cxf.ws.policy.PolicyEngine;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
@@ -301,24 +301,15 @@ public class HTTPConduit
         proxyFactory = new ProxyFactory();
         connectionFactory = new HttpsURLConnectionFactory();
         cookies = new Cookies();
-        updateClientPolicy();
-        CXFAuthenticator.addAuthenticator();
-    }
-
-    /**
-     * updates the HTTPClientPolicy that is compatible with the assertions
-     * included in the service, endpoint, operation and message policy subjects
-     * if a PolicyDataEngine is installed
-     * 
-     * wsdl extensors are superseded by policies which in 
-     * turn are superseded by injection
-     */
-    private void updateClientPolicy() {
-        PolicyDataEngine policyEngine = bus.getExtension(PolicyDataEngine.class);
-        if (policyEngine != null && endpointInfo.getService() != null) {
-            clientSidePolicy = policyEngine.getClientEndpointPolicy(endpointInfo, 
-                                                                    this, new ClientPolicyCalculator());
+        
+        // wsdl extensors are superseded by policies which in        
+        // turn are superseded by injection                          
+        PolicyEngine pe = bus.getExtension(PolicyEngine.class);      
+        if (null != pe && pe.isEnabled() && endpointInfo.getService() != null) {                          
+            clientSidePolicy =                                       
+                PolicyUtils.getClient(pe, endpointInfo, this);              
         }
+        CXFAuthenticator.addAuthenticator();
     }
 
     /**
@@ -848,17 +839,7 @@ public class HTTPConduit
     }
     
     public HTTPClientPolicy getClient(Message message) {
-        ClientPolicyCalculator cpc = new ClientPolicyCalculator();
-        HTTPClientPolicy messagePol = message.get(HTTPClientPolicy.class);
-        if (messagePol != null) {
-            return cpc.intersect(messagePol, clientSidePolicy);
-        }
-
-        PolicyDataEngine policyDataEngine = bus.getExtension(PolicyDataEngine.class);
-        if (policyDataEngine == null) {
-            return clientSidePolicy;
-        }
-        return policyDataEngine.getPolicy(message, clientSidePolicy, cpc);
+        return PolicyUtils.getClient(message, clientSidePolicy);
     }
 
     /**
@@ -1530,7 +1511,9 @@ public class HTTPConduit
                         WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
                             .getExtension(WorkQueueManager.class);
                         AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
-                        qu = mgr.getAutomaticWorkQueue();
+                        if (ex == null) {
+                            qu = mgr.getAutomaticWorkQueue();
+                        }
                         qu.execute(runnable, 5000);
                     } else {
                         outMessage.getExchange().put(Executor.class.getName() 
@@ -1708,12 +1691,11 @@ public class HTTPConduit
     }
     
     public void assertMessage(Message message) {
-        PolicyDataEngine policyDataEngine = bus.getExtension(PolicyDataEngine.class);
-        policyDataEngine.assertMessage(message, getClient(), new ClientPolicyCalculator());
+        PolicyUtils.assertClientPolicy(message, clientSidePolicy);
     }
     
     public boolean canAssert(QName type) {
-        return new ClientPolicyCalculator().equals(type);  
+        return PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME.equals(type);  
     }
 
     public void propertyChange(PropertyChangeEvent evt) {

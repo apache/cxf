@@ -33,7 +33,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
+import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.PolicyEngine;
@@ -67,7 +67,7 @@ public class PolicyLoggingInterceptor extends AbstractPhaseInterceptor<Message> 
             for (Assertion a : as) {
                 LOG.fine("Assertion: " + a.getClass().getName());
                 HTTPServerPolicy p = (JaxbAssertion.cast(a, HTTPServerPolicy.class)).getData(); 
-                LOG.fine("server policy: " + ServerPolicyCalculator.toString(p));
+                LOG.fine("server policy: " + PolicyUtils.toString(p));
             }
         }
 

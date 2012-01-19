@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -67,14 +68,14 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
             return;
         }
         
-        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
         
             String address = "CHANGE_ME";
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
     
             if (javaModel.getServiceClasses().size() == 0) {
-                ServiceInfo serviceInfo = env.get(ServiceInfo.class);
+                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SRV", LOG, wsdl);
                 if (penv.isVerbose()) {
@@ -82,8 +83,12 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
                 }
                 return;
             }
-            for (JavaServiceClass js : javaModel.getServiceClasses().values()) {
-                for (JavaPort jp : js.getPorts()) {
+            Iterator it = javaModel.getServiceClasses().values().iterator();
+            while (it.hasNext()) {
+                JavaServiceClass js = (JavaServiceClass)it.next();
+                Iterator i = js.getPorts().iterator();
+                while (i.hasNext()) {
+                    JavaPort jp = (JavaPort)i.next();
                     String interfaceName = jp.getInterfaceClass();
                     JavaInterface intf = interfaces.get(interfaceName);
                     if (intf == null) {
@@ -99,7 +104,7 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
                     setAttributes("serverClassName", serverClassName);
                     setAttributes("intf", intf);
                     if (penv.optionSet(ToolConstants.CFG_IMPL_CLASS)) {
-                        setAttributes("impl", penv.get(ToolConstants.CFG_IMPL_CLASS));
+                        setAttributes("impl", (String)penv.get(ToolConstants.CFG_IMPL_CLASS));
                         penv.remove(ToolConstants.CFG_IMPL_CLASS);
                     } else {
                         setAttributes("impl", intf.getName() + "Impl");

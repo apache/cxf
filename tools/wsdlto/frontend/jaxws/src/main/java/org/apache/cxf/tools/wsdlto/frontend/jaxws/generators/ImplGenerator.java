@@ -69,7 +69,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         if (passthrough()) {
             return;
         }
-        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
 
     

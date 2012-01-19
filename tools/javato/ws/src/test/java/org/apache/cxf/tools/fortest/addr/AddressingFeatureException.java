@@ -22,7 +22,6 @@ package org.apache.cxf.tools.fortest.addr;
 import javax.xml.ws.WebServiceException;
 
 public class AddressingFeatureException extends WebServiceException {
-    private static final long serialVersionUID = -1114499217515864968L;
     String detail;
 
     public AddressingFeatureException(String message) {

@@ -30,8 +30,6 @@ public class StringMapImpl
     extends HashMap<String, Object> 
     implements StringMap {
     
-    private static final long serialVersionUID = -4590903451121887L;
-
     public StringMapImpl() {
     }
     public StringMapImpl(Map<String, Object> i) {

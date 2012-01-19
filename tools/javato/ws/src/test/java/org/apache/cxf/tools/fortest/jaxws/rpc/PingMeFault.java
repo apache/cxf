@@ -28,7 +28,6 @@ import javax.xml.ws.WebFault;
 
 public class PingMeFault extends Exception {
 
-    private static final long serialVersionUID = -4009029959664048871L;
     private int code;
 
     public int getCode() {

@@ -27,12 +27,12 @@ import java.util.Map;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.WSDLGetUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.UrlUtilities;
 
 /**
  * 
@@ -91,7 +91,7 @@ public final class MEXUtils {
             if (StringUtils.isEmpty(id) 
                 || id.equals(xsd.getKey())) {
                 String query = xsd.getValue().substring(xsd.getValue().indexOf('?') + 1);
-                Map<String, String> params = UrlUtils.parseQueryString(query);
+                Map<String, String> params = UrlUtilities.parseQueryString(query);
 
                 ret.add(utils.getDocument(message, base, params, ctxUri, info).getDocumentElement());
             }

@@ -92,7 +92,7 @@ public class StaxDataBinding extends AbstractDataBinding {
             return read(null, input, part.getTypeClass());
         }
 
-        public Object read(QName name, XMLStreamReader input, Class<?> type) {
+        public Object read(QName name, XMLStreamReader input, Class type) {
             return input;
         }
 

@@ -61,7 +61,7 @@ public class ArrayType extends AegisType {
                              Context context, boolean asArray)
         throws DatabindingException {
         try {
-            Collection<Object> values = readCollection(reader, flatElementName, context);
+            Collection values = readCollection(reader, flatElementName, context);
             if (asArray) {
                 return makeArray(getComponentType().getTypeClass(), values);
             }
@@ -92,8 +92,8 @@ public class ArrayType extends AegisType {
      * @return a collection of the objects.
      * @throws DatabindingException
      */
-    protected Collection<Object> readCollection(MessageReader reader, QName flatElementName,
-                                                Context context) throws DatabindingException {
+    protected Collection readCollection(MessageReader reader, QName flatElementName,
+                                        Context context) throws DatabindingException {
         Collection<Object> values = createCollection();
 
         /**
@@ -145,7 +145,8 @@ public class ArrayType extends AegisType {
         }
     }
 
-    protected Object makeArray(Class<?> arrayType, Collection<Object> values) {
+    @SuppressWarnings("unchecked")
+    protected Object makeArray(Class arrayType, Collection values) {
         int i;
         int n;
         Object array = null;

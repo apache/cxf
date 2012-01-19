@@ -46,7 +46,7 @@ public class EnumType extends AegisType {
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
         // match the reader.
-        writer.writeValue(((Enum<?>)object).name());
+        writer.writeValue(((Enum)object).name());
     }
 
     @Override
@@ -77,7 +77,7 @@ public class EnumType extends AegisType {
         List<XmlSchemaFacet> facets = restriction.getFacets();
         for (Object constant : constants) {
             XmlSchemaEnumerationFacet f = new XmlSchemaEnumerationFacet();
-            f.setValue(((Enum<?>)constant).name());
+            f.setValue(((Enum)constant).name());
             facets.add(f);
         }
     }

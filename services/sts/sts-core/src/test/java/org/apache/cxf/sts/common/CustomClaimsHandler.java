@@ -19,8 +19,11 @@
 package org.apache.cxf.sts.common;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimCollection;
@@ -45,7 +48,20 @@ public class CustomClaimsHandler implements ClaimsHandler {
 
     public List<URI> getSupportedClaimTypes() {
         return knownURIs;
-    }    
+    }
+
+    @Deprecated
+    public ClaimCollection retrieveClaimValues(
+            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
+        
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(principal);
+        params.setWebServiceContext(context);
+        params.setRealm(realm);
+        
+        return retrieveClaimValues(claims, params);
+    }
+    
     
     public ClaimCollection retrieveClaimValues(
             RequestClaimCollection claims, ClaimsParameters parameters) {

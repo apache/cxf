@@ -28,7 +28,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -139,8 +138,8 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             }
         } else {
             Destination destination = exchange.getDestination();
-            List<List<Assertion>> incoming 
-                = CastUtils.cast((List<?>)exchange.get("ws-policy.validated.alternatives"));
+            @SuppressWarnings("unchecked")
+            List<List<Assertion>> incoming = (List)exchange.get("ws-policy.validated.alternatives");
             EffectivePolicy effectivePolicy 
                 = pe.getEffectiveServerResponsePolicy(ei, boi, destination, incoming);
             msg.put(EffectivePolicy.class, effectivePolicy);

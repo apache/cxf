@@ -136,7 +136,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                               exchange.getInMessage());
                 
                 ProviderInfo<?> appProvider = 
-                    (ProviderInfo<?>)exchange.getEndpoint().get(Application.class.getName());
+                    (ProviderInfo)exchange.getEndpoint().get(Application.class.getName());
                 if (appProvider != null) {
                     InjectionUtils.injectContexts(appProvider.getProvider(),
                                                   appProvider,
@@ -264,7 +264,7 @@ public class JAXRSInvoker extends AbstractInvoker {
     }
 
     @SuppressWarnings("unchecked")
-    protected MultivaluedMap<String, String> getTemplateValues(Message msg) {
+    protected MultivaluedMap getTemplateValues(Message msg) {
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
         MultivaluedMap<String, String> oldValues = 
             (MultivaluedMap<String, String>)msg.get(URITemplate.TEMPLATE_PARAMETERS);
@@ -324,7 +324,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             if (result instanceof MessageContentsList) {
                 result = ((MessageContentsList)result).get(0);
             } else if (result instanceof List) {
-                result = ((List<?>)result).get(0);
+                result = ((List)result).get(0);
             } else if (result.getClass().isArray()) {
                 result = ((Object[])result)[0];
             }
@@ -341,6 +341,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private void pushOntoStack(OperationResourceInfo ori, Class<?> realClass, Message msg) {
         OperationResourceInfoStack stack = msg.get(OperationResourceInfoStack.class);
         if (stack == null) {
@@ -349,9 +350,8 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         
         
-        @SuppressWarnings("unchecked")
         MultivaluedMap<String, String> params = 
-            (MultivaluedMap<String, String>)msg.get(URITemplate.TEMPLATE_PARAMETERS);
+            (MultivaluedMap)msg.get(URITemplate.TEMPLATE_PARAMETERS);
         List<String> values = null;
         if (params == null || params.size() == 1) {
             values = Collections.emptyList();

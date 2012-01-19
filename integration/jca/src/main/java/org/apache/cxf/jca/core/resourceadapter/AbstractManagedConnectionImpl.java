@@ -48,7 +48,7 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
         Subject sj) throws ResourceException {
         
         this.managedConnectionFactory = managedFactory;
-        this.crinfo = crInfo;
+        this.crinfo = (ConnectionRequestInfo)crInfo;
     }
 
     
@@ -129,8 +129,10 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
     }
 
     protected void sendEvent(ConnectionEvent coEvent) {
-        for (ConnectionEventListener l : connectionEventListeners) {
-            sendEventToListener(coEvent, l);
+        Iterator iter = connectionEventListeners.iterator();
+
+        while (iter.hasNext()) {
+            sendEventToListener(coEvent, (ConnectionEventListener)iter.next());
         }
     }
 

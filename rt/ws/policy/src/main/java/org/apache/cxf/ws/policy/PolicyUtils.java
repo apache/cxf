@@ -24,11 +24,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.message.Message;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
@@ -40,25 +37,6 @@ import org.apache.neethi.PolicyOperator;
  * 
  */
 public final class PolicyUtils {
-
-    public static class WrappedAssertor implements Assertor {
-        org.apache.cxf.transport.Assertor obj;
-        
-        public WrappedAssertor(org.apache.cxf.transport.Assertor o) {
-            obj = o;
-        }
-
-        public void assertMessage(Message message) {
-            obj.assertMessage(message);
-        }
-
-        public boolean canAssert(QName type) {
-            return obj.canAssert(type);
-        }
-        public org.apache.cxf.transport.Assertor getWrappedAssertor() {
-            return obj;
-        }
-    }
 
     private static final String INDENT = "  ";
     
@@ -173,7 +151,7 @@ public final class PolicyUtils {
                 buf.append(" (optional)");
             }
             buf.append(" (");
-            buf.append(pc);
+            buf.append((Assertion)pc);
             buf.append(")");
             nl(buf);
             if (pc instanceof PolicyContainingAssertion) {
@@ -220,16 +198,6 @@ public final class PolicyUtils {
             break;
         }
         return "";
-    }
-    
-    public static Assertor createAsserter(Object o) {
-        if (o instanceof Assertor) {
-            return (Assertor)o;
-        }
-        if (o instanceof org.apache.cxf.transport.Assertor) {
-            return new WrappedAssertor((org.apache.cxf.transport.Assertor)o);
-        }
-        return null;
     }
     
 }

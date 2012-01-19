@@ -352,7 +352,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         }
     }
 
-    public Class<?> getServiceClass() {
+    public Class getServiceClass() {
         return serviceClass;
     }
 
@@ -361,7 +361,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
      *
      * @param serviceClass the service's implementaiton class
      */
-    public void setServiceClass(Class<?> serviceClass) {
+    public void setServiceClass(Class serviceClass) {
         this.serviceClass = serviceClass;
     }
 

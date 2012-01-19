@@ -37,7 +37,7 @@ public class SoapHeaderOutFilterInterceptor extends AbstractSoapInterceptor {
         Iterator<Header> iter =  message.getHeaders().iterator();
         
         while (iter.hasNext()) {
-            Header hdr  = iter.next();
+            Header hdr  = (Header) iter.next();
             //Only remove inbound marked headers..
             if (hdr.getDirection() == Header.Direction.DIRECTION_IN) {
                 iter.remove(); 

@@ -92,7 +92,7 @@ public class XMLBeansElementProvider extends AbstractConfigurableProvider
      * @param reader stream reader for the XML stream
      * @return an XMLBean data object, or none if unable to process
      */
-    protected XmlObject parseXmlBean(Class<?> type, XMLStreamReader reader) {
+    protected XmlObject parseXmlBean(Class type, XMLStreamReader reader) {
 
         XmlObject result = null;
 
@@ -130,7 +130,7 @@ public class XMLBeansElementProvider extends AbstractConfigurableProvider
      * @param inStream
      * @return an XMLBean object if successful, otherwise null
      */
-    protected XmlObject parseXmlBean(Class<?> type, InputStream inStream) {
+    protected XmlObject parseXmlBean(Class type, InputStream inStream) {
         XmlObject result = null;
 
         Reader r = new InputStreamReader(inStream);
@@ -148,7 +148,7 @@ public class XMLBeansElementProvider extends AbstractConfigurableProvider
      * @param reader
      * @return an instance of the required object, otherwise null
      */
-    protected XmlObject parseXmlBean(Class<?> type, Reader reader) {
+    protected XmlObject parseXmlBean(Class type, Reader reader) {
         XmlObject result = null;
 
         Class<?> factory = getFactory(type);
@@ -181,17 +181,17 @@ public class XMLBeansElementProvider extends AbstractConfigurableProvider
      * @param type
      * @return the Factory class if present, otherwise null.
      */
-    private Class<?> getFactory(Class<?> type) {
-        Class<?> result = null;
+    private Class getFactory(Class type) {
+        Class result = null;
 
-        Class<?>[] interfaces = type.getInterfaces();
+        Class[] interfaces = type.getInterfaces();
 
         // look for XMLBeans inner class Factory
-        for (Class<?> inter : interfaces) {
+        for (Class inter : interfaces) {
 
-            Class<?>[] declared = inter.getDeclaredClasses();
+            Class[] declared = inter.getDeclaredClasses();
 
-            for (Class<?> c : declared) {
+            for (Class c : declared) {
 
                 if (c.getSimpleName().equals("Factory")) {
                     result = c;
@@ -211,21 +211,21 @@ public class XMLBeansElementProvider extends AbstractConfigurableProvider
      * @param type
      * @return true if found to be an XMLBean object, otherwise false
      */
-    protected boolean isXmlBean(Class<?> type) {
+    protected boolean isXmlBean(Class type) {
         boolean result = false;
 
-        Class<?>[] interfaces = {type};
+        Class[] interfaces = {type};
 
         if (!type.isInterface()) {
 
             interfaces = type.getInterfaces();
         }
 
-        for (Class<?> i : interfaces) {
+        for (Class i : interfaces) {
 
-            Class<?>[] superInterfaces = i.getInterfaces();
+            Class[] superInterfaces = i.getInterfaces();
 
-            for (Class<?> superI : superInterfaces) {
+            for (Class superI : superInterfaces) {
 
                 if (superI.getName().equals("org.apache.xmlbeans.XmlObject")) {
                     result = true;

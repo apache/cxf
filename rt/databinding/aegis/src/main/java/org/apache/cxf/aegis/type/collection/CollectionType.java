@@ -58,7 +58,7 @@ public class CollectionType extends ArrayType {
     @Override
     @SuppressWarnings("unchecked")
     protected Collection<Object> createCollection() {
-        Collection<Object> values = null;
+        Collection values = null;
         
         /*
          * getTypeClass returns the type of the object. These 'if's asked if the proposed
@@ -66,21 +66,21 @@ public class CollectionType extends ArrayType {
          * Vector and Set before SortedSet.
          */
         
-        Class<?> userTypeClass = getTypeClass();
+        Class userTypeClass = getTypeClass();
         if (userTypeClass.isAssignableFrom(List.class)) {
-            values = new ArrayList<Object>();
+            values = new ArrayList();
         } else if (userTypeClass.isAssignableFrom(LinkedList.class)) {
-            values = new LinkedList<Object>();
+            values = new LinkedList();
         } else if (userTypeClass.isAssignableFrom(Set.class)) {
-            values = new HashSet<Object>();
+            values = new HashSet();
         } else if (userTypeClass.isAssignableFrom(SortedSet.class)) {
-            values = new TreeSet<Object>();
+            values = new TreeSet();
         } else if (userTypeClass.isAssignableFrom(Vector.class)) {
-            values = new Vector<Object>();
+            values = new Vector();
         } else if (userTypeClass.isAssignableFrom(Stack.class)) {
-            values = new Stack<Object>();
+            values = new Stack();
         } else if (userTypeClass.isInterface()) {
-            values = new ArrayList<Object>();
+            values = new ArrayList();
         } else {
             try {
                 values = (Collection<Object>)userTypeClass.newInstance();
@@ -102,7 +102,7 @@ public class CollectionType extends ArrayType {
         }
 
         try {
-            Collection<?> list = (Collection<?>)object;
+            Collection list = (Collection)object;
 
             AegisType type = getComponentType();
 
@@ -110,7 +110,7 @@ public class CollectionType extends ArrayType {
                 throw new DatabindingException("Couldn't find component type for Collection.");
             }
 
-            for (Iterator<?> itr = list.iterator(); itr.hasNext();) {
+            for (Iterator itr = list.iterator(); itr.hasNext();) {
                 String ns = null;
                 if (type.isAbstract()) {
                     ns = getSchemaType().getNamespaceURI();

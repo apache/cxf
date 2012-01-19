@@ -102,7 +102,7 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
         T value = getExtensor(type);
         
         if (value == null) {
-            if (binding != null) {
+            if (value == null && binding != null) {
                 value = binding.getExtensor(type);
             }
             

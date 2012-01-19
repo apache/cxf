@@ -75,7 +75,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
             return t;
         }
         if (wr.iterator()) {
-            return new WrapperIterator(wr.value(), (Iterator<?>)t);
+            return new WrapperIterator(wr.value(), (Iterator)t);
         }
         return createProxyWrapper(t, wr.value());
     }
@@ -92,10 +92,10 @@ public class ReflectionInvokationHandler implements InvocationHandler {
         boolean iterator() default false;
     }
     
-    private static class WrapperIterator implements Iterator<Object> {
+    private static class WrapperIterator implements Iterator {
         Class<?> cls;
-        Iterator<?> internal;
-        public WrapperIterator(Class<?> c, Iterator<?> it) {
+        Iterator internal;
+        public WrapperIterator(Class<?> c, Iterator it) {
             internal = it;
             cls = c;
         }

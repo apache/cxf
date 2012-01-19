@@ -38,11 +38,11 @@ public class ClassHelper {
     protected ClassHelper() {
     }
     
-    protected Class<?> getRealClassInternal(Object o) {
+    protected Class getRealClassInternal(Object o) {
         return o.getClass();
     }
     
-    protected Class<?> getRealClassFromClassInternal(Class<?> cls) {
+    protected Class getRealClassFromClassInternal(Class cls) {
         return cls;
     }
     protected Object getRealObjectInternal(Object o) {
@@ -51,11 +51,11 @@ public class ClassHelper {
     
     
     
-    public static Class<?> getRealClass(Object o) {
+    public static Class getRealClass(Object o) {
         return HELPER.getRealClassInternal(o);
     }
     
-    public static Class<?> getRealClassFromClass(Class<?> cls) {
+    public static Class getRealClassFromClass(Class cls) {
         return HELPER.getRealClassFromClassInternal(cls);
     }
     

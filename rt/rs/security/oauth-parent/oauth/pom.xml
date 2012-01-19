@@ -21,7 +21,7 @@
 
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-rs-security-oauth</artifactId>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.5.2</version>
 
     <packaging>jar</packaging>
     <name>Apache CXF Runtime OAuth 1.0a</name>
@@ -31,7 +31,7 @@
     <parent>
         <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>2.5.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

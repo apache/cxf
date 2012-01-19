@@ -1263,8 +1263,9 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         Thread t = new Thread() {
             public void run() {
-                Destination destination = jmsTemplate.execute(new SessionCallback<Destination>() {
-                    public Destination doInJms(Session session) throws JMSException {
+                @SuppressWarnings("unchecked")
+                Destination destination = (Destination)jmsTemplate.execute(new SessionCallback() {
+                    public Object doInJms(Session session) throws JMSException {
                         DestinationResolver resolv = jmsTemplate.getDestinationResolver();
                         return resolv.resolveDestinationName(session, jmsConfig.getTargetDestination(),
                                                              false);
@@ -1278,15 +1279,15 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     }
                 };
                     
-                Destination destination2 = jmsTemplate
-                    .execute(new SessionCallback<Destination>() {
-                        public Destination doInJms(Session session) throws JMSException {
-                            DestinationResolver resolv = jmsTemplate.getDestinationResolver();
-                            return resolv.resolveDestinationName(session,
+                @SuppressWarnings("unchecked")
+                Destination destination2 = (Destination)jmsTemplate.execute(new SessionCallback() {
+                    public Object doInJms(Session session) throws JMSException {
+                        DestinationResolver resolv = jmsTemplate.getDestinationResolver();
+                        return resolv.resolveDestinationName(session,
                                                              jmsConfig.getReplyDestination(),
                                                              false);
-                        }
-                    });
+                    }
+                });
                 jmsTemplate.send(destination2, messageCreator);
             }
         };

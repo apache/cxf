@@ -38,7 +38,7 @@ public class DataSourceProviderTest extends Assert {
 
     @Test
     public void testReadDataHandler() throws Exception {
-        DataSourceProvider<DataHandler> p = new DataSourceProvider<DataHandler>();
+        DataSourceProvider p = new DataSourceProvider();
         DataHandler ds = (DataHandler)p.readFrom(DataHandler.class, null, new Annotation[]{}, 
                    MediaType.valueOf("image/png"), new MetadataMap<String, String>(), 
                    new ByteArrayInputStream("image".getBytes()));
@@ -49,7 +49,7 @@ public class DataSourceProviderTest extends Assert {
     
     @Test
     public void testWriteDataHandler() throws Exception {
-        DataSourceProvider<DataHandler> p = new DataSourceProvider<DataHandler>();
+        DataSourceProvider p = new DataSourceProvider();
         DataHandler ds = new DataHandler(new InputStreamDataSource(
                              new ByteArrayInputStream("image".getBytes()), 
                              "image/png")); 
@@ -62,7 +62,7 @@ public class DataSourceProviderTest extends Assert {
     
     @Test
     public void testReadDataSource() throws Exception {
-        DataSourceProvider<DataSource> p = new DataSourceProvider<DataSource>();
+        DataSourceProvider p = new DataSourceProvider();
         DataSource ds = (DataSource)p.readFrom(DataSource.class, null, new Annotation[]{}, 
                    MediaType.valueOf("image/png"), new MetadataMap<String, String>(), 
                    new ByteArrayInputStream("image".getBytes()));
@@ -73,7 +73,7 @@ public class DataSourceProviderTest extends Assert {
     
     @Test
     public void testWriteDataSource() throws Exception {
-        DataSourceProvider<DataSource> p = new DataSourceProvider<DataSource>();
+        DataSourceProvider p = new DataSourceProvider();
         DataSource ds = new InputStreamDataSource(new ByteArrayInputStream("image".getBytes()), 
                                                   "image/png"); 
         ByteArrayOutputStream os = new ByteArrayOutputStream(); 
@@ -87,7 +87,7 @@ public class DataSourceProviderTest extends Assert {
     
     @Test
     public void testWriteDataSourceWithDiffCT() throws Exception {
-        DataSourceProvider<DataSource> p = new DataSourceProvider<DataSource>();
+        DataSourceProvider p = new DataSourceProvider();
         DataSource ds = new InputStreamDataSource(new ByteArrayInputStream("image".getBytes()), 
                                                   "image/png"); 
         ByteArrayOutputStream os = new ByteArrayOutputStream();

@@ -32,7 +32,7 @@ import org.apache.cxf.interceptor.Fault;
  */
 public abstract class AbstractWrapperHelper implements WrapperHelper {
     
-    public static final Class<?> NO_CLASSES[] = new Class[0];
+    public static final Class NO_CLASSES[] = new Class[0];
     public static final Object NO_PARAMS[] = new Object[0];
         
     protected final Class<?> wrapperType;
@@ -54,7 +54,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
         return "" + System.identityHashCode(this);
     }
     
-    protected abstract Object createWrapperObject(Class<?> typeClass) throws Exception;
+    protected abstract Object createWrapperObject(Class typeClass) throws Exception;
     
     protected abstract Object getWrapperObject(Object object) throws Exception;
     
@@ -83,7 +83,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
                 Object o = lst.get(x);
                 o = getPartObject(x, o);                
                 if (o instanceof List && getMethods[x] != null) {
-                    List<Object> col = CastUtils.cast((List<?>)getMethods[x].invoke(wrapperObject));
+                    List<Object> col = CastUtils.cast((List)getMethods[x].invoke(wrapperObject));
                     if (col == null) {
                         //broken generated java wrappers
                         if (setMethods[x] != null) {
@@ -92,7 +92,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
                             fields[x].set(wrapperObject, lst.get(x));
                         }
                     } else {
-                        List<Object> olst = CastUtils.cast((List<?>)o);
+                        List<Object> olst = CastUtils.cast((List)o);
                         col.addAll(olst);
                     }
                 } else if (setMethods[x] != null) {                        

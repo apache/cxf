@@ -26,7 +26,7 @@ import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 public class ExternalAttachmentProviderBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
     @Override
-    protected Class<?> getBeanClass(Element el) {
+    protected Class getBeanClass(Element el) {
         return ExternalAttachmentProvider.class;
     }
 

@@ -33,7 +33,6 @@ import javax.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
@@ -43,6 +42,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationWithEndpoint;
+import org.apache.cxf.transport.http.UrlUtilities;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 
@@ -71,7 +71,7 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
     
     public String getResponseContentType(String fullQueryString, String ctx) {
         URI uri = URI.create(fullQueryString);
-        Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
+        Map<String, String> map = UrlUtilities.parseQueryString(uri.getQuery());
         if (map.containsKey(CODE_QUERY_KEY)) {
             return "application/javascript;charset=UTF-8";
         }
@@ -84,9 +84,9 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
             return false;
         }
         URI uri = URI.create(baseUri);
-        Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
+        Map<String, String> map = UrlUtilities.parseQueryString(uri.getQuery());
         if (map.containsKey(CODE_QUERY_KEY)) {
-            return endpointInfo.getAddress().contains(UrlUtils.getStem(uri.getSchemeSpecificPart()));
+            return endpointInfo.getAddress().contains(UrlUtilities.getStem(uri.getSchemeSpecificPart()));
         }
         return false;
     }
@@ -127,7 +127,7 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
     public void writeResponse(String fullQueryString, String ctx, EndpointInfo endpoint, OutputStream os) {
         URI uri = URI.create(fullQueryString);
         String query = uri.getQuery();
-        Map<String, String> map = UrlUtils.parseQueryString(query);
+        Map<String, String> map = UrlUtilities.parseQueryString(query);
         OutputStreamWriter writer = new OutputStreamWriter(os, UTF8);
         if (!map.containsKey(NO_UTILS_QUERY_KEY)) {
             writeUtilsToResponseStream(JavascriptQueryHandler.class, os);

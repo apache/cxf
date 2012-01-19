@@ -54,7 +54,7 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
     
     public void handleMessage(Message message) throws Fault {
 
-        AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
+        AuthorizationPolicy policy = (AuthorizationPolicy)message.get(AuthorizationPolicy.class);
         if (policy == null || policy.getUserName() == null || policy.getPassword() == null) {
             String name = null;
             String password = null;

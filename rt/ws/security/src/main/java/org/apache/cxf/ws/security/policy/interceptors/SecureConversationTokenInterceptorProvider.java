@@ -48,8 +48,6 @@ import org.apache.neethi.Policy;
 public class SecureConversationTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
     static final Logger LOG = LogUtils.getL7dLogger(SecureConversationTokenInterceptorProvider.class);
 
-    private static final long serialVersionUID = 8739057200687855383L;
-
 
     public SecureConversationTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.SECURE_CONVERSATION_TOKEN,

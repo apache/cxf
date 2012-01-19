@@ -23,7 +23,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -145,13 +144,15 @@ public class WSDLToCorbaBinding {
             for (String interfaceName : interfaceNames) {
                 PortType portType = null;
 
-                Map<QName, PortType> portTypes = CastUtils.cast(def.getAllPortTypes());
+                Map portTypes = def.getAllPortTypes();
                 if (portTypes != null) {
-                    for (QName existPortQName : portTypes.keySet()) {
+                    Iterator it2 = portTypes.keySet().iterator();
+                    while (it2.hasNext()) {
+                        QName existPortQName = (QName)it2.next();
                         if (!existPortQName.getLocalPart().equals(interfaceName)) {
                             portType = null;
                         } else {
-                            portType = portTypes.get(existPortQName);
+                            portType = (PortType)portTypes.get(existPortQName);
                             break;
                         }
                     }
@@ -171,14 +172,14 @@ public class WSDLToCorbaBinding {
 
         Binding[] bindings = new Binding[intfs.size()];
         for (int i = 0; i < intfs.size(); i++) {
-            bindings[i] = generateCORBABinding(def, intfs.get(i));
-            generateCORBAServiceForBinding(def, intfs.get(i), bindings[i]);
+            bindings[i] = generateCORBABinding(def, (PortType) intfs.get(i));
+            generateCORBAServiceForBinding(def, (PortType) intfs.get(i), bindings[i]);
         }
         return bindings;
     }
 
     private List<PortType> getPortTypeList() throws Exception {
-        Map<QName, PortType> portTypes = CastUtils.cast(def.getAllPortTypes());
+        Map portTypes = def.getAllPortTypes();
         List<PortType> intfs = null;
 
         if (portTypes == null) {
@@ -189,15 +190,16 @@ public class WSDLToCorbaBinding {
             PortType portType = null;
             intfs = new ArrayList<PortType>();
             if (portTypes.size() == 1) {
-                portType = portTypes.values().iterator().next();
+                portType = (PortType) portTypes.values().iterator().next();
                 interfaceNames.add(portType.getQName().getLocalPart());
                 intfs.add(portType);
             } else if (portTypes.size() > 1) {
                 if (def.getAllBindings().size() > 0) {
-                    throwMultipleMultipleTypeException(CastUtils.cast(def.getAllBindings().keySet(),
-                                                                      QName.class));
+                    throwMultipleMultipleTypeException(def.getAllBindings());
                 }
-                for (PortType port : portTypes.values()) {
+                Iterator iter = portTypes.values().iterator();
+                while (iter.hasNext()) {
+                    PortType port = (PortType)iter.next();
                     interfaceNames.add(port.getQName().getLocalPart());
                     intfs.add(port);
                 }
@@ -206,16 +208,16 @@ public class WSDLToCorbaBinding {
         return intfs;
     }
 
-    private void throwMultipleMultipleTypeException(Collection<QName> binds) throws Exception {
+    private void throwMultipleMultipleTypeException(Map binds) throws Exception {
         StringBuilder sb = new StringBuilder();
         org.apache.cxf.common.i18n.Message msgDef =
             new org.apache.cxf.common.i18n.Message("Multiple Bindings already defined in the wsdl", LOG);
         sb.append(msgDef.toString());
-        Iterator<QName> it2 = binds.iterator();
+        Iterator it2 = binds.keySet().iterator();
         int cnt = 0;
         while (it2.hasNext()) {
             cnt++;
-            sb.append("  " + cnt + " --> " + it2.next().getLocalPart());
+            sb.append("  " + cnt + " --> " + ((QName) it2.next()).getLocalPart());
         }
         throw new Exception(sb.toString());
     }
@@ -387,8 +389,10 @@ public class WSDLToCorbaBinding {
                 }
                 // add Faults
                 if (op.getFaults() != null && op.getFaults().size() > 0) {
-                    Collection<Fault> faults = CastUtils.cast(op.getFaults().values());
-                    for (Fault fault : faults) {
+                    Map faults = op.getFaults();
+                    Iterator i = faults.values().iterator();
+                    while (i.hasNext()) {
+                        Fault fault = (Fault)i.next();
                         BindingFault bindingFault = definition.createBindingFault();
                         bindingFault.setName(fault.getName());
                         bindingOperation.addBindingFault(bindingFault);
@@ -449,8 +453,10 @@ public class WSDLToCorbaBinding {
             operationType.setReturn(retType);
         }
 
-        Collection<Fault> faults = CastUtils.cast(op.getFaults().values());
-        for (Fault fault : faults) {
+        Map faults = op.getFaults();
+        Iterator i = faults.values().iterator();
+        while (i.hasNext()) {
+            Fault fault = (Fault)i.next();
             RaisesType raisestype = new RaisesType();
             CorbaTypeImpl extype = convertFaultToCorbaType(xmlSchemaType, fault);
             if (extype != null) {
@@ -465,8 +471,8 @@ public class WSDLToCorbaBinding {
 
     private void addCorbaTypeMap(Definition definition) throws Exception {
 
-        Iterator<?> t = definition.getExtensibilityElements().iterator();
-        Iterator<?> j = definition.getExtensibilityElements().iterator();
+        Iterator t = definition.getExtensibilityElements().iterator();
+        Iterator j = definition.getExtensibilityElements().iterator();
         while (t.hasNext()) {
             if (j.next() instanceof TypeMappingType) {
                 typeMappingType = (TypeMappingType)t.next();
@@ -593,7 +599,7 @@ public class WSDLToCorbaBinding {
     private CorbaTypeImpl convertFaultToCorbaType(XmlSchema xmlSchema, Fault fault) throws Exception {
         org.apache.cxf.binding.corba.wsdl.Exception corbaex = null;
         XmlSchemaType schemaType = null;
-        Iterator<Part> parts = CastUtils.cast(fault.getMessage().getParts().values().iterator());
+        Iterator parts = fault.getMessage().getParts().values().iterator();
 
         if (!parts.hasNext()) {
             String msgStr = "Fault " + fault.getMessage().getQName().getLocalPart()
@@ -603,7 +609,7 @@ public class WSDLToCorbaBinding {
             throw new Exception(msg.toString());
         }
 
-        Part part = parts.next();
+        Part part = (Part)parts.next();
         schemaType = helper.lookUpType(part);
         if (schemaType != null) {
             QName name = schemaType.getQName();
@@ -657,7 +663,7 @@ public class WSDLToCorbaBinding {
                 + corbaex.getName().replace('.', '/')
                 + WSDLToCorbaHelper.IDL_VERSION;
             corbaex.setRepositoryID(repoId);
-            CorbaTypeImpl corbaTypeImpl = corbaex;
+            CorbaTypeImpl corbaTypeImpl = (CorbaTypeImpl)corbaex;
             if (!helper.isDuplicate(corbaTypeImpl)) {
                 CorbaTypeImpl dup = helper.isDuplicateException(corbaTypeImpl);
                 if (dup != null) {
@@ -672,7 +678,7 @@ public class WSDLToCorbaBinding {
     }
 
     private org.apache.cxf.binding.corba.wsdl.Exception createCorbaException(QName schemaTypeName,
-                                                                             XmlSchemaType stype)
+                                                                                  XmlSchemaType stype)
         throws Exception {
         org.apache.cxf.binding.corba.wsdl.Exception corbaex = null;
         XmlSchemaComplexType complex = null;
@@ -690,15 +696,19 @@ public class WSDLToCorbaBinding {
                                     + defaultName.getLocalPart()
                                     + WSDLToCorbaHelper.IDL_VERSION);
             String uri = defaultName.getNamespaceURI();
-            List<MemberType> attributeMembers = helper.processAttributesAsMembers(complex.getAttributes(),
+            List attributeMembers = helper.processAttributesAsMembers(complex.getAttributes(),
                                                                       uri);
-            for (MemberType memberType : attributeMembers) {
+            Iterator iterator = attributeMembers.iterator();
+            while (iterator.hasNext()) {
+                MemberType memberType = (MemberType)iterator.next();
                 corbaex.getMember().add(memberType);
             }
-            List<MemberType> members = helper.processContainerAsMembers(complex.getParticle(),
+            List members = helper.processContainerAsMembers(complex.getParticle(),
                                                             stype.getQName(),
                                                             defaultName);
-            for (MemberType memberType : members) {
+            Iterator it = members.iterator();
+            while (it.hasNext()) {
+                MemberType memberType = (MemberType)it.next();
                 corbaex.getMember().add(memberType);
             }
         }
@@ -848,7 +858,7 @@ public class WSDLToCorbaBinding {
         interfaceNames.add(interfaceName);
     }
 
-    public List<String> getInterfaceNames() {
+    public List getInterfaceNames() {
         return interfaceNames;
     }
 

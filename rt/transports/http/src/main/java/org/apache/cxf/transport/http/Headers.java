@@ -326,7 +326,7 @@ public class Headers {
 
         //TODO how to deal with the fields        
         for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
-            String fname = e.nextElement();
+            String fname = (String)e.nextElement();
             String mappedName = HttpHeaderHelper.getHeaderKey(fname);
             List<String> values;
             if (headers.containsKey(mappedName)) {
@@ -336,7 +336,7 @@ public class Headers {
                 headers.put(mappedName, values);
             }
             for (Enumeration<String> e2 = req.getHeaders(fname); e2.hasMoreElements();) {
-                String val = e2.nextElement();
+                String val = (String)e2.nextElement();
                 values.add(val);
             }
         }
@@ -397,7 +397,7 @@ public class Headers {
                 message.getContextualProperty(ADD_HEADERS_PROPERTY));
         for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
             String header = (String)iter.next();
-            List<?> headerList = headers.get(header);
+            List<?> headerList = (List<?>)headers.get(header);
             
             if (addHeaders || HTTP_HEADERS_SETCOOKIE.equals(header)) {
                 for (int i = 0; i < headerList.size(); i++) {

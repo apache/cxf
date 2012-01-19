@@ -57,7 +57,7 @@ public class EndpointReferenceBuilder {
             Iterator<ExtensibilityElement> extensionElements = portExtensors.iterator();
             QName wsaEpr = new QName(Names.WSA_NAMESPACE_NAME, "EndpointReference");
             while (extensionElements.hasNext()) {
-                ExtensibilityElement ext = extensionElements.next();
+                ExtensibilityElement ext = (ExtensibilityElement)extensionElements.next();
                 if (ext instanceof UnknownExtensibilityElement && wsaEpr.equals(ext.getElementType())) {
                     Element eprEle = ((UnknownExtensibilityElement)ext).getElement();
                     List<Element> addressElements = DOMUtils.getChildrenWithName(eprEle,

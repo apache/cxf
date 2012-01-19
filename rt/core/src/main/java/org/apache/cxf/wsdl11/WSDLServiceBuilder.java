@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl11;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -209,13 +210,13 @@ public class WSDLServiceBuilder {
         parseImports(d, defList);
         for (Definition def : defList) {
 
-            for (Iterator<?> ite = def.getPortTypes().entrySet().iterator(); ite.hasNext();) {
-                Entry<?, ?> entry = (Entry<?, ?>)ite.next();
+            for (Iterator ite = def.getPortTypes().entrySet().iterator(); ite.hasNext();) {
+                Entry entry = (Entry)ite.next();
                 PortType portType = def.getPortType((QName)entry.getKey());
                 ServiceInfo serviceInfo = this.buildMockService(def, portType);
                 serviceList.add(serviceInfo);
 
-                for (Iterator<?> it2 = d.getAllBindings().values().iterator(); it2.hasNext();) {
+                for (Iterator it2 = d.getAllBindings().values().iterator(); it2.hasNext();) {
                     Binding b = (Binding)it2.next();
                     if (b.getPortType() == portType) {
                         this.buildBinding(serviceInfo, b);
@@ -399,7 +400,7 @@ public class WSDLServiceBuilder {
     }
 
     public EndpointInfo buildEndpoint(ServiceInfo service, BindingInfo bi, Port port) {
-        List<?> elements = port.getExtensibilityElements();
+        List elements = port.getExtensibilityElements();
         String ns = null;
 
         DestinationFactory factory = null;
@@ -427,10 +428,10 @@ public class WSDLServiceBuilder {
             if (null != elements && elements.size() > 0) {
                 for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
                     if (el instanceof SOAPBinding) {
-                        ns = ((SOAPBinding)el).getTransportURI();
+                        ns = (String)((SOAPBinding)el).getTransportURI();
                         break;
                     } else if (el instanceof SOAP12Binding) {
-                        ns = ((SOAP12Binding)el).getTransportURI();
+                        ns = (String)((SOAP12Binding)el).getTransportURI();
                         break;
                         // TODO: this is really ugly, but how to link between
                         // this binding and this transport ?
@@ -456,7 +457,8 @@ public class WSDLServiceBuilder {
         if (factory instanceof WSDLEndpointFactory) {
             WSDLEndpointFactory wFactory = (WSDLEndpointFactory)factory;
             ei = wFactory.createEndpointInfo(service, bi, 
-                                             port.getExtensibilityElements());
+                                    port == null ? Collections.emptyList() 
+                                                 : port.getExtensibilityElements());
         }
 
         if (ei == null) {
@@ -581,7 +583,7 @@ public class WSDLServiceBuilder {
             opInfo.setProperty(WSDL_OPERATION, op);
         }
         copyDocumentation(opInfo, op);
-        List<String> porderList = CastUtils.cast((List<?>)op.getParameterOrdering());
+        List<String> porderList = CastUtils.cast((List)op.getParameterOrdering());
         opInfo.setParameterOrdering(porderList);
         this.copyExtensors(opInfo, op.getExtensibilityElements());
         this.copyExtensionAttributes(opInfo, op);
@@ -847,7 +849,7 @@ public class WSDLServiceBuilder {
     private void buildMessage(AbstractMessageContainer minfo, Message msg) {
         SchemaCollection schemas = minfo.getOperation().getInterface().getService()
             .getXmlSchemaCollection();
-        List<?> orderedParam = msg.getOrderedParts(null);
+        List orderedParam = msg.getOrderedParts(null);
         for (Part part : cast(orderedParam, Part.class)) {
             MessagePartInfo pi = minfo.addMessagePart(new QName(minfo.getName().getNamespaceURI(), part
                 .getName()));

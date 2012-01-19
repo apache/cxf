@@ -156,14 +156,14 @@ public class LogicalMessageImpl implements LogicalMessage {
             }
 
             if (mode == Service.Mode.PAYLOAD) {
-                source = obj;
+                source = (Source)obj;
             } else {
                 try {
                     CachedOutputStream cos = new CachedOutputStream();
                     StaxUtils.copy(obj, cos);
                     InputStream in = cos.getInputStream();
                     SOAPMessage msg = initSOAPMessage(in);
-                    source = new DOMSource(msg.getSOAPBody().getFirstChild());
+                    source = new DOMSource(((SOAPMessage)msg).getSOAPBody().getFirstChild());
                     in.close();
                     cos.close();
                 } catch (Exception e) {
@@ -172,7 +172,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             }
         } else if (message instanceof XMLMessage) {
             if (obj != null) {
-                source = obj;
+                source = (Source)obj;
             } else if (message.getContent(DataSource.class) != null) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message(
                                     "GETPAYLOAD_OF_DATASOURCE_NOT_VALID_XMLHTTPBINDING",
@@ -194,7 +194,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                         // instead of creating a new empty one.
                         SOAPMessage msg = initSOAPMessage(null);
                         write(s, msg.getSOAPBody());
-                        s = new DOMSource(msg.getSOAPPart());
+                        s = new DOMSource(((SOAPMessage)msg).getSOAPPart());
                     } catch (Exception e) {
                         throw new Fault(e);
                     }

@@ -108,14 +108,14 @@ public final class DateTypeCustomGenerator extends AbstractGenerator<File> {
         return new File(outputdir, wsdlName + ".xjb");
     }
 
-    protected String getAdapterMethod(final Class<?> clz, final String methodName) {
+    protected String getAdapterMethod(final Class clz, final String methodName) {
         if (clz == Date.class) {
             return DATE_ADAPTER + methodName;
         }
         return CALENDAR_ADAPTER + methodName;
     }
 
-    protected Class<?> getDateType() {
+    protected Class getDateType() {
         if (getServiceModel() == null) {
             return null;
         }

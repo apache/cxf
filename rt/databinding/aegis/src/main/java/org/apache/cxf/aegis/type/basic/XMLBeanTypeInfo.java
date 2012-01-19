@@ -20,6 +20,7 @@ package org.apache.cxf.aegis.type.basic;
 
 import java.beans.PropertyDescriptor;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,14 +38,14 @@ import org.apache.cxf.helpers.DOMUtils;
 
 public class XMLBeanTypeInfo extends BeanTypeInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLBeanTypeInfo.class);
-    private List<Element> mappings;
+    private List mappings;
 
     /**
      * Map used for storing meta data about each property
      */
     private Map<QName, BeanTypePropertyInfo> name2PropertyInfo = new HashMap<QName, BeanTypePropertyInfo>();
 
-    public XMLBeanTypeInfo(Class<?> typeClass, List<Element> mappings, String defaultNS) {
+    public XMLBeanTypeInfo(Class typeClass, List mappings, String defaultNS) {
         super(typeClass, defaultNS);
 
         this.mappings = mappings;
@@ -176,10 +177,11 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
     }
 
     private Element getPropertyElement(String name2) {
-        for (Element mapping2 : mappings) {
+        for (Iterator itr = mappings.iterator(); itr.hasNext();) {
+            Element mapping2 = (Element)itr.next();
             List<Element> elements = DOMUtils.getChildrenWithName(mapping2, "", "property");
             for (int i = 0; i < elements.size(); i++) {
-                Element e = elements.get(i);
+                Element e = (Element)elements.get(i);
                 String name = DOMUtils.getAttributeValueEmptyNull(e, "name");
 
                 if (name != null && name.equals(name2)) {

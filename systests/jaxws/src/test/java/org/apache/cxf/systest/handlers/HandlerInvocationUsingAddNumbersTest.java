@@ -67,7 +67,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
 
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);
-        AddNumbers port = service.getPort(portName, AddNumbers.class);
+        AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
         setAddress(port, addNumbersAddress);
         SmallNumberHandler sh = new SmallNumberHandler();
         addHandlersProgrammatically((BindingProvider)port, sh);
@@ -83,7 +83,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
 
         AddNumbersServiceWithAnnotation service = new AddNumbersServiceWithAnnotation(wsdl, serviceName);
-        AddNumbers port = service.getPort(portName, AddNumbers.class);
+        AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
         setAddress(port, addNumbersAddress);
 
         int result = port.addNumbers(10, 20);
@@ -142,7 +142,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
 
         AddNumbersServiceWithAnnotation service = new AddNumbersServiceWithAnnotation(wsdl, serviceName);
-        AddNumbers port = service.getPort(portName, AddNumbers.class);
+        AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
         setAddress(port, addNumbersAddress);
 
         @SuppressWarnings("rawtypes")
@@ -164,7 +164,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
 
         AddNumbersServiceWithAnnotation service = new AddNumbersServiceWithAnnotation(wsdl, serviceName);
-        AddNumbers port = service.getPort(portName, AddNumbers.class);
+        AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
         setAddress(port, addNumbersAddress);
 
         @SuppressWarnings("rawtypes")

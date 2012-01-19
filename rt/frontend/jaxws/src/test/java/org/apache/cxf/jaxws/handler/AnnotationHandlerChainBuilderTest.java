@@ -20,12 +20,13 @@
 package org.apache.cxf.jaxws.handler;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.junit.Assert;
@@ -104,22 +105,28 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         assertEquals(7, handlers.size());
     }
     
-    public static class TestLogicalHandler implements LogicalHandler<LogicalMessageContext> {
+    public static class TestLogicalHandler implements LogicalHandler {
+        Map config;
         boolean initCalled;
 
         public void close(MessageContext arg0) {
         }
 
-        public boolean handleFault(LogicalMessageContext arg0) {
+        public boolean handleFault(MessageContext arg0) {
             return false;
         }
 
-        public boolean handleMessage(LogicalMessageContext arg0) {
+        public boolean handleMessage(MessageContext arg0) {
             return false;
+        }
+
+        public final void init(final Map map) {
+            config = map;
+            initCalled = true;
         }
     }
 
-    public static class TestProtocolHandler implements Handler<MessageContext> {
+    public static class TestProtocolHandler implements Handler {
 
         public void close(MessageContext arg0) {
         }

@@ -108,7 +108,7 @@ public class NormalizeTest extends Assert {
         assertNotNull(samplePolicy);
         assertNotNull(normalisedPolicy);
         
-        Policy normalisedSamplePolicy = samplePolicy.normalize(true);
+        Policy normalisedSamplePolicy = (Policy)samplePolicy.normalize(true);
         assertTrue(PolicyComparator.compare(normalisedPolicy, normalisedSamplePolicy));
     }
     

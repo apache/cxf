@@ -60,7 +60,7 @@ public class JMSDestinationBeanDefinitionParser extends AbstractBeanDefinitionPa
     }
 
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return JMSDestination.class;
     }
 

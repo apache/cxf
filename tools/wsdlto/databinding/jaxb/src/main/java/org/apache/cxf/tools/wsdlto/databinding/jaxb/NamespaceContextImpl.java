@@ -58,7 +58,7 @@ public class NamespaceContextImpl implements NamespaceContext {
         return element.lookupPrefix(namespaceURI);
     }
 
-    public Iterator<?> getPrefixes(String namespaceURI) {
+    public Iterator getPrefixes(String namespaceURI) {
         return null;
     }
 

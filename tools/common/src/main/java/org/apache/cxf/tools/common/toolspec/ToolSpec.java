@@ -172,8 +172,8 @@ public class ToolSpec {
         }
     }
 
-    public List<String> getInstreamIds() {
-        List<String> res = new ArrayList<String>();
+    public List getInstreamIds() {
+        List<Object> res = new ArrayList<Object>();
         Element streams = getStreams();
 
         if (streams != null) {
@@ -187,8 +187,8 @@ public class ToolSpec {
         return Collections.unmodifiableList(res);
     }
 
-    public List<String> getOutstreamIds() {
-        List<String> res = new ArrayList<String>();
+    public List getOutstreamIds() {
+        List<Object> res = new ArrayList<Object>();
         Element streams = getStreams();
 
         if (streams != null) {

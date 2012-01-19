@@ -50,8 +50,6 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
-    private static final long serialVersionUID = -8916352798780577499L;
-
     private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
     
     private static final String USER_MODEL_PARAM = "user.model";
@@ -97,16 +95,16 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         setSchemasLocations(bean, servletConfig);
         setAllInterceptors(bean, servletConfig);
         
-        Map<Class<?>, Map<String, String>> resourceClasses = 
+        Map<Class, Map<String, String>> resourceClasses = 
             getServiceClasses(servletConfig, modelRef != null);
-        Map<Class<?>, ResourceProvider> resourceProviders = 
+        Map<Class, ResourceProvider> resourceProviders = 
             getResourceProviders(servletConfig, resourceClasses);
         
         List<?> providers = getProviders(servletConfig);
                 
-        bean.setResourceClasses(new ArrayList<Class<?>>(resourceClasses.keySet()));
+        bean.setResourceClasses(new ArrayList<Class>(resourceClasses.keySet()));
         bean.setProviders(providers);
-        for (Map.Entry<Class<?>, ResourceProvider> entry : resourceProviders.entrySet()) {
+        for (Map.Entry<Class, ResourceProvider> entry : resourceProviders.entrySet()) {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
         setExtensions(bean, servletConfig);
@@ -202,7 +200,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
     }
     
-    protected Map<Class<?>, Map<String, String>> getServiceClasses(ServletConfig servletConfig,
+    protected Map<Class, Map<String, String>> getServiceClasses(ServletConfig servletConfig,
                                             boolean modelAvailable) throws ServletException {
         String serviceBeans = servletConfig.getInitParameter(SERVICE_CLASSES_PARAM);
         if (serviceBeans == null) {
@@ -212,7 +210,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             throw new ServletException("At least one resource class should be specified");
         }
         String[] classNames = serviceBeans.split(" ");
-        Map<Class<?>, Map<String, String>> map = new HashMap<Class<?>, Map<String, String>>();
+        Map<Class, Map<String, String>> map = new HashMap<Class, Map<String, String>>();
         for (String cName : classNames) {
             Map<String, String> props = new HashMap<String, String>();
             String theName = getClassNameAndProperties(cName, props);
@@ -256,16 +254,16 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         return theName;
     }
     
-    protected Map<Class<?>, ResourceProvider> getResourceProviders(ServletConfig servletConfig,
-            Map<Class<?>, Map<String, String>> resourceClasses) throws ServletException {
+    protected Map<Class, ResourceProvider> getResourceProviders(ServletConfig servletConfig,
+            Map<Class, Map<String, String>> resourceClasses) throws ServletException {
         String scope = servletConfig.getInitParameter(SERVICE_SCOPE_PARAM);
         if (scope != null && !SERVICE_SCOPE_SINGLETON.equals(scope)
             && !SERVICE_SCOPE_REQUEST.equals(scope)) {
             throw new ServletException("Only singleton and prototype scopes are supported");
         }
         boolean isPrototype = SERVICE_SCOPE_REQUEST.equals(scope);
-        Map<Class<?>, ResourceProvider> map = new HashMap<Class<?>, ResourceProvider>();
-        for (Map.Entry<Class<?>, Map<String, String>> entry : resourceClasses.entrySet()) {
+        Map<Class, ResourceProvider> map = new HashMap<Class, ResourceProvider>();
+        for (Map.Entry<Class, Map<String, String>> entry : resourceClasses.entrySet()) {
             Class<?> c = entry.getKey();
             map.put(c, isPrototype ? new PerRequestResourceProvider(c)
                                    : new SingletonResourceProvider(
@@ -278,7 +276,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     protected Object createSingletonInstance(Class<?> cls, Map<String, String> props, ServletConfig sc) 
         throws ServletException {
-        Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
+        Constructor c = ResourceUtils.findResourceConstructor(cls, false);
         if (c == null) {
             throw new ServletException("No valid constructor found for " + cls.getName());
         }

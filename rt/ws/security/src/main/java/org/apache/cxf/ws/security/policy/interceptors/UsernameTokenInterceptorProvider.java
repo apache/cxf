@@ -33,7 +33,6 @@ import org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor;
  * 
  */
 public class UsernameTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    private static final long serialVersionUID = -1507727324874727254L;
     private static final Collection<QName> ASSERTION_TYPES;
     static {
         ASSERTION_TYPES = new ArrayList<QName>();

@@ -23,7 +23,7 @@ import java.io.File;
 import java.net.URI;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;

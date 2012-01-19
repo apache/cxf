@@ -331,7 +331,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         
         /* Common to simple and preflight */
         rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, 
-                        m.getExchange().get(CorsHeaderConstants.HEADER_ORIGIN));
+                        (String)m.getExchange().get(CorsHeaderConstants.HEADER_ORIGIN));
         rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS,
                         Boolean.toString(allowCredentials));
         

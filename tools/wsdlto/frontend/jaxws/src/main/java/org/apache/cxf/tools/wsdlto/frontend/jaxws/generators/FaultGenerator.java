@@ -20,6 +20,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -67,12 +68,14 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
         if (passthrough()) {
             return;
         }
-        Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
 
             Map<String, JavaExceptionClass> exceptionClasses = javaModel
                     .getExceptionClasses();
-            for (String expClassName : exceptionClasses.keySet()) {
+            for (Iterator iter = exceptionClasses.keySet().iterator(); iter
+                    .hasNext();) {
+                String expClassName = (String)iter.next();
                 JavaExceptionClass expClz =
                     exceptionClasses.get(expClassName);
     

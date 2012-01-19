@@ -195,7 +195,7 @@ public class CorbaServerConduitTest extends Assert {
                 
     @Test
     public void testBuildRequestResult() {
-        NVList list = orb.create_list(0);        
+        NVList list = (NVList)orb.create_list(0);        
         CorbaServerConduit conduit = setupCorbaServerConduit(false);  
         CorbaMessage msg = control.createMock(CorbaMessage.class);
         Exchange exchange = control.createMock(Exchange.class);        
@@ -221,7 +221,7 @@ public class CorbaServerConduitTest extends Assert {
     
     @Test
     public void testBuildRequestResultException() {
-        NVList list = orb.create_list(0);        
+        NVList list = (NVList)orb.create_list(0);        
         CorbaServerConduit conduit = setupCorbaServerConduit(false);  
         CorbaMessage msg = control.createMock(CorbaMessage.class);
         Exchange exchange = control.createMock(Exchange.class);        
@@ -261,7 +261,7 @@ public class CorbaServerConduitTest extends Assert {
         arguments[0] = arg;
         arguments[0].setMode(org.omg.CORBA.ARG_OUT.value);        
         
-        NVList nvlist = orb.create_list(2);    
+        NVList nvlist = (NVList)orb.create_list(2);    
         Any value = orb.create_any();
         value.insert_Streamable(arguments[0]);
         nvlist.add_value(arguments[0].getName(), value, arguments[0].getMode());

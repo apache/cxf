@@ -32,7 +32,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.provider.PrimitiveTextProvider;
 
-public class StringTextWriter extends PrimitiveTextProvider<String> {
+public class StringTextWriter extends PrimitiveTextProvider {
     
     @Context
     private UriInfo ui;
@@ -52,10 +52,10 @@ public class StringTextWriter extends PrimitiveTextProvider<String> {
         }
     }
     
-    public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns, 
+    public void writeTo(Object obj, Class<?> type, Type genType, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
-        if (type == String.class && type == genType) {
+        if (obj instanceof String && type == String.class && type == genType) {
             obj = "Nonexistent method".equals(obj) ? "StringTextWriter - " + obj : obj; 
             super.writeTo(obj, type, genType, anns, mt, headers, os);
             return;

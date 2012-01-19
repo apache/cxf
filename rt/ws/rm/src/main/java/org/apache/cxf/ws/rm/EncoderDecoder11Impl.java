@@ -75,22 +75,22 @@ public final class EncoderDecoder11Impl implements EncoderDecoder {
         return RM11Constants.INSTANCE;
     }
 
-    public Class<?> getCreateSequenceType() {
+    public Class getCreateSequenceType() {
         return org.apache.cxf.ws.rm.v200702.CreateSequenceType.class;
     }
 
-    public Class<?> getCreateSequenceResponseType() {
+    public Class getCreateSequenceResponseType() {
         return org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType.class;
     }
 
-    public Class<?> getTerminateSequenceType() {
+    public Class getTerminateSequenceType() {
         return org.apache.cxf.ws.rm.v200702.TerminateSequenceType.class;
     }
 
     private static JAXBContext getContext() throws JAXBException {
         synchronized (EncoderDecoder11Impl.class) {
             if (jaxbContext == null) {
-                Class<?> clas = RMUtils.getWSRMFactory().getClass();
+                Class clas = RMUtils.getWSRMFactory().getClass();
                 jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(clas),
                     clas.getClassLoader());
             }
@@ -115,7 +115,7 @@ public final class EncoderDecoder11Impl implements EncoderDecoder {
         SequenceType seq = rmps.getSequence();
         if (null != seq) {
             LOG.log(Level.FINE, "encoding sequence into RM header");
-            JAXBElement<SequenceType> element = RMUtils.getWSRMFactory().createSequence(seq);
+            JAXBElement element = RMUtils.getWSRMFactory().createSequence(seq);
             marshaller.marshal(element, header);
         } 
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();

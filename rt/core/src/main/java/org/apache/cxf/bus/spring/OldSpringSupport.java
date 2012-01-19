@@ -30,7 +30,7 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * 
  */
-public final class OldSpringSupport implements FactoryBean<Object>, BeanNameAware {
+public final class OldSpringSupport implements FactoryBean, BeanNameAware {
     public static final Logger LOG = LogUtils.getL7dLogger(OldSpringSupport.class);
     Bus bus;
     Class<?> cls;
@@ -60,7 +60,7 @@ public final class OldSpringSupport implements FactoryBean<Object>, BeanNameAwar
         return bus.getExtension(cls);
     }
 
-    public Class<?> getObjectType() {
+    public Class getObjectType() {
         return cls;
     }
 

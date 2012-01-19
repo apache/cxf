@@ -44,7 +44,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 
 public class MessageImpl extends StringMapImpl implements Message {
-    private static final long serialVersionUID = -3020763696429459865L;
     private static final Class<?> DEFAULT_CONTENTS[];
     private static final int DEFAULT_CONTENTS_LENGTH;
     
@@ -209,8 +208,6 @@ public class MessageImpl extends StringMapImpl implements Message {
     
     private void calcContextCache() {
         Map<String, Object> o = new HashMap<String, Object>() {
-            private static final long serialVersionUID = 7067290677790419348L;
-
             public void putAll(Map<? extends String, ? extends Object> m) {
                 if (m != null) {
                     super.putAll(m);

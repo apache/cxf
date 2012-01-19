@@ -349,10 +349,11 @@ public final class PluginLoader {
         return "/" + getContainerPackage(frontend).replace(".", "/") + "/" + toolspec;
     }
 
-    private AbstractWSDLBuilder loadBuilder(String fullClzName) {
-        AbstractWSDLBuilder builder = null;
+    @SuppressWarnings("unchecked")
+    private AbstractWSDLBuilder<? extends Object> loadBuilder(String fullClzName) {
+        AbstractWSDLBuilder<? extends Object> builder = null;
         try {
-            builder = (AbstractWSDLBuilder) ClassLoaderUtils
+            builder = (AbstractWSDLBuilder<? extends Object>) ClassLoaderUtils
                 .loadClass(fullClzName, getClass()).newInstance();
 
         } catch (Exception e) {

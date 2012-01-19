@@ -414,7 +414,7 @@ public class CorbaDestination implements MultiplexDestination {
         
         orbConfig.addPOAPolicies(orb, name, parentPOA, poaManager, policies);
         
-        Policy[] policyList = policies.toArray(new Policy[policies.size()]);
+        Policy[] policyList = (Policy[])policies.toArray(new Policy[policies.size()]);
 
         try {
             return parentPOA.create_POA(name, poaManager, policyList);
@@ -450,7 +450,7 @@ public class CorbaDestination implements MultiplexDestination {
         return ref;
     }
 
-    public String getId(Map<String, Object> contextMap) {
+    public String getId(Map contextMap) {
         String id = null;
         try {
             Current currentPoa = (Current) orb

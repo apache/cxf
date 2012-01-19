@@ -51,7 +51,7 @@ public class NodeDataReader implements DataReader<Node> {
         return read(input);
     }
 
-    public Object read(QName name, Node input, Class<?> type) {
+    public Object read(QName name, Node input, Class type) {
         if (SAXSource.class.isAssignableFrom(type)) {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader((Element)input);
             return new StaxSource(reader);

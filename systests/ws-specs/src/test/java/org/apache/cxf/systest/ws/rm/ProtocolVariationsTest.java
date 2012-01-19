@@ -334,7 +334,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
                 ClientProxy.getClient(greeter).getConduit().close();
             }
             if (dispatch != null) {
-                ((DispatchImpl<?>)dispatch).getClient().getConduit().close();
+                ((DispatchImpl)dispatch).getClient().getConduit().close();
             }
             greeterBus.shutdown(true);
             greeter = null;

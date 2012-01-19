@@ -47,7 +47,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
@@ -162,7 +161,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
             // Build the ServiceModel from the WSDLModel
             if (version == WSDLConstants.WSDLVersion.WSDL11) {
-                AbstractWSDLBuilder builder = frontend.getWSDLBuilder();
+                @SuppressWarnings("unchecked")
+                AbstractWSDLBuilder<Definition> builder = (AbstractWSDLBuilder<Definition>)frontend
+                    .getWSDLBuilder();
                 builder.setContext(context);
                 builder.setBus(getBus());
                 context.put(Bus.class, getBus());
@@ -300,10 +301,12 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     public QName getServiceQName(Definition def) {
         List<Definition> defs = new ArrayList<Definition>();
         defs.add(def);
-        Iterator<?> ite1 = def.getImports().values().iterator();
+        Iterator ite1 = def.getImports().values().iterator();
         while (ite1.hasNext()) {
-            List<javax.wsdl.Import> defList = CastUtils.cast((List<?>)ite1.next());
-            for (javax.wsdl.Import importDef : defList) {
+            List defList = (List)ite1.next();
+            Iterator ite2 = defList.iterator();
+            while (ite2.hasNext()) {
+                javax.wsdl.Import importDef = (javax.wsdl.Import)ite2.next();
                 defs.add(importDef.getDefinition());
             }
         }
@@ -480,7 +483,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     protected void setLibraryReferences(ToolContext env) {
         Properties props = loadProperties(getResourceAsStream("wsdltojavalib.properties"));
         if (props != null) {
-            for (Iterator<?> keys = props.keySet().iterator(); keys.hasNext();) {
+            for (Iterator keys = props.keySet().iterator(); keys.hasNext();) {
                 String key = (String)keys.next();
                 env.put(key, props.get(key));
             }
@@ -613,7 +616,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             throw new RuntimeException(ex);
         }
 
-        for (Iterator<?> it = initialExtensions.values().iterator(); it.hasNext();) {
+        for (Iterator it = initialExtensions.values().iterator(); it.hasNext();) {
             String validatorClass = (String)it.next();
             try {
                 if (LOG.isLoggable(Level.FINE)) {

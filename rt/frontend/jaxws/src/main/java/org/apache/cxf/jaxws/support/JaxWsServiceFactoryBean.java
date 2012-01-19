@@ -294,7 +294,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     protected void initializeWSDLOperationsForProvider() {
-        Class<?> c = getProviderParameterType(getServiceClass());
+        Class c = getProviderParameterType(getServiceClass());
         if (c == null) {
             throw new ServiceConstructionException(new Message("INVALID_PROVIDER_EXC", LOG));
         }
@@ -404,15 +404,15 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                 if (Provider.class == rawCls) {
                     return (Class<?>)((ParameterizedType)type).getActualTypeArguments()[0];
                 }
-            } else if (type instanceof Class && Provider.class.isAssignableFrom((Class<?>)type)) {
-                return getProviderParameterType((Class<?>)type);
+            } else if (type instanceof Class && Provider.class.isAssignableFrom((Class)type)) {
+                return getProviderParameterType((Class)type);
             }
         }
         return getProviderParameterType(cls.getSuperclass());
     }
 
     void initializeWrapping(OperationInfo o, Method selected) {
-        Class<?> responseWrapper = getResponseWrapper(selected);
+        Class responseWrapper = getResponseWrapper(selected);
         if (responseWrapper != null) {
             o.getOutput().getMessageParts().get(0).setTypeClass(responseWrapper);
         }
@@ -511,7 +511,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
     }
 
-    private FaultInfo getFaultInfo(final OperationInfo operation, final Class<?> expClass) {
+    private FaultInfo getFaultInfo(final OperationInfo operation, final Class expClass) {
         for (FaultInfo fault : operation.getFaults()) {
             if (fault.getProperty(Class.class.getName()) == expClass
                 || fault.getProperty(Class.class.getName()) == expClass) {
@@ -686,7 +686,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         getService().put(WS_FEATURES, getWsFeatures());
     }
 
-    protected void initializeParameter(MessagePartInfo part, Class<?> rawClass, Type type) {
+    protected void initializeParameter(MessagePartInfo part, Class rawClass, Type type) {
         if (implInfo.isWebServiceProvider()) {
             part.setTypeQName(XMLSchemaQNames.XSD_ANY);
             part.setTypeClass(rawClass);

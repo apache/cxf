@@ -59,7 +59,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         }
     }
 
-    public Object read(QName name, XMLStreamReader input, Class<?> typeClass) {
+    public Object read(QName name, XMLStreamReader input, Class typeClass) {
         MessagePartInfo info = databinding.getPartFromClass(typeClass);
         return info == null ? read(input) : read(info, input);
     }

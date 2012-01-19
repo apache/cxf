@@ -168,14 +168,14 @@ public final class JibxUtil {
                || "void".equals(type);
     }
 
-    public static boolean isSimpleValue(final Class<?> type) {
+    public static boolean isSimpleValue(final Class type) {
         return isSimpleValue(type.getName());
     }
 
     public static QName getSchemaType(final String jtype) {
-        QName stype = simplePrimitiveTypeMap.get(jtype);
+        QName stype = (QName)simplePrimitiveTypeMap.get(jtype);
         if (stype == null) {
-            stype = simpleObjectTypeMap.get(jtype);
+            stype = (QName)simpleObjectTypeMap.get(jtype);
         }
         return stype;
     }

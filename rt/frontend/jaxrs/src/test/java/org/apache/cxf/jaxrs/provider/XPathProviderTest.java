@@ -32,37 +32,38 @@ public class XPathProviderTest extends Assert {
 
     @Test
     public void testIsReadableClassName() {
-        XPathProvider<?> provider = new XPathProvider<Object>();
+        XPathProvider provider = new XPathProvider();
         provider.setExpression("/");
-        assertTrue(provider.isReadable(Book.class, null, null, null));
-        assertTrue(provider.isReadable(BookStore.class, null, null, null));
+        assertTrue(provider.isReadable((Class)Book.class, null, null, null));
+        assertTrue(provider.isReadable((Class)BookStore.class, null, null, null));
         provider.setClassName(Book.class.getName());
-        assertFalse(provider.isReadable(BookStore.class, null, null, null));
-        assertTrue(provider.isReadable(Book.class, null, null, null));
+        assertFalse(provider.isReadable((Class)BookStore.class, null, null, null));
+        assertTrue(provider.isReadable((Class)Book.class, null, null, null));
         provider.setClassName(null);
-        assertTrue(provider.isReadable(Book.class, null, null, null));
-        assertTrue(provider.isReadable(BookStore.class, null, null, null));
+        assertTrue(provider.isReadable((Class)Book.class, null, null, null));
+        assertTrue(provider.isReadable((Class)BookStore.class, null, null, null));
     }
     
     @Test
     public void testIsReadableClassNames() {
-        XPathProvider<?> provider = new XPathProvider<Object>();
-        assertFalse(provider.isReadable(Book.class, null, null, null));
-        assertFalse(provider.isReadable(BookStore.class, null, null, null));
+        XPathProvider provider = new XPathProvider();
+        assertFalse(provider.isReadable((Class)Book.class, null, null, null));
+        assertFalse(provider.isReadable((Class)BookStore.class, null, null, null));
         Map<String, String> map = new HashMap<String, String>();
         map.put(Book.class.getName(), "/");
         provider.setExpressions(map);
-        assertFalse(provider.isReadable(BookStore.class, null, null, null));
-        assertTrue(provider.isReadable(Book.class, null, null, null));
+        assertFalse(provider.isReadable((Class)BookStore.class, null, null, null));
+        assertTrue(provider.isReadable((Class)Book.class, null, null, null));
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadFrom() throws Exception {
         String value = "<Book><name>The Book</name><id>2</id></Book>";
-        XPathProvider<Book> provider = new XPathProvider<Book>();
+        XPathProvider provider = new XPathProvider();
         provider.setExpression("/Book");
         provider.setClassName(Book.class.getName());
-        Book book = (Book)provider.readFrom(Book.class, null, null, null, null,
+        Book book = (Book)provider.readFrom((Class)Book.class, null, null, null, null,
                           new ByteArrayInputStream(value.getBytes()));
         assertNotNull(book);
         assertEquals(2L, book.getId());

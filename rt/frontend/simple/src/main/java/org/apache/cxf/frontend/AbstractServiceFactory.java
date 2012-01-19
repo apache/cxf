@@ -85,7 +85,7 @@ public abstract class AbstractServiceFactory extends AbstractWSDLBasedEndpointFa
         return null;
     }
 
-    public void setServiceClass(Class<?> clz) {
+    public void setServiceClass(Class clz) {
         super.setServiceClass(clz);
         getServiceFactory().setServiceClass(clz);
     }

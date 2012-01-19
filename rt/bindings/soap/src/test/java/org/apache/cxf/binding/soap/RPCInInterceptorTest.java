@@ -85,7 +85,7 @@ public class RPCInInterceptorTest extends TestBase {
 
         interceptor.handleMessage(soapMessage);
 
-        List<?> parameters = soapMessage.getContent(List.class);
+        List<?> parameters = (List<?>) soapMessage.getContent(List.class);
         assertEquals(1, parameters.size());
 
         Object obj = parameters.get(0);
@@ -104,7 +104,7 @@ public class RPCInInterceptorTest extends TestBase {
 
         interceptor.handleMessage(soapMessage);
 
-        List<?> parameters = soapMessage.getContent(List.class);
+        List<?> parameters = (List<?>) soapMessage.getContent(List.class);
         assertEquals(2, parameters.size());
 
         Object obj = parameters.get(1);

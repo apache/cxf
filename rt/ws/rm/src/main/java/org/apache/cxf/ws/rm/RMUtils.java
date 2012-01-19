@@ -30,7 +30,7 @@ import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingConstants;
-import org.apache.cxf.ws.addressing.impl.AddressingConstantsImpl;
+import org.apache.cxf.ws.addressing.AddressingConstantsImpl;
 
 public final class RMUtils {
    

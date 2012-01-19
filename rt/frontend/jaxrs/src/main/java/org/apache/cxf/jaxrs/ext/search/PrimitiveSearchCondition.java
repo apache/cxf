@@ -99,7 +99,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         return pojo.getClass().getName().startsWith("java.lang");
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     private boolean compare(Object lval, ConditionType cond, Object rval) {
         boolean compares = true;
         if (cond == ConditionType.EQUALS || cond == ConditionType.NOT_EQUALS) {

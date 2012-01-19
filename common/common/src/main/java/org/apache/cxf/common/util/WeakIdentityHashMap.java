@@ -102,8 +102,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         if (!(o instanceof WeakIdentityHashMap)) {
             return false;
         }
-        WeakIdentityHashMap<?, ?> v = (WeakIdentityHashMap<?, ?>)o;
-        return backingStore.equals(v.backingStore);
+        return backingStore.equals(((WeakIdentityHashMap)o).backingStore);
     }
 
     public V get(Object key) {
@@ -123,7 +122,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         reap();
         return backingStore.isEmpty();
     }
-    public void putAll(Map<? extends K, ? extends V> t) {
+    public void putAll(Map t) {
         throw new UnsupportedOperationException();
     }
     public V remove(Object key) {
@@ -166,7 +165,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
                 return true;
             }
             if (o instanceof WeakReference) {
-                WeakReference<?> ref = (WeakReference<?>)o;
+                WeakReference ref = (WeakReference)o;
                 if (this.get() == ref.get()) {
                     return true;
                 }

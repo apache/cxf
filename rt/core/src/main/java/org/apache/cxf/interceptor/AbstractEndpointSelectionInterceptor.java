@@ -48,7 +48,7 @@ public abstract class AbstractEndpointSelectionInterceptor extends AbstractPhase
 
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
-        Set<Endpoint> endpoints = CastUtils.cast((Set<?>)ex.get(MultipleEndpointObserver.ENDPOINTS));
+        Set<Endpoint> endpoints = CastUtils.cast((Set)ex.get(MultipleEndpointObserver.ENDPOINTS));
 
         Endpoint ep = selectEndpoint(message, endpoints);
 

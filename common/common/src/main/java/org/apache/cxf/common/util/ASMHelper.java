@@ -98,12 +98,12 @@ public class ASMHelper {
     }
     public static String getClassCode(Type type) {
         if (type instanceof Class) {
-            return getClassCode((Class<?>)type);
+            return getClassCode((Class)type);
         } else if (type instanceof GenericArrayType) {
             GenericArrayType at = (GenericArrayType)type;
             return "[" + getClassCode(at.getGenericComponentType());
         } else if (type instanceof TypeVariable) {
-            TypeVariable<?> tv = (TypeVariable<?>)type;
+            TypeVariable tv = (TypeVariable)type;
             Type[] bounds = tv.getBounds();
             if (bounds != null && bounds.length == 1) {
                 return getClassCode(bounds[0]);
@@ -159,6 +159,7 @@ public class ASMHelper {
                     // newConstInt was removed in 2.x, if we get this far, we're
                     // using 1.5.x,
                     // set to null so we don't attempt to use it.
+                    newCw = null;    
                     oldASM = true;
                 } catch (Throwable t) {
                     newCw = cons.newInstance(new Object[] {Boolean.TRUE});
@@ -181,7 +182,7 @@ public class ASMHelper {
     }
     
     
-    public Class<?> loadClass(String className, Class<?> clz , byte[] bytes) { 
+    public Class<?> loadClass(String className, Class clz , byte[] bytes) { 
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
@@ -191,7 +192,7 @@ public class ASMHelper {
             return cls;
         }
     }
-    public Class<?> findClass(String className, Class<?> clz) { 
+    public Class<?> findClass(String className, Class clz) { 
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         return loader.lookupDefinedClass(className);
     }

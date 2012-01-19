@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-core</artifactId>
     <packaging>jar</packaging>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.5.2</version>
     <name>Apache CXF Runtime Core</name>
     <description>Apache CXF Runtime Core</description>
     <url>http://cxf.apache.org</url>
@@ -29,27 +29,9 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>2.5.2</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
-
-    <properties>
-        <cxf.bundle.activator>org.apache.cxf.bus.osgi.CXFActivator</cxf.bundle.activator>
-        <cxf.osgi.symbolic.name>${project.groupId}.bundle</cxf.osgi.symbolic.name>
-
-        <cxf.osgi.import>
-            org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}",
-            javax.mail;version="${cxf.osgi.javax.mail.version}",
-            javax.annotation;version="${cxf.osgi.javax.annotation.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}"
-        </cxf.osgi.import>
-        <cxf.osgi.export>
-            '=META-INF.cxf',
-            org.apache.cxf.*;-split-package:=first,
-        </cxf.osgi.export>
-    </properties>
 
     <dependencies>
         <dependency>

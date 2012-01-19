@@ -96,7 +96,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         String name = null;
         String password = null;
         
-        AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
+        AuthorizationPolicy policy = (AuthorizationPolicy)message.get(AuthorizationPolicy.class);
         if (policy != null) {
             name = policy.getUserName();
             password = policy.getPassword();

@@ -73,7 +73,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
         }        
 
         
-        if (boi.isUnwrappedCapable()) {
+        if (boi != null && boi.isUnwrappedCapable()) {
             BindingOperationInfo boi2 = boi.getUnwrappedOperation();
             OperationInfo op = boi2.getOperationInfo();
             BindingMessageInfo bmi;

@@ -708,7 +708,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         SoapBodyInfo bodyInfo = new SoapBodyInfo();
         SoapBody soapBody = SOAPBindingUtil.getSoapBody(bmsg.getExtensors(ExtensibilityElement.class));
         
-        List<?> parts = null;
+        List parts = null;
         if (soapBody == null) {
             MIMEMultipartRelated mmr = bmsg.getExtensor(MIMEMultipartRelated.class);
             if (mmr != null) {
@@ -724,7 +724,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         List<MessagePartInfo> attParts = null;
         if (parts != null) {
             List<MessagePartInfo> bodyParts = new ArrayList<MessagePartInfo>();
-            for (Iterator<?> itr = parts.iterator(); itr.hasNext();) {
+            for (Iterator itr = parts.iterator(); itr.hasNext();) {
                 Object part = itr.next();
                 if (part instanceof MIMEPart) {
                     MIMEPart mpart = (MIMEPart) part;

@@ -30,7 +30,6 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 @NoJSR250Annotations
 public class MTOMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
-    private static final long serialVersionUID = -2101800288259099105L;
     private static final Collection<QName> ASSERTION_TYPES;
     private static final MTOMPolicyInterceptor INTERCEPTOR = new MTOMPolicyInterceptor();
     

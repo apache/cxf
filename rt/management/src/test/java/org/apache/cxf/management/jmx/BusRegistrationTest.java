@@ -112,7 +112,7 @@ public class BusRegistrationTest extends Assert {
             assertEquals("There should be one MBeanServer", mbs, mbs2);
             
             // check both server and client bus can be found from this server
-            Set<ObjectName> s;
+            Set s;
             ObjectName serverName = getObjectName(serverBus);
             s = mbs.queryNames(serverName, null);
             assertTrue("sever-side bus should be found", s.size() == 1);

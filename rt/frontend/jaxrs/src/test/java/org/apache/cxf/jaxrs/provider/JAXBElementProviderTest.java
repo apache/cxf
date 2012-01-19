@@ -66,7 +66,6 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2NoRootElement;
@@ -91,6 +90,7 @@ import org.junit.Test;
 
 public class JAXBElementProviderTest extends Assert {
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadFromISO() throws Exception {
         
@@ -101,22 +101,23 @@ public class JAXBElementProviderTest extends Assert {
         
         byte[] iso88591bytes = bookStringUTF16.getBytes("ISO-8859-1");
         
-        JAXBElementProvider<Book> p = new JAXBElementProvider<Book>();
-        Book book = p.readFrom(Book.class, null,
+        JAXBElementProvider p = new JAXBElementProvider();
+        Book book = (Book)p.readFrom((Class)Book.class, null,
                 new Annotation[]{}, 
                 MediaType.valueOf(MediaType.APPLICATION_XML), null, 
                 new ByteArrayInputStream(iso88591bytes));
         assertEquals(book.getName(), nameStringUTF16);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadChineeseChars() throws Exception {
         
         String nameStringUTF16 = "中文";
         
         String bookStringUTF16 = "<Book><name>" + nameStringUTF16 + "</name></Book>";
-        JAXBElementProvider<Book> p = new JAXBElementProvider<Book>();
-        Book book = p.readFrom(Book.class, null,
+        JAXBElementProvider p = new JAXBElementProvider();
+        Book book = (Book)p.readFrom((Class)Book.class, null,
                 new Annotation[]{}, 
                 MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null, 
                 new ByteArrayInputStream(bookStringUTF16.getBytes("UTF-8")));
@@ -127,7 +128,7 @@ public class JAXBElementProviderTest extends Assert {
     public void testSingleJAXBContext() throws Exception {
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(JAXBResource.class, JAXBResource.class, true, true);
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setSingleJaxbContext(true);
         provider.init(Collections.singletonList(cri));
         JAXBContext bookContext = provider.getJAXBContext(Book.class, Book.class);
@@ -140,7 +141,7 @@ public class JAXBElementProviderTest extends Assert {
     public void testExtraClass() throws Exception {
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        JAXBElementProvider<SuperBook> provider = new JAXBElementProvider<SuperBook>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setSingleJaxbContext(true);
         provider.setExtraClass(new Class[]{SuperBook.class});
         provider.init(Collections.singletonList(cri));
@@ -154,7 +155,7 @@ public class JAXBElementProviderTest extends Assert {
     public void testExtraClassWithoutSingleContext() throws Exception {
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        JAXBElementProvider<SuperBook> provider = new JAXBElementProvider<SuperBook>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setExtraClass(new Class[]{SuperBook.class});
         provider.init(Collections.singletonList(cri));
         JAXBContext bookContext = provider.getJAXBContext(Book.class, Book.class);
@@ -168,7 +169,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testExtraClassWithGenerics() throws Exception {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setExtraClass(new Class[]{XmlObject.class});
         testXmlList(provider);
     }
@@ -177,7 +178,7 @@ public class JAXBElementProviderTest extends Assert {
     public void testExtraClassWithGenericsAndSingleContext() throws Exception {
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(XmlListResource.class, XmlListResource.class, true, true);
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setExtraClass(new Class[]{XmlObject.class});
         provider.init(Collections.singletonList(cri));
         testXmlList(provider);
@@ -185,7 +186,7 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @SuppressWarnings("unchecked")
-    private void testXmlList(JAXBElementProvider<?> provider) throws Exception {
+    private void testXmlList(JAXBElementProvider provider) throws Exception {
         
         List<XmlObject> list = new ArrayList<XmlObject>();
         for (int i = 0; i < 10; i++) {
@@ -227,7 +228,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testIsSupportedWithJaxbIndex() {
-        JAXBElementProvider<TestBean> provider = new JAXBElementProvider<TestBean>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         assertTrue(provider.isSupported(TestBean.class, TestBean.class, new Annotation[]{}));
     }
     
@@ -237,7 +238,7 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     private void testIsWriteableCollection(String mName) throws Exception {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setCollectionWrapperName("foo");
         Method m = CollectionsResource.class.getMethod(mName, new Class[0]);
         assertTrue(provider.isWriteable(m.getReturnType(), m.getGenericReturnType(),
@@ -270,19 +271,17 @@ public class JAXBElementProviderTest extends Assert {
         doWriteUnqualifiedCollection(true, "getBooksArray", "setBooksArray", Book[].class);
     }
     
-    public <T> void doWriteUnqualifiedCollection(boolean setName, String mName, 
-                                                 String setterName, 
-                                                 Class<T> type) throws Exception {
-        JAXBElementProvider<T> provider = new JAXBElementProvider<T>();
+    public void doWriteUnqualifiedCollection(boolean setName, String mName, String setterName, 
+                                             Class<?> type) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
         if (setName) {
             provider.setCollectionWrapperName("Books");
         }
         List<Book> books = new ArrayList<Book>();
         books.add(new Book("CXF in Action", 123L));
         books.add(new Book("CXF Rocks", 124L));
-        @SuppressWarnings("unchecked")
-        T o = (T)(type.isArray() ? books.toArray() : type == Set.class 
-            ? new HashSet<Book>(books) : books);
+        Object o = type.isArray() ? books.toArray() : type == Set.class 
+            ? new HashSet<Book>(books) : books;
         
         Method m = CollectionsResource.class.getMethod(mName, new Class[0]);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -303,7 +302,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteDerivedType() throws Exception {
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
         Book b = new SuperBook("CXF in Action", 123L, 124L);
         
@@ -315,7 +314,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteDerivedType2() throws Exception {
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Book b = new SuperBook("CXF in Action", 123L, 124L);
         
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -327,7 +326,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteWithCustomPrefixes() throws Exception {
-        JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setNamespacePrefixes(
             Collections.singletonMap("http://tags", "prefix"));
         TagVO2 tag = new TagVO2("a", "b");
@@ -340,7 +339,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteCollectionWithCustomPrefixes() throws Exception {
-        JAXBElementProvider<List<TagVO2>> provider = new JAXBElementProvider<List<TagVO2>>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setNamespacePrefixes(
             Collections.singletonMap("http://tags", "prefix"));
         TagVO2 tag = new TagVO2("a", "b");
@@ -375,8 +374,7 @@ public class JAXBElementProviderTest extends Assert {
     public void doTestWriteWithoutXmlRootElement(String name, boolean unmarshalAsJaxbElement,
                                                  boolean marshalAsJaxbElement) 
         throws Exception {
-        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> provider 
-            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         if (!marshalAsJaxbElement) {
             provider.setJaxbElementClassMap(Collections.singletonMap(
                 org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
@@ -398,8 +396,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testWriteCollectionWithoutXmlRootElement() 
         throws Exception {
-        JAXBElementProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>> provider 
-            = new JAXBElementProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
         provider.setJaxbElementClassMap(Collections.singletonMap(
                 org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
@@ -424,8 +421,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteWithoutXmlRootElementDerived() throws Exception {
-        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book> provider 
-            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setJaxbElementClassMap(Collections.singletonMap(
             org.apache.cxf.jaxrs.fortest.jaxb.Book.class.getName(), "Book"));
         org.apache.cxf.jaxrs.fortest.jaxb.Book b = 
@@ -439,9 +435,10 @@ public class JAXBElementProviderTest extends Assert {
         readSuperBook2(bos.toString(), false);
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testWriteWithoutXmlRootElementWithPackageInfo() throws Exception {
-        JAXBElementProvider<Book2NoRootElement> provider = new JAXBElementProvider<Book2NoRootElement>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setMarshallAsJaxbElement(true);
         Book2NoRootElement book = new Book2NoRootElement(333);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -454,16 +451,18 @@ public class JAXBElementProviderTest extends Assert {
         provider.setUnmarshallAsJaxbElement(true);
         
         ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
-        Book2NoRootElement book2 = provider.readFrom(
-                       Book2NoRootElement.class, 
+        Book2NoRootElement book2 = 
+            (Book2NoRootElement)provider.readFrom(
+                       (Class)Book2NoRootElement.class, 
                        Book2NoRootElement.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(book2.getId(), book.getId());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testWriteWithXmlRootElementAndPackageInfo() throws Exception {
-        JAXBElementProvider<Book2> provider = new JAXBElementProvider<Book2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Book2 book = new Book2(333);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(book, Book2.class, 
@@ -473,17 +472,18 @@ public class JAXBElementProviderTest extends Assert {
         assertTrue(bos.toString().contains("thebook2"));
         assertTrue(bos.toString().contains("http://superbooks"));
         ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
-        Book2 book2 = provider.readFrom(
-                       Book2.class, 
+        Book2 book2 = 
+            (Book2)provider.readFrom(
+                       (Class)Book2.class, 
                        Book2.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(book2.getId(), book.getId());
     }
     
     @Test
+    @SuppressWarnings("unchecked")
     public void testWriteWithoutXmlRootElementObjectFactory() throws Exception {
-        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2> provider 
-            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setJaxbElementClassMap(Collections.singletonMap(
             org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class.getName(), 
             "{http://books}SuperBook2"));
@@ -495,64 +495,66 @@ public class JAXBElementProviderTest extends Assert {
                          org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class,
                          new Annotation[0], MediaType.TEXT_XML_TYPE, 
                          new MetadataMap<String, Object>(), bos);
-        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2> provider2 
-            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2>();
+        JAXBElementProvider provider2 = new JAXBElementProvider();
         ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2 book = provider2.readFrom(
-                       org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class, 
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2 book = 
+            (org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2)provider2.readFrom(
+                       (Class)org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class, 
                        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(124L, book.getSuperId());
     }
     
+    @SuppressWarnings("unchecked")
     private void readSuperBook(String data, boolean xsiTypeExpected) throws Exception {
         if (xsiTypeExpected) {
             assertTrue(data.contains("xsi:type"));
         }
-        JAXBElementProvider<SuperBook> provider = new JAXBElementProvider<SuperBook>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        SuperBook book = provider.readFrom(
-                       SuperBook.class, SuperBook.class,
+        SuperBook book = (SuperBook)provider.readFrom(
+                       (Class)SuperBook.class, SuperBook.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(124L, book.getSuperId());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadSuperBookWithJaxbElement() throws Exception {
         final String data = "<BookNoRootElement>"
             + "<name>superbook</name><id>111</id>" 
             + "</BookNoRootElement>";
-        JAXBElementProvider<BookNoRootElement> provider 
-            = new JAXBElementProvider<BookNoRootElement>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setUnmarshallAsJaxbElement(true);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        BookNoRootElement book = provider.readFrom(
-                       BookNoRootElement.class, BookNoRootElement.class,
+        BookNoRootElement book = (BookNoRootElement)provider.readFrom(
+                       (Class)BookNoRootElement.class, BookNoRootElement.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(111L, book.getId());
         assertEquals("superbook", book.getName());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testReadSuperBookWithJaxbElementAndTransform() throws Exception {
         final String data = "<BookNoRootElement xmlns=\"http://books\">"
             + "<name>superbook</name><id>111</id>" 
             + "</BookNoRootElement>";
-        JAXBElementProvider<BookNoRootElement> provider = new JAXBElementProvider<BookNoRootElement>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setUnmarshallAsJaxbElement(true);
         provider.setInTransformElements(Collections.singletonMap(
              "{http://books}*", ""));
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        BookNoRootElement book = provider.readFrom(
-                       BookNoRootElement.class, BookNoRootElement.class,
+        BookNoRootElement book = (BookNoRootElement)provider.readFrom(
+                       (Class)BookNoRootElement.class, BookNoRootElement.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(111L, book.getId());
         assertEquals("superbook", book.getName());
     }
     
+    @SuppressWarnings("unchecked")
     private void readSuperBook2(String data, boolean unmarshalAsJaxbElement) throws Exception {
-        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> provider 
-            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         if (!unmarshalAsJaxbElement) {
             provider.setJaxbElementClassMap(Collections.singletonMap(
                 org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), "SuperBook"));
@@ -560,15 +562,16 @@ public class JAXBElementProviderTest extends Assert {
             provider.setUnmarshallAsJaxbElement(true);
         }
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook book = provider.readFrom(
-                       org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class, 
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook book = 
+            (org.apache.cxf.jaxrs.fortest.jaxb.SuperBook)provider.readFrom(
+                       (Class)org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class, 
                        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(124L, book.getSuperId());
     }
     
     private void doTestWriteJAXBCollection(String mName) throws Exception {
-        JAXBElementProvider<List<?>> provider = new JAXBElementProvider<List<?>>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         List<JAXBElement<Book>> books = new ArrayList<JAXBElement<Book>>();
         books.add(new JAXBElement<Book>(new QName("Books"), Book.class, null, 
             new Book("CXF in Action", 123L)));
@@ -584,7 +587,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteQualifiedCollection() throws Exception {
-        JAXBElementProvider<List<TagVO2>> provider = new JAXBElementProvider<List<TagVO2>>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setCollectionWrapperName("{http://tags}tags");
         List<TagVO2> tags = new ArrayList<TagVO2>();
         tags.add(new TagVO2("A", "B"));
@@ -622,11 +625,12 @@ public class JAXBElementProviderTest extends Assert {
         readAppendElementsNoNs(data, Collections.singletonMap("list", "tags"));
     }
     
+    @SuppressWarnings("unchecked")
     private void readAppendElementsNoNs(String data, Map<String, String> appendMap) throws Exception {
-        JAXBElementProvider<ManyTags> provider = new JAXBElementProvider<ManyTags>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setInAppendElements(appendMap);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(ManyTags.class, ManyTags.class,
+        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         ManyTags holder = (ManyTags)o;
         assertNotNull(holder);    
@@ -637,13 +641,14 @@ public class JAXBElementProviderTest extends Assert {
     
     
     @Test
+    @SuppressWarnings("unchecked")
     public void testInDropElement() throws Exception {
         String data = "<Extra><ManyTags><tags><list><group>b</group><name>a</name></list></tags>"
             + "</ManyTags></Extra>";
-        JAXBElementProvider<ManyTags> provider = new JAXBElementProvider<ManyTags>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setInDropElements(Collections.singletonList("Extra"));
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(ManyTags.class, ManyTags.class,
+        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         ManyTags holder = (ManyTags)o;
         assertNotNull(holder);    
@@ -668,30 +673,32 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     
+    @SuppressWarnings("unchecked")
     private void readTagVO2AfterTransform(String data, String keyValue) throws Exception {
-        JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put(keyValue, "{http://tags}thetag");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(TagVO2.class, TagVO2.class,
+        Object o = provider.readFrom((Class)TagVO2.class, TagVO2.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         TagVO2 tag2 = (TagVO2)o;
         assertEquals("A", tag2.getName());
         assertEquals("B", tag2.getGroup());    
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testInNsElementsFromLocals() throws Exception {
         String data = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<tagholder><thetag><group>B</group><name>A</name></thetag></tagholder>";
-        JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagholder", "{http://tags}tagholder");
         map.put("thetag", "{http://tags}thetag");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(TagVO2Holder.class, TagVO2Holder.class,
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         TagVO2Holder holder = (TagVO2Holder)o;
         TagVO2 tag2 = holder.getTagValue();
@@ -699,18 +706,19 @@ public class JAXBElementProviderTest extends Assert {
         assertEquals("B", tag2.getGroup());    
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testInNsElementsFromLocalsWildcard() throws Exception {
         String data = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<tagholder><thetag><group>B</group><name>A</name></thetag></tagholder>";
-        JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("group", "group");
         map.put("name", "name");
         map.put("*", "{http://tags}*");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(TagVO2Holder.class, TagVO2Holder.class,
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         TagVO2Holder holder = (TagVO2Holder)o;
         TagVO2 tag2 = holder.getTagValue();
@@ -718,19 +726,20 @@ public class JAXBElementProviderTest extends Assert {
         assertEquals("B", tag2.getGroup());    
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testInNsElementsFromLocalsWildcard2() throws Exception {
         String data = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<ns2:tagholder xmlns:ns2=\"http://tags2\" attr=\"attribute\"><ns2:thetag><group>B</group>"
             + "<name>A</name></ns2:thetag></ns2:tagholder>";
-        JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("group", "group");
         map.put("name", "name");
         map.put("{http://tags2}*", "{http://tags}*");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(TagVO2Holder.class, TagVO2Holder.class,
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         TagVO2Holder holder = (TagVO2Holder)o;
         TagVO2 tag2 = holder.getTagValue();
@@ -738,13 +747,14 @@ public class JAXBElementProviderTest extends Assert {
         assertEquals("B", tag2.getGroup());    
     }
     
+    @SuppressWarnings("unchecked")
     private void readTagVOAfterTransform(String data, String keyValue) throws Exception {
-        JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put(keyValue, "tagVO");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(TagVO.class, TagVO.class,
+        Object o = provider.readFrom((Class)TagVO.class, TagVO.class,
                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         TagVO tag2 = (TagVO)o;
         assertEquals("A", tag2.getName());
@@ -753,7 +763,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutAttributesAsElements() throws Exception {
-        JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "thetag");
         map.put("{http://tags}tagholder", "tagholder");
@@ -774,7 +784,7 @@ public class JAXBElementProviderTest extends Assert {
     public void testOutAttributesAsElementsForList() throws Exception {
 
         //Provider
-        JAXBElementProvider<List<?>> provider = new JAXBElementProvider<List<?>>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setCollectionWrapperName("tagholders");
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}*", "*");
@@ -810,7 +820,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutAppendElementsDiffNs() throws Exception {
-        JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
@@ -825,7 +835,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutAppendNsElementBeforeLocal() throws Exception {
-        JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
@@ -840,7 +850,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutAppendLocalBeforeLocal() throws Exception {
-        JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "supertag");
         provider.setOutAppendElements(map);
@@ -855,7 +865,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutAppendElementsSameNs() throws Exception {
-        JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tags}t");
         provider.setOutAppendElements(map);
@@ -872,7 +882,7 @@ public class JAXBElementProviderTest extends Assert {
         
     @Test
     public void testOutElementsMapLocalNsToLocalNs() throws Exception {
-        JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutTransformElements(map);
@@ -888,7 +898,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalNsToLocal() throws Exception {
-        JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "t");
         provider.setOutTransformElements(map);
@@ -903,7 +913,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalNsToLocalWildcard() throws Exception {
-        JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}*", "*");
         provider.setOutTransformElements(map);
@@ -920,7 +930,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalNsToLocalWildcard2() throws Exception {
-        JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}*", "{http://tags2}*");
         provider.setOutTransformElements(map);
@@ -939,7 +949,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalToLocalNs() throws Exception {
-        JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "{http://tags}thetag");
         provider.setOutTransformElements(map);
@@ -954,7 +964,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testOutElementsMapLocalToLocal() throws Exception {
-        JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "thetag");
         map.put("group", "group2");
@@ -970,7 +980,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testDropElements() throws Exception {
-        JAXBElementProvider<ManyTags> provider = new JAXBElementProvider<ManyTags>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         List<String> list = new ArrayList<String>();
         list.add("tagVO");
         list.add("ManyTags");
@@ -991,7 +1001,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testDropQualifiedElements() throws Exception {
-        JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         List<String> list = new ArrayList<String>();
         list.add("{http://tags}thetag");
         provider.setOutDropElements(list);
@@ -1016,10 +1026,11 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Test
+    @SuppressWarnings("unchecked")
     public void testReadMalformedXML() throws Exception {
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         try {
-            provider.readFrom(Book.class, Book.class,
+            provider.readFrom((Class)Book.class, Book.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), 
                        new ByteArrayInputStream("<Book>".getBytes()));
             fail("404 is expected");
@@ -1029,13 +1040,13 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @SuppressWarnings("unchecked")
-    private <T> void doReadUnqualifiedCollection(String data, String mName, Class<T> type) throws Exception {
-        JAXBElementProvider<T> provider = new JAXBElementProvider<T>();
+    private void doReadUnqualifiedCollection(String data, String mName, Class<?> type) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
         Method m = CollectionsResource.class.getMethod(mName, 
                                                        new Class[]{type});
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
         Object o = provider.readFrom(
-                       type, m.getGenericParameterTypes()[0],
+                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertNotNull(o);
         Book b1 = null;
@@ -1045,7 +1056,7 @@ public class JAXBElementProviderTest extends Assert {
             b1 = ((Book[])o)[0];
             b2 = ((Book[])o)[1];
         } else if (type == Set.class) {
-            Set<Book> set = CastUtils.cast((Set<?>)o);
+            Set<Book> set = (Set)o;
             List<Book> books = new ArrayList<Book>(new TreeSet<Book>(set));
             b1 = books.get(0);
             b2 = books.get(1);
@@ -1080,9 +1091,7 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @SuppressWarnings("unchecked")
-    public void doReadQualifiedCollection(String data,
-                                          boolean isArray) throws Exception {
-        @SuppressWarnings("rawtypes")
+    public void doReadQualifiedCollection(String data, boolean isArray) throws Exception {
         JAXBElementProvider provider = new JAXBElementProvider();
         Method m = null;
         if (!isArray) {
@@ -1093,15 +1102,15 @@ public class JAXBElementProviderTest extends Assert {
         
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
         Object o = provider.readFrom(
-                       m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
+                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertNotNull(o);
         TagVO2 t1 = null;
         TagVO2 t2 = null;
         if (!isArray) {
-            assertEquals(2, ((List<?>)o).size());
-            t1 = (TagVO2)((List<?>)o).get(0);
-            t2 = (TagVO2)((List<?>)o).get(1);
+            assertEquals(2, ((List)o).size());
+            t1 = (TagVO2)((List)o).get(0);
+            t2 = (TagVO2)((List)o).get(1);
         } else {
             assertEquals(2, ((Object[])o).length);
             t1 = (TagVO2)((Object[])o)[0];
@@ -1116,7 +1125,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testSetSchemasFromClasspath() {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         List<String> locations = new ArrayList<String>();
         locations.add("classpath:/test.xsd");
         provider.setSchemas(locations);
@@ -1126,7 +1135,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testSetSchemasFromDisk() throws Exception {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         List<String> locations = new ArrayList<String>();
         String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
         
@@ -1138,7 +1147,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteWithValidation() throws Exception {
-        JAXBElementProvider<Book2> provider = new JAXBElementProvider<Book2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         List<String> locations = new ArrayList<String>();
         String loc = getClass().getClassLoader().getResource("book1.xsd").toURI().getPath();
         locations.add(loc);
@@ -1160,7 +1169,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteWithFailedValidation() throws Exception {
-        JAXBElementProvider<Book2> provider = new JAXBElementProvider<Book2>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         List<String> locations = new ArrayList<String>();
         String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
         locations.add(loc);
@@ -1185,7 +1194,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test 
     public void testIsReadableWithJaxbIndex() {
-        JAXBElementProvider<TestBean> p = new JAXBElementProvider<TestBean>();
+        JAXBElementProvider p = new JAXBElementProvider();
         assertTrue(p.isReadable(TestBean.class, 
                                 TestBean.class, 
                                 new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
@@ -1193,7 +1202,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test 
     public void testResponseIsNotReadable() {
-        JAXBElementProvider<Response> p = new JAXBElementProvider<Response>();
+        JAXBElementProvider p = new JAXBElementProvider();
         assertFalse(p.isReadable(Response.class, 
                                  Response.class, 
                                  new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
@@ -1201,7 +1210,7 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test 
     public void testResponseIsNotReadable2() {
-        JAXBElementProvider<Response> p = new JAXBElementProvider<Response>();
+        JAXBElementProvider p = new JAXBElementProvider();
         p.setUnmarshallAsJaxbElement(true);
         assertFalse(p.isReadable(Response.class, 
                                  Response.class, 
@@ -1211,15 +1220,14 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test 
     public void testXMLSourceIsNotReadable() {
-        JAXBElementProvider<XMLSource> p = new JAXBElementProvider<XMLSource>();
+        JAXBElementProvider p = new JAXBElementProvider();
         assertFalse(p.isReadable(XMLSource.class, 
                                  XMLSource.class, 
                                  new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
     }
     @Test 
     public void testPackageContextObjectFactory() {
-        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book> p 
-            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book>();
+        JAXBElementProvider p = new JAXBElementProvider();
         assertTrue(p.isReadable(org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
                                 org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
                                 new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
@@ -1244,7 +1252,7 @@ public class JAXBElementProviderTest extends Assert {
         
         final TestMarshaller m = new TestMarshaller();
         
-        JAXBElementProvider<Object> provider = new JAXBElementProvider<Object>() {
+        JAXBElementProvider provider = new JAXBElementProvider() {
             @Override
             protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
                 throws JAXBException {
@@ -1253,7 +1261,7 @@ public class JAXBElementProviderTest extends Assert {
         };
         
         provider.setMarshallerProperties(props);
-        provider.writeTo("123", String.class, String.class, new Annotation[]{}, 
+        provider.writeTo("123", String.class, (Type)String.class, new Annotation[]{}, 
                          MediaType.APPLICATION_XML_TYPE, new MetadataMap<String, Object>(), 
                          new ByteArrayOutputStream());
         
@@ -1268,11 +1276,10 @@ public class JAXBElementProviderTest extends Assert {
             
         }
         
-        public Map<String, Object> getProperties() {
+        public Map getProperties() {
             return props;
         }
         
-        @SuppressWarnings("rawtypes")
         public <A extends XmlAdapter> A getAdapter(Class<A> type) {
             // TODO Auto-generated method stub
             return null;
@@ -1346,13 +1353,11 @@ public class JAXBElementProviderTest extends Assert {
             
         }
 
-        @SuppressWarnings("rawtypes")
         public void setAdapter(XmlAdapter adapter) {
             // TODO Auto-generated method stub
             
         }
 
-        @SuppressWarnings("rawtypes")
         public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
             // TODO Auto-generated method stub
             

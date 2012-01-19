@@ -30,8 +30,6 @@ import org.apache.cxf.common.i18n.UncheckedException;
  */
 public class WSDLRuntimeException extends UncheckedException {
 
-    private static final long serialVersionUID = 969542255108690960L;
-
     public WSDLRuntimeException(Message msg, Throwable t) {
         super(msg, t);
     }

@@ -42,12 +42,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
@@ -246,7 +246,7 @@ public final class WrapperClassGenerator extends ASMHelper {
         wrapperBeans.add(clz);
     }
 
-    private void generatePackageInfo(String className, String ns, Class<?> clz) {
+    private void generatePackageInfo(String className, String ns, Class clz) {
         ClassWriter cw = createClassWriter();
         String classFileName = periodToSlashes(className);
         cw.visit(Opcodes.V1_5, Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE, classFileName, null,
@@ -310,16 +310,16 @@ public final class WrapperClassGenerator extends ASMHelper {
         }
         String classFileName = periodToSlashes(className);
         String name = mpi.getName().getLocalPart();
-        Class<?> clz = mpi.getTypeClass();
+        Class clz = mpi.getTypeClass();
         Object obj = mpi.getProperty(ReflectionServiceFactoryBean.RAW_CLASS);
         if (obj != null) {
-            clz = (Class<?>)obj;
+            clz = (Class)obj;
         }
         Type genericType = (Type)mpi.getProperty(ReflectionServiceFactoryBean.GENERIC_TYPE);
         if (genericType instanceof ParameterizedType) {
             ParameterizedType tp = (ParameterizedType)genericType;
             if (tp.getRawType() instanceof Class
-                && Holder.class.isAssignableFrom((Class<?>)tp.getRawType())) {
+                && Holder.class.isAssignableFrom((Class)tp.getRawType())) {
                 genericType = tp.getActualTypeArguments()[0];
             }
         }

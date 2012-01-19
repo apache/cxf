@@ -39,7 +39,7 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     private static final String SAML_ELEMENT = "SAMLToken";
     private static final String SAML_RELAY_STATE = "RelayState";
    
-    private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>();
+    private FormEncodingProvider provider = new FormEncodingProvider();
     
     public SamlFormInHandler() {
         provider.setExpectedEncoded(true);
@@ -77,9 +77,10 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
         return null;
     }
     
+    @SuppressWarnings("unchecked")
     private Form readFormData(Message message) {
         try {
-            return provider.readFrom(Form.class, Form.class, 
+            return (Form)provider.readFrom((Class)Form.class, Form.class, 
                               new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
                               new MetadataMap<String, String>(), 
                               message.getContent(InputStream.class));

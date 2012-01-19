@@ -31,10 +31,9 @@ import org.apache.cxf.tools.common.model.JavaParameter;
 
 public class XmlJavaTypeAdapterAnnotator implements Annotator {
     private JavaInterface jf;
-    private Class<? extends XmlAdapter<?, ?>> adapter;
+    private Class<? extends XmlAdapter> adapter;
 
-    public XmlJavaTypeAdapterAnnotator(JavaInterface intf, 
-                                       Class<? extends XmlAdapter<?, ?>> adapter) {
+    public XmlJavaTypeAdapterAnnotator(JavaInterface intf, Class<? extends XmlAdapter> adapter) {
         this.jf = intf;
         this.adapter = adapter;
     }

@@ -28,7 +28,6 @@ import org.apache.cxf.message.Message;
 public abstract class AbstractAttributedInterceptorProvider extends HashMap<String, Object>
     implements InterceptorProvider {
 
-    private static final long serialVersionUID = -1915876045710441978L;
     private List<Interceptor<? extends Message>> in 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     private List<Interceptor<? extends Message>> out 

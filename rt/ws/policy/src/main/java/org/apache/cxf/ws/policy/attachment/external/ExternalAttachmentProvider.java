@@ -178,13 +178,13 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
                     }
                     attachment.setDomainExpressions(des);                    
                 } else if (Constants.isPolicyElement(qn)) {
-                    Policy p = builder.getPolicy(nd);
+                    Policy p = builder.getPolicy((Element)nd);
                     if (null != attachment.getPolicy()) {
                         p = p.merge(attachment.getPolicy());
                     }
                     attachment.setPolicy(p);
                 } else if (Constants.isPolicyRef(qn)) {
-                    PolicyReference ref = builder.getPolicyReference(nd);
+                    PolicyReference ref = builder.getPolicyReference((Element)nd);
                     if (null != ref) {   
                         Policy p = resolveReference(ref, doc);
                         if (null != attachment.getPolicy()) {

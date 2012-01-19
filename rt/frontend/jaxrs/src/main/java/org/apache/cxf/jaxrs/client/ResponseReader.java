@@ -57,8 +57,8 @@ public class ResponseReader implements MessageBodyReader<Response> {
         return cls.isAssignableFrom(Response.class);
     }
 
-    public Response readFrom(Class<Response> cls, Type genericType,
-                             Annotation[] anns, MediaType mt,
+    @SuppressWarnings("unchecked")
+    public Response readFrom(Class<Response> cls, Type genericType, Annotation[] anns, MediaType mt,
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
         
@@ -74,29 +74,23 @@ public class ResponseReader implements MessageBodyReader<Response> {
         }
         
         if (entityCls != null) {
-            Object entity = readFrom(entityCls, anns, mt, headers, is);
+            Providers providers = getContext().getProviders();
+            MessageBodyReader<?> reader = 
+                providers.getMessageBodyReader(entityCls, getEntityGenericType(), anns, mt);
+            if (reader == null) {
+                throw new ClientWebApplicationException("No reader for Response entity "
+                                                        + entityCls.getName());
+            }
+            
+            Object entity = reader.readFrom((Class)entityCls, getEntityGenericType(), 
+                                            anns, mt, headers, is);
             rb.entity(entity);
         }
         
+        
         return rb.build();
     }
-    private <T> T readFrom(Class<T> type,  
-               Annotation anns[], MediaType mt,
-               MultivaluedMap<String, String> headers, 
-               InputStream is) throws IOException, WebApplicationException {
-        
-        Providers providers = getContext().getProviders();
-        MessageBodyReader<T> reader = 
-            providers.getMessageBodyReader(type, getEntityGenericType(), anns, mt);
-        if (reader == null) {
-            throw new ClientWebApplicationException("No reader for Response entity "
-                                                    + entityCls.getName());
-        }
-        
-        return reader.readFrom(type, getEntityGenericType(), 
-                               anns, mt, headers, is);
-    }
-       
+
     public void setEntityClass(Class<?> cls) {
         entityCls = cls;
     }

@@ -111,10 +111,10 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
             || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
             || "features".equals(name)) {
-            List<?> list = ctx.getDelegate().parseListElement(e, bean.getBeanDefinition());
+            List list = ctx.getDelegate().parseListElement(e, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else if ("properties".equals(name)) {
-            Map<?, ?> map = ctx.getDelegate().parseMapElement(e, bean.getBeanDefinition());
+            Map map = ctx.getDelegate().parseMapElement(e, bean.getBeanDefinition());
             bean.addPropertyValue("properties", map);
         }
     }

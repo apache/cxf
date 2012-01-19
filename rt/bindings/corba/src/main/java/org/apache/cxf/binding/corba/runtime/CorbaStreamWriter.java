@@ -335,7 +335,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
             map.put(pfx, ns);
         }
         public String getNamespaceURI(String prefix) {
-            String answer = map.get(prefix);
+            String answer = (String) map.get(prefix);
             if (answer == null && parent != null) {
                 return parent.getNamespaceURI(prefix);
             }
@@ -345,7 +345,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         public String getPrefix(String namespaceURI) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (namespaceURI.equals(entry.getValue())) {
-                    return entry.getKey();
+                    return (String) entry.getKey();
                 }
             }
             if (parent != null) {

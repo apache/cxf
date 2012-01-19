@@ -44,13 +44,13 @@ public class WSDLManagerImplTest extends Assert {
         Definition def = builder.getDefinition(wsdlUrl);
         assertNotNull(def);
         
-        Map<?, ?> services = def.getServices();
+        Map services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
         Service service = (Service)services.get(new QName(qname, "SOAPService"));
         assertNotNull(service);
         
-        Map<?, ?> ports = service.getPorts();
+        Map ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("SoapPort");
@@ -65,7 +65,7 @@ public class WSDLManagerImplTest extends Assert {
         Definition def = builder.getDefinition(wsdlUrl);
 
         assertNotNull(def);
-        Map<?, ?> services = def.getServices();
+        Map services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
         
@@ -73,7 +73,7 @@ public class WSDLManagerImplTest extends Assert {
         Service service = (Service)services.get(new QName(serviceQName, "SOAPService"));
         assertNotNull(service);
         
-        Map<?, ?> ports = service.getPorts();
+        Map ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("SoapPort");

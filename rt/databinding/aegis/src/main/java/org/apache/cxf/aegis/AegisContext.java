@@ -179,7 +179,7 @@ public class AegisContext {
      * @param clazz
      * @return
      */
-    public AegisType getRootType(Class<?> clazz) {
+    public AegisType getRootType(Class clazz) {
         if (rootClasses.contains(clazz)) {
             return typeMapping.getType(clazz);
         } else {

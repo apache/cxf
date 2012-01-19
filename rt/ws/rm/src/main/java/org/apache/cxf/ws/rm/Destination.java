@@ -34,7 +34,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
@@ -181,7 +181,7 @@ public class Destination extends AbstractEndpoint {
         // can be added we need to send an out-of-band
         // SequenceAcknowledgement message
 
-        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
         String replyToAddress = null;
         if (null != maps.getReplyTo()) {
             replyToAddress = maps.getReplyTo().getAddress().getValue();

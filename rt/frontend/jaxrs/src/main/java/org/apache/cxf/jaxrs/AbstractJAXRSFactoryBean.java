@@ -358,7 +358,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             }
             db.initialize(s);
         }
-        factory.setUserProviders(Collections.singletonList(new DataBindingProvider<Object>(db)));
+        factory.setUserProviders(Collections.singletonList(new DataBindingProvider(db)));
     }
     
     /**

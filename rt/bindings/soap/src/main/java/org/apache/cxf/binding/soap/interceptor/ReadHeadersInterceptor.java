@@ -127,7 +127,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
 
         if (xmlReader == null) {
-            InputStream in = message.getContent(InputStream.class);
+            InputStream in = (InputStream)message.getContent(InputStream.class);
             if (in == null) {
                 throw new RuntimeException("Can't find input stream in message");
             }

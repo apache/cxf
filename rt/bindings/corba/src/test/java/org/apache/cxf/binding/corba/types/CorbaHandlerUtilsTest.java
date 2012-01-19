@@ -61,7 +61,7 @@ public class CorbaHandlerUtilsTest extends Assert {
 
         bus = BusFactory.getDefaultBus();              
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);        
-        factory = bfm.getBindingFactory("http://cxf.apache.org/bindings/corba");
+        factory = (BindingFactory)bfm.getBindingFactory("http://cxf.apache.org/bindings/corba");
         bfm.registerBindingFactory(CorbaConstants.NU_WSDL_CORBA, factory);        
 
         java.util.Properties props = System.getProperties();

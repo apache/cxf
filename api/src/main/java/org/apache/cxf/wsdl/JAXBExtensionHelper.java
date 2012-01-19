@@ -50,12 +50,11 @@ import javax.xml.stream.util.StreamReaderDelegate;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.jaxb.JAXBContextCache;
-import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.staxutils.StaxUtils;
 
 
@@ -202,8 +201,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
      *  javax.xml.namespace.QName, javax.wsdl.extensions.ExtensibilityElement,
      *   java.io.PrintWriter, javax.wsdl.Definition, javax.wsdl.extensions.ExtensionRegistry)
      */
-    public void marshall(@SuppressWarnings("rawtypes") Class parent, QName qname,
-                         ExtensibilityElement obj, PrintWriter pw,
+    public void marshall(Class parent, QName qname, ExtensibilityElement obj, PrintWriter pw,
                          final Definition wsdl, ExtensionRegistry registry) throws WSDLException {
         // TODO Auto-generated method stub
         try {
@@ -241,7 +239,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     }
                     
                     for (Object ent : wsdl.getNamespaces().entrySet()) {
-                        Map.Entry<?, ?> entry = (Map.Entry<?, ?>)ent;
+                        Map.Entry entry = (Map.Entry)ent;
                         if (arg.equals(entry.getValue())) {
                             return (String)entry.getKey();
                         }
@@ -249,12 +247,11 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     return null;
                 }
                 
-                public Iterator<String> getPrefixes(String arg) {
+                public Iterator getPrefixes(String arg) {
                     if (arg.equals(jaxbNamespace)) {
                         arg = namespace;
                     }
-                    Iterator<String> ret = CastUtils.cast(wsdl.getNamespaces().keySet().iterator());
-                    return ret;
+                    return wsdl.getNamespaces().keySet().iterator();
                 }
             });
             
@@ -274,8 +271,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
      *   javax.wsdl.Definition,
      *   javax.wsdl.extensions.ExtensionRegistry)
      */
-    public ExtensibilityElement unmarshall(@SuppressWarnings("rawtypes") Class parent, 
-                                           QName qname, Element element, Definition wsdl,
+    public ExtensibilityElement unmarshall(Class parent, QName qname, Element element, Definition wsdl,
                                            ExtensionRegistry registry) throws WSDLException {
         try {
             Unmarshaller u = getContext().createUnmarshaller();
@@ -332,7 +328,6 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     return ctx.getPrefix(namespaceURI);
                 }
 
-                @SuppressWarnings("rawtypes")
                 public Iterator getPrefixes(String namespaceURI) {
                     if (jaxbNamespace.equals(namespaceURI)) {
                         return ctx.getPrefixes(namespace);

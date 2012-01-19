@@ -78,7 +78,7 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
         for (Iterator<ParamType> iter = paramTypes.iterator(); iter.hasNext();) {
             ParamType param = iter.next();
             if (!param.getMode().equals(ModeType.OUT)) {
-                params.add(param);
+                params.add((ArgType)param);
             }
         }
         CorbaStreamWriter writer = new CorbaStreamWriter(orb, params, typeMap, service, wrap);
@@ -101,7 +101,7 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
         for (Iterator<ParamType> iter = paramTypes.iterator(); iter.hasNext();) {
             ParamType param = iter.next();
             if (!param.getMode().equals(ModeType.IN)) {
-                params.add(param);
+                params.add((ArgType)param);
             }
         }
         CorbaStreamWriter writer = new CorbaStreamWriter(orb, params, typeMap, service, wrap);

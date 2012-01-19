@@ -20,26 +20,29 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 
 public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     private IdlType elemType;
-    private List<Integer> dims;    
+    private List<Object> dims;    
     private int size;
 
     protected IdlArrayBase(IdlScopeBase parent, String name, IdlType elem, int length) {
         super(parent, name);
         this.size = length;
-        dims = new Vector<Integer>();
+        dims = new Vector<Object>();
 
         if (elem instanceof IdlAnonArray) {
             IdlAnonArray arr = (IdlAnonArray)elem;
             elemType = arr.elemType();
 
-            for (Integer i : arr.dimensions()) {
-                dims.add(i);
+            Iterator it = arr.dimensions().iterator();
+
+            while (it.hasNext()) {
+                dims.add(it.next());
             }
         } else {
             elemType = elem;
@@ -49,8 +52,10 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     }
 
     public void write(PrintWriter pw) {
-        for (Integer i : dims) {
-            pw.print("[" + i + "]");
+        Iterator it = dims.iterator();
+
+        while (it.hasNext()) {
+            pw.print("[" + it.next() + "]");
         }
     }
 
@@ -58,8 +63,10 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     public void write(PrintWriter pw, String name) {
         pw.print(name);
 
-        for (Integer i : dims) {
-            pw.print("[" + i + "]");
+        Iterator it = dims.iterator();
+
+        while (it.hasNext()) {
+            pw.print("[" + it.next() + "]");
         }
     }
 
@@ -83,7 +90,7 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     }
 
 
-    protected List<Integer> dimensions() {
+    protected List dimensions() {
         return dims;
     }
 }

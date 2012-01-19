@@ -99,7 +99,7 @@ public class DocLiteralInInterceptorTest extends Assert {
 
         message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
             .createXMLStreamReader(getTestStream(getClass(), "resources/GreetMeDocLiteralReq.xml")));
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+        XMLStreamReader reader = (XMLStreamReader)message.getContent(XMLStreamReader.class);
         // skip the start element of soap body
         StaxUtils.skipToStartOfElement(reader);
 
@@ -125,7 +125,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         DocLiteralInInterceptor interceptor = new DocLiteralInInterceptor();
         message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
             .createXMLStreamReader(getTestStream(getClass(), "resources/sayHiDocLitBareReq.xml")));
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+        XMLStreamReader reader = (XMLStreamReader)message.getContent(XMLStreamReader.class);
         // skip the start element of soap body
         StaxUtils.skipToStartOfElement(reader);
 
@@ -153,7 +153,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
             .createXMLStreamReader(getTestStream(getClass(), "resources/bareNoParamDocLitBareReq.xml")));
 
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+        XMLStreamReader reader = (XMLStreamReader)message.getContent(XMLStreamReader.class);
         // skip the start element of soap body, so that we can serve an empty request to
         // interceptor
         StaxUtils.skipToStartOfElement(reader);

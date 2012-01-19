@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.type.DefaultTypeCreator;
 public class NoNamespaceTypeCreator extends DefaultTypeCreator {
 
     @Override
-    protected QName createQName(Class<?> javaType) {
+    protected QName createQName(Class javaType) {
         // no namespace.
         QName defQname = super.createQName(javaType);
         return new QName(defQname.getLocalPart());

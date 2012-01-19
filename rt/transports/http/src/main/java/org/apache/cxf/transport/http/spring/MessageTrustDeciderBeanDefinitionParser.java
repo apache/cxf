@@ -34,7 +34,7 @@ public class MessageTrustDeciderBeanDefinitionParser extends
     }
     
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return MessageTrustDecider.class;
     }
 

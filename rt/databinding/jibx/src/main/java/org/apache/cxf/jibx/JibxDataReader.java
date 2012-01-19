@@ -61,7 +61,7 @@ public class JibxDataReader implements DataReader<XMLStreamReader> {
         }
     }
 
-    public Object read(QName elementQName, XMLStreamReader input, Class<?> type) {
+    public Object read(QName elementQName, XMLStreamReader input, Class type) {
         throw new UnsupportedOperationException("Not Implemented");
     }
 
@@ -74,8 +74,7 @@ public class JibxDataReader implements DataReader<XMLStreamReader> {
     public void setSchema(Schema s) {
     }
 
-    private static UnmarshallingContext getUnmarshallingContext(XMLStreamReader reader, 
-                                                                Class<?> jtype)
+    private static UnmarshallingContext getUnmarshallingContext(XMLStreamReader reader, Class jtype)
         throws JiBXException {
         IBindingFactory factory;
         if (JibxSimpleTypes.isSimpleType(jtype)) {

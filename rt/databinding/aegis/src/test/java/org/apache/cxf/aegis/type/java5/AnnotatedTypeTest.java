@@ -78,7 +78,7 @@ public class AnnotatedTypeTest extends AbstractAegisTest {
         } else {
             fail("Unexpected element name: " + element.getLocalPart());
         }
-        element = elements.next();
+        element = (QName)elements.next();
         assertFalse(elements.hasNext());
 
         custom = info.getType(element);
@@ -140,7 +140,7 @@ public class AnnotatedTypeTest extends AbstractAegisTest {
 
         assertTrue(elements.hasNext());
         // minOccurs = 1 second
-        element = elements.next();
+        element = (QName)elements.next();
         if ("minOccursProperty".equals(element.getLocalPart())) {
             assertEquals(1, info.getMinOccurs(element));
         } else {

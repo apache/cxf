@@ -70,7 +70,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.EndpointResolverRegistry;
@@ -79,6 +78,7 @@ import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -339,7 +339,7 @@ public final class EndpointReferenceUtils {
                     return new QName(namespaceURI, service);
                 }
             } else if (obj instanceof JAXBElement) {
-                Object val = ((JAXBElement<?>)obj).getValue();
+                Object val = ((JAXBElement)obj).getValue();
                 if (val instanceof ServiceNameType) {
                     return ((ServiceNameType)val).getValue();
                 }
@@ -369,7 +369,7 @@ public final class EndpointReferenceUtils {
                         return item != null ? item.getTextContent() : null;
                     }
                 } else if (obj instanceof JAXBElement) {
-                    Object val = ((JAXBElement<?>)obj).getValue();
+                    Object val = ((JAXBElement)obj).getValue();
                     if (val instanceof ServiceNameType) {
                         return ((ServiceNameType)val).getEndpointName();
                     }
@@ -399,7 +399,7 @@ public final class EndpointReferenceUtils {
                         node.setAttribute(JAXWSAConstants.WSAM_ENDPOINT_NAME, portName);
                     }
                 } else if (obj instanceof JAXBElement) {
-                    Object val = ((JAXBElement<?>)obj).getValue();
+                    Object val = ((JAXBElement)obj).getValue();
                     if (val instanceof ServiceNameType) {
                         ((ServiceNameType)val).setEndpointName(portName);
                     }
@@ -459,7 +459,7 @@ public final class EndpointReferenceUtils {
                     return new QName(namespaceURI, content);
                 }
             } else if (obj instanceof JAXBElement) {
-                Object val = ((JAXBElement<?>)obj).getValue();
+                Object val = ((JAXBElement)obj).getValue();
                 if (val instanceof AttributedQNameType) {
                     return ((AttributedQNameType)val).getValue();
                 }
@@ -761,7 +761,7 @@ public final class EndpointReferenceUtils {
         for (Object obj : metadata.getAny()) {
             
             if (obj instanceof JAXBElement) {
-                Object jaxbVal = ((JAXBElement<?>)obj).getValue();
+                Object jaxbVal = ((JAXBElement)obj).getValue();
 
                 if (jaxbVal instanceof ServiceNameType) {
                     Port port = null;
@@ -1011,7 +1011,7 @@ public final class EndpointReferenceUtils {
      * @param messageContext the current message context 
      * @return the id embedded in the current endpoint reference or null if not found
      */
-    public static String getEndpointReferenceId(Map<String, Object> messageContext) {
+    public static String getEndpointReferenceId(Map messageContext) {
         String id = null;
         Destination destination = (Destination) messageContext.get(Destination.class.getName());
         if (destination instanceof MultiplexDestination) {
@@ -1064,7 +1064,7 @@ public final class EndpointReferenceUtils {
     private static MultiplexDestination getMatchingMultiplexDestination(QName serviceQName, String portName,
                                                                         Bus bus) {
         MultiplexDestination destination = null;
-        ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
+        ServerRegistry serverRegistry = (ServerRegistry)bus.getExtension(ServerRegistry.class);
         if (null != serverRegistry) {
             List<Server> servers = serverRegistry.getServers();
             for (Server s : servers) {

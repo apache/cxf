@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.utils.multipart;
 import java.io.IOException;
 
 public class MultipartReadException extends IOException {
-    private static final long serialVersionUID = 4147731360800379534L;
     private String expectedContentId;    
     private String expectedContentType;
     private String errorMessage;

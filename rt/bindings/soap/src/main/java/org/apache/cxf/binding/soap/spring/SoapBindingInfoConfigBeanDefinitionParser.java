@@ -26,7 +26,7 @@ import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 public class SoapBindingInfoConfigBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
     @Override
-    protected Class<?> getBeanClass(Element arg0) {
+    protected Class getBeanClass(Element arg0) {
         return SoapBindingConfiguration.class;
     }
 

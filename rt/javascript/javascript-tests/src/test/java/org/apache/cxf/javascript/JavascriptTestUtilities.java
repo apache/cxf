@@ -58,16 +58,12 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     public static class JavaScriptAssertionFailed extends RuntimeException {
 
-        private static final long serialVersionUID = -4776862940267084055L;
-
         public JavaScriptAssertionFailed(String what) {
             super(what);
         }
     }
 
     public static class JsAssert extends ScriptableObject {
-
-        private static final long serialVersionUID = 8541723718764399405L;
 
         public JsAssert() {
         }
@@ -84,8 +80,6 @@ public class JavascriptTestUtilities extends TestUtilities {
     }
 
     public static class Trace extends ScriptableObject {
-
-        private static final long serialVersionUID = -8478529983202430575L;
 
         public Trace() {
         }
@@ -104,7 +98,6 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     public static class Notifier extends ScriptableObject {
 
-        private static final long serialVersionUID = 4581431707286545806L;
         private boolean notified;
 
         public Notifier() {
@@ -137,7 +130,6 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     public static class CountDownNotifier extends ScriptableObject {
 
-        private static final long serialVersionUID = 2057930200102896264L;
         private CountDownLatch latch;
 
         public CountDownNotifier() {

@@ -160,8 +160,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         if (paramHeaders != null) {
             mustUnderstandQNames.addAll(paramHeaders);
         }
-        for (Interceptor<? extends org.apache.cxf.message.Message> interceptorInstance 
-            : soapMessage.getInterceptorChain()) {
+        for (Interceptor interceptorInstance : soapMessage.getInterceptorChain()) {
             if (interceptorInstance instanceof SoapInterceptor) {
                 SoapInterceptor si = (SoapInterceptor) interceptorInstance;
                 Set<URI> roles = si.getRoles();

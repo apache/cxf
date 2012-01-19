@@ -24,7 +24,6 @@ import java.io.Serializable;
  * @author jdavias
  */
 public class BeanD implements Serializable {
-    private static final long serialVersionUID = -2735554744385322074L;
     private String propD;
 
     public String getMpropD() {

@@ -28,7 +28,6 @@ import org.apache.tuscany.sdo.impl.DataObjectBase;
 import commonj.sdo.Type;
 
 //CHECKSTYLE:OFF
-@SuppressWarnings("rawtypes")
 public class StructureImpl extends DataObjectBase implements Structure {
 
     public static final int TEXT = 0;

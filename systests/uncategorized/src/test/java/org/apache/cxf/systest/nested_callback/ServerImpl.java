@@ -29,9 +29,9 @@ import javax.xml.ws.Service;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.jaxb.JAXBUtils;
-import org.apache.cxf.jaxws.spi.ProviderImpl;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
@@ -58,7 +58,7 @@ public class ServerImpl implements ServerPortType  {
         try {
             W3CEndpointReference w3cEpr = callbackObject.getCallback();
             
-            EndpointReferenceType callback = ProviderImpl.convertToInternal(w3cEpr);
+            EndpointReferenceType callback = VersionTransformer.convertToInternal(w3cEpr);
 
             WSDLManager manager = new WSDLManagerImpl();
         

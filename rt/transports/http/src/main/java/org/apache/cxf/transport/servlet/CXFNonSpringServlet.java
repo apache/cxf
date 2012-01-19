@@ -39,7 +39,6 @@ import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
-    private static final long serialVersionUID = -2437897227486327166L;
     private DestinationRegistry destinationRegistry;
     private Bus bus;
     private ServletController controller;

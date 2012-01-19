@@ -23,7 +23,6 @@ package org.apache.cxf.systest.jaxws;
  * 
  */
 public class CustomException extends Exception {
-    private static final long serialVersionUID = 3996024887423007223L;
     private String a;
     private String b;
 

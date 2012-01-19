@@ -34,7 +34,7 @@ public class JibxWrapperHelper extends AbstractWrapperHelper {
     }
     
     @Override
-    protected Object createWrapperObject(Class<?> clazz) throws Exception {
+    protected Object createWrapperObject(Class clazz) throws Exception {
         return clazz.newInstance();
     }
 

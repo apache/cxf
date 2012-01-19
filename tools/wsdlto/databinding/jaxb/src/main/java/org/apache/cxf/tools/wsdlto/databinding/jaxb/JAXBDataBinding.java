@@ -416,7 +416,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private boolean isJAXB22() {
-        return org.apache.cxf.common.jaxb.JAXBUtils.isJAXB22();
+        return org.apache.cxf.jaxb.JAXBUtils.isJAXB22();
     }
 
     private static final class ReferenceFinder extends AbstractReferenceFinderImpl {
@@ -715,7 +715,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             TypesCodeWriter fileCodeWriter = new TypesCodeWriter(new File(dir), context.getExcludePkgList());
 
             if (rawJaxbModelGenCode instanceof S2JJAXBModel) {
-                S2JJAXBModel schem2JavaJaxbModel = rawJaxbModelGenCode;
+                S2JJAXBModel schem2JavaJaxbModel = (S2JJAXBModel)rawJaxbModelGenCode;
 
                 ClassCollector classCollector = context.get(ClassCollector.class);
                 for (JClass cls : schem2JavaJaxbModel.getAllObjectFactories()) {
@@ -973,7 +973,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     try {
                         Field f = jdc.getClass().getDeclaredField("enumConstantsByName");
                         f.setAccessible(true);
-                        Map<?, ?> map = (Map<?, ?>)f.get(jdc);
+                        Map map = (Map)f.get(jdc);
                         Set<String> values = CastUtils.cast(map.keySet());
                         String first = defaultValues.chooseEnumValue(path, values);
                         writer.write(tp.fullName());

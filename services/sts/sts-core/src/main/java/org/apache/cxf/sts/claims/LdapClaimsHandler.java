@@ -37,6 +37,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
+import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -126,7 +127,20 @@ public class LdapClaimsHandler implements ClaimsHandler {
         }
 
         return uriList;
-    }    
+    }
+
+    @Deprecated
+    public ClaimCollection retrieveClaimValues(
+            Principal principal, RequestClaimCollection claims, WebServiceContext context, String realm) {
+        
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(principal);
+        params.setWebServiceContext(context);
+        params.setRealm(realm);
+        
+        return retrieveClaimValues(claims, params);
+    }
+    
     
     public ClaimCollection retrieveClaimValues(
             RequestClaimCollection claims, ClaimsParameters parameters) {

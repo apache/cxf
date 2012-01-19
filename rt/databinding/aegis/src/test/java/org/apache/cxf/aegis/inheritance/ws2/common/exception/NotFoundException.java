@@ -24,7 +24,6 @@ package org.apache.cxf.aegis.inheritance.ws2.common.exception;
  * @author xfournet
  */
 public class NotFoundException extends Exception {
-    private static final long serialVersionUID = 6832746456656999568L;
     private final String id;
 
     public NotFoundException(String id) {

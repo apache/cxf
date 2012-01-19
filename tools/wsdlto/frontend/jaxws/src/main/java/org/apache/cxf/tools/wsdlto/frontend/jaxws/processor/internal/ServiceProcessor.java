@@ -22,6 +22,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,6 @@ import org.w3c.dom.Element;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -352,7 +352,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (isSoapBinding()) {
                     // TODO: add customize here
                     //doCustomizeOperation(jf, jm, bop);
-                    Map<String, Object> prop = getSoapOperationProp(bop);
+                    Map prop = getSoapOperationProp(bop);
                     String soapAction = prop.get(soapOPAction) == null ? "" : (String)prop.get(soapOPAction);
                     String soapStyle = prop.get(soapOPStyle) == null ? "" : (String)prop.get(soapOPStyle);
                     jm.setSoapAction(soapAction);
@@ -383,8 +383,8 @@ public class ServiceProcessor extends AbstractProcessor {
 
                 OperationInfo opinfo = bop.getOperationInfo();
 
-                JAXWSBinding opBinding = opinfo.getExtensor(JAXWSBinding.class);
-                JAXWSBinding infBinding = opinfo.getInterface().getExtensor(JAXWSBinding.class);
+                JAXWSBinding opBinding = (JAXWSBinding)opinfo.getExtensor(JAXWSBinding.class);
+                JAXWSBinding infBinding = (JAXWSBinding)opinfo.getInterface().getExtensor(JAXWSBinding.class);
                 boolean enableMime = enableOpMime;
                 boolean enableWrapperStyle = true;
                 
@@ -566,10 +566,13 @@ public class ServiceProcessor extends AbstractProcessor {
 
     public void processMultipart(JavaMethod jm, BindingOperationInfo operation,
                                  MIMEMultipartRelated ext, JavaType.Style style) throws ToolException {
-        List<MIMEPart> mimeParts = CastUtils.cast(ext.getMIMEParts());
-        for (MIMEPart mPart : mimeParts) {
-            List<ExtensibilityElement> extns = CastUtils.cast(mPart.getExtensibilityElements());
-            for (ExtensibilityElement extElement : extns) {
+        List mimeParts = ext.getMIMEParts();
+        Iterator itParts = mimeParts.iterator();
+        while (itParts.hasNext()) {
+            MIMEPart mPart = (MIMEPart)itParts.next();
+            Iterator extns = mPart.getExtensibilityElements().iterator();
+            while (extns.hasNext()) {
+                ExtensibilityElement extElement = (ExtensibilityElement)extns.next();
                 if (extElement instanceof MIMEContent) {
                     MIMEContent mimeContent = (MIMEContent)extElement;
                     String mimeJavaType = getJavaTypeForMimeType(mPart);
@@ -620,7 +623,7 @@ public class ServiceProcessor extends AbstractProcessor {
         }
     }
 
-    private Map<String, Object> getSoapOperationProp(BindingOperationInfo bop) {
+    private Map getSoapOperationProp(BindingOperationInfo bop) {
         Map<String, Object> soapOPProp = new HashMap<String, Object>();
         if (bop.getExtensor(ExtensibilityElement.class) != null) {
             for (ExtensibilityElement ext : bop.getExtensors(ExtensibilityElement.class)) {
@@ -654,7 +657,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 return BindingType.SOAPBinding;
             }
             if (ext instanceof HTTPBinding) {
-                bindingObj = ext;
+                bindingObj = (HTTPBinding)ext;
                 return BindingType.HTTPBinding;
             }
         }

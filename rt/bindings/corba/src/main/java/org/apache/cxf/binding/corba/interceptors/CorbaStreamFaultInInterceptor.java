@@ -90,7 +90,7 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
                 
                 org.omg.CORBA.ORB orb = (org.omg.CORBA.ORB) message.get(CorbaConstants.ORB);
                 if (orb == null) {
-                    orb = message.getExchange().get(org.omg.CORBA.ORB.class); 
+                    orb = (org.omg.CORBA.ORB) message.getExchange().get(org.omg.CORBA.ORB.class); 
                 }
                 QName elName = new QName("", exStreamable.getName());
                 FaultInfo fault = getFaultInfo(opInfo, elName);
@@ -122,7 +122,7 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
                         e = faultEx;
                     }
                 }
-                message.setContent(Exception.class, e);
+                message.setContent(Exception.class, (Exception) e);
             }
         } catch (java.lang.Exception ex) {
             LOG.log(Level.SEVERE, "CORBA unmarshalFault exception", ex);

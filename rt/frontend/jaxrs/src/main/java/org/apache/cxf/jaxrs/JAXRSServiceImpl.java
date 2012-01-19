@@ -56,7 +56,6 @@ import org.apache.cxf.workqueue.SynchronousExecutor;
  * to register the JAX-RS endpoint with the runtime.
  */
 public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider implements Service, Configurable {
-    private static final long serialVersionUID = 6765400202555126993L;
     private List<ClassResourceInfo> classResourceInfos;
     private DataBinding dataBinding;
     private Executor executor;
@@ -99,7 +98,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
             return serviceName;
         }
         if (address == null) {
-            Class<?> primaryClass = classResourceInfos.get(0).getServiceClass();
+            Class primaryClass = classResourceInfos.get(0).getServiceClass();
             String ns = PackageUtils.getNamespace(PackageUtils.getPackageName(primaryClass));
             return new QName(ns, primaryClass.getSimpleName());
         } else {

@@ -240,7 +240,7 @@ public class SoapArrayType extends AegisType {
                 + ", but was " + positionString);
     }
 
-    protected Object makeArray(List<Object> values, List<Integer> dimensions, Class<?> componentType) {
+    protected Object makeArray(List values, List<Integer> dimensions, Class componentType) {
 
         // if this is an array of arrays, recurse into this function
         // for each nested array
@@ -252,7 +252,7 @@ public class SoapArrayType extends AegisType {
             }
             Object[] array = (Object[]) Array.newInstance(componentType, dimensions.get(0));
             for (int i = 0; i < array.length; i++) {
-                List<Object> chunk = values.subList(i * chunkSize, (i + 1) * chunkSize);
+                List<?> chunk = values.subList(i * chunkSize, (i + 1) * chunkSize);
                 Object value = makeArray(chunk,
                         dimensions.subList(1, dimensions.size()),
                         componentType.getComponentType());

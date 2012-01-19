@@ -141,7 +141,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         TestFeature testFeature = new TestFeature();
         List<AbstractFeature> features = new ArrayList<AbstractFeature>();
-        features.add(testFeature);
+        features.add((AbstractFeature)testFeature);
         bean.setFeatures(features);
         
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);

@@ -32,7 +32,6 @@ import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
 
 public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
-    private static final long serialVersionUID = -9134254448692671780L;
     private static final Collection<QName> ASSERTION_TYPES;
     private RMInInterceptor rmIn = new RMInInterceptor();
     private RMOutInterceptor rmOut = new RMOutInterceptor();

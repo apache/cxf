@@ -96,7 +96,7 @@ public class JAXBExtensionHelperTest extends Assert {
 
         wsdlDefinition = wsdlReader.readWSDL(file);
 
-        List<?> extList = wsdlDefinition.getExtensibilityElements();
+        List extList = wsdlDefinition.getExtensibilityElements();
         NewServiceType newService = null;
         for (Object ext : extList) {
             if (ext instanceof NewServiceType) {
@@ -162,7 +162,7 @@ public class JAXBExtensionHelperTest extends Assert {
         Service s = wsdlDefinition.getService(new QName("http://cxf.apache.org/test/hello_world",
             "HelloWorldService"));
         Port p = s.getPort("HelloWorldPort");
-        List<?> extPortList = p.getExtensibilityElements();
+        List extPortList = p.getExtensibilityElements();
     
         TestPolicyType tp = null;
         AnotherPolicyType ap = null;

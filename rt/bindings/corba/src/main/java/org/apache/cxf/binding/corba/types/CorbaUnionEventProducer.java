@@ -71,7 +71,7 @@ public class CorbaUnionEventProducer extends AbstractStartEndEventProducer {
         if (unionType.isSetNillable() && unionType.isNillable()) {
             CorbaPrimitiveHandler descHandler = (CorbaPrimitiveHandler) handler.getDiscriminator();
             Boolean descValue = (Boolean) descHandler.getValue();
-            if (!descValue.booleanValue()) {
+            if (!((Boolean)descValue).booleanValue()) {
                 isItNil = true;
             }
         }

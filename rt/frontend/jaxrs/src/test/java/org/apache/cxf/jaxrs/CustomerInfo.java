@@ -26,7 +26,7 @@ import javax.ws.rs.ext.ContextResolver;
 
 public interface CustomerInfo {
     void setUriInfoContext(@Context UriInfo uriInfo);
-    ContextResolver<?> getContextResolver();
+    ContextResolver getContextResolver();
     
     @Context 
     void setHttpServletRequest(HttpServletRequest request);

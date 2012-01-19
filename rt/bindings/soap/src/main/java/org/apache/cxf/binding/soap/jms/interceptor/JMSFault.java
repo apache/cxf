@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
  */
 public class JMSFault extends Exception {
 
-    private static final long serialVersionUID = 8567771013189842711L;
     private JMSFaultType jmsFaultType;
     private boolean sender;
     private Object detail;

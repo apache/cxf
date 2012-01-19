@@ -382,23 +382,19 @@ public abstract class AbstractClient implements Client, Retryable {
         state.setResponseBuilder(currentResponseBuilder);
         return rb;
     }
-    protected <T> void writeBody(T o, Message outMessage, Type type, Annotation[] anns,
-                                 MultivaluedMap<String, Object> headers, OutputStream os) {
-        @SuppressWarnings("unchecked")
-        Class<T> cls = (Class<T>)o.getClass();
-        writeBody(o, outMessage, cls, type, anns, headers, os);
-    }       
-    protected <T> void writeBody(T o, Message outMessage, Class<T> cls, Type type, Annotation[] anns, 
-        MultivaluedMap<String, Object> headers, OutputStream os) {
+
+    @SuppressWarnings("unchecked")
+    protected void writeBody(Object o, Message outMessage, Class<?> cls, Type type, Annotation[] anns, 
+        MultivaluedMap<String, String> headers, OutputStream os) {
         
         if (o == null) {
             return;
         }
         
-        MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type").toString()); 
+        MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type")); 
         
-        MessageBodyWriter<T> mbw = ProviderFactory.getInstance(outMessage)
-            .createMessageBodyWriter(cls, type, anns, contentType, outMessage);
+        MessageBodyWriter mbw = ProviderFactory.getInstance(outMessage).createMessageBodyWriter(
+            cls, type, anns, contentType, outMessage);
         if (mbw != null) {
             try {
                 mbw.writeTo(o, cls, type, anns, contentType, headers, os);
@@ -415,12 +411,12 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     @SuppressWarnings("unchecked")
-    protected <T> T readBody(Response r, Message inMessage, Class<T> cls, 
-                             Type type, Annotation[] anns) {
+    protected Object readBody(Response r, Message inMessage, Class<?> cls, 
+                              Type type, Annotation[] anns) {
 
         InputStream inputStream = (InputStream)r.getEntity();
         if (inputStream == null) {
-            return cls == Response.class ? cls.cast(r) : null;
+            return cls == Response.class ? r : null;
         }
         
         int status = r.getStatus();
@@ -428,31 +424,23 @@ public abstract class AbstractClient implements Client, Retryable {
             Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
             if (length == null || Integer.parseInt(length.toString()) == 0
                 || status >= 400) {
-                if (cls == Response.class) {
-                    return cls.cast(r);
-                } else {
-                    return null;
-                }
+                return cls == Response.class ? r : status >= 400 ? inputStream : null;
             }
         }
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader<T> mbr 
-            = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
-                cls, type, anns, contentType, inMessage);
+        MessageBodyReader mbr = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
+            cls, type, anns, contentType, inMessage);
         if (mbr != null) {
             try {
-                MultivaluedMap<String, String> m 
-                    = (MultivaluedMap<String, String>)
-                        ((MultivaluedMap<?, ?>)new MetadataMap<String, Object>(r.getMetadata(),
-                            true, true));
-                return mbr.readFrom(cls, type, anns, contentType, m, inputStream);
+                return mbr.readFrom(cls, type, anns, contentType, 
+                       new MetadataMap<String, Object>(r.getMetadata(), true, true), inputStream);
             } catch (Exception ex) {
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
             }
         } else if (cls == Response.class) {
-            return cls.cast(r);
+            return r;
         } else {
             reportMessageHandlerProblem("NO_MSG_READER", cls, contentType, null, null);
         }
@@ -483,7 +471,7 @@ public abstract class AbstractClient implements Client, Retryable {
         }
         checkClientException(message, message.getExchange().get(Exception.class));
         
-        List<?> result = message.getExchange().get(List.class);
+        List result = message.getExchange().get(List.class);
         return result != null ? result.toArray() : null;
     }
     
@@ -528,7 +516,7 @@ public abstract class AbstractClient implements Client, Retryable {
         
         try {
             Object body = params.length == 0 ? null : params[0];
-            Map<String, Object> reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
+            Map<String, Object> reqContext = CastUtils.cast((Map)context.get(REQUEST_CONTEXT));
             MultivaluedMap<String, String> headers = 
                 (MultivaluedMap<String, String>)reqContext.get(Message.PROTOCOL_HEADERS);
                         
@@ -565,7 +553,7 @@ public abstract class AbstractClient implements Client, Retryable {
             
             if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
                 Collection<?> c = pValue.getClass().isArray() 
-                    ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
+                    ? Arrays.asList((Object[]) pValue) : (Collection) pValue;
                 for (Iterator<?> it = c.iterator(); it.hasNext();) {
                     addToBuilder(ub, paramName, it.next(), pt);
                 }
@@ -771,12 +759,11 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     protected Map<String, Object> getRequestContext(Message outMessage) {
-        Map<String, Object> invContext 
-            = CastUtils.cast((Map<?, ?>)outMessage.get(Message.INVOCATION_CONTEXT));
-        return CastUtils.cast((Map<?, ?>)invContext.get(REQUEST_CONTEXT));
+        Map<String, Object> invContext = CastUtils.cast((Map)outMessage.get(Message.INVOCATION_CONTEXT));
+        return CastUtils.cast((Map)invContext.get(REQUEST_CONTEXT));
     }
     
-    protected List<?> getContentsList(Object body) {
+    protected List getContentsList(Object body) {
         return body == null ? new MessageContentsList() : new MessageContentsList(body);
     }
     
@@ -801,8 +788,8 @@ public abstract class AbstractClient implements Client, Retryable {
         if (context == null) {
             context = new HashMap<String, Object>();
         }
-        reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
-        resContext = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
+        reqContext = CastUtils.cast((Map)context.get(REQUEST_CONTEXT));
+        resContext = CastUtils.cast((Map)context.get(RESPONSE_CONTEXT));
         if (reqContext == null) { 
             reqContext = new HashMap<String, Object>(cfg.getRequestContext());
             context.put(REQUEST_CONTEXT, reqContext);

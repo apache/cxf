@@ -40,8 +40,6 @@ import org.mozilla.javascript.xml.XMLObject;
 
 public abstract class AbstractDOMProvider {
     public static class JSDOMProviderException extends Exception {
-        private static final long serialVersionUID = -6082342781592829823L;
-
         public JSDOMProviderException(String reason) {
             super(reason);
         }

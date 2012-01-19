@@ -245,7 +245,7 @@ public class SelectableTable<T> extends Composite {
     private void setColumnsWidth() {
         assert columnDefinitions != null;
         for (int j = 0; j < columnDefinitions.size(); j++) {
-            ColumnDefinition<?> columnDefinition = columnDefinitions.get(j);
+            ColumnDefinition columnDefinition = columnDefinitions.get(j);
             table.getColumnFormatter().setWidth(j, columnDefinition.getWidth());
         }
     }

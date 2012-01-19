@@ -39,7 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
     protected int currentEvent = XMLStreamConstants.START_DOCUMENT;
 
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map properties = new HashMap();
 
     private FastStack<ElementFrame<T, I>> frames = new FastStack<ElementFrame<T, I>>();
 

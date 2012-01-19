@@ -49,7 +49,6 @@ import org.apache.cxf.transport.MessageObserver;
 
 public class EndpointImpl extends AbstractAttributedInterceptorProvider implements Endpoint, Configurable {
 
-    private static final long serialVersionUID = -7660560719050162091L;
     private static final Logger LOG = LogUtils.getL7dLogger(EndpointImpl.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
 

@@ -66,7 +66,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         return read(null, input, part.getTypeClass());
     }
 
-    public Object read(final QName name, XMLStreamReader input, Class<?> type) {
+    public Object read(final QName name, XMLStreamReader input, Class type) {
         if (Source.class.equals(type) && message != null) {
             //generic Source, find the preferred type
             String s = (String)message.getContextualProperty(SourceDataBinding.PREFERRED_FORMAT);
