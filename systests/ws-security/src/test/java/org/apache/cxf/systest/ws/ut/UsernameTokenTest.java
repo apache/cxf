@@ -189,4 +189,29 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
     }
     
+    @org.junit.Test
+    public void testNoUsernameToken() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItInlinePolicyPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        try {
+            utPort.doubleIt(25);
+            fail("Failure expected on no UsernameToken");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error));
+        }
+    }
 }

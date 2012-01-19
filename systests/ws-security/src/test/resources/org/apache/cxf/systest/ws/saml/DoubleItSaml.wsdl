@@ -239,6 +239,22 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItInlinePolicyBinding" type="tns:DoubleItPortType">
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
 
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSaml1TransportPort" binding="tns:DoubleItSaml1TransportBinding">
@@ -281,6 +297,9 @@
         <wsdl:port name="DoubleItSaml2EndorsingEncryptedTransportPort" 
                    binding="tns:DoubleItSaml2EndorsingEncryptedTransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml2EndorsingEncryptedTransport" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItInlinePolicyPort" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9009/DoubleItSamlInlinePolicy" />
         </wsdl:port>
     </wsdl:service>
 
