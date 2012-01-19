@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,18 +88,16 @@ public class AuthorizationRequestHandler {
             Map<String, String> queryParams = new HashMap<String, String>();
             if (allow) {
                 SecurityContext sc = mc.getSecurityContext();
-                
-                UserSubject subject = new UserSubject();
-                subject.setLogin(sc.getUserPrincipal().getName());
+                List<String> roleNames = Collections.emptyList();
                 if (sc instanceof LoginSecurityContext) {
-                    List<String> roleNames = new ArrayList<String>();
+                    roleNames = new ArrayList<String>();
                     Set<Principal> roles = ((LoginSecurityContext)sc).getUserRoles();
                     for (Principal p : roles) {
                         roleNames.add(p.getName());
                     }
-                    subject.setRoles(roleNames);
                 }
-                token.setSubject(subject);
+                token.setSubject(new UserSubject(sc.getUserPrincipal().getName(),
+                                                 roleNames));
                 
                 String verifier = dataProvider.setRequestTokenVerifier(token);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);

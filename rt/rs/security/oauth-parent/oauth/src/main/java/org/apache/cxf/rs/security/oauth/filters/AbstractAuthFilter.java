@@ -199,10 +199,10 @@ public class AbstractAuthFilter {
     }
     
     protected OAuthContext createOAuthContext(OAuthInfo info) {
-        OAuthContext context = new OAuthContext();
+        UserSubject subject = null;
         if (info.getToken() != null) {
-            context.setSubject(info.getToken().getSubject());
+            subject = info.getToken().getSubject();
         }
-        return context;
+        return new OAuthContext(subject, info.getPermissions());
     }
 }
