@@ -394,7 +394,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             if (!ignoreNamespaces) {
                 if (namespaceMap.containsKey(qname.getNamespaceURI())) {
                     prefix = namespaceMap.get(qname.getNamespaceURI());
-                    if (!prefix.isEmpty()) {
+                    if (prefix.length() > 0) {
                         prefix += ".";
                     }
                 } else if (qname.getNamespaceURI().length() > 0) {
