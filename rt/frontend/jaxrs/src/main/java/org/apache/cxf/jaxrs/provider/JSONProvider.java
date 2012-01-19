@@ -467,7 +467,9 @@ public class JSONProvider extends AbstractJAXBProvider  {
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         
         QName qname = getQName(actualClass, genericType, actualObject, true);
-        
+        if (ignoreNamespaces && (isCollection  || dropRootElement)) {        
+            qname = new QName(qname.getLocalPart());
+        }
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             return JSONUtils.createBadgerFishWriter(os);
         }
@@ -482,7 +484,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys,
              isCollection || dropRootElement);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
-        writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces && !isCollection);
+        writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
         return createTransformWriterIfNeeded(writer, os);
     }
     

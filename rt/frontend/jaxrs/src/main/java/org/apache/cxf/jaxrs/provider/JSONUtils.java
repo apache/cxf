@@ -221,6 +221,11 @@ public final class JSONUtils {
         }
         
         @Override
+        public void writeStartElement(String local) throws XMLStreamException {
+            this.writeStartElement("", local, "");
+        }
+        
+        @Override
         public void writeEndElement() throws XMLStreamException {
             index--;
             if (rootDropped && index == 0) {
