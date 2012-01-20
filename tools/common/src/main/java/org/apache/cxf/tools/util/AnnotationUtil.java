@@ -33,6 +33,7 @@ import javax.jws.WebResult;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.ToolException;
 
 public final class AnnotationUtil {

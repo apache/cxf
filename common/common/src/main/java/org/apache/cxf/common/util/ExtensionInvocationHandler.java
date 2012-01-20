@@ -17,11 +17,28 @@
  * under the License.
  */
 
-package org.apache.cxf.tools.common.extensions.soap;
+package org.apache.cxf.common.util;
 
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap12.SOAP12Address;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
-public interface SoapAddress extends SOAPAddress, SOAP12Address {
+public class ExtensionInvocationHandler implements InvocationHandler {
 
+    private Object obj;
+    public ExtensionInvocationHandler(Object o) {
+        obj = o;
+    }
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        Class<?>[] clzs = null;
+        if (args != null) {
+            clzs = new Class[args.length];
+            for (int i = 0; i < args.length; i++) {
+                clzs[i] = args[i].getClass();
+            }
+        }
+        
+        Method m = obj.getClass().getMethod(method.getName(), method.getParameterTypes());
+        return m.invoke(obj, args);
+    }
 }

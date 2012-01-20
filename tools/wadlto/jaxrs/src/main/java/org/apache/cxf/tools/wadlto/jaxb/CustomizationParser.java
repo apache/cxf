@@ -37,6 +37,7 @@ import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XMLUtils;
@@ -46,9 +47,7 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.JAXBUtils;
-import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
-
 
 public final class CustomizationParser {
     private static final Logger LOG = LogUtils.getL7dLogger(CustomizationParser.class);

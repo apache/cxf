@@ -21,6 +21,7 @@ package org.apache.cxf.tools.util;
 
 import java.net.URLDecoder;
 
+import org.apache.cxf.common.util.URIParserUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

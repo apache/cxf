@@ -27,12 +27,11 @@ import java.util.Set;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.tools.common.extensions.soap.SoapHeader;
-import org.apache.cxf.tools.util.SOAPBindingUtil;
 
 public final class HeaderUtil {
     private static final String HEADERS_PROPERTY = HeaderUtil.class.getName() + ".HEADERS";

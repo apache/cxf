@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.tools.util;
+package org.apache.cxf.binding.soap;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -49,15 +49,16 @@ import javax.wsdl.extensions.soap12.SOAP12Header;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapFault;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation;
 import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.util.ExtensionInvocationHandler;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.tools.common.ExtensionInvocationHandler;
-import org.apache.cxf.tools.common.extensions.soap.SoapAddress;
-import org.apache.cxf.tools.common.extensions.soap.SoapBinding;
-import org.apache.cxf.tools.common.extensions.soap.SoapBody;
-import org.apache.cxf.tools.common.extensions.soap.SoapFault;
-import org.apache.cxf.tools.common.extensions.soap.SoapHeader;
-import org.apache.cxf.tools.common.extensions.soap.SoapOperation;
+
 
 public final class SOAPBindingUtil {
     private static Map<String, String> bindingMap = new HashMap<String, String>();

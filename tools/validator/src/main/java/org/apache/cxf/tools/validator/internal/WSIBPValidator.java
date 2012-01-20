@@ -36,15 +36,15 @@ import javax.wsdl.Part;
 import javax.wsdl.PortType;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.SOAPBindingUtil;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapFault;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.WSDLHelper;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.tools.common.extensions.soap.SoapBody;
-import org.apache.cxf.tools.common.extensions.soap.SoapFault;
-import org.apache.cxf.tools.common.extensions.soap.SoapHeader;
-import org.apache.cxf.tools.util.SOAPBindingUtil;
 
 public class WSIBPValidator extends AbstractDefinitionValidator {
     private List<String> operationMap = new ArrayList<String>();

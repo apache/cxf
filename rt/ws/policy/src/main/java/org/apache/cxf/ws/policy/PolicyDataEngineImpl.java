@@ -58,8 +58,8 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
 
     public <T> T getClientEndpointPolicy(EndpointInfo ei, Conduit c,
                                          PolicyCalculator<T> policyCalculator) {
-        Collection<Assertion> alternative = getPolicyEngine()
-            .getClientEndpointPolicy(ei, c).getChosenAlternative();
+        Collection<Assertion> alternative = getPolicyEngine().getClientEndpointPolicy(ei, c)
+            .getChosenAlternative();
         List<T> filteredPolicies = new ArrayList<T>();
         for (Assertion a : alternative) {
             if (policyCalculator.getDataClassName().equals(a.getName())) {

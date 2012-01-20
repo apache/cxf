@@ -25,10 +25,9 @@ import java.util.Map;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.util.PropertyUtil;
-import org.apache.cxf.tools.util.URIParserUtil;
-
 
 public class ProcessorEnvironment {
 

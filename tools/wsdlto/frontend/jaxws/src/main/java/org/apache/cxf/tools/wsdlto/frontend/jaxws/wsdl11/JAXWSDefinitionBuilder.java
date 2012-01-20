@@ -37,18 +37,16 @@ import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.xml.WSDLReader;
 
 import org.w3c.dom.Element;
-
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.tools.util.SOAPBindingUtil;
-import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.validator.internal.WSDL11Validator;
 import org.apache.cxf.tools.wsdlto.core.AbstractWSDLBuilder;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.CustomizationParser;

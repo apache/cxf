@@ -29,13 +29,13 @@ import javax.xml.ws.WebFault;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.annotator.WrapperBeanAnnotator;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.model.WrapperBeanClass;
 import org.apache.cxf.tools.util.AnnotationUtil;
-import org.apache.cxf.tools.util.URIParserUtil;
 
 public final class FaultBean {
     private static final String[] EXCLUDED_GETTER = new String[] {"getCause",

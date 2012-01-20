@@ -39,6 +39,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ClassUtils;
@@ -47,7 +48,6 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
-import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.jibx.binding.Compile;
 import org.jibx.binding.Utility;
@@ -69,6 +69,7 @@ import org.jibx.schema.codegen.custom.SchemaCustom;
 import org.jibx.schema.codegen.custom.SchemasetCustom;
 import org.jibx.schema.validation.ProblemMultiHandler;
 import org.jibx.util.DummyClassLocator;
+
 
 public class JibxToolingDataBinding implements DataBindingProfile {
 

@@ -24,8 +24,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.maven_plugin.common.DocumentArtifact;
-import org.apache.cxf.tools.util.URIParserUtil;
 
 public class WadlOption extends Option {
 

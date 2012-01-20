@@ -24,9 +24,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.maven_plugin.WsdlArtifact;
 import org.apache.cxf.tools.common.ToolConstants;
-import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.maven.plugin.MojoExecutionException;
 
 public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.GenericWsdlOption {

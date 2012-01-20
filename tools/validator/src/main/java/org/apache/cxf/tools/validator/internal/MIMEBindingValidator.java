@@ -31,8 +31,8 @@ import javax.wsdl.extensions.mime.MIMEContent;
 import javax.wsdl.extensions.mime.MIMEMultipartRelated;
 import javax.wsdl.extensions.mime.MIMEPart;
 
+import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.tools.util.SOAPBindingUtil;
 
 public class MIMEBindingValidator
     extends AbstractDefinitionValidator {

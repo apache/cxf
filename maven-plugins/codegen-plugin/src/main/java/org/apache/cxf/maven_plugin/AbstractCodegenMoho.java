@@ -34,8 +34,8 @@ import java.util.Set;
 
 import org.apache.commons.lang.SystemUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;

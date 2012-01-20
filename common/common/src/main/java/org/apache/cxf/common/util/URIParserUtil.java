@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.tools.util;
+package org.apache.cxf.common.util;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

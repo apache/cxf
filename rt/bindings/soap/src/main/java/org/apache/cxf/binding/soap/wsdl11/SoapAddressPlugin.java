@@ -23,16 +23,17 @@ import java.util.Map;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 
-import org.apache.cxf.tools.common.ToolConstants;
-import org.apache.cxf.tools.common.extensions.soap.SoapAddress;
-import org.apache.cxf.tools.util.SOAPBindingUtil;
+import org.apache.cxf.binding.soap.SOAPBindingUtil;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
 import org.apache.cxf.wsdl.AbstractWSDLPlugin;
 
 public final class SoapAddressPlugin extends AbstractWSDLPlugin {
+    public static final String CFG_ADDRESS = "address";
+    public static final String CFG_SOAP12 = "soap12";
 
     public ExtensibilityElement createExtension(Map<String, Object> args) throws WSDLException {
-        return createExtension(optionSet(args, ToolConstants.CFG_SOAP12),
-                               getOption(args, ToolConstants.CFG_ADDRESS));
+        return createExtension(optionSet(args, CFG_SOAP12),
+                               getOption(args, CFG_ADDRESS));
     }
 
     public ExtensibilityElement createExtension(final boolean isSOAP12,

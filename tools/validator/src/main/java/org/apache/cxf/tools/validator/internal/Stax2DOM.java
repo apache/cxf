@@ -30,10 +30,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
-
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.tools.util.URIParserUtil;
 
 public class Stax2DOM {
     static final String XML_NS = "http://www.w3.org/2000/xmlns/";

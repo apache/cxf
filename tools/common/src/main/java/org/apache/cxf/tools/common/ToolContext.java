@@ -30,9 +30,9 @@ import javax.xml.namespace.QName;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.util.PropertyUtil;
-import org.apache.cxf.tools.util.URIParserUtil;
 
 public class ToolContext {
 

@@ -97,8 +97,8 @@
         </dependency>
 
         <dependency>
-	  <groupId>org.apache.ws.xmlschema</groupId>
-	  <artifactId>xmlschema-core</artifactId>
+            <groupId>org.apache.ws.xmlschema</groupId>
+            <artifactId>xmlschema-core</artifactId>
         </dependency>
 
         <dependency>
@@ -119,6 +119,7 @@
             <artifactId>spring-aop</artifactId>
             <version>${cxf.spring.version}</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

@@ -34,8 +34,12 @@ import javax.wsdl.extensions.soap.SOAPHeader;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.binding.soap.SOAPBindingUtil;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingInfo;
@@ -49,10 +53,6 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.tools.common.extensions.soap.SoapBinding;
-import org.apache.cxf.tools.common.extensions.soap.SoapBody;
-import org.apache.cxf.tools.common.extensions.soap.SoapHeader;
-import org.apache.cxf.tools.common.extensions.soap.SoapOperation;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;
 import org.apache.cxf.tools.common.model.JavaInterface;
@@ -64,7 +64,6 @@ import org.apache.cxf.tools.common.model.JavaServiceClass;
 import org.apache.cxf.tools.common.model.JavaType;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.NameUtil;
-import org.apache.cxf.tools.util.SOAPBindingUtil;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 
 public class ServiceProcessor extends AbstractProcessor {

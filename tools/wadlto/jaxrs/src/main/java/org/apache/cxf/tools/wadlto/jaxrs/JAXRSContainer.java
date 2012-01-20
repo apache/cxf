@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xml.sax.InputSource;
-
+import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.codegen.SourceGenerator;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
@@ -38,7 +38,6 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.common.toolspec.parser.BadUsageException;
 import org.apache.cxf.tools.util.ClassCollector;
-import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 import org.apache.cxf.tools.wadlto.jaxb.CustomizationParser;
 

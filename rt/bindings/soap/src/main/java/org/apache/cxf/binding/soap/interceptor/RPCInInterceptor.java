@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
@@ -50,7 +51,6 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.tools.common.extensions.soap.SoapBody;
 
 public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     private static final QName SOAP12_RESULT = new QName("http://www.w3.org/2003/05/soap-rpc",

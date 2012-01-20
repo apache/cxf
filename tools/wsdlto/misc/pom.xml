@@ -98,7 +98,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>

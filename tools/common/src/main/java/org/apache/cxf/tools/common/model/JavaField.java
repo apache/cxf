@@ -23,7 +23,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.tools.util.URIParserUtil;
+import org.apache.cxf.common.util.URIParserUtil;
 
 public class JavaField extends JavaType implements JavaAnnotatable {
     private String modifier;

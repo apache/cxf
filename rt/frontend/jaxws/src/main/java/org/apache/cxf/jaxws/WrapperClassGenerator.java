@@ -55,7 +55,6 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
-import org.apache.cxf.tools.common.ToolConstants;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
@@ -64,6 +63,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 public final class WrapperClassGenerator extends ASMHelper {
+    public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
     private Set<Class<?>> wrapperBeans = new LinkedHashSet<Class<?>>();
     private InterfaceInfo interfaceInfo;
@@ -78,7 +79,7 @@ public final class WrapperClassGenerator extends ASMHelper {
 
     private String getPackageName(Method method) {
         String pkg = PackageUtils.getPackageName(method.getDeclaringClass());
-        return pkg.length() == 0 ? ToolConstants.DEFAULT_PACKAGE_NAME : pkg;
+        return pkg.length() == 0 ? DEFAULT_PACKAGE_NAME : pkg;
     }
 
     private Annotation[] getMethodParameterAnnotations(final MessagePartInfo mpi) {

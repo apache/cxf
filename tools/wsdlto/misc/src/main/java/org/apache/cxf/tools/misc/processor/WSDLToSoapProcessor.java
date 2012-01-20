@@ -40,16 +40,16 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.SOAPBindingUtil;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapFault;
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
-import org.apache.cxf.tools.common.extensions.soap.SoapBinding;
-import org.apache.cxf.tools.common.extensions.soap.SoapBody;
-import org.apache.cxf.tools.common.extensions.soap.SoapFault;
-import org.apache.cxf.tools.common.extensions.soap.SoapOperation;
-import org.apache.cxf.tools.util.SOAPBindingUtil;
 
 
 public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
