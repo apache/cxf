@@ -19,6 +19,7 @@
 
 package minimalosgi;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
@@ -51,7 +52,7 @@ public class Activator implements BundleActivator {
                 public Object addingService(ServiceReference serviceReference) {
                     try {
                         HttpService service = (HttpService)_context.getService(serviceReference);
-                        Map<String, String> initParams = new Hashtable<String, String>();
+                        Dictionary<String, String> initParams = new Hashtable<String, String>();
                         initParams.put("javax.ws.rs.Application", SampleApplication.class.getName());
                         service.registerServlet(_path, new SampleServlet(), initParams, null);
                         return service;
