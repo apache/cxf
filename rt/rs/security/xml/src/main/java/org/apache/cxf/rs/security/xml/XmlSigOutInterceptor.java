@@ -163,7 +163,8 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         newDoc.adoptNode(docEl);
         Element object = newDoc.createElementNS(Constants.SignatureSpecNS, "ds:Object");
         object.appendChild(docEl);
-        object.setAttribute("ID", id);
+        docEl.setAttributeNS(null, "ID", id);
+        docEl.setIdAttributeNS(null, "ID", true);  
         
         XMLSignature sig = new XMLSignature(newDoc, "", sigAlgo);
         newDoc.appendChild(sig.getElement());
@@ -184,7 +185,8 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         Document newDoc = DOMUtils.createDocument();
         doc.removeChild(docEl);
         newDoc.adoptNode(docEl);
-        docEl.setAttribute("ID", id);
+        docEl.setAttributeNS(null, "ID", id);
+        docEl.setIdAttributeNS(null, "ID", true);  
         
         Element root = newDoc.createElementNS(envelopeQName.getNamespaceURI(), 
                 envelopeQName.getPrefix() + ":" + envelopeQName.getLocalPart());
@@ -205,7 +207,8 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             String id, 
             String referenceURI,
             String sigAlgo) throws Exception {
-        doc.getDocumentElement().setAttribute("ID", id);    
+        doc.getDocumentElement().setAttributeNS(null, "ID", id);
+        doc.getDocumentElement().setIdAttributeNS(null, "ID", true);    
     
         XMLSignature sig = new XMLSignature(doc, "", sigAlgo);
         doc.getDocumentElement().appendChild(sig.getElement());
