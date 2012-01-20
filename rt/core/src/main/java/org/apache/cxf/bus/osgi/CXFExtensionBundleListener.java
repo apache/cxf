@@ -115,7 +115,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             if (clazz == null) {
                 try {
                     clazz = bundle.loadClass(className);
-                } catch (ClassNotFoundException e) {
+                } catch (Throwable e) {
                     //ignore, fall to super
                 }
             }
@@ -125,7 +125,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         public Class<?> loadInterface(ClassLoader cl) {
             try {
                 return bundle.loadClass(interfaceName);
-            } catch (ClassNotFoundException e) {
+            } catch (Throwable e) {
                 //ignore, fall to super
             }
             return super.loadInterface(cl);
