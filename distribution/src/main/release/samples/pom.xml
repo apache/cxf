@@ -91,6 +91,9 @@
         <module>ws_notification</module>
         <module>sts</module>
 
+        <!--module>jax_rs/minimal_osgi</module>
+        <module>oauth/server</module>
+        <module>oauth/client</module-->
 
         <!--
         these are a bit fragile as they need to go off to external sites to get stuff like
