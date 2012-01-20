@@ -44,10 +44,8 @@ is defined by the combination of URI and HTTP method. Once a client has obtained
 it may cache it. JAX-RS, on the other hand, defines a resource as:
 <ul>
 <li>URI</li>
-<li>method</li>
-<li>Accepts</li>
-<li>Accepts-Language</li>
-<li>Content-Type</li>
+<li>HTTP Method</li>
+<li>Content-Type and Accept HTTP headers</li>
 </ul>
 The logical place, in other words, to specify CORS policy in a JAX-RS application is at the level of an annotated method. However, each method is
 applied to the narrow 'resource' defined by the list above, not just the URI+Method pair. This will motivate the annotation model below. 
@@ -67,12 +65,6 @@ resource access models above makes it impossible for CXF to map the OPTIONS requ
 <p>
 If all the methods of a class can share a common policy, you can attach a single @{@link CrossOriginResourceSharing} 
 to a resource class, and it will apply to all the resource implied by all of the methods.
-</p>
-<p>
-If you need finer control, you can use @{@link CrossOriginResourceSharingPaths} at the class level. This annotation contains a list of 
-@{@link CrossOriginResourceSharing} annotations. In the nested annotations, you add <tt>path = "/localResourcePath"</tt> to associate the 
-annotation with a path. The filter will find the annotation based on path, and then allow (or forbid) based on the method
-as compared to the <tt>allowedMethods</tt>.
 </p>
 <h2>Bean Configuration</h2>
 <p>
