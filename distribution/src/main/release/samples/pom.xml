@@ -48,6 +48,7 @@
         <module>jax_rs/content_negotiation</module>
         <module>jax_rs/basic_https</module>
         <module>jax_rs/basic</module>
+        <module>jax_rs/minimal_osgi</module>
         <module>callback</module>
         <module>wsdl_first_pure_xml</module>
         <module>jaxws_dispatch_provider</module>
@@ -91,6 +92,8 @@
         <module>ws_notification</module>
         <module>sts</module>
 
+        <module>oauth/server</module>
+        <module>oauth/client</module>
 
         <!--
         these are a bit fragile as they need to go off to external sites to get stuff like
