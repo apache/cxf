@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf.services.sts</groupId>
     <artifactId>cxf-services-sts</artifactId>
     <packaging>pom</packaging>
-    <version>2.5.3-SNAPSHOT</version>
+    <version>2.5.2</version>
     <name>Apache CXF STS service</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf.services</groupId>
         <artifactId>cxf-services</artifactId>
-        <version>2.5.3-SNAPSHOT</version>
+        <version>2.5.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
