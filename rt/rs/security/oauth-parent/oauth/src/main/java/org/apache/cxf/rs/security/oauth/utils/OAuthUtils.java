@@ -201,7 +201,7 @@ public final class OAuthUtils {
                 scopeList.add(token);
             }
         }
-        if (defaultValue != null) {
+        if (defaultValue != null && !scopeList.contains(defaultValue)) {
             scopeList.add(defaultValue);
         }
         return scopeList;

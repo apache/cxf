@@ -19,11 +19,17 @@
 package org.apache.cxf.rs.security.oauth.filters;
 
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
@@ -38,6 +44,7 @@ import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.UserSubject;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
+import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
@@ -56,6 +63,14 @@ public class AbstractAuthFilter {
             OAuth.OAUTH_TIMESTAMP,
             OAuth.OAUTH_NONCE
         };
+    
+    private static final Set<String> ALLOWED_OAUTH_PARAMETERS;
+    static {
+        ALLOWED_OAUTH_PARAMETERS = new HashSet<String>();
+        ALLOWED_OAUTH_PARAMETERS.addAll(Arrays.asList(REQUIRED_PARAMETERS));
+        ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.X_OAUTH_SCOPE);
+        ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.X_OAUTH_URI);
+    }
     
     private OAuthDataProvider dataProvider;
 
@@ -90,7 +105,8 @@ public class AbstractAuthFilter {
         AccessToken accessToken = null;
         Client client = null;
         
-        OAuthMessage oAuthMessage = OAuthServlet.getMessage(req, req.getRequestURL().toString());
+        OAuthMessage oAuthMessage = OAuthServlet.getMessage(new CustomHttpServletWrapper(req), 
+                                                            OAuthServlet.getRequestURL(req));
         if (oAuthMessage.getParameter(OAuth.OAUTH_TOKEN) != null) {
             oAuthMessage.requireParameters(REQUIRED_PARAMETERS);
 
@@ -204,5 +220,25 @@ public class AbstractAuthFilter {
             subject = info.getToken().getSubject();
         }
         return new OAuthContext(subject, info.getPermissions());
+    }
+    
+    private static class CustomHttpServletWrapper extends HttpServletRequestWrapper {
+        public CustomHttpServletWrapper(HttpServletRequest req) {
+            super(req);
+        }
+        
+        public Map<String, String[]> getParameterMap() {
+            Map<String, String[]> params = super.getParameterMap();
+            if (ALLOWED_OAUTH_PARAMETERS.containsAll(params.keySet())) {
+                return params;
+            }
+            Map<String, String[]> newParams = new HashMap<String, String[]>();
+            for (Map.Entry<String, String[]> entry : params.entrySet()) {
+                if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())) {    
+                    newParams.put(entry.getKey(), entry.getValue());
+                }
+            }
+            return newParams;
+        }
     }
 }

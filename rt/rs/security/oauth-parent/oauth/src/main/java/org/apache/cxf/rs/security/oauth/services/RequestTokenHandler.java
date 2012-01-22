@@ -67,12 +67,7 @@ public class RequestTokenHandler {
                 .getClient(oAuthMessage.getParameter(OAuth.OAUTH_CONSUMER_KEY));
             //client credentials not found
             if (client == null) {
-                OAuthProblemException problemEx = new OAuthProblemException(
-                    OAuth.Problems.CONSUMER_KEY_UNKNOWN);
-                problemEx
-                    .setParameter(OAuthProblemException.HTTP_STATUS_CODE,
-                        HttpServletResponse.SC_UNAUTHORIZED);
-                throw problemEx;
+                throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
             }
 
             OAuthUtils.validateMessage(oAuthMessage, client, null, dataProvider);
@@ -112,8 +107,11 @@ public class RequestTokenHandler {
             if (LOG.isLoggable(Level.WARNING)) {
                 LOG.log(Level.WARNING, "An OAuth-related problem: {0}", new Object[] {e.fillInStackTrace()});
             }
-            return OAuthUtils.handleException(e, e.getHttpStatusCode(),
-                String.valueOf(e.getParameters().get("realm")));
+            int code = e.getHttpStatusCode();
+            if (code == 200) {
+                code = HttpServletResponse.SC_UNAUTHORIZED; 
+            }
+            return OAuthUtils.handleException(e, code, String.valueOf(e.getParameters().get("realm")));
         } catch (Exception e) {
             if (LOG.isLoggable(Level.SEVERE)) {
                 LOG.log(Level.SEVERE, "Unexpected internal server exception: {0}",

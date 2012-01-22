@@ -30,8 +30,8 @@ public class OAuthPermission extends Permission {
     private List<String> uri = Collections.emptyList();
     private boolean authorizationKeyRequired = true;
     
-    public OAuthPermission(String permission, String description, String role) {
-        this(permission, description, Collections.singletonList(role));
+    public OAuthPermission(String permission, String description) {
+        super(permission, description);
     }
     
     public OAuthPermission(String permission, String description, List<String> roles) {
