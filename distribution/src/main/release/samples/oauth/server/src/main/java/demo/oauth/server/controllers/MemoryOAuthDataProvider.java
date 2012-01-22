@@ -20,6 +20,7 @@
 package demo.oauth.server.controllers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,9 +53,10 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     static {
         AVAILABLE_PERMISSIONS
                 .put("read_info", new OAuthPermission("read_info", "Read your personal information",
-                        "ROLE_USER"));
+                                                      Collections.singletonList("ROLE_USER")));
         AVAILABLE_PERMISSIONS.put("modify_info",
-                new OAuthPermission("modify_info", "Modify your personal information", "ROLE_ADMIN"));
+                new OAuthPermission("modify_info", "Modify your personal information", 
+                                    Collections.singletonList("ROLE_ADMIN")));
     }
 
     protected ConcurrentHashMap<String, Client> clientAuthInfo = new ConcurrentHashMap<String, Client>();

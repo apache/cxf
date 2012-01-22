@@ -161,7 +161,16 @@ public final class OAuthClientUtils {
             String method, String requestURI, Map<String, String> parameters) {
         try {
             OAuthMessage msg = accessor.newRequestMessage(method, requestURI, parameters.entrySet());
-            return msg.getAuthorizationHeader(null);
+            StringBuilder sb = new StringBuilder();
+            sb.append(msg.getAuthorizationHeader(null));
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                if (!entry.getKey().startsWith("oauth_")) {
+                    sb.append(", ");
+                    sb.append(OAuth.percentEncode(entry.getKey())).append("=\"");
+                    sb.append(OAuth.percentEncode(entry.getValue())).append('"');
+                }
+            }
+            return sb.toString();
         } catch (Exception ex) {
             throw new ClientWebApplicationException(ex);
         }
