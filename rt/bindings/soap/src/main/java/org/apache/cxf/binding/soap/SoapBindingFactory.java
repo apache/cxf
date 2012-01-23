@@ -394,7 +394,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         
         sb.getOutInterceptors().add(new AttachmentOutInterceptor());
         sb.getOutInterceptors().add(new StaxOutInterceptor());
-        sb.getOutInterceptors().add(new SoapHeaderOutFilterInterceptor());
+        sb.getOutInterceptors().add(SoapHeaderOutFilterInterceptor.INSTANCE);
 
         if (SoapBindingConstants.BINDING_STYLE_RPC.equalsIgnoreCase(bindingStyle)) {
             sb.getInInterceptors().add(new RPCInInterceptor());
@@ -422,6 +422,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         sb.getOutInterceptors().add(new SoapPreProtocolOutInterceptor());
         sb.getOutInterceptors().add(new SoapOutInterceptor(getBus()));
         sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
+        sb.getOutFaultInterceptors().add(SoapHeaderOutFilterInterceptor.INSTANCE);
 
         // REVISIT: The phase interceptor chain seems to freak out if this added
         // first. Not sure what the deal is at the moment, I suspect the
