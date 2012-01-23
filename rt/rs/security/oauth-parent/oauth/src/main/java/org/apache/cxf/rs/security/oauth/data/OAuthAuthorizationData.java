@@ -38,8 +38,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String applicationURI;
     private String replyTo;
     private List<? extends Permission> permissions;
-    private List<String> uris;
-
+    
     public OAuthAuthorizationData() {
     }
 
@@ -69,14 +68,6 @@ public class OAuthAuthorizationData implements Serializable {
 
     public void setPermissions(List<? extends Permission> permissions) {
         this.permissions = permissions;
-    }
-
-    public void setUris(List<String> uris) {
-        this.uris = uris;
-    }
-
-    public List<String> getUris() {
-        return uris;
     }
 
     public void setAuthenticityToken(String authenticityToken) {

@@ -92,15 +92,6 @@ public final class OAuthUtils {
         return scopes;
     }
     
-    public static List<String> getAllUris(Client client, Token token) {
-        List<String> uris = new LinkedList<String>();
-        if (token != null) {
-            uris.addAll(token.getUris());
-        }
-        uris.addAll(client.getUris());
-        return uris;
-    }
-    
     public static void validateMessage(OAuthMessage oAuthMessage, 
                                        Client client, 
                                        Token token,

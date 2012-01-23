@@ -31,7 +31,6 @@ public class Client {
     
     private String loginName;
         
-    private List<String> uris = Collections.emptyList();
     private List<OAuthPermission> scopes = Collections.emptyList();
 
     public Client(String consumerId, 
@@ -130,22 +129,6 @@ public class Client {
      */
     public void setScopes(List<OAuthPermission> scopes) {
         this.scopes = scopes;
-    }
-    
-    /**
-     * Returns a list of relative URIs the consumer wishes to access
-     * @return the uris
-     */
-    public List<String> getUris() {
-        return uris;
-    }
-
-    /**
-     * Sets a list of relative URIs the consumer wishes to access
-     * @param uris the uris
-     */
-    public void setUris(List<String> uris) {
-        this.uris = uris;
     }
     
     @Override

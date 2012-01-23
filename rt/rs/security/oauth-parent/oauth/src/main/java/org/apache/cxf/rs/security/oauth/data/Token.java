@@ -32,7 +32,6 @@ public abstract class Token {
     private long lifetime = -1;
     private Client client;
     private List<OAuthPermission> scopes = Collections.emptyList();
-    private List<String> uris = Collections.emptyList();
     private UserSubject subject;
     
     protected Token(Client client, String tokenKey,
@@ -98,22 +97,6 @@ public abstract class Token {
      */
     public void setScopes(List<OAuthPermission> scopes) {
         this.scopes = scopes;
-    }
-    
-    /**
-     * Returns a list of relative URIs the consumer wishes to access
-     * @return the uris
-     */
-    public List<String> getUris() {
-        return uris;
-    }
-
-    /**
-     * Sets a list of relative URIs the consumer wishes to access
-     * @param uris the uris
-     */
-    public void setUris(List<String> uris) {
-        this.uris = uris;
     }
     
     /**

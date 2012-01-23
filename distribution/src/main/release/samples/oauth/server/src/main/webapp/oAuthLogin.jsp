@@ -50,16 +50,15 @@ under the License.
                             the
                             ability to access and update your data on Sample OAuth CXF server:
                             <br/></p>
-                        <b>Scopes:</b>
-                        <c:forEach items="${oauthauthorizationdata.uris}" var="uri">
-                            <li>${uri}</li>
-                        </c:forEach>
-
                         <br/>
                         <b>Permissions:</b>
 
                         <c:forEach items="${oauthauthorizationdata.permissions}" var="permission">
                             <li>${permission.description}</li>
+                            URIs:
+                            <c:forEach items="${permission.uris}" var="uri">
+                               <li>${uri}</li>
+                            </c:forEach>
                         </c:forEach>
                         <br/>
                         Please ensure that you trust this website with your information before

@@ -25,9 +25,11 @@ import java.util.List;
  * Provides the complete information about a given opaque permission.
  */
 public class OAuthPermission extends Permission {
+    private String subjectName;
     private List<String> roles = Collections.emptyList();
+    
     private List<String> httpVerbs = Collections.emptyList();
-    private List<String> uri = Collections.emptyList();
+    private List<String> uris = Collections.emptyList();
     private boolean authorizationKeyRequired = true;
     
     public OAuthPermission(String permission, String description) {
@@ -38,53 +40,45 @@ public class OAuthPermission extends Permission {
         super(permission, description);
         this.roles = roles;
     }
-    
-    public OAuthPermission(String permission, String description, 
-                           List<String> roles, List<String> httpVerbs) {
-        this(permission, description, roles);
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setHttpVerbs(List<String> httpVerbs) {
         this.httpVerbs = httpVerbs;
     }
-    
-    public OAuthPermission(String permission, 
-                           String description, 
-                           List<String> roles, 
-                           List<String> httpVerbs, 
-                           List<String> uris,
-                           boolean authorizeKeyRequired) {
-        this(permission, description, roles, httpVerbs);
-        this.uri = uris;
-        this.authorizationKeyRequired = authorizeKeyRequired;
-    }
-    
-    /**
-     * Returns an optional list of role names
-     * @return the roles
-     */
-    public List<String> getRoles() {
-        return Collections.unmodifiableList(roles);
-    }
 
-    /**
-     * Returns an optional list of HTTP verbs
-     * @return the list of verbs
-     */
     public List<String> getHttpVerbs() {
-        return Collections.unmodifiableList(httpVerbs);
+        return httpVerbs;
     }
 
-    /**
-     * Returns an optional list of URI    
-     * @return the uri
-     */
+    public void setUris(List<String> uri) {
+        this.uris = uri;
+    }
+
     public List<String> getUris() {
-        return Collections.unmodifiableList(uri);
+        return uris;
     }
 
-    /**
-     * Indicates if the access token must be present or not
-     * @return the boolean value
-     */
+    public void setAuthorizationKeyRequired(boolean authorizationKeyRequired) {
+        this.authorizationKeyRequired = authorizationKeyRequired;
+    }
+
     public boolean isAuthorizationKeyRequired() {
         return authorizationKeyRequired;
     }
+    
 }
