@@ -96,8 +96,8 @@ public class AuthorizationRequestHandler {
                         roleNames.add(p.getName());
                     }
                 }
-                token.setSubject(new UserSubject(sc.getUserPrincipal().getName(),
-                                                 roleNames));
+                token.setSubject(new UserSubject(sc.getUserPrincipal() == null 
+                    ? null : sc.getUserPrincipal().getName(), roleNames));
                 
                 String verifier = dataProvider.setRequestTokenVerifier(token);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
@@ -157,7 +157,6 @@ public class AuthorizationRequestHandler {
         secData.setApplicationURI(token.getClient().getApplicationURI());
         
         secData.setPermissions(OAuthUtils.getAllScopes(token.getClient(), token));
-        secData.setUris(OAuthUtils.getAllUris(token.getClient(), token));
         
         return secData;
     }

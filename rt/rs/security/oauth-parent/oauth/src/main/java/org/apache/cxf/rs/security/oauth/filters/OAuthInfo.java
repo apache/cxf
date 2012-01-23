@@ -32,15 +32,12 @@ public class OAuthInfo {
     private Client client;
     private AccessToken token;
     private List<OAuthPermission> permissions;
-    private boolean useUserSubject;
     public OAuthInfo(Client client, 
                      AccessToken token, 
-                     List<OAuthPermission> permissions,
-                     boolean useUserSubject) {
+                     List<OAuthPermission> permissions) {
         this.client = client;
         this.token = token;
         this.permissions = permissions;
-        this.useUserSubject = useUserSubject;
     }
     public Client getClient() {
         return client;
@@ -61,8 +58,5 @@ public class OAuthInfo {
         return permissions;
     }
     
-    public boolean useUserSubject() {
-        return useUserSubject;
-    }
-    
+        
 }

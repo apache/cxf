@@ -96,7 +96,6 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         RequestToken reqToken = new RequestToken(reg.getClient(), token, tokenSecret, 
                                                  reg.getLifetime(), reg.getIssuedAt());
         reqToken.setScopes(getPermissionsInfo(reg.getScopes()));
-        reqToken.setUris(reg.getUris());
         reqToken.setCallback(reg.getCallback());
         oauthTokens.put(token, reqToken);
         return reqToken;
@@ -132,8 +131,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
             tokenSecretString, 3600, System.currentTimeMillis() / 1000);
 
         accessToken.setScopes(requestToken.getScopes());
-        accessToken.setUris(requestToken.getUris());
-
+ 
         synchronized (oauthTokens) {
             oauthTokens.remove(requestToken.getTokenKey());
             oauthTokens.put(accessTokenString, accessToken);
