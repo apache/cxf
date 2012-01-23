@@ -70,7 +70,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         clientAuthInfo.put(OAuthTestUtils.CLIENT_ID, client);
     }
     
-    public List<OAuthPermission> getPermissionsInfo(List<String> requestPermissions) {
+    private List<OAuthPermission> getPermissionsInfo(List<String> requestPermissions) {
         List<OAuthPermission> permissions = new ArrayList<OAuthPermission>();
         for (String requestScope : requestPermissions) {
             OAuthPermission oAuthPermission = AVAILABLE_PERMISSIONS.get(requestScope);
@@ -90,7 +90,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
 
         RequestToken reqToken = new RequestToken(reg.getClient(), token, tokenSecret, 
                                                  reg.getLifetime(), reg.getIssuedAt());
-        reqToken.setScopes(reg.getScopes());
+        reqToken.setScopes(getPermissionsInfo(reg.getScopes()));
         reqToken.setUris(reg.getUris());
         
         oauthTokens.put(token, reqToken);
