@@ -137,8 +137,7 @@ public class AbstractAuthFilter {
         //check valid URI
         checkRequestURI(req, OAuthUtils.getAllUris(client, accessToken));
         
-        List<OAuthPermission> permissions = dataProvider.getPermissionsInfo(
-                OAuthUtils.getAllScopes(client, accessToken));
+        List<OAuthPermission> permissions = OAuthUtils.getAllScopes(client, accessToken);
         
         for (OAuthPermission perm : permissions) {
             checkRequestURI(req, perm.getUris());
