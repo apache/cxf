@@ -85,7 +85,7 @@ public final class Client {
 
         } catch (UndeclaredThrowableException ex) {
             ex.getUndeclaredThrowable().printStackTrace();
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             ex.printStackTrace();
         }  finally {
             System.exit(0);
