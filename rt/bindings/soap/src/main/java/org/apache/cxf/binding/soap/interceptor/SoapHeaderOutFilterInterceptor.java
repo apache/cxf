@@ -27,6 +27,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 
 public class SoapHeaderOutFilterInterceptor extends AbstractSoapInterceptor {
+    public static final SoapHeaderOutFilterInterceptor INSTANCE = new SoapHeaderOutFilterInterceptor();
     
     public SoapHeaderOutFilterInterceptor()  {
         super(Phase.PRE_LOGICAL);
