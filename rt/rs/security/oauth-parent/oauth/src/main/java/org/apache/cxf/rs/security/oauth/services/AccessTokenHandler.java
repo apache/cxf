@@ -33,6 +33,7 @@ import net.oauth.OAuthProblemException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
+import org.apache.cxf.rs.security.oauth.data.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
@@ -70,7 +71,9 @@ public class AccessTokenHandler {
             OAuthUtils.validateMessage(oAuthMessage, requestToken.getClient(), requestToken,
                                        dataProvider);
 
-            AccessToken accessToken = dataProvider.createAccessToken(requestToken);
+            AccessTokenRegistration reg = new AccessTokenRegistration();
+            reg.setRequestToken(requestToken);
+            AccessToken accessToken = dataProvider.createAccessToken(reg);
 
             //create response
             Map<String, Object> responseParams = new HashMap<String, Object>();
