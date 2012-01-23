@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImpl;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImplService;
@@ -44,7 +45,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
     @Test
@@ -171,5 +172,24 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("Unexpected wrapper"));
         }
+    }
+    
+    @Test
+    public void testFaultFromNonAddressService() throws Exception {
+        new LoggingFeature().initialize(this.getBus());
+        AddNumberImpl port = getPort();
+        java.util.Map<String, Object> requestContext = ((BindingProvider)port).getRequestContext();
+        requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                           "http://localhost:" + PORT + "/AddNumberImplPort-noaddr");
+        
+        long start = System.currentTimeMillis();
+        port.addNumbers(1, 2);
+        try {
+            port.addNumbers3(-1, -1);
+        } catch (Exception ex) {
+            //ignore, expected
+        }
+        long end = System.currentTimeMillis();
+        assertTrue((end - start) < 50000);
     }
 }

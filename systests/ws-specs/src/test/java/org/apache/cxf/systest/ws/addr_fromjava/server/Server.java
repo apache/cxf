@@ -29,11 +29,13 @@ public class Server extends AbstractBusTestServerBase {
     protected void run() {
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/AddNumberImplPort";
-        
         EndpointImpl ep = new EndpointImpl(implementor);
-
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
+        
+        ep = new EndpointImpl(new AddNumberImplNoAddr());
+        ep.publish(address + "-noaddr");
+        
     }
 
     public static void main(String[] args) {

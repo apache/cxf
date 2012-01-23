@@ -820,7 +820,8 @@ public class ClientImpl
             }
         } finally {
             synchronized (message.getExchange()) {
-                if (!isPartialResponse(message) && callback == null) {
+                if ((!isPartialResponse(message) && callback == null) 
+                    || message.getContent(Exception.class) != null) {
                     message.getExchange().put(FINISHED, Boolean.TRUE);
                     message.getExchange().setInMessage(message);
                     message.getExchange().notifyAll();
