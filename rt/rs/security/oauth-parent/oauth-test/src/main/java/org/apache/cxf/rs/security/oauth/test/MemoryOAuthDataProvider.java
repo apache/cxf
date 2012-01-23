@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
+import org.apache.cxf.rs.security.oauth.data.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
@@ -108,9 +109,11 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         return requestToken.getVerifier();
     }
 
-    public AccessToken createAccessToken(RequestToken requestToken) throws
+    public AccessToken createAccessToken(AccessTokenRegistration reg) throws
             OAuthServiceException {
 
+        RequestToken requestToken = reg.getRequestToken();
+        
         Client client = requestToken.getClient();
         requestToken = getRequestToken(requestToken.getTokenKey());
 
