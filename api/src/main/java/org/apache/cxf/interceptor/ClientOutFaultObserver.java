@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
-import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -55,7 +55,7 @@ public class ClientOutFaultObserver extends AbstractFaultChainInitiatorObserver 
         if (callback != null) {
             Map<String, Object> resCtx = CastUtils.cast((Map<?, ?>) m.getExchange().getOutMessage().get(
                     Message.INVOCATION_CONTEXT));
-            resCtx = CastUtils.cast((Map<?, ?>) resCtx.get(ClientImpl.RESPONSE_CONTEXT));
+            resCtx = CastUtils.cast((Map<?, ?>) resCtx.get(Client.RESPONSE_CONTEXT));
             callback.handleException(resCtx, ex);
         }
     }
