@@ -326,11 +326,16 @@ public class WadlGenerator implements RequestHandler {
     }
 
     private String getPath(String path) {
+        String thePath = null;
         if (ignoreForwardSlash && path.startsWith("/") && path.length() > 0) {
-            return path.substring(1);
+            thePath = path.substring(1);
         } else {
-            return path;
+            thePath = path;
         }
+        if (thePath.contains("&")) {
+            thePath = thePath.replace("&", "&amp;");
+        }
+        return thePath;
     }
     
     private void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {

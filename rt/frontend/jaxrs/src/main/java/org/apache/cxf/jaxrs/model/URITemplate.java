@@ -40,7 +40,7 @@ public final class URITemplate {
     public static final String LIMITED_REGEX_SUFFIX = "(/.*)?";
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
-    private static final String CHARACTERS_TO_ESCAPE = ".*+";
+    private static final String CHARACTERS_TO_ESCAPE = ".*+$()";
     private static final String SLASH = "/";
     private static final String SLASH_QUOTE = "/;";
     

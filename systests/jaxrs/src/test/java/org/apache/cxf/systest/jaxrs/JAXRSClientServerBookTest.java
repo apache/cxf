@@ -80,6 +80,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testWithComplexPath() {
+        WebClient wc = 
+            WebClient.create("http://localhost:" + PORT + "/bookstore/allCharsButA-B/:@!$&'()*+,;=-._~");
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals("Encoded Path", book.getName());
+    }
+    
+    @Test
     public void testMalformedAcceptType() {
         WebClient wc = 
             WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
