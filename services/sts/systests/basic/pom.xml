@@ -83,6 +83,21 @@
            <artifactId>slf4j-jdk14</artifactId>
            <scope>runtime</scope>
        </dependency>
+       <dependency>
+           <groupId>net.sf.ehcache</groupId>
+           <artifactId>ehcache-core</artifactId>
+           <version>${cxf.ehcache.version}</version>
+       </dependency>
+       <dependency>
+          <groupId>org.springframework.ldap</groupId>
+          <artifactId>spring-ldap-core</artifactId>
+          <version>${cxf.spring.ldap.version}</version>
+       </dependency>
+       <dependency>
+          <groupId>com.hazelcast</groupId>
+          <artifactId>hazelcast</artifactId>
+          <version>${cxf.hazelcast.version}</version>
+       </dependency> 
     </dependencies>
 
     <build>

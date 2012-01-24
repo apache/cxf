@@ -160,6 +160,21 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+           <groupId>net.sf.ehcache</groupId>
+           <artifactId>ehcache-core</artifactId>
+           <version>${cxf.ehcache.version}</version>
+       </dependency>
+       <dependency>
+          <groupId>org.springframework.ldap</groupId>
+          <artifactId>spring-ldap-core</artifactId>
+          <version>${cxf.spring.ldap.version}</version>
+       </dependency>
+       <dependency>
+          <groupId>com.hazelcast</groupId>
+          <artifactId>hazelcast</artifactId>
+          <version>${cxf.hazelcast.version}</version>
+       </dependency> 
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
             <version>${project.version}</version>
