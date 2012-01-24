@@ -26,6 +26,8 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.managers.ConduitInitiatorManagerImpl;
+import org.apache.cxf.bus.managers.DestinationFactoryManagerImpl;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
@@ -37,9 +39,7 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
 import org.apache.cxf.transport.ConduitInitiatorManager;
-import org.apache.cxf.transport.ConduitInitiatorManagerImpl;
 import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.transport.DestinationFactoryManagerImpl;
 
 /**
  * This bus uses CXF's built in extension manager to load components

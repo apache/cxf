@@ -42,7 +42,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseChainCache;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 
 public class ChainInitiationObserver implements MessageObserver {
@@ -159,7 +158,7 @@ public class ChainInitiationObserver implements MessageObserver {
         if (exchange.getDestination() == null) {
             exchange.setDestination(m.getDestination());
         }
-        if (endpoint != null && (endpoint.getService() instanceof ServiceImpl)) {
+        if (endpoint != null && endpoint.getService() != null) {
 
             EndpointInfo endpointInfo = endpoint.getEndpointInfo();
 

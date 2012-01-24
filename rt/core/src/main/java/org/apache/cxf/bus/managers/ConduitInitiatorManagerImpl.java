@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport;
+package org.apache.cxf.bus.managers;
 
 import java.util.Map;
 
@@ -35,6 +35,9 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.spring.MapProvider;
+import org.apache.cxf.transport.ConduitInitiator;
+import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.transport.TransportFinder;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManager {

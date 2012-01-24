@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport;
+package org.apache.cxf.bus.managers;
 
 import java.util.Map;
 import java.util.Properties;
@@ -34,6 +34,9 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.spring.MapProvider;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.TransportFinder;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public final class DestinationFactoryManagerImpl implements DestinationFactoryManager {
