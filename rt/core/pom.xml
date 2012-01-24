@@ -35,7 +35,6 @@
 
     <properties>
         <cxf.bundle.activator>org.apache.cxf.bus.osgi.CXFActivator</cxf.bundle.activator>
-        <cxf.osgi.symbolic.name>${project.groupId}.bundle</cxf.osgi.symbolic.name>
 
         <cxf.osgi.import>
             org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",

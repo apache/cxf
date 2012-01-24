@@ -36,6 +36,10 @@
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
         </cxf.osgi.import>
+        <cxf.osgi.export>
+            '=META-INF.cxf.osgi',
+            org.apache.cxf.*,
+        </cxf.osgi.export>
     </properties>
 
     <dependencies>
