@@ -38,6 +38,7 @@ import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.saml.ext.SAMLCallback;
+import org.apache.ws.security.saml.ext.bean.ActionBean;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
@@ -121,6 +122,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 
                 AuthDecisionStatementBean authDecBean = new AuthDecisionStatementBean();
                 authDecBean.setDecision(Decision.INDETERMINATE);
+                authDecBean.setResource("https://sp.example.com/SAML2");
+                ActionBean actionBean = new ActionBean();
+                actionBean.setContents("Read");
+                authDecBean.setActions(Collections.singletonList(actionBean));
                 callback.setAuthDecisionStatementData(Collections.singletonList(authDecBean));
                 
                 AuthenticationStatementBean authBean = new AuthenticationStatementBean();
@@ -154,6 +159,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 }
                 
                 AttributeBean authClaim = new AttributeBean();
+                authClaim.setSimpleName("http://claims/authentication");
                 authClaim.setQualifiedName("http://claims/authentication");
                 authClaim.setNameFormat("http://claims/authentication-format");
                 authClaim.setAttributeValues(authMethods);

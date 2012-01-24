@@ -92,11 +92,14 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             callback.setAuthenticationStatementData(Collections.singletonList(authBean));
         } else if (statement == Statement.ATTR) {
             AttributeStatementBean attrBean = new AttributeStatementBean();
+            AttributeBean attributeBean = new AttributeBean();
             if (subjectBean != null) {
                 attrBean.setSubject(subjectBean);
+                attributeBean.setSimpleName("role");
+                attributeBean.setQualifiedName("http://custom-ns");
+            } else {
+                attributeBean.setQualifiedName("role");
             }
-            AttributeBean attributeBean = new AttributeBean();
-            attributeBean.setSimpleName("role");
             attributeBean.setAttributeValues(Collections.singletonList("user"));
             attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             callback.setAttributeStatementData(Collections.singletonList(attrBean));

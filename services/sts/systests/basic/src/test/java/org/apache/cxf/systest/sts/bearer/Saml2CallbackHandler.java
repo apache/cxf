@@ -57,7 +57,7 @@ public class Saml2CallbackHandler implements CallbackHandler {
                     attrBean.setSubject(subjectBean);
                 }
                 AttributeBean attributeBean = new AttributeBean();
-                attributeBean.setSimpleName("role");
+                attributeBean.setQualifiedName("role");
                 attributeBean.setAttributeValues(Collections.singletonList("user"));
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
