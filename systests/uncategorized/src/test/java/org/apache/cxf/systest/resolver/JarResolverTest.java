@@ -24,8 +24,8 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
+import org.apache.cxf.bus.managers.ServiceContractResolverRegistryImpl;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
-import org.apache.cxf.endpoint.ServiceContractResolverRegistryImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.BeforeClass;

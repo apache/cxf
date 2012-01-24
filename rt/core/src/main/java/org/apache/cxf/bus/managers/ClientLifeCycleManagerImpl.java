@@ -17,55 +17,59 @@
  * under the License.
  */
 
-package org.apache.cxf.endpoint;
+package org.apache.cxf.bus.managers;
 
 import java.util.Collection;
-
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientLifeCycleListener;
+import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.extension.BusExtension;
 
 @NoJSR250Annotations
-public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusExtension {
+public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusExtension {
     
-    private CopyOnWriteArrayList<ServerLifeCycleListener> listeners = 
-            new CopyOnWriteArrayList<ServerLifeCycleListener>();
+    private CopyOnWriteArrayList<ClientLifeCycleListener> listeners 
+        = new CopyOnWriteArrayList<ClientLifeCycleListener>(); 
 
-    public ServerLifeCycleManagerImpl() {
+    public ClientLifeCycleManagerImpl() {
         
     }
-    public ServerLifeCycleManagerImpl(Bus b) {
-        Collection<? extends ServerLifeCycleListener> l = b.getExtension(ConfiguredBeanLocator.class)
-                .getBeansOfType(ServerLifeCycleListener.class);
+    
+    public ClientLifeCycleManagerImpl(Bus b) {
+        Collection<? extends ClientLifeCycleListener> l = b.getExtension(ConfiguredBeanLocator.class)
+                .getBeansOfType(ClientLifeCycleListener.class);
         if (l != null) {
             listeners.addAll(l);
         }
     }
+    
     public Class<?> getRegistrationType() {
-        return ServerLifeCycleManager.class;
+        return ClientLifeCycleManager.class;
     }
 
-    
-    public synchronized void registerListener(ServerLifeCycleListener listener) {
+    public void registerListener(ClientLifeCycleListener listener) {
         listeners.addIfAbsent(listener);
     }
 
-    public void startServer(Server server) {
-        for (ServerLifeCycleListener listener : listeners) {
-            listener.startServer(server);
+    public void clientCreated(Client client) {
+        for (ClientLifeCycleListener listener : listeners) {
+            listener.clientCreated(client);
         }
     }
 
-    public void stopServer(Server server) {
-        for (ServerLifeCycleListener listener : listeners) {
-            listener.stopServer(server);
+    public void clientDestroyed(Client client) {
+        for (ClientLifeCycleListener listener : listeners) {
+            listener.clientDestroyed(client);
         }
     }
 
-    public synchronized void unRegisterListener(ServerLifeCycleListener listener) {
+    public void unRegisterListener(ClientLifeCycleListener listener) {
         listeners.remove(listener);
     }
+
 }

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.endpoint;
 
+import org.apache.cxf.bus.managers.ServerRegistryImpl;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 

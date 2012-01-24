@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.endpoint;
+package org.apache.cxf.bus.managers;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -29,6 +29,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.endpoint.ServerRegistry;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener {

@@ -17,25 +17,35 @@
  * under the License.
  */
 
-package org.apache.cxf.endpoint;
+package org.apache.cxf.wsdl11;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.net.URL;
 
-public class ServerRegistryImpTest extends Assert {
+import javax.xml.namespace.QName;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.service.Service;
+import org.apache.cxf.wsdl.WSDLServiceFactory;
+
+/**
+ * 
+ */
+@NoJSR250Annotations
+public class WSDLServiceFactoryImpl implements WSDLServiceFactory {
+    Bus bus;
     
-    @Test
-    public void testServerRegistryPreShutdown() {
-        ServerRegistryImpl serverRegistryImpl = new ServerRegistryImpl();        
-        Server server = new DummyServer(serverRegistryImpl);
-        server.start();
-        assertEquals("The serverList should have one service", serverRegistryImpl.serversList.size(), 1);
-        serverRegistryImpl.preShutdown();
-        assertEquals("The serverList should be clear ", serverRegistryImpl.serversList.size(), 0);
-        serverRegistryImpl.postShutdown();
-        assertEquals("The serverList should be clear ", serverRegistryImpl.serversList.size(), 0);
-    }    
+    public WSDLServiceFactoryImpl(Bus b) {
+        bus = b;
+        bus.setExtension(this, WSDLServiceFactory.class);
+    }
     
-    
+    public Service create(URL d) {
+        return new org.apache.cxf.wsdl11.WSDLServiceFactory(bus, d).create();
+    }
+
+    public Service create(URL d, QName serviceName) {
+        return new org.apache.cxf.wsdl11.WSDLServiceFactory(bus, d, serviceName).create();
+    }
 
 }

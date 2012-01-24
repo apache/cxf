@@ -1,14 +1,15 @@
 org.apache.cxf.wsdl11.WSDLManagerImpl:org.apache.cxf.wsdl.WSDLManager:true
+org.apache.cxf.wsdl11.WSDLServiceFactoryImpl:org.apache.cxf.wsdl.WSDLServiceFactory:true
 org.apache.cxf.bus.managers.PhaseManagerImpl:org.apache.cxf.phase.PhaseManager:true
 org.apache.cxf.bus.managers.WorkQueueManagerImpl:org.apache.cxf.workqueue.WorkQueueManager:true
 org.apache.cxf.bus.managers.CXFBusLifeCycleManager:org.apache.cxf.buslifecycle.BusLifeCycleManager:true   	   
-org.apache.cxf.endpoint.ServerRegistryImpl:org.apache.cxf.endpoint.ServerRegistry:true
+org.apache.cxf.bus.managers.ServerRegistryImpl:org.apache.cxf.endpoint.ServerRegistry:true
 org.apache.cxf.transports.http.internal.QueryHandlerRegistryImpl:org.apache.cxf.transports.http.QueryHandlerRegistry:true 
-org.apache.cxf.endpoint.EndpointResolverRegistryImpl:org.apache.cxf.endpoint.EndpointResolverRegistry:true
+org.apache.cxf.bus.managers.EndpointResolverRegistryImpl:org.apache.cxf.endpoint.EndpointResolverRegistry:true
 org.apache.cxf.bus.managers.HeaderManagerImpl:org.apache.cxf.headers.HeaderManager:true
 org.apache.cxf.catalog.OASISCatalogManager:org.apache.cxf.catalog.OASISCatalogManager:true
 org.apache.cxf.service.factory.FactoryBeanListenerManager::true
-org.apache.cxf.endpoint.ServerLifeCycleManagerImpl:org.apache.cxf.endpoint.ServerLifeCycleManager:true
-org.apache.cxf.endpoint.ClientLifeCycleManagerImpl:org.apache.cxf.endpoint.ClientLifeCycleManager:true
+org.apache.cxf.bus.managers.ServerLifeCycleManagerImpl:org.apache.cxf.endpoint.ServerLifeCycleManager:true
+org.apache.cxf.bus.managers.ClientLifeCycleManagerImpl:org.apache.cxf.endpoint.ClientLifeCycleManager:true
 org.apache.cxf.bus.resource.ResourceManagerImpl:org.apache.cxf.resource.ResourceManager:true
 

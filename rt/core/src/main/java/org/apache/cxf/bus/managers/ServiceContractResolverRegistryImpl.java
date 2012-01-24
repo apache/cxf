@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.endpoint;
+package org.apache.cxf.bus.managers;
 
 import java.net.URI;
 import java.util.List;
@@ -27,6 +27,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.endpoint.ServiceContractResolver;
+import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 
 /**
  * A simple contract resolver registry. It maintains a list of contract resolvers in an

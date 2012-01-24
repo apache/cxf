@@ -17,10 +17,11 @@
  * under the License.
  */
 
-package org.apache.cxf.endpoint;
+package org.apache.cxf.bus.managers;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.endpoint.EndpointResolver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;

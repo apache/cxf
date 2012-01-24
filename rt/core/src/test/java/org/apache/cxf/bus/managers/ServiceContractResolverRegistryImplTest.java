@@ -17,13 +17,14 @@
  * under the License.
  */
 
-package org.apache.cxf.endpoint;
+package org.apache.cxf.bus.managers;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.endpoint.ServiceContractResolver;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;

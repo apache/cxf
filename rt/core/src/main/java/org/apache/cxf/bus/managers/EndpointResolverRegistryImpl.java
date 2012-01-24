@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.endpoint;
+package org.apache.cxf.bus.managers;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -26,6 +26,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.endpoint.EndpointResolver;
+import org.apache.cxf.endpoint.EndpointResolverRegistry;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**

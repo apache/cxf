@@ -73,7 +73,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.workqueue.SynchronousExecutor;
-import org.apache.cxf.wsdl11.WSDLServiceFactory;
+import org.apache.cxf.wsdl.WSDLServiceFactory;
 
 public class ClientImpl
     extends AbstractBasicInterceptorProvider
@@ -153,9 +153,9 @@ public class ClientImpl
         this.bus = bus;
         outFaultObserver = new ClientOutFaultObserver(bus);
 
-        WSDLServiceFactory sf = (service == null)
-            ? (new WSDLServiceFactory(bus, wsdlUrl)) : (new WSDLServiceFactory(bus, wsdlUrl, service));
-        Service svc = sf.create();
+        Service svc = service == null 
+            ? bus.getExtension(WSDLServiceFactory.class).create(wsdlUrl)
+                : bus.getExtension(WSDLServiceFactory.class).create(wsdlUrl, service);
         EndpointInfo epfo = findEndpoint(svc, port);
 
         try {
@@ -169,6 +169,7 @@ public class ClientImpl
         }
         notifyLifecycleManager();        
     }
+    
     /**
      * Create a Client that uses a specific EndpointImpl.
      * @param bus
