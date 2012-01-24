@@ -25,10 +25,10 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.bus.managers.WorkQueueManagerImpl;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.management.counters.CounterRepository;
 import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
-import org.apache.cxf.workqueue.WorkQueueManagerImpl;
 
 import org.junit.After;
 import org.junit.Assert;

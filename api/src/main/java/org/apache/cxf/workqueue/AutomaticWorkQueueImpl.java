@@ -485,7 +485,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         return executor == null ? true : executor.getQueue().size() == 0;
     }
 
-    boolean isFull() {
+    public boolean isFull() {
         return executor == null ? false : executor.getQueue().remainingCapacity() == 0;
     }
 

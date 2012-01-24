@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.workqueue;
+package org.apache.cxf.bus.managers;
 
 import javax.management.JMException;
 import javax.management.ObjectName;
@@ -27,6 +27,8 @@ import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedAttribute;
 import org.apache.cxf.management.annotation.ManagedResource;
+import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
+import org.apache.cxf.workqueue.WorkQueueManager;
 
 @ManagedResource(componentName = "WorkQueue", 
                  description = "The CXF work queue", 

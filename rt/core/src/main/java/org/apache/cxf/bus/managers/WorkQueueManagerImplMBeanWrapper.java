@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.workqueue;
+package org.apache.cxf.bus.managers;
 
 import javax.management.JMException;
 import javax.management.ObjectName;

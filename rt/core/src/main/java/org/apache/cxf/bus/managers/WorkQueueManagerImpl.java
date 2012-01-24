@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.workqueue;
+package org.apache.cxf.bus.managers;
 
 import java.util.Collection;
 import java.util.Map;
@@ -35,6 +35,9 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.workqueue.AutomaticWorkQueue;
+import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
+import org.apache.cxf.workqueue.WorkQueueManager;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class WorkQueueManagerImpl implements WorkQueueManager {
