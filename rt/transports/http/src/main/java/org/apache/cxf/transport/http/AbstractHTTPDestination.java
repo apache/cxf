@@ -300,8 +300,9 @@ public abstract class AbstractHTTPDestination
         inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
         inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
         inMessage.put(SecurityContext.class, new SecurityContext() {
+            private Principal pp = req.getUserPrincipal(); 
             public Principal getUserPrincipal() {
-                return req.getUserPrincipal();
+                return pp;
             }
             public boolean isUserInRole(String role) {
                 return req.isUserInRole(role);
