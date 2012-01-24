@@ -674,6 +674,8 @@ public class JettyHTTPDestinationTest extends Assert {
         EasyMock.expectLastCall().andReturn(method).atLeastOnce();
         request.getConnection();
         EasyMock.expectLastCall().andReturn(null).anyTimes();
+        request.getUserPrincipal();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         
         if (setRedirectURL) {
             policy.setRedirectURL(NOWHERE + "foo/bar");
@@ -751,14 +753,18 @@ public class JettyHTTPDestinationTest extends Assert {
         }
         
         if (decoupled) {
-            decoupledBackChannel = EasyMock.createMock(Conduit.class);
-            decoupledBackChannel.setMessageObserver(EasyMock.isA(MessageObserver.class));           
-            decoupledBackChannel.prepare(EasyMock.isA(Message.class));
-            EasyMock.expectLastCall();
-            EasyMock.replay(decoupledBackChannel);
+            setupDecoupledBackChannel();
         }
         EasyMock.replay(response);
         EasyMock.replay(request);
+    }
+    
+    private void setupDecoupledBackChannel() throws IOException {
+        decoupledBackChannel = EasyMock.createMock(Conduit.class);
+        decoupledBackChannel.setMessageObserver(EasyMock.isA(MessageObserver.class));           
+        decoupledBackChannel.prepare(EasyMock.isA(Message.class));
+        EasyMock.expectLastCall();
+        EasyMock.replay(decoupledBackChannel);
     }
     
     private void setUpInMessage() {
