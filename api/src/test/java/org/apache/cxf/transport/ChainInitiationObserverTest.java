@@ -22,7 +22,6 @@ package org.apache.cxf.transport;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -50,7 +49,7 @@ public class ChainInitiationObserverTest extends Assert {
         SortedSet<Phase> phases = new TreeSet<Phase>();
         phases.add(phase1);
         chain = new TestChain(phases);
-        observer = new ChainInitiationObserver(null, BusFactory.getDefaultBus());
+        observer = new ChainInitiationObserver(null, null);
     }
 
     @After
