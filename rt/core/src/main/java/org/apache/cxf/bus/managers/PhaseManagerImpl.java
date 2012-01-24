@@ -17,13 +17,15 @@
  * under the License.
  */
 
-package org.apache.cxf.phase;
+package org.apache.cxf.bus.managers;
 
 import java.util.SortedSet;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.extension.BusExtension;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseManager;
 
 @NoJSR250Annotations
 public class PhaseManagerImpl implements PhaseManager, BusExtension {
@@ -128,9 +130,5 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
         outPhases.add(new Phase(Phase.SETUP_ENDING, ++i * 1000));
 
     }
-
-
-
-
 
 }
