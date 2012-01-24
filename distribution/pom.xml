@@ -338,6 +338,16 @@
             <groupId>org.apache.cxf.services.wsn</groupId>
             <artifactId>cxf-services-wsn-core</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
