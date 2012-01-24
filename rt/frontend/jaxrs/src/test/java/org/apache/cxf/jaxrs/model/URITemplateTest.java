@@ -40,6 +40,13 @@ public class URITemplateTest extends Assert {
     }
 
     @Test
+    public void testPathCharacters() {
+        String pathChars = ":@!$&'*+,;=-._~()";
+        assertTrue(new URITemplate(pathChars).match(pathChars, 
+                                                    new MetadataMap<String, String>()));
+    }
+    
+    @Test
     public void testMatchBasic() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{id}");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();

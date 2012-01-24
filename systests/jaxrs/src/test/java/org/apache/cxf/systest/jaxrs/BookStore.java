@@ -117,6 +117,12 @@ public class BookStore {
     public void preDestroy() {
         //System.out.println("PreDestroy called");
     }
+
+    @GET
+    @Path("allCharsButA-B/:@!$&'()*+,;=-._~")
+    public Book getWithComplexPath() {
+        return new Book("Encoded Path", 125L);
+    }
     
     @GET
     @Path("/default")
