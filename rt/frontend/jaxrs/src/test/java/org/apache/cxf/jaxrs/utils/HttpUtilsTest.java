@@ -59,8 +59,24 @@ public class HttpUtilsTest extends Assert {
         assertEquals("%2B+", HttpUtils.urlEncode("+ "));
     }
      
+    
     @Test
     public void testPathEncode() {
+        // rfc3986.txt 3.3
+        //segment-nz    = 1*pchar
+        //pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+        // sub-delims  = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+        // unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+        
+        // '&' has to be represented as &amp; in WADL
+        
+        String pathChars = ":@!$&'()*+,;=-._~";
+        String str = HttpUtils.pathEncode(pathChars);
+        assertEquals(str, pathChars);
+    }
+    
+    @Test
+    public void testPathEncodeWithPlusAndSpace() {
         assertEquals("+%20", HttpUtils.pathEncode("+ "));
     }
     
