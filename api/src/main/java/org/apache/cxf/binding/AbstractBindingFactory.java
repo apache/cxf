@@ -35,7 +35,6 @@ import org.apache.cxf.service.model.AbstractPropertiesHolder;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.wsdl11.WSDLBindingFactory;
 
 import static org.apache.cxf.helpers.CastUtils.cast;
 

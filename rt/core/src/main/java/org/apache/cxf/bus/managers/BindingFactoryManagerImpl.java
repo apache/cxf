@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.binding;
+package org.apache.cxf.bus.managers;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -32,6 +32,9 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.binding.AbstractBindingFactory;
+import org.apache.cxf.binding.BindingFactory;
+import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
