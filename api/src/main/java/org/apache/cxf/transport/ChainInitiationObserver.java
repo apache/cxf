@@ -162,25 +162,28 @@ public class ChainInitiationObserver implements MessageObserver {
 
             EndpointInfo endpointInfo = endpoint.getEndpointInfo();
 
-            QName serviceQName = endpointInfo.getService().getName();
-            exchange.put(Message.WSDL_SERVICE, serviceQName);
+            if (endpointInfo.getService() != null)  {
+                QName serviceQName = endpointInfo.getService().getName();
+                exchange.put(Message.WSDL_SERVICE, serviceQName);
 
-            QName interfaceQName = endpointInfo.getService().getInterface().getName();
-            exchange.put(Message.WSDL_INTERFACE, interfaceQName);
+                QName interfaceQName = endpointInfo.getService().getInterface().getName();
+                exchange.put(Message.WSDL_INTERFACE, interfaceQName);
 
-            QName portQName = endpointInfo.getName();
-            exchange.put(Message.WSDL_PORT, portQName);
-            URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
-            if (wsdlDescription == null) {
-                String address = endpointInfo.getAddress();
-                try {
-                    wsdlDescription = new URI(address + "?wsdl");
-                } catch (URISyntaxException e) {
-                    // do nothing
+
+                QName portQName = endpointInfo.getName();
+                exchange.put(Message.WSDL_PORT, portQName);
+                URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
+                if (wsdlDescription == null && !endpointInfo.hasProperty("URI")) {
+                    String address = endpointInfo.getAddress();
+                    try {
+                        wsdlDescription = new URI(address + "?wsdl");
+                    } catch (URISyntaxException e) {
+                        // do nothing
+                    }
+                    endpointInfo.setProperty("URI", wsdlDescription);
                 }
-                endpointInfo.setProperty("URI", wsdlDescription);
+                exchange.put(Message.WSDL_DESCRIPTION, wsdlDescription);
             }
-            exchange.put(Message.WSDL_DESCRIPTION, wsdlDescription);
         }  
     }
 
