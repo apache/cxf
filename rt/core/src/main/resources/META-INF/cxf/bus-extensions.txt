@@ -5,7 +5,7 @@ org.apache.cxf.buslifecycle.CXFBusLifeCycleManager:org.apache.cxf.buslifecycle.B
 org.apache.cxf.endpoint.ServerRegistryImpl:org.apache.cxf.endpoint.ServerRegistry:true
 org.apache.cxf.transports.http.internal.QueryHandlerRegistryImpl:org.apache.cxf.transports.http.QueryHandlerRegistry:true 
 org.apache.cxf.endpoint.EndpointResolverRegistryImpl:org.apache.cxf.endpoint.EndpointResolverRegistry:true
-org.apache.cxf.headers.HeaderManagerImpl:org.apache.cxf.headers.HeaderManager:true
+org.apache.cxf.bus.managers.HeaderManagerImpl:org.apache.cxf.headers.HeaderManager:true
 org.apache.cxf.catalog.OASISCatalogManager:org.apache.cxf.catalog.OASISCatalogManager:true
 org.apache.cxf.service.factory.FactoryBeanListenerManager::true
 org.apache.cxf.endpoint.ServerLifeCycleManagerImpl:org.apache.cxf.endpoint.ServerLifeCycleManager:true

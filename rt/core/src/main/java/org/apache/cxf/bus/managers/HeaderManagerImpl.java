@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.headers;
+package org.apache.cxf.bus.managers;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +25,8 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.headers.HeaderManager;
+import org.apache.cxf.headers.HeaderProcessor;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class HeaderManagerImpl implements HeaderManager {
