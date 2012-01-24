@@ -42,6 +42,7 @@
             org.apache.commons.lang*;resolution:=optional;version="${cxf.osgi.commons.lang.version}",
             javax.resource*;resolution:=optional
         </cxf.osgi.import>
+        <cxf.osgi.dynamic.import>org.apache.cxf.bus</cxf.osgi.dynamic.import>
     </properties>
 
     <dependencies>
@@ -115,16 +116,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Fragment-Host></Fragment-Host>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-xjc-plugin</artifactId>

@@ -83,6 +83,7 @@
             <artifactId>jdom</artifactId>
             <version>${cxf.jdom.version}</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
