@@ -51,6 +51,8 @@ import org.apache.ws.security.validate.SignatureTrustValidator;
 import org.apache.ws.security.validate.Validator;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.xml.validation.ValidationException;
+import org.opensaml.xml.validation.ValidatorSuite;
 
 /**
  * Validate a SAML Assertion. It is valid if it was issued and signed by this STS.
@@ -165,6 +167,9 @@ public class SAMLTokenValidator implements TokenValidator {
                 assertion.verifySignature(
                     requestData, new WSDocInfo(validateTargetElement.getOwnerDocument())
                 );
+                
+                // Validate the assertion against schemas/profiles
+                validateAssertion(assertion);
 
                 // Now verify trust on the signature
                 Credential trustCredential = new Credential();
@@ -225,6 +230,37 @@ public class SAMLTokenValidator implements TokenValidator {
         }
 
         return response;
+    }
+    
+    /**
+     * Validate the assertion against schemas/profiles
+     */
+    protected void validateAssertion(AssertionWrapper assertion) throws WSSecurityException {
+        if (assertion.getSaml1() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
+            try {
+                schemaValidators.validate(assertion.getSaml1());
+                specValidators.validate(assertion.getSaml1());
+            } catch (ValidationException e) {
+                LOG.fine("Saml Validation error: " + e.getMessage());
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+        } else if (assertion.getSaml2() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
+            try {
+                schemaValidators.validate(assertion.getSaml2());
+                specValidators.validate(assertion.getSaml2());
+            } catch (ValidationException e) {
+                LOG.fine("Saml Validation error: " + e.getMessage());
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+        }
     }
     
 }
