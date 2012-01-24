@@ -2069,7 +2069,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             return null;
         }
 
-        if (FaultInfoException.class.isAssignableFrom(exClass)) {
+        if (FaultOutInterceptor.FaultInfoException.class.isAssignableFrom(exClass)) {
             try {
                 Method m = exClass.getMethod("getFaultInfo");
                 return m.getReturnType();

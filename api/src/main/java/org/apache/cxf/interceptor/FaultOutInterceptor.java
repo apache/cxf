@@ -44,6 +44,15 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(FaultOutInterceptor.class); 
 
+    /**
+     * Marker interfaces for Exceptions that have a
+     * getFaultInfo() method that returns some sort 
+     * of object that the FaultOutInterceptor can
+     * marshal into a fault detail element
+     */
+    public interface FaultInfoException {
+    }
+    
     public FaultOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
@@ -132,7 +141,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     protected Object getFaultBean(Throwable cause, FaultInfo faultPart, Message message) {
-        if (isFaultInfoException(cause.getClass())) {
+        if (cause instanceof FaultInfoException) {
             try {
                 Method method = cause.getClass().getMethod("getFaultInfo", new Class[0]);
                 return method.invoke(cause, new Object[0]);
@@ -145,16 +154,6 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         return cause;
-    }
-
-    private boolean isFaultInfoException(Class<?> cls) {
-        if (cls == null) {
-            return false;
-        }
-        if ("org.apache.cxf.service.factory.FaultInfoException".equals(cls.getName())) {
-            return true;
-        }
-        return isFaultInfoException(cls.getSuperclass());
     }
 
     /**
