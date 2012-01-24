@@ -19,8 +19,8 @@
 package org.apache.cxf.bus.spring;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.bus.managers.CXFBusLifeCycleManager;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
-import org.apache.cxf.buslifecycle.CXFBusLifeCycleManager;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

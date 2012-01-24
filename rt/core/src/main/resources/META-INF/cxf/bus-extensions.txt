@@ -1,7 +1,7 @@
 org.apache.cxf.wsdl11.WSDLManagerImpl:org.apache.cxf.wsdl.WSDLManager:true
 org.apache.cxf.bus.managers.PhaseManagerImpl:org.apache.cxf.phase.PhaseManager:true
 org.apache.cxf.workqueue.WorkQueueManagerImpl:org.apache.cxf.workqueue.WorkQueueManager:true
-org.apache.cxf.buslifecycle.CXFBusLifeCycleManager:org.apache.cxf.buslifecycle.BusLifeCycleManager:true   	   
+org.apache.cxf.bus.managers.CXFBusLifeCycleManager:org.apache.cxf.buslifecycle.BusLifeCycleManager:true   	   
 org.apache.cxf.endpoint.ServerRegistryImpl:org.apache.cxf.endpoint.ServerRegistry:true
 org.apache.cxf.transports.http.internal.QueryHandlerRegistryImpl:org.apache.cxf.transports.http.QueryHandlerRegistry:true 
 org.apache.cxf.endpoint.EndpointResolverRegistryImpl:org.apache.cxf.endpoint.EndpointResolverRegistry:true
