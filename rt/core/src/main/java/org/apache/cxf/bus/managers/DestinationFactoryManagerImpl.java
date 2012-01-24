@@ -41,7 +41,8 @@ import org.apache.cxf.transport.TransportFinder;
 @NoJSR250Annotations(unlessNull = "bus")
 public final class DestinationFactoryManagerImpl implements DestinationFactoryManager {
 
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(DestinationFactoryManager.class);
+    private static final ResourceBundle BUNDLE 
+        = BundleUtils.getBundle(DestinationFactoryManagerImpl.class);
 
     Map<String, DestinationFactory> destinationFactories;
     Set<String> failed = new CopyOnWriteArraySet<String>();

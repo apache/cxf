@@ -42,7 +42,8 @@ import org.apache.cxf.transport.TransportFinder;
 @NoJSR250Annotations(unlessNull = "bus")
 public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManager {
 
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ConduitInitiatorManager.class);
+    private static final ResourceBundle BUNDLE 
+        = BundleUtils.getBundle(ConduitInitiatorManagerImpl.class);
 
     Map<String, ConduitInitiator> conduitInitiators;
     Set<String> failed = new CopyOnWriteArraySet<String>();
