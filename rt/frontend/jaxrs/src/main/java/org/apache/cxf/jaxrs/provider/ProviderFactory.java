@@ -678,6 +678,8 @@ public final class ProviderFactory {
     public void clearThreadLocalProxies() {
         clearProxies(messageReaders,
                      messageWriters,
+                     jaxbReaders,
+                     jaxbWriters,
                      contextResolvers,
                      requestHandlers,
                      responseHandlers,
