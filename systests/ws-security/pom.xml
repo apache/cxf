@@ -194,7 +194,13 @@
         <dependency>
              <groupId>com.sun.xml.fastinfoset</groupId>
              <artifactId>FastInfoset</artifactId>
-         </dependency>
+        </dependency>
+        
+        <dependency>
+             <groupId>org.bouncycastle</groupId>
+             <artifactId>bcprov-jdk15</artifactId>
+             <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <properties>
