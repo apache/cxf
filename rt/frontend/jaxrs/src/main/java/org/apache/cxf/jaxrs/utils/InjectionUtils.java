@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -88,6 +89,7 @@ import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public final class InjectionUtils {
     
@@ -99,6 +101,8 @@ public final class InjectionUtils {
     private static final String HTTP_SERVLET_REQUEST_CLASS_NAME = "javax.servlet.http.HttpServletRequest";
     private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "javax.servlet.http.HttpServletResponse";
         
+    private static final String PARAM_HANDLERS_FIRST = "check.parameter.handlers.first";
+    
     private InjectionUtils() {
         
     }
@@ -380,12 +384,10 @@ public final class InjectionUtils {
 
     private static Object instantiateFromParameterHandler(String value, 
                                                      Class<?> pClass,
-                                                     Message message) {
-        // TODO: Consider always checking custom parameter handlers first.
-        // Right now, Locale and Date are two special cases so it's very cheap
-        // just to check if it is Locale or not; 
-        if (Locale.class == pClass) {
-            return createFromParameterHandler(value, pClass, message);
+                                                     Message m) {
+        if (Date.class == pClass || Locale.class == pClass 
+            || m != null && MessageUtils.isTrue(m.getContextualProperty(PARAM_HANDLERS_FIRST))) {
+            return createFromParameterHandler(value, pClass, m);
         } else {
             return null;
         }
