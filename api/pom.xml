@@ -45,8 +45,6 @@
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
-            org.apache.commons.lang*;resolution:=optional;version="${cxf.osgi.commons.lang.version}",
-            javax.resource*;resolution:=optional
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             com.sun.xml.bind.api,
@@ -150,16 +148,6 @@
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>wsdl4j</groupId>
