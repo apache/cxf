@@ -107,18 +107,24 @@
         <bundle start-level='30' dependency="true">mvn:org.apache.neethi/neethi/${cxf.neethi.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-policy/${project.version}</bundle>
     </feature>
+    <feature name="cxf-ws-addr" version="${project.version}" resolver='(obr)'>
+        <feature version="${project.version}">cxf-core</feature>
+        <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-addr/${project.version}</bundle>
+    </feature>
     <feature name="cxf-ws-rm" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-ws-policy</feature>
+        <feature version="${project.version}">cxf-ws-addr</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-rm/${project.version}</bundle>
     </feature>
     <feature name="cxf-ws-mex" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-ws-policy</feature>
-        <bundle start-level='40' dependency="true">mvn:org.apache.cxf/cxf-rt-ws-addr/${project.version}</bundle>
+        <feature version="${project.version}">cxf-ws-addr</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-mex/${project.version}</bundle>
     </feature>
     <feature name="cxf-ws-security" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="${cxf.wss4j.version}">wss4j</feature>
+        <feature version="${project.version}">cxf-ws-addr</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
     </feature>
 
