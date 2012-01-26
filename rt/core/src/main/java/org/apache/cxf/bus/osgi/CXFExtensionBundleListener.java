@@ -20,6 +20,7 @@ package org.apache.cxf.bus.osgi;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,7 +79,13 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         if (orig.isEmpty()) {
             return;
         }
-        LOG.info("Adding the extension from bundle " + bundle.getBundleId());
+        
+        List<String> names = new ArrayList<String>(orig.size());
+        for (Extension ext : orig) {
+            names.add(ext.getName());
+        }
+        LOG.info("Adding the extensions from bundle " + bundle.getSymbolicName() 
+                 + " (" + bundle.getBundleId() + ") " + names); 
         List<Extension> list = extensions.get(bundle.getBundleId());
         if (list == null) {
             list = new CopyOnWriteArrayList<Extension>();

@@ -55,14 +55,13 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-common</artifactId>
             <version>${project.version}</version>
+            <optional>true</optional>
         </dependency>
-
-
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-wsdlto-core</artifactId>

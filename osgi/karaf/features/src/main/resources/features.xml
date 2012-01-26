@@ -53,8 +53,11 @@
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level='10'>mvn:javax.mail/mail/${cxf.javax.mail.version}</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/${cxf.servicemix.specs.version}</bundle>
+
         <bundle start-level='20'>mvn:org.codehaus.woodstox/stax2-api/${cxf.woodstox.stax2-api.version}</bundle>
         <bundle start-level='20'>mvn:org.codehaus.woodstox/woodstox-core-asl/${cxf.woodstox.core.version}</bundle>
+        <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${cxf.jaxb.bundle.version}</bundle>
+        <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
     </feature>
 
     <!-- Current the abdera bundle is not working as we expect -->
@@ -76,9 +79,9 @@
 
     <feature name="wss4j" version="${cxf.wss4j.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-specs</feature>
-        <bundle>mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.opensaml/${cxf.opensaml.osgi.version}</bundle>
-        <bundle start-level='25'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${cxf.saaj-impl.bundle.version}</bundle>
+        <bundle start-level='25' dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle>
+        <bundle start-level='25' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.opensaml/${cxf.opensaml.osgi.version}</bundle>
+        <bundle start-level='25' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${cxf.saaj-impl.bundle.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/${cxf.xerces.bundle.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/${cxf.bcel.bundle.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/${cxf.xalan.bundle.version}</bundle>
@@ -92,8 +95,6 @@
         <bundle start-level='30' dependency="true">mvn:org.apache.ws.xmlschema/xmlschema-core/${cxf.xmlschema.version}</bundle>
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.wsdl4j/${cxf.wsdl4j.bundle.version}</bundle>
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${cxf.xmlresolver.bundle.version}</bundle>
-        <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${cxf.jaxb.bundle.version}</bundle>
-        <bundle start-level='20'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
 
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-common-utilities/${project.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
@@ -154,6 +155,9 @@
     <feature name="cxf-jaxrs" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-http</feature>
+
+        <bundle start-level="30" dependency="true">mvn:org.codehaus.jettison/jettison/${cxf.jettison.version}</bundle>
+
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-bindings-xml/${project.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-frontend-jaxrs/${project.version}</bundle>
     </feature>
@@ -218,6 +222,7 @@
         <feature version="${project.version}">cxf-jaxws</feature>
         <feature version="${project.version}">cxf-javascript</feature>
 
+        <bundle>mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
         <bundle>mvn:org.apache.velocity/velocity/${cxf.velocity.version}</bundle>
         <bundle>mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
 
@@ -246,6 +251,8 @@
         <feature version="${project.version}">cxf-bindings-coloc</feature>
         <feature version="${project.version}">cxf-bindings-object</feature>
 
+        <feature version="${project.version}">cxf-http-jetty</feature>
+
         <feature version="${project.version}">cxf-transports-local</feature>
         <feature version="${project.version}">cxf-transports-jms</feature>
 
@@ -258,6 +265,9 @@
         <feature version="${project.version}">cxf-frontend-javascript</feature>
 
         <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
+
+        <!-- Compatibility bundle for the Require-Bundle use cases -->
+        <bundle>mvn:org.apache.cxf/cxf-bundle-compatible/${project.version}</bundle>
 
         <!-- needs jra
         <bundle>mvn:org.apache.cxf/cxf-rt-bindings-http/${project.version}</bundle-->
