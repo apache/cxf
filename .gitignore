@@ -1,4 +1,6 @@
-*.i??
+*.iml
+*.ipr
+*.iws
 .DS_Store
 .checkstyle
 .classpath
