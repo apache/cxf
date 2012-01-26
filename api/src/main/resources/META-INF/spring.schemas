@@ -18,6 +18,9 @@
 #    under the License.
 #
 #
+http\://cxf.apache.org/schemas/configuration/cxf-beans.xsd=schemas/configuration/cxf-beans.xsd
+http\://cxf.apache.org/configuration/parameterized-types=schemas/configuration/parameterized-types.xsd
+
 http\://schemas.xmlsoap.org/wsdl/=schemas/wsdl/wsdl.xsd
 http\://schemas.xmlsoap.org/wsdl/2003-02-11.xsd=schemas/wsdl/wsdl.xsd
 http\://schemas.xmlsoap.org/wsdl/http/=schemas/wsdl/http.xsd

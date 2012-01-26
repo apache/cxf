@@ -67,14 +67,8 @@
         </dependency>
 
         <dependency>
-	  <groupId>org.apache.ws.xmlschema</groupId>
-	  <artifactId>xmlschema-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-common-utilities</artifactId>
-            <version>${project.version}</version>
+           <groupId>org.apache.ws.xmlschema</groupId>
+           <artifactId>xmlschema-core</artifactId>
         </dependency>
 
         <dependency>

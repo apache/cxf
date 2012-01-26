@@ -96,7 +96,6 @@
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.wsdl4j/${cxf.wsdl4j.bundle.version}</bundle>
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${cxf.xmlresolver.bundle.version}</bundle>
 
-        <bundle start-level='40'>mvn:org.apache.cxf/cxf-common-utilities/${project.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-core/${project.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-management/${project.version}</bundle> 

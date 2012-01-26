@@ -83,11 +83,6 @@
             <artifactId>cxf-rt-management</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-common-utilities</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

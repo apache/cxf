@@ -123,11 +123,6 @@
             <artifactId>jaxb-xjc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-common-utilities</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
            <groupId>commons-lang</groupId>
            <artifactId>commons-lang</artifactId>
         </dependency>

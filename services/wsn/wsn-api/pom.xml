@@ -36,7 +36,7 @@
 	<dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-common-utilities</artifactId>
+            <artifactId>cxf-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
