@@ -58,6 +58,9 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     public JMSTransportFactory() {
         super(DEFAULT_NAMESPACES);
     }
+    public JMSTransportFactory(Bus b) {
+        super(DEFAULT_NAMESPACES, b);
+    }
     
     @Resource(name = "cxf")
     public void setBus(Bus bus) {
