@@ -149,19 +149,6 @@ public class JAXBDataBinding extends AbstractDataBinding
         } catch (Exception e) {
             //IGNORE
         }
-        try {
-            resolver.resolve("", "classpath:/schemas/wsdl/wsrm.xsd", JAXBDataBinding.class);
-            if (resolver.isResolved()) {
-                InputStream ins = resolver.getInputStream();
-                Document doc = XMLUtils.parse(ins);
-                ins.close();
-                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/wsrm.xsd");
-                BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
-                resolver.unresolve();
-            }
-        } catch (Exception e) {
-            //IGNORE
-        }
     }
 
     Class<?>[] extraClass;
