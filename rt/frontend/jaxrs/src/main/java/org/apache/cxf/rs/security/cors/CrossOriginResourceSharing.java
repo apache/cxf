@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.cors;
+package org.apache.cxf.rs.security.cors;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

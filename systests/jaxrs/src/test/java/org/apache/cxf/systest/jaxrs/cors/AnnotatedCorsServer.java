@@ -32,8 +32,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.jaxrs.cors.CorsHeaderConstants;
-import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharing;
+import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
+import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 
 /**
  * Service bean with no class-level annotation for cross-script control.

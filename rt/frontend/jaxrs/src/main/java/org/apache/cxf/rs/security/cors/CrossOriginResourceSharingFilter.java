@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.cors;
+package org.apache.cxf.rs.security.cors;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -331,7 +331,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         
         /* Common to simple and preflight */
         rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, 
-                        (String)m.getExchange().get(CorsHeaderConstants.HEADER_ORIGIN));
+                        m.getExchange().get(CorsHeaderConstants.HEADER_ORIGIN));
         rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS,
                         Boolean.toString(allowCredentials));
         
