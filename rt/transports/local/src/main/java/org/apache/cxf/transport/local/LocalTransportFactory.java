@@ -83,7 +83,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
         this(null);
     }
     public LocalTransportFactory(Bus b) {
-        super(DEFAULT_NAMESPACES, b);
+        super(DEFAULT_NAMESPACES, null);
         
         messageFilterProperties = new HashSet<String>();
         messageIncludeProperties = new HashSet<String>();
@@ -94,6 +94,9 @@ public class LocalTransportFactory extends AbstractTransportFactory
         messageIncludeProperties.add(Message.CONTENT_TYPE);
         messageIncludeProperties.add(Message.ACCEPT_CONTENT_TYPE);
         messageIncludeProperties.add(Message.RESPONSE_CODE);
+        
+        bus = b;
+        register();
     }
     
     @Resource(name = "cxf")
