@@ -81,13 +81,11 @@ public class HTTPTransportActivator
         configAdminTracker.close();
     }
 
-    @Override
     public String getName() {
         return FACTORY_PID;
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary properties)
         throws ConfigurationException {
         if (pid == null) {
@@ -110,7 +108,6 @@ public class HTTPTransportActivator
 
     }
 
-    @Override
     public void deleted(String pid) {
         @SuppressWarnings("rawtypes")
         Dictionary d = props.remove(pid);
@@ -134,7 +131,6 @@ public class HTTPTransportActivator
         }
     }
 
-    @Override
     public void configure(String name, String address, HTTPConduit c) {
         String pid = null;
         synchronized (matchers) {
