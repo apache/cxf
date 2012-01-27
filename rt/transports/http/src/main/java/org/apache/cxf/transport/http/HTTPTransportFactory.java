@@ -253,6 +253,10 @@ public class HTTPTransportFactory
         if (address != null && address.indexOf('?') != -1) {
             address = address.substring(0, address.indexOf('?'));
         }
+        HTTPConduitConfigurer c1 = bus.getExtension(HTTPConduitConfigurer.class);
+        if (c1 != null) {
+            c1.configure(conduit.getBeanName(), address, conduit);
+        }
         configure(conduit, conduit.getBeanName(), address);
         conduit.finalizeConfig();
         return conduit;
