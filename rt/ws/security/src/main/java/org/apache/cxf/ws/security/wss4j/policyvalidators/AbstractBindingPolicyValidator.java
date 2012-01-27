@@ -74,12 +74,13 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.TS, timestampResults);
         
         // Check whether we received a timestamp and compare it to the policy
-        if (includeTimestamp && timestampResults.isEmpty()) {
-            return false;
-        } else if (!includeTimestamp && !timestampResults.isEmpty()) {
+        if (includeTimestamp && timestampResults.size() != 1) {
             return false;
         } else if (!includeTimestamp) {
-            return true;
+            if (timestampResults.isEmpty()) {
+                return true;
+            }
+            return false;
         }
         
         // At this point we received a (required) Timestamp. Now check that it is integrity protected.
