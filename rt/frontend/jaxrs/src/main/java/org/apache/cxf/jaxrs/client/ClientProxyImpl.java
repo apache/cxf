@@ -281,9 +281,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             if (formParams || bodyClass != null && MultivaluedMap.class.isAssignableFrom(bodyClass)) {
                 headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
             } else {
-                String cType = 
-                    bodyClass != null && InjectionUtils.isPrimitive(bodyClass) 
-                        ? MediaType.TEXT_PLAIN : ori.getConsumeTypes().isEmpty() 
+                String cType = ori.getConsumeTypes().isEmpty() 
                     || ori.getConsumeTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
                     ? MediaType.APPLICATION_XML : ori.getConsumeTypes().get(0).toString();   
                 headers.putSingle(HttpHeaders.CONTENT_TYPE, cType);
