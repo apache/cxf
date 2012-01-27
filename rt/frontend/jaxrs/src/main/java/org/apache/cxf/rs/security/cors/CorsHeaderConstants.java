@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.cors;
+package org.apache.cxf.rs.security.cors;
 
 /**
  * Headers used to implement http://www.w3.org/TR/cors/.

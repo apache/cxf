@@ -27,7 +27,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.apache.cxf.jaxrs.cors.CrossOriginResourceSharingFilter;
+import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
 
 /**
  * 

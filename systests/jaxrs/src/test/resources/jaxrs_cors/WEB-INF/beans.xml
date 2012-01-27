@@ -21,7 +21,7 @@ http://cxf.apache.org/core
       http://cxf.apache.org/schemas/core.xsd">
 	<import resource="classpath:/META-INF/cxf/cxf.xml" />
 
-	<bean id="cors-filter" class="org.apache.cxf.jaxrs.cors.CrossOriginResourceSharingFilter">
+	<bean id="cors-filter" class="org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter">
 		<property name="allowAllOrigins" value="true" />
 	</bean>
 

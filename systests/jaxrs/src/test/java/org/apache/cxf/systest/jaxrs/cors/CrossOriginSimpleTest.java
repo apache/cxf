@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.cors.CorsHeaderConstants;
+import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.http.Header;
