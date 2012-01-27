@@ -41,7 +41,7 @@
 	    <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>asm</groupId>
+            <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
             <scope>test</scope>
         </dependency>

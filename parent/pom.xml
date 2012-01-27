@@ -63,7 +63,7 @@
         </cxf.osgi.export>
         <cxf.osgi.dynamic.import />
         <cxf.osgi.spring.version>[2.5,4)</cxf.osgi.spring.version>
-        <cxf.osgi.asm.version>[2.0,4)</cxf.osgi.asm.version>
+        <cxf.osgi.asm.version>[2.0,5)</cxf.osgi.asm.version>
         <cxf.osgi.commons.lang.version>[2.4,3)</cxf.osgi.commons.lang.version>
         <cxf.osgi.slf4j.version>[1.5,2)</cxf.osgi.slf4j.version>
         <cxf.osgi.javax.annotation.version>[0.0,2)</cxf.osgi.javax.annotation.version>
@@ -1141,9 +1141,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>asm</groupId>
+                <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>3.3</version>
+                <version>4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.velocity</groupId>
