@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth.test;
+package org.apache.cxf.systest.jaxrs.security.oauth;
 
 import java.io.BufferedReader;
 import java.io.IOException;
