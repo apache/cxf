@@ -80,7 +80,6 @@
         <module>soap_header</module>
         <module>jms-spec-demo</module>
         <module>wsdl_first_xml_wrapped</module>
-        <module>restful_http_binding</module>
         <module>aegis</module>
         <module>jax_server_aegis_client</module>
         <module>jaxws_handlers</module>

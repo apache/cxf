@@ -1,1 +1,0 @@
-org.apache.cxf.binding.http.HttpBindingFactory::true

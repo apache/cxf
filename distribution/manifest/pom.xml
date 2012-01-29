@@ -189,12 +189,6 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-rt-bindings-http</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
             <version>${project.version}</version>
         </dependency>

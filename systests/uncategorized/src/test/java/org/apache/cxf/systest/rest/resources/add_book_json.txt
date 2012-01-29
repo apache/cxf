@@ -1,2 +1,0 @@
-{"acme.Book":{"acme.name":"CXF in Action - JSON"}}
-    

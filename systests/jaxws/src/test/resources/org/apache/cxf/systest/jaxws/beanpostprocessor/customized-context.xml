@@ -14,7 +14,7 @@
 
 <bean id='serverFactory' class='org.apache.cxf.jaxws.JaxWsServerFactoryBean'
 	  scope='prototype'>
-	<property name="bindingId" value="http://apache.org/cxf/binding/http"/>
+	<property name="bindingId" value="http://cxf.apache.org/bindings/xformat"/>
 </bean>
 
 <bean id="postprocess" class="org.apache.cxf.jaxws.spring.JaxWsWebServicePublisherBeanPostProcessor">
