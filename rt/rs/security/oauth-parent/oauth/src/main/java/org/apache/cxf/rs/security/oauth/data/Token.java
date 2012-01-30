@@ -33,6 +33,7 @@ public abstract class Token {
     private Client client;
     private List<OAuthPermission> scopes = Collections.emptyList();
     private UserSubject subject;
+    private boolean preAuthorized;
     
     protected Token(Client client, String tokenKey,
                     String tokenSecret, long lifetime, long issuedAt) {
@@ -117,6 +118,14 @@ public abstract class Token {
      */
     public UserSubject getSubject() {
         return subject;
+    }
+
+    public void setPreAuthorized(boolean preAuthorized) {
+        this.preAuthorized = preAuthorized;
+    }
+
+    public boolean isPreAuthorized() {
+        return preAuthorized;
     }
 
 }

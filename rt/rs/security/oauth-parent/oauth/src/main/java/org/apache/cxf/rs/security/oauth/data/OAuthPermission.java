@@ -25,12 +25,9 @@ import java.util.List;
  * Provides the complete information about a given opaque permission.
  */
 public class OAuthPermission extends Permission {
-    private String subjectName;
     private List<String> roles = Collections.emptyList();
-    
     private List<String> httpVerbs = Collections.emptyList();
     private List<String> uris = Collections.emptyList();
-    private boolean authorizationKeyRequired = true;
     
     public OAuthPermission(String permission, String description) {
         super(permission, description);
@@ -39,14 +36,6 @@ public class OAuthPermission extends Permission {
     public OAuthPermission(String permission, String description, List<String> roles) {
         super(permission, description);
         this.roles = roles;
-    }
-
-    public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
-    }
-
-    public String getSubjectName() {
-        return subjectName;
     }
 
     public void setRoles(List<String> roles) {
@@ -71,14 +60,6 @@ public class OAuthPermission extends Permission {
 
     public List<String> getUris() {
         return uris;
-    }
-
-    public void setAuthorizationKeyRequired(boolean authorizationKeyRequired) {
-        this.authorizationKeyRequired = authorizationKeyRequired;
-    }
-
-    public boolean isAuthorizationKeyRequired() {
-        return authorizationKeyRequired;
     }
     
 }

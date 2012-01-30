@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth.data;
 
-import java.util.Collections;
-import java.util.List;
 /**
  * Represents a registered third-party consumer
  */
@@ -31,7 +29,7 @@ public class Client {
     
     private String loginName;
         
-    private List<OAuthPermission> scopes = Collections.emptyList();
+    private AccessToken preAuthorizedToken;
 
     public Client(String consumerId, 
                   String secretKey,
@@ -115,22 +113,6 @@ public class Client {
         this.loginName = name;
     }
     
-    /**
-     * Returns a list of opaque permissions/scopes
-     * @return the scopes
-     */
-    public List<OAuthPermission> getScopes() {
-        return scopes;
-    }
-
-    /**
-     * Sets a list of opaque permissions/scopes
-     * @param scopes the scopes
-     */
-    public void setScopes(List<OAuthPermission> scopes) {
-        this.scopes = scopes;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -157,5 +139,13 @@ public class Client {
         int result = consumerKey.hashCode();
         result = 31 * result + secretKey.hashCode();
         return result;
+    }
+
+    public void setPreAuthorizedToken(AccessToken preAuthorizedToken) {
+        this.preAuthorizedToken = preAuthorizedToken;
+    }
+
+    public AccessToken getPreAuthorizedToken() {
+        return preAuthorizedToken;
     }
 }

@@ -50,8 +50,7 @@ public class AccessTokenHandler {
             OAuth.OAUTH_SIGNATURE_METHOD,
             OAuth.OAUTH_SIGNATURE,
             OAuth.OAUTH_TIMESTAMP,
-            OAuth.OAUTH_NONCE,
-            OAuth.OAUTH_VERIFIER
+            OAuth.OAUTH_NONCE
         };
     
     public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
@@ -63,8 +62,15 @@ public class AccessTokenHandler {
             if (requestToken == null) {
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
+            
             String oauthVerifier = oAuthMessage.getParameter(OAuth.OAUTH_VERIFIER);
-            if (oauthVerifier == null || !oauthVerifier.equals(requestToken.getVerifier())) {
+            if (oauthVerifier == null) {
+                if (requestToken.getSubject() != null && requestToken.isPreAuthorized()) {
+                    LOG.fine("Preauthorized request token");
+                } else {
+                    throw new OAuthProblemException(OAuthConstants.VERIFIER_INVALID);
+                }
+            } else if (!oauthVerifier.equals(requestToken.getVerifier())) {
                 throw new OAuthProblemException(OAuthConstants.VERIFIER_INVALID);
             }
             
