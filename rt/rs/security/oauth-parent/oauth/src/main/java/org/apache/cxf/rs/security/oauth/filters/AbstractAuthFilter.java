@@ -56,7 +56,6 @@ import org.apache.cxf.security.SecurityContext;
  * Base OAuth filter which can be used to protect end-user endpoints
  */
 public class AbstractAuthFilter {
-    protected static final String USE_USER_SUBJECT = "org.apache.cxf.rs.security.oauth.use_user_subject";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthFilter.class);
     private static final String[] REQUIRED_PARAMETERS = 
         new String[] {
@@ -74,7 +73,6 @@ public class AbstractAuthFilter {
         ALLOWED_OAUTH_PARAMETERS.addAll(Arrays.asList(REQUIRED_PARAMETERS));
         ALLOWED_OAUTH_PARAMETERS.add(OAuth.OAUTH_VERSION);
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.X_OAUTH_SCOPE);
-        ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.X_OAUTH_URI);
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
     }
     

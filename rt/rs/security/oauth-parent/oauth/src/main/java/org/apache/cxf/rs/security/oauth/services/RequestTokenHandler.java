@@ -56,7 +56,6 @@ public class RequestTokenHandler {
     
     private long tokenLifetime = 3600L;
     private String defaultScope;
-    private String defaultURI;
     
     public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
         try {
@@ -77,14 +76,11 @@ public class RequestTokenHandler {
 
             List<String> scopes = OAuthUtils.parseParamValue(
                     oAuthMessage.getParameter(OAuthConstants.X_OAUTH_SCOPE), defaultScope);
-            List<String> uris = OAuthUtils.parseParamValue(
-                    oAuthMessage.getParameter(OAuthConstants.X_OAUTH_URI), defaultURI);
             
             RequestTokenRegistration reg = new RequestTokenRegistration();
             reg.setClient(client);
             reg.setCallback(callback);
             reg.setState(oAuthMessage.getParameter("state"));
-            reg.setUris(uris);
             reg.setScopes(scopes);
             reg.setLifetime(tokenLifetime);
             reg.setIssuedAt(System.currentTimeMillis() / 1000);
@@ -143,10 +139,6 @@ public class RequestTokenHandler {
 
     public void setDefaultScope(String defaultScope) {
         this.defaultScope = defaultScope;
-    }
-
-    public void setDefaultURI(String defaultURI) {
-        this.defaultURI = defaultURI;
     }
             
 }

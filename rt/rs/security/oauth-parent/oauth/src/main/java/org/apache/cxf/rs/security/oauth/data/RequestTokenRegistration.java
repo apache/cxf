@@ -28,7 +28,6 @@ public class RequestTokenRegistration {
     private Client client; 
     private String state;
     private String callback;
-    private List<String> uris;
     private List<String> scopes;
     private long lifetime;
     private long issuedAt;
@@ -53,12 +52,6 @@ public class RequestTokenRegistration {
     }
     public String getState() {
         return state;
-    }
-    public void setUris(List<String> uris) {
-        this.uris = uris;
-    }
-    public List<String> getUris() {
-        return uris;
     }
     public void setScopes(List<String> scopes) {
         this.scopes = scopes;
