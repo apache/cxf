@@ -43,6 +43,8 @@ import org.apache.cxf.security.SecurityContext;
  * HTTP Servlet filter which can be used to protect end user endpoints
  */
 public class OAuthServletFilter extends AbstractAuthFilter implements javax.servlet.Filter {
+    protected static final String USE_USER_SUBJECT = "org.apache.cxf.rs.security.oauth.use_user_subject";
+    
     public void init(FilterConfig filterConfig) throws ServletException {
         ServletContext servletContext = filterConfig.getServletContext();
         super.setDataProvider(OAuthUtils.getOAuthDataProvider(servletContext));
