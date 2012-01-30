@@ -22,25 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
-import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 
 /**
  * Captures the information about the current request
  */
 public class OAuthInfo {
-    private Client client;
     private AccessToken token;
     private List<OAuthPermission> permissions;
-    public OAuthInfo(Client client, 
-                     AccessToken token, 
-                     List<OAuthPermission> permissions) {
-        this.client = client;
+    public OAuthInfo(AccessToken token, 
+                     List<OAuthPermission> matchedPermissions) {
         this.token = token;
-        this.permissions = permissions;
-    }
-    public Client getClient() {
-        return client;
+        this.permissions = matchedPermissions;
     }
     public AccessToken getToken() {
         return token;
@@ -54,7 +47,7 @@ public class OAuthInfo {
         return authorities;
     }
     
-    public List<OAuthPermission> getPermissions() {
+    public List<OAuthPermission> getMatchedPermissions() {
         return permissions;
     }
     

@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,7 +50,6 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.rs.security.oauth.data.Client;
-import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.Token;
 import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
@@ -81,15 +79,6 @@ public final class OAuthUtils {
             // ignore
         }
         return false;
-    }
-    
-    public static List<OAuthPermission> getAllScopes(Client client, Token token) {
-        List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
-        if (token != null) {
-            scopes.addAll(token.getScopes());
-        }
-        scopes.addAll(client.getScopes());
-        return scopes;
     }
     
     public static void validateMessage(OAuthMessage oAuthMessage, 
