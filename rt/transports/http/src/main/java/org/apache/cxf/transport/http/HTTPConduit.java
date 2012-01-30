@@ -1557,8 +1557,10 @@ public class HTTPConduit
         protected void handleResponseInternal() throws IOException {
             Exchange exchange = outMessage.getExchange();
             int responseCode = connection.getResponseCode();
-            
-            if (outMessage != null && exchange != null) {
+            if (responseCode == -1) {
+                LOG.warning("HTTP Response code appears to be corrupted");
+            }
+            if (exchange != null) {
                 exchange.put(Message.RESPONSE_CODE, responseCode);
             }
             
