@@ -27,7 +27,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-
+@Deprecated
 public class JAXBToStringBuilderTest {
 
     final String dataV = "someData";    

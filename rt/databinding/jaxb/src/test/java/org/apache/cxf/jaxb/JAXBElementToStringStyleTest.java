@@ -28,6 +28,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
+@Deprecated
 public class JAXBElementToStringStyleTest {
     
     class Holder {

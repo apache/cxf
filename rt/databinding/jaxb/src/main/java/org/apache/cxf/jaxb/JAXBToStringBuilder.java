@@ -24,6 +24,11 @@ import java.util.Collection;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+/**
+ * Class was moved to project org.apache.cxf.xjc-utils:cxf-xjc-runtime
+ * so generated code does not have to depend on cxf
+ */
+@Deprecated
 public final class JAXBToStringBuilder {
     private JAXBToStringBuilder() {        
     }

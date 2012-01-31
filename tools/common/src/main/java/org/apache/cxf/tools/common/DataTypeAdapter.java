@@ -23,6 +23,11 @@ import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
 
+/**
+ *Class was moved to project org.apache.cxf.xjc-utils:cxf-xjc-runtime
+ * so generated code does not have to depend on cxf
+ */
+@Deprecated
 public final class DataTypeAdapter {
 
     private DataTypeAdapter() {

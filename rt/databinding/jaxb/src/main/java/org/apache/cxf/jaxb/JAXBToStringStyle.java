@@ -25,9 +25,13 @@ import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-/*
+/**
  * Override default styles to recognise JAXBElement as needing introspection
+ * 
+ * Class was moved to project org.apache.cxf.xjc-utils:cxf-xjc-runtime
+ * so generated code does not have to depend on cxf
  */
+@Deprecated
 public final class JAXBToStringStyle {
 
     public static final ToStringStyle MULTI_LINE_STYLE =

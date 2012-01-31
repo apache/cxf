@@ -36,7 +36,6 @@
         <module>core</module>
         <module>transports/local</module>
         <module>databinding/jaxb</module>
-        <module>databinding/jaxb-adapter</module>
         <module>databinding/xmlbeans</module>
         <module>databinding/aegis</module>
         <module>databinding/sdo</module>
