@@ -152,11 +152,11 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
         int retval = 0;
         
         if (wsdlURL != null) {
-            retval += wsdlURL.hashCode();
+            retval += wsdlURL.hashCode(); //NOSONAR
         }
         
         if (busConfigURL != null) {
-            retval += busConfigURL.hashCode();
+            retval += busConfigURL.hashCode();  //NOSONAR
         }
         
         if (serviceClass != null) {

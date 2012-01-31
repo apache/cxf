@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -53,7 +54,7 @@ public class OASISCatalogManager {
     
 
     private Object resolver;
-    private Set<URL> loadedCatalogs = Collections.synchronizedSet(new HashSet<URL>());
+    private Set<URI> loadedCatalogs = Collections.synchronizedSet(new HashSet<URI>());
     private Bus bus;
 
     public OASISCatalogManager() {
@@ -114,15 +115,15 @@ public class OASISCatalogManager {
         Enumeration<URL> catalogs = classLoader.getResources(name);
         while (catalogs.hasMoreElements()) {
             URL catalogURL = catalogs.nextElement();
-            if (!loadedCatalogs.contains(catalogURL)) {
+            if (!loadedCatalogs.contains(URI.create(catalogURL.toString()))) {
                 ((Catalog)resolver).parseCatalog(catalogURL);
-                loadedCatalogs.add(catalogURL);
+                loadedCatalogs.add(URI.create(catalogURL.toString()));
             }
         }
     }
 
     public final void loadCatalog(URL catalogURL) throws IOException {
-        if (!loadedCatalogs.contains(catalogURL) && resolver != null) {
+        if (!loadedCatalogs.contains(URI.create(catalogURL.toString())) && resolver != null) {
             if ("file".equals(catalogURL.getProtocol())) {
                 try {
                     File file = new File(catalogURL.toURI());
@@ -136,7 +137,7 @@ public class OASISCatalogManager {
 
             ((Catalog)resolver).parseCatalog(catalogURL);
 
-            loadedCatalogs.add(catalogURL);
+            loadedCatalogs.add(URI.create(catalogURL.toString()));
         }
     }
 

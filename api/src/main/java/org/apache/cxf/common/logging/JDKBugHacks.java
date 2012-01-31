@@ -72,7 +72,7 @@ final class JDKBugHacks {
                     try {
                         cname = din.readLine();
                         if (cname != null) {
-                            cname.trim();
+                            cname = cname.trim();
                         }
                     } finally {
                         din.close();
