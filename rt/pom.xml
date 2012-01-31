@@ -54,6 +54,7 @@
         <module>ws/rm</module>
         <module>ws/security</module>
         <module>ws/mex</module>
+        <module>rs/extensions/providers</module>
         <module>rs/security/xml</module>
         <module>rs/security/oauth-parent</module>
         <module>rs/security/cors</module>

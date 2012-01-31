@@ -90,7 +90,7 @@ http://cxf.apache.org/schemas/core.xsd">
   </jaxrs:server>
 
   <bean id="sdoDatabinding" class="org.apache.cxf.sdo.SDODataBinding"/>
-  <bean id="jsonSdoBean" class="org.apache.cxf.jaxrs.provider.DataBindingJSONProvider">
+  <bean id="jsonSdoBean" class="org.apache.cxf.jaxrs.ext.provider.DataBindingJSONProvider">
       <property name="dataBinding" ref="sdoDatabinding"/>
       <property name="namespaceMap" ref="jsonNamespaceMap"/>
   </bean>

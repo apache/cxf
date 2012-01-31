@@ -107,7 +107,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       
   </jaxws:endpoint>        
 
-  <bean id="jaxrs-data-binding" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
+  <bean id="jaxrs-data-binding" class="org.apache.cxf.jaxrs.ext.provider.JAXRSDataBinding">
       <property name="provider" ref="jaxbProviderSoap"/>
   </bean>
 

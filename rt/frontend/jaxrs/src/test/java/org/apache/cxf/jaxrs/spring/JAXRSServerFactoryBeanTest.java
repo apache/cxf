@@ -69,7 +69,7 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         
         sfb = (JAXRSServerFactoryBean)ctx.getBean("inlineProvider");
         assertNotNull("The provider should not be null", sfb.getProviders());
-        assertEquals("Get a wrong provider size", sfb.getProviders().size(), 3);
+        assertEquals("Get a wrong provider size", 2, sfb.getProviders().size());
         verifyJaxbProvider(sfb.getProviders());
         sfb = (JAXRSServerFactoryBean)ctx.getBean("moduleServer");
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());

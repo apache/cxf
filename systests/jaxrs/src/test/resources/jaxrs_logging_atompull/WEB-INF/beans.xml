@@ -107,10 +107,10 @@ http://www.springframework.org/schema/util/spring-util.xsd">
    	</bean>
    	 
 
-	<bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider">
+	<bean id="feed" class="org.apache.cxf.jaxrs.ext.provider.AtomFeedProvider">
 	    <property name="formattedOutput" value="true"/>
 	</bean>
-	<bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider">
+	<bean id="entry" class="org.apache.cxf.jaxrs.ext.provider.AtomEntryProvider">
 	    <property name="formattedOutput" value="true"/>
 	</bean>
 

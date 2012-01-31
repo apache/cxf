@@ -364,7 +364,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
     
     @SuppressWarnings("unchecked")
-    protected JAXBContext getJAXBContext(Class<?> type, Type genericType) throws JAXBException {
+    public JAXBContext getJAXBContext(Class<?> type, Type genericType) throws JAXBException {
         if (mc != null) {
             ContextResolver<JAXBContext> resolver = 
                 mc.getResolver(ContextResolver.class, JAXBContext.class);

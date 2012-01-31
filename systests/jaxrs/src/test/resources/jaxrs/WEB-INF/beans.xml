@@ -95,7 +95,7 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:serviceBeans>		  
     
     <jaxrs:providers>
-       <bean class="org.apache.cxf.jaxrs.provider.AegisElementProvider"/>
+       <bean class="org.apache.cxf.jaxrs.ext.provider.AegisElementProvider"/>
     </jaxrs:providers> 
     
   </jaxrs:server> 
@@ -139,11 +139,11 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:serviceBeans>		  
 
     <jaxrs:inInterceptors>
-       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpInInterceptor"/>
+       <bean class="org.apache.cxf.jaxrs.ext.provider.jsonp.JsonpInInterceptor"/>
     </jaxrs:inInterceptors>
     <jaxrs:outInterceptors>
-       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPreStreamInterceptor"/>
-       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPostStreamInterceptor"/>
+       <bean class="org.apache.cxf.jaxrs.ext.provider.jsonp.JsonpPreStreamInterceptor"/>
+       <bean class="org.apache.cxf.jaxrs.ext.provider.jsonp.JsonpPostStreamInterceptor"/>
     </jaxrs:outInterceptors> 
   </jaxrs:server> 
   

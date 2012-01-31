@@ -54,8 +54,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     address="http://localhost:9090/simpleWithAddress"
     bus="cxf" staticSubresourceResolution="false">
     <jaxrs:providers>
-        <ref bean="feed"/>
-        <ref bean="entry"/>
+        <ref bean="dataBinding"/>
         <ref bean="jaxb"/>
     </jaxrs:providers>	
     <jaxrs:extensionMappings>
@@ -63,8 +62,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:extensionMappings>    
   </jaxrs:server>
   
-  <bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider"/>
-  <bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider"/>
+  <bean id="dataBinding" class="org.apache.cxf.jaxrs.provider.DataBindingProvider"/>
   <bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="singleJaxbContext" value="true"/>
       <property name="extraClass">

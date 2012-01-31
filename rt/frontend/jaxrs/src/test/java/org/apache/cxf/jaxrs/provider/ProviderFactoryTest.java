@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -51,8 +50,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
 
-import org.apache.abdera.model.Entry;
-import org.apache.abdera.model.Feed;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.Customer;
@@ -530,15 +527,6 @@ public class ProviderFactoryTest extends Assert {
         verifyProvider(String.class, PrimitiveTextProvider.class, "text/*");
     }
     
-    @Test
-    public void testGetAtomProvider() throws Exception {
-        ProviderFactory factory = ProviderFactory.getInstance();
-        factory.setUserProviders(
-             Arrays.asList(
-                  new Object[]{new AtomEntryProvider(), new AtomFeedProvider()}));
-        verifyProvider(factory, Entry.class, AtomEntryProvider.class, "application/atom+xml");
-        verifyProvider(factory, Feed.class, AtomFeedProvider.class, "application/atom+xml");
-    }
     
     @Test
     public void testGetStringProviderUsingProviderDeclaration() throws Exception {

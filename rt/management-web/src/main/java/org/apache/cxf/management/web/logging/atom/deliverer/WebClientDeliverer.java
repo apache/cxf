@@ -27,8 +27,8 @@ import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Feed;
 import org.apache.commons.lang.Validate;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
-import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
+import org.apache.cxf.jaxrs.ext.provider.AtomEntryProvider;
+import org.apache.cxf.jaxrs.ext.provider.AtomFeedProvider;
 
 /**
  * Marshaling and delivering based on JAXRS' WebClient.
