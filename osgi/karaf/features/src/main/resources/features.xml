@@ -99,7 +99,6 @@
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-core/${project.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-management/${project.version}</bundle> 
-		<bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-common/${project.version}</bundle> 
         <bundle start-level='40'>mvn:org.apache.cxf.karaf/cxf-karaf-commands/${project.version}</bundle>
     </feature>
     <feature name="cxf-ws-policy" version="${project.version}" resolver='(obr)'>

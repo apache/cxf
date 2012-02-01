@@ -60,11 +60,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-management</artifactId>
             <version>${project.version}</version>
         </dependency>
