@@ -41,12 +41,15 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             throw new IllegalArgumentException("Media type value can not be null");
         }
         
-        if (mType.equals(MediaType.MEDIA_TYPE_WILDCARD) || mType.startsWith("*;")) {
-            return new MediaType("*", "*");
-        }
-        
         int i = mType.indexOf('/');
         if (i == -1) {
+            mType = mType.trim();
+            if (mType.startsWith(MediaType.MEDIA_TYPE_WILDCARD)) {
+                char next = mType.length() == 1 ? ' ' : mType.charAt(1);
+                if (next == ' ' || next == ';') {
+                    return new MediaType("*", "*");
+                }
+            }
             throw new IllegalArgumentException("Media type separator is missing");
         }
         
