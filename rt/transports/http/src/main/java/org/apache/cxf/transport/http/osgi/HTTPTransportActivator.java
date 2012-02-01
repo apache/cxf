@@ -22,15 +22,27 @@ package org.apache.cxf.transport.http.osgi;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.configuration.jsse.spring.TLSParameterJaxBUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.configuration.security.CertStoreType;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
+import org.apache.cxf.configuration.security.CombinatorType;
+import org.apache.cxf.configuration.security.DNConstraintsType;
+import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.configuration.security.KeyManagersType;
+import org.apache.cxf.configuration.security.KeyStoreType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
+import org.apache.cxf.configuration.security.SecureRandomParameters;
+import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.cxf.transports.http.configuration.ConnectionType;
@@ -46,6 +58,27 @@ import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
+ * This class registers a HTTPConduitConfigurer that will pull information from the 
+ * config:admin service to configure conduits.   With the Felix file based impl, the
+ * format for that would be in files named org.apache.cxf.http.conduits-XYZ.cfg
+ * that has a list of properties like:
+ * 
+ * url: Regex url to match the configuration
+ * client.*
+ * tlsClientParameters.*
+ * proxyAuthorization.*
+ * authorization.*
+ * 
+ * Where each of those is a prefix for the attributes that would be on the elements 
+ * of the http:conduit configuration defined at:
+ * 
+ * http://cxf.apache.org/schemas/configuration/http-conf.xsd
+ * 
+ * For example:
+ * client.ReceiveTimeout: 1000
+ * authorization.Username: Foo
+ * tlsClientParameters.keyManagers.keyStore.file: mykeys.jks
+ * etc....
  * 
  */
 public class HTTPTransportActivator 
@@ -167,6 +200,9 @@ public class HTTPTransportActivator
     private void applyTlsClientParameters(Dictionary<String, String> d, HTTPConduit c) {
         Enumeration<String> keys = d.keys();
         TLSClientParameters p = c.getTlsClientParameters();
+        SecureRandomParameters srp = null;
+        KeyManagersType kmt = null;
+        TrustManagersType tmt = null;
         while (keys.hasMoreElements()) {
             String k = keys.nextElement();
             if (k.startsWith("tlsClientParameters.")) {
@@ -177,12 +213,171 @@ public class HTTPTransportActivator
                 String v = d.get(k);
                 k = k.substring("tlsClientParameters.".length());
 
-                if ("".equals(v)) {
-                    //
+                if ("secureSocketProtocol".equals(k)) {
+                    p.setSecureSocketProtocol(v);
+                } else if ("sslCacheTimeout".equals(k)) {
+                    p.setSslCacheTimeout(Integer.parseInt(v));
+                } else if ("jsseProvider".equals(k)) {
+                    p.setJsseProvider(v);
+                } else if ("disableCNCheck".equals(k)) {
+                    p.setDisableCNCheck(Boolean.parseBoolean(v));
+                } else if ("useHttpsURLConnectionDefaultHostnameVerifier".equals(k)) {
+                    p.setUseHttpsURLConnectionDefaultHostnameVerifier(Boolean.parseBoolean(v));
+                } else if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(k)) {
+                    p.setUseHttpsURLConnectionDefaultSslSocketFactory(Boolean.parseBoolean(v));
+                } else if (k.startsWith("certConstraints.")) {
+                    k = k.substring("certConstraints.".length());
+                    CertificateConstraintsType cct = p.getCertConstraints();
+                    if (cct == null) {
+                        cct = new CertificateConstraintsType();
+                        p.setCertConstraints(cct);
+                    }
+                    DNConstraintsType dnct = null;
+                    if (k.startsWith("SubjectDNConstraints.")) {
+                        dnct = cct.getSubjectDNConstraints();
+                        if (dnct == null) {
+                            dnct = new DNConstraintsType();
+                            cct.setSubjectDNConstraints(dnct);
+                        }
+                        k = k.substring("SubjectDNConstraints.".length());
+                    } else if (k.startsWith("IssuerDNConstraints.")) {
+                        dnct = cct.getIssuerDNConstraints();
+                        if (dnct == null) {
+                            dnct = new DNConstraintsType();
+                            cct.setIssuerDNConstraints(dnct);
+                        }
+                        k = k.substring("IssuerDNConstraints.".length());
+                    }
+                    if ("combinator".equals(k)) {
+                        dnct.setCombinator(CombinatorType.fromValue(v));
+                    } else if ("RegularExpression".equals(k)) {
+                        dnct.getRegularExpression().add(k);
+                    }
+                } else if (k.startsWith("secureRandomParameters.")) {
+                    k = k.substring("secureRandomParameters.".length());
+                    if (srp == null) {
+                        srp = new SecureRandomParameters();
+                    }
+                    if ("algorithm".equals(k)) {
+                        srp.setAlgorithm(v);
+                    } else if ("provider".equals(k)) {
+                        srp.setProvider(v);
+                    }
+                } else if (k.startsWith("cipherSuitesFilter.")) {
+                    k = k.substring("cipherSuitesFilter.".length());
+                    StringTokenizer st = new StringTokenizer(v, ",");
+                    FiltersType ft = p.getCipherSuitesFilter();
+                    if (ft == null) {
+                        p.setCipherSuitesFilter(ft);
+                    }
+                    List<String> lst = "include".equals(k) ? ft.getInclude() : ft.getExclude();
+                    while (st.hasMoreTokens()) {
+                        lst.add(st.nextToken());
+                    }
+                } else if (k.startsWith("cipherSuites")) {
+                    StringTokenizer st = new StringTokenizer(v, ",");
+                    while (st.hasMoreTokens()) {
+                        p.getCipherSuites().add(st.nextToken());
+                    }
+                } else if (k.startsWith("trustManagers.")) {
+                    tmt = getTrustManagers(tmt,
+                                          k.substring("trustManagers.".length()),
+                                          v);
+                } else if (k.startsWith("keyManagers.")) {
+                    kmt = getKeyManagers(kmt,
+                                         k.substring("keyManagers.".length()),
+                                         v);
                 }
-                //TODO - map properties into tls information 
             }
         }
+        
+        try {
+            if (srp != null) {
+                p.setSecureRandom(TLSParameterJaxBUtils.getSecureRandom(srp));
+            }
+            if (kmt != null) {
+                p.setKeyManagers(TLSParameterJaxBUtils.getKeyManagers(kmt));
+            }
+            if (tmt != null) {
+                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt));
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private KeyManagersType getKeyManagers(KeyManagersType keyManagers, String k, String v) {
+        if (keyManagers == null) {
+            keyManagers = new KeyManagersType();
+        }
+        if ("factoryAlgorithm".equals(k)) {
+            keyManagers.setFactoryAlgorithm(v);
+        } else if ("provider".equals(k)) {
+            keyManagers.setProvider(v);
+        } else if ("keyPassword".equals(k)) {
+            keyManagers.setKeyPassword(v);
+        } else if (k.startsWith("keyStore.")) {
+            keyManagers.setKeyStore(getKeyStore(keyManagers.getKeyStore(),
+                                                k.substring("keyStore.".length()),
+                                                v));
+        }
+        return keyManagers;
+    }
+
+    private KeyStoreType getKeyStore(KeyStoreType ks, String k, String v) {
+        if (ks == null) {
+            ks = new KeyStoreType();
+        }
+        if ("type".equals(k)) {
+            ks.setType(v);
+        } else if ("password".equals(k)) {
+            ks.setPassword(v);
+        } else if ("provider".equals(k)) {
+            ks.setProvider(v);
+        } else if ("url".equals(k)) {
+            ks.setUrl(v);
+        } else if ("file".equals(k)) {
+            ks.setFile(v);
+        } else if ("resource".equals(k)) {
+            ks.setResource(v);
+        }
+        return ks;
+    }
+
+    private TrustManagersType getTrustManagers(TrustManagersType tmt, String k, String v) {
+        if (tmt == null) {
+            tmt = new TrustManagersType();
+        }
+        if ("provider".equals(k)) {
+            tmt.setProvider(v);
+        } else if ("factoryAlgorithm".equals(k)) {
+            tmt.setFactoryAlgorithm(v);
+        } else if (k.startsWith("keyStore.")) {
+            tmt.setKeyStore(getKeyStore(tmt.getKeyStore(),
+                                        k.substring("keyStore.".length()),
+                                        v));
+        } else if (k.startsWith("certStore")) {
+            tmt.setCertStore(getCertStore(tmt.getCertStore(),
+                                          k.substring("certStore.".length()),
+                                          v));
+        }
+        return tmt;
+    }
+
+    private CertStoreType getCertStore(CertStoreType cs, String k, String v) {
+        if (cs == null) {
+            cs = new CertStoreType();
+        }
+        if ("file".equals(k)) {
+            cs.setFile(v);
+        } else if ("url".equals(k)) {
+            cs.setUrl(v);
+        } else if ("resource".equals(k)) {
+            cs.setResource(v);
+        }
+        return cs;
     }
 
     private void applyProxyAuthorization(Dictionary<String, String> d, HTTPConduit c) {
