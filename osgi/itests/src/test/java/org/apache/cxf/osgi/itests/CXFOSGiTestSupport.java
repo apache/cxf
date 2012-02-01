@@ -42,6 +42,8 @@ import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.TestProbeBuilder;
+import org.ops4j.pax.exam.junit.ProbeBuilder;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -81,19 +83,29 @@ public class CXFOSGiTestSupport {
 
     ExecutorService executor = Executors.newCachedThreadPool();
 
+    /**
+     * @param probe
+     * @return
+     */
+    @ProbeBuilder
+    public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
+        probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE, "*,org.apache.felix.service.*;status=provisional");
+
+        return probe;
+    }
+
 
     /**
      * Installs the CXF feature
      */
     protected void installCXF() {
         System.err.println(executeCommand("features:addurl " + CXF_FEATURE_URL));
-        System.err.println(executeCommand("features:listurl"));
-        System.err.println(executeCommand("features:list"));
-        //executeCommand("features:install cxf");
+        System.err.println(executeCommand("features:install cxf"));
     }
 
     protected void unInstallCXF() {
         System.err.println(executeCommand("features:uninstall cxf"));
+        System.err.println(executeCommand("list"));
     }
 
     /**
