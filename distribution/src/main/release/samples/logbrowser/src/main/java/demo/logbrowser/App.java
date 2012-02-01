@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 
-import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
-import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
+import org.apache.cxf.jaxrs.ext.provider.AtomEntryProvider;
+import org.apache.cxf.jaxrs.ext.provider.AtomFeedProvider;
 
 import org.apache.cxf.management.web.browser.bootstrapping.BootstrapStorage;
 import org.apache.cxf.management.web.browser.bootstrapping.SimpleXMLSettingsStorage;
