@@ -58,6 +58,13 @@ public class MediaTypeHeaderProviderTest extends Assert {
     }
     
     @Test
+    public void testShortWildcardWithParameters2() {
+        MediaType m = MediaType.valueOf("* ;q=0.2");
+        assertEquals("Media type was not parsed correctly", 
+                     m, new MediaType("*", "*"));
+    }
+    
+    @Test
     public void testBadType() {
         try {
             new MediaTypeHeaderProvider().fromString("texthtml");
