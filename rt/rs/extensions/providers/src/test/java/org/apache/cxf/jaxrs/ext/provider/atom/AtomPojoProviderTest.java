@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.provider;
+package org.apache.cxf.jaxrs.ext.provider.atom;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,10 +31,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.cxf.jaxrs.ext.provider.atom.AbstractEntryBuilder;
-import org.apache.cxf.jaxrs.ext.provider.atom.AbstractFeedBuilder;
-import org.apache.cxf.jaxrs.ext.provider.atom.AtomElementReader;
-import org.apache.cxf.jaxrs.ext.provider.atom.AtomElementWriter;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 
 import org.junit.Assert;
@@ -51,7 +47,7 @@ public class AtomPojoProviderTest extends Assert {
     public void setUp() {
         ctx = 
             new ClassPathXmlApplicationContext(
-                new String[] {"/org/apache/cxf/jaxrs/ext/provider/servers.xml"});
+                new String[] {"/org/apache/cxf/jaxrs/ext/provider/atom/servers.xml"});
     }
     
     @Test

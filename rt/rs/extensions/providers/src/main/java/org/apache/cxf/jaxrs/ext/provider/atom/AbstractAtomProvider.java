@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext.provider;
+package org.apache.cxf.jaxrs.ext.provider.atom;
 
 import java.io.IOException;
 import java.io.InputStream;

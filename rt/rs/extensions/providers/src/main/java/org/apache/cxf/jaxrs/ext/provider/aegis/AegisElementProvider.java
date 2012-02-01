@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext.provider;
+package org.apache.cxf.jaxrs.ext.provider.aegis;
 
 
 import java.io.IOException;

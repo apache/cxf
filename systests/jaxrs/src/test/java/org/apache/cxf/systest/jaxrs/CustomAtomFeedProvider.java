@@ -30,7 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.abdera.model.Feed;
-import org.apache.cxf.jaxrs.ext.provider.AtomFeedProvider;
+import org.apache.cxf.jaxrs.ext.provider.atom.AtomFeedProvider;
 
 @Produces({"application/atom+xml", "application/atom+xml;type=feed", "application/json" })
 @Consumes({"application/atom+xml", "application/atom+xml;type=feed" })

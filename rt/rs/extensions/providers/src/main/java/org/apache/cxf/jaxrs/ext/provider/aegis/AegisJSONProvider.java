@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext.provider;
+package org.apache.cxf.jaxrs.ext.provider.aegis;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +43,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.jaxrs.ext.provider.PrefixCollectingXMLStreamWriter;
 import org.apache.cxf.jaxrs.provider.JSONUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;

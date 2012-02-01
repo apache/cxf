@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext.provider;
+package org.apache.cxf.jaxrs.ext.provider.atom;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -27,17 +27,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Entry;
 
-@Produces({"application/atom+xml", "application/atom+xml;type=feed", "application/json" })
-@Consumes({"application/atom+xml", "application/atom+xml;type=feed" })
+@Produces({"application/atom+xml", "application/atom+xml;type=entry", "application/json" })
+@Consumes({"application/atom+xml", "application/atom+xml;type=entry" })
 @Provider
-public class AtomFeedProvider extends AbstractAtomProvider<Feed> {
+public class AtomEntryProvider extends AbstractAtomProvider<Entry> {
+    
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return Feed.class.isAssignableFrom(type);
+        return Entry.class.isAssignableFrom(type);
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return Feed.class.isAssignableFrom(type);
+        return Entry.class.isAssignableFrom(type);
     }
+    
 }

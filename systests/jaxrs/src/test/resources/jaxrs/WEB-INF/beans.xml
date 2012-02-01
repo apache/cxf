@@ -95,7 +95,7 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:serviceBeans>		  
     
     <jaxrs:providers>
-       <bean class="org.apache.cxf.jaxrs.ext.provider.AegisElementProvider"/>
+       <bean class="org.apache.cxf.jaxrs.ext.provider.aegis.AegisElementProvider"/>
     </jaxrs:providers> 
     
   </jaxrs:server> 

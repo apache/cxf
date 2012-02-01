@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.ext.provider;
+package org.apache.cxf.jaxrs.ext.provider.xmlbeans;
 
 import java.io.File;
 import java.io.FileInputStream;

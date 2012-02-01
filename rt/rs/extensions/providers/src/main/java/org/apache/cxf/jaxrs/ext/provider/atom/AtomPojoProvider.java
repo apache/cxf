@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.provider;
+package org.apache.cxf.jaxrs.ext.provider.atom;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,11 +58,6 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.writer.Writer;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.provider.atom.AbstractAtomElementBuilder;
-import org.apache.cxf.jaxrs.ext.provider.atom.AbstractEntryBuilder;
-import org.apache.cxf.jaxrs.ext.provider.atom.AbstractFeedBuilder;
-import org.apache.cxf.jaxrs.ext.provider.atom.AtomElementReader;
-import org.apache.cxf.jaxrs.ext.provider.atom.AtomElementWriter;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
