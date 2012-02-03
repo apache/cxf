@@ -198,7 +198,8 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         for (Parameter p : parameters) {
             if (p.getType() == ParameterType.CONTEXT) {
-                reportInvalidResourceMethod(ori.getMethodToInvoke(), "NO_CONTEXT_PARAMETERS");
+                // ignore
+                continue;
             }
             map.add(p.getType(), p);
         }
