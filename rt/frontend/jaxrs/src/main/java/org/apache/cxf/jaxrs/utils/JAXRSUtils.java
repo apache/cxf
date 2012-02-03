@@ -160,20 +160,19 @@ public final class JAXRSUtils {
         String[] values = getUserMediaTypes(provider, "getConsumeMediaTypes");
         
         if (values == null) {
-            Consumes c = provider.getClass().getAnnotation(Consumes.class);
-            values = c == null ? new String[]{"*/*"} : c.value();
+            return getConsumeTypes(provider.getClass().getAnnotation(Consumes.class));
+        } else {
+            return JAXRSUtils.getMediaTypes(values);
         }
-        return JAXRSUtils.getMediaTypes(values);
     }
     
     public static List<MediaType> getProviderProduceTypes(MessageBodyWriter provider) {
         String[] values = getUserMediaTypes(provider, "getProduceMediaTypes");
-        
         if (values == null) {
-            Produces c = provider.getClass().getAnnotation(Produces.class);
-            values = c == null ? new String[]{"*/*"} : c.value();
+            return getProduceTypes(provider.getClass().getAnnotation(Produces.class));
+        } else {
+            return JAXRSUtils.getMediaTypes(values);
         }
-        return JAXRSUtils.getMediaTypes(values);
     }
     
     public static List<MediaType> getMediaTypes(String[] values) {
@@ -1120,14 +1119,24 @@ public final class JAXRSUtils {
                 if (!isCompatible && requiredType.getType().equalsIgnoreCase(userType.getType())) {
                     // check if we have composite subtypes
                     String subType1 = requiredType.getSubtype();
-                    String subTypeAfterPlus1 = splitMediaSubType(subType1); 
                     String subType2 = userType.getSubtype();
-                    String subTypeAfterPlus2 = splitMediaSubType(subType2);
                     
-                    if (subTypeAfterPlus1 != null && subTypeAfterPlus2 != null
-                        && subTypeAfterPlus1.equalsIgnoreCase(subTypeAfterPlus2)
-                        && (subType1.charAt(0) == '*' || subType2.charAt(0) == '*')) {
-                        isCompatible = true;
+                    String subTypeAfterPlus1 = splitMediaSubType(subType1, true); 
+                    String subTypeAfterPlus2 = splitMediaSubType(subType2, true);
+                    
+                    if (subTypeAfterPlus1 != null && subTypeAfterPlus2 != null) {
+                    
+                        isCompatible = subTypeAfterPlus1.equalsIgnoreCase(subTypeAfterPlus2)
+                            && (subType1.charAt(0) == '*' || subType2.charAt(0) == '*');
+                        
+                        if (!isCompatible) {
+                            String subTypeBeforePlus1 = splitMediaSubType(subType1, false);
+                            String subTypeBeforePlus2 = splitMediaSubType(subType2, false);
+                            
+                            isCompatible = subTypeBeforePlus1.equalsIgnoreCase(subTypeBeforePlus2)
+                                && (subType1.charAt(subType1.length() - 1) == '*' 
+                                    || subType2.charAt(subType2.length() - 1) == '*');
+                        }
                     }
                 }
                 if (isCompatible) {
@@ -1165,9 +1174,9 @@ public final class JAXRSUtils {
         
     }
     
-    static String splitMediaSubType(String type) {
+    private static String splitMediaSubType(String type, boolean after) {
         int index = type.indexOf('+');
-        return index == -1 ? null : type.substring(index + 1);
+        return index == -1 ? null : after ? type.substring(index + 1) : type.substring(0, index);
     }
     
     public static List<MediaType> intersectMimeTypes(List<MediaType> mimeTypesA, 
