@@ -31,12 +31,10 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.ext.codegen.CodeGeneratorProvider;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
 public class RequestPreprocessor {
@@ -83,9 +81,6 @@ public class RequestPreprocessor {
         handleCType(m, queries);
         handleMethod(m, queries, new HttpHeadersImpl(m));
         Response r = checkMetadataRequest(m, u);
-        if (r == null) {
-            r = checkCodeRequest(m);
-        }
         if (r != null) {
             m.getExchange().put(Response.class, r);
         }
@@ -226,22 +221,5 @@ public class RequestPreprocessor {
         return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
     
-    public Response checkCodeRequest(Message m) {
-        String query = (String)m.get(Message.QUERY_STRING);
-        if (query != null && (query.contains(CodeGeneratorProvider.CODE_QUERY) 
-            || query.contains(CodeGeneratorProvider.SOURCE_QUERY))) {
-            String requestURI = (String)m.get(Message.REQUEST_URI);
-            String baseAddress = HttpUtils.getBaseAddress(m);
-            if (baseAddress.equals(requestURI)) {
-                List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(m).getRequestHandlers();
-                for (ProviderInfo<RequestHandler> provider : shs) {
-                    if (provider.getProvider() instanceof CodeGeneratorProvider) { 
-                        InjectionUtils.injectContextMethods(provider.getProvider(), provider, m);
-                        return provider.getProvider().handleRequest(m, null);
-                    }
-                }
-            }
-        }
-        return null;
-    }
+    
 }

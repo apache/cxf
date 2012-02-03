@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.codegen;
+package org.apache.cxf.tools.wadlto.jaxrs;
 
 import java.io.File;
 import java.io.FileNotFoundException;
