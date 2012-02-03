@@ -57,9 +57,9 @@ import org.w3c.dom.DOMError;
 import org.w3c.dom.DOMErrorHandler;
 
 import org.apache.cxf.BusException;
+import org.apache.cxf.annotations.EvaluateAllEndpoints;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
-import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -399,12 +399,13 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         boolean setEPName = true;
         if (features != null) {
             for (AbstractFeature f : features) {
-                if (f instanceof FailoverFeature) {
+                if (f.getClass().isAnnotationPresent(EvaluateAllEndpoints.class)) {
                     setEPName = false;
                 }
             }
         }
         if (setEPName) {
+            // CXF will only evaluate this endpoint
             factory.setEndpointName(getEndpointName(false));
         }
         sendEvent(Event.WSDL_LOADED, factory.getDefinition());

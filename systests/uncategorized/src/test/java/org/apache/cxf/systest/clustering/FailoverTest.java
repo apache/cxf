@@ -93,7 +93,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class));
+                   launchServer(Server.class, true));
     }
             
     protected String getConfig() {
@@ -452,6 +452,11 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     }
     
     
+    /**
+     * Exchange the port number in all service addresses on the bus.  
+     * @param port1 current port
+     * @param port2 new port
+     */
     private void updateWsdlExtensors(String port1, String port2) {
         try {
             Definition def = bus.getExtension(WSDLManager.class)

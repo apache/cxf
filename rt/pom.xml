@@ -41,6 +41,7 @@
         <module>databinding/sdo</module>
         <module>databinding/jibx</module>
         <module>bindings</module>
+        <module>features/clustering</module>
         <module>frontend/simple</module>
         <module>frontend/jaxws</module>
         <module>frontend/jaxrs</module>

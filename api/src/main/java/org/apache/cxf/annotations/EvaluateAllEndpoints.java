@@ -16,24 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.clustering.spring;
+package org.apache.cxf.annotations;
 
-import org.w3c.dom.Element;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.apache.cxf.clustering.FailoverFeature;
-import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.ParserContext;
+/**
+ * Marker for CXF Features. If a client or endpoint declaration has a Feature with this annotation then
+ * CXF will evaluate all Endpoints of the respective service instead of only the used endpoint.
+ */
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Target({ ElementType.TYPE })
+public @interface EvaluateAllEndpoints {
 
-public class FailoverBeanDefinitionParser extends AbstractBeanDefinitionParser {
-
-    @Override
-    protected Class<?> getBeanClass(Element element) {
-        return FailoverFeature.class;
-    }
- 
-    @Override
-    protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
-        setFirstChildAsProperty(e, ctx, bean, name);
-    }
 }

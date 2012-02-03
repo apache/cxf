@@ -20,46 +20,17 @@ package org.apache.cxf.jaxrs.features.clustering;
 
 import java.util.List;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.clustering.AbstractStaticFailoverStrategy;
 import org.apache.cxf.clustering.FailoverStrategy;
-import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.ConduitSelector;
-import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.jaxrs.client.ClientConfiguration;
 
 /**
- * This feature may be applied to proxy or HTTP-centric clients
+ * Use the default FailoverFeature instead
  */
+@Deprecated
 @NoJSR250Annotations
 public class FailoverFeature extends org.apache.cxf.clustering.FailoverFeature {
 
-    private FailoverTargetSelector customSelector;
-    
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        initialize((ClientConfiguration)interceptorProvider, bus);
-    }
-    
-    public void initialize(ClientConfiguration client, Bus bus) {
-        ConduitSelector selector = initTargetSelector(client.getConduitSelector().getEndpoint());
-        client.setConduitSelector(selector);
-    }
-
-    @Override
-    protected FailoverTargetSelector getTargetSelector() {
-        if (customSelector != null) {
-            return customSelector;
-        } else {
-            return super.getTargetSelector();
-        }
-    }
-    
-    public void setTargetSelector(FailoverTargetSelector selector) {
-        customSelector = selector;
-    }
-    
     @Override
     public FailoverStrategy getStrategy()  {
         FailoverStrategy strategy = super.getStrategy();

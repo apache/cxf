@@ -133,6 +133,11 @@
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>${project.version}</version>
         </dependency>
+         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-features-clustering</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>

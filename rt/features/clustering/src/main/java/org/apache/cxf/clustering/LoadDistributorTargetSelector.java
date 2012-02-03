@@ -1,0 +1,221 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.cxf.clustering;
+
+import java.util.List;
+import java.util.logging.Logger;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.Conduit;
+
+/**
+ *
+ * @author jtalbut
+ * 
+ * The LoadDistributorTargetSelector attempts to do the same job as the 
+ * FailoverTargetSelector, but to choose an alternate target on every request
+ * rather than just when a fault occurs.
+ * The LoadDistributorTargetSelector uses the same FailoverStrategy interface as 
+ * the FailoverTargetSelector, but has a few significant limitations:
+ * 1. Because the LoadDistributorTargetSelector needs to maintain a list of targets
+ *    between calls it has to obtain that list without reference to a Message.
+ *    Most FailoverStrategy classes can support this for addresses, but it cannot
+ *    be supported for endpoints.
+ *    If the list of targets cannot be obtained without reference to a Message then
+ *    the list will still be obtained but it will be specific to the Message and thus
+ *    discarded after this message has been processed.  As a consequence, if the
+ *    strategy chosen is a simple sequential one the first item in the list will
+ *    be chosen every time.
+ *    Conclusion: Be aware that if you are working with targets that are 
+ *    dependent on the Message the process will be less efficient and that the
+ *    SequentialStrategy will not distribute the load at all.
+ * 2. The AbstractStaticFailoverStrategy base class excludes the 'default' endpoint
+ *    from the list of alternate endpoints.
+ *    If alternate endpoints (as opposed to alternate addresses) are to be used
+ *    you should probably ensure that your FailoverStrategy overrides getAlternateEndpoints
+ *    and calls getEndpoints with acceptCandidatesWithSameAddress = true.
+ */
+public class LoadDistributorTargetSelector extends FailoverTargetSelector {
+    private static final Logger LOG = LogUtils.getL7dLogger(
+                        LoadDistributorTargetSelector.class);
+    private static final String IS_DISTRIBUTED = 
+            "org.apache.cxf.clustering.LoadDistributorTargetSelector.IS_DISTRIBUTED";
+
+    private List<String> addressList;
+
+    private boolean failover = true;
+
+    /**
+     * Normal constructor.
+     */
+    public LoadDistributorTargetSelector() {
+        this(null);
+    }
+
+    /**
+     * Constructor, allowing a specific conduit to override normal selection.
+     *
+     * @param c specific conduit
+     */
+    public LoadDistributorTargetSelector(Conduit c) {
+        super(c);
+    }
+
+    public boolean isFailover() {
+        return failover;
+    }
+
+    public void setFailover(boolean failover) {
+        this.failover = failover;
+    }
+
+    @Override
+    protected java.util.logging.Logger getLogger() {
+        return LOG;
+    }
+
+    /**
+     * Called when a Conduit is actually required.
+     *
+     * @param message
+     * @return the Conduit to use for mediation of the message
+     */
+    public Conduit selectConduit(Message message) {
+        Exchange exchange = message.getExchange();
+        InvocationKey key = new InvocationKey(exchange);
+        InvocationContext invocation = inProgress.get(key);
+        if ((invocation != null) && !invocation.getContext().containsKey(IS_DISTRIBUTED)) {
+            Endpoint target = getDistributionTarget(exchange, invocation);
+            if (target != null) {
+                setEndpoint(target);
+                if (selectedConduit != null) {
+                    selectedConduit.close();
+                    selectedConduit = null;
+                }
+                message.put(Message.ENDPOINT_ADDRESS, target.getEndpointInfo().getAddress());
+                overrideAddressProperty(invocation.getContext());
+                invocation.getContext().put(IS_DISTRIBUTED, null);
+            }
+        }
+        return getSelectedConduit(message);
+    }
+
+    /**
+     * Get the failover target endpoint, if a suitable one is available.
+     *
+     * @param exchange the current Exchange
+     * @param invocation the current InvocationContext
+     * @return a failover endpoint if one is available
+     * 
+     * Note: The only difference between this and the super implementation is
+     * that the current (failed) address is removed from the list set of alternates,
+     * it could be argued that that change should be in the super implementation
+     * but I'm not sure of the impact.
+     */
+    protected Endpoint getFailoverTarget(Exchange exchange,
+                                       InvocationContext invocation) {
+        List<String> alternateAddresses = null;
+        if (!invocation.hasAlternates()) {
+            // no previous failover attempt on this invocation
+            //
+            alternateAddresses = 
+                getStrategy().getAlternateAddresses(exchange);
+            if (alternateAddresses != null) {
+                alternateAddresses.remove(exchange.getEndpoint().getEndpointInfo().getAddress());
+                invocation.setAlternateAddresses(alternateAddresses);
+            } else {
+                invocation.setAlternateEndpoints(
+                    getStrategy().getAlternateEndpoints(exchange));
+            }
+        } else {
+            alternateAddresses = invocation.getAlternateAddresses();
+        }
+
+        Endpoint failoverTarget = null;
+        if (alternateAddresses != null) {
+            String alternateAddress = 
+                getStrategy().selectAlternateAddress(alternateAddresses);
+            if (alternateAddress != null) {
+                // re-use current endpoint
+                //
+                failoverTarget = getEndpoint();
+
+                failoverTarget.getEndpointInfo().setAddress(alternateAddress);
+            }
+        } else {
+            failoverTarget = getStrategy().selectAlternateEndpoint(
+                                 invocation.getAlternateEndpoints());
+        }
+        return failoverTarget;
+    }
+
+    /**
+     * Get the distribution target endpoint, if a suitable one is available.
+     *
+     * @param exchange the current Exchange
+     * @param invocation the current InvocationContext
+     * @return a distribution endpoint if one is available
+     */
+    private Endpoint getDistributionTarget(Exchange exchange,
+                                           InvocationContext invocation) {
+        List<String> alternateAddresses = null;
+        if ((addressList == null) || (addressList.isEmpty())) {
+            try {
+                addressList = getStrategy().getAlternateAddresses(null);
+            } catch (NullPointerException ex) {
+                getLogger().fine("Strategy " + getStrategy().getClass()
+                        + " cannot handle a null argument to getAlternateAddresses: " + ex.toString());
+            }
+        }
+        alternateAddresses = addressList;
+
+        if ((alternateAddresses == null) || (alternateAddresses.isEmpty())) {
+            alternateAddresses = getStrategy().getAlternateAddresses(exchange);
+            if (alternateAddresses != null) {
+                invocation.setAlternateAddresses(alternateAddresses);
+            } else {
+                invocation.setAlternateEndpoints(
+                    getStrategy().getAlternateEndpoints(exchange));
+            }
+        }
+
+        Endpoint distributionTarget = null;
+        if ((alternateAddresses != null) && !alternateAddresses.isEmpty()) {
+            String alternateAddress =
+                getStrategy().selectAlternateAddress(alternateAddresses);
+            if (alternateAddress != null) {
+                // re-use current endpoint
+                distributionTarget = getEndpoint();
+                distributionTarget.getEndpointInfo().setAddress(alternateAddress);
+            }
+        } else {
+            distributionTarget = getStrategy().selectAlternateEndpoint(
+                                 invocation.getAlternateEndpoints());
+        }
+        return distributionTarget;
+    }
+
+    @Override
+    protected boolean requiresFailover(Exchange exchange) {
+        return failover && super.requiresFailover(exchange);
+    }
+
+}

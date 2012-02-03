@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.endpoint.ConduitSelector;
+import org.apache.cxf.endpoint.ConduitSelectorHolder;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -43,7 +44,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
  * Given an instance with the name 'client', one can access its configuration
  * using a WebClient.getConfig(client) call.
  */
-public class ClientConfiguration implements InterceptorProvider {
+public class ClientConfiguration implements InterceptorProvider, ConduitSelectorHolder {
     private static final Logger LOG = LogUtils.getL7dLogger(ClientConfiguration.class);
     
     private List<Interceptor<? extends Message>> inInterceptors 

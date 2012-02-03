@@ -16,35 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.endpoint;
 
-package org.apache.cxf.clustering;
-
-import java.util.List;
-import java.util.Random;
-
-/**
- * Failover strategy based on a randomized walk through the
- * static cluster represented by multiple endpoints associated 
- * with the same service instance.
- */
-public class RandomStrategy extends AbstractStaticFailoverStrategy {
+public interface ConduitSelectorHolder {
+    ConduitSelector getConduitSelector();
     
-    private Random random;
-    
-    /**
-     * Constructor.
-     */
-    public RandomStrategy() {
-        random = new Random();
-    }
-
-    /**
-     * Get next alternate endpoint.
-     * 
-     * @param alternates non-empty List of alternate endpoints 
-     * @return
-     */
-    protected <T> T getNextAlternate(List<T> alternates) {
-        return alternates.remove(random.nextInt(alternates.size()));
-    }
+    void setConduitSelector(ConduitSelector conduitSelector);
 }

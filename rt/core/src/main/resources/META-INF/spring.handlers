@@ -18,5 +18,4 @@
 #    under the License.
 #
 #
-http\://cxf.apache.org/clustering=org.apache.cxf.clustering.spring.NamespaceHandler
 http\://cxf.apache.org/core=org.apache.cxf.bus.spring.NamespaceHandler
