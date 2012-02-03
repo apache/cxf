@@ -66,14 +66,6 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
-        <!-- Only necessary for the @Deprecated FailoverFeature -->
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-features-clustering</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>

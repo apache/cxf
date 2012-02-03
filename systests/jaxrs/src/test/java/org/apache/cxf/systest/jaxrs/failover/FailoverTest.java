@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.clustering.RetryStrategy;
@@ -36,7 +37,6 @@ import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.features.clustering.FailoverFeature;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;

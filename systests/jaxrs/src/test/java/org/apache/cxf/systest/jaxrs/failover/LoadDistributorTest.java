@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.LoadDistributorTargetSelector;
 import org.apache.cxf.clustering.SequentialStrategy;
@@ -31,7 +32,6 @@ import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.features.clustering.FailoverFeature;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
