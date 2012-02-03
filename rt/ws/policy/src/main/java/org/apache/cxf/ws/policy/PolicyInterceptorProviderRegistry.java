@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -35,7 +36,7 @@ import org.apache.neethi.Assertion;
  * assertion domain specific interceptors.
  */
 public interface PolicyInterceptorProviderRegistry 
-    extends Registry<QName, PolicyInterceptorProvider> {
+    extends Registry<QName, Set<PolicyInterceptorProvider>> {
     
     /**
      * Register the builder for all qnames from the provider
@@ -44,7 +45,15 @@ public interface PolicyInterceptorProviderRegistry
      */
     void register(PolicyInterceptorProvider provider);
     
-    List<Interceptor<? extends Message>> getInterceptors(Collection<? extends Assertion> alterative, 
-                                                         boolean out, boolean fault);
+    List<Interceptor<? extends Message>> 
+    getInterceptorsForAlternative(Collection<? extends Assertion> alterative,
+                                  boolean out, boolean fault);
 
+    List<Interceptor<? extends Message>> getInInterceptorsForAssertion(QName qn);
+
+    List<Interceptor<? extends Message>> getInFaultInterceptorsForAssertion(QName qn);
+
+    List<Interceptor<? extends Message>> getOutInterceptorsForAssertion(QName qn);
+
+    List<Interceptor<? extends Message>> getOutFaultInterceptorsForAssertion(QName qn);
 }

@@ -19,7 +19,18 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -27,10 +38,71 @@ import org.junit.Test;
  */
 public class PolicyInterceptorProviderRegistryImplTest extends Assert {
 
+    private static final QName ASSERTION = new QName("testns", "test");
+    private static final QName WRONG_ASSERTION = new QName("testns", "wrong");
+    private IMocksControl control;
+
+    @Before
+    public void setUp() {
+        control = EasyMock.createNiceControl();
+        new Integer(4);
+    }
+
     @Test
     public void testConstructors() {
         PolicyInterceptorProviderRegistryImpl reg = new PolicyInterceptorProviderRegistryImpl();
         assertNotNull(reg);
         assertEquals(PolicyInterceptorProviderRegistry.class, reg.getRegistrationType());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testRegister() {
+        PolicyInterceptorProviderRegistryImpl reg = new PolicyInterceptorProviderRegistryImpl();
+        PolicyInterceptorProvider pp = control.createMock(PolicyInterceptorProvider.class);
+        Interceptor<Message> pi1 = control.createMock(Interceptor.class);
+        Interceptor<Message> pi2 = control.createMock(Interceptor.class);
+        Interceptor<Message> pif = control.createMock(Interceptor.class);
+        Interceptor<Message> po = control.createMock(Interceptor.class);
+        Interceptor<Message> pof = control.createMock(Interceptor.class);
+        List<Interceptor<? extends Message>> pil = new ArrayList<Interceptor<? extends Message>>();
+        pil.add(pi1);
+        pil.add(pi2);
+        List<Interceptor<? extends Message>> pifl = new ArrayList<Interceptor<? extends Message>>();
+        pifl.add(pif);
+        List<Interceptor<? extends Message>> pol = new ArrayList<Interceptor<? extends Message>>();
+        pol.add(po);
+        List<Interceptor<? extends Message>> pofl = new ArrayList<Interceptor<? extends Message>>();
+        pofl.add(pof);
+        EasyMock.expect(pp.getInInterceptors()).andReturn(pil);
+        EasyMock.expect(pp.getInFaultInterceptors()).andReturn(pifl);
+        EasyMock.expect(pp.getOutInterceptors()).andReturn(pol);
+        EasyMock.expect(pp.getOutFaultInterceptors()).andReturn(pofl);
+        Collection<QName> assertionTypes = new ArrayList<QName>();
+        assertionTypes.add(ASSERTION);
+        EasyMock.expect(pp.getAssertionTypes()).andReturn(assertionTypes);
+        control.replay();
+        reg.register(pp);
+        assertEquals(pil, reg.getInInterceptorsForAssertion(ASSERTION));
+        assertEquals(pifl, reg.getInFaultInterceptorsForAssertion(ASSERTION));
+        assertEquals(pol, reg.getOutInterceptorsForAssertion(ASSERTION));
+        assertEquals(pofl, reg.getOutFaultInterceptorsForAssertion(ASSERTION));
+        assertTrue(reg.getInInterceptorsForAssertion(WRONG_ASSERTION).isEmpty());
+        control.verify();
+    }
+
+    @Test
+    public void testGetNotNull() {
+        PolicyInterceptorProviderRegistryImpl reg = new PolicyInterceptorProviderRegistryImpl();
+        assertNotNull(reg.get(ASSERTION));
+        assertTrue(reg.get(ASSERTION).isEmpty());
+        assertNotNull(reg.getInInterceptorsForAssertion(ASSERTION));
+        assertTrue(reg.getInInterceptorsForAssertion(ASSERTION).isEmpty());
+        assertNotNull(reg.getOutInterceptorsForAssertion(ASSERTION));
+        assertTrue(reg.getOutInterceptorsForAssertion(ASSERTION).isEmpty());
+        assertNotNull(reg.getInFaultInterceptorsForAssertion(ASSERTION));
+        assertTrue(reg.getInFaultInterceptorsForAssertion(ASSERTION).isEmpty());
+        assertNotNull(reg.getOutFaultInterceptorsForAssertion(ASSERTION));
+        assertTrue(reg.getOutFaultInterceptorsForAssertion(ASSERTION).isEmpty());
     }
 }

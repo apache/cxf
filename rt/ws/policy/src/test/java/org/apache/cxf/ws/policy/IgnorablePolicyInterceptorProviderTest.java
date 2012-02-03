@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -40,32 +41,35 @@ import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
 /**
  * 
  */
 public class IgnorablePolicyInterceptorProviderTest extends Assert {
     private static final QName ONEWAY_QNAME = new QName("http://tempuri.org/policy", "OneWay");
     private static final QName DUPLEX_QNAME = new QName("http://tempuri.org/policy", "Duplex");
-        
+
     @Test
     public void testProvider() {
         Bus bus = null;
         try {
             bus = new SpringBusFactory().createBus("/org/apache/cxf/ws/policy/ignorable-policy.xml", false);
-            
-            PolicyInterceptorProviderRegistry pipreg = 
-                bus.getExtension(PolicyInterceptorProviderRegistry.class);
-            
+
+            PolicyInterceptorProviderRegistry pipreg = bus
+                .getExtension(PolicyInterceptorProviderRegistry.class);
+
             assertNotNull(pipreg);
-            
-            PolicyInterceptorProvider pip = pipreg.get(ONEWAY_QNAME);
-            
-            assertNotNull(pip);
-            
-            PolicyInterceptorProvider pip2 = pipreg.get(DUPLEX_QNAME);
-            
-            assertEquals(pip, pip2);
+
+            Set<PolicyInterceptorProvider> pips = pipreg.get(ONEWAY_QNAME);
+
+            assertNotNull(pips);
+            assertFalse(pips.isEmpty());
+
+            Set<PolicyInterceptorProvider> pips2 = pipreg.get(DUPLEX_QNAME);
+
+            assertNotNull(pips2);
+            assertFalse(pips2.isEmpty());
+
+            assertEquals(pips.iterator().next(), pips2.iterator().next());
 
         } finally {
             if (null != bus) {
@@ -80,26 +84,29 @@ public class IgnorablePolicyInterceptorProviderTest extends Assert {
         Bus bus = null;
         try {
             bus = new SpringBusFactory().createBus("/org/apache/cxf/ws/policy/ignorable-policy.xml", false);
-            
-            PolicyInterceptorProviderRegistry pipreg = 
-                bus.getExtension(PolicyInterceptorProviderRegistry.class);
-            
+
+            PolicyInterceptorProviderRegistry pipreg = bus
+                .getExtension(PolicyInterceptorProviderRegistry.class);
+
             assertNotNull(pipreg);
-            
-            PolicyInterceptorProvider pip = pipreg.get(ONEWAY_QNAME);
-            
-            assertNotNull(pip);
-            
+
+            Set<PolicyInterceptorProvider> pips = pipreg.get(ONEWAY_QNAME);
+
+            assertNotNull(pips);
+            assertFalse(pips.isEmpty());
+
+            PolicyInterceptorProvider pip = pips.iterator().next();
+
             List<Interceptor<Message>> list;
             list = CastUtils.cast(pip.getOutInterceptors());
             verifyAssertion(list);
-            
+
             list = CastUtils.cast(pip.getInInterceptors());
             verifyAssertion(list);
 
             list = CastUtils.cast(pip.getOutFaultInterceptors());
             verifyAssertion(list);
-            
+
             list = CastUtils.cast(pip.getInFaultInterceptors());
             verifyAssertion(list);
 
@@ -110,8 +117,7 @@ public class IgnorablePolicyInterceptorProviderTest extends Assert {
             }
         }
     }
-    
-    
+
     private void verifyAssertion(List<Interceptor<Message>> list) {
         Message message = new MessageImpl();
         AssertionInfoMap aim = createTestAssertions();
@@ -125,7 +131,7 @@ public class IgnorablePolicyInterceptorProviderTest extends Assert {
         for (Interceptor<Message> p : list) {
             p.handleMessage(message);
         }
-            
+
         aim.check();
     }
 
@@ -138,25 +144,29 @@ public class IgnorablePolicyInterceptorProviderTest extends Assert {
             context = new ClassPathXmlApplicationContext("/org/apache/cxf/ws/policy/ignorable-policy2.xml");
             cxf1 = (Bus)context.getBean("cxf1");
             assertNotNull(cxf1);
-            
+
             cxf2 = (Bus)context.getBean("cxf2");
             assertNotNull(cxf2);
-            
-            PolicyInterceptorProviderRegistry pipreg1 = 
-                cxf1.getExtension(PolicyInterceptorProviderRegistry.class);
+
+            PolicyInterceptorProviderRegistry pipreg1 = cxf1
+                .getExtension(PolicyInterceptorProviderRegistry.class);
             assertNotNull(pipreg1);
 
-            PolicyInterceptorProviderRegistry pipreg2 = 
-                cxf2.getExtension(PolicyInterceptorProviderRegistry.class);
+            PolicyInterceptorProviderRegistry pipreg2 = cxf2
+                .getExtension(PolicyInterceptorProviderRegistry.class);
             assertNotNull(pipreg2);
 
-            PolicyInterceptorProvider pip1 = pipreg1.get(ONEWAY_QNAME);
-            
-            assertNotNull(pip1);
-            
-            PolicyInterceptorProvider pip2 = pipreg2.get(ONEWAY_QNAME);
-            
-            assertEquals(pip1, pip2);
+            Set<PolicyInterceptorProvider> pips1 = pipreg1.get(ONEWAY_QNAME);
+
+            assertNotNull(pips1);
+            assertFalse(pips1.isEmpty());
+
+            Set<PolicyInterceptorProvider> pips2 = pipreg2.get(ONEWAY_QNAME);
+
+            assertNotNull(pips2);
+            assertFalse(pips2.isEmpty());
+
+            assertEquals(pips1.iterator().next(), pips2.iterator().next());
 
         } finally {
             if (null != cxf1) {
@@ -166,9 +176,8 @@ public class IgnorablePolicyInterceptorProviderTest extends Assert {
         }
     }
 
-
     private AssertionInfoMap createTestAssertions() {
-        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST, 
+        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
         Assertion a = new PrimitiveAssertion(ONEWAY_QNAME);
         Assertion b = new PrimitiveAssertion(DUPLEX_QNAME);
@@ -178,7 +187,7 @@ public class IgnorablePolicyInterceptorProviderTest extends Assert {
 
         aim.put(ONEWAY_QNAME, Collections.singleton(ai));
         aim.put(DUPLEX_QNAME, Collections.singleton(bi));
-        
+
         return aim;
     }
 }

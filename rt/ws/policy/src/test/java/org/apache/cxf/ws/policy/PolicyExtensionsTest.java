@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -67,10 +68,12 @@ public class PolicyExtensionsTest extends Assert {
             PolicyInterceptorProviderRegistry pipr = bus
                 .getExtension(PolicyInterceptorProviderRegistry.class);
             assertNotNull(pipr);
-            PolicyInterceptorProvider pip = pipr.get(KNOWN);
-            assertNotNull(pip);
-            pip = pipr.get(UNKNOWN);
-            assertNull(pip);
+            Set<PolicyInterceptorProvider> pips = pipr.get(KNOWN);
+            assertNotNull(pips);
+            assertFalse(pips.isEmpty());
+            pips = pipr.get(UNKNOWN);
+            assertNotNull(pips);
+            assertTrue(pips.isEmpty());
             
             DomainExpressionBuilderRegistry debr = bus.getExtension(DomainExpressionBuilderRegistry.class);
             assertNotNull(debr);

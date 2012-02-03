@@ -352,7 +352,7 @@ public class RMEndpointTest extends Assert {
         EasyMock.expect(ep.getChosenAlternative()).andReturn(alt).times(2);
         PolicyInterceptorProviderRegistry reg = control.createMock(PolicyInterceptorProviderRegistry.class);
         List<Interceptor<? extends Message>> li = new ArrayList<Interceptor<? extends Message>>();
-        EasyMock.expect(reg.getInterceptors(alt, true, false)).andReturn(li);
+        EasyMock.expect(reg.getInterceptorsForAlternative(alt, true, false)).andReturn(li);
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(ep.getPolicy()).andReturn(p);
         control.replay();

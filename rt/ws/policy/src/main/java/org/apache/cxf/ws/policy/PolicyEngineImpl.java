@@ -569,7 +569,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             if (pc instanceof Assertion) {
                 Assertion a = (Assertion)pc;
                 if (!(a.isOptional() 
-                    || (null != pipr.get(a.getName())) 
+                    || !pipr.get(a.getName()).isEmpty() 
                     || (null != assertor && assertor.canAssert(a.getName())))) {
                 
                     LOG.fine("Alternative " + a.getName() + " is not supported");

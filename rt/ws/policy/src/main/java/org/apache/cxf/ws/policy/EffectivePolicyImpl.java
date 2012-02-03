@@ -215,16 +215,15 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         return alternatives;
     }
 
-    void initialiseInterceptors(PolicyInterceptorProviderRegistry reg,
-                                PolicyEngineImpl engine,
-                                Set<Interceptor<? extends org.apache.cxf.message.Message>> out,
-                                Assertion a,
+    void initialiseInterceptors(PolicyInterceptorProviderRegistry reg, PolicyEngineImpl engine,
+                                Set<Interceptor<? extends org.apache.cxf.message.Message>> out, Assertion a,
                                 boolean usIn) {
         QName qn = a.getName();
-        PolicyInterceptorProvider pp = reg.get(qn);
-        if (null != pp) {
-            out.addAll(usIn ? pp.getInInterceptors() : pp.getOutInterceptors());
-        }
+        List<Interceptor<? extends org.apache.cxf.message.Message>> i = 
+            usIn ? reg.getInInterceptorsForAssertion(qn) 
+                : reg.getOutInterceptorsForAssertion(qn);
+        out.addAll(i);
+
         if (a instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)a).getPolicy();
             if (p != null) {

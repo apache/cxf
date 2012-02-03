@@ -21,8 +21,11 @@ package org.apache.cxf.ws.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.annotation.Resource;
 import javax.xml.namespace.QName;
@@ -42,7 +45,7 @@ import org.apache.neethi.Assertion;
  */
 @NoJSR250Annotations(unlessNull = "bus")
 public class PolicyInterceptorProviderRegistryImpl 
-    extends RegistryImpl<QName, PolicyInterceptorProvider> 
+    extends RegistryImpl<QName, Set<PolicyInterceptorProvider>> 
     implements PolicyInterceptorProviderRegistry, BusExtension {
 
     private Bus bus;
@@ -56,17 +59,20 @@ public class PolicyInterceptorProviderRegistryImpl
         setBus(b);
     }
 
-    public PolicyInterceptorProviderRegistryImpl(Map<QName, PolicyInterceptorProvider> interceptors) {
+    public PolicyInterceptorProviderRegistryImpl(Map<QName, Set<PolicyInterceptorProvider>> interceptors) {
         super(interceptors);
     }    
-    public PolicyInterceptorProviderRegistryImpl(MapProvider<QName, PolicyInterceptorProvider> interceptors) {
+    public PolicyInterceptorProviderRegistryImpl(MapProvider<QName, 
+                                                 Set<PolicyInterceptorProvider>> interceptors) {
         super(interceptors.createMap());
     }    
     public PolicyInterceptorProviderRegistryImpl(Bus b, 
-                                                 MapProvider<QName, PolicyInterceptorProvider> interceptors) {
+        MapProvider<QName, Set<PolicyInterceptorProvider>> interceptors) {
+        
         super(interceptors.createMap());
         setBus(b);
     }    
+
     @Resource
     public final void setBus(Bus b) {
         bus = b;
@@ -74,15 +80,22 @@ public class PolicyInterceptorProviderRegistryImpl
             b.setExtension(this, PolicyInterceptorProviderRegistry.class);
         }
     }
+
     public void register(PolicyInterceptorProvider provider) {
         for (QName qn : provider.getAssertionTypes()) {
-            super.register(qn, provider);
+            Set<PolicyInterceptorProvider> providers = super.get(qn);
+            if (providers == null) {
+                providers = new CopyOnWriteArraySet<PolicyInterceptorProvider>();
+            }
+            providers.add(provider);
+            super.register(qn, providers);
         }
     }
 
     public Class<?> getRegistrationType() {
         return PolicyInterceptorProviderRegistry.class;
     }
+
     protected synchronized void loadDynamic() {
         if (!dynamicLoaded && bus != null) {
             dynamicLoaded = true;
@@ -95,22 +108,57 @@ public class PolicyInterceptorProviderRegistryImpl
             }
         }
     }
-    public List<Interceptor<? extends Message>> getInterceptors(Collection<? extends Assertion> alternative, 
-                                             boolean out, boolean fault) {
-        loadDynamic();
+
+    @Override
+    public Set<PolicyInterceptorProvider> get(QName qn) {
+        Set<PolicyInterceptorProvider> pps = super.get(qn);
+        if (pps == null) {
+            pps = Collections.emptySet();
+        }
+        return pps;
+    }
+
+    public List<Interceptor<? extends Message>> 
+    getInterceptorsForAlternative(Collection<? extends Assertion> alternative,
+                                  boolean out, boolean fault) {
         List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
         for (Assertion a : alternative) {
             if (a.isOptional()) {
                 continue;
             }
             QName qn = a.getName();
-            PolicyInterceptorProvider pp = get(qn);
-            if (null != pp) {
-                interceptors.addAll(out                
-                    ? (fault ? pp.getOutFaultInterceptors() : pp.getOutInterceptors())       
-                    : (fault ? pp.getInFaultInterceptors() : pp.getInInterceptors())); 
-            }
+            interceptors.addAll(getInterceptorsForAssertion(qn, out, fault));
         }
         return interceptors;
     }
+
+    public List<Interceptor<? extends Message>> getInInterceptorsForAssertion(QName qn) {
+        return getInterceptorsForAssertion(qn, false, false);
+    }
+
+    public List<Interceptor<? extends Message>> getInFaultInterceptorsForAssertion(QName qn) {
+        return getInterceptorsForAssertion(qn, false, true);
+    }
+
+    public List<Interceptor<? extends Message>> getOutInterceptorsForAssertion(QName qn) {
+        return getInterceptorsForAssertion(qn, true, false);
+    }
+
+    public List<Interceptor<? extends Message>> getOutFaultInterceptorsForAssertion(QName qn) {
+        return getInterceptorsForAssertion(qn, true, true);
+    }
+
+    protected List<Interceptor<? extends Message>> getInterceptorsForAssertion(QName qn, boolean out,
+                                                                               boolean fault) {
+        loadDynamic();
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
+        Set<PolicyInterceptorProvider> pps = get(qn);
+        for (PolicyInterceptorProvider pp : pps) {
+            interceptors.addAll(out 
+                                ? (fault ? pp.getOutFaultInterceptors() : pp.getOutInterceptors()) 
+                                    : (fault ? pp.getInFaultInterceptors() : pp.getInInterceptors()));
+        }
+        return interceptors;
+    }
+
 }

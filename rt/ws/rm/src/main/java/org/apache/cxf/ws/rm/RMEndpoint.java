@@ -672,7 +672,8 @@ public class RMEndpoint {
         EffectivePolicyImpl(EndpointPolicy ep, PolicyInterceptorProviderRegistry reg, boolean outbound,
                             boolean fault) {
             endpointPolicy = ep;
-            interceptors = reg.getInterceptors(endpointPolicy.getChosenAlternative(), outbound, fault);
+            interceptors = reg.getInterceptorsForAlternative(endpointPolicy.getChosenAlternative(),
+                                                             outbound, fault);
         }
 
         public Collection<Assertion> getChosenAlternative() {

@@ -251,14 +251,13 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
 
     void initializeInterceptors(PolicyInterceptorProviderRegistry reg,
-                                Set<Interceptor<? extends Message>> out,
-                                Assertion a, 
+                                Set<Interceptor<? extends Message>> out, Assertion a, 
                                 boolean fault) {
         QName qn = a.getName();
-        PolicyInterceptorProvider pp = reg.get(qn);
-        if (null != pp) {
-            out.addAll(fault ? pp.getInFaultInterceptors() : pp.getInInterceptors());
-        }
+        List<Interceptor<? extends org.apache.cxf.message.Message>> i 
+            = fault ? reg.getInFaultInterceptorsForAssertion(qn)
+            : reg.getInInterceptorsForAssertion(qn);
+        out.addAll(i);
         if (a instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)a).getPolicy();
             if (p != null) {
