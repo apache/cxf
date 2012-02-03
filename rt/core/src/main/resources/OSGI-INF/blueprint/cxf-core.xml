@@ -22,16 +22,21 @@
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
 
-  <service interface="org.apache.aries.blueprint.NamespaceHandler">
+  <bean id="CXFCoreNamespaceHandler" class="org.apache.cxf.bus.blueprint.CXFCoreNamespaceHandler"/>
+
+  <service ref="CXFCoreNamespaceHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
     <service-properties>
-      <entry key="osgi.service.blueprint.namespace">
-        <list>
-            <value>http://cxf.apache.org/blueprint/core</value>
-            <value>http://cxf.apache.org/configuration/beans</value>
-            <value>http://cxf.apache.org/configuration/parameterized-types</value>
-        </list>
-      </entry>
+      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/blueprint/core"/>
     </service-properties>
-    <bean class="org.apache.cxf.bus.blueprint.CXFCoreNamespaceHandler"/>
+  </service>
+  <service ref="CXFCoreNamespaceHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
+    <service-properties>
+      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/configuration/beans"/>
+    </service-properties>
+  </service>
+  <service ref="CXFCoreNamespaceHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
+    <service-properties>
+      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/configuration/parameterized-types"/>
+    </service-properties>
   </service>
 </blueprint>
