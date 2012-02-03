@@ -64,13 +64,6 @@ public class BasicFeatureTest extends CXFOSGiTestSupport {
     public Option[] config() {
         File file = new File("target/karaf-base/apache-karaf-2.2.5/etc/jre.properties.cxf")
             .getAbsoluteFile();
-        System.out.println(file);
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
         return new Option[]{
                 cxfDistributionConfiguration(), 
                 keepRuntimeFolder(),
