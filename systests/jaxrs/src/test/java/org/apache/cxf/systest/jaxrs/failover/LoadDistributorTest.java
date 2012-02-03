@@ -43,7 +43,6 @@ import org.junit.Test;
 /**
  * Tests failover within a static cluster.
  */
-@SuppressWarnings("deprecation")
 public class LoadDistributorTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
