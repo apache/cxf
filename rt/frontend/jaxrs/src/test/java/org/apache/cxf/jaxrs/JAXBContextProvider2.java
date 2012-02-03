@@ -23,8 +23,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.ext.ContextResolver;
 import javax.xml.bind.JAXBContext;
 
-@Produces("text/xml+a")
-public class JAXBContextProvider implements ContextResolver<JAXBContext> {
+@Produces("text/xml+b")
+public class JAXBContextProvider2 implements ContextResolver<JAXBContext> {
 
     public JAXBContext getContext(Class<?> type) {
         // TODO Auto-generated method stub
