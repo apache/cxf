@@ -51,6 +51,7 @@ import org.junit.Test;
 /**
  * Tests failover within a static cluster.
  */
+@SuppressWarnings("deprecation")
 public class FailoverTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
