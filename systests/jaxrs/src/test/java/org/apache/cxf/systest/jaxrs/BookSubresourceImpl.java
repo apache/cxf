@@ -103,7 +103,6 @@ public class BookSubresourceImpl implements BookSubresource {
         return order;
     }
 
-    @Override
     public Book getTheBookWithContext(UriInfo ui) throws BookNotFoundFault {
         return getTheBook();
     }
