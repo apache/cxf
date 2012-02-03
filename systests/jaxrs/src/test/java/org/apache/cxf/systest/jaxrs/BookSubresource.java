@@ -32,7 +32,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 public interface BookSubresource {
     
@@ -40,6 +42,11 @@ public interface BookSubresource {
     @Path("/subresource")
     @Produces("application/xml")
     Book getTheBook() throws BookNotFoundFault;
+    
+    @GET
+    @Path("/subresource")
+    @Produces("application/xml")
+    Book getTheBookWithContext(@Context UriInfo ui) throws BookNotFoundFault;
     
     @GET
     @Path("/subresource/noproduces")
