@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.util.List;
 
+import javax.ws.rs.core.UriInfo;
+
 
 
 public class BookSubresourceImpl implements BookSubresource {
@@ -99,6 +101,11 @@ public class BookSubresourceImpl implements BookSubresource {
     
     public OrderBean addOrder(OrderBean order) {
         return order;
+    }
+
+    @Override
+    public Book getTheBookWithContext(UriInfo ui) throws BookNotFoundFault {
+        return getTheBook();
     }
 
 }
