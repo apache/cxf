@@ -56,6 +56,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 
 public class MessageContextImpl implements MessageContext {
 
@@ -87,12 +88,8 @@ public class MessageContextImpl implements MessageContext {
         return value;
     }
     
-    private boolean isRequestor() {
-        return Boolean.TRUE.equals(m.containsKey(Message.REQUESTOR_ROLE));
-    }
-    
     public <T> T getContent(Class<T> format) {
-        if (isRequestor() && m.getExchange().getInMessage() != null) {
+        if (MessageUtils.isRequestor(m) && m.getExchange().getInMessage() != null) {
             Message inMessage = m.getExchange().getInMessage();
             return inMessage.getContent(format);
         } 
@@ -164,7 +161,7 @@ public class MessageContextImpl implements MessageContext {
             convertToAttachments(value);
         }
         m.put(key.toString(), value);
-        if (!isRequestor()) {
+        if (!MessageUtils.isRequestor(m)) {
             m.getExchange().put(key.toString(), value);
         }
             

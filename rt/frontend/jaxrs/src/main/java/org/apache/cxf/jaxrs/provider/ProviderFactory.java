@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -49,6 +51,7 @@ import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
+import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -57,6 +60,7 @@ import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public final class ProviderFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactory.class);
@@ -154,9 +158,29 @@ public final class ProviderFactory {
     
     public <T> ContextResolver<T> createContextResolver(Type contextType, 
                                                         Message m) {
-        Object mt = m.get(Message.CONTENT_TYPE);
+        boolean isRequestor = MessageUtils.isRequestor(m);
+        Message requestMessage = isRequestor ? m.getExchange().getOutMessage() 
+                                             : m.getExchange().getInMessage();
+        HttpHeaders requestHeaders = new HttpHeadersImpl(requestMessage);
+        MediaType mt = null;
+        
+        Message responseMessage = isRequestor ? m.getExchange().getInMessage() 
+                                              : m.getExchange().getOutMessage();
+        if (responseMessage != null) {
+            if (!responseMessage.containsKey(Message.CONTENT_TYPE)) {
+                List<MediaType> accepts = requestHeaders.getAcceptableMediaTypes();
+                if (accepts.size() > 0) {
+                    mt = accepts.get(0);
+                }
+            } else {
+                mt = MediaType.valueOf(responseMessage.get(Message.CONTENT_TYPE).toString());
+            }
+        } else {
+            mt = requestHeaders.getMediaType();
+        }
+        
         return createContextResolver(contextType, m,
-               mt == null ? MediaType.valueOf("*/*") : MediaType.valueOf(mt.toString()));
+               mt == null ? MediaType.WILDCARD_TYPE : mt);
         
     }
     
@@ -164,22 +188,41 @@ public final class ProviderFactory {
     public <T> ContextResolver<T> createContextResolver(Type contextType, 
                                                         Message m,
                                                         MediaType type) {
+        Class<?> contextCls = InjectionUtils.getActualType(contextType);
+        if (contextCls == null) {
+            return null;
+        }
+        List<ContextResolver<T>> candidates = new LinkedList<ContextResolver<T>>();
         for (ProviderInfo<ContextResolver> cr : contextResolvers) {
             Type[] types = cr.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
                 if (t instanceof ParameterizedType) {
                     ParameterizedType pt = (ParameterizedType)t;
                     Type[] args = pt.getActualTypeArguments();
-                    for (int i = 0; i < args.length; i++) {
-                        if (contextType == args[i]) {
-                            injectContextValues(cr, m);
-                            return cr.getProvider();
+                    if (args.length > 0) {
+                        Class<?> argCls = InjectionUtils.getActualType(args[0]);
+                        
+                        if (argCls != null && argCls.isAssignableFrom(contextCls)) {
+                            List<MediaType> mTypes = JAXRSUtils.getProduceTypes(
+                                 cr.getProvider().getClass().getAnnotation(Produces.class));
+                            if (JAXRSUtils.intersectMimeTypes(mTypes, type).size() > 0) {
+                                injectContextValues(cr, m);
+                                candidates.add((ContextResolver<T>)cr.getProvider());
+                            }
                         }
                     }
                 }
             }
         }
-        return null;
+        if (candidates.size() == 0) {
+            return null;
+        } else if (candidates.size() == 1) {
+            return candidates.get(0);
+        } else {
+            Collections.sort(candidates, new ClassComparator());
+            return new ContextResolverProxy(candidates);
+        }
+        
     }
     
     
@@ -439,6 +482,7 @@ public final class ProviderFactory {
         }
         sortReaders();
         sortWriters();
+        sortContextResolvers();
         
         injectContextProxies(messageReaders, messageWriters, contextResolvers, requestHandlers, responseHandlers,
                        exceptionMappers);
@@ -477,6 +521,10 @@ public final class ProviderFactory {
     
     private void sortWriters() {
         Collections.sort(messageWriters, new MessageBodyWriterComparator());
+    }
+    
+    private void sortContextResolvers() {
+        Collections.sort(contextResolvers, new ContextResolverComparator());
     }
     
         
@@ -661,6 +709,25 @@ public final class ProviderFactory {
         }
     }
     
+    private static class ContextResolverComparator 
+        implements Comparator<ProviderInfo<ContextResolver>> {
+        
+        public int compare(ProviderInfo<ContextResolver> p1, 
+                           ProviderInfo<ContextResolver> p2) {
+            ContextResolver<?> e1 = p1.getProvider();
+            ContextResolver<?> e2 = p2.getProvider();
+            
+            List<MediaType> types1 =
+                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProduceTypes(
+                                               e1.getClass().getAnnotation(Produces.class)));
+            List<MediaType> types2 =
+                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProduceTypes(
+                                               e2.getClass().getAnnotation(Produces.class)));
+    
+            return JAXRSUtils.compareSortedMediaTypes(types1, types2);
+        }
+    }
+    
     public void setApplicationProvider(ProviderInfo<Application> app) {
         application = app;
     }
@@ -820,5 +887,25 @@ public final class ProviderFactory {
             return types;
         }
         return getGenericInterfaces(cls.getSuperclass());
+    }
+    
+    static class ContextResolverProxy<T> implements ContextResolver<T> {
+        private List<ContextResolver<T>> candidates; 
+        public ContextResolverProxy(List<ContextResolver<T>> candidates) {
+            this.candidates = candidates;
+        }
+        public T getContext(Class<?> cls) {
+            for (ContextResolver<T> resolver : candidates) {
+                T context = resolver.getContext(cls);
+                if (context != null) {
+                    return context;
+                }
+            }
+            return null;
+        } 
+        
+        public List<ContextResolver<T>> getResolvers() {
+            return candidates;
+        }
     }
 }

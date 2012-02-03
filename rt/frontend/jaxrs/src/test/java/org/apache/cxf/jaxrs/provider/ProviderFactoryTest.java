@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -58,9 +59,11 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
+import org.apache.cxf.jaxrs.JAXBContextProvider2;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -566,10 +569,77 @@ public class ProviderFactoryTest extends Assert {
     public void testRegisterCustomResolver() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new JAXBContextProvider());
-        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, new MessageImpl());
+        Message message = prepareMessage("*/*", null);
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
+        assertFalse(cr instanceof ProviderFactory.ContextResolverProxy);
         assertTrue("JAXBContext ContextProvider can not be found", 
                    cr instanceof JAXBContextProvider);
         
+    }
+    
+    @Test
+    public void testRegisterCustomResolver2() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new JAXBContextProvider());
+        pf.registerUserProvider(new JAXBContextProvider2());
+        Message message = prepareMessage("text/xml+b", null);
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
+        assertFalse(cr instanceof ProviderFactory.ContextResolverProxy);
+        assertTrue("JAXBContext ContextProvider can not be found", 
+                   cr instanceof JAXBContextProvider2);
+        
+    }
+    
+    @Test
+    public void testNoCustomResolver() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new JAXBContextProvider());
+        pf.registerUserProvider(new JAXBContextProvider2());
+        Message message = prepareMessage("text/xml+c", null);
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
+        assertNull(cr);
+    }
+    
+    @Test
+    public void testCustomResolverOut() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new JAXBContextProvider());
+        pf.registerUserProvider(new JAXBContextProvider2());
+        Message message = prepareMessage("text/xml+c", "text/xml+a");
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
+        assertFalse(cr instanceof ProviderFactory.ContextResolverProxy);
+        assertTrue("JAXBContext ContextProvider can not be found", 
+                   cr instanceof JAXBContextProvider);
+    }
+    
+    @Test
+    public void testCustomResolverProxy() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new JAXBContextProvider());
+        pf.registerUserProvider(new JAXBContextProvider2());
+        Message message = prepareMessage("text/xml+*", null);
+        ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
+        assertTrue(cr instanceof ProviderFactory.ContextResolverProxy);
+        assertTrue(((ProviderFactory.ContextResolverProxy)cr).getResolvers().get(0) 
+                   instanceof JAXBContextProvider);
+        assertTrue(((ProviderFactory.ContextResolverProxy)cr).getResolvers().get(1) 
+                   instanceof JAXBContextProvider2);
+    }
+    
+    private Message prepareMessage(String contentType, String acceptType) {
+        Message message = new MessageImpl();
+        Map<String, List<String>> headers = new MetadataMap<String, String>();
+        message.put(Message.PROTOCOL_HEADERS, headers);
+        Exchange exchange = new ExchangeImpl();
+        exchange.setInMessage(message);
+        if (acceptType != null) {
+            headers.put("Accept", Collections.singletonList(acceptType));
+            exchange.setOutMessage(new MessageImpl());
+        } else {
+            headers.put("Content-Type", Collections.singletonList(contentType));
+        }
+        message.setExchange(exchange);
+        return message;
     }
     
     @Test
