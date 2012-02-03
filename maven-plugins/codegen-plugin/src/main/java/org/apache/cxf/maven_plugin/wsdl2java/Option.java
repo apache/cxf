@@ -500,6 +500,9 @@ public class Option {
         bareMethods = mergeList(bareMethods, defaultOptions.bareMethods, String.class);
         asyncMethods = mergeList(asyncMethods, defaultOptions.asyncMethods, String.class);
         mimeMethods = mergeList(mimeMethods, defaultOptions.mimeMethods, String.class);
+        if (!isSetWsdlLocation() && defaultOptions.isSetWsdlLocation()) {
+            wsdlLocation = defaultOptions.getWsdlLocation();
+        }
     }
     
     @SuppressWarnings("unchecked")
