@@ -222,7 +222,7 @@ public class ProcessorTestBase extends Assert {
                         throw new ComparisonFailure("Attributes not equal: ",
                                                 attr.getKey() + ":" + attr.getValue(),
                                                 attr.getKey() + ":"
-                                                + sourceTag.getAttributes().get(attr.getKey()).toString());
+                                                + sourceTag.getAttributes().get(attr.getKey()));
                     }
                 } else {
                     throw new AssertionError("Attribute: " + attr + " is missing in the source file.");
@@ -232,8 +232,8 @@ public class ProcessorTestBase extends Assert {
             if (!StringUtils.isEmpty(expectedTag.getText())
                 && !expectedTag.getText().equals(sourceTag.getText())) {
                 throw new ComparisonFailure("Text not equal: ",
-                                            expectedTag.getText().toString(),
-                                            sourceTag.getText().toString());
+                                            expectedTag.getText(),
+                                            sourceTag.getText());
             }
         }
         return true;
@@ -285,8 +285,8 @@ public class ProcessorTestBase extends Assert {
         if (!StringUtils.isEmpty(expected.getText())
                 && !expected.getText().equals(source.getText())) {
             throw new ComparisonFailure("Text not equal: ",
-                                        expected.getText().toString(),
-                                        source.getText().toString());
+                                        expected.getText(),
+                                        source.getText());
         }
 
         if (!expected.getTags().isEmpty()) {

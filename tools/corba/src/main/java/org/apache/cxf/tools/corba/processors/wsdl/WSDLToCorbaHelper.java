@@ -585,7 +585,7 @@ public class WSDLToCorbaHelper {
             } else {
                 String msg = "Unsupported Attribute Found in CORBA Binding Generation:"
                     + attrName;
-                LOG.log(Level.WARNING, msg.toString());
+                LOG.log(Level.WARNING, msg);
             }
         }
 
@@ -908,7 +908,7 @@ public class WSDLToCorbaHelper {
                 if (!anonymous) {
                     String msg = "Couldn't Map to Array:" + name + ":minOccurs="
                         + minOccurs + ":maxOccurs=" + maxOccurs;
-                    LOG.log(Level.WARNING, msg.toString());
+                    LOG.log(Level.WARNING, msg);
                     return null;
                 } else {
                     return WSDLTypes.mapToArray(name, checkPrefix(schematypeName), arrayType,
@@ -1418,7 +1418,7 @@ public class WSDLToCorbaHelper {
                     caselist.add("TRUE");
                 } else {
                     String msg = "Discriminator Type doesnt match number of Choices in Union:" + name;
-                    LOG.log(Level.WARNING, msg.toString());
+                    LOG.log(Level.WARNING, msg);
                 }
             }
         }

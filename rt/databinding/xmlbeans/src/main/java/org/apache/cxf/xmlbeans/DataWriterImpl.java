@@ -48,7 +48,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlAnySimpleType;
@@ -75,8 +74,6 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
             if (typeClass == null) {
                 typeClass = obj.getClass();
             }
-            XmlSchemaAnnotated schemaType = part ==  null ? null : part.getXmlSchema();
-            
             if (!XmlObject.class.isAssignableFrom(typeClass) && part != null) {
                 typeClass = (Class<?>)part.getProperty(XmlAnySimpleType.class.getName());
                 
@@ -103,8 +100,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
             }
 
             
-            if (obj != null
-                || !(schemaType instanceof XmlSchemaElement)) {
+            if (obj != null) {
                 XmlOptions options = new XmlOptions();
                 if (schema != null) {
                     options.setValidateOnSet();

@@ -241,7 +241,7 @@ public class CorbaObjectReader {
             long l2 = l & 0x7FFFFFFFFFFFFFL;
             BigInteger i = BigInteger.valueOf(l2);
             BigInteger i2 = BigInteger.valueOf(0);
-            i2.setBit(63);
+            i2 = i2.setBit(63);
             i = i.or(i2);
             return i;
         }

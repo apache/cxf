@@ -64,7 +64,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
                 
                 return o;
             } catch (Exception e) {
-                new Fault(e);
+                throw new Fault(e);
             }
         }
         return null;

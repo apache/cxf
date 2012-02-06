@@ -84,7 +84,7 @@ public final class WSDLTypes {
                     Node node = nlist.item(0);
                     String info = node.getNodeValue();
 
-                    info.trim();
+                    info = info.trim();
 
                     if ("corba:binding=".equals(info.substring(0, 14))) {
                         String bindingName = info.substring(14);
