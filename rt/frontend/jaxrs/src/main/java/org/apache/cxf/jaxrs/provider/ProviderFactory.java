@@ -220,7 +220,7 @@ public final class ProviderFactory {
             return candidates.get(0);
         } else {
             Collections.sort(candidates, new ClassComparator());
-            return new ContextResolverProxy(candidates);
+            return new ContextResolverProxy<T>(candidates);
         }
         
     }
