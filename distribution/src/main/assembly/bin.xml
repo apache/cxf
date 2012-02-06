@@ -19,7 +19,7 @@
 -->
 <assembly>
     <!-- id typically identifies the "type" (src vs bin etc) of the assembly -->
-    <id></id>
+    <id>bin</id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
         <format>dir</format>
