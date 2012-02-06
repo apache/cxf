@@ -130,7 +130,7 @@
         <!-- various OSGi related versions -->
         <cxf.aries.version>0.3.1</cxf.aries.version>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
-        <cxf.karaf.version>2.2.4</cxf.karaf.version>
+        <cxf.karaf.version>2.2.5</cxf.karaf.version>
 
         <cxf.ehcache.bundle.version>2.4.3_1</cxf.ehcache.bundle.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
