@@ -53,6 +53,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
@@ -497,7 +498,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         SecurityManager sm = System.getSecurityManager();
         boolean checkPublishEndpointPermissionWithSecurityManager
             = Boolean.valueOf(
-                      System.getProperty(
+                      SystemPropertyAction.getProperty(
                                          CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY_WITH_SECURITY_MANAGER, 
                                          "true"));
         if (checkPublishEndpointPermissionWithSecurityManager && sm != null) {
