@@ -209,7 +209,6 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
             super(Phase.READ);
             addAfter(ReadHeadersInterceptor.class.getName());
         }
-        @Override
         public void handleMessage(SoapMessage message) throws Fault {
             List<Header> headers = message.getHeaders();
             Header h2 = null;
