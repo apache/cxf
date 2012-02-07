@@ -213,6 +213,16 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testExceptionMappersHierarchyWithGenerics() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        RuntimeExceptionMapper1 exMapper1 = new RuntimeExceptionMapper1(); 
+        pf.registerUserProvider(exMapper1);
+        RuntimeExceptionMapper2 exMapper2 = new RuntimeExceptionMapper2(); 
+        pf.registerUserProvider(exMapper2);
+        assertSame(exMapper1, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
+        assertSame(exMapper2, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
+    }
+    
     public void testMessageBodyHandlerHierarchy() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         List<Object> providers = new ArrayList<Object>();
@@ -727,6 +737,26 @@ public class ProviderFactoryTest extends Assert {
     private static class TestHandler implements RequestHandler {
 
         public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+            return null;
+        }
+        
+    }
+
+    private static class RuntimeExceptionMapper1 
+        extends AbstractTestExceptionMapper<RuntimeException> {
+        
+    }
+    
+    private static class RuntimeExceptionMapper2 
+        extends AbstractTestExceptionMapper<WebApplicationException> {
+        
+    }
+    
+    private static class AbstractTestExceptionMapper<T extends RuntimeException> 
+        implements ExceptionMapper<T> {
+
+        public Response toResponse(T arg0) {
+            // TODO Auto-generated method stub
             return null;
         }
         

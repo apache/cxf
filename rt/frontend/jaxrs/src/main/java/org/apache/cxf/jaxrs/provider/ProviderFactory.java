@@ -813,6 +813,10 @@ public final class ProviderFactory {
         if (Object.class == cls) {
             return new Type[]{};
         }
+        Type genericSuperCls = cls.getGenericSuperclass();
+        if (genericSuperCls instanceof ParameterizedType) {
+            return new Type[]{genericSuperCls};
+        }
         Type[] types = cls.getGenericInterfaces();
         if (types.length > 0) {
             return types;
