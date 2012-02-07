@@ -39,7 +39,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersService;
 import org.apache.handlers.types.AddNumbersResponse;
@@ -54,7 +53,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
     static QName portName = new QName("http://apache.org/handlers", "AddNumbersPort");
 
     static String addNumbersAddress
-        = "http://localhost:" + TestUtil.getPortNumber(HandlerServer.class, 1)
+        = "http://localhost:" + HandlerServer.PORT1
             + "/handlers/AddNumbersService/AddNumbersPort";
 
     @BeforeClass
