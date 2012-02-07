@@ -391,7 +391,6 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
-    @Ignore
     public void testExceptionMappersHierarchyWithGenerics() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         RuntimeExceptionMapper1 exMapper1 = new RuntimeExceptionMapper1(); 
