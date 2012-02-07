@@ -22,10 +22,21 @@ package org.apache.cxf.systest.ws.addr_fromjava;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.Map;
+import java.util.List;
+
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.SOAPFaultException;
 
+
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.headers.Header;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImpl;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImplService;
@@ -192,4 +203,43 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         long end = System.currentTimeMillis();
         assertTrue((end - start) < 50000);
     }
+    
+    static class RemoveRelatesToHeaderInterceptor extends AbstractSoapInterceptor {
+        public RemoveRelatesToHeaderInterceptor() {
+            super(Phase.READ);
+            addAfter(ReadHeadersInterceptor.class.getName());
+        }
+        @Override
+        public void handleMessage(SoapMessage message) throws Fault {
+            List<Header> headers = message.getHeaders();
+            Header h2 = null;
+            for (Header h : headers) {
+                if ("RelatesTo".equals(h.getName().getLocalPart())) {
+                    h2 = h;
+                }
+            }
+            headers.remove(h2);
+        }
+    }
+    
+    @Test
+    public void testNoRelatesToHeader() throws Exception {
+        new LoggingFeature().initialize(this.getBus());
+        AddNumberImpl port = getPort();
+
+        Client c = ClientProxy.getClient(port);
+        c.getInInterceptors().add(new RemoveRelatesToHeaderInterceptor());
+        
+        
+        long start = System.currentTimeMillis();
+        port.addNumbers(1, 2);
+        try {
+            port.addNumbers3(-1, -1);
+        } catch (Exception ex) {
+            //ignore, expected
+        }
+        long end = System.currentTimeMillis();
+        assertTrue((end - start) < 50000);
+    }    
+    
 }
