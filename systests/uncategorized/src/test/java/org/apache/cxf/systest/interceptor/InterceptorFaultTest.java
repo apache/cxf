@@ -153,6 +153,15 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testWithoutAddressing() throws Exception {
+        testWithoutAddressing(false);
+    }
+
+    @Test
+    public void testRobustWithoutAddressing() throws Exception {
+        testWithoutAddressing(true);
+    }
+
+    private void testWithoutAddressing(boolean robust) throws Exception {
         
         setupGreeter("org/apache/cxf/systest/interceptor/no-addr.xml", false);
 
@@ -166,14 +175,20 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             p = it.next();
             location.setPhase(p.getName());
             if (Phase.PRE_LOGICAL.equals(p.getName())) {
+                continue;
+            } else if (Phase.POST_INVOKE.equals(p.getName())) {
                 break;
-            }             
-            testFail(location);
+            }    
+            testFail(location, false, robust);
         }
     }
     
     @Test
     public void testWithAddressingAnonymousReplies() throws Exception {
+        testWithAddressingAnonymousReplies(false);
+    }
+
+    private void testWithAddressingAnonymousReplies(boolean robust) throws Exception {
         setupGreeter("org/apache/cxf/systest/interceptor/addr.xml", false);
 
         // all interceptors pass
@@ -203,7 +218,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             if (Phase.PRE_LOGICAL.equals(p.getName())) {
                 break;
             }   
-            testFail(location, true);
+            testFail(location, true, robust);
         }
         
         // test failure occuring after logical addressing interceptor -
@@ -217,24 +232,22 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
                 //been returned.  The server has accepted the message
                 break;
             }             
-            testFail(location, true);
+            testFail(location, true, robust);
             p = it.hasNext() ? it.next() : null;
         } while (null != p);
     }
     
-    private void testFail(FaultLocation location) throws PingMeFault {
-        testFail(location, false);
-    }
    
-    private void testFail(FaultLocation location, boolean usingAddressing) throws PingMeFault {
+    private void testFail(FaultLocation location, boolean usingAddressing, boolean robust) 
+        throws PingMeFault {
         // System.out.print("Test interceptor failing in phase: " + location.getPhase()); 
         
         control.setFaultLocation(location);       
-       
+        control.setRobustInOnlyMode(robust);
 
         // oneway reports a plain fault (although server sends a soap fault)
 
-        boolean expectOnewayFault = !usingAddressing 
+        boolean expectOnewayFault = robust 
             || comparator.compare(preLogicalPhase, getPhase(location.getPhase())) > 0;
         
         try {

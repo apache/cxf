@@ -110,7 +110,7 @@
                     </sequence>
                 </complexType>
             </element>
-
+            <element name="robustInOnlyMode" type="xsd:boolean"/>
         </schema>
     </wsdl:types>
 
@@ -157,6 +157,11 @@
     </wsdl:message>
     <wsdl:message name="setFaultLocationResponse">
     </wsdl:message>
+    <wsdl:message name="setRobustInOnlyModeRequest">
+        <wsdl:part element="x1:robustInOnlyMode" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="setRobustInOnlyModeResponse">
+    </wsdl:message>
     
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
@@ -194,6 +199,11 @@
         <wsdl:operation name="setFaultLocation">
             <wsdl:input message="tns:setFaultLocationRequest" name="setFaultLocationRequest"/>
             <wsdl:output message="tns:setFaultLocationResponse" name="setFaultLocationResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="setRobustInOnlyMode">
+            <wsdl:input message="tns:setRobustInOnlyModeRequest" name="setRobustInOnlyModeRequest"/>
+            <wsdl:output message="tns:setRobustInOnlyModeResponse" name="setRobustInOnlyModeResponse"/>
         </wsdl:operation>
     </wsdl:portType>
 
@@ -268,6 +278,15 @@
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output name="setFaultLocationResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setRobustInOnlyMode">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="setRobustInOnlyModeRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="setRobustInOnlyModeResponse">
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
