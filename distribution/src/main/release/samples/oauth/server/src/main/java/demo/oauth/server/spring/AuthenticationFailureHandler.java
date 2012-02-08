@@ -39,16 +39,10 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
                                         AuthenticationException exception)
         throws IOException, ServletException {
         String oauthToken = request.getParameter(OAuth.OAUTH_TOKEN);
-        String xOAuthURI = request.getParameter(OAuthConstants.X_OAUTH_URI);
         String xScope = request.getParameter(OAuthConstants.X_OAUTH_SCOPE);
 
         StringBuffer url = new StringBuffer(authorizeUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
             .append(oauthToken);
-
-        if (!StringUtils.isEmpty(xOAuthURI)) {
-            url.append("&").append(OAuthConstants.X_OAUTH_URI).append("=")
-                .append(xOAuthURI);
-        }
 
         if (!StringUtils.isEmpty(xScope)) {
             url.append("&").append(OAuthConstants.X_OAUTH_SCOPE).append("=").append(xScope);

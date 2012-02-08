@@ -72,7 +72,6 @@ public class AbstractAuthFilter {
         ALLOWED_OAUTH_PARAMETERS = new HashSet<String>();
         ALLOWED_OAUTH_PARAMETERS.addAll(Arrays.asList(REQUIRED_PARAMETERS));
         ALLOWED_OAUTH_PARAMETERS.add(OAuth.OAUTH_VERSION);
-        ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.X_OAUTH_SCOPE);
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
     }
     

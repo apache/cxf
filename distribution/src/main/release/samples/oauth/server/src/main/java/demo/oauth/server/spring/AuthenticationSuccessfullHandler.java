@@ -46,7 +46,6 @@ public class AuthenticationSuccessfullHandler extends SavedRequestAwareAuthentic
         String oauthToken = request.getParameter(OAuth.OAUTH_TOKEN);
         String authToken = request.getParameter(OAuthConstants.AUTHENTICITY_TOKEN);
         String decision = request.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
-        String xOAuthURI = request.getParameter(OAuthConstants.X_OAUTH_URI);
         String xScope = request.getParameter(OAuthConstants.X_OAUTH_SCOPE);
 
         if (StringUtils.isEmpty(oauthToken)) {
@@ -61,11 +60,6 @@ public class AuthenticationSuccessfullHandler extends SavedRequestAwareAuthentic
         if (!StringUtils.isEmpty(decision)) {
             url.append("&").append(OAuthConstants.AUTHORIZATION_DECISION_KEY).append("=")
                     .append(decision);
-        }
-
-        if (!StringUtils.isEmpty(xOAuthURI)) {
-            url.append("&").append(OAuthConstants.X_OAUTH_URI).append("=")
-                    .append(xOAuthURI);
         }
 
         if (!StringUtils.isEmpty(xScope)) {

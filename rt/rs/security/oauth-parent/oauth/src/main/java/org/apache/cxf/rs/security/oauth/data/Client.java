@@ -26,6 +26,8 @@ public class Client {
     private String secretKey;
     private String applicationURI;
     private String applicationName;
+    private String applicationDescription;
+    private String relativeLogoPath;
     
     private String loginName;
         
@@ -94,6 +96,29 @@ public class Client {
      */
     public void setApplicationURI(String applicationURI) {
         this.applicationURI = applicationURI;
+    }
+
+    /**
+     * Sets the description of the third-party application.
+     */
+    public void setApplicationDescription(String applicationDescription) {
+        this.applicationDescription = applicationDescription;
+    }
+
+    /**
+     * Gets the description of the third-party application.
+     * @return the application description
+     */
+    public String getApplicationDescription() {
+        return applicationDescription;
+    }
+    
+    public void setRelativeLogoPath(String relativeLogoPath) {
+        this.relativeLogoPath = relativeLogoPath;
+    }
+
+    public String getRelativeLogoPath() {
+        return relativeLogoPath;
     }
 
     /**

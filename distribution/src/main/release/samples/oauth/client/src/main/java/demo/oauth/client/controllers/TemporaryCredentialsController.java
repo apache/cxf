@@ -81,8 +81,7 @@ public class TemporaryCredentialsController {
             parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
             parameters.put(OAuth.OAUTH_CALLBACK, oAuthParams.getCallbackURL());
             parameters.put("realm", "private");
-            parameters.put("x_oauth_scope", "read_info,modify_info");
-            parameters.put("x_oauth_uri", "/resources/person/*");
+            parameters.put("scope", "read_info modify_info");
 
 
             try {

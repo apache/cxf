@@ -39,10 +39,6 @@ under the License.
                                value="${oauthauthorizationdata.authenticityToken}"/>
                         <input type="hidden"
                                name="<%=org.apache.cxf.rs.security.oauth.utils.OAuthConstants
-                                   .X_OAUTH_URI%>"
-                               value="<%=request.getParameter("x_oauth_uri")%>"/>
-                        <input type="hidden"
-                               name="<%=org.apache.cxf.rs.security.oauth.utils.OAuthConstants
                                    .X_OAUTH_SCOPE%>"
                                value="<%=request.getParameter("x_oauth_scope")%>"/>
 
