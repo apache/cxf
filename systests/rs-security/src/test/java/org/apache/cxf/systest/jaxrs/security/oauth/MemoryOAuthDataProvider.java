@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.oauth.test;
+package org.apache.cxf.systest.jaxrs.security.oauth;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -40,7 +40,6 @@
 
     <modules>
         <module>oauth</module>
-        <module>oauth-test</module> 
     </modules>
 
 </project>
