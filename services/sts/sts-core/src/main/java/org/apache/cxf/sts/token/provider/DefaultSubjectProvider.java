@@ -57,6 +57,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultSubjectProvider.class);
     private String subjectNameQualifier = "http://cxf.apache.org/sts";
+    private String subjectNameIDFormat;
     
     /**
      * Set the SubjectNameQualifier.
@@ -64,6 +65,14 @@ public class DefaultSubjectProvider implements SubjectProvider {
     public void setSubjectNameQualifier(String subjectNameQualifier) {
         this.subjectNameQualifier = subjectNameQualifier;
         LOG.fine("Setting Subject Name Qualifier: " + subjectNameQualifier);
+    }
+    
+    /**
+     * Set the SubjectNameIDFormat.
+     */
+    public void setSubjectNameIDFormat(String subjectNameIDFormat) {
+        this.subjectNameIDFormat = subjectNameIDFormat;
+        LOG.fine("Setting Subject Name format: " + subjectNameIDFormat);
     }
 
     /**
@@ -95,7 +104,10 @@ public class DefaultSubjectProvider implements SubjectProvider {
         SubjectBean subjectBean = 
             new SubjectBean(principal.getName(), subjectNameQualifier, confirmationMethod);
         LOG.fine("Creating new subject with principal name: " + principal.getName());
-
+        if (subjectNameIDFormat != null && subjectNameIDFormat.length() > 0) {
+            subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
+        }
+        
         if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)) {
             Crypto crypto = stsProperties.getEncryptionCrypto();
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);

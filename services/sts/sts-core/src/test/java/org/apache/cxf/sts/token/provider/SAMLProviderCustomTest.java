@@ -39,6 +39,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.DOM2Writer;
 
 /**
@@ -211,6 +212,33 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
         assertFalse(tokenString.contains("AuthenticationStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains("http://cxf.apache.org/sts/custom"));
+    }
+    
+    /**
+     * Create a Saml1 Assertion with a custom NameID Format of the Subject
+     */
+    @org.junit.Test
+    public void testCustomSaml1SubjectNameIDFormat() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
+        
+        DefaultSubjectProvider subjectProvider = new DefaultSubjectProvider();
+        subjectProvider.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
+        ((SAMLTokenProvider)samlTokenProvider).setSubjectProvider(subjectProvider);
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertFalse(tokenString.contains("AuthenticationStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS));
     }
     
     private TokenProviderParameters createProviderParameters(
