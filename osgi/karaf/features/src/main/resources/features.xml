@@ -129,14 +129,7 @@
 
     <feature name="cxf-http" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
-        <feature version="[2,3)">http</feature>
-        <config name="org.ops4j.pax.url.war">
-            org.ops4j.pax.url.war.importPaxLoggingPackages=true
-        </config>
-        <bundle start-level="30">mvn:org.ops4j.pax.web/pax-web-extender-war/1.0.7</bundle>
-        <bundle start-level="30">mvn:org.ops4j.pax.web/pax-web-extender-whiteboard/1.0.7</bundle>
-        <bundle start-level="30">mvn:org.ops4j.pax.web/pax-web-deployer/1.0.7</bundle>
-        <bundle start-level="30">mvn:org.ops4j.pax.url/pax-url-war/1.2.8</bundle>
+        <feature version="[2,3)">http-whiteboard</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
     </feature>
     <feature name="cxf-http-jetty" version="${project.version}" resolver='(obr)'>
