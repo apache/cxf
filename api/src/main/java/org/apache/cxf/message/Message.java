@@ -70,7 +70,7 @@ public interface Message extends StringMap {
     String EMPTY_PARTIAL_RESPONSE_MESSAGE = "org.apache.cxf.partial.response.empty";
     String ONE_WAY_REQUEST = "OnewayRequest";
     
-
+    String ROBUST_ONEWAY = "org.apache.cxf.oneway.robust";
     
     String HTTP_REQUEST_METHOD = "org.apache.cxf.request.method";
     String REQUEST_URI = "org.apache.cxf.request.uri";
