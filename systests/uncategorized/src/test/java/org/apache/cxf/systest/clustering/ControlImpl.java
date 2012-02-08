@@ -113,4 +113,22 @@ public class ControlImpl implements Control {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public Response<?> setRobustInOnlyModeAsync(boolean in) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Future<?> setRobustInOnlyModeAsync(boolean in, AsyncHandler<?> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setRobustInOnlyMode(boolean in) {
+        // TODO Auto-generated method stub
+        
+    }
 }
