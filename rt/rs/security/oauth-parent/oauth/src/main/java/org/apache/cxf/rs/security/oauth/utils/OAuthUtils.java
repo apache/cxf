@@ -175,7 +175,7 @@ public final class OAuthUtils {
         List<String> scopeList = new ArrayList<String>();
 
         if (!StringUtils.isEmpty(paramValue)) {
-            StringTokenizer tokenizer = new StringTokenizer(paramValue, ",");
+            StringTokenizer tokenizer = new StringTokenizer(paramValue, " ");
 
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();

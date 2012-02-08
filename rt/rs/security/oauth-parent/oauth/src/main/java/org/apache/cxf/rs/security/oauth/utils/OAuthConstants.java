@@ -36,7 +36,7 @@ public final class OAuthConstants {
     public static final String AUTHORIZATION_DECISION_ALLOW = "allow";
     public static final String AUTHORIZATION_DECISION_DENY = "deny";
 
-    public static final String X_OAUTH_SCOPE = "x_oauth_scope";
+    public static final String X_OAUTH_SCOPE = "scope";
     public static final String OAUTH_CONSUMER_SECRET = "oauth_consumer_secret";
     
     private OAuthConstants() {
