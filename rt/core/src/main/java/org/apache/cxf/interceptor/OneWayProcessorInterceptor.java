@@ -32,9 +32,11 @@ import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.workqueue.WorkQueueManager;
 
 
@@ -79,15 +81,13 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             message.put(OneWayProcessorInterceptor.class, this);
             final InterceptorChain chain = message.getInterceptorChain();
 
-            Object o = message.getContextualProperty(USE_ORIGINAL_THREAD);
-            if (o == null) {
-                o = Boolean.FALSE;
-            } else if (o instanceof String) {
-                o = Boolean.valueOf((String)o);
-            }
+            boolean robust = 
+                MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
 
+            boolean useOriginalThread = 
+                MessageUtils.isTrue(message.getContextualProperty(USE_ORIGINAL_THREAD));
             
-            if (Boolean.FALSE.equals(o)) {
+            if (!useOriginalThread && !robust) {
                 //need to suck in all the data from the input stream as
                 //the transport might discard any data on the stream when this 
                 //thread unwinds or when the empty response is sent back
@@ -96,7 +96,21 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                     in.cacheInput();
                 }
             }
-
+            
+            if (robust) {
+                // continue to invoke the chain
+                chain.pause();
+                chain.resume();
+                if (message.getContent(Exception.class) != null) {
+                    // return the fault over the response fault channel
+                    MessageObserver faultObserver = chain.getFaultObserver();
+                    if (faultObserver != null) {
+                        message.getExchange().setOneWay(false);
+                        faultObserver.onMessage(message);
+                    } 
+                    return;
+                }
+            }
             
             try {
                 Message partial = createMessage(message.getExchange());
@@ -116,7 +130,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 //IGNORE
             }
             
-            if (Boolean.FALSE.equals(o)) {
+            if (!useOriginalThread && !robust) {
                 chain.pause();
                 try {
                     final Object lock = new Object();
