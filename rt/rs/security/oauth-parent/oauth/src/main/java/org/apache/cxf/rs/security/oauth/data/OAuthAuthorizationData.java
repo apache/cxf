@@ -36,7 +36,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String applicationName;
     private String applicationURI;
     private String applicationDescription;
-    private String relativeLogoPath;
+    private String logoUri;
     private String replyTo;
     private List<? extends Permission> permissions;
     
@@ -103,11 +103,11 @@ public class OAuthAuthorizationData implements Serializable {
         return applicationDescription;
     }
 
-    public void setRelativeLogoPath(String relativeLogoPath) {
-        this.relativeLogoPath = relativeLogoPath;
+    public void setLogoUri(String logoPath) {
+        this.logoUri = logoPath;
     }
 
-    public String getRelativeLogoPath() {
-        return relativeLogoPath;
+    public String getLogoUri() {
+        return logoUri;
     }
 }

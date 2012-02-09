@@ -156,7 +156,7 @@ public class AuthorizationRequestHandler {
         secData.setApplicationName(token.getClient().getApplicationName()); 
         secData.setApplicationURI(token.getClient().getApplicationURI());
         secData.setApplicationDescription(token.getClient().getApplicationDescription());
-        secData.setRelativeLogoPath(token.getClient().getRelativeLogoPath());
+        secData.setLogoUri(token.getClient().getLogoUri());
         secData.setPermissions(token.getScopes());
         
         return secData;
