@@ -27,7 +27,7 @@ public class Client {
     private String applicationURI;
     private String applicationName;
     private String applicationDescription;
-    private String relativeLogoPath;
+    private String logoUri;
     
     private String loginName;
         
@@ -113,12 +113,17 @@ public class Client {
         return applicationDescription;
     }
     
-    public void setRelativeLogoPath(String relativeLogoPath) {
-        this.relativeLogoPath = relativeLogoPath;
+    /**
+     * Sets the uri pointing to a client logo image.
+     * At the moment it must be a relative URI
+     * @param logoPath
+     */
+    public void setLogoUri(String logoPath) {
+        this.logoUri = logoPath;
     }
 
-    public String getRelativeLogoPath() {
-        return relativeLogoPath;
+    public String getLogoUri() {
+        return logoUri;
     }
 
     /**
