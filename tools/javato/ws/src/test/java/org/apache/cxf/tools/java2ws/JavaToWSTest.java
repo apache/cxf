@@ -338,8 +338,9 @@ public class JavaToWSTest extends ToolTestBase {
         File file = new File(output.getPath() + "/AddNumbers.wsdl");
         String str = FileUtils.getStringFromFile(file);
         String swaImport = "http://ws-i.org/profiles/basic/1.1/xsd";
+        String schemaLoc = "http://ws-i.org/profiles/basic/1.1/swaref.xsd";
         assertTrue("Java2wsdl did not generate swaRef type element",
-                   str.indexOf(":swaRef") > -1 && str.indexOf(swaImport) > -1);
+                   str.indexOf(":swaRef") > -1 && str.indexOf(swaImport) > -1 && str.indexOf(schemaLoc) > -1);
 
     }
     
