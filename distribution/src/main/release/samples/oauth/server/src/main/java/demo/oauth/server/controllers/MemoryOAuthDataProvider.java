@@ -32,6 +32,7 @@ import net.oauth.OAuthProblemException;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.AccessTokenRegistration;
+import org.apache.cxf.rs.security.oauth.data.AuthorizationInput;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
@@ -110,8 +111,9 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         return (RequestToken) token;
     }
 
-    public String setRequestTokenVerifier(RequestToken requestToken) throws
+    public String finalizeAuthorization(AuthorizationInput input) throws
             OAuthServiceException {
+        RequestToken requestToken = input.getToken();
         requestToken.setVerifier(generateToken());
         return requestToken.getVerifier();
     }

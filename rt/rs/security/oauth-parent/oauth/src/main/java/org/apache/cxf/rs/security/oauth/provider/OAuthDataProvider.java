@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth.provider;
 
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.AccessTokenRegistration;
+import org.apache.cxf.rs.security.oauth.data.AuthorizationInput;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
@@ -66,11 +67,11 @@ public interface OAuthDataProvider {
      * this verifier to the client who will exchange it for 
      * a new {@link AccessToken}
      *    
-     * @param requestToken the request token
+     * @param data AuthorizationInput
      * @return the generated verifier
      * @throws OAuthServiceException
      */
-    String setRequestTokenVerifier(RequestToken requestToken) throws OAuthServiceException;
+    String finalizeAuthorization(AuthorizationInput data) throws OAuthServiceException;
     
     /**
      * Creates a new {@link AccessToken}
