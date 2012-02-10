@@ -123,14 +123,32 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
     }
 
-    private static Properties getProps(Object o, SoapMessage message) {
-        Properties properties = getPropertiesCache(message).get(o);
+    private static Properties getProps(Object o, String propsKey, URL propsURL, SoapMessage message) {
+        Properties properties = getPropertiesCache(message).get(propsKey);
         if (properties != null) {
             return properties;
         }
         if (o instanceof Properties) {
             properties = (Properties)o;
-        } else if (o instanceof String) {
+        } else if (propsURL != null) {
+            try {
+                properties = new Properties();
+                InputStream ins = propsURL.openStream();
+                properties.load(ins);
+                ins.close();
+            } catch (IOException e) {
+                properties = null;
+            }
+        }
+        
+        if (properties != null) {
+            getPropertiesCache(message).put(propsKey, properties);
+        }
+        return properties;
+    }
+    
+    private URL getPropertiesFileURL(Object o, SoapMessage message) {
+        if (o instanceof String) {
             URL url = null;
             ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
             url = rm.resolveResource((String)o, URL.class);
@@ -141,29 +159,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 if (url == null) {
                     url = new URL((String)o);
                 }
-                if (url != null) {
-                    properties = new Properties();
-                    InputStream ins = url.openStream();
-                    properties.load(ins);
-                    ins.close();
-                }
+                return url;
             } catch (IOException e) {
-                properties = null;
+                // Do nothing
             }
         } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                properties = null;
-            }            
+            return (URL)o;        
         }
-        if (properties != null) {
-            getPropertiesCache(message).put(o, properties);
-        }
-        return properties;
+        return null;
     }
     
     private void handleWSS11(AssertionInfoMap aim, SoapMessage message) {
@@ -216,15 +219,25 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
         Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         if (s != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + s.toString());
-            message.put("RefId-" + s.toString(), getProps(s, message));
+            URL propsURL = getPropertiesFileURL(s, message);
+            String propsKey = s.toString();
+            if (propsURL != null) {
+                propsKey = propsURL.getPath();
+            }
+            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
+            message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
             if (e == null) {
                 e = s;
             }
         }
         if (e != null) {
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + e.toString());
-            message.put("RefId-" + e.toString(), getProps(e, message));
+            URL propsURL = getPropertiesFileURL(e, message);
+            String propsKey = e.toString();
+            if (propsURL != null) {
+                propsKey = propsURL.getPath();
+            }
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
+            message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
         }
      
         return action;
@@ -243,15 +256,25 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
         Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         if (s != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + s.toString());
-            message.put("RefId-" + s.toString(), getProps(s, message));
+            URL propsURL = getPropertiesFileURL(s, message);
+            String propsKey = s.toString();
+            if (propsURL != null) {
+                propsKey = propsURL.getPath();
+            }
+            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
+            message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
             if (e == null) {
                 e = s;
             }
         }
         if (e != null) {
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + e.toString());
-            message.put("RefId-" + e.toString(), getProps(e, message));
+            URL propsURL = getPropertiesFileURL(e, message);
+            String propsKey = e.toString();
+            if (propsURL != null) {
+                propsKey = propsURL.getPath();
+            }
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
+            message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
         }
 
         return action;
@@ -277,21 +300,41 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         if (isRequestor(message)) {
             if (e != null) {
-                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + e.toString());
-                message.put("RefId-" + e.toString(), getProps(e, message));
+                URL propsURL = getPropertiesFileURL(e, message);
+                String propsKey = e.toString();
+                if (propsURL != null) {
+                    propsKey = propsURL.getPath();
+                }
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
+                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
             }
             if (s != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + s.toString());
-                message.put("RefId-" + s.toString(), getProps(s, message));
+                URL propsURL = getPropertiesFileURL(s, message);
+                String propsKey = s.toString();
+                if (propsURL != null) {
+                    propsKey = propsURL.getPath();
+                }
+                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
+                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
             }
         } else {
             if (s != null) {
-                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + s.toString());
-                message.put("RefId-" + s.toString(), getProps(s, message));
+                URL propsURL = getPropertiesFileURL(s, message);
+                String propsKey = s.toString();
+                if (propsURL != null) {
+                    propsKey = propsURL.getPath();
+                }
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
+                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
             }
             if (e != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + e.toString());
-                message.put("RefId-" + e.toString(), getProps(e, message));
+                URL propsURL = getPropertiesFileURL(e, message);
+                String propsKey = e.toString();
+                if (propsURL != null) {
+                    propsKey = propsURL.getPath();
+                }
+                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
+                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
             }
         }
         
