@@ -51,6 +51,7 @@ import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -400,8 +401,25 @@ public final class ContextUtils {
                 Conduit backChannel = target.getBackChannel(inMessage,
                                                             partialResponse,
                                                             reference);
-
                 if (backChannel != null) {
+                    boolean robust =
+                        MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
+                    
+                    if (robust) {
+                        // insert the executor in the exchange to fool the OneWayProcessorInterceptor
+                        exchange.put(Executor.class, getExecutor(inMessage));
+                        // pause dispatch on current thread and resume...
+                        inMessage.getInterceptorChain().pause();
+                        inMessage.getInterceptorChain().resume();
+                        MessageObserver faultObserver = inMessage.getInterceptorChain().getFaultObserver();
+                        if (null != inMessage.getContent(Exception.class) && null != faultObserver) {
+                            // return the fault over the response fault channel
+                            inMessage.getExchange().setOneWay(false);
+                            faultObserver.onMessage(inMessage);
+                            return;
+                        }
+                    }
+                    
                     // set up interceptor chains and send message
                     InterceptorChain chain =
                         fullResponse != null
@@ -445,20 +463,22 @@ public final class ContextUtils {
                             in.cacheInput();
                         }
                         
-                        // async service invocation required *after* a response
-                        // has been sent (i.e. to a oneway, or a partial response
-                        // to a decoupled twoway)
+                        if (!robust) {
+                            // async service invocation required *after* a response
+                            // has been sent (i.e. to a oneway, or a partial response
+                            // to a decoupled twoway)
                         
         
-                        // pause dispatch on current thread ...
-                        inMessage.getInterceptorChain().pause();
+                            // pause dispatch on current thread ...
+                            inMessage.getInterceptorChain().pause();
 
-                        // ... and resume on executor thread
-                        getExecutor(inMessage).execute(new Runnable() {
-                            public void run() {
-                                inMessage.getInterceptorChain().resume();
-                            }
-                        });
+                            // ... and resume on executor thread
+                            getExecutor(inMessage).execute(new Runnable() {
+                                public void run() {
+                                    inMessage.getInterceptorChain().resume();
+                                }
+                            });
+                        }
                     }
                 }
             } catch (Exception e) {
