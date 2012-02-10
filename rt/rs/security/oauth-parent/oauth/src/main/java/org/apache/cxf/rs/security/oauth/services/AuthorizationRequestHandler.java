@@ -45,6 +45,7 @@ import net.oauth.OAuthProblemException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth.data.AuthorizationInput;
 import org.apache.cxf.rs.security.oauth.data.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.UserSubject;
@@ -99,7 +100,12 @@ public class AuthorizationRequestHandler {
                 token.setSubject(new UserSubject(sc.getUserPrincipal() == null 
                     ? null : sc.getUserPrincipal().getName(), roleNames));
                 
-                String verifier = dataProvider.setRequestTokenVerifier(token);
+                AuthorizationInput input = new AuthorizationInput();
+                input.setToken(token);
+                //TODO: check if some of individual scopes may have been refused 
+                input.setApprovedScopes(token.getScopes());
+                
+                String verifier = dataProvider.finalizeAuthorization(input);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
             } else {
                 dataProvider.removeToken(token);
