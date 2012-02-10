@@ -26,6 +26,7 @@ package org.apache.cxf.rs.security.oauth.data;
 public class Permission {
     private String permission;
     private String description;
+    private boolean isDefault;
     
     public Permission() {
         
@@ -50,5 +51,19 @@ public class Permission {
 
     public void setPermission(String permission) {
         this.permission = permission;
+    }
+
+    /**
+     * Indicates that this permission has been allocated by default.
+     * Authorization View handlers may use this property in order to restrict
+     * the list of scopes which may be refused to non-default scopes only
+     * @param isDefault
+     */
+    public void setDefault(boolean value) {
+        this.isDefault = value;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
     }
 }
