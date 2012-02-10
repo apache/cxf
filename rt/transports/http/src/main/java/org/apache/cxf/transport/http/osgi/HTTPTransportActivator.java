@@ -268,6 +268,7 @@ public class HTTPTransportActivator
                     StringTokenizer st = new StringTokenizer(v, ",");
                     FiltersType ft = p.getCipherSuitesFilter();
                     if (ft == null) {
+                        ft = new FiltersType();
                         p.setCipherSuitesFilter(ft);
                     }
                     List<String> lst = "include".equals(k) ? ft.getInclude() : ft.getExclude();
