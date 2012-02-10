@@ -110,7 +110,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken secToken = getSecurityToken();
                     if (secToken == null) {
-                        policyNotAsserted(initiatorToken, "No intiator token id");
+                        policyNotAsserted(initiatorToken, "Security token is not found or expired");
                         return;
                     } else {
                         policyAsserted(initiatorToken);
@@ -221,7 +221,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             if (initiatorToken instanceof IssuedToken) {
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
-                    policyNotAsserted(initiatorToken, "No intiator token id");
+                    policyNotAsserted(initiatorToken, "Security token is not found or expired");
                     return;
                 } else {
                     policyAsserted(initiatorToken);
