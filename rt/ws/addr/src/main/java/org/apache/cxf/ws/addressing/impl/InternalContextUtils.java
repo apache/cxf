@@ -43,6 +43,7 @@ import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -119,6 +120,25 @@ final class InternalContextUtils {
                                                             reference);
 
                 if (backChannel != null) {
+                    boolean robust =
+                        MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
+                    
+                    if (robust) {
+                        // insert the executor in the exchange to fool the OneWayProcessorInterceptor
+                        exchange.put(Executor.class, getExecutor(inMessage));
+                        // pause dispatch on current thread and resume...
+                        inMessage.getInterceptorChain().pause();
+                        inMessage.getInterceptorChain().resume();
+                        MessageObserver faultObserver = inMessage.getInterceptorChain().getFaultObserver();
+                        if (null != inMessage.getContent(Exception.class) && null != faultObserver) {
+                            // return the fault over the response fault channel
+                            inMessage.getExchange().setOneWay(false);
+                            faultObserver.onMessage(inMessage);
+                            return;
+                        }
+                    }
+                    
+                    
                     // set up interceptor chains and send message
                     InterceptorChain chain =
                         fullResponse != null
@@ -153,7 +173,7 @@ final class InternalContextUtils {
                     exchange.setDestination(destination);
                          
                     
-                    if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage)) {
+                    if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage) && !robust) {
                         //need to suck in all the data from the input stream as
                         //the transport might discard any data on the stream when this 
                         //thread unwinds or when the empty response is sent back
