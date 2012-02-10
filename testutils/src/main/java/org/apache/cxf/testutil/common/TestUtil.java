@@ -31,8 +31,21 @@ import java.util.Properties;
 
 public final class TestUtil {
     private static boolean useRandomPorts = Boolean.getBoolean("useRandomPorts");
-    private static int portNum = 9000;
+    private static int portNum = -1;
     private static Properties ports = new Properties();
+    
+    static {
+        int pn = 9000;
+        while (portNum == -1) {
+            try {
+                ServerSocket sock = new ServerSocket(pn);
+                sock.close();
+                portNum = pn;
+            } catch (IOException ex) {
+                pn += 100;
+            }
+        }
+    }
     
     private TestUtil() {
         //Complete
