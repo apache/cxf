@@ -123,6 +123,9 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
             CachedOutputStream bos = new CachedOutputStream();
+            if (threshold > 0) {
+                bos.setThreshold(threshold);
+            }
             try {
                 IOUtils.copy(is, bos);
 

@@ -70,6 +70,9 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (!hasLogged) {
                 message.put(LOG_SETUP, Boolean.TRUE);
                 final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+                if (threshold > 0) {
+                    newOut.setThreshold(threshold);
+                }
                 message.setContent(OutputStream.class, newOut);
                 newOut.registerCallback(new LoggingCallback(logger, message, os));
             }

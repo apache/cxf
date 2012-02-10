@@ -48,6 +48,7 @@ import org.apache.cxf.service.model.InterfaceInfo;
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     protected int limit = 100 * 1024;
+    protected long threshold = -1;
     protected PrintWriter writer;
     protected boolean prettyLogging;
     
@@ -120,8 +121,15 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public boolean isPrettyLogging() {
         return prettyLogging;
     }
-    
-    
+
+    public void setInMemThreshold(long t) {
+        threshold = t;
+    }
+
+    public long getInMemThreshold() {
+        return threshold;
+    }
+
     protected void writePayload(StringBuilder builder, CachedOutputStream cos,
                                 String encoding, String contentType) 
         throws Exception {
