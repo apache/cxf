@@ -132,13 +132,13 @@ public final class ProviderFactory {
         try {
             return ClassLoaderUtils.loadClass(className, ProviderFactory.class).newInstance();
         } catch (Throwable ex) {
-            String message = "Problem with setting the default provider " + className;
+            String message = "Problem with creating the default provider " + className;
             if (ex.getMessage() != null) {
-                message += ex.getMessage();
+                message += ": " + ex.getMessage();
             } else {
                 message += ", exception class : " + ex.getClass().getName();  
             }
-            LOG.info(message);
+            LOG.fine(message);
         }
         return null;
     }
