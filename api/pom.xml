@@ -45,18 +45,14 @@
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
+            com.sun.xml.bind.api;resolution:=optional,
+            com.sun.xml.bind.api.impl;resolution:=optional,
+            com.sun.xml.internal.bind.api;resolution:=optional,
+            com.sun.xml.internal.bind.api.impl;resolution:=optional,
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
-            com.sun.xml.bind.api,
-            com.sun.xml.bind.api.*,
-            com.sun.xml.internal.bind.api,
-            com.sun.xml.internal.bind.api.*,
-            com.ctc.wstx.*,
-            org.apache.commons.logging.*,
-            org.slf4j.*,
-            org.slf4j.impl.*,
+            org.apache.cxf.bus
         </cxf.osgi.dynamic.import>
-        <cxf.osgi.dynamic.import>org.apache.cxf.bus</cxf.osgi.dynamic.import>
     </properties>
 
     <dependencies>

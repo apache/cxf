@@ -41,9 +41,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.JAXBClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
@@ -164,33 +163,13 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 && clazz.getAnnotation(XmlRootElement.class) == null
                 && clazz.getAnnotation(XmlType.class) != null
                 && StringUtils.isEmpty(clazz.getAnnotation(XmlType.class).name())) {
-                createTypeReference(part.getName(), clazz);
+                Object ref = JAXBClassLoaderUtils.createTypeReference(part.getName(), clazz);
+                if (ref != null) {
+                    typeReferences.add(ref);
+                }
             }
             
             addClass(clazz);
-        }
-    }
-    
-    private void createTypeReference(QName n, Class<?> cls) {
-        Class<?> refClass = null;
-        try {
-            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference", this.getClass());
-        } catch (Throwable ex) {
-            try {
-                refClass = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.api.TypeReference",
-                                                      this.getClass());
-            } catch (Throwable ex2) {
-                //ignore
-            }
-        }
-        if (refClass != null) {
-            try {
-                Object o =  refClass.getConstructor(QName.class, Type.class, new Annotation[0].getClass())
-                    .newInstance(n, cls, new Annotation[0]);
-                typeReferences.add(o);
-            } catch (Throwable e) {
-                //ignore
-            }
         }
     }
 

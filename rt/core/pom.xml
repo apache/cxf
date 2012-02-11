@@ -45,9 +45,11 @@
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}"
         </cxf.osgi.import>
         <cxf.osgi.export>
-            '=META-INF.cxf',
-            org.apache.cxf.*;-split-package:=first,
+            META-INF.cxf, *
         </cxf.osgi.export>
+        <cxf.osgi.dynamic.import>
+            com.ctc.wstx.*
+        </cxf.osgi.dynamic.import>
     </properties>
 
     <dependencies>
