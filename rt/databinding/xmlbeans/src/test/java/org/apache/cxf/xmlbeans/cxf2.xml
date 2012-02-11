@@ -23,6 +23,7 @@
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
     <bean id="GreeterImpl"
           class="org.apache.cxf.xmlbeans.GreeterMineImpl"
@@ -44,7 +45,7 @@
     </bean>
 
     <jaxws:endpoint id="greeterMineEndpoint"
-                    address="http://localhost:9000/SoapContext/SoapPort"
+                    address="http://localhost:${testutil.ports.XmlBeansTest}/SoapContext/SoapPort"
                     implementor="org.apache.cxf.xmlbeans.GreeterMineImpl">
         <jaxws:serviceFactory>
             <ref bean="testServiceFactory"/>

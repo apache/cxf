@@ -28,9 +28,10 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.AbstractCXFSpringTest;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public abstract class JavascriptRhinoTest extends AbstractCXFSpringTest {
-    
+    public static final String PORT = TestUtil.getPortNumber("TestPort");
     protected JavascriptTestUtilities testUtilities;
     protected JaxWsProxyFactoryBean clientProxyFactory;
     protected ServiceInfo serviceInfo;

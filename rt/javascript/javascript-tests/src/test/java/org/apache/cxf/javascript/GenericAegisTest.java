@@ -30,6 +30,8 @@ import org.apache.cxf.javascript.service.ServiceJavascriptBuilder;
 import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
@@ -42,6 +44,7 @@ import static org.junit.Assert.assertNotNull;
  * SEBs.
  */
 public class GenericAegisTest  {
+    public static final String PORT = TestUtil.getPortNumber(GenericAegisTest.class);
 
     // the claim is that code generation makes this go boom.
     @Test
@@ -53,7 +56,7 @@ public class GenericAegisTest  {
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         // we sure can't get a .class for the interface, can we?
         svrFactory.setServiceClass(impl.getClass());
-        svrFactory.setAddress("http://localhost:9000/aegisgeneric");
+        svrFactory.setAddress("http://localhost:" + PORT + "/aegisgeneric");
         svrFactory.setServiceBean(impl);
         Server server = svrFactory.create();
         ServiceInfo serviceInfo = ((EndpointImpl)server.getEndpoint()).getEndpointInfo().getService();

@@ -48,7 +48,7 @@ public class JMSConduitTest extends AbstractJMSTester {
 
     @BeforeClass
     public static void createAndStartBroker() throws Exception {
-        startBroker(new JMSBrokerSetup("tcp://localhost:61500"));
+        startBroker(new JMSBrokerSetup("tcp://localhost:" + JMS_PORT));
     }
 
     @Test
@@ -154,7 +154,6 @@ public class JMSConduitTest extends AbstractJMSTester {
     public void testJMSMessageMarshal() throws Exception {
         setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HelloWorldServiceLoop", "HelloWorldPortLoop");
-
         String testMsg = "Test Message";
         JMSConduit conduit = setupJMSConduit(true, false);
         Message msg = new MessageImpl();

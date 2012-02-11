@@ -27,9 +27,10 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
               
   <import resource="classpath:META-INF/cxf/cxf.xml" />
+  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
               
  <jaxws:server id="greeter-service-endpoint" 
-    address="http://localhost:8808/Greeter" >
+    address="http://localhost:${testutil.ports.TestPort}/Greeter" >
     <jaxws:serviceBean>
       <bean class='org.apache.cxf.javascript.hwdemo.GreeterImpl'/>
     </jaxws:serviceBean>

@@ -27,16 +27,17 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
               
   <import resource="classpath:META-INF/cxf/cxf.xml" />
+  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
               
  <jaxws:server id="mtom-service-endpoint" 
-    address="http://localhost:8808/mtom" >
+    address="http://localhost:${testutil.ports.TestPort}/mtom" >
     <jaxws:serviceBean>
       <bean class='org.apache.cxf.javascript.fortest.MtoMImpl'/>
     </jaxws:serviceBean>
  </jaxws:server>
  
  <jaxws:client id="mtom-client" 
- 			   address="http://localhost:8808/mtom" 
+ 			   address="http://localhost:${testutil.ports.TestPort}/mtom" 
  			   serviceClass="org.apache.cxf.javascript.fortest.MtoM">
     <jaxws:inInterceptors>
 			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />

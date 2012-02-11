@@ -27,10 +27,11 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
 
  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
 
  <jaxws:server id="hwg-service-endpoint"
-  address="http://localhost:8808/HelloWorldGreeter">
+  address="http://localhost:${testutil.ports.TestPort}/HelloWorldGreeter">
   <jaxws:serviceBean>
    <bean class='org.apache.hello_world.GreeterImpl' />
   </jaxws:serviceBean>

@@ -30,6 +30,10 @@ http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
+    
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+        p:brokerURL="vm://localhost"/>
+    
     <bean id="jndi" class="org.apache.xbean.spring.jndi.SpringInitialContextFactory" factory-method="makeInitialContext" singleton="true">
         <property name="entries" ref="jndiEntries" />
     </bean>
@@ -37,13 +41,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <util:map id="jndiEntries">
         <entry key="ConnectionFactory">
             <bean class="org.springframework.jms.connection.SingleConnectionFactory">
-                <property name="targetConnectionFactory">
-                    <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                        <property name="brokerURL">
-                            <value>tcp://localhost:61500</value>
-                        </property>
-                    </bean>
-                </property>
+                <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
             </bean>
         </entry>
     </util:map>
