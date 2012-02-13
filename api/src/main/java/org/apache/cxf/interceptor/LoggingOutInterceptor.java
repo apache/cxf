@@ -132,6 +132,12 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 buffer.getHeader().append(headers);
             }
 
+            if (!isShowBinaryContent() && isBinaryContent(ct)) {
+                buffer.getMessage().append(BINARY_CONTENT_MESSAGE).append('\n');
+                log(logger, buffer.toString());
+                return;
+            }
+            
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
                 if (cos.size() > limit) {
