@@ -24,13 +24,16 @@ package org.apache.cxf.management.jmx;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 
 
 public class MBServerConnectorTest extends Assert {
-    
+    private static final String PORT = TestUtil.getPortNumber(MBServerConnectorTest.class);
+
     @Test
     public void testMBServerConnector() {
         MBServerConnectorFactory mcf;    
@@ -40,7 +43,7 @@ public class MBServerConnectorTest extends Assert {
         mcf.setMBeanServer(mbs);
         mcf.setThreaded(true);
         mcf.setDaemon(true);
-        mcf.setServiceUrl("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi");
+        mcf.setServiceUrl("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         try {
             mcf.createConnector(); 
             Thread.sleep(1000);           
