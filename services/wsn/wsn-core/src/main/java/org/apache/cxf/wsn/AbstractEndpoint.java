@@ -20,7 +20,7 @@ package org.apache.cxf.wsn;
 
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-public abstract class AbstractEndpoint {
+public abstract class AbstractEndpoint implements EndpointMBean {
 
     protected final String name;
 

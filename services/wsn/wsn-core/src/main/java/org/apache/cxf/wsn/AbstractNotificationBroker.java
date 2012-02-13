@@ -19,6 +19,8 @@
 package org.apache.cxf.wsn;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -72,7 +74,7 @@ import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker")
 public abstract class AbstractNotificationBroker extends AbstractEndpoint 
-    implements NotificationBroker, GetResourceProperty {
+    implements NotificationBroker, NotificationBrokerMBean, GetResourceProperty {
 
     public static final String NAMESPACE_URI = "http://docs.oasis-open.org/wsn/b-2";
     public static final String PREFIX = "wsnt";
@@ -109,6 +111,26 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     public void destroy() throws Exception {
         anonymousPublisher.destroy();
         unregister();
+    }
+    
+    public List<String> getPublisher() {
+        return new ArrayList<String>(publishers.keySet());
+    }
+    
+    public List<String> getSubscriptions() {
+        return new ArrayList<String>(subscriptions.keySet());
+    }
+    
+    public EndpointMBean getPublisher(String name) {
+        return publishers.get(name);
+    }
+
+    public EndpointMBean getSubscription(String name) {
+        return subscriptions.get(name);
+    }
+
+    public EndpointMBean getAnonymousPublisher() {
+        return anonymousPublisher;
     }
 
     /**

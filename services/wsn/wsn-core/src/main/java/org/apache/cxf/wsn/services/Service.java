@@ -19,6 +19,11 @@
 
 package org.apache.cxf.wsn.services;
 
+import java.lang.management.ManagementFactory;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.wsn.AbstractCreatePullPoint;
 import org.apache.cxf.wsn.AbstractNotificationBroker;
@@ -29,6 +34,7 @@ import org.apache.cxf.wsn.AbstractNotificationBroker;
 public class Service {
     String rootURL = "http://0.0.0.0:9000/wsn";
     String activeMqUrl = "vm:(broker:(tcp://localhost:6000)?persistent=false)";
+    boolean jmxEnable = true;
 
     AbstractCreatePullPoint createPullPointServer;
     AbstractNotificationBroker notificationBrokerServer;
@@ -39,6 +45,8 @@ public class Service {
                 activeMqUrl = args[++x];
             } else if ("-rootUrl".equals(args[x])) {
                 rootURL = args[++x];
+            } else if ("-jmxEnable".equals(args[x])) {
+                jmxEnable = Boolean.valueOf(args[++x]);
             }
         }
         
@@ -62,6 +70,21 @@ public class Service {
         createPullPointServer = new JaxwsCreatePullPoint("CreatePullPoint", activemq);
         createPullPointServer.setAddress(rootURL + "/CreatePullPoint");
         createPullPointServer.init();
+        
+        if (jmxEnable) {
+            
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            
+            ObjectName nbServerName = 
+                new ObjectName("org.apache.cxf.service.mbeans:type=WSNotificationBroker");
+            
+            ObjectName cpServerName = new ObjectName("org.apache.cxf.service.mbeans:type=CreatePullPoint");
+            
+            mbs.registerMBean(notificationBrokerServer, nbServerName);
+            
+            mbs.registerMBean(createPullPointServer, cpServerName);
+       
+        }
     }
 
 }
