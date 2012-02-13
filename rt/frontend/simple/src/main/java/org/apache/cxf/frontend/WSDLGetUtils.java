@@ -575,12 +575,14 @@ public class WSDLGetUtils {
     }
 
     private String findSchemaLocation(Map<String, SchemaReference> doneSchemas, SchemaReference imp) {
-        for (Map.Entry<String, SchemaReference> e : doneSchemas.entrySet()) {
-            if (e.getValue().getReferencedSchema().getElement() 
-                == imp.getReferencedSchema().getElement()) {
-                doneSchemas.put(imp.getSchemaLocationURI(), imp);
-                imp.setSchemaLocationURI(e.getKey());
-                return e.getKey();
+        if (imp.getReferencedSchema() != null) {
+            for (Map.Entry<String, SchemaReference> e : doneSchemas.entrySet()) {
+                if (e.getValue().getReferencedSchema().getElement() 
+                    == imp.getReferencedSchema().getElement()) {
+                    doneSchemas.put(imp.getSchemaLocationURI(), imp);
+                    imp.setSchemaLocationURI(e.getKey());
+                    return e.getKey();
+                }
             }
         }
         return imp.getSchemaLocationURI();
