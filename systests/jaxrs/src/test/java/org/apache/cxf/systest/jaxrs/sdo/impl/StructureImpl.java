@@ -420,7 +420,9 @@ public class StructureImpl extends DataObjectBase implements Structure {
             return;
         case TEXTS:
             getTexts().clear();
-            getTexts().addAll((Collection)newValue);
+            Collection col = (Collection)newValue;
+            List textsList = getTexts();
+            textsList.addAll(col);
             return;
         }
         super.set(propertyIndex, newValue);
