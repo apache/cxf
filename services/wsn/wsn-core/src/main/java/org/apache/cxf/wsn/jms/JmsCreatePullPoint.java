@@ -79,5 +79,5 @@ public class JmsCreatePullPoint extends AbstractCreatePullPoint {
     public void setConnectionFactory(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
-
+   
 }

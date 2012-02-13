@@ -31,7 +31,8 @@ import org.apache.cxf.wsn.jms.JmsCreatePullPoint;
             serviceName = "CreatePullPoint",
             portName = "CreatePullPointPort")
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
-public class JaxwsCreatePullPoint extends JmsCreatePullPoint {
+public class JaxwsCreatePullPoint extends JmsCreatePullPoint
+    implements JaxwsCreatePullPointMBean {
 
     public JaxwsCreatePullPoint(String name) {
         super(name);

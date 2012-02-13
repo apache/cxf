@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.wsn;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -37,7 +39,8 @@ import org.oasis_open.docs.wsn.bw_2.UnableToCreatePullPointFault;
 import org.oasis_open.docs.wsn.bw_2.UnableToDestroyPullPointFault;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint")
-public abstract class AbstractCreatePullPoint extends AbstractEndpoint implements CreatePullPoint {
+public abstract class AbstractCreatePullPoint extends AbstractEndpoint 
+    implements CreatePullPoint, CreatePullPointMBean {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(AbstractCreatePullPoint.class);
 
@@ -57,6 +60,14 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint implement
 
     public void destroy() throws Exception {
         unregister();
+    }
+    
+    public List<String> getPullEndpoints() {
+        return new ArrayList<String>(pullPoints.keySet());
+    }
+
+    public EndpointMBean getPullEndpoint(String name) {
+        return pullPoints.get(name);
     }
 
     @WebMethod(operationName = "CreatePullPoint")

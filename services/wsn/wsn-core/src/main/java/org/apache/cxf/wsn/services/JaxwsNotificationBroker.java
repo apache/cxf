@@ -31,7 +31,8 @@ import org.apache.cxf.wsn.jms.JmsSubscription;
             serviceName = "NotificationBroker",
             portName = "NotificationBrokerPort")
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
-public class JaxwsNotificationBroker extends JmsNotificationBroker {
+public class JaxwsNotificationBroker extends JmsNotificationBroker 
+    implements JaxwsNotificationBrokerMBean {
 
     public JaxwsNotificationBroker(String name) {
         super(name);
@@ -52,4 +53,5 @@ public class JaxwsNotificationBroker extends JmsNotificationBroker {
     protected JmsPublisher createJmsPublisher(String name) {
         return new JaxwsPublisher(name, this);
     }
+    
 }
