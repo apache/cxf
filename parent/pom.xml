@@ -371,7 +371,6 @@
                         <parallel>${cxf.surefire.parallel.mode}</parallel>
                         <systemPropertyVariables>
                             <org.apache.ws.commons.schema.protectReadOnlyCollections>${cxf.protect-xmlschema-collections}</org.apache.ws.commons.schema.protectReadOnlyCollections>
-                            <useRandomPorts>true</useRandomPorts>
                             <cxf.validateServiceSchemas>${cxf.validateServices}</cxf.validateServiceSchemas>
                             <java.awt.headless>${java.awt.headless}</java.awt.headless>
                             <java.util.logging.config.file>${basedir}/target/test-classes/logging.properties</java.util.logging.config.file>
