@@ -167,7 +167,11 @@ public class ServerLauncher {
                 if (null != properties) {
                     for (Map.Entry<String, String> entry : properties.entrySet()) {
                         old.put(entry.getKey(), System.getProperty(entry.getKey()));
-                        System.setProperty(entry.getKey(), entry.getValue());
+                        if (entry.getValue() == null) {
+                            System.clearProperty(entry.getKey());
+                        } else {
+                            System.setProperty(entry.getKey(), entry.getValue());
+                        }
                     }
                 }
                 

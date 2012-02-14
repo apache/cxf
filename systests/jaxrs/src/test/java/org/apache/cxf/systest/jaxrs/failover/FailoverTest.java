@@ -52,7 +52,8 @@ import org.junit.Test;
  * Tests failover within a static cluster.
  */
 public class FailoverTest extends AbstractBusClientServerTestBase {
-    
+    public static final String NON_PORT = allocatePort(FailoverTest.class);
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -153,14 +154,14 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     @Test(expected = ClientWebApplicationException.class)    
     public void testSequentialStrategyFailure() throws Exception {
         FailoverFeature feature = 
-            getFeature(false, false, "http://localhost:8182/non-existent"); 
+            getFeature(false, false, "http://localhost:" + NON_PORT + "/non-existent"); 
         strategyTest(Server.ADDRESS1, feature, null, null, false, false, false);
     }
     
     @Test
     public void testSequentialStrategyWithRetries() throws Exception {
-        String address = "http://localhost:8182/non-existent";
-        String address2 = "http://localhost:8182/non-existent2";
+        String address = "http://localhost:" + NON_PORT + "/non-existent";
+        String address2 = "http://localhost:" + NON_PORT + "/non-existent2";
         
         FailoverFeature feature = new FailoverFeature();
         List<String> alternateAddresses = new ArrayList<String>();

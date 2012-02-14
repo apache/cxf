@@ -97,6 +97,7 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
                                       DOMSource.class, Service.Mode.PAYLOAD);
         
         try {
+            setAddress(disp, ADDRESS);
             result = disp.invoke(reqMsg);
             fail("should have a schema validation exception of some sort");
         } catch (Exception ex) {

@@ -21,11 +21,14 @@ package org.apache.cxf.systest.mtom;
 
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 public class ServerWithJMS extends AbstractBusTestServerBase {
 
@@ -33,6 +36,9 @@ public class ServerWithJMS extends AbstractBusTestServerBase {
         Object implementor = new TestMtomJMSImpl();
         String address = "http://not.required.for.jms";
         try {
+            Bus bus = BusFactory.getDefaultBus();
+            EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/mtom_xop.wsdl");
+            
             EndpointImpl jaxep = (EndpointImpl) javax.xml.ws.Endpoint.publish(address, implementor);
             Endpoint ep = jaxep.getServer().getEndpoint();
             ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
@@ -43,7 +49,7 @@ public class ServerWithJMS extends AbstractBusTestServerBase {
             jaxWsSoapBinding.setMTOMEnabled(true);
 
         } catch (Exception e) {
-            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
     }
 

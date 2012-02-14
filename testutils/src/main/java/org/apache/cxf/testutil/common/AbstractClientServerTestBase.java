@@ -69,7 +69,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
             ServerLauncher sl = new ServerLauncher(clz.getName());
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
-            launchers.add(sl);
+            launchers.add(0, sl);
         } catch (IOException ex) {
             ex.printStackTrace();
             fail("failed to launch server " + clz);
@@ -83,7 +83,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
             ServerLauncher sl = new ServerLauncher(clz.getName(), inProcess);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
-            launchers.add(sl);
+            launchers.add(0, sl);
         } catch (IOException ex) {
             ex.printStackTrace();
             fail("failed to launch server " + clz);
@@ -101,7 +101,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
             ServerLauncher sl = new ServerLauncher(clz.getName(), props, args, inProcess);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
-            launchers.add(sl);
+            launchers.add(0, sl);
         } catch (IOException ex) {
             ex.printStackTrace();
             fail("failed to launch server " + clz);
