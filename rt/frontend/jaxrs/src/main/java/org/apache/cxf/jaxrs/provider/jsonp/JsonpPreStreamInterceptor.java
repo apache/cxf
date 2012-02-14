@@ -34,8 +34,7 @@ import org.apache.cxf.phase.Phase;
  */
 public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor {
 
-    private static final String JSONP_TYPE = "application/x+javascript";
-    private String mediaType = JSONP_TYPE;
+    private String mediaType = JsonpInInterceptor.JSONP_TYPE;
     private String paddingEnd = "(";
     
     public JsonpPreStreamInterceptor() {

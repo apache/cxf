@@ -19,19 +19,24 @@
 
 package org.apache.cxf.jaxrs.provider.jsonp;
 
+import java.io.IOException;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JsonpInterceptorTest {
+public class JsonpInterceptorTest extends Assert {
 
     public static final String JSON = "{}";
 
@@ -100,6 +105,43 @@ public class JsonpInterceptorTest {
         // Verify that the mock response stream was written to as expected
         org.easymock.EasyMock.verify(out);
     }
+    
+    @Test
+    public void testJsonWithDefaultPadding() throws Exception {
+        // Mock up an output stream as a strict mock. We want to verify that its
+        // being written to correctly.
+        final TestServletOutputStream out = new TestServletOutputStream();
+
+        // Mock up an HTTP request
+        HttpServletRequest request = EasyMock
+                .createNiceMock(HttpServletRequest.class);
+        EasyMock.expect(
+                request.getParameter(JsonpInInterceptor.CALLBACK_PARAM))
+                .andReturn(null);
+        EasyMock.replay(request);
+
+        // Mock up an HTTP response
+        HttpServletResponse response = EasyMock
+                .createNiceMock(HttpServletResponse.class);
+        EasyMock.expect(response.getOutputStream()).andReturn(out).times(2);
+        EasyMock.replay(response);
+
+        // Mock up a message
+        Message message = new MessageImpl();
+        message.put("HTTP.REQUEST", request);
+        message.put("HTTP.RESPONSE", response);
+        message.put(Message.ACCEPT_CONTENT_TYPE, JsonpInInterceptor.JSONP_TYPE);
+
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        
+        // Process the message
+        in.handleMessage(message);
+        preStream.handleMessage(message);
+        postStream.handleMessage(message);
+
+        assertEquals("callback();", out.getValue());
+    }
 
     @Test
     public void testJsonWithoutPadding() throws Exception {
@@ -151,5 +193,16 @@ public class JsonpInterceptorTest {
         org.easymock.EasyMock.verify(out);
     }
 
-    
+    private static class TestServletOutputStream extends ServletOutputStream {
+        private StringBuilder sb = new StringBuilder();
+        
+        public void write(byte[] data) throws IOException {
+            sb.append(new String(data, "UTF-8"));
+        }
+        public String getValue() {
+            return sb.toString();
+        }
+        public void write(int b) throws IOException {
+        }
+    };
 }
