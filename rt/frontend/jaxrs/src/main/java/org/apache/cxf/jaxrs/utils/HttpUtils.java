@@ -57,6 +57,7 @@ public final class HttpUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(HttpUtils.class);
     
     private static final String ANY_IP_ADDRESS = "0.0.0.0";
+    private static final String ANY_IP_ADDRESS_START = "://0.0.0.0";
     private static final int DEFAULT_HTTP_PORT = 80;
     
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
@@ -186,7 +187,7 @@ public final class HttpUtils {
         HttpServletRequest request = 
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
         boolean absolute = u.isAbsolute();
-        if (request != null && (!absolute || u.getHost().equals(ANY_IP_ADDRESS))) {
+        if (request != null && (!absolute || u.toString().contains(ANY_IP_ADDRESS_START))) {
             String serverAndPort = request.getServerName();
             int port = request.getLocalPort();
             if (port != DEFAULT_HTTP_PORT) {
