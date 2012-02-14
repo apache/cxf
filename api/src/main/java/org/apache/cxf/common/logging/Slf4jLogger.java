@@ -66,7 +66,7 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
         Level level;
         // Verify from the wider (trace) to the narrower (error)
         if (logger.isTraceEnabled()) {
-            level = Level.FINER; // FINEST
+            level = Level.FINEST;
         } else if (logger.isDebugEnabled()) {
             // map to the lowest between FINER, FINE and CONFIG
             level = Level.FINER;
@@ -114,7 +114,7 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
             if (locationAwareLogger == null) {
                 logger.trace(msg, t);
             } else {
-                locationAwareLogger.log(null, FQCN, LocationAwareLogger.TRACE_INT, msg, null, t);
+                locationAwareLogger.log(null, FQCN, LocationAwareLogger.DEBUG_INT, msg, null, t);
             }
         } else if (Level.FINEST.equals(level)) {
             if (locationAwareLogger == null) {
