@@ -22,10 +22,12 @@ package org.apache.cxf.xmlbeans;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.xmlbeans.wsdltest.GreeterMine;
 import org.apache.cxf.xmlbeans.wsdltest.SOAPMineService;
 import org.apache.cxf.xmlbeans.wsdltest.SayHi2MessageDocument;
@@ -35,7 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class XmlBeansTest extends AbstractCXFTest {
-
+    private static final String PORT = TestUtil.getPortNumber(XmlBeansTest.class);
     private static final String CONFIG1 = "org/apache/cxf/xmlbeans/cxf.xml";
     private static final String CONFIG2 = "org/apache/cxf/xmlbeans/cxf2.xml";
 
@@ -75,6 +77,10 @@ public class XmlBeansTest extends AbstractCXFTest {
             new SOAPMineService(wsdlURL,
                                 new QName("http://cxf.apache.org/xmlbeans/wsdltest", "SOAPMineService"));
         GreeterMine port = ss.getSoapPort();
+        ((BindingProvider)port).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                 "http://localhost:" + PORT + "/SoapContext/SoapPort");
+       
         
         SayHi2MessageDocument document = SayHi2MessageDocument.Factory.newInstance();
         StringListType stringListType = document.addNewSayHi2Message();

@@ -27,11 +27,12 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
               
   <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
   <bean id='rpc-service' class='org.apache.cxf.javascript.fortest.SimpleRPCImpl'/>
   
   <jaxws:server id="rpc-service-endpoint" 
-    address="http://localhost:8808/SimpleRPC" >
+    address="http://localhost:${testutil.ports.TestPort}/SimpleRPC" >
      <jaxws:serviceBean>
       <ref bean="rpc-service" />
     </jaxws:serviceBean>

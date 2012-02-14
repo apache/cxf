@@ -31,6 +31,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -42,8 +43,10 @@ import org.junit.Assert;
 import org.junit.Before;
 
 public abstract class AbstractJMSTester extends Assert {
+    public static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    
     protected static final String MESSAGE_CONTENT = "HelloWorld";
-
+    
     private static JMSBrokerSetup broker;
 
     protected Bus bus;
@@ -82,6 +85,7 @@ public abstract class AbstractJMSTester extends Assert {
     protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
         URL wsdlUrl = getClass().getResource(wsdl);
         assertNotNull(wsdlUrl);
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlUrl.toString());
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlUrl, new QName(ns, serviceName));
 
         Service service = factory.create();
@@ -108,6 +112,22 @@ public abstract class AbstractJMSTester extends Assert {
         os.close();
     }
 
+    protected void adjustEndpointInfoURL() {
+        if (endpointInfo != null) {
+            AddressType at = endpointInfo.getExtensor(AddressType.class);
+            if (at != null) {
+                for (JMSNamingPropertyType jnt : at.getJMSNamingProperty()) {
+                    if (jnt.getName().equals("java.naming.provider.url")) {
+                        String v = jnt.getValue();
+                        v = v.replace("61500", JMS_PORT);
+                        v = v.replace("61616", JMS_PORT);
+                        jnt.setValue(v);
+                    }
+                }
+            }
+        }
+    }
+    
     protected JMSConduit setupJMSConduit(boolean send, boolean decoupled) throws IOException {
         if (decoupled) {
             // setup the reference type
@@ -115,6 +135,8 @@ public abstract class AbstractJMSTester extends Assert {
             target = EasyMock.createMock(EndpointReferenceType.class);
         }
         
+        adjustEndpointInfoURL();
+
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
             .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, null, true);
         JMSConduit jmsConduit = new JMSConduit(endpointInfo, target, jmsConfig, bus);

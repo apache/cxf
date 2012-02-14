@@ -53,7 +53,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
     
     @BeforeClass
     public static void createAndStartBroker() throws Exception {
-        startBroker(new JMSBrokerSetup("tcp://localhost:61500"));
+        startBroker(new JMSBrokerSetup("tcp://localhost:" + JMS_PORT));
     }
 
     private void waitForReceiveInMessage() {
@@ -85,8 +85,11 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     public JMSDestination setupJMSDestination(boolean send) throws IOException {
+
+        adjustEndpointInfoURL();
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
             .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, null, false);
+        
         JMSDestination jmsDestination = new JMSDestination(bus, endpointInfo, jmsConfig);
 
         if (send) {

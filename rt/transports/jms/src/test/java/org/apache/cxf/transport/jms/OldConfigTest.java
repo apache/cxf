@@ -29,7 +29,7 @@ public class OldConfigTest extends AbstractJMSTester {
 
     @BeforeClass
     public static void createAndStartBroker() throws Exception {
-        startBroker(new JMSBrokerSetup("tcp://localhost:61500"));
+        startBroker(new JMSBrokerSetup("tcp://localhost:" + JMS_PORT));
     }
 
     @Test

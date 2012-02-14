@@ -27,9 +27,10 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd">
               
   <import resource="classpath:META-INF/cxf/cxf.xml" />
+  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
   <jaxws:server id="hw-service-endpoint" 
-    address="http://localhost:8808/HelloWorldDocLit" >
+    address="http://localhost:${testutil.ports.TestPort}/HelloWorldDocLit" >
     <jaxws:serviceBean>
     	<bean class='org.apache.hello_world_doc_lit.GreeterImplDoc'/>
     </jaxws:serviceBean>

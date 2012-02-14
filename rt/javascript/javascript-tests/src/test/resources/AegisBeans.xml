@@ -22,11 +22,14 @@
               http://www.springframework.org/schema/beans/spring-beans.xsd
            http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
            http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
-
+           
+  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+  
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 
 	<simple:server id="aegis-service"
-		serviceClass="org.apache.cxf.javascript.fortest.AegisService" address="http://localhost:8808/aegis">
+		serviceClass="org.apache.cxf.javascript.fortest.AegisService" 
+		address="http://localhost:${testutil.ports.TestPort}/aegis">
 		<simple:serviceBean>
 			<bean class="org.apache.cxf.javascript.fortest.AegisServiceImpl" />
 		</simple:serviceBean>

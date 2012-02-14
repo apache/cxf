@@ -24,6 +24,7 @@ under the License.
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 						http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 						http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 	<!-- CXF -->
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 

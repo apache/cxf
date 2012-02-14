@@ -28,6 +28,7 @@
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
               
+  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   <import resource="classpath:META-INF/cxf/cxf.xml" />
   <!-- 
       <cxf:bus>
@@ -38,7 +39,7 @@
     -->
   
   <jaxws:server id="dlw-service-endpoint" 
-    address="http://localhost:8808/SimpleDocLitWrapped" >
+    address="http://localhost:${testutil.ports.TestPort}/SimpleDocLitWrapped" >
      <jaxws:serviceBean>
       <bean class='org.apache.cxf.javascript.fortest.SimpleDocLitWrappedImpl'/>
     </jaxws:serviceBean>
