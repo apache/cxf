@@ -32,11 +32,15 @@ import org.apache.cxf.phase.Phase;
  * querystring.
  */
 public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static final String JSONP_TYPE = "application/x-javascript";
     public static final String CALLBACK_PARAM = "_jsonp";
     public static final String CALLBACK_KEY = "JSONP.CALLBACK";
+    public static final String DEFAULT_CALLBACK_VALUE = "callback";
 
     private String callbackParam = CALLBACK_PARAM;
+    private String defaultCallback = DEFAULT_CALLBACK_VALUE;
     private String acceptType;
+    private String mediaType = JSONP_TYPE;
     
     public JsonpInInterceptor() {
         this(Phase.UNMARSHAL);
@@ -60,7 +64,14 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     protected String getCallbackValue(Message message) {
         HttpServletRequest request = (HttpServletRequest) message.get("HTTP.REQUEST");
-        return request.getParameter(callbackParam);
+        String callback = request.getParameter(callbackParam);
+        if (StringUtils.isEmpty(callback)) {
+            String httpAcceptType = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+            if (httpAcceptType != null && mediaType.equals(httpAcceptType)) {
+                return defaultCallback;
+            }
+        }
+        return callback;
     }
     
     public void setCallbackParam(String callbackParam) {
@@ -77,5 +88,21 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public String getAcceptType() {
         return acceptType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setDefaultCallback(String defaultCallback) {
+        this.defaultCallback = defaultCallback;
+    }
+
+    public String getDefaultCallback() {
+        return defaultCallback;
     }
 }
