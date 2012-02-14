@@ -28,13 +28,15 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.cxf.management.jmx.export.AnnotationTestInstrumentation;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class JMXManagedComponentManagerTest extends Assert {
-       
+    private static final String PORT = TestUtil.getPortNumber(JMXManagedComponentManagerTest.class);
     private static final String NAME_ATTRIBUTE = "Name";    
     private InstrumentationManagerImpl manager;
     
@@ -44,7 +46,7 @@ public class JMXManagedComponentManagerTest extends Assert {
         manager.setDaemon(false);
         manager.setThreaded(true);
         manager.setEnabled(true);
-        manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi");
+        manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         manager.init();
         //Wait for MBeanServer connector to be initialized on separate thread.
         Thread.sleep(2000);
@@ -130,7 +132,7 @@ public class JMXManagedComponentManagerTest extends Assert {
         // cannot be created.
         this.manager.setThreaded(false);
         this.manager.setEnabled(true);
-        this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi");
+        this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
         this.manager.register();
         this.manager.init();
@@ -164,7 +166,7 @@ public class JMXManagedComponentManagerTest extends Assert {
         // cannot be created.
         this.manager.setThreaded(false);
         this.manager.setEnabled(true);
-        this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi");
+        this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
         this.manager.register();
         this.manager.init();

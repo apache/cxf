@@ -27,13 +27,17 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Test;
 
 /**
  * 
  */
 public class TypeCreationOptionsSpringTest extends AbstractCXFSpringTest {
-
+    public static final String PORT = TestUtil.getPortNumber(TypeCreationOptionsSpringTest.class);
+    
+    
     @Override
     protected String[] getConfigLocations() {
         setConfigContextClass(TypeCreationOptionsSpringTest.class);
