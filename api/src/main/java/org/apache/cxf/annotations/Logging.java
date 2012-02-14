@@ -50,5 +50,10 @@ public @interface Logging {
      * For XML content, turn on pretty printing in the logs
      */
     boolean pretty() default false;
+    
+    /**
+     * Ignore binary payloads by default 
+     */
+    boolean showBinary() default false;
 }
 

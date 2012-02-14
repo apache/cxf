@@ -50,6 +50,7 @@ public class LoggingFeature extends AbstractFeature {
     String inLocation;
     String outLocation;
     boolean prettyLogging;
+    boolean showBinary;
     
     int limit = DEFAULT_LIMIT;
 
@@ -75,12 +76,18 @@ public class LoggingFeature extends AbstractFeature {
         limit = lim;
         prettyLogging = p;
     }
+    
+    public LoggingFeature(String in, String out, int lim, boolean p, boolean showBinary) {
+        this(in, out, lim, p);
+        this.showBinary = showBinary;
+    }
 
     public LoggingFeature(Logging annotation) {
         inLocation = annotation.inLocation();
         outLocation = annotation.outLocation();
         limit = annotation.limit();
         prettyLogging = annotation.pretty();
+        showBinary = annotation.showBinary();
     }
 
     @Override
@@ -95,9 +102,11 @@ public class LoggingFeature extends AbstractFeature {
             LoggingInInterceptor in = new LoggingInInterceptor(limit);
             in.setOutputLocation(inLocation);
             in.setPrettyLogging(prettyLogging);
+            in.setShowBinaryContent(showBinary);
             LoggingOutInterceptor out = new LoggingOutInterceptor(limit);
             out.setOutputLocation(outLocation);
             out.setPrettyLogging(prettyLogging);
+            out.setShowBinaryContent(showBinary);
             
             provider.getInInterceptors().add(in);
             provider.getInFaultInterceptors().add(in);

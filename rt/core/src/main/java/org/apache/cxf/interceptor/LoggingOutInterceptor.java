@@ -70,6 +70,9 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (!hasLogged) {
                 message.put(LOG_SETUP, Boolean.TRUE);
                 final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+                if (threshold > 0) {
+                    newOut.setThreshold(threshold);
+                }
                 message.setContent(OutputStream.class, newOut);
                 newOut.registerCallback(new LoggingCallback(logger, message, os));
             }
@@ -129,6 +132,12 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 buffer.getHeader().append(headers);
             }
 
+            if (!isShowBinaryContent() && isBinaryContent(ct)) {
+                buffer.getMessage().append(BINARY_CONTENT_MESSAGE).append('\n');
+                log(logger, buffer.toString());
+                return;
+            }
+            
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
                 if (cos.size() > limit) {

@@ -23,6 +23,8 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -46,10 +48,22 @@ import org.apache.cxf.service.model.InterfaceInfo;
  * Logger.
  */
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
-
+    
+    protected static final String BINARY_CONTENT_MESSAGE = "--- Binary Content ---";
+    private static final List<String> BINARY_CONTENT_MEDIA_TYPES;
+    static {
+        BINARY_CONTENT_MEDIA_TYPES = new ArrayList<String>();
+        BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
+        BINARY_CONTENT_MEDIA_TYPES.add("image/png");
+        BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");
+        BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
+    }
+    
     protected int limit = 100 * 1024;
+    protected long threshold = -1;
     protected PrintWriter writer;
     protected boolean prettyLogging;
+    private boolean showBinaryContent;
     
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
@@ -120,8 +134,15 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public boolean isPrettyLogging() {
         return prettyLogging;
     }
-    
-    
+
+    public void setInMemThreshold(long t) {
+        threshold = t;
+    }
+
+    public long getInMemThreshold() {
+        return threshold;
+    }
+
     protected void writePayload(StringBuilder builder, CachedOutputStream cos,
                                 String encoding, String contentType) 
         throws Exception {
@@ -178,5 +199,13 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             logger.log(lr);
         }
     }
-    
+    public void setShowBinaryContent(boolean showBinaryContent) {
+        this.showBinaryContent = showBinaryContent;
+    }
+    public boolean isShowBinaryContent() {
+        return showBinaryContent;
+    }
+    public boolean isBinaryContent(String contentType) {
+        return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
+    }
 }

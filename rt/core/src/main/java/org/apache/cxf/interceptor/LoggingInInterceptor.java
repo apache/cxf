@@ -119,10 +119,19 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getAddress().append("?").append(query);
             }
         }
-            
+        
+        if (!isShowBinaryContent() && isBinaryContent(ct)) {
+            buffer.getMessage().append(BINARY_CONTENT_MESSAGE).append('\n');
+            log(logger, buffer.toString());
+            return;
+        }
+        
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
             CachedOutputStream bos = new CachedOutputStream();
+            if (threshold > 0) {
+                bos.setThreshold(threshold);
+            }
             try {
                 IOUtils.copy(is, bos);
 
