@@ -30,17 +30,24 @@ import java.util.Properties;
 
 
 public final class TestUtil {
-    private static boolean useRandomPorts = Boolean.getBoolean("useRandomPorts");
     private static int portNum = -1;
     private static Properties ports = new Properties();
+    
+    @SuppressWarnings("unused")
+    private static ServerSocket lock;
     
     static {
         int pn = 9000;
         while (portNum == -1) {
             try {
+                //we'll hold a socket open and allocate ports up from that socket.
+                //if a second CXF build process (like running parallel builds)
+                //tries to open the socket, it will throw an exception and it
+                //will try again 100 ports up.   At this point, 100 ports is WAY 
+                //more than enough.  We can adjust later if needed. 
                 ServerSocket sock = new ServerSocket(pn);
-                sock.close();
-                portNum = pn;
+                lock = sock;
+                portNum = pn + 1;
             } catch (IOException ex) {
                 pn += 100;
             }
@@ -110,21 +117,19 @@ public final class TestUtil {
                 ports.setProperty("testutil.ports." + name, p);
             }
         }
-        if (p == null) {
-            if (useRandomPorts) {
-                try {
-                    ServerSocket sock = new ServerSocket(0);
-                    p = Integer.toString(sock.getLocalPort());
-                    sock.close();
-                } catch (IOException ex) {
-                    //
-                }
-            } else {
-                p = Integer.toString(portNum++);
+        while (p == null) {
+            int pn = portNum++;
+            try {
+                //make sure the port can be opened.   Something MIGHT be running on it.
+                ServerSocket sock = new ServerSocket(pn);
+                sock.close();
+                p = Integer.toString(pn);
+            } catch (IOException ex) {
+                //
             }
-            ports.put("testutil.ports." + name, p);
-            System.setProperty("testutil.ports." + name, p);
         }
+        ports.put("testutil.ports." + name, p);
+        System.setProperty("testutil.ports." + name, p);
         return p;
     }
 }
