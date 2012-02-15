@@ -61,16 +61,13 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
         }
 
         Element polEl = PolicyConstants.findPolicyElement(element);
-        if (polEl == null) {
-            throw new IllegalArgumentException(
-                "sp:KeyValueToken/wsp:Policy must have a value"
-            );
-        }
-        Element child = DOMUtils.getFirstElement(polEl);
-        if (child != null) {
-            QName qname = new QName(child.getNamespaceURI(), child.getLocalName());
-            if ("RsaKeyValue".equals(qname.getLocalPart())) {
-                token.setForceRsaKeyValue(true);
+        if (polEl != null) {
+            Element child = DOMUtils.getFirstElement(polEl);
+            if (child != null) {
+                QName qname = new QName(child.getNamespaceURI(), child.getLocalName());
+                if ("RsaKeyValue".equals(qname.getLocalPart())) {
+                    token.setForceRsaKeyValue(true);
+                }
             }
         }
         return token;

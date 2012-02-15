@@ -58,16 +58,19 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
         spnegoContextToken.setIgnorable(PolicyConstants.isIgnorable(element));
         
         String attribute = DOMUtils.getAttribute(element, consts.getIncludeToken());
-        if (attribute != null) {
-            spnegoContextToken.setInclusion(consts.getInclusionFromAttributeValue(attribute.trim()));
+        if (attribute == null) {
+            throw new IllegalArgumentException("SpnegoContextToken doesn't contain "
+                                               + "any sp:IncludeToken attribute");
         }
 
+        String inclusionValue = attribute.trim();
+
+        spnegoContextToken.setInclusion(consts.getInclusionFromAttributeValue(inclusionValue));
+
         Element elem = DOMUtils.getFirstElement(element);
-        boolean foundPolicy = false;
         while (elem != null) {
             QName qn = DOMUtils.getElementQName(elem);
             if (Constants.isPolicyElement(qn)) {
-                foundPolicy = true;
                 if (DOMUtils.getFirstChildWithName(elem, consts.getNamespace(),
                         SPConstants.REQUIRE_DERIVED_KEYS) != null) {
                     spnegoContextToken.setDerivedKeys(true);
@@ -83,12 +86,6 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
                 spnegoContextToken.setIssuerEpr(DOMUtils.getFirstElement(elem));
             }
             elem = DOMUtils.getNextElement(elem);
-        }
-        
-        if (!foundPolicy && consts != SP11Constants.INSTANCE) {
-            throw new IllegalArgumentException(
-                "sp:SpnegoContextToken/wsp:Policy must have a value"
-            );
         }
         return spnegoContextToken;
     }

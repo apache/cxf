@@ -68,8 +68,6 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
                                     SPConstants consts,
                                     AssertionBuilderFactory factory) {
         Element polEl = DOMUtils.getFirstElement(element);
-        boolean foundTransportToken = false;
-        boolean foundAlgorithmSuite = false;
         while (polEl != null) {
             if (Constants.isPolicyElement(new QName(polEl.getNamespaceURI(),
                                                        polEl.getLocalName()))) {
@@ -77,11 +75,9 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
                 while (child != null) {
                     String name = child.getLocalName();
                     if (name.equals(SPConstants.ALGO_SUITE)) {
-                        foundAlgorithmSuite = true;
                         parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder(bus)
                             .build(child, factory));
                     } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
-                        foundTransportToken = true;
                         parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)
                                                         .build(child, factory));
                     } else if (name.equals(SPConstants.INCLUDE_TIMESTAMP)) {
@@ -105,17 +101,6 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
                 }
             }
             polEl = DOMUtils.getNextElement(polEl);
-        }
-        
-        if (!foundTransportToken && consts != SP11Constants.INSTANCE) {
-            throw new IllegalArgumentException(
-                "sp:TransportBinding/wsp:Policy/sp:TransportToken must have a value"
-            );
-        }
-        if (!foundAlgorithmSuite) {
-            throw new IllegalArgumentException(
-                "sp:TransportBinding/wsp:Policy/sp:AlgorithmSuite must have a value"
-            );
         }
         
     }

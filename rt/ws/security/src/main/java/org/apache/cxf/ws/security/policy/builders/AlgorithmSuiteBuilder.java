@@ -57,11 +57,6 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
             loader = new DefaultAlgorithmSuiteLoader();
         } 
         Element policyElement = DOMUtils.getFirstElement(element);
-        if (policyElement == null) {
-            throw new IllegalArgumentException(
-                "sp:AlgorithmSuite/wsp:Policy must have a value"
-            );
-        }
         AlgorithmSuite algorithmSuite = null;
         try {
             algorithmSuite = loader.getAlgorithmSuite(policyElement, consts);
@@ -69,7 +64,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
             throw new IllegalArgumentException(e);
         }
         
-        if (algorithmSuite == null && consts != SP11Constants.INSTANCE) {
+        if (algorithmSuite == null) {
             String algorithmSuiteName = DOMUtils.getFirstElement(policyElement).getLocalName();
             throw new IllegalArgumentException(
                 "Algorithm suite \"" + algorithmSuiteName + "\" is not registered"

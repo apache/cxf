@@ -67,28 +67,26 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
         httpsToken.setIgnorable(PolicyConstants.isIgnorable(element));
 
         if (consts.getVersion() == SPConstants.Version.SP_V11) {
-            String attr = DOMUtils.getAttribute(element, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+            String attr = DOMUtils.getAttribute(element,
+                                                SPConstants.REQUIRE_CLIENT_CERTIFICATE);
             if (attr != null) {
                 httpsToken.setRequireClientCertificate("true".equals(attr));
             }
         } else {
             Element polEl = PolicyConstants.findPolicyElement(element);
-            if (polEl == null) {
-                throw new IllegalArgumentException(
-                    "sp:HttpsToken/wsp:Policy must have a value"
-                );
-            }
-            
-            Element child = DOMUtils.getFirstElement(polEl);
-            if (child != null) {
-                if (SP12Constants.HTTP_BASIC_AUTHENTICATION.equals(DOMUtils.getElementQName(child))) {
-                    httpsToken.setHttpBasicAuthentication(true);
-                } else if (SP12Constants.HTTP_DIGEST_AUTHENTICATION
-                        .equals(DOMUtils.getElementQName(child))) {
-                    httpsToken.setHttpDigestAuthentication(true);
-                } else if (SP12Constants.REQUIRE_CLIENT_CERTIFICATE
-                        .equals(DOMUtils.getElementQName(child))) {
-                    httpsToken.setRequireClientCertificate(true);
+             
+            if (polEl != null) {
+                Element child = DOMUtils.getFirstElement(polEl);
+                if (child != null) {
+                    if (SP12Constants.HTTP_BASIC_AUTHENTICATION.equals(DOMUtils.getElementQName(child))) {
+                        httpsToken.setHttpBasicAuthentication(true);
+                    } else if (SP12Constants.HTTP_DIGEST_AUTHENTICATION
+                            .equals(DOMUtils.getElementQName(child))) {
+                        httpsToken.setHttpDigestAuthentication(true);
+                    } else if (SP12Constants.REQUIRE_CLIENT_CERTIFICATE
+                            .equals(DOMUtils.getElementQName(child))) {
+                        httpsToken.setRequireClientCertificate(true);
+                    }
                 }
             }
         }
