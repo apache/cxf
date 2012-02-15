@@ -112,7 +112,7 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
                 "sp:TransportBinding/wsp:Policy/sp:TransportToken must have a value"
             );
         }
-        if (!foundAlgorithmSuite) {
+        if (!foundAlgorithmSuite && consts != SP11Constants.INSTANCE) {
             throw new IllegalArgumentException(
                 "sp:TransportBinding/wsp:Policy/sp:AlgorithmSuite must have a value"
             );
