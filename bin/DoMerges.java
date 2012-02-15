@@ -666,7 +666,7 @@ public class DoMerges {
         for (String ver : verList) {
             cur++;
             jiras.clear();
-            System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
+            System.out.println("Merging: " + ver + " (" + cur + "/" + verList.size() + ")");
             System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
             
             String log = getLog(ver, jiras);
