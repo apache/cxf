@@ -25,6 +25,7 @@
                 </wst:Participants>
                 <wst:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey</wst:KeyType>
               </sp:RequestSecurityTokenTemplate>
+              <wsp:Policy/>
            </sp:IssuedToken>
         </wsp:Policy>
       </sp:SignedSupportingTokens>

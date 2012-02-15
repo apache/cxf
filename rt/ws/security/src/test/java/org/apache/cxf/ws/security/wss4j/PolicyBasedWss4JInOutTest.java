@@ -77,9 +77,6 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(CoverageType.SIGNED));
     }
     
-    // TODO this test does not follow the traditional pattern as no server-side enforcement
-    // of algorithm suites yet exists.  This support is blocked on WSS4J patches.  In the interim
-    // the outbound side is tested ONLY.
     @Test
     public void testSignedElementsWithIssuedSAMLToken() throws Exception {
         this.runOutInterceptorAndValidateSamlTokenAttached(
