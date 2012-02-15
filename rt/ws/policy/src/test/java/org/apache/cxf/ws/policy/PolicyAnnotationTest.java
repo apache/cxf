@@ -40,6 +40,8 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.ws.policy.EndpointPolicy;
+import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.neethi.Constants;
@@ -107,6 +109,12 @@ public class PolicyAnnotationTest extends Assert {
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:output",
                   "echoIntBindingOpOutputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestImplServiceServicePolicy");
+            
+            
+            EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
+                .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null);
+            assertNotNull(policy);
+            assertEquals(1, policy.getChosenAlternative().size());
         } finally {
             bus.shutdown(true);
         }
@@ -168,6 +176,8 @@ public class PolicyAnnotationTest extends Assert {
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:output",
                   "echoIntBindingOpOutputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestInterfaceServiceServicePolicy");
+            
+            
         } finally {
             bus.shutdown(true);
         }
@@ -216,7 +226,7 @@ public class PolicyAnnotationTest extends Assert {
     
     
     @Policies({
-        @Policy(uri = "annotationpolicies/TestImplPolicy.xml")
+        @Policy(uri = "annotationpolicies/TestImplPolicy.xml"),
     }
     )
     @WebService(endpointInterface = "org.apache.cxf.ws.policy.PolicyAnnotationTest$TestInterface")

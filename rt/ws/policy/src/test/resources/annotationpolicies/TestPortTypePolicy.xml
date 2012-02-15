@@ -18,5 +18,6 @@
   under the License.
 -->
 <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
-	<wsp:ExactlyOne />
+    <!-- porttype -->
+	<wsp:All />
 </wsp:Policy>

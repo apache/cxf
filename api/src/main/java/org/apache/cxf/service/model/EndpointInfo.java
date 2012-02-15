@@ -42,6 +42,13 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
         service = serv;
     }
     
+    public DescriptionInfo getDescription() {
+        if (service == null) {
+            return null;
+        }
+        return service.getDescription();
+    }
+
     
     public String getTransportId() {
         return transportId;
