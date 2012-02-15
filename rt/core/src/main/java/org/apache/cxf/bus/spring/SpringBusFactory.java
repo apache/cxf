@@ -83,6 +83,10 @@ public class SpringBusFactory extends BusFactory {
         initializeBus(bus);        
         
         registerApplicationContextLifeCycleListener(bus, bac);
+        
+        if (bus instanceof SpringBus && defaultBusNotExists()) {
+            ((SpringBus)bus).setCloseContext(true);
+        }
         return bus;
     }
     
