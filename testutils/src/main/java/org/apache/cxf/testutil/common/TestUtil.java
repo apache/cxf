@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
+import java.util.Random;
 
 
 public final class TestUtil {
@@ -38,6 +39,9 @@ public final class TestUtil {
     
     static {
         int pn = 9000;
+        if (Boolean.getBoolean("cxf.useRandomFirstPort")) {
+            pn += new Random().nextInt(500) * 100;
+        }
         while (portNum == -1) {
             try {
                 //we'll hold a socket open and allocate ports up from that socket.
