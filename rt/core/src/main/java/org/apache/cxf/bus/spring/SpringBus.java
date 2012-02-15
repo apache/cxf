@@ -41,7 +41,7 @@ public class SpringBus extends ExtensionManagerBus
     implements ApplicationContextAware, ApplicationListener {
 
     AbstractApplicationContext ctx;
-
+    boolean closeContext;
     
     public SpringBus() {
     }
@@ -86,7 +86,6 @@ public class SpringBus extends ExtensionManagerBus
             }
             ac = ac.getParent();
         }
-        
         if (doIt) {
             if (event instanceof ContextRefreshedEvent) {
                 initialize();
@@ -97,7 +96,9 @@ public class SpringBus extends ExtensionManagerBus
     }
     
     public void destroyBeans() {
-        ctx.close();
+        if (closeContext) {
+            ctx.close();
+        }
         super.destroyBeans();
     }
     
@@ -115,6 +116,10 @@ public class SpringBus extends ExtensionManagerBus
             }
         }
         return id;
+    }
+
+    public void setCloseContext(boolean b) {
+        closeContext = b;
     }
 
 }
