@@ -74,6 +74,7 @@ public final class ProviderFactory {
                                     new SourceProvider(),
                                     new FormEncodingProvider(),
                                     new PrimitiveTextProvider(),
+                                    new DataSourceProvider(),
                                     new MultipartProvider(),
                                     new WebApplicationExceptionMapper(),
                                     new WadlGenerator());
