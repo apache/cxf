@@ -122,6 +122,10 @@ public class ControlImpl implements Control {
                 break;
             }
         }
+        if (null == fl.getPhase() || "".equals(fl.getPhase())) {
+            LOG.fine("Removed FaultThrowingInterceptor");
+            return;
+        }
         
         fi = new FaultThrowingInterceptor(fl.getPhase());
         if (null != fl.getBefore() && !"".equals(fl.getBefore())) {
