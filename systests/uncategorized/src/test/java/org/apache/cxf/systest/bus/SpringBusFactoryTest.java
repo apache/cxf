@@ -64,6 +64,19 @@ public class SpringBusFactoryTest extends Assert {
         checkBindingExtensions(bus);
         checkHTTPTransportFactories(bus);
         checkOtherCoreExtensions(bus);
+        ctx.destroy();
+    }
+    @Test
+    public void testLoadBusWithApplicationContext() throws BusException {
+        ClassPathXmlApplicationContext ctx = 
+            new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/systest/bus/basic.xml"});
+        Bus bus = ctx.getBean("cxf", Bus.class);
+        ctx.refresh();
+        bus = ctx.getBean("cxf", Bus.class);
+        checkBindingExtensions(bus);
+        checkHTTPTransportFactories(bus);
+        checkOtherCoreExtensions(bus);
+        ctx.destroy();
     }
     
     private void checkBindingExtensions(Bus bus) throws BusException {
