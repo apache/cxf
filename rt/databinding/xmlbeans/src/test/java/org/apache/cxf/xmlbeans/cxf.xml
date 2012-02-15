@@ -43,7 +43,7 @@
     </bean>
 
     <jaxws:endpoint id="greeterMineEndpoint"
-                    address="http://localhost:9000/SoapContext/SoapPort"
+                    address="local://SoapContext/SoapPort"
                     implementor="org.apache.cxf.xmlbeans.GreeterMineImpl"
                     serviceName="ns:SOAPMineService"
                     xmlns:ns="http://cxf.apache.org/xmlbeans">

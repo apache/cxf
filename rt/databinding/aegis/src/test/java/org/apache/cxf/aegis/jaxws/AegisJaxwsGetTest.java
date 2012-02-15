@@ -30,6 +30,7 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,11 +39,13 @@ import org.junit.Test;
  * 
  */
 public class AegisJaxwsGetTest extends AbstractCXFTest {
+    public static final String PORT = TestUtil.getPortNumber(AegisJaxwsGetTest.class); 
+    
     
     @Before
     public void before() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
-        sf.setAddress("http://localhost:9167/Echo");
+        sf.setAddress("http://localhost:" + PORT + "/Echo");
         sf.setDataBinding(new AegisDatabinding());
         sf.setServiceBean(new Echo());
         Server server = sf.create();
@@ -51,7 +54,7 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
             .getService().put(AbstractInDatabindingInterceptor.NO_VALIDATE_PARTS, Boolean.TRUE);
         
         ServerFactoryBean sf2 = new ServerFactoryBean();
-        sf2.setAddress("http://localhost:9167/SimpleEcho");
+        sf2.setAddress("http://localhost:" + PORT + "/SimpleEcho");
         sf2.setDataBinding(new AegisDatabinding());
         sf2.setServiceBean(new Echo());
         server = sf2.create();
@@ -70,7 +73,7 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
     @Test
     public void testGetEcho() throws Exception {
         HttpClient httpClient = createClient();
-        String url = "http://localhost:9167/Echo/echo/echo/hello";
+        String url = "http://localhost:" + PORT + "/Echo/echo/echo/hello";
         HttpMethod method = null;
         method = new GetMethod(url);
         int status = httpClient.executeMethod(method);
@@ -82,7 +85,7 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
     @Test
     public void testGetEchoSimple() throws Exception {
         HttpClient httpClient = createClient();
-        String url = "http://localhost:9167/SimpleEcho/simpleEcho/string/hello";
+        String url = "http://localhost:" + PORT + "/SimpleEcho/simpleEcho/string/hello";
         HttpMethod method = null;
         method = new GetMethod(url);
         int status = httpClient.executeMethod(method);

@@ -26,12 +26,18 @@ http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/
 http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
-
+	
   <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
       <property name="transportIds">
           <list>
               <value>http://cxf.apache.org/transports/local</value>
               <value>http://cxf.apache.org/transports/http</value>
+          </list>
+      </property>
+      <property name="uriPrefixes">
+          <list>
+              <value>http</value>
+              <value>local</value>
           </list>
       </property>
   </bean>

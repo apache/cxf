@@ -35,6 +35,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -45,6 +46,8 @@ import org.junit.Test;
 public class LocalServerRegistrationTest extends AbstractCXFTest {
     private Message response;
 
+    
+    
     @Test
     public void testServer() throws Exception {
         // Enable the auto registration of a default local endpoint when we use other transports
@@ -56,7 +59,10 @@ public class LocalServerRegistrationTest extends AbstractCXFTest {
         // Create an HTTP endpoint
         ServerFactoryBean sfb = new ServerFactoryBean();
         sfb.setServiceClass(EchoImpl.class);
-        sfb.setAddress("http://localhost:9001/echo");
+        
+        sfb.setAddress("http://localhost:" 
+            + TestUtil.getPortNumber(LocalServerRegistrationTest.class) 
+            + "/echo");
         Server server = sfb.create();
 
         List<Object> content = new ArrayList<Object>();
