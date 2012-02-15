@@ -22,7 +22,6 @@ package org.apache.cxf.systest.interceptor;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -165,22 +164,18 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         
         setupGreeter("org/apache/cxf/systest/interceptor/no-addr.xml", false);
 
+        control.setRobustInOnlyMode(robust);
+
+        // all interceptors pass
+        testInterceptorsPass();
+
         // behaviour is identicial for all phases
-        Iterator<Phase> it = inPhases.iterator();
-        Phase p = null;
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
             .createFaultLocation();        
         
-        while (it.hasNext()) {
-            p = it.next();
-            location.setPhase(p.getName());
-            if (Phase.PRE_LOGICAL.equals(p.getName())) {
-                continue;
-            } else if (Phase.POST_INVOKE.equals(p.getName())) {
-                break;
-            }    
-            testFail(location, false, robust);
-        }
+        // test failure occuring before and after logical addressing interceptor 
+        // won't get a fault in case of oneways non-robust for the latter (partial response already sent)
+        testInterceptorFail(inPhases, location, robust);
     }
     
     @Test
@@ -188,62 +183,60 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         testWithAddressingAnonymousReplies(false);
     }
 
+    @Test
+    public void testRobustWithAddressingAnonymousReplies() throws Exception {
+        testWithAddressingAnonymousReplies(true);
+    }
+
     private void testWithAddressingAnonymousReplies(boolean robust) throws Exception {
         setupGreeter("org/apache/cxf/systest/interceptor/addr.xml", false);
-
+        
+        control.setRobustInOnlyMode(robust);
+        
         // all interceptors pass
+        testInterceptorsPass();
+        
+        // test failure in phases before Phase.PRE_LOGICAL
+        FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
+            .createFaultLocation();
+        location.setAfter(MAPAggregator.class.getName());
+        
+        // test failure occuring before and after logical addressing interceptor 
+        // won't get a fault in case of oneways non-robust for the latter (partial response already sent)
+        testInterceptorFail(inPhases, location, robust);
+    }
+    
+   
+    private void testInterceptorFail(List<Phase> phases, FaultLocation location, boolean robust) 
+        throws PingMeFault {
+        for (Phase p : phases) {
+            location.setPhase(p.getName());
+            if (Phase.PRE_LOGICAL.equals(p.getName())) {
+                continue;
+            } else if (Phase.POST_INVOKE.equals(p.getName())) {
+                break;
+            }   
+            testFail(location, true, robust);
+        }
+    }
+
+    private void testInterceptorsPass() {
         greeter.greetMeOneWay("one");
         assertEquals("TWO", greeter.greetMe("two"));
         try {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
         } catch (PingMeFault f) {
-            assertEquals(20, (int)f.getFaultInfo().getMajor());
-            assertEquals(10, (int)f.getFaultInfo().getMinor());
+            assertEquals(20, f.getFaultInfo().getMajor());
+            assertEquals(10, f.getFaultInfo().getMinor());
         }
-        
-        // test failure in phases before Phase.PRE_LOGICAL
-        
-        Iterator<Phase> it = inPhases.iterator();
-        Phase p = null;
-        FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
-            .createFaultLocation();
-        location.setAfter(MAPAggregator.class.getName());
-        
-        // test failure occuring before logical addressing interceptor 
-
-        while (it.hasNext()) {
-            p = it.next();
-            location.setPhase(p.getName());
-            if (Phase.PRE_LOGICAL.equals(p.getName())) {
-                break;
-            }   
-            testFail(location, true, robust);
-        }
-        
-        // test failure occuring after logical addressing interceptor -
-        // won't get a fault in case of oneways (partial response already sent)
-        
-        do {  
-            location.setPhase(p.getName());
-            if (Phase.INVOKE.equals(p.getName())) {
-                //faults from the PRE_LOGICAL and later phases won't make 
-                //it back to the client, the 200/202 response has already 
-                //been returned.  The server has accepted the message
-                break;
-            }             
-            testFail(location, true, robust);
-            p = it.hasNext() ? it.next() : null;
-        } while (null != p);
     }
-    
-   
+
     private void testFail(FaultLocation location, boolean usingAddressing, boolean robust) 
         throws PingMeFault {
         // System.out.print("Test interceptor failing in phase: " + location.getPhase()); 
         
         control.setFaultLocation(location);       
-        control.setRobustInOnlyMode(robust);
 
         // oneway reports a plain fault (although server sends a soap fault)
 
