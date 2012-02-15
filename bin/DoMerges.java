@@ -599,7 +599,7 @@ public class DoMerges {
             String id = getGitVersion(ver);
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick",
                                                                        "--no-commit", 
-                                                                       id, gitSource}));
+                                                                       id}));
         } else {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "merge", "--non-interactive",
                                                                        "-c", ver, svnSource}));
@@ -731,7 +731,17 @@ public class DoMerges {
         }
 
         argLine.addAll(Arrays.asList(args));
-        System.out.println("Running " + argLine + "...");
+        StringBuilder b = new StringBuilder(256);
+        for (String s : argLine) {
+            if (b.length() == 0) {
+                b.append("Running \"");
+            } else {
+                b.append(" ");
+            }
+            b.append(s);
+        }
+        b.append("\"...");
+        System.out.println(b.toString());
         return argLine.toArray(new String[argLine.size()]);
     }
 
