@@ -226,7 +226,7 @@ public class PolicyAnnotationTest extends Assert {
     
     
     @Policies({
-        @Policy(uri = "annotationpolicies/TestImplPolicy.xml"),
+        @Policy(uri = "annotationpolicies/TestImplPolicy.xml")
     }
     )
     @WebService(endpointInterface = "org.apache.cxf.ws.policy.PolicyAnnotationTest$TestInterface")
