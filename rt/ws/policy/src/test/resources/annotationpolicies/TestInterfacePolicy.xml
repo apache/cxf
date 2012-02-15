@@ -18,5 +18,8 @@
   under the License.
 -->
 <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
-	<wsp:ExactlyOne />
+    <!-- interface -->
+	<wsp:All>
+	    <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata"/>
+	</wsp:All>
 </wsp:Policy>
