@@ -140,10 +140,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             addEncryptedKeyElement(cloneElement(el));
                         } 
                     }
-                    
-                    handleNonEndorsingSupportingTokens();
-                    handleEndorsingSupportingTokens();
                 }
+                handleNonEndorsingSupportingTokens();
+                handleEndorsingSupportingTokens();
             } else {
                 addSignatureConfirmation(null);
             }
