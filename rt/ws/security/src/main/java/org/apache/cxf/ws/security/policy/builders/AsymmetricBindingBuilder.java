@@ -66,14 +66,13 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative(iterator.next(), asymmetricBinding, consts);
-
-            /*
-             * since there should be only one alternative
-             */
-            break;
+        Iterator<List<Assertion>> iterator = policy.getAlternatives();
+        if (!iterator.hasNext()) {
+            throw new IllegalArgumentException(
+                "sp:AsymmetricBinding must specify at least one alternative"
+            );
         }
+        processAlternative(iterator.next(), asymmetricBinding, consts);
 
         return asymmetricBinding;
     }
@@ -84,6 +83,7 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
 
         QName name;
 
+        boolean foundAlgorithmSuite = false;
         for (Assertion assertion : assertions) {
             name = assertion.getName();
 
@@ -92,7 +92,6 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
                 continue;
             }
 
-            
             if (SPConstants.INITIATOR_TOKEN.equals(name.getLocalPart())) {
                 asymmetricBinding.setInitiatorToken((InitiatorToken)assertion);
                 
@@ -113,6 +112,7 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
                 asymmetricBinding.setRecipientEncryptionToken((RecipientEncryptionToken)assertion);
 
             } else if (SPConstants.ALGO_SUITE.equals(name.getLocalPart())) {
+                foundAlgorithmSuite = true;
                 asymmetricBinding.setAlgorithmSuite((AlgorithmSuite)assertion);
 
             } else if (SPConstants.LAYOUT.equals(name.getLocalPart())) {
@@ -136,6 +136,12 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
             } else if (SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY.equals(name.getLocalPart())) {
                 asymmetricBinding.setEntireHeadersAndBodySignatures(true);
             }
+        }
+        
+        if (!foundAlgorithmSuite && consts != SP11Constants.INSTANCE) {
+            throw new IllegalArgumentException(
+                "sp:AsymmetricBinding/wsp:Policy/sp:AlgorithmSuite must have a value"
+            );
         }
     }
 

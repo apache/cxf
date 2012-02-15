@@ -61,6 +61,11 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
             }
 
             String namespaceAttribute = element.getAttribute(SPConstants.NAMESPACE);
+            if ("".equals(namespaceAttribute)) {
+                throw new IllegalArgumentException(
+                    "sp:RequiredParts/sp:Header@Namespace must have a value"
+                );
+            }
             parent.addHeader(new Header(nameAttribute, namespaceAttribute));
         }
     }
