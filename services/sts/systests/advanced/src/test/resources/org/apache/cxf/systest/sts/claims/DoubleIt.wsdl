@@ -136,7 +136,9 @@
 										</wsaw:Metadata>
 									</sp:Issuer>
 								</sp:IssuedToken>
-								<sp:HttpsToken RequireClientCertificate="false" />
+								<sp:HttpsToken>
+                                                                    <wsp:Policy/>
+                                                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>
@@ -181,7 +183,9 @@
 					<wsp:Policy>
 						<sp:TransportToken>
 							<wsp:Policy>
-								<sp:HttpsToken RequireClientCertificate="false" />
+								<sp:HttpsToken>
+                                                                    <wsp:Policy/>
+                                                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>
@@ -289,7 +293,9 @@
 										</wsaw:Metadata>
 									</sp:Issuer>
 								</sp:IssuedToken>
-								<sp:HttpsToken RequireClientCertificate="false" />
+								<sp:HttpsToken>
+                                                                    <wsp:Policy/>
+                                                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>
