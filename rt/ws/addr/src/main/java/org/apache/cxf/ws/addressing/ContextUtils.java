@@ -405,6 +405,7 @@ public final class ContextUtils {
                         MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
                     
                     if (robust) {
+                        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
                         // insert the executor in the exchange to fool the OneWayProcessorInterceptor
                         exchange.put(Executor.class, getExecutor(inMessage));
                         // pause dispatch on current thread and resume...
@@ -417,6 +418,8 @@ public final class ContextUtils {
                             faultObserver.onMessage(inMessage);
                             return;
                         }
+                        // restore the BOI for the partial response handling
+                        exchange.put(BindingOperationInfo.class, boi);
                     }
                     
                     // set up interceptor chains and send message
