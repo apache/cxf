@@ -53,7 +53,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
-
+    public static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomJMSPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomJMSService");
 
@@ -71,7 +72,7 @@ public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
         TestUtilities.setKeepAliveSystemProperty(false);
-        assertTrue("server did not launch correctly", launchServer(ServerWithJMS.class, true));
+        assertTrue("server did not launch correctly", launchServer(ServerWithJMS.class));
     }
     
     @AfterClass
