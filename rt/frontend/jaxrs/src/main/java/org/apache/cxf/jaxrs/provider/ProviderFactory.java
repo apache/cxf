@@ -73,6 +73,7 @@ public final class ProviderFactory {
     static {
         SHARED_FACTORY.setProviders(new BinaryDataProvider<Object>(),
                                     new SourceProvider<Object>(),
+                                    new DataSourceProvider<Object>(),
                                     new FormEncodingProvider<Object>(),
                                     new PrimitiveTextProvider<Object>(),
                                     new MultipartProvider(),
