@@ -27,6 +27,7 @@
            http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
            http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
           ">
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 
@@ -56,7 +57,7 @@
         </bean>
 
         <jaxws:endpoint id="aegisServiceTest"
-        	implementor="#aegisService" address="http://localhost:9876/aegis">
+        	implementor="#aegisService" address="http://localhost:${testutil.ports.TypeCreationOptionsSpringTest}/aegis">
         	<jaxws:serviceFactory>
         		<ref bean='jaxws-and-aegis-service-factory' />
         	</jaxws:serviceFactory>
