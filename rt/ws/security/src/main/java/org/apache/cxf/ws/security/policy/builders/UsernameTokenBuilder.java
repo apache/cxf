@@ -59,6 +59,11 @@ public class UsernameTokenBuilder implements AssertionBuilder<Element> {
         }
 
         Element polEl = PolicyConstants.findPolicyElement(element);
+        if (polEl == null && consts != SP11Constants.INSTANCE) {
+            throw new IllegalArgumentException(
+                "sp:UsernameToken/wsp:Policy must have a value"
+            );
+        }
         if (polEl != null) {
             NodeList children = polEl.getChildNodes();
             if (children != null) {

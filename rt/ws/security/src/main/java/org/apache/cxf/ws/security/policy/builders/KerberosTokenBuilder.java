@@ -55,13 +55,15 @@ public class KerberosTokenBuilder implements AssertionBuilder<Element> {
 
         String attribute = element.getAttributeNS(element.getNamespaceURI(), SPConstants.ATTR_INCLUDE_TOKEN);
         if (attribute != null) {
-            kerberosToken.setInclusion(consts.getInclusionFromAttributeValue(attribute));
+            kerberosToken.setInclusion(consts.getInclusionFromAttributeValue(attribute.trim()));
         }
         
         Element child = DOMUtils.getFirstElement(element);
+        boolean foundPolicy = false;
         while (child != null) {
             String ln = child.getLocalName();
             if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
+                foundPolicy = true;
                 NodeList policyChildren = child.getChildNodes();
                 if (policyChildren != null) {
                     for (int i = 0; i < policyChildren.getLength(); i++) {
@@ -82,6 +84,12 @@ public class KerberosTokenBuilder implements AssertionBuilder<Element> {
                 }
             }
             child = DOMUtils.getNextElement(child);
+        }
+        
+        if (!foundPolicy && consts != SP11Constants.INSTANCE) {
+            throw new IllegalArgumentException(
+                "sp:KerberosToken/wsp:Policy must have a value"
+            );
         }
         return kerberosToken;
     }

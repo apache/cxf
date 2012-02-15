@@ -55,6 +55,11 @@ public class LayoutBuilder implements AssertionBuilder<Element> {
 
     public void processAlternative(Element element, Layout parent, SPConstants consts) {
         Element polEl = PolicyConstants.findPolicyElement(element);
+        if (polEl == null && consts != SP11Constants.INSTANCE) {
+            throw new IllegalArgumentException(
+                "sp:Layout/wsp:Policy must have a value"
+            );
+        }
         if (polEl != null) {
             Element child = DOMUtils.getFirstElement(polEl);
             if (child != null) {

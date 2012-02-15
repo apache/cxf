@@ -221,7 +221,9 @@
                                        <wsp:Policy>
                                           <sp:TransportToken>
                                              <wsp:Policy>
-                                                <sp:HttpsToken RequireClientCertificate="false" />
+                                                <sp:HttpsToken>
+                                                    <wsp:Policy/>
+                                                </sp:HttpsToken>
                                              </wsp:Policy>
                                           </sp:TransportToken>
                                           <sp:Layout>
@@ -240,7 +242,9 @@
                                     <sp:SupportingTokens>
                                         <wsp:Policy>
                                             <sp:UsernameToken
-                                                sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient" />
+                                                sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                                <wsp:Policy/>
+                                            </sp:UsernameToken>
                                         </wsp:Policy>
                                     </sp:SupportingTokens>
                                 </wsp:All>
