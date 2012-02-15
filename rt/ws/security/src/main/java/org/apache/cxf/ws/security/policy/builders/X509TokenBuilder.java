@@ -54,11 +54,6 @@ public class X509TokenBuilder implements AssertionBuilder<Element> {
         x509Token.setIgnorable(PolicyConstants.isIgnorable(element));
 
         Element policyElement = DOMUtils.getFirstElement(element);
-        if (policyElement == null && consts != SP11Constants.INSTANCE) {
-            throw new IllegalArgumentException(
-                "sp:X509Token/wsp:Policy must have a value"
-            );
-        }
 
         // Process token inclusion
         String includeAttr = DOMUtils.getAttribute(element, consts.getIncludeToken());
@@ -70,27 +65,29 @@ public class X509TokenBuilder implements AssertionBuilder<Element> {
         }
 
         if (policyElement != null) {
+
             if (DOMUtils.getFirstChildWithName(policyElement, consts.getRequiredDerivedKeys()) != null) {
                 x509Token.setDerivedKeys(true);
             } else if (DOMUtils.getFirstChildWithName(policyElement, 
-                    SP12Constants.REQUIRE_IMPLIED_DERIVED_KEYS) != null) {
+                                                      SP12Constants.REQUIRE_IMPLIED_DERIVED_KEYS) != null) {
                 x509Token.setImpliedDerivedKeys(true);
             } else if (DOMUtils.getFirstChildWithName(policyElement, 
-                    SP12Constants.REQUIRE_EXPLICIT_DERIVED_KEYS) != null) {
+                                                      SP12Constants.REQUIRE_EXPLICIT_DERIVED_KEYS) != null) {
                 x509Token.setExplicitDerivedKeys(true);
             }
-        }
 
-        Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = policy.normalize(builder.getPolicyRegistry(), false);
 
-        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
-            processAlternative(iterator.next(), x509Token, consts);
+            Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
+            policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-            /*
-             * since there should be only one alternative
-             */
-            break;
+            for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+                processAlternative(iterator.next(), x509Token, consts);
+
+                /*
+                 * since there should be only one alternative
+                 */
+                break;
+            }
         }
         return x509Token;
     }

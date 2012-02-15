@@ -68,8 +68,6 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
         }
         
         Element child = DOMUtils.getFirstElement(element);
-        boolean foundPolicy = false;
-        boolean foundRST = false;
         while (child != null) {
             String ln = child.getLocalName();
             if (SPConstants.ISSUER.equals(ln)) {
@@ -80,10 +78,8 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
                     throw new IllegalArgumentException(e);
                 }
             } else if (SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE.equals(ln)) {
-                foundRST = true;
                 issuedToken.setRstTemplate(child);
             } else if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
-                foundPolicy = true;
                 Policy policy = builder.getPolicy(child);
                 policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
@@ -95,18 +91,6 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
             
             child = DOMUtils.getNextElement(child);
         }
-        
-        if (!foundPolicy && consts != SP11Constants.INSTANCE) {
-            throw new IllegalArgumentException(
-                "sp:IssuedToken/wsp:Policy must have a value"
-            );
-        }
-        if (!foundRST) {
-            throw new IllegalArgumentException(
-                "sp:IssuedToken/sp:RequestSecurityTokenTemplate must have a value"
-            );
-        }
-        
         return issuedToken;
     }
 

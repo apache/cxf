@@ -61,14 +61,14 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
-        Iterator<List<Assertion>> iterator = policy.getAlternatives();
-        if (!iterator.hasNext()) {
-            throw new IllegalArgumentException(
-                "sp:SymmetricBinding must specify at least one alternative"
-            );
-        }
-        processAlternatives(iterator.next(), symmetricBinding, consts);
+        for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternatives(iterator.next(), symmetricBinding, consts);
 
+            /*
+             * since there should be only one alternative ..
+             */
+            break;
+        }
         return symmetricBinding;
     }
 
@@ -76,7 +76,6 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
     private void processAlternatives(List<Assertion> assertions,
                                      SymmetricBinding symmetricBinding, SPConstants consts) {
         QName name;
-        boolean foundAlgorithmSuite = false;
         for (Assertion assertion : assertions) {
             name = assertion.getName();
 
@@ -86,7 +85,6 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
             }
 
             if (SPConstants.ALGO_SUITE.equals(name.getLocalPart())) {
-                foundAlgorithmSuite = true;
                 symmetricBinding.setAlgorithmSuite((AlgorithmSuite)assertion);
 
             } else if (SPConstants.LAYOUT.equals(name.getLocalPart())) {
@@ -111,12 +109,6 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
             } else if (SPConstants.PROTECT_TOKENS.equals(name.getLocalPart())) {
                 symmetricBinding.setTokenProtection(true);
             } 
-        }
-        
-        if (!foundAlgorithmSuite && consts != SP11Constants.INSTANCE) {
-            throw new IllegalArgumentException(
-                "sp:SymmetricBinding/wsp:Policy/sp:AlgorithmSuite must have a value"
-            );
         }
     }
 }

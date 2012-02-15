@@ -54,31 +54,27 @@ public class SecurityContextTokenBuilder implements AssertionBuilder<Element> {
         }
 
         element = PolicyConstants.findPolicyElement(element);
-        if (element == null && consts != SP11Constants.INSTANCE) {
-            throw new IllegalArgumentException(
-                "sp:SecurityContextToken/wsp:Policy must have a value"
-            );
-        }
 
         if (element != null) {
+
             if (DOMUtils.getFirstChildWithName(element, 
-                    consts.getNamespace(),
-                    SPConstants.REQUIRE_DERIVED_KEYS) != null) {
+                                               consts.getNamespace(),
+                                               SPConstants.REQUIRE_DERIVED_KEYS) != null) {
                 contextToken.setDerivedKeys(true);
             }
-    
+
             if (DOMUtils.getFirstChildWithName(element, 
-                    consts.getNamespace(),
-                    SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE) != null) {
+                                               consts.getNamespace(),
+                                               SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE) != null) {
                 contextToken.setRequireExternalUriRef(true);
             }
-    
+
             if (DOMUtils.getFirstChildWithName(element,
-                    consts.getNamespace(),
-                    SPConstants.SC10_SECURITY_CONTEXT_TOKEN) != null) {
+                                               consts.getNamespace(),
+                                               SPConstants.SC10_SECURITY_CONTEXT_TOKEN) != null) {
                 contextToken.setSc10SecurityContextToken(true);
             }
-    
+            
             if (DOMUtils.getFirstChildWithName(element,
                     consts.getNamespace(),
                     SPConstants.SC13_SECURITY_CONTEXT_TOKEN) != null) {
