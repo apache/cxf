@@ -33,4 +33,12 @@ public class Echo {
     public String simpleEcho(String string) {
         return string;
     }
+    @WebMethod
+    public String simpleEchoWithHeaders(
+        @WebParam(name = "firstHeader", header = true) int i,
+        @WebParam(name = "secondHeader", header = true) String s,
+        String string) {
+        
+        return string;
+    }
 }

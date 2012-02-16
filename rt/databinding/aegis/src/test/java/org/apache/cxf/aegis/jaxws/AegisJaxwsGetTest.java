@@ -19,6 +19,12 @@
 
 package org.apache.cxf.aegis.jaxws;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -29,7 +35,9 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.test.XPathAssert;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Before;
@@ -81,6 +89,19 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
         String result = method.getResponseBodyAsString();
         assertTrue(result.contains("hello"));
         method.releaseConnection();
+        
+        httpClient = createClient();
+        url = "http://localhost:" + PORT + "/Echo/echo/echo/hello?wsdl";
+        method = new GetMethod(url);
+        status = httpClient.executeMethod(method);
+        assertEquals(HttpStatus.SC_OK, status);
+        Document doc = StaxUtils.read(method.getResponseBodyAsStream());
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        NodeList nl = XPathAssert.assertValid("//xsd:element[@name='firstHeader']",
+                                              doc.getDocumentElement(),
+                                              ns);
+        assertEquals(1, nl.getLength());
     }
     @Test
     public void testGetEchoSimple() throws Exception {
