@@ -98,6 +98,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             implementor.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
             GreeterImpl greeterImplementor = new GreeterImpl();
             greeterImplementor.setThrowAlways(true);
+            greeterImplementor.useLastOnewayArg(true);
             implementor.setImplementor(greeterImplementor);
             Endpoint.publish(CONTROL_PORT_ADDRESS, implementor);
             LOG.fine("Published control endpoint.");
@@ -167,7 +168,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         control.setRobustInOnlyMode(robust);
 
         // all interceptors pass
-        testInterceptorsPass();
+        testInterceptorsPass(robust);
 
         // behaviour is identicial for all phases
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
@@ -194,7 +195,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         control.setRobustInOnlyMode(robust);
         
         // all interceptors pass
-        testInterceptorsPass();
+        testInterceptorsPass(robust);
         
         // test failure in phases before Phase.PRE_LOGICAL
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
@@ -220,9 +221,19 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private void testInterceptorsPass() {
+    private void testInterceptorsPass(boolean robust) {
         greeter.greetMeOneWay("one");
-        assertEquals("TWO", greeter.greetMe("two"));
+        
+        // wait 5 seconds for the non-robust case
+        if (!robust) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
+        // verify both the previous greetMeOneWay call and this greetMe call 
+        assertEquals("one", greeter.greetMe("two"));
         try {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
