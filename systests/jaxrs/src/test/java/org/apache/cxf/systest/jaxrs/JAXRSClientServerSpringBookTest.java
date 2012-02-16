@@ -230,7 +230,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         client.query("_jsonp", "callback");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Response r = client.get();
-        assertEquals("application/x+javascript", r.getMetadata().getFirst("Content-Type"));
+        assertEquals("application/x-javascript", r.getMetadata().getFirst("Content-Type"));
         assertEquals("callback({\"Book\":{\"id\":123,\"name\":\"CXF in Action\"}});",
                      IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
