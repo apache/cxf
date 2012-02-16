@@ -688,11 +688,11 @@ public class DoMerges {
         Set<Integer> ignores = new TreeSet<Integer>();
         Set<String> jiras = new TreeSet<String>();
 
-        int cur = 0;
-        for (Integer ver : verList) {
-            cur++;
+        Integer verArray[] = verList.toArray(new Integer[verList.size()]);
+        for (int cur = 0; cur < verArray.length; cur++) {
             jiras.clear();
-            System.out.println("Merging: " + ver + " (" + cur + "/" + verList.size() + ")");
+            int ver = verArray[cur];
+            System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
             System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
             
             String log = getLog(ver, jiras);
