@@ -1038,15 +1038,14 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected void checkForElement(ServiceInfo serviceInfo, MessagePartInfo mpi) {
-        for (SchemaInfo s : serviceInfo.getSchemas()) {
-            XmlSchemaElement e = s.getElementByQName(mpi.getElementQName());
-            if (e != null) {
-                mpi.setXmlSchema(e);
-                return;
-            }
-        }
         SchemaInfo si = getOrCreateSchema(serviceInfo, mpi.getElementQName().getNamespaceURI(),
                                           getQualifyWrapperSchema());
+        XmlSchemaElement e = si.getElementByQName(mpi.getElementQName());
+        e = si.getSchema().getElementByName(mpi.getElementQName().getLocalPart());
+        if (e != null) {
+            mpi.setXmlSchema(e);
+            return;
+        }
         XmlSchema schema = si.getSchema();
         si.setElement(null); //cached element is now invalid
 
@@ -1257,7 +1256,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         ct.setParticle(seq);
 
         for (MessagePartInfo mpi : unwrappedMessage.getMessageParts()) {
-            el = new XmlSchemaElement(schema, false);
+            el = new XmlSchemaElement(schema, Boolean.TRUE.equals(mpi.getProperty(HEADER)));
             // We hope that we can't have parts that different only in namespace.
             el.setName(mpi.getName().getLocalPart());
             Map<Class, Boolean> jaxbAnnoMap = getJaxbAnnoMap(mpi);
