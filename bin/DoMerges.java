@@ -172,7 +172,11 @@ public class DoMerges {
         }
     }
 
+
     static void waitFor(Process p) throws Exception  {
+        waitFor(p, true);
+    }
+    static void waitFor(Process p, boolean exit) throws Exception  {
         if (p.waitFor() != 0) {
             System.out.println("ERROR!");
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -181,17 +185,22 @@ public class DoMerges {
                 System.out.println(line);
                 line = reader.readLine();
             }
-            System.exit(1);
+            if (exit) {
+                System.exit(1);
+            }
         }
     }
     static void runProcess(Process p) throws Exception {
+        runProcess(p, true);
+    }
+    static void runProcess(Process p, boolean exit) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line = reader.readLine();
         while (line != null) {
             System.out.println(line);
             line = reader.readLine();
         }
-        waitFor(p);
+        waitFor(p, exit);
     }
     
     static void initSvnInfo() throws Exception {
@@ -379,7 +388,7 @@ public class DoMerges {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
         BufferedReader reader = new BufferedReader(new StringReader(log));
         writer.write("Merged revisions ");
-        writer.write(ver);
+        writer.write(Integer.toString(ver));
         writer.write(" via ");
         if (isGit) {
             writer.write(" git cherry-pick from\n");
@@ -476,7 +485,7 @@ public class DoMerges {
                 if (ver.length() > 0) {
                     ver.append(',');
                 }
-                ver.append(s.ver);
+                ver.append(Integer.toString(s.ver));
                 merged.addRange(new Range(s.ver));
             }
             System.out.println("Recording " + ver);
@@ -500,7 +509,7 @@ public class DoMerges {
                 if (ver.length() > 0) {
                     ver.append(',');
                 }
-                ver.append(s.ver);
+                ver.append(Integer.toString(s.ver));
                 blocked.addRange(new Range(s.ver));
             }
             System.out.println("Blocking " + ver);
@@ -608,7 +617,7 @@ public class DoMerges {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "merge", "--non-interactive",
                                                                        "-c", Integer.toString(ver), svnSource}));
         }
-        runProcess(p);
+        runProcess(p, false);
         
         if (!isGit) {
             removeSvnMergeInfo();
@@ -644,8 +653,13 @@ public class DoMerges {
     }
     
     public static void main (String args[]) throws Exception {
-        if (args.length > 0 && "-auto".equals(args[0])) { 
-            auto = true;
+        int onlyVersion = -1;
+        if (args.length > 0) {
+            if ("-auto".equals(args[0])) { 
+                auto = true;
+            } else {
+                onlyVersion = Integer.valueOf(args[0]);
+            }
         }
         File file = new File(".git");
         if (file.exists() && file.isDirectory()) {
@@ -658,6 +672,14 @@ public class DoMerges {
         initSvnInfo();
         
         Set<Integer> verList = getAvailableUpdates();
+        if (onlyVersion != -1) {
+            if (!verList.contains(onlyVersion)) {
+                System.out.println("Version: " + onlyVersion + " does not need merging");
+                System.exit(0);
+            }
+            verList.clear();
+            verList.add(onlyVersion);
+        }
 
         System.out.println("Merging versions (" + verList.size() + "): " + verList);
 
