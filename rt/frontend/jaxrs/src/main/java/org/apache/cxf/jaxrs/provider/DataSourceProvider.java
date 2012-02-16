@@ -31,11 +31,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 
+@Provider
 public class DataSourceProvider implements MessageBodyReader, MessageBodyWriter {
     
     public boolean isReadable(Class type, Type genericType, Annotation[] annotations, MediaType mt) {
