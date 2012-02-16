@@ -73,5 +73,6 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
 
     public WSSecurityPolicyInterceptorProvider() {
         super(ASSERTION_TYPES);
+        getOutInterceptors().add(SecurityVerificationOutInterceptor.INSTANCE);
     }
 }
