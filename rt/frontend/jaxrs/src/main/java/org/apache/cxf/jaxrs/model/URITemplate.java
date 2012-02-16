@@ -98,6 +98,10 @@ public final class URITemplate {
     public String getValue() {
         return template;
     }
+    
+    public String getPatternValue() {
+        return templateRegexPattern.toString();
+    }
 
     /**
      * List of all variables in order of appearance in template.
@@ -341,6 +345,10 @@ public final class URITemplate {
                 return gCustom1 < gCustom2 ? 1 : -1;
             }
         }
+        if (result == 0) {
+            result = t1.getPatternValue().compareTo(t2.getPatternValue());
+        }
+            
         return result;
     }
 

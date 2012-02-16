@@ -40,6 +40,15 @@ public class URITemplateTest extends Assert {
     }
 
     @Test
+    public void testCompareRegExTemplates() {
+        URITemplate t1 = new URITemplate("{entitySetName}{optionalParens: (\\(\\))?}");
+        URITemplate t2 = new URITemplate("{entitySetName}{id: \\(.+?\\)}");
+        assertTrue(URITemplate.compareTemplates(t1, t2) < 0);
+        assertTrue(URITemplate.compareTemplates(t2, t1) > 0);
+        assertEquals(0, URITemplate.compareTemplates(t2, t2));
+    }
+    
+    @Test
     public void testPathCharacters() {
         String pathChars = ":@!$&'*+,;=-._~()";
         assertTrue(new URITemplate(pathChars).match(pathChars, 
