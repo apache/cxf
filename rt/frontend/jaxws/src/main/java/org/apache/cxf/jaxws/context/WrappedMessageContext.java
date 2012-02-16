@@ -258,7 +258,7 @@ public class WrappedMessageContext implements MessageContext {
                 }
             } else if (Message.WSDL_OPERATION.equals(key)) {
                 BindingOperationInfo boi = getBindingOperationInfo(exchange);
-                if (boi != null) {
+                if (boi != null && boi.getProperty("operation.is.synthetic") != Boolean.TRUE) {
                     ret = boi.getName();
                 }
             } else if (Message.WSDL_SERVICE.equals(key)) {

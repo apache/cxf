@@ -141,6 +141,8 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
                                               Message message) {
         Endpoint ep = exchange.get(Endpoint.class);
         MessagePartInfo lastChoice = null;
+        BindingOperationInfo lastBoi = null;
+        BindingMessageInfo lastMsgInfo = null;
         BindingMessageInfo msgInfo = null;
         BindingOperationInfo boi = null;
         for (Iterator<OperationInfo> itr = operations.iterator(); itr.hasNext();) {
@@ -181,12 +183,15 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
 
             if (XSD_ANY.equals(p.getTypeQName())) {
                 lastChoice = p;
+                lastBoi = boi;
+                lastMsgInfo = msgInfo;
             } else {
                 itr.remove();
             }
         }
         if (lastChoice != null) {
-            setMessage(message, boi, client, boi.getBinding().getService(), msgInfo.getMessageInfo());
+            setMessage(message, lastBoi, client, lastBoi.getBinding().getService(), 
+                       lastMsgInfo.getMessageInfo());
         }
         return lastChoice;
     }    
@@ -196,12 +201,16 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         message.put(MessageInfo.class, msgInfo);
 
         Exchange ex = message.getExchange();
+        
         ex.put(BindingOperationInfo.class, operation);
         ex.put(OperationInfo.class, operation.getOperationInfo());
         ex.setOneWay(operation.getOperationInfo().isOneWay());
 
         //Set standard MessageContext properties required by JAX_WS, but not specific to JAX_WS.
-        message.put(Message.WSDL_OPERATION, operation.getName());
+        boolean synthetic = operation.getProperty("operation.is.synthetic") == Boolean.TRUE;
+        if (!synthetic) {
+            message.put(Message.WSDL_OPERATION, operation.getName());
+        }
 
         QName serviceQName = si.getName();
         message.put(Message.WSDL_SERVICE, serviceQName);
