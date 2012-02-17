@@ -160,7 +160,7 @@ public class PolicyAnnotationTest extends Assert {
     
     
     @Policies({
-        @Policy(uri = "annotationpolicies/TestImplPolicy.xml"),
+        @Policy(uri = "annotationpolicies/TestImplPolicy.xml")
     }
     )
     @WebService()
