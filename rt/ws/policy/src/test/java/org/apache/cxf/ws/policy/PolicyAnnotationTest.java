@@ -40,6 +40,8 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.ws.policy.EndpointPolicy;
+import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 
@@ -106,11 +108,17 @@ public class PolicyAnnotationTest extends Assert {
                   "echoIntBindingOpInputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:output",
                   "echoIntBindingOpOutputPolicy");
+            
+            
+            EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
+                .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null);
+            assertNotNull(policy);
+            assertEquals(1, policy.getChosenAlternative().size());
         } finally {
             bus.shutdown(true);
         }
     }
-    
+
     private void check(XPathUtils xpu, Element wsdl, String path, String uri) {
         assertTrue(uri + " not found",
                    xpu.isExist("/wsdl:definitions/wsp:Policy[@wsu:Id='" + uri + "']",
@@ -152,7 +160,7 @@ public class PolicyAnnotationTest extends Assert {
     
     
     @Policies({
-        @Policy(uri = "annotationpolicies/TestImplPolicy.xml")
+        @Policy(uri = "annotationpolicies/TestImplPolicy.xml"),
     }
     )
     @WebService()

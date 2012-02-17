@@ -43,7 +43,13 @@ public class InterfaceInfo extends AbstractDescriptionElement implements NamedIt
         service = info;
         info.setInterface(this);
     }
-    
+    public DescriptionInfo getDescription() {
+        if (service == null) {
+            return null;
+        }
+        return service.getDescription();
+    }
+
     public ServiceInfo getService() {
         return service;
     }

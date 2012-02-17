@@ -475,7 +475,6 @@ public class WSDLServiceBuilder {
         service.addEndpoint(ei);
         DescriptionInfo d = service.getDescription();
         if (null != d) {
-            ei.setDescription(d);
             d.getDescribed().add(ei);
         }
         return ei;
@@ -538,7 +537,6 @@ public class WSDLServiceBuilder {
         service.addBinding(bi);
         DescriptionInfo d = service.getDescription();
         if (null != d) {
-            bi.setDescription(d);
             d.getDescribed().add(bi);
         }
         return bi;
@@ -564,7 +562,6 @@ public class WSDLServiceBuilder {
         InterfaceInfo inf = si.createInterface(p.getQName());
         DescriptionInfo d = si.getDescription();
         if (null != d) {
-            inf.setDescription(si.getDescription());
             d.getDescribed().add(inf);
         }
         copyDocumentation(inf, p);

@@ -45,6 +45,13 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
         this.bindingId = bindingId;
     }
     
+    public DescriptionInfo getDescription() {
+        if (service == null) {
+            return null;
+        }
+        return service.getDescription();
+    }
+
     public InterfaceInfo getInterface() {
         return service.getInterface();
     }

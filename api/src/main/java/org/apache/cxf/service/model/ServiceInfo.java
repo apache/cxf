@@ -41,11 +41,19 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     List<SchemaInfo> schemas = new ArrayList<SchemaInfo>(4);
     private SchemaCollection xmlSchemaCollection;
     private String topLevelDoc;
+    private DescriptionInfo description;
 
     public ServiceInfo() {
         xmlSchemaCollection = new SchemaCollection();
     }
     
+    public DescriptionInfo getDescription() {
+        return description;
+    }
+    public void setDescription(DescriptionInfo d) {
+        description = d;
+    }
+
     public String getTopLevelDoc() {
         return topLevelDoc;
     }
