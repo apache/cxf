@@ -89,6 +89,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.Timestamp;
@@ -216,8 +217,15 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        if (s == null) {
+            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+        }
+        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        if (e == null) {
+            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+        }
+        
         if (s != null) {
             URL propsURL = getPropertiesFileURL(s, message);
             String propsKey = s.toString();
@@ -225,7 +233,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 propsKey = propsURL.getPath();
             }
             message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-            message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+            if (s instanceof Crypto) {
+                message.put("RefId-" + propsKey, (Crypto)s);
+            } else {
+                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+            }
             if (e == null) {
                 e = s;
             }
@@ -237,7 +249,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 propsKey = propsURL.getPath();
             }
             message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-            message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+            if (e instanceof Crypto) {
+                message.put("RefId-" + propsKey, (Crypto)e);
+            } else {
+                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+            }
         }
      
         return action;
@@ -253,8 +269,15 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        if (s == null) {
+            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+        }
+        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        if (e == null) {
+            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+        }
+        
         if (s != null) {
             URL propsURL = getPropertiesFileURL(s, message);
             String propsKey = s.toString();
@@ -262,7 +285,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 propsKey = propsURL.getPath();
             }
             message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-            message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+            if (s instanceof Crypto) {
+                message.put("RefId-" + propsKey, (Crypto)s);
+            } else {
+                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+            }
             if (e == null) {
                 e = s;
             }
@@ -274,7 +301,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 propsKey = propsURL.getPath();
             }
             message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-            message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+            if (e instanceof Crypto) {
+                message.put("RefId-" + propsKey, (Crypto)e);
+            } else {
+                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+            }
         }
 
         return action;
@@ -290,8 +321,15 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
-        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
-        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+        Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        if (s == null) {
+            s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
+        }
+        Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        if (e == null) {
+            e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
+        }
+        
         if (e != null && s == null) {
             s = e;
         } else if (s != null && e == null) {
@@ -306,7 +344,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     propsKey = propsURL.getPath();
                 }
                 message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+                if (e instanceof Crypto) {
+                    message.put("RefId-" + propsKey, (Crypto)e);
+                } else {
+                    message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+                }
             }
             if (s != null) {
                 URL propsURL = getPropertiesFileURL(s, message);
@@ -315,7 +357,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     propsKey = propsURL.getPath();
                 }
                 message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+                if (s instanceof Crypto) {
+                    message.put("RefId-" + propsKey, (Crypto)s);
+                } else {
+                    message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+                }
             }
         } else {
             if (s != null) {
@@ -325,7 +371,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     propsKey = propsURL.getPath();
                 }
                 message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+                if (s instanceof Crypto) {
+                    message.put("RefId-" + propsKey, (Crypto)s);
+                } else {
+                    message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
+                }
             }
             if (e != null) {
                 URL propsURL = getPropertiesFileURL(e, message);
@@ -334,7 +384,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     propsKey = propsURL.getPath();
                 }
                 message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+                if (e instanceof Crypto) {
+                    message.put("RefId-" + propsKey, (Crypto)e);
+                } else {
+                    message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
+                }
             }
         }
         
