@@ -21,8 +21,8 @@ package org.apache.cxf.systest.ws.addr_fromjava;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.SOAPFaultException;
