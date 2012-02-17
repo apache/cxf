@@ -72,10 +72,10 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
             greeterBus.getOutFaultInterceptors().add(logOut);
 
             if (cfgResource.indexOf("provider") == -1) {
-                Endpoint.publish(address, implementor);
+                endpoint = Endpoint.publish(address, implementor);
                 LOG.info("Published greeter endpoint.");
             } else {
-                Endpoint.publish(address, new GreeterProvider());
+                endpoint = Endpoint.publish(address, new GreeterProvider());
                 LOG.info("Published greeter provider.");
             }
         } finally {
