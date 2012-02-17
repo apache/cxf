@@ -54,6 +54,8 @@ public abstract class AbstractDataBinding implements DataBinding {
     {
         BUILTIN_SCHEMA_LOCS.put("http://www.w3.org/2005/08/addressing",
                                 "http://www.w3.org/2006/03/addressing/ws-addr.xsd");
+        BUILTIN_SCHEMA_LOCS.put("http://ws-i.org/profiles/basic/1.1/xsd",
+                                "http://ws-i.org/profiles/basic/1.1/swaref.xsd");
     }
     protected boolean mtomEnabled;
     protected int mtomThreshold;
