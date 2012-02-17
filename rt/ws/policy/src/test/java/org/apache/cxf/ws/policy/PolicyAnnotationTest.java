@@ -40,8 +40,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-import org.apache.cxf.ws.policy.EndpointPolicy;
-import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 
