@@ -50,6 +50,7 @@ import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMConstants;
+import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 
 import org.junit.After;
@@ -159,6 +160,29 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         assertEquals("THREE", greeter.greetMe("three"));
 
         verifyTwowayNonAnonymous(Names.WSA_NAMESPACE_NAME, RM11Constants.INSTANCE);
+    }
+    
+    @Test
+    public void testInvalidRM11WSA200408() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
+        
+        // WS-RM 1.1, but using the WS-A 1.0 namespace
+        Client client = ClientProxy.getClient(greeter);
+        client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM11Constants.NAMESPACE_URI);
+        client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names200408.WSA_NAMESPACE_NAME);
+
+        try {
+            greeter.greetMe("one");
+            fail("invalid namespace combination");
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof RMException);
+            // verify a partial error text match to exclude an unexpected exception
+            // (see UNSUPPORTED_NAMESPACE in Messages.properties)
+            final String text = Names200408.WSA_NAMESPACE_NAME + " is not supported";
+            assertTrue(e.getCause().getMessage() != null 
+                       && e.getCause().getMessage().indexOf(text) > 0);
+        }
+        
     }
     
     @Test

@@ -283,11 +283,11 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                                 wsauri = maps.getNamespaceURI();
                             }
                             ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, wsauri);
-                            codec = protocol.getCodec();
-                            if (codec == null) {
+                            if (protocol == null) {
                                 LOG.log(Level.WARNING, "NAMESPACE_ERROR_MSG", wsauri); 
                                 break;
                             }
+                            codec = protocol.getCodec();
                         }
                         String localName = elem.getLocalName();
                         LOG.log(Level.FINE, "decoding RM header {0}", localName);
