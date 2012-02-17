@@ -50,7 +50,6 @@ import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
-import org.apache.cxf.interceptor.WrappedInInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -437,11 +436,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         boolean wrappedIn = false;
         while (it.hasNext() && !wrappedIn && !bareIn) {
             PhaseInterceptor<? extends Message> pi = (PhaseInterceptor<? extends Message>)it.next();
-            if (WrappedInInterceptor.class.getName().equals(pi.getId())) {
-                wrappedIn = true;
-                it.remove();
-                LOG.fine("Removed WrappedInInterceptor from chain.");
-            } else if (BareInInterceptor.class.getName().equals(pi.getId())) {
+            if (BareInInterceptor.class.getName().equals(pi.getId())) {
                 bareIn = true;
             }
       
