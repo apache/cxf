@@ -124,11 +124,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             if (ei == null && !serviceFactory.isPopulateFromClass()) {
                 ei = ServiceModelUtil.findBestEndpointInfo(serviceFactory.getInterfaceName(), service
                                                            .getServiceInfos());
-                if (ei != null
-                    && transportId != null
-                    && !ei.getTransportId().equals(transportId)) {
-                    ei = null;
-                }
+
                 if (ei != null) {
                     BindingFactoryManager bfm = getBus().getExtension(BindingFactoryManager.class);
                     bindingFactory = bfm.getBindingFactory(ei.getBinding().getBindingId());
@@ -137,14 +133,20 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                 if (ei == null) {
                     LOG.warning("Could not find endpoint/port for " 
                                 + endpointName + " in wsdl. Creating default.");
-                } else {
+                } else if (!ei.getName().equals(endpointName)) {
                     LOG.warning("Could not find endpoint/port for " 
                                 + endpointName + " in wsdl. Using " 
                                 + ei.getName() + ".");                        
                 }
             }
             if (ei == null) {
-                ei = createEndpointInfo();
+                ei = createEndpointInfo(null);
+            } else if (transportId != null
+                    && !ei.getTransportId().equals(transportId)) {
+                LOG.warning("Transport for endpoint/port " 
+                    + endpointName + " in wsdl doesn't match " + transportId + ".");
+                BindingInfo bi = ei.getBinding();
+                ei = createEndpointInfo(bi);
             } else if (getAddress() != null) {
                 ei.setAddress(getAddress());
                 if (ei.getAddress().startsWith("camel")
@@ -242,26 +244,26 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
     protected abstract String detectTransportIdFromAddress(String ad);
     protected abstract WSDLEndpointFactory getWSDLEndpointFactory();
     
-    protected EndpointInfo createEndpointInfo() throws BusException {
-        // Get the Service from the ServiceFactory if specified
-        Service service = serviceFactory.getService();
+    protected EndpointInfo createEndpointInfo(BindingInfo bindingInfo) throws BusException {
         // setup the transport ID for the soap over jms if there is only address information
         if (transportId == null && getAddress() != null 
             && getAddress().startsWith("jms:") && !"jms://".equals(getAddress())) {
             // Set the transportId to be soap over jms transport
             transportId = SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID;
         }
-        
-        // SOAP nonsense
-        BindingInfo bindingInfo = createBindingInfo();
-        if (bindingInfo instanceof SoapBindingInfo
-            && (((SoapBindingInfo) bindingInfo).getTransportURI() == null
-            || LocalTransportFactory.TRANSPORT_ID.equals(transportId))) {
-            ((SoapBindingInfo) bindingInfo).setTransportURI(transportId);
-            transportId = "http://schemas.xmlsoap.org/wsdl/soap/";
+        // Get the Service from the ServiceFactory if specified
+        Service service = serviceFactory.getService();
+        if (bindingInfo == null) {
+            // SOAP nonsense
+            bindingInfo = createBindingInfo();
+            if (bindingInfo instanceof SoapBindingInfo
+                && (((SoapBindingInfo) bindingInfo).getTransportURI() == null
+                || LocalTransportFactory.TRANSPORT_ID.equals(transportId))) {
+                ((SoapBindingInfo) bindingInfo).setTransportURI(transportId);
+                transportId = "http://schemas.xmlsoap.org/wsdl/soap/";
+            }
+            service.getServiceInfos().get(0).addBinding(bindingInfo);
         }
-        
-        
         if (transportId == null) {
             if (bindingInfo instanceof SoapBindingInfo) {
                 transportId = ((SoapBindingInfo)bindingInfo).getTransportURI();
@@ -275,8 +277,6 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                 transportId = "http://schemas.xmlsoap.org/wsdl/http/";
             }
         }
-        
-        service.getServiceInfos().get(0).addBinding(bindingInfo);
 
         setTransportId(transportId);
         

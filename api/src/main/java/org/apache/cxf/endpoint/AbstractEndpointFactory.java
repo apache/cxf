@@ -39,7 +39,6 @@ import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.AnnotationInterceptors;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
@@ -65,8 +64,6 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     protected ConduitSelector conduitSelector;
 
     protected abstract Endpoint createEndpoint() throws BusException, EndpointException;
-
-    protected abstract EndpointInfo createEndpointInfo() throws BusException;
 
     protected abstract BindingInfo createBindingInfo();
 
