@@ -343,6 +343,8 @@ public class DoMerges {
             p = Runtime.getRuntime().exec(new String[] {"git", "commit", "-a", "-F", file.toString()});
         } else {
             p = Runtime.getRuntime().exec(new String[] {"svn", "commit", "-F", file.toString()});
+            runProcess(p);
+            p = Runtime.getRuntime().exec(new String[] {"svn", "up"});
         }
         runProcess(p);
         return true;
@@ -524,6 +526,8 @@ public class DoMerges {
                                                                        logF.toString(),
                                                                        checkout.toString()}));
             runProcess(p);
+            p = Runtime.getRuntime().exec(new String[] {"svn", "up"});
+            runProcess(p);
         }
         blocks.clear();
         records.clear();
@@ -536,7 +540,7 @@ public class DoMerges {
             p = Runtime.getRuntime().exec(new String[] {"git", "svn", "rebase"});
             runProcess(p);
         } else {
-            Process p = Runtime.getRuntime().exec(new String[] {"svn", "up", "-r", "head", "."});
+            Process p = Runtime.getRuntime().exec(new String[] {"svn", "up", "-r", "head"});
             runProcess(p);
         }
     }
