@@ -48,14 +48,17 @@ import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  */
 public class HTTPConduitURLEasyMockTest extends Assert {
-    
+    private static String oldHttpProxyHost;
+
     private enum ResponseStyle { NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED };
     private enum ResponseDelimiter { LENGTH, CHUNKED, EOF };
 
@@ -71,6 +74,22 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     private OutputStream os;
     private InputStream is;
     
+    @BeforeClass
+    public static void disableHttpProxy() throws Exception {
+        oldHttpProxyHost = System.getProperty("http.proxyHost");
+        if (oldHttpProxyHost != null) {
+            // disable http proxy so that the connection mocking works (see setUpConduit)
+            System.clearProperty("http.proxyHost");
+        }
+    }
+    
+    @AfterClass
+    public static void revertHttpProxy() throws Exception {
+        if (oldHttpProxyHost != null) {
+            System.setProperty("http.proxyHost", oldHttpProxyHost);
+        }
+    }
+
     /**
      * This is an extension to the HTTPConduit that replaces
      * the dynamic assignment of the HttpURLConnectionFactory,
