@@ -856,7 +856,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             QName name = getFaultName(o.getInterface(), o, exClass, beanClass);
 
             for (FaultInfo fi : o.getFaults()) {
-                for (MessagePartInfo mpi : fi.getMessageParts()) {
+                List<MessagePartInfo> mpis = fi.getMessageParts();
+                if (mpis.size() != 1) {
+                    Message message = new Message("NO_FAULT_PART", LOG, fi.getFaultName()); 
+                    LOG.log(Level.WARNING, message.toString());
+                }
+                for (MessagePartInfo mpi : mpis) {
                     String ns = null;
                     if (mpi.isElement()) {
                         ns = mpi.getElementQName().getNamespaceURI();
