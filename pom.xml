@@ -503,6 +503,7 @@
                         <javadocVersion>1.5</javadocVersion>
                         <encoding>UTF-8</encoding>
                         <detectOfflineLinks>false</detectOfflineLinks>
+                        <notimestamp>true</notimestamp>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>

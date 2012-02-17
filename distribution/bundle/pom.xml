@@ -179,6 +179,7 @@ cxf.schema.version = ${os}
                             <header>Apache CXF API</header>
                             <footer>Apache CXF API</footer>
                             <sourcepath>${project.build.directory}/sources</sourcepath>
+                            <notimestamp>true</notimestamp>
                         </configuration>
                     </plugin>
                 </plugins>
