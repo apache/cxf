@@ -100,6 +100,7 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
             }
         }
         if (null == policyElem) {
+            System.out.println(elem.getLocalName());
             throw new PolicyException(new Message("UNEXPECTED_CHILD_ELEMENT_EXC", BUNDLE, 
                                                   PolicyConstants.POLICY_ELEM_NAME));
         }

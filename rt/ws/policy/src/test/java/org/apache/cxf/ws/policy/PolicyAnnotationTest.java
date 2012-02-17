@@ -91,7 +91,7 @@ public class PolicyAnnotationTest extends Assert {
                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             ns.put("wsp", PolicyConstants.NAMESPACE_XMLSOAP_200409);
             XPathUtils xpu = new XPathUtils(ns);
-            //org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
+            org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestImplServiceServicePolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/wsdl:port", "TestImplPortPortPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/", "TestInterfacePortTypePolicy");
