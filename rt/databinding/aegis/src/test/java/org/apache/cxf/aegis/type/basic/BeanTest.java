@@ -643,9 +643,8 @@ public class BeanTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:foo", "ExtendingInterface"));
 
         Set<AegisType> dependencies = type.getDependencies();
-        assertEquals(2, dependencies.size());
-        dependencies.remove(stringType);
-        assertEquals(SimpleInterface.class, dependencies.iterator().next().getTypeClass());
+        assertEquals(1, dependencies.size());
+        assertEquals(String.class, dependencies.iterator().next().getTypeClass());
     }
 
     @Test
