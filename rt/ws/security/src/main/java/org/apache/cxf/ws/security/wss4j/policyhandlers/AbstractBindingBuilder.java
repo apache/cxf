@@ -25,6 +25,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -472,23 +473,9 @@ public abstract class AbstractBindingBuilder {
         }
         for (Token token : suppTokens.getTokens()) {
             if (token instanceof UsernameToken) {
-                WSSecUsernameToken utBuilder = addUsernameToken((UsernameToken)token);
-                if (utBuilder != null) {
-                    utBuilder.prepare(saaj.getSOAPPart());
-                    addSupportingElement(utBuilder.getUsernameTokenElement());
-                    ret.put(token, utBuilder);
-                    //WebLogic and WCF always encrypt these
-                    //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
-                    //encryptedTokensIdList.add(utBuilder.getId());
-                    if (suppTokens.isEncryptedToken()
-                        || MessageUtils.getContextualBoolean(message, 
-                                                             SecurityConstants.ALWAYS_ENCRYPT_UT,
-                                                             true)) {
-                        WSEncryptionPart part = new WSEncryptionPart(utBuilder.getId(), "Element");
-                        part.setElement(utBuilder.getUsernameTokenElement());
-                        encryptedTokensList.add(part);
-                    }
-                }
+                handleUsernameTokenSupportingToken(
+                    (UsernameToken)token, endorse, suppTokens.isEncryptedToken(), ret
+                );
             } else if (isRequestor() 
                 && (token instanceof IssuedToken
                     || token instanceof SecureConversationToken
@@ -592,6 +579,42 @@ public abstract class AbstractBindingBuilder {
             }
         }
         return ret;
+    }
+    
+    protected void handleUsernameTokenSupportingToken(
+        UsernameToken token, boolean endorse, boolean encryptedToken, Map<Token, Object> ret
+    ) throws WSSecurityException {
+        if (endorse) {
+            WSSecUsernameToken utBuilder = addDKUsernameToken(token, true);
+            if (utBuilder != null) {
+                utBuilder.prepare(saaj.getSOAPPart());
+                addSupportingElement(utBuilder.getUsernameTokenElement());
+                ret.put(token, utBuilder);
+                if (encryptedToken) {
+                    WSEncryptionPart part = new WSEncryptionPart(utBuilder.getId(), "Element");
+                    part.setElement(utBuilder.getUsernameTokenElement());
+                    encryptedTokensList.add(part);
+                }
+            }
+        } else {
+            WSSecUsernameToken utBuilder = addUsernameToken(token);
+            if (utBuilder != null) {
+                utBuilder.prepare(saaj.getSOAPPart());
+                addSupportingElement(utBuilder.getUsernameTokenElement());
+                ret.put(token, utBuilder);
+                //WebLogic and WCF always encrypt these
+                //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
+                //encryptedTokensIdList.add(utBuilder.getId());
+                if (encryptedToken
+                    || MessageUtils.getContextualBoolean(message, 
+                                                         SecurityConstants.ALWAYS_ENCRYPT_UT,
+                                                         true)) {
+                    WSEncryptionPart part = new WSEncryptionPart(utBuilder.getId(), "Element");
+                    part.setElement(utBuilder.getUsernameTokenElement());
+                    encryptedTokensList.add(part);
+                }
+            }
+        }
     }
     
     protected Element cloneElement(Element el) {
@@ -1767,6 +1790,34 @@ public abstract class AbstractBindingBuilder {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+            } else if (tempTok instanceof WSSecUsernameToken) {
+                WSSecUsernameToken utBuilder = (WSSecUsernameToken)tempTok;
+                String id = utBuilder.getId();
+
+                Date created = new Date();
+                Date expires = new Date();
+                expires.setTime(created.getTime() + 300000);
+                SecurityToken secToken = 
+                    new SecurityToken(id, utBuilder.getUsernameTokenElement(), created, expires);
+                
+                if (isTokenProtection) {
+                    sigParts.add(new WSEncryptionPart(secToken.getId()));
+                }
+                
+                try {
+                    byte[] secret = utBuilder.getDerivedKey();
+                    secToken.setSecret(secret);
+                    
+                    if (ent.getKey().isDerivedKeys()) {
+                        doSymmSignatureDerived(ent.getKey(), secToken, sigParts, isTokenProtection);
+                    } else {
+                        doSymmSignature(ent.getKey(), secToken, sigParts, isTokenProtection);
+                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
             }
         } 
     }
@@ -1823,7 +1874,9 @@ public abstract class AbstractBindingBuilder {
             //Set the value type of the reference
             dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                 + WSConstants.ENC_KEY_VALUE_TYPE);
-        }
+        } else if (policyToken instanceof UsernameToken) {
+            dkSign.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+        } 
         
         dkSign.prepare(doc, secHeader);
         
@@ -1881,6 +1934,8 @@ public abstract class AbstractBindingBuilder {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
             } else if (tokenType != null) {
                 sig.setCustomTokenValueType(tokenType);
+            } else if (policyToken instanceof UsernameToken) {
+                sig.setCustomTokenValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
             } else {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
             }

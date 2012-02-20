@@ -38,6 +38,7 @@ import org.junit.BeforeClass;
  */
 public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ServerDerived.class);
+    static final String PORT2 = allocatePort(ServerDerived.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -103,10 +104,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     /**
      * Here the key derived from a UsernameToken is used as a protection token for the 
      * symmetric binding, and used to encrypt the SOAP Body.
-     * TODO - Re-enable when WSS4J 1.6.5 is picked up
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSymmetricProtectionEncryptionToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -119,6 +118,102 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricProtectionEncPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        utPort.doubleIt(25);
+    }
+    
+    /**
+     * Here the key derived from a UsernameToken is used to sign the Timestamp over the Transport
+     * binding.
+     */
+    @org.junit.Test
+    public void testTransportEndorsing() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT2);
+        
+        utPort.doubleIt(25);
+    }
+    
+    /**
+     * Here the key derived from a UsernameToken is used to sign the message signature over the
+     * Symmetric binding. The UsernameToken is signed.
+     */
+    @org.junit.Test
+    public void testSymmetricSignedEndorsing() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignedEndorsingPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        utPort.doubleIt(25);
+    }
+    
+    /**
+     * Here the key derived from a UsernameToken is used to sign the message signature over the
+     * Symmetric binding. The UsernameToken is encrypted.
+     */
+    @org.junit.Test
+    public void testSymmetricEndorsingEncrypted() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingEncryptedPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        utPort.doubleIt(25);
+    }
+    
+    /**
+     * Here the key derived from a UsernameToken is used to sign the message signature over the
+     * Symmetric binding. The UsernameToken is encrypted and signed.
+     */
+    @org.junit.Test
+    public void testSymmetricSignedEndorsingEncrypted() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignedEndorsingEncryptedPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
