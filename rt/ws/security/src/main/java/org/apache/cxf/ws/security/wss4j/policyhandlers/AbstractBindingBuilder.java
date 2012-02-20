@@ -1375,6 +1375,9 @@ public abstract class AbstractBindingBuilder {
         Crypto crypto = getCrypto(wrapper, SecurityConstants.ENCRYPT_CRYPTO,
                                   SecurityConstants.ENCRYPT_PROPERTIES);
         Wss10 wss10 = getWss10();
+        if (wss10 == null) {
+            return crypto;
+        }
         boolean enableRevocation = wss10.isEnableRevocation();
         if (enableRevocation && crypto != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
