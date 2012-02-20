@@ -75,7 +75,7 @@
      
     </jaxws:endpoint> 
     
-     <jaxws:endpoint 
+    <jaxws:endpoint 
        id="SymmetricEncryption"
        address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricProtectionEnc" 
        serviceName="s:DoubleItService"
@@ -89,6 +89,101 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
        </jaxws:properties> 
      
-    </jaxws:endpoint> 
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="TransportEndorsing"
+       address="https://localhost:${testutil.ports.ServerDerived.2}/DoubleItUTDerivedTransportEndorsing" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportEndorsingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       depends-on="tls-settings"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="SymmetricSignedEndorsing"
+       address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricSignedEndorsing" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricSignedEndorsingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="SymmetricEndorsingEncrypted"
+       address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricEndorsingEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricEndorsingEncryptedPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="SymmetricSignedEndorsingEncrypted"
+       address="http://localhost:${testutil.ports.ServerDerived}/DoubleItUTDerivedSymmetricSignedEndorsingEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSymmetricSignedEndorsingEncryptedPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtDerived.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint>
+    
+    
+    <!-- -->
+    <!-- Any services listening on port X must use the following -->
+    <!-- Transport Layer Security (TLS) settings -->
+    <!-- -->
+    <httpj:engine-factory id="tls-settings">
+        <httpj:engine port="${testutil.ports.ServerDerived.2}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
     
 </beans>

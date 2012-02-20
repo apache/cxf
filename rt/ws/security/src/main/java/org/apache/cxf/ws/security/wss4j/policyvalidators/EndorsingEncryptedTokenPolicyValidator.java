@@ -33,6 +33,7 @@ import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.ws.security.WSSecurityEngineResult;
 
@@ -86,6 +87,10 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
                     }
                 } else if (token instanceof X509Token) {
                     if (!processX509Tokens()) {
+                        processingFailed = true;
+                    }
+                } else if (token instanceof UsernameToken) {
+                    if (!processUsernameTokens()) {
                         processingFailed = true;
                     }
                 } else if (token instanceof SecurityContextToken) {
