@@ -108,6 +108,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -1371,9 +1372,31 @@ public abstract class AbstractBindingBuilder {
 
 
     public Crypto getEncryptionCrypto(TokenWrapper wrapper) throws WSSecurityException {
-        return getCrypto(wrapper, 
-                         SecurityConstants.ENCRYPT_CRYPTO,
-                         SecurityConstants.ENCRYPT_PROPERTIES);
+        Crypto crypto = getCrypto(wrapper, SecurityConstants.ENCRYPT_CRYPTO,
+                                  SecurityConstants.ENCRYPT_PROPERTIES);
+        Wss10 wss10 = getWss10();
+        if (wss10 == null) {
+            return crypto;
+        }
+        boolean enableRevocation = wss10.isEnableRevocation();
+        if (enableRevocation && crypto != null) {
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            String encrUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+            if (crypto != null && encrUser == null) {
+                try {
+                    encrUser = crypto.getDefaultX509Identifier();
+                } catch (WSSecurityException e1) {
+                    throw new Fault(e1);
+                }
+            }
+            cryptoType.setAlias(encrUser);
+            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+            if (certs != null && certs.length > 0) {
+                crypto.verifyTrust(certs, enableRevocation);
+            }
+        }
+        return crypto;
+
     }
     
     public Crypto getCrypto(

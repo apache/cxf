@@ -386,6 +386,8 @@ public abstract class SPConstants {
     
     public static final String MUST_SUPPORT_ISSUED_TOKENS = "MustSupportIssuedTokens";
     
+    public static final String ENABLE_REVOCATION = "EnableRevocation";
+    
     public static final String REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION 
         = "RequireRequestSecurityTokenCollection";
     
