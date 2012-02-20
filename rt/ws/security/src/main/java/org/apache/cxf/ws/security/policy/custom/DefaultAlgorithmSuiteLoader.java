@@ -28,13 +28,23 @@ import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
  * This class retrieves the default AlgorithmSuites.
  */
 public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
+    
+    private static final String CXF_CUSTOM_POLICY_NS = 
+         "http://cxf.apache.org/custom/security-policy";
 
     public AlgorithmSuite getAlgorithmSuite(Element policyElement, SPConstants consts) {
         if (policyElement != null) {
-            AlgorithmSuite algorithmSuite = new AlgorithmSuite(consts);
-            String algorithmSuiteName = DOMUtils.getFirstElement(policyElement).getLocalName();
-            algorithmSuite.setAlgorithmSuite(algorithmSuiteName);
-            return algorithmSuite;
+            Element algorithm = DOMUtils.getFirstElement(policyElement);
+            if (algorithm != null) {
+                AlgorithmSuite algorithmSuite = null;
+                if (CXF_CUSTOM_POLICY_NS.equals(algorithm.getNamespaceURI())) {
+                    algorithmSuite = new GCMAlgorithmSuite(consts);
+                } else {
+                    algorithmSuite = new AlgorithmSuite(consts);
+                }
+                algorithmSuite.setAlgorithmSuite(algorithm.getLocalName());
+                return algorithmSuite;
+            }
         }
         return null;
     }
