@@ -61,7 +61,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.WSSecBase;
@@ -932,15 +931,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     expires.setTime(created.getTime() + 300000);
                     SecurityToken tempTok = new SecurityToken(utID, created, expires);
                     
-                    org.apache.ws.security.message.token.UsernameToken usernameToken = 
-                        (org.apache.ws.security.message.token.UsernameToken)wser.get(
-                            WSSecurityEngineResult.TAG_USERNAME_TOKEN
-                        );
-                    
-                    RequestData data = new RequestData();
-                    data.setCallbackHandler(getCallbackHandler());
-                    usernameToken.setRawPassword(data);
-                    tempTok.setSecret(usernameToken.getDerivedKey());
+                    byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                    tempTok.setSecret(secret);
                     tokenStore.add(tempTok);
 
                     return utID;

@@ -50,7 +50,7 @@
         </wsdl:operation>
     </wsdl:binding>
     
-     <wsdl:binding name="DoubleItSymmetricProtectionSigDKBinding" type="tns:DoubleItPortType">
+    <wsdl:binding name="DoubleItSymmetricProtectionSigDKBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItSymmetricProtectionDKPolicy" />
         <soap:binding style="document"
             transport="http://schemas.xmlsoap.org/soap/http" />
@@ -90,6 +90,86 @@
         </wsdl:operation>
     </wsdl:binding>
     
+    <wsdl:binding name="DoubleItTransportEndorsingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItTransportEndorsingPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="DoubleItSymmetricSignedEndorsingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricSignedEndorsingPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="DoubleItSymmetricEndorsingEncryptedBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricEndorsingEncryptedPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:binding name="DoubleItSymmetricSignedEndorsingEncryptedBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricSignedEndorsingEncryptedPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Signature_Encryption_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSymmetricProtectionSigPort" 
                    binding="tns:DoubleItSymmetricProtectionSigBinding">
@@ -102,6 +182,22 @@
         <wsdl:port name="DoubleItSymmetricProtectionEncPort" 
                    binding="tns:DoubleItSymmetricProtectionEncBinding">
             <soap:address location="http://localhost:9009/DoubleItUTDerivedSymmetricProtectionEnc" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItTransportEndorsingPort" 
+                   binding="tns:DoubleItTransportEndorsingBinding">
+            <soap:address location="https://localhost:9010/DoubleItUTDerivedTransportEndorsing" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricSignedEndorsingPort" 
+                   binding="tns:DoubleItSymmetricSignedEndorsingBinding">
+            <soap:address location="http://localhost:9009/DoubleItUTDerivedSymmetricSignedEndorsing" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricEndorsingEncryptedPort" 
+                   binding="tns:DoubleItSymmetricEndorsingEncryptedBinding">
+            <soap:address location="http://localhost:9009/DoubleItUTDerivedSymmetricEndorsingEncrypted" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricSignedEndorsingEncryptedPort" 
+                   binding="tns:DoubleItSymmetricSignedEndorsingEncryptedBinding">
+            <soap:address location="http://localhost:9009/DoubleItUTDerivedSymmetricSignedEndorsingEncrypted" />
         </wsdl:port>
     </wsdl:service>
 
@@ -204,6 +300,178 @@
         </wsp:ExactlyOne>
     </wsp:Policy>
     
+    <wsp:Policy wsu:Id="DoubleItTransportEndorsingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding>
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:EndorsingSupportingTokens>
+                   <wsp:Policy>
+                        <sp:UsernameToken
+                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                             <wsp:Policy>
+                                <sp:WssUsernameToken10/>
+                                <!-- <sp:RequireDerivedKeys/> -->
+                             </wsp:Policy>
+                        </sp:UsernameToken>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItSymmetricSignedEndorsingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                  <wsp:Policy>
+                    <sp:ProtectionToken>
+                       <wsp:Policy>
+                          <sp:X509Token
+                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                             <wsp:Policy>
+                                <sp:WssX509V3Token10 />
+                             </wsp:Policy>
+                          </sp:X509Token>
+                       </wsp:Policy>
+                    </sp:ProtectionToken>
+                    <sp:Layout>
+                       <wsp:Policy>
+                          <sp:Lax/>
+                       </wsp:Policy>
+                    </sp:Layout>
+                    <sp:IncludeTimestamp/>
+                    <sp:OnlySignEntireHeadersAndBody/>
+                    <sp:AlgorithmSuite>
+                       <wsp:Policy>
+                          <sp:Basic128/>
+                       </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                 </wsp:Policy>
+              </sp:SymmetricBinding>
+              <sp:SignedEndorsingSupportingTokens>
+                  <wsp:Policy>
+                       <sp:UsernameToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                               <sp:WssUsernameToken10/>
+                               <!-- <sp:RequireDerivedKeys/> -->
+                            </wsp:Policy>
+                       </sp:UsernameToken>
+                   </wsp:Policy>
+              </sp:SignedEndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItSymmetricEndorsingEncryptedPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                  <wsp:Policy>
+                    <sp:ProtectionToken>
+                       <wsp:Policy>
+                          <sp:X509Token
+                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                             <wsp:Policy>
+                                <sp:WssX509V3Token10 />
+                             </wsp:Policy>
+                          </sp:X509Token>
+                       </wsp:Policy>
+                    </sp:ProtectionToken>
+                    <sp:Layout>
+                       <wsp:Policy>
+                          <sp:Lax/>
+                       </wsp:Policy>
+                    </sp:Layout>
+                    <sp:IncludeTimestamp/>
+                    <sp:OnlySignEntireHeadersAndBody/>
+                    <sp:AlgorithmSuite>
+                       <wsp:Policy>
+                          <sp:Basic128/>
+                       </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                 </wsp:Policy>
+              </sp:SymmetricBinding>
+              <sp:EndorsingEncryptedSupportingTokens>
+                  <wsp:Policy>
+                       <sp:UsernameToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                               <sp:WssUsernameToken10/>
+                               <!-- <sp:RequireDerivedKeys/> -->
+                            </wsp:Policy>
+                       </sp:UsernameToken>
+                   </wsp:Policy>
+              </sp:EndorsingEncryptedSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItSymmetricSignedEndorsingEncryptedPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                  <wsp:Policy>
+                    <sp:ProtectionToken>
+                       <wsp:Policy>
+                          <sp:X509Token
+                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                             <wsp:Policy>
+                                <sp:WssX509V3Token10 />
+                             </wsp:Policy>
+                          </sp:X509Token>
+                       </wsp:Policy>
+                    </sp:ProtectionToken>
+                    <sp:Layout>
+                       <wsp:Policy>
+                          <sp:Lax/>
+                       </wsp:Policy>
+                    </sp:Layout>
+                    <sp:IncludeTimestamp/>
+                    <sp:OnlySignEntireHeadersAndBody/>
+                    <sp:AlgorithmSuite>
+                       <wsp:Policy>
+                          <sp:Basic128/>
+                       </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                 </wsp:Policy>
+              </sp:SymmetricBinding>
+              <sp:SignedEndorsingEncryptedSupportingTokens>
+                  <wsp:Policy>
+                       <sp:UsernameToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                               <sp:WssUsernameToken10/>
+                               <!-- <sp:RequireDerivedKeys/> -->
+                            </wsp:Policy>
+                       </sp:UsernameToken>
+                   </wsp:Policy>
+              </sp:SignedEndorsingEncryptedSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
     <wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Signature_Policy">
       <wsp:ExactlyOne>
          <wsp:All>
@@ -217,6 +485,19 @@
    <wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Encryption_Policy">
       <wsp:ExactlyOne>
          <wsp:All>
+            <sp:EncryptedParts>
+               <sp:Body/>
+            </sp:EncryptedParts>
+         </wsp:All>
+      </wsp:ExactlyOne>
+   </wsp:Policy>
+   
+   <wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Signature_Encryption_Policy">
+      <wsp:ExactlyOne>
+         <wsp:All>
+            <sp:SignedParts>
+               <sp:Body/>
+            </sp:SignedParts>
             <sp:EncryptedParts>
                <sp:Body/>
             </sp:EncryptedParts>

@@ -43,7 +43,7 @@
         </cxf:features>
     </cxf:bus>
     
-      <!-- -->
+    <!-- -->
     <!-- Any services listening on port 9009 must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
