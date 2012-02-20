@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.ws.gcm;
+package org.apache.cxf.ws.security.policy.custom;
 
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -56,6 +56,16 @@ public class GCMAlgorithmSuite extends AlgorithmSuite {
             this.encryptionDerivedKeyLength = 128;
             this.signatureDerivedKeyLength = 128;
             this.minimumSymmetricKeyLength = 128;
+        } else if ("Basic192GCM".equals(algoSuite)) {
+            this.digest = SPConstants.SHA1;
+            this.encryption = "http://www.w3.org/2009/xmlenc11#aes192-gcm";
+            this.symmetricKeyWrap = SPConstants.KW_AES192;
+            this.asymmetricKeyWrap = SPConstants.KW_RSA_OAEP;
+            this.encryptionKeyDerivation = SPConstants.P_SHA1_L192;
+            this.signatureKeyDerivation = SPConstants.P_SHA1_L192;
+            this.encryptionDerivedKeyLength = 192;
+            this.signatureDerivedKeyLength = 192;
+            this.minimumSymmetricKeyLength = 192;
         } else if ("Basic256GCM".equals(algoSuite)) {
             this.digest = SPConstants.SHA1;
             this.encryption = "http://www.w3.org/2009/xmlenc11#aes256-gcm";

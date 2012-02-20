@@ -58,7 +58,6 @@ public class GCMTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testAESGCM128() throws Exception {
         if (!unrestrictedPoliciesInstalled) {
             return;
@@ -81,7 +80,28 @@ public class GCMTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
+    public void testAESGCM192() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = GCMTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = GCMTest.class.getResource("DoubleItGCM.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItGCM192Port");
+        DoubleItPortType gcmPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(gcmPort, PORT);
+        gcmPort.doubleIt(25);
+    }
+    
+    @org.junit.Test
     public void testAESGCM256() throws Exception {
         if (!unrestrictedPoliciesInstalled) {
             return;
