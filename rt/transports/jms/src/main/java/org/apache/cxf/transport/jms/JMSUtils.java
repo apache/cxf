@@ -393,7 +393,8 @@ public final class JMSUtils {
         String enc = (String)message.get(org.apache.cxf.message.Message.ENCODING);
         // add the encoding information
         if (null != contentType) {
-            if (enc != null && contentType.indexOf("charset=") == -1) {
+            if (enc != null && contentType.indexOf("charset=") == -1
+                && !contentType.toLowerCase().contains("multipart/related")) {
                 contentType = contentType + "; charset=" + enc;
             }
         } else if (enc != null) {
@@ -428,7 +429,8 @@ public final class JMSUtils {
         String enc = (String)message.get(org.apache.cxf.message.Message.ENCODING);
         // add the encoding information
         if (null != contentType) {
-            if (enc != null && contentType.indexOf("charset=") == -1) {
+            if (enc != null && contentType.indexOf("charset=") == -1&& 
+                !contentType.toLowerCase().contains("multipart/related")) {
                 contentType = contentType + "; charset=" + enc;
             }
         } else if (enc != null) {
