@@ -65,6 +65,8 @@ public class WSS10Builder implements AssertionBuilder<Element> {
                     parent.setMustSupportRefExternalURI(true);
                 } else if (SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN.equals(name)) {
                     parent.setMustSupportRefEmbeddedToken(true);
+                } else if (SPConstants.ENABLE_REVOCATION.equals(name)) {
+                    parent.setEnableRevocation(true);
                 }
                 child = DOMUtils.getNextElement(child);
             }
