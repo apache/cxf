@@ -84,6 +84,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String POLICY_CXF3041_ADDRESS = "http://localhost:" + PORT + "/SecPolTestCXF3041";
     public static final String POLICY_CXF3042_ADDRESS = "http://localhost:" + PORT + "/SecPolTestCXF3042";
     public static final String POLICY_CXF3452_ADDRESS = "http://localhost:" + PORT + "/SecPolTestCXF3452";
+    public static final String POLICY_CXF4122_ADDRESS = "http://localhost:" + PORT + "/SecPolTestCXF4122";
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -528,5 +529,53 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Certificate revocation")
                        || errorMessage.contains("Error during certificate path validation"));
         }
+    }
+    
+    @Test
+    public void testCXF4122() throws Exception {
+        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
+        ep.setEndpointName(
+            new QName("http://www.example.org/contract/DoubleIt", "DoubleItPortCXF4122")
+        );
+        ep.setWsdlLocation(wsdl.getPath());
+        ep.setAddress(POLICY_CXF4122_ADDRESS);
+        ep.publish();
+        EndpointInfo ei = ep.getServer().getEndpoint().getEndpointInfo();
+        setCryptoProperties(ei, "bob.properties", "revocation.properties");
+        ei.setProperty(SecurityConstants.ENABLE_REVOCATION, Boolean.TRUE);
+
+        
+        
+        SpringBusFactory bf = new SpringBusFactory();
+
+        Bus bus = bf.createBus();
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+
+        DoubleItPortType pt;
+
+        QName
+        portQName = new QName(NAMESPACE, "DoubleItPortCXF4122");
+        pt = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(pt, PORT);
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
+                                                      new KeystorePasswordCallback());
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                                      getClass().getResource("revocation.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
+                                                      getClass().getResource("bob.properties"));
+        try {
+            pt.doubleIt(5);
+            fail("should fail on server side when do signature validation due the revoked certificates");
+        } catch (Exception ex) {
+            String errorMessage = ex.getMessage();
+            // Different errors using different JDKs...
+            assertTrue(errorMessage.contains("Certificate has been revoked")
+                       || errorMessage.contains("Certificate revocation")
+                       || errorMessage.contains("Error during certificate path validation"));
+        }
+
     }
 }
