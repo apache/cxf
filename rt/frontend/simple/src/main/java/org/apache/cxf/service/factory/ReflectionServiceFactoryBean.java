@@ -832,7 +832,19 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             initializeParameter(part, paramType, genericType);
             part.setIndex(i);
 
+            QName inName = part.getConcreteName();
             part = o.getOutput().getMessagePart(name);
+            
+            if (part == null) {
+                part = o.getOutput().getMessagePart(inName);
+            }
+            if (part == null && isHeader && o.isUnwrapped()) {
+                part = o.getUnwrappedOperation().getOutput().getMessagePart(name);
+                if (part == null) {
+                    part = o.getUnwrappedOperation().getOutput().getMessagePart(inName);
+                }
+            }
+
             if (part == null) {
                 return false;
             }
