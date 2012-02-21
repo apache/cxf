@@ -64,6 +64,7 @@ public final class EncryptionUtils {
         throws WSSecurityException {
         try {
             XMLCipher cipher = XMLCipher.getInstance(symEncAlgo);
+            cipher.setSecureValidation(true);
             cipher.init(mode, key);
             return cipher;
         } catch (XMLEncryptionException ex) {
